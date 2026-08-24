@@ -1,5 +1,13 @@
 # **Personal Finance Management**
 
+**Nhóm 3:**
+- Ứng Trọng Trình — B24DCCE271
+- Nguyễn Đinh Anh Quân — B24DCCE222
+- Lê Anh Minh — B24DCCE180
+- Nguyễn Đình Tiến — B24DCCE264
+
+---
+
 ## Mục lục
 1. [Giới thiệu](#1-giới-thiệu)
 2. [Mô tả tổng quan hệ thống](#2-mô-tả-tổng-quan-hệ-thống)

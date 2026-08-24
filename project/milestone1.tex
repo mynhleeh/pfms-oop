@@ -1,0 +1,1211 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- Packages ---
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.2cm, right=2.2cm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setsansfont{Arial}
+\setmonofont{Consolas}
+
+\usepackage[vietnamese]{babel}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, shadows}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[colorlinks=true, linkcolor=blue!80!black, urlcolor=blue!80!black, citecolor=blue!80!black]{hyperref}
+
+% --- Color Definitions ---
+\definecolor{primaryblue}{RGB}{30, 58, 138}
+\definecolor{accentblue}{RGB}{37, 99, 235}
+\definecolor{sectionblue}{RGB}{29, 78, 216}
+\definecolor{coregreen}{RGB}{22, 101, 52}
+\definecolor{coregreenbg}{RGB}{220, 252, 231}
+\definecolor{deferredamber}{RGB}{133, 77, 14}
+\definecolor{deferredamberbg}{RGB}{254, 249, 195}
+\definecolor{outgray}{RGB}{55, 65, 81}
+\definecolor{outgraybg}{RGB}{243, 244, 246}
+\definecolor{tableheaderbg}{RGB}{241, 245, 249}
+\definecolor{tablerowalt}{RGB}{248, 250, 252}
+
+% --- Custom Badges ---
+\newcommand{\badgecore}{\tcbox[on line, boxsep=1pt, left=4pt, right=4pt, top=1pt, bottom=1pt, colback=coregreenbg, colframe=coregreen!70, boxrule=0.5pt, arc=3pt]{\small\bfseries\color{coregreen}Core}}
+\newcommand{\badgedeferred}{\tcbox[on line, boxsep=1pt, left=4pt, right=4pt, top=1pt, bottom=1pt, colback=deferredamberbg, colframe=deferredamber!70, boxrule=0.5pt, arc=3pt]{\small\bfseries\color{deferredamber}Deferred}}
+\newcommand{\badgeout}{\tcbox[on line, boxsep=1pt, left=4pt, right=4pt, top=1pt, bottom=1pt, colback=outgraybg, colframe=outgray!70, boxrule=0.5pt, arc=3pt]{\small\bfseries\color{outgray}Out}}
+
+\newcommand{\badgemust}{\tcbox[on line, boxsep=1pt, left=3pt, right=3pt, top=1pt, bottom=1pt, colback=red!10, colframe=red!60!black, boxrule=0.5pt, arc=2pt]{\footnotesize\bfseries\color{red!70!black}Must}}
+\newcommand{\badgeshould}{\tcbox[on line, boxsep=1pt, left=3pt, right=3pt, top=1pt, bottom=1pt, colback=blue!10, colframe=blue!60!black, boxrule=0.5pt, arc=2pt]{\footnotesize\bfseries\color{blue!70!black}Should}}
+\newcommand{\badgecould}{\tcbox[on line, boxsep=1pt, left=3pt, right=3pt, top=1pt, bottom=1pt, colback=gray!15, colframe=gray!60!black, boxrule=0.5pt, arc=2pt]{\footnotesize\bfseries\color{gray!80!black}Could}}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+% --- Custom Boxes ---
+\newtcolorbox{notebox}[1][Ghi chú]{
+  colback=blue!5!white,
+  colframe=primaryblue!80!black,
+  fonttitle=\bfseries,
+  title=#1,
+  arc=4pt,
+  boxrule=0.8pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt
+}
+
+\newtcolorbox{warnbox}[1][Lưu ý quan trọng]{
+  colback=orange!5!white,
+  colframe=orange!80!black,
+  fonttitle=\bfseries,
+  title=#1,
+  arc=4pt,
+  boxrule=0.8pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt
+}
+
+% --- Header & Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\color{gray!80}\small Personal Finance Management — Milestone 1}
+\lhead{\color{gray!80}\small Đặc tả Yêu cầu Hệ thống}
+\rfoot{\color{gray!80}\small Trang \thepage}
+\lfoot{\color{gray!80}\small PFMS}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- Title Section Styling ---
+\titleformat{\section}{\Large\bfseries\color{primaryblue}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{sectionblue}}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\bfseries\color{blue!90!black}}{\thesubsubsection}{1em}{}
+
+% --- Column Types ---
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+
+% --- Cover / Header ---
+\begin{center}
+    {\Huge \bfseries \color{primaryblue} Personal Finance Management} \\[0.3cm]
+    {\LARGE \bfseries Đặc tả Yêu cầu Hệ thống (Milestone 1)} \\[0.4cm]
+    
+    \begin{tcolorbox}[
+      colback=tableheaderbg,
+      colframe=primaryblue!60,
+      arc=6pt, boxrule=0.8pt,
+      width=0.75\linewidth,
+      halign=center
+    ]
+      \centering
+      {\large\bfseries\color{primaryblue} NHÓM 3}\\[0.2cm]
+      \small
+      \begin{tabular}{l c l}
+        \textbf{Ứng Trọng Trình} & --- & B24DCCE271 \\
+        \textbf{Nguyễn Đinh Anh Quân} & --- & B24DCCE222 \\
+        \textbf{Lê Anh Minh} & --- & B24DCCE180 \\
+        \textbf{Nguyễn Đình Tiến} & --- & B24DCCE264 \\
+      \end{tabular}
+    \end{tcolorbox}
+    \vspace{0.2cm}
+    \rule{\linewidth}{1.5pt} \\[0.4cm]
+\end{center}
+
+\tableofcontents
+\vspace{0.8cm}
+\hrule
+\vspace{0.8cm}
+
+% ==========================================
+\section{Giới thiệu}
+% ==========================================
+
+\subsection{Mục đích}
+Tài liệu này đặc tả các yêu cầu chức năng và phi chức năng của hệ thống \textbf{Quản lý tài chính cá nhân (Personal Finance Management System - PFMS)} — một ứng dụng Desktop giúp người dùng quản lý ví tiền, giao dịch thu/chi, chuyển khoản, công nợ, sổ tiết kiệm, chứng chỉ quỹ đầu tư và các quỹ mục tiêu cá nhân. Hệ thống được chuyển hóa từ mô hình dữ liệu của file Excel \code{finance-mng.xlsm}.
+
+\subsection{Phạm vi hệ thống}
+Hệ thống phát triển theo 2 giai đoạn chính:
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} C{2.5cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Giai đoạn} & \textbf{Phạm vi} & \textbf{Nội dung} \\
+\midrule
+\textbf{\code{Core}} & Làm \& code trước & Ghi chép \& phân loại thu/chi; Thống kê số tiền trong ví; Lịch sử thu/chi; Chuyển tiền nội bộ. \\
+\textbf{\code{Deferred}} & Làm sau khi Core hoàn thiện & Công nợ $\cdot$ Sổ tiết kiệm $\cdot$ Chứng chỉ quỹ $\cdot$ Quỹ mục tiêu $\cdot$ Chốt tháng $\cdot$ Import/Export. \\
+\bottomrule
+\end{tabularx}
+\caption{Phạm vi phát triển hệ thống}
+\end{table}
+
+\subsection{Đối tượng sử dụng}
+Người dùng cá nhân (1 người dùng — Owner). \textbf{Không} có đăng nhập/phân quyền.
+
+\vspace{0.5cm}
+% ==========================================
+\section{Mô tả tổng quan hệ thống}
+% ==========================================
+
+\subsection{Bối cảnh hệ thống}
+Hệ thống quản lý dữ liệu tài chính của một cá nhân, hỗ trợ nhiều ví, nhiều loại tài sản và báo cáo tổng hợp. Dữ liệu lưu cục bộ, single-user.
+
+\subsection{Mục tiêu hệ thống (System Goals)}
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*]
+    \item \textbf{Quản lý dòng tiền:} Ghi chép, phân loại và theo dõi thu/chi theo danh mục 3 cấp (\code{type} $\rightarrow$ \code{group} $\rightarrow$ \code{category}).
+    \item \textbf{Nắm bắt tình hình tài sản:} Tính toán số dư từng ví và tổng tài sản theo thời gian thực.
+    \item \textbf{Hỗ trợ ra quyết định:} Cung cấp dashboard tổng quan với biểu đồ cơ cấu tài sản, thu/chi theo tháng và dòng tiền.
+    \item \textbf{Quản lý mục tiêu tài chính:} Theo dõi tiến độ các quỹ mục tiêu (khẩn cấp, sức khỏe, mục tiêu, hưu trí).
+    \item \textbf{Đảm bảo độ chính xác tài chính:} Mọi phép tính tiền dùng \code{BigDecimal}, không dùng số thực dấu chấm động.
+\end{enumerate}
+
+\subsection{Giả định (Assumptions)}
+\begin{itemize}[leftmargin=*]
+    \item Hệ thống là \textbf{single-user}: chỉ có một người dùng là Owner, \textbf{không} có đăng nhập/phân quyền.
+    \item Dữ liệu \textbf{lưu cục bộ} (database nhúng, ví dụ H2); \textbf{không} đồng bộ lên cloud/đa thiết bị.
+    \item Danh mục phân loại cố định \textbf{3 cấp}: \code{type} $\rightarrow$ \code{group} $\rightarrow$ \code{category}.
+    \item Mọi số tiền, lãi suất, số dư đều là \code{BigDecimal} (2 số thập phân).
+    \item Người dùng có thể import dữ liệu từ file Excel nguồn \code{finance-mng.xlsm} hoặc template CSV.
+    \item Lãi suất tính theo quy ước: tiết kiệm không kỳ hạn = lãi đơn \code{capital * rate / 365}; có kỳ hạn theo số ngày thực gửi; chứng chỉ quỹ dùng hàm \code{RATE()}.
+\end{itemize}
+
+\subsection{Ràng buộc (Constraints)}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Nền tảng:} Desktop \textbf{Java 17+} với \textbf{JavaFX} (FXML, SceneBuilder); đóng gói \code{.exe} bằng \code{jpackage}.
+    \item \textbf{Kiến trúc:} Phân tầng View (JavaFX/FXML) / Controller / Model / Service / Repository; tuân thủ OOP, SOLID.
+    \item \textbf{Không} có yêu cầu đăng nhập, cloud sync, bản Web hoặc bản Mobile.
+    \item \textbf{Dữ liệu lịch sử:} Hỗ trợ đối chiếu với kết quả của file Excel gốc.
+\end{itemize}
+
+\subsection{Actor}
+Hệ thống chỉ có \textbf{một actor duy nhất}:
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{C{3.5cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Actor} & \textbf{Mô tả} \\
+\midrule
+\textbf{Owner} (Người dùng) & Chủ sở hữu tài chính cá nhân, thực hiện mọi thao tác: nhập thu/chi, chuyển khoản, quản lý tài sản, xem báo cáo. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{notebox}[Ghi chú về Sơ đồ Use Case]
+Vì hệ thống chỉ hướng tới một đối tượng duy nhất, sơ đồ Use Case không thể hiện mối quan hệ "nối từng UC vào actor". Thay vào đó, sơ đồ tập trung vào \textbf{quan hệ giữa các use case} (include / extend / generalization) và \textbf{phân nhóm theo module}, phân tầng \code{Core} / \code{Deferred}. Xem Mục 7.
+\end{notebox}
+
+\subsection{Phạm vi (In / Out)}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.2cm} C{3.8cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Nhãn} & \textbf{Nghĩa} & \textbf{Nội dung} \\
+\midrule
+\badgecore & Làm \& code trước & Như Mục 1.2 \\
+\badgedeferred & Thuộc dự án, làm sau & Như Mục 1.2 \\
+\badgeout & Không thuộc dự án này & Đăng nhập/phân quyền $\cdot$ Cloud sync $\cdot$ Bản Web $\cdot$ Bản Mobile $\cdot$ Đồng bộ đa thiết bị \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}
+% ==========================================
+\section{Thuật ngữ \& định nghĩa (Glossary)}
+% ==========================================
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{L{3.8cm} L{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuật ngữ (EN)} & \textbf{Tiếng Việt} & \textbf{Mô tả} \\
+\midrule
+\code{Wallet} / \code{Account} & Ví / Tài khoản & Nơi lưu tiền: cash, mb bank, timo, vietcombank, msb, shopee pay. \\
+\code{Transaction} & Giao dịch & Thu/chi tiền, ghi nhận ngày, số tiền, ví, danh mục. \\
+\code{Transfer} & Chuyển khoản & Chuyển tiền nội bộ giữa 2 ví (không tính thu/chi). \\
+\code{Income} / \code{Expense} & Thu nhập / Chi tiêu & 2 loại giao dịch chính. \\
+\code{Category} & Danh mục & Phân loại 3 cấp: \code{type} $\rightarrow$ \code{group} $\rightarrow$ \code{category}. \\
+\code{Debt} & Công nợ & Cho vay (\code{lend}) / đi vay (\code{borrow}), thu (\code{collect}), trả (\code{repay}), xóa (\code{write-off}). \\
+\code{Receivable} / \code{Payable} & Phải thu / Phải trả & Công nợ tổng hợp. \\
+\code{Saving} & Sổ tiết kiệm & Gửi tiết kiệm kỳ hạn / không kỳ hạn, có lãi. \\
+\code{FundCertificate} & Chứng chỉ quỹ & Đầu tư: stock / bond / balance. \\
+\code{Goal Fund} & Quỹ mục tiêu & Emergency, Health, Target, Retirement. \\
+\code{Snapshot} & Chốt số tháng & Đóng băng số liệu cuối tháng (audit trail). \\
+\code{Cash Flow} & Dòng tiền & Income $-$ Expense trong 1 kỳ. \\
+\bottomrule
+\end{tabularx}
+\caption{Bảng thuật ngữ hệ thống}
+\end{table}
+
+\vspace{0.5cm}
+% ==========================================
+\section{Yêu cầu chức năng (FR)}
+% ==========================================
+
+\begin{notebox}[Quy ước đặt tên FR]
+\textbf{Cú pháp:} \code{FR-<nhóm>-<số>} $\quad\cdot\quad$ \textbf{MoSCoW:} Must / Should / Could $\quad\cdot\quad$ \textbf{Scope:} Core / Deferred
+\end{notebox}
+
+\subsection{Wallet}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-WAL-01} & Hiển thị danh sách ví \& số dư từng ví & \badgemust & \badgecore \\
+\code{FR-WAL-02} & Số dư ví = $\Sigma$(transactions) $\pm$ $\Sigma$(transfers) $\pm$ $\Sigma$(debt flows) & \badgemust & \badgecore \\
+\code{FR-WAL-03} & Hiển thị tỷ trọng (\%) từng ví & \badgeshould & \badgecore \\
+\code{FR-WAL-04} & Tạo / chỉnh sửa ví & \badgecould & \badgedeferred \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Transaction}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-TXN-01} & Thêm giao dịch (date, amount, wallet, type, group, category) & \badgemust & \badgecore \\
+\code{FR-TXN-02} & Số tiền dùng \code{BigDecimal}, dương=thu, âm=chi & \badgemust & \badgecore \\
+\code{FR-TXN-03} & Sửa / xóa giao dịch & \badgemust & \badgecore \\
+\code{FR-TXN-04} & Xem lịch sử, lọc theo ngày/thời gian/nhóm/danh mục & \badgemust & \badgecore \\
+\code{FR-TXN-05} & Cột type/group/category là dropdown động & \badgemust & \badgecore \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Transfer}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-TRF-01} & Chuyển tiền giữa 2 ví (date, amount, from, to) & \badgemust & \badgecore \\
+\code{FR-TRF-02} & Không tính là thu/chi, chỉ cập nhật số dư & \badgemust & \badgecore \\
+\code{FR-TRF-03} & Ngăn chuyển khi số dư ví nguồn không đủ & \badgeshould & \badgecore \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Category}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-CAT-01} & Phân cấp 3 cấp type $\rightarrow$ group $\rightarrow$ category & \badgemust & \badgecore \\
+\code{FR-CAT-02} & Định nghĩa group cho income \& expense & \badgemust & \badgecore \\
+\code{FR-CAT-03} & Lọc group/category theo type/group đã chọn & \badgemust & \badgecore \\
+\code{FR-CAT-04} & Thêm/sửa/xóa danh mục & \badgecould & \badgecore \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Dashboard}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-DSH-01} & Tổng tài sản = wallets + savings + investments + receivable $-$ payable & \badgemust & \badgecore \\
+\code{FR-DSH-02} & Biểu đồ cơ cấu tài sản, ví, quỹ & \badgeshould & \badgecore \\
+\code{FR-DSH-03} & Thu/chi theo tháng (income, expense, cash flow, savings rate) & \badgeshould & \badgecore \\
+\code{FR-DSH-04} & Biểu đồ thu/chi theo nhóm \& danh mục & \badgeshould & \badgecore \\
+\code{FR-DSH-05} & Bảng thống kê 12 tháng gần nhất & \badgecould & \badgecore \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Debt (Deferred)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-DBT-01} & Ghi nhận lend/borrow/collect/repay/write-off & \badgemust & \badgedeferred \\
+\code{FR-DBT-02} & receivable = lend $-$ collect $-$ write-off lend; payable = borrow $-$ repay $-$ write-off borrow & \badgemust & \badgedeferred \\
+\code{FR-DBT-03} & Sao kê công nợ theo người & \badgeshould & \badgedeferred \\
+\code{FR-DBT-04} & Cập nhật số dư ví khi có nghiệp vụ công nợ & \badgemust & \badgedeferred \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Saving (Deferred)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-SAV-01} & Quản lý sổ tiết kiệm (fund, principal, term, rate, start) & \badgemust & \badgedeferred \\
+\code{FR-SAV-02} & Tính số dư: kỳ hạn cố định vs unlimited & \badgemust & \badgedeferred \\
+\code{FR-SAV-03} & Hiển thị tiến độ kỳ hạn (process) & \badgeshould & \badgedeferred \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{FundCert (Deferred)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-FCT-01} & Quản lý chứng chỉ quỹ (fund, name, type, principal, start) & \badgemust & \badgedeferred \\
+\code{FR-FCT-02} & Nhập giá trị hiện tại (balance) theo giá thị trường & \badgemust & \badgedeferred \\
+\code{FR-FCT-03} & Tính suất sinh lời năm (annualized return) bằng RATE() & \badgemust & \badgedeferred \\
+\code{FR-FCT-04} & Hiển thị lãi/lỗ = balance $-$ principal & \badgeshould & \badgedeferred \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{GoalFund (Deferred)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-GFD-01} & Quỹ = cash + saving + fund\_cert & \badgemust & \badgedeferred \\
+\code{FR-GFD-02} & Hiển thị total, target, tiến độ \% & \badgemust & \badgedeferred \\
+\code{FR-GFD-03} & Phân bổ tiền mặt vào quỹ (funds\_cash) & \badgeshould & \badgedeferred \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Snapshot (Deferred)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-SST-01} & Thêm dòng tháng mới cho assets\_total \& fund\_performance & \badgemust & \badgedeferred \\
+\code{FR-SST-02} & Chuyển formula $\rightarrow$ value (đóng băng) & \badgemust & \badgedeferred \\
+\code{FR-SST-03} & Hiển thị chuỗi thời gian tổng tài sản theo tháng & \badgeshould & \badgedeferred \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Import/Export (Deferred)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{2.5cm} Y C{2.2cm} C{2.2cm}}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} & \textbf{MoSCoW} & \textbf{Scope} \\
+\midrule
+\code{FR-IEX-01} & Import từ Excel/CSV & \badgemust & \badgedeferred \\
+\code{FR-IEX-02} & Export dữ liệu \& báo cáo & \badgeshould & \badgedeferred \\
+\code{FR-IEX-03} & Validate dữ liệu trước khi import & \badgemust & \badgedeferred \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}
+% ==========================================
+\section{Yêu cầu phi chức năng (NFR)}
+% ==========================================
+
+\begin{notebox}[Quy ước đặt tên NFR]
+\textbf{Cú pháp:} \code{NFR-<loại>-<số>}
+\end{notebox}
+
+\subsection{Hiệu năng (Performance)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} \\
+\midrule
+\code{NFR-PERF-01} & Thao tác thêm/sửa/xóa giao dịch phản hồi $<$ 1s \\
+\code{NFR-PERF-02} & Mở dashboard với $\ge$ 5.000 giao dịch $<$ 3s \\
+\code{NFR-PERF-03} & Import 1.000+ giao dịch $<$ 10s \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Bảo mật (Security)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} \\
+\midrule
+\code{NFR-SEC-01} & Dữ liệu lưu cục bộ, không gửi lên server ngoài \\
+\code{NFR-SEC-02} & Có thể mã hóa dữ liệu lưu (tùy chọn) \\
+\code{NFR-SEC-03} & Single-user, không đăng nhập \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Độ chính xác tài chính (Financial Accuracy) — QUAN TRỌNG}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} \\
+\midrule
+\code{NFR-FIN-01} & \textbf{Bắt buộc dùng \code{BigDecimal}} cho mọi số tiền, lãi suất, số dư — KHÔNG dùng \code{double}/\code{float} \\
+\code{NFR-FIN-02} & Kết quả tính toán khớp với file Excel (đối chiếu dữ liệu) \\
+\code{NFR-FIN-03} & Làm tròn đến 2 số thập phân (quy tắc kinh doanh) \\
+\code{NFR-FIN-04} & Nhất quán số dư ví: mọi giao dịch cập nhật chính xác \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Khả năng bảo trì (Maintainability)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} \\
+\midrule
+\code{NFR-MNT-01} & Tuân thủ 4 nguyên lý OOP (Encapsulation, Inheritance, Polymorphism, Abstraction) \\
+\code{NFR-MNT-02} & Tuân thủ SOLID (SRP, OCP, LSP, ISP, DIP) \\
+\code{NFR-MNT-03} & Áp dụng Design Patterns (Strategy, Factory, Observer, State, Command, Template Method, Builder) \\
+\code{NFR-MNT-04} & Tách lớp: View (JavaFX/FXML) / Controller / Model / Service / Repository \\
+\code{NFR-MNT-05} & Comments/JavaDoc; phân package theo module \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Khả dụng (Usability)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} \\
+\midrule
+\code{NFR-USA-01} & Giao diện trực quan, dễ dùng cho người không chuyên \\
+\code{NFR-USA-02} & Dropdown, validation, thông báo lỗi rõ ràng \\
+\code{NFR-USA-03} & Biểu đồ trực quan (donut, line, bar) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Khả năng kiểm thử (Testability)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} \\
+\midrule
+\code{NFR-TST-01} & Logic nghiệp vụ tách biệt khỏi GUI \\
+\code{NFR-TST-02} & Unit test: lãi suất, công nợ, chuyển khoản, RATE \\
+\code{NFR-TST-03} & Coverage $\ge$ 80\% domain/service \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Tương thích (Compatibility)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} \\
+\midrule
+\code{NFR-COMP-01} & Chạy Windows (chính), có thể macOS/Linux \\
+\code{NFR-COMP-02} & Java 17+ (JavaFX), package \code{.exe} bằng jpackage \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Khả năng mở rộng (Scalability)}
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{ID} & \textbf{Yêu cầu} \\
+\midrule
+\code{NFR-SCAL-01} & Hỗ trợ 10.000+ giao dịch không giảm hiệu năng \\
+\code{NFR-SCAL-02} & Mở rộng module mới không phá vỡ hệ thống \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+% ==========================================
+\section{Đặc tả Use Case}
+% ==========================================
+
+\begin{notebox}[Quy ước Format A Use Case Specification]
+Các Use Case được biểu diễn đầy đủ theo định dạng Format A gồm: Tên, Mô tả, Actor, Pre/Post-condition, Main/Alternate/Exception Flow, Trigger, Frequency, Priority.
+\end{notebox}
+
+% ------------------------------------------
+\subsection{Module Wallet — \code{WAL-01}: Xem số dư các ví}
+% ------------------------------------------
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Xem số dư các ví (View Wallet Balances) \\
+\textbf{Mô tả} & Người dùng xem số dư hiện tại của từng ví và tỷ trọng của mỗi ví trên tổng tài sản. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Hệ thống đã có dữ liệu ví (tối thiểu 1 ví). \\
+\textbf{Post-condition} & Người dùng nhìn thấy bảng số dư từng ví + số dư tổng + tỷ trọng (\%). \\
+\textbf{Giả định} & Đã có dữ liệu ví; số dư được tính từ giao dịch, chuyển khoản và công nợ đã lưu. \\
+\textbf{Trigger} & Người dùng mở màn hình "Wallets" hoặc trang Dashboard. \\
+\textbf{Frequency} & Rất thường xuyên (mỗi lần mở app). \\
+\textbf{Priority} & \badgecore $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng chọn mục "Wallet". \newline
+2. Hệ thống lấy danh sách ví (\code{List<Wallet>}). \newline
+3. Với mỗi ví, hệ thống tính \code{balance = $\Sigma$(transactions) $\pm$ $\Sigma$(transfers) $\pm$ $\Sigma$(debt flows)}. \newline
+4. Hệ thống hiển thị bảng: \code{Wallet | Balance | Rate\%}. \newline
+5. Hệ thống hiển thị tổng số dư (Total). \\
+\textbf{Alternate Flow} & 3a. Nếu ví chưa có giao dịch nào $\rightarrow$ hiển thị \code{balance = 0}. \\
+\textbf{Exception Flow} & 5a. Nếu danh sách ví rỗng $\rightarrow$ thông báo "Chưa có ví, hãy tạo ví mới". \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case WAL-01}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module Transaction}
+% ------------------------------------------
+
+\subsubsection{\code{TXN-01}: Ghi chép giao dịch thu/chi}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Ghi chép giao dịch thu/chi (Create Transaction) \\
+\textbf{Mô tả} & Người dùng nhập một giao dịch thu hoặc chi với ngày, số tiền, ví, và phân loại danh mục. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Có ít nhất 1 ví và hệ thống đã có danh mục phân loại. \\
+\textbf{Post-condition} & Một giao dịch mới được lưu, số dư ví tương ứng được cập nhật. \\
+\textbf{Giả định} & Có $\ge$ 1 ví; danh mục phân loại đã được cấu hình; hệ thống validate danh mục theo \code{type}/\code{group}. \\
+\textbf{Trigger} & Người dùng bấm "Add Transaction". \\
+\textbf{Frequency} & Rất thường xuyên (mỗi khi có thu/chi phát sinh). \\
+\textbf{Priority} & \badgecore $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng mở form "Add Transaction". \newline
+2. Hệ thống hiển thị các trường: date, amount, wallet, type, group, category. \newline
+3. Người dùng nhập ngày \& số tiền, chọn ví (dropdown), chọn type (income/expense). \newline
+4. Hệ thống hiển thị danh sách \code{group} phù hợp với \code{type}. \newline
+5. Người dùng chọn group $\rightarrow$ hệ thống hiển thị danh sách \code{category} phù hợp. \newline
+6. Người dùng chọn category, xác nhận Save. \newline
+7. Hệ thống kiểm tra dữ liệu hợp lệ $\rightarrow$ thêm bản ghi. \newline
+8. Số dư ví được cập nhật; thông báo thành công. \\
+\textbf{Alternate Flow} & 6a. Người dùng hủy bỏ $\rightarrow$ không lưu gì, đóng form. \\
+\textbf{Exception Flow} & 7a. Số tiền $\le$ 0 hoặc không phải số $\rightarrow$ lỗi "Amount must be $>$ 0". \newline
+7b. Ngày không hợp lệ $\rightarrow$ lỗi "Invalid date". \newline
+7c. Ví/category không hợp lệ $\rightarrow$ lỗi "Category does not belong to selected group". \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case TXN-01}
+\end{table}
+
+\subsubsection{\code{TXN-02}: Sửa / Xóa giao dịch}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Sửa / Xóa giao dịch (Edit / Delete Transaction) \\
+\textbf{Mô tả} & Người dùng chỉnh sửa hoặc xóa một giao dịch đã nhập; số dư ví được tính lại. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Giao dịch tồn tại trong hệ thống. \\
+\textbf{Post-condition} & Giao dịch được cập nhật hoặc xóa; số dư ví phản ánh đúng. \\
+\textbf{Giả định} & Giao dịch cần sửa/xóa đang tồn tại và chưa bị đóng băng bởi snapshot. \\
+\textbf{Trigger} & Người dùng chọn một giao dịch trong bảng lịch sử $\rightarrow$ "Edit" / "Delete". \\
+\textbf{Frequency} & Trung bình. \\
+\textbf{Priority} & \badgecore $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng chọn giao dịch từ danh sách. \newline
+2. Chọn hành động "Edit" hoặc "Delete". \newline
+3. \textit{Nếu Edit:} form hiển thị dữ liệu hiện tại; người dùng sửa \& lưu. \newline
+4. \textit{Nếu Delete:} hệ thống hỏi xác nhận. \newline
+5. Hệ thống cập nhật/xóa bản ghi. \newline
+6. Số dư ví được tính lại (giảm/trả lại giao dịch cũ). \\
+\textbf{Exception Flow} & 4a. Người dùng hủy xác nhận $\rightarrow$ không xóa. \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case TXN-02}
+\end{table}
+
+\subsubsection{\code{TXN-03}: Xem lịch sử thu/chi}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Xem lịch sử thu/chi (View Transaction History) \\
+\textbf{Mô tả} & Người dùng xem danh sách giao dịch, lọc theo thời gian / ví / loại / nhóm / danh mục. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Hệ thống có dữ liệu giao dịch. \\
+\textbf{Post-condition} & Hiển thị bảng giao dịch phù hợp bộ lọc, kèm tổng thu/chi. \\
+\textbf{Giả định} & Hệ thống có dữ liệu giao dịch; bộ lọc có thể kết hợp (ngày, ví, type, group, category). \\
+\textbf{Trigger} & Người dùng mở màn hình "Transactions". \\
+\textbf{Frequency} & Rất thường xuyên. \\
+\textbf{Priority} & \badgecore $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng mở màn hình "Transactions". \newline
+2. Hệ thống hiển thị toàn bộ giao dịch (bảng, cột date/amount/wallet/type/group/category). \newline
+3. Người dùng áp bộ lọc (khoảng ngày, ví, type, group, category). \newline
+4. Hệ thống lọc \& hiển thị danh sách. \newline
+5. Hệ thống hiển thị tổng thu, tổng chi ở cuối bảng. \\
+\textbf{Alternate Flow} & 4a. Không có giao dịch phù hợp $\rightarrow$ thông báo "No transactions match filter". \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case TXN-03}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module Transfer — \code{TRF-01}: Chuyển tiền nội bộ giữa các ví}
+% ------------------------------------------
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Chuyển tiền nội bộ (Internal Transfer) \\
+\textbf{Mô tả} & Người dùng chuyển tiền từ ví này sang ví khác; không tính là thu/chi. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Có $\ge$ 2 ví. \\
+\textbf{Post-condition} & Ví nguồn giảm, ví đích tăng; không phát sinh bản ghi thu/chi. \\
+\textbf{Giả định} & Có $\ge$ 2 ví; ví nguồn và ví đích khác nhau; số dư ví nguồn đủ để chuyển. \\
+\textbf{Trigger} & Người dùng bấm "Transfer Money". \\
+\textbf{Frequency} & Trung bình. \\
+\textbf{Priority} & \badgecore $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng mở form "Transfer". \newline
+2. Nhập ngày, chọn ví nguồn (from), ví đích (to), nhập số tiền. \newline
+3. Hệ thống kiểm tra \code{from $\neq$ to} và số dư ví nguồn đủ. \newline
+4. Hệ thống cập nhật: \code{from.balance -= amount}; \code{to.balance += amount}. \newline
+5. Lưu bản ghi chuyển khoản; thông báo thành công. \\
+\textbf{Exception Flow} & 3a. \code{from == to} $\rightarrow$ lỗi "Source and destination wallet must be different". \newline
+3b. Số dư ví nguồn $<$ amount $\rightarrow$ lỗi "Insufficient balance". \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case TRF-01}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module Category}
+% ------------------------------------------
+
+\subsubsection{\code{CAT-01}: Phân loại thu/chi theo danh mục}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Phân loại thu/chi theo danh mục (Classify Transaction) \\
+\textbf{Mô tả} & Người dùng gán một giao dịch vào danh mục phân cấp type $\rightarrow$ group $\rightarrow$ category. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Hệ thống có cấu hình danh mục (classification). \\
+\textbf{Post-condition} & Giao dịch được gán danh mục hợp lệ. \\
+\textbf{Giả định} & Cấu hình danh mục (classification) đã tồn tại; \code{type}/\code{group}/\code{category} quan hệ 3 cấp khớp nhau. \\
+\textbf{Trigger} & Người dùng nhập giao dịch mới hoặc sửa danh mục của giao dịch cũ. \\
+\textbf{Frequency} & Rất thường xuyên (gắn với TXN-01). \\
+\textbf{Priority} & \badgecore $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Hệ thống xác định \code{type} người dùng chọn. \newline
+2. Hệ thống lọc danh sách \code{group} theo \code{type} (loại trùng bằng dictionary). \newline
+3. Người dùng chọn \code{group}. \newline
+4. Hệ thống lọc danh sách \code{category} theo \code{type} + \code{group}. \newline
+5. Người dùng chọn \code{category}; lưu phân loại. \\
+\textbf{Exception Flow} & 5a. Danh mục không tồn tại / không khớp group $\rightarrow$ lỗi "Category mismatch". \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case CAT-01}
+\end{table}
+
+\subsubsection{\code{CAT-02}: Quản lý danh mục phân loại}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Quản lý danh mục phân loại (Manage Categories) \\
+\textbf{Mô tả} & Người dùng thêm / sửa / xóa group, category trong danh mục. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Hệ thống đang ở màn hình quản lý danh mục. \\
+\textbf{Post-condition} & Danh mục được cập nhật; dropdown và dữ liệu mới phản ánh đúng. \\
+\textbf{Giả định} & Người dùng có quyền quản lý danh mục; thay đổi không làm hỏng dữ liệu giao dịch đã gán. \\
+\textbf{Trigger} & Người dùng truy cập "Manage Categories". \\
+\textbf{Frequency} & Thấp. \\
+\textbf{Priority} & \badgecore $\cdot$ \badgecould \\
+\textbf{Main Flow} & 1. Người dùng chọn \code{type}. \newline
+2. Hệ thống hiển thị cây danh mục (group $\rightarrow$ category). \newline
+3. Người dùng thêm group mới / thêm category vào group / sửa tên / xóa. \newline
+4. Hệ thống lưu thay đổi, cập nhật dropdown. \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case CAT-02}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module Dashboard — \code{DSH-01}: Xem dashboard tổng quan}
+% ------------------------------------------
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Xem dashboard tổng quan (View Dashboard) \\
+\textbf{Mô tả} & Người dùng xem tổng quan tài chính: tổng tài sản, cơ cấu ví, thu/chi theo tháng, quỹ mục tiêu, biểu đồ. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Hệ thống có dữ liệu giao dịch. \\
+\textbf{Post-condition} & Dashboard hiển thị các chỉ số \& biểu đồ cập nhật. \\
+\textbf{Giả định} & Hệ thống có dữ liệu giao dịch và cấu hình danh mục để tính toán; số liệu dùng \code{BigDecimal}. \\
+\textbf{Trigger} & Người dùng mở ứng dụng (mặc định hiển thị dashboard). \\
+\textbf{Frequency} & Rất thường xuyên. \\
+\textbf{Priority} & \badgecore $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Hệ thống tính tổng tài sản = wallets + savings + investments + receivable $-$ payable. \newline
+2. Hệ thống tính thu/chi theo tháng hiện tại \& 12 tháng gần nhất. \newline
+3. Hệ thống hiển thị biểu đồ: donut cơ cấu tài sản, line dòng tiền, bar thu/chi theo nhóm. \newline
+4. Hệ thống hiển thị bảng thống kê tháng (income, expense, cash flow, savings rate). \\
+\textbf{Exception Flow} & 4a. Không có dữ liệu $\rightarrow$ hiển thị dashboard trống + thông báo. \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case DSH-01}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module Debt — \code{DBT-01}: Quản lý công nợ (Deferred)}
+% ------------------------------------------
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Quản lý công nợ (Manage Debts) \\
+\textbf{Mô tả} & Người dùng ghi nhận các nghiệp vụ cho vay/đi vay, thu nợ, trả nợ, xóa nợ. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Có ít nhất 1 ví. \\
+\textbf{Post-condition} & Công nợ được ghi nhận; receivable/payable \& số dư ví được cập nhật. \\
+\textbf{Giả định} & Có $\ge$ 1 ví; các nghiệp vụ (lend/borrow/collect/repay/write-off) không vi phạm logic phải thu/phải trả. \\
+\textbf{Trigger} & Người dùng truy cập "Debts". \\
+\textbf{Frequency} & Trung bình. \\
+\textbf{Priority} & \badgedeferred $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng chọn loại nghiệp vụ (lend/borrow/collect/repay/write-off). \newline
+2. Nhập ngày, batch, người (person), số tiền, ví. \newline
+3. Hệ thống xác định nghiệp vụ: \newline
+   \quad $\bullet$ \code{lend} $\rightarrow$ tăng receivable, giảm ví. \newline
+   \quad $\bullet$ \code{borrow} $\rightarrow$ tăng payable, tăng ví. \newline
+   \quad $\bullet$ \code{collect} $\rightarrow$ giảm receivable, tăng ví. \newline
+   \quad $\bullet$ \code{repay} $\rightarrow$ giảm payable, giảm ví. \newline
+   \quad $\bullet$ \code{write-off lend} $\rightarrow$ giảm receivable (xóa). \newline
+   \quad $\bullet$ \code{write-off borrow} $\rightarrow$ giảm payable (xóa). \newline
+4. Hệ thống lưu \& cập nhật số dư ví. \\
+\textbf{Exception Flow} & 3a. Vi phạm logic (thu nợ $>$ phải thu) $\rightarrow$ lỗi. \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case DBT-01}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module Saving — \code{SAV-01}: Quản lý sổ tiết kiệm (Deferred)}
+% ------------------------------------------
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Quản lý sổ tiết kiệm (Manage Savings) \\
+\textbf{Mô tả} & Người dùng quản lý các sổ tiết kiệm có kỳ hạn / không kỳ hạn, tính số dư \& lãi. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Có quỹ mục tiêu (goal fund). \\
+\textbf{Post-condition} & Sổ tiết kiệm được lưu; số dư \& tiến độ tính đúng. \\
+\textbf{Giả định} & Có ít nhất 1 quỹ mục tiêu; \code{term} có trong danh mục kỳ hạn; lãi suất là \code{BigDecimal}. \\
+\textbf{Trigger} & Người dùng truy cập "Savings". \\
+\textbf{Frequency} & Thấp–trung bình. \\
+\textbf{Priority} & \badgedeferred $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng thêm sổ tiết kiệm: fund, principal, term, rate, start. \newline
+2. Hệ thống tra \code{term} để lấy số ngày. \newline
+3. Hệ thống tính \code{balance}: kỳ hạn cố định (gốc + lãi theo ngày gửi/kỳ hạn) hoặc unlimited (lãi đơn \code{capital * rate / 365}). \newline
+4. Hệ thống tính \code{process} (tiến độ kỳ hạn). \newline
+5. Hiển thị danh sách sổ tiết kiệm. \\
+\textbf{Exception Flow} & 2a. \code{term} không có trong danh mục $\rightarrow$ lỗi "Invalid term". \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case SAV-01}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module FundCert — \code{FCT-01}: Quản lý chứng chỉ quỹ đầu tư (Deferred)}
+% ------------------------------------------
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Quản lý chứng chỉ quỹ (Manage Fund Certificates) \\
+\textbf{Mô tả} & Người dùng quản lý danh mục đầu tư: stock/bond/balanced, nhập giá hiện tại, tính suất sinh lời năm. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Có quỹ mục tiêu. \\
+\textbf{Post-condition} & Chứng chỉ quỹ được lưu; suất sinh lời \& lãi/lỗ tính đúng. \\
+\textbf{Giả định} & Có ít nhất 1 quỹ mục tiêu; \code{principal $>$ 0}; \code{start} hợp lệ; \code{type} thuộc stock/bond/balance. \\
+\textbf{Trigger} & Người dùng truy cập "Fund Certificates". \\
+\textbf{Frequency} & Thấp–trung bình. \\
+\textbf{Priority} & \badgedeferred $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng thêm chứng chỉ quỹ: fund, name, type, principal, start. \newline
+2. Người dùng nhập \code{balance} hiện tại (theo giá thị trường). \newline
+3. Hệ thống tính số năm nắm giữ = (today $-$ start)/365.25. \newline
+4. Hệ thống tính \code{rate} = RATE(nper=năm, pmt=0, pv=$-$principal, fv=balance). \newline
+5. Hệ thống tính \code{interest} = balance $-$ principal. \newline
+6. Hiển thị danh sách. \\
+\textbf{Exception Flow} & 3a. \code{principal} $\le$ 0 hoặc ngày bất hợp lệ $\rightarrow$ lỗi. \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case FCT-01}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module GoalFund — \code{GFD-01}: Phân bổ \& theo dõi quỹ mục tiêu (Deferred)}
+% ------------------------------------------
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Quản lý quỹ mục tiêu (Manage Goal Funds) \\
+\textbf{Mô tả} & Người dùng theo dõi các quỹ (emergency, health, target, retirement), tổng của từng quỹ và tiến độ so với mục tiêu. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Có sổ tiết kiệm \& chứng chỉ quỹ. \\
+\textbf{Post-condition} & Mỗi quỹ hiển thị cash + saving + fund\_cert + total + tiến độ \%. \\
+\textbf{Giả định} & Có ít nhất 1 sổ tiết kiệm và 1 chứng chỉ quỹ; đã phân bổ tiền mặt (\code{funds\_cash}) cho từng quỹ; \code{target $\ge$ 0}. \\
+\textbf{Trigger} & Người dùng truy cập "Goal Funds". \\
+\textbf{Frequency} & Trung bình. \\
+\textbf{Priority} & \badgedeferred $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Hệ thống lấy danh sách quỹ (emergency, health, target, retirement). \newline
+2. Người dùng phân bổ tiền mặt vào quỹ (\code{funds\_cash}): chọn quỹ, nhập \code{amount} (FR-GFD-03). \newline
+3. Với mỗi quỹ: tính \code{cash} (từ funds\_cash), \code{saving} ($\Sigma$ savings), \code{fund\_cert} ($\Sigma$ fund\_certs). \newline
+4. Hệ thống tính \code{total} = cash + saving + fund\_cert. \newline
+5. Hệ thống lấy \code{target} \& tính \code{process} = total/target. \newline
+6. Hiển thị bảng + biểu đồ tiến độ. \\
+\textbf{Exception Flow} & 5a. \code{target} = 0 $\rightarrow$ hiển thị process = N/A (chia cho 0). \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case GFD-01}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module Snapshot — \code{SST-01}: Chốt số cuối tháng (Deferred)}
+% ------------------------------------------
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Chốt số cuối tháng (Month-End Freeze) \\
+\textbf{Mô tả} & Hệ thống đóng băng số liệu tháng cũ và thêm dòng tháng mới cho chuỗi tổng tài sản \& hiệu suất quỹ. \\
+\textbf{Actor} & Owner (kích hoạt thủ công hoặc tự động khi mở app). \\
+\textbf{Pre-condition} & Hệ thống có dữ liệu. \\
+\textbf{Post-condition} & Bảng assets\_total \& fund\_performance có dòng tháng mới, số liệu tháng cũ được đóng băng (formula $\rightarrow$ value). \\
+\textbf{Giả định} & Hệ thống có dữ liệu; bảng chuỗi thời gian đã tồn tại; chỉ chốt 1 lần mỗi tháng, không trùng lặp. \\
+\textbf{Trigger} & Cuối tháng / khi mở app (Workbook\_Open analog) hoặc người dùng bấm "Freeze". \\
+\textbf{Frequency} & 1 lần mỗi tháng. \\
+\textbf{Priority} & \badgedeferred $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Hệ thống lấy dòng cuối của bảng assets\_total. \newline
+2. So sánh tháng dòng cuối với tháng hiện tại. \newline
+3. Nếu dòng cuối ở tháng hiện tại \& chưa đóng băng $\rightarrow$ không làm gì. \newline
+4. Ngược lại: chuyển công thức dòng cuối $\rightarrow$ giá trị; thêm dòng mới với tháng +1. \newline
+5. Lặp lại cho bảng fund\_performance. \\
+\textbf{Exception Flow} & 2a. Tháng dòng cuối = tháng hiện tại nhưng đã đóng băng $\rightarrow$ không thêm trùng. \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case SST-01}
+\end{table}
+
+% ------------------------------------------
+\subsection{Module Import/Export}
+% ------------------------------------------
+
+\subsubsection{\code{IEX-01}: Import dữ liệu từ Excel/CSV (Deferred)}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Import dữ liệu (Import Data) \\
+\textbf{Mô tả} & Người dùng nhập dữ liệu từ file Excel/CSV (từ \code{finance-mng.xlsm} hoặc template). \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Có file Excel/CSV đúng định dạng. \\
+\textbf{Post-condition} & Dữ liệu được import vào hệ thống (giao dịch, ví, danh mục...). \\
+\textbf{Giả định} & Có file Excel/CSV đúng format; dữ liệu hợp lệ (định dạng, ngày, số tiền, danh mục) trước khi import. \\
+\textbf{Trigger} & Người dùng bấm "Import". \\
+\textbf{Frequency} & Thấp. \\
+\textbf{Priority} & \badgedeferred $\cdot$ \badgemust \\
+\textbf{Main Flow} & 1. Người dùng chọn file. \newline
+2. Hệ thống đọc dữ liệu (Apache POI/CSV parser). \newline
+3. Hệ thống validate (định dạng, ngày, số tiền, danh mục). \newline
+4. Hệ thống import vào đúng module tương ứng. \newline
+5. Thông báo kết quả (số dòng thành công/lỗi). \\
+\textbf{Exception Flow} & 3a. File sai định dạng $\rightarrow$ lỗi "Invalid file format". \newline
+3b. Dòng dữ liệu lỗi $\rightarrow$ bỏ qua \& báo cáo. \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case IEX-01}
+\end{table}
+
+\subsubsection{\code{IEX-02}: Export dữ liệu \& báo cáo (Deferred)}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{3.2cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Thuộc tính} & \textbf{Mô tả} \\
+\midrule
+\textbf{Tên} & Export dữ liệu \& báo cáo (Export Data / Report) \\
+\textbf{Mô tả} & Người dùng xuất dữ liệu hoặc báo cáo ra file Excel/CSV/PDF. \\
+\textbf{Actor} & Owner \\
+\textbf{Pre-condition} & Hệ thống có dữ liệu cần xuất. \\
+\textbf{Post-condition} & File xuất ra được tạo thành công. \\
+\textbf{Giả định} & Hệ thống có dữ liệu cần xuất; thư mục đích ghi được; chọn đúng định dạng (Excel/CSV/PDF). \\
+\textbf{Trigger} & Người dùng bấm "Export". \\
+\textbf{Frequency} & Thấp. \\
+\textbf{Priority} & \badgedeferred $\cdot$ \badgeshould \\
+\textbf{Main Flow} & 1. Người dùng chọn loại báo cáo / phạm vi dữ liệu. \newline
+2. Chọn định dạng (Excel/CSV/PDF). \newline
+3. Hệ thống tạo file. \newline
+4. Thông báo đường dẫn file xuất. \\
+\bottomrule
+\end{tabularx}
+\caption{Đặc tả Use Case IEX-02}
+\end{table}
+
+\newpage
+% ==========================================
+\section{Phụ lục — Sơ đồ Use Case}
+% ==========================================
+
+\begin{notebox}[Ghi chú về thiết kế sơ đồ Use Case]
+Vì hệ thống chỉ có \textbf{một actor duy nhất (Owner)}, sơ đồ không vẽ "nối từng UC vào actor" (thừa). Thay vào đó, sơ đồ tập trung vào \textbf{phân nhóm theo module}, \textbf{phân tầng \code{Core}/\code{Deferred}} và \textbf{quan hệ \code{include} giữa các use case} (A bắt buộc thực thi B). Các quan hệ \textbf{đọc/ghi dữ liệu} (data dependency) và các \textbf{nghiệp vụ con} được ghi chú bằng chữ, không vẽ mũi tên — vì chúng không phải quan hệ use case theo chuẩn UML.
+\end{notebox}
+
+\subsection{Hình 7.1 — Tổng quan hệ thống (1 Actor + 2 tầng + các module)}
+
+\begin{figure}[H]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  actor/.style={circle, draw=blue!80!black, fill=blue!10, thick, minimum size=1.4cm, align=center, font=\bfseries},
+  corebox/.style={rectangle, draw=coregreen, fill=coregreenbg, rounded corners=5pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\small\bfseries},
+  defbox/.style={rectangle, draw=deferredamber, fill=deferredamberbg, rounded corners=5pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\small\bfseries}
+]
+
+% Actor
+\node[actor] (owner) at (0,0) {Owner};
+
+% Subgraph Core
+\node[corebox] (wal) at (3.8, 1.8) {Wallet};
+\node[corebox] (txn) at (6.3, 1.8) {Transaction};
+\node[corebox] (trf) at (8.8, 1.8) {Transfer};
+\node[corebox] (cat) at (11.3, 1.8) {Category};
+\node[corebox] (dsh) at (13.8, 1.8) {Dashboard};
+
+% Subgraph Deferred
+\node[defbox] (dbt) at (3.8, -1.8) {Debt};
+\node[defbox] (sav) at (6.3, -1.8) {Saving};
+\node[defbox] (fct) at (8.8, -1.8) {FundCert};
+\node[defbox] (gfd) at (11.3, -1.8) {GoalFund};
+\node[defbox] (sst) at (13.8, -1.8) {Snapshot};
+\node[defbox] (iex) at (16.3, -1.8) {Import/Export};
+
+\begin{scope}[on background layer]
+  \node[draw=coregreen, fill=coregreenbg!30, rounded corners=8pt, inner sep=10pt, fit=(wal) (txn) (trf) (cat) (dsh), label=above:{\bfseries\color{coregreen}[Core — Phase 1]}] (core_group) {};
+  \node[draw=deferredamber, fill=deferredamberbg!30, rounded corners=8pt, inner sep=10pt, fit=(dbt) (sav) (fct) (gfd) (sst) (iex), label=below:{\bfseries\color{deferredamber}[Deferred — Phase 2]}] (def_group) {};
+  \node[draw=primaryblue, fill=blue!3, rounded corners=12pt, inner sep=14pt, fit=(core_group) (def_group), label=above:{\Large\bfseries\color{primaryblue}PFMS — Personal Finance Management System}] (sys_group) {};
+\end{scope}
+
+\draw[<->, line width=1.5pt, primaryblue] (owner) -- node[above, font=\small\bfseries] {thao tác} (sys_group.west);
+
+\end{tikzpicture}%
+}
+\caption{Sơ đồ tổng quan kiến trúc phân tầng use case của hệ thống PFMS}
+\end{figure}
+
+\subsection{Hình 7.2 — Chi tiết tầng Core (quan hệ \code{include})}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\linewidth}{!}{%
+\begin{tikzpicture}[
+  actor/.style={circle, draw=blue!80!black, fill=blue!10, thick, minimum size=1.4cm, align=center, font=\bfseries},
+  uc/.style={ellipse, draw=coregreen, fill=coregreenbg!80, thick, align=center, font=\small\bfseries, inner sep=4pt, minimum height=0.9cm},
+  groupbox/.style={draw=coregreen, fill=coregreenbg!20, rounded corners=10pt, inner sep=14pt}
+]
+
+\node[actor] (owner) at (0,0) {Owner};
+
+\node[uc] (dsh01) at (4.5, 4.0) {DSH-01: Dashboard tổng quan};
+\node[uc] (txn01) at (4.5, 2.2) {TXN-01: Ghi chép thu/chi};
+\node[uc] (txn02) at (4.5, 0.4) {TXN-02: Sửa/Xóa giao dịch};
+\node[uc] (txn03) at (4.5, -1.4) {TXN-03: Xem lịch sử thu/chi};
+\node[uc] (trf01) at (4.5, -3.2) {TRF-01: Chuyển tiền nội bộ};
+
+\node[uc] (cat01) at (11.0, 1.3) {CAT-01: Phân loại danh mục};
+\node[uc] (wal01) at (11.0, -0.5) {WAL-01: Xem số dư ví};
+\node[uc] (cat02) at (11.0, -2.3) {CAT-02: Quản lý danh mục};
+
+\begin{scope}[on background layer]
+  \node[groupbox, fit=(dsh01) (txn01) (cat01) (txn02) (txn03) (trf01) (wal01) (cat02), label=above:{\Large\bfseries\color{coregreen}[Core — Phase 1]}] (core_sys) {};
+\end{scope}
+
+\draw[<->, line width=1.5pt, primaryblue] (owner) -- (core_sys.west);
+\draw[->, dashed, line width=1.2pt, >=stealth, sectionblue] (txn01) -- node[above, font=\small\bfseries] {$\ll$include$\gg$} (cat01);
+\draw[->, dashed, line width=1.2pt, >=stealth, sectionblue] (txn02) -- node[below, font=\small\bfseries] {$\ll$include$\gg$} (cat01);
+
+\end{tikzpicture}%
+}
+\caption{Chi tiết các Use Case tầng Core và mối quan hệ include}
+\end{figure}
+
+\begin{notebox}[Ghi chú quan hệ dữ liệu (tầng Core)]
+\begin{itemize}[leftmargin=*]
+    \item \code{DSH-01} (Dashboard) \textbf{đọc} dữ liệu từ \code{WAL-01} (số dư), \code{TXN-03} (thu/chi) và \code{TRF-01} (chuyển khoản) để vẽ biểu đồ.
+    \item \code{TRF-01} \textbf{cập nhật} số dư ví của \code{WAL-01} (transfer không tính thu/chi).
+    \item \code{CAT-02} (quản lý danh mục) \textbf{cung cấp master data} cho \code{CAT-01} (phân loại).
+    \item \code{TXN-02} include \code{CAT-01} chỉ áp dụng cho phần \textbf{Sửa} (sửa danh mục của giao dịch cũ); phần \textbf{Xóa} là alternate flow, không phân loại lại.
+\end{itemize}
+\end{notebox}
+
+\subsection{Hình 7.3 — Chi tiết tầng Deferred (quan hệ \code{include})}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\linewidth}{!}{%
+\begin{tikzpicture}[
+  actor/.style={circle, draw=blue!80!black, fill=blue!10, thick, minimum size=1.4cm, align=center, font=\bfseries},
+  uc/.style={ellipse, draw=deferredamber, fill=deferredamberbg!80, thick, align=center, font=\small\bfseries, inner sep=4pt, minimum height=0.9cm},
+  groupbox/.style={draw=deferredamber, fill=deferredamberbg!20, rounded corners=10pt, inner sep=14pt}
+]
+
+\node[actor] (owner) at (0,0) {Owner};
+
+\node[uc] (dbt01) at (4.5, 3.6) {DBT-01: Quản lý công nợ};
+\node[uc] (gfd01) at (4.5, 1.4) {GFD-01: Quỹ mục tiêu};
+\node[uc] (sst01) at (4.5, -0.8) {SST-01: Chốt số cuối tháng};
+\node[uc] (iex01) at (4.5, -2.8) {IEX-01: Import dữ liệu};
+
+\node[uc] (sav01) at (11.0, 2.3) {SAV-01: Sổ tiết kiệm};
+\node[uc] (fct01) at (11.0, 0.5) {FCT-01: Chứng chỉ quỹ};
+\node[uc] (iex02) at (11.0, -2.8) {IEX-02: Export dữ liệu};
+
+\begin{scope}[on background layer]
+  \node[groupbox, fit=(dbt01) (gfd01) (sav01) (fct01) (sst01) (iex01) (iex02), label=above:{\Large\bfseries\color{deferredamber}[Deferred — Phase 2]}] (def_sys) {};
+\end{scope}
+
+\draw[<->, line width=1.5pt, primaryblue] (owner) -- (def_sys.west);
+\draw[->, dashed, line width=1.2pt, >=stealth, sectionblue] (gfd01) -- node[above, font=\small\bfseries] {$\ll$include$\gg$} (sav01);
+\draw[->, dashed, line width=1.2pt, >=stealth, sectionblue] (gfd01) -- node[below, font=\small\bfseries] {$\ll$include$\gg$} (fct01);
+
+\end{tikzpicture}%
+}
+\caption{Chi tiết các Use Case tầng Deferred và mối quan hệ include}
+\end{figure}
+
+\begin{notebox}[Ghi chú quan hệ dữ liệu (tầng Deferred)]
+\begin{itemize}[leftmargin=*]
+    \item \code{GFD-01} (quỹ mục tiêu) \textbf{tổng hợp} từ \code{funds\_cash} + \code{savings} + \code{fund\_certs} $\rightarrow$ mỗi quỹ = cash + saving + fund\_cert (FR-GFD-01). Công nợ (\code{DBT-01}) \textbf{không} nằm trong thành phần quỹ.
+    \item \code{SST-01} (chốt tháng) \textbf{đóng băng} bảng chuỗi thời gian \code{assets\_total} và \code{fund\_performance} (chuyển formula $\rightarrow$ value) — không trực tiếp sửa record \code{savings}/\code{fund\_certs}.
+    \item \code{IEX-01} (Import) và \code{IEX-02} (Export) là \textbf{hai chức năng độc lập}, không có quan hệ include/extend với nhau.
+    \item 6 nghiệp vụ công nợ (\code{lend}/\code{borrow}/\code{collect}/\code{repay}/\code{write-off lend}/\code{write-off borrow}) là \textbf{nhánh xử lý bên trong} \code{DBT-01} (xem Main Flow Mục 6.6), sẽ được thể hiện bằng \textbf{kế thừa ở class diagram} (Milestone 3), không phải generalization use case.
+\end{itemize}
+\end{notebox}
+
+\vspace{0.8cm}
+% ==========================================
+\section{Tổng kết}
+% ==========================================
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tablerowalt}{white}
+\begin{tabularx}{\linewidth}{C{5.0cm} Y}
+\toprule
+\rowcolor{tableheaderbg} \textbf{Hạng mục} & \textbf{Kết quả} \\
+\midrule
+\textbf{Đề tài} & Personal Finance Manager — mở rộng từ Topic 10 (Basic) \\
+\textbf{Use Case} & 15 UC (Format A đầy đủ) — 8 Core + 7 Deferred \\
+\textbf{Functional Requirements} & $\sim$40 FR (Must/Should/Could) \\
+\textbf{Non-Functional Requirements} & $\sim$30 NFR (8 nhóm) \\
+\textbf{Actor} & 1 (Owner, single-user) \\
+\textbf{Platform} & Desktop JavaFX \\
+\bottomrule
+\end{tabularx}
+\caption{Bảng tổng kết đặc tả Milestone 1}
+\end{table}
+
+\end{document}
