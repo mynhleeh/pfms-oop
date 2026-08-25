@@ -93,7 +93,11 @@
 
 % --- BỔ SUNG: Cấu hình đường kẻ ngang mờ giữa các hàng ---
 \definecolor{faintgray}{gray}{0.85} % Định nghĩa màu xám mờ
-\newcommand{\faintline}{\noalign{\global\arrayrulecolor{faintgray}}\hline\noalign{\global\arrayrulecolor{black}}} % Lệnh kẻ đường mờ và trả lại màu đen cho đường viền chính
+\newcommand{\faintline}{%
+  \noalign{\global\arrayrulecolor{faintgray}}%
+  \hline
+  \noalign{\global\arrayrulecolor{black}}%
+} % Lệnh kẻ đường mờ và trả lại màu đen cho đường viền chính
 
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
@@ -110,20 +114,33 @@
 \author{}
 \date{}
 
+\usepackage{tocloft}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}} % Giữ lại chấm nối nếu cần
+\renewcommand{\cftsubsecfont}{\bfseries}               % In đậm tên mục (1. Giới thiệu, 2. Mô tả,...)
+\renewcommand{\cftsubsecleader}{\bfseries\cftdotfill{\cftdotsep}} % In đậm dấu chấm nối
+\renewcommand{\cftsubsecpagefont}{\bfseries}           % In đậm số trang của mục
+
 \begin{document}
-\begin{center}
+\newpage
+\thispagestyle{empty} % Tắt số trang ở trang bìa
 
-\section{\texorpdfstring{\huge \textbf{Personal Finance Management}}{Personal Finance Management}}\label{personal-finance-management}
+\begin{titlepage} % Sử dụng môi trường titlepage chuẩn để cô lập định dạng
+    \setlength{\parskip}{0pt} % Triệt tiêu khoảng trống parskip gây lệch vertical spacing
+    \vfill
+    \begin{center}
+        {\Huge \textbf{Personal Finance Management}} \\[1.5cm]
+        {\huge \textbf{Nhóm 3}} \\[0.5cm]
+        Lê Anh Minh -- B24DCCE180 \\
+        Ứng Trọng Trình -- B24DCCE271 \\
+        Nguyễn Đình Tiến -- B24DCCE264 \\
+        Nguyễn Đinh Anh Quân -- B24DCCE222
+    \end{center}
+    \vfill
+\end{titlepage}
 
-    {\Large \textbf{Nhóm 3:}} \\[0.3cm]
-    Lê Anh Minh -- B24DCCE180 \\
-    Ứng Trọng Trình -- B24DCCE271 \\
-    Nguyễn Đình Tiến -- B24DCCE264 \\
-    Nguyễn Đinh Anh Quân -- B24DCCE222 
-\end{center} 
 \newpage
 
-\renewcommand{\contentsname}{\huge\textbf{Mục lục}}
+\renewcommand{\contentsname}{\Large\textbf{Mục lục}}
 \tableofcontents
 \newpage
 
@@ -168,6 +185,8 @@ Nội dung
 Người dùng cá nhân (1 người dùng --- Owner). Không có đăng nhập/phân quyền.
 
 \begin{center}\rule{1.0\linewidth}{0.5pt}\end{center}
+
+\newpage
 
 \subsection{2. Mô tả tổng quan hệ thống}\label{muxf4-tux1ea3-tux1ed5ng-quan-hux1ec7-thux1ed1ng}
 
@@ -301,6 +320,8 @@ Cloud sync · Bản Web · Bản Mobile · Đồng bộ đa thiết bị \\
 
 \begin{center}\rule{1.0\linewidth}{0.5pt}\end{center}
 
+\newpage
+
 \subsection{3. Thuật ngữ \& định nghĩa (Glossary)}\label{thuux1eadt-ngux1eef-ux111ux1ecbnh-nghux129a-glossary}
 
 {\def\LTcaptype{none}
@@ -336,6 +357,8 @@ Mô tả
 }
 
 \begin{center}\rule{1.0\linewidth}{0.5pt}\end{center}
+
+\newpage
 
 \subsection{4. Yêu cầu chức năng (FR)}\label{yuxeau-cux1ea7u-chux1ee9c-nux103ng-fr}
 
@@ -654,6 +677,8 @@ ID & Yêu cầu & MoSCoW & Scope \\
 
 \begin{center}\rule{1.0\linewidth}{0.5pt}\end{center}
 
+\newpage
+
 \subsection{5. Yêu cầu phi chức năng (NFR)}\label{yuxeau-cux1ea7u-phi-chux1ee9c-nux103ng-nfr}
 
 \textbf{Quy ước:}
@@ -813,6 +838,8 @@ ID & Yêu cầu \\
 }
 
 \begin{center}\rule{1.0\linewidth}{0.5pt}\end{center}
+
+\newpage
 
 \subsection{6. Đặc tả Use Case}\label{ux111ux1eb7c-tux1ea3-use-case}
 
@@ -1038,8 +1065,8 @@ Mô tả
 
 {\def\LTcaptype{none}
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.8}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Thuộc tính
@@ -1276,8 +1303,8 @@ Mô tả
 
 {\def\LTcaptype{none}
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.8}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Thuộc tính
@@ -1310,8 +1337,8 @@ Mô tả
 
 {\def\LTcaptype{none}
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.8}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Thuộc tính
@@ -1339,6 +1366,8 @@ Mô tả
 }
 
 \begin{center}\rule{1.0\linewidth}{0.5pt}\end{center}
+
+\newpage
 
 \subsection{7. Phụ lục --- Sơ đồ Use Case}\label{phux1ee5-lux1ee5c-sux1a1-ux111ux1ed3-use-case}
 
