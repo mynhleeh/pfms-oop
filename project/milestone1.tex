@@ -1,14 +1,20 @@
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
+
 \documentclass[11pt,a4paper]{article}
+
+\usepackage{graphicx}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc}
 
 % --- 1. CHỈNH LỀ TRANG (Margin Setup) ---
 \usepackage[top=2.5cm, bottom=2.5cm, left=3.0cm, right=2.0cm]{geometry}
 
 \usepackage{xcolor}
-\usepackage{colortbl} % <-- BỔ SUNG: Hỗ trợ đổi màu đường kẻ bảng
+\usepackage{colortbl} 
 \usepackage{amsmath,amssymb}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\setcounter{secnumdepth}{-\maxdimen} 
 \usepackage{iftex}
 
 % --- 2. THỐNG NHẤT FONT CHỮ (Font Setup) ---
@@ -16,7 +22,7 @@
   \usepackage[utf8]{inputenc}
   \usepackage[T1]{fontenc}
   \usepackage{mathptmx} 
-\else % if luatex or xetex
+\else 
   \usepackage{fontspec}
   \setmainfont{Times New Roman}
   \usepackage{unicode-math}
@@ -25,7 +31,7 @@
 \usepackage{textcomp}
 \usepackage{lmodern}
 
-% Upquote if available
+
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \IfFileExists{microtype.sty}{%
   \usepackage[]{microtype}
@@ -91,14 +97,6 @@
 \patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
 \makeatother
 
-% --- BỔ SUNG: Cấu hình đường kẻ ngang mờ giữa các hàng ---
-\definecolor{faintgray}{gray}{0.85} % Định nghĩa màu xám mờ
-\newcommand{\faintline}{%
-  \noalign{\global\arrayrulecolor{faintgray}}%
-  \hline
-  \noalign{\global\arrayrulecolor{black}}%
-} % Lệnh kẻ đường mờ và trả lại màu đen cho đường viền chính
-
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
 \setlength{\emergencystretch}{3em}
@@ -115,19 +113,45 @@
 \date{}
 
 \usepackage{tocloft}
-\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}} % Giữ lại chấm nối nếu cần
-\renewcommand{\cftsubsecfont}{\bfseries}               % In đậm tên mục (1. Giới thiệu, 2. Mô tả,...)
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}} 
+\renewcommand{\cftsubsecfont}{\bfseries}               % 
 \renewcommand{\cftsubsecleader}{\bfseries\cftdotfill{\cftdotsep}} % In đậm dấu chấm nối
 \renewcommand{\cftsubsecpagefont}{\bfseries}           % In đậm số trang của mục
+
+\usepackage{titlesec}
+
+% Chỉnh định dạng cho \section (mục 1, 2, 3, ...)
+\titleformat{\subsection}
+  {\Large\bfseries\underline}   % cỡ chữ, in đậm, gạch chân
+  {\thesection}                 % số mục
+  {1em}                         % khoảng cách giữa số và tiêu đề
+  {}                            % trước tiêu đề
+  []                            % sau tiêu đề
+
+% Chỉnh định dạng cho \subsection (1.1, 1.2, ...)
+\titleformat{\subsubsection}
+  {\large\bfseries}             % cỡ chữ large, in đậm
+  {\thesubsection}
+  {1em}
+  {}
+  []
+
 
 \begin{document}
 \newpage
 \thispagestyle{empty} % Tắt số trang ở trang bìa
 
-\begin{titlepage} % Sử dụng môi trường titlepage chuẩn để cô lập định dạng
+\begin{titlepage} 
+    \begin{tikzpicture}[remember picture, overlay]
+        \draw[black, line width=2pt] 
+            ([shift={(1cm,-1cm)}] current page.north west) rectangle 
+            ([shift={(-1cm,1cm)}] current page.south east);
+    \end{tikzpicture}
+    
     \setlength{\parskip}{0pt} % Triệt tiêu khoảng trống parskip gây lệch vertical spacing
-    \vfill
+    \vspace*{\fill}
     \begin{center}
+        \includegraphics[width=4cm]{logo-PTIT.jpg} \\[1.5cm]
         {\Huge \textbf{Personal Finance Management}} \\[1.5cm]
         {\huge \textbf{Nhóm 3}} \\[0.5cm]
         Lê Anh Minh -- B24DCCE180 \\
@@ -135,7 +159,7 @@
         Nguyễn Đình Tiến -- B24DCCE264 \\
         Nguyễn Đinh Anh Quân -- B24DCCE222
     \end{center}
-    \vfill
+    \vspace*{\fill}
 \end{titlepage}
 
 \newpage
@@ -175,7 +199,7 @@ Nội dung
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{\texttt{Core}} & Làm \& code trước & Ghi chép \& phân loại thu/chi; Thống kê số tiền trong ví; Lịch sử thu/chi; Chuyển tiền nội bộ \\ \faintline
+\textbf{\texttt{Core}} & Làm \& code trước & Ghi chép \& phân loại thu/chi; Thống kê số tiền trong ví; Lịch sử thu/chi; Chuyển tiền nội bộ \\ 
 \textbf{\texttt{Deferred}} & Làm sau khi Core hoàn thiện & Công nợ · Sổ tiết kiệm · Chứng chỉ quỹ · Quỹ mục tiêu · Chốt tháng · Import/Export \\
 \end{longtable}
 }
@@ -311,8 +335,8 @@ Nội dung
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{\texttt{Core}} & Làm \& code trước & Như mục 1.2 \\ \faintline
-\textbf{\texttt{Deferred}} & Thuộc dự án, làm sau & Như mục 1.2 \\ \faintline
+\textbf{\texttt{Core}} & Làm \& code trước & Như mục 1.2 \\ 
+\textbf{\texttt{Deferred}} & Thuộc dự án, làm sau & Như mục 1.2 \\ 
 \textbf{\texttt{Out}} & Không thuộc dự án này & Đăng nhập/phân quyền ·
 Cloud sync · Bản Web · Bản Mobile · Đồng bộ đa thiết bị \\
 \end{longtable}
@@ -341,17 +365,17 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{Wallet} / \texttt{Account} & Ví / Tài khoản & Nơi lưu tiền: cash, mb bank, timo, vietcombank, msb, shopee pay \\ \faintline
-\texttt{Transaction} & Giao dịch & Thu/chi tiền, ghi nhận ngày, số tiền, ví, danh mục \\ \faintline
-\texttt{Transfer} & Chuyển khoản & Chuyển tiền nội bộ giữa 2 ví (không tính thu/chi) \\ \faintline
-\texttt{Income} / \texttt{Expense} & Thu nhập / Chi tiêu & 2 loại giao dịch chính \\ \faintline
-\texttt{Category} & Danh mục & Phân loại 3 cấp: \texttt{type} → \texttt{group} → \texttt{category} \\ \faintline
-\texttt{Debt} & Công nợ & Cho vay (\texttt{lend}) / đi vay (\texttt{borrow}), thu (\texttt{collect}), trả (\texttt{repay}), xóa (\texttt{write-off}) \\ \faintline
-\texttt{Receivable} / \texttt{Payable} & Phải thu / Phải trả & Công nợ tổng hợp \\ \faintline
-\texttt{Saving} & Sổ tiết kiệm & Gửi tiết kiệm kỳ hạn / không kỳ hạn, có lãi \\ \faintline
-\texttt{FundCertificate} & Chứng chỉ quỹ & Đầu tư: stock / bond / balance \\ \faintline
-\texttt{Goal\ Fund} & Quỹ mục tiêu & Emergency, Health, Target, Retirement \\ \faintline
-\texttt{Snapshot} & Chốt số tháng & Đóng băng số liệu cuối tháng (audit trail) \\ \faintline
+\texttt{Wallet} / \texttt{Account} & Ví / Tài khoản & Nơi lưu tiền: cash, mb bank, timo, vietcombank, msb, shopee pay \\ 
+\texttt{Transaction} & Giao dịch & Thu/chi tiền, ghi nhận ngày, số tiền, ví, danh mục \\ 
+\texttt{Transfer} & Chuyển khoản & Chuyển tiền nội bộ giữa 2 ví (không tính thu/chi) \\ 
+\texttt{Income} / \texttt{Expense} & Thu nhập / Chi tiêu & 2 loại giao dịch chính \\ 
+\texttt{Category} & Danh mục & Phân loại 3 cấp: \texttt{type} → \texttt{group} → \texttt{category} \\ 
+\texttt{Debt} & Công nợ & Cho vay (\texttt{lend}) / đi vay (\texttt{borrow}), thu (\texttt{collect}), trả (\texttt{repay}), xóa (\texttt{write-off}) \\ 
+\texttt{Receivable} / \texttt{Payable} & Phải thu / Phải trả & Công nợ tổng hợp \\ 
+\texttt{Saving} & Sổ tiết kiệm & Gửi tiết kiệm kỳ hạn / không kỳ hạn, có lãi \\ 
+\texttt{FundCertificate} & Chứng chỉ quỹ & Đầu tư: stock / bond / balance \\ 
+\texttt{Goal\ Fund} & Quỹ mục tiêu & Emergency, Health, Target, Retirement \\ 
+\texttt{Snapshot} & Chốt số tháng & Đóng băng số liệu cuối tháng (audit trail) \\ 
 \texttt{Cash\ Flow} & Dòng tiền & Income − Expense trong 1 kỳ \\
 \end{longtable}
 }
@@ -388,9 +412,9 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-WAL-01} & Hiển thị danh sách ví \& số dư từng ví & Must & Core \\ \faintline
-\texttt{FR-WAL-02} & Số dư ví = Σ(transactions) ± Σ(transfers) ± Σ(debt flows) & Must & Core \\ \faintline
-\texttt{FR-WAL-03} & Hiển thị tỷ trọng (\%) từng ví & Should & Core \\ \faintline
+\texttt{FR-WAL-01} & Hiển thị danh sách ví \& số dư từng ví & Must & Core \\ 
+\texttt{FR-WAL-02} & Số dư ví = Σ(transactions) ± Σ(transfers) ± Σ(debt flows) & Must & Core \\ 
+\texttt{FR-WAL-03} & Hiển thị tỷ trọng (\%) từng ví & Should & Core \\ 
 \texttt{FR-WAL-04} & Tạo / chỉnh sửa ví & Could & Deferred \\
 \end{longtable}
 }
@@ -417,10 +441,10 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-TXN-01} & Thêm giao dịch (date, amount, wallet, type, group, category) & Must & Core \\ \faintline
-\texttt{FR-TXN-02} & Số tiền dùng \texttt{BigDecimal}, dương=thu, âm=chi & Must & Core \\ \faintline
-\texttt{FR-TXN-03} & Sửa / xóa giao dịch & Must & Core \\ \faintline
-\texttt{FR-TXN-04} & Xem lịch sử, lọc theo ngày/thời gian/nhóm/danh mục & Must & Core \\ \faintline
+\texttt{FR-TXN-01} & Thêm giao dịch (date, amount, wallet, type, group, category) & Must & Core \\ 
+\texttt{FR-TXN-02} & Số tiền dùng \texttt{BigDecimal}, dương=thu, âm=chi & Must & Core \\ 
+\texttt{FR-TXN-03} & Sửa / xóa giao dịch & Must & Core \\ 
+\texttt{FR-TXN-04} & Xem lịch sử, lọc theo ngày/thời gian/nhóm/danh mục & Must & Core \\ 
 \texttt{FR-TXN-05} & Cột type/group/category là dropdown động & Must & Core \\
 \end{longtable}
 }
@@ -447,8 +471,8 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-TRF-01} & Chuyển tiền giữa 2 ví (date, amount, from, to) & Must & Core \\ \faintline
-\texttt{FR-TRF-02} & Không tính là thu/chi, chỉ cập nhật số dư & Must & Core \\ \faintline
+\texttt{FR-TRF-01} & Chuyển tiền giữa 2 ví (date, amount, from, to) & Must & Core \\ 
+\texttt{FR-TRF-02} & Không tính là thu/chi, chỉ cập nhật số dư & Must & Core \\ 
 \texttt{FR-TRF-03} & Ngăn chuyển khi số dư ví nguồn không đủ & Should & Core \\
 \end{longtable}
 }
@@ -475,9 +499,9 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-CAT-01} & Phân cấp 3 cấp type → group → category & Must & Core \\ \faintline
-\texttt{FR-CAT-02} & Định nghĩa group cho income \& expense & Must & Core \\ \faintline
-\texttt{FR-CAT-03} & Lọc group/category theo type/group đã chọn & Must & Core \\ \faintline
+\texttt{FR-CAT-01} & Phân cấp 3 cấp type → group → category & Must & Core \\ 
+\texttt{FR-CAT-02} & Định nghĩa group cho income \& expense & Must & Core \\ 
+\texttt{FR-CAT-03} & Lọc group/category theo type/group đã chọn & Must & Core \\ 
 \texttt{FR-CAT-04} & Thêm/sửa/xóa danh mục & Could & Core \\
 \end{longtable}
 }
@@ -504,10 +528,10 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-DSH-01} & Tổng tài sản = wallets + savings + investments + receivable − payable & Must & Core \\ \faintline
-\texttt{FR-DSH-02} & Biểu đồ cơ cấu tài sản, ví, quỹ & Should & Core \\ \faintline
-\texttt{FR-DSH-03} & Thu/chi theo tháng (income, expense, cash flow, savings rate) & Should & Core \\ \faintline
-\texttt{FR-DSH-04} & Biểu đồ thu/chi theo nhóm \& danh mục & Should & Core \\ \faintline
+\texttt{FR-DSH-01} & Tổng tài sản = wallets + savings + investments + receivable − payable & Must & Core \\ 
+\texttt{FR-DSH-02} & Biểu đồ cơ cấu tài sản, ví, quỹ & Should & Core \\ 
+\texttt{FR-DSH-03} & Thu/chi theo tháng (income, expense, cash flow, savings rate) & Should & Core \\ 
+\texttt{FR-DSH-04} & Biểu đồ thu/chi theo nhóm \& danh mục & Should & Core \\ 
 \texttt{FR-DSH-05} & Bảng thống kê 12 tháng gần nhất & Could & Core \\
 \end{longtable}
 }
@@ -534,9 +558,9 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-DBT-01} & Ghi nhận lend/borrow/collect/repay/write-off & Must & Deferred \\ \faintline
-\texttt{FR-DBT-02} & receivable = lend − collect − write-off lend; payable = borrow − repay − write-off borrow & Must & Deferred \\ \faintline
-\texttt{FR-DBT-03} & Sao kê công nợ theo người & Should & Deferred \\ \faintline
+\texttt{FR-DBT-01} & Ghi nhận lend/borrow/collect/repay/write-off & Must & Deferred \\ 
+\texttt{FR-DBT-02} & receivable = lend − collect − write-off lend; payable = borrow − repay − write-off borrow & Must & Deferred \\ 
+\texttt{FR-DBT-03} & Sao kê công nợ theo người & Should & Deferred \\ 
 \texttt{FR-DBT-04} & Cập nhật số dư ví khi có nghiệp vụ công nợ & Must & Deferred \\
 \end{longtable}
 }
@@ -563,8 +587,8 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-SAV-01} & Quản lý sổ tiết kiệm (fund, principal, term, rate, start) & Must & Deferred \\ \faintline
-\texttt{FR-SAV-02} & Tính số dư: kỳ hạn cố định vs unlimited & Must & Deferred \\ \faintline
+\texttt{FR-SAV-01} & Quản lý sổ tiết kiệm (fund, principal, term, rate, start) & Must & Deferred \\ 
+\texttt{FR-SAV-02} & Tính số dư: kỳ hạn cố định vs unlimited & Must & Deferred \\ 
 \texttt{FR-SAV-03} & Hiển thị tiến độ kỳ hạn (process) & Should & Deferred \\
 \end{longtable}
 }
@@ -591,9 +615,9 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-FCT-01} & Quản lý chứng chỉ quỹ (fund, name, type, principal, start) & Must & Deferred \\ \faintline
-\texttt{FR-FCT-02} & Nhập giá trị hiện tại (balance) theo giá thị trường & Must & Deferred \\ \faintline
-\texttt{FR-FCT-03} & Tính suất sinh lời năm (annualized return) bằng RATE() & Must & Deferred \\ \faintline
+\texttt{FR-FCT-01} & Quản lý chứng chỉ quỹ (fund, name, type, principal, start) & Must & Deferred \\ 
+\texttt{FR-FCT-02} & Nhập giá trị hiện tại (balance) theo giá thị trường & Must & Deferred \\ 
+\texttt{FR-FCT-03} & Tính suất sinh lời năm (annualized return) bằng RATE() & Must & Deferred \\ 
 \texttt{FR-FCT-04} & Hiển thị lãi/lỗ = balance − principal & Should & Deferred \\
 \end{longtable}
 }
@@ -620,8 +644,8 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-GFD-01} & Quỹ = cash + saving + fund\_cert & Must & Deferred \\ \faintline
-\texttt{FR-GFD-02} & Hiển thị total, target, tiến độ \% & Must & Deferred \\ \faintline
+\texttt{FR-GFD-01} & Quỹ = cash + saving + fund\_cert & Must & Deferred \\ 
+\texttt{FR-GFD-02} & Hiển thị total, target, tiến độ \% & Must & Deferred \\ 
 \texttt{FR-GFD-03} & Phân bổ tiền mặt vào quỹ (funds\_cash) & Should & Deferred \\
 \end{longtable}
 }
@@ -648,8 +672,8 @@ Scope
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-SST-01} & Thêm dòng tháng mới cho assets\_total \& fund\_performance & Must & Deferred \\ \faintline
-\texttt{FR-SST-02} & Chuyển formula → value (đóng băng) & Must & Deferred \\ \faintline
+\texttt{FR-SST-01} & Thêm dòng tháng mới cho assets\_total \& fund\_performance & Must & Deferred \\ 
+\texttt{FR-SST-02} & Chuyển formula → value (đóng băng) & Must & Deferred \\ 
 \texttt{FR-SST-03} & Hiển thị chuỗi thời gian tổng tài sản theo tháng & Should & Deferred \\
 \end{longtable}
 }
@@ -669,8 +693,8 @@ ID & Yêu cầu & MoSCoW & Scope \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{FR-IEX-01} & Import từ Excel/CSV & Must & Deferred \\ \faintline
-\texttt{FR-IEX-02} & Export dữ liệu \& báo cáo & Should & Deferred \\ \faintline
+\texttt{FR-IEX-01} & Import từ Excel/CSV & Must & Deferred \\ 
+\texttt{FR-IEX-02} & Export dữ liệu \& báo cáo & Should & Deferred \\ 
 \texttt{FR-IEX-03} & Validate dữ liệu trước khi import & Must & Deferred \\
 \end{longtable}
 }
@@ -696,8 +720,8 @@ ID & Yêu cầu \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{NFR-PERF-01} & Thao tác thêm/sửa/xóa giao dịch phản hồi \textless{} 1s \\ \faintline
-\texttt{NFR-PERF-02} & Mở dashboard với ≥ 5.000 giao dịch \textless{} 3s \\ \faintline
+\texttt{NFR-PERF-01} & Thao tác thêm/sửa/xóa giao dịch phản hồi \textless{} 1s \\ 
+\texttt{NFR-PERF-02} & Mở dashboard với ≥ 5.000 giao dịch \textless{} 3s \\ 
 \texttt{NFR-PERF-03} & Import 1.000+ giao dịch \textless{} 10s \\
 \end{longtable}
 }
@@ -714,8 +738,8 @@ ID & Yêu cầu \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{NFR-SEC-01} & Dữ liệu lưu cục bộ, không gửi lên server ngoài \\ \faintline
-\texttt{NFR-SEC-02} & Có thể mã hóa dữ liệu lưu (tùy chọn) \\ \faintline
+\texttt{NFR-SEC-01} & Dữ liệu lưu cục bộ, không gửi lên server ngoài \\ 
+\texttt{NFR-SEC-02} & Có thể mã hóa dữ liệu lưu (tùy chọn) \\ 
 \texttt{NFR-SEC-03} & Single-user, không đăng nhập \\
 \end{longtable}
 }
@@ -736,9 +760,9 @@ Yêu cầu
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{NFR-FIN-01} & \textbf{Bắt buộc dùng \texttt{BigDecimal}} cho mọi số tiền, lãi suất, số dư --- không dùng \texttt{double}/\texttt{float} \\ \faintline
-\texttt{NFR-FIN-02} & Kết quả tính toán khớp với file Excel (đối chiếu dữ liệu) \\ \faintline
-\texttt{NFR-FIN-03} & Làm tròn đến 2 số thập phân (quy tắc kinh doanh) \\ \faintline
+\texttt{NFR-FIN-01} & \textbf{Bắt buộc dùng \texttt{BigDecimal}} cho mọi số tiền, lãi suất, số dư --- không dùng \texttt{double}/\texttt{float} \\ 
+\texttt{NFR-FIN-02} & Kết quả tính toán khớp với file Excel (đối chiếu dữ liệu) \\ 
+\texttt{NFR-FIN-03} & Làm tròn đến 2 số thập phân (quy tắc kinh doanh) \\ 
 \texttt{NFR-FIN-04} & Nhất quán số dư ví: mọi giao dịch cập nhật chính xác \\
 \end{longtable}
 }
@@ -759,10 +783,10 @@ Yêu cầu
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{NFR-MNT-01} & Tuân thủ 4 nguyên lý OOP (Encapsulation, Inheritance, Polymorphism, Abstraction) \\ \faintline
-\texttt{NFR-MNT-02} & Tuân thủ SOLID (SRP, OCP, LSP, ISP, DIP) \\ \faintline
-\texttt{NFR-MNT-03} & Áp dụng Design Patterns (Strategy, Factory, Observer, State, Command, Template Method, Builder) \\ \faintline
-\texttt{NFR-MNT-04} & Tách lớp: View (JavaFX/FXML) / Controller / Model / Service / Repository \\ \faintline
+\texttt{NFR-MNT-01} & Tuân thủ 4 nguyên lý OOP (Encapsulation, Inheritance, Polymorphism, Abstraction) \\ 
+\texttt{NFR-MNT-02} & Tuân thủ SOLID (SRP, OCP, LSP, ISP, DIP) \\ 
+\texttt{NFR-MNT-03} & Áp dụng Design Patterns (Strategy, Factory, Observer, State, Command, Template Method, Builder) \\ 
+\texttt{NFR-MNT-04} & Tách lớp: View (JavaFX/FXML) / Controller / Model / Service / Repository \\ 
 \texttt{NFR-MNT-05} & Comments/JavaDoc; phân package theo module \\
 \end{longtable}
 }
@@ -779,8 +803,8 @@ ID & Yêu cầu \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{NFR-USA-01} & Giao diện trực quan, dễ dùng cho người không chuyên \\ \faintline
-\texttt{NFR-USA-02} & Dropdown, validation, thông báo lỗi rõ ràng \\ \faintline
+\texttt{NFR-USA-01} & Giao diện trực quan, dễ dùng cho người không chuyên \\ 
+\texttt{NFR-USA-02} & Dropdown, validation, thông báo lỗi rõ ràng \\ 
 \texttt{NFR-USA-03} & Biểu đồ trực quan (donut, line, bar) \\
 \end{longtable}
 }
@@ -797,8 +821,8 @@ ID & Yêu cầu \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{NFR-TST-01} & Logic nghiệp vụ tách biệt khỏi GUI \\ \faintline
-\texttt{NFR-TST-02} & Unit test: lãi suất, công nợ, chuyển khoản, RATE \\ \faintline
+\texttt{NFR-TST-01} & Logic nghiệp vụ tách biệt khỏi GUI \\ 
+\texttt{NFR-TST-02} & Unit test: lãi suất, công nợ, chuyển khoản, RATE \\ 
 \texttt{NFR-TST-03} & Coverage ≥ 80\% domain/service \\
 \end{longtable}
 }
@@ -815,7 +839,7 @@ ID & Yêu cầu \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{NFR-COMP-01} & Chạy Windows (chính), có thể macOS/Linux \\ \faintline
+\texttt{NFR-COMP-01} & Chạy Windows (chính), có thể macOS/Linux \\ 
 \texttt{NFR-COMP-02} & Java 17+ (JavaFX), package \texttt{.exe} bằng jpackage \\
 \end{longtable}
 }
@@ -832,7 +856,7 @@ ID & Yêu cầu \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{NFR-SCAL-01} & Hỗ trợ 10.000+ giao dịch không giảm hiệu năng \\ \faintline
+\texttt{NFR-SCAL-01} & Hỗ trợ 10.000+ giao dịch không giảm hiệu năng \\ 
 \texttt{NFR-SCAL-02} & Mở rộng module mới không phá vỡ hệ thống \\
 \end{longtable}
 }
@@ -863,21 +887,21 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Xem số dư các ví (View Wallet Balances) \\ \faintline
-\textbf{Mô tả} & Người dùng xem số dư hiện tại của từng ví và tỷ trọng của mỗi ví trên tổng tài sản. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Hệ thống đã có dữ liệu ví (tối thiểu 1 ví). \\ \faintline
-\textbf{Post-condition} & Người dùng nhìn thấy bảng số dư từng ví + số dư tổng + tỷ trọng (\%). \\ \faintline
-\textbf{Giả định} & Đã có dữ liệu ví; số dư được tính từ giao dịch, chuyển khoản và công nợ đã lưu. \\ \faintline
-\textbf{Trigger} & Người dùng mở màn hình ``Wallets'' hoặc trang Dashboard. \\ \faintline
-\textbf{Frequency} & Rất thường xuyên (mỗi lần mở app). \\ \faintline
-\textbf{Priority} & \texttt{Core} · Must \\ \faintline
+\textbf{Tên} & Xem số dư các ví (View Wallet Balances) \\ 
+\textbf{Mô tả} & Người dùng xem số dư hiện tại của từng ví và tỷ trọng của mỗi ví trên tổng tài sản. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Hệ thống đã có dữ liệu ví (tối thiểu 1 ví). \\ 
+\textbf{Post-condition} & Người dùng nhìn thấy bảng số dư từng ví + số dư tổng + tỷ trọng (\%). \\ 
+\textbf{Giả định} & Đã có dữ liệu ví; số dư được tính từ giao dịch, chuyển khoản và công nợ đã lưu. \\ 
+\textbf{Trigger} & Người dùng mở màn hình ``Wallets'' hoặc trang Dashboard. \\ 
+\textbf{Frequency} & Rất thường xuyên (mỗi lần mở app). \\ 
+\textbf{Priority} & \texttt{Core} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng chọn mục ``Wallet''. \\
 &2. Hệ thống lấy danh sách ví (\texttt{List\textless{}Wallet\textgreater{}}).\\
 &3. Với mỗi ví, hệ thống tính \texttt{balance = Σ(transactions) ± Σ(transfers) ± Σ(debt flows)}.\\ 
 &4. Hệ thống hiển thị bảng: \texttt{Wallet | Balance | Rate\%}. \\ 
-&5. Hệ thống hiển thị tổng số dư (Total). \\ \faintline
-\textbf{Alternate Flow} & 3a. Nếu ví chưa có giao dịch nào → hiển thị \texttt{balance = 0}. \\ \faintline
+&5. Hệ thống hiển thị tổng số dư (Total). \\ 
+\textbf{Alternate Flow} & 3a. Nếu ví chưa có giao dịch nào → hiển thị \texttt{balance = 0}. \\ 
 \textbf{Exception Flow} & 5a. Nếu danh sách ví rỗng → thông báo ``Chưa có ví, hãy tạo ví mới''. \\
 \end{longtable}
 }
@@ -900,15 +924,15 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Ghi chép giao dịch thu/chi (Create Transaction) \\ \faintline
-\textbf{Mô tả} & Người dùng nhập một giao dịch thu hoặc chi với ngày, số tiền, ví, và phân loại danh mục. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Có ít nhất 1 ví và hệ thống đã có danh mục phân loại. \\ \faintline
-\textbf{Post-condition} & Một giao dịch mới được lưu, số dư ví tương ứng được cập nhật. \\ \faintline
-\textbf{Giả định} & Có ≥ 1 ví; danh mục phân loại đã được cấu hình; hệ thống validate danh mục theo \texttt{type}/\texttt{group}. \\ \faintline
-\textbf{Trigger} & Người dùng bấm ``Add Transaction''. \\ \faintline
-\textbf{Frequency} & Rất thường xuyên (mỗi khi có thu/chi phát sinh). \\ \faintline
-\textbf{Priority} & \texttt{Core} · Must \\ \faintline
+\textbf{Tên} & Ghi chép giao dịch thu/chi (Create Transaction) \\ 
+\textbf{Mô tả} & Người dùng nhập một giao dịch thu hoặc chi với ngày, số tiền, ví, và phân loại danh mục. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Có ít nhất 1 ví và hệ thống đã có danh mục phân loại. \\ 
+\textbf{Post-condition} & Một giao dịch mới được lưu, số dư ví tương ứng được cập nhật. \\ 
+\textbf{Giả định} & Có ≥ 1 ví; danh mục phân loại đã được cấu hình; hệ thống validate danh mục theo \texttt{type}/\texttt{group}. \\ 
+\textbf{Trigger} & Người dùng bấm ``Add Transaction''. \\ 
+\textbf{Frequency} & Rất thường xuyên (mỗi khi có thu/chi phát sinh). \\ 
+\textbf{Priority} & \texttt{Core} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng mở form ``Add Transaction''.\\
 &2. Hệ thống hiển thị các trường: date, amount, wallet, type, group, category.\\
 &3. Người dùng nhập ngày \& số tiền, chọn ví (dropdown), chọn type (income/expense).\\
@@ -916,8 +940,8 @@ Mô tả
 &5. Người dùng chọn group → hệ thống hiển thị danh sách \texttt{category} phù hợp.\\
 &6. Người dùng chọn category, xác nhận Save.\\
 &7. Hệ thống kiểm tra dữ liệu hợp lệ → thêm bản ghi.\\
-&8. Số dư ví được cập nhật; thông báo thành công. \\ \faintline
-\textbf{Alternate Flow} & 6a. Người dùng hủy bỏ → không lưu gì, đóng form. \\ \faintline
+&8. Số dư ví được cập nhật; thông báo thành công. \\ 
+\textbf{Alternate Flow} & 6a. Người dùng hủy bỏ → không lưu gì, đóng form. \\ 
 \textbf{Exception Flow} & 7a. Số tiền ≤ 0 hoặc không phải số → lỗi ``Amount must be > 0''. 7b. Ngày không hợp lệ → lỗi ``Invalid date''. 7c. Ví/category không hợp lệ → lỗi ``Category does not belong to selected group''. \\
 \end{longtable}
 }
@@ -938,21 +962,21 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Sửa / Xóa giao dịch (Edit / Delete Transaction) \\ \faintline
-\textbf{Mô tả} & Người dùng chỉnh sửa hoặc xóa một giao dịch đã nhập; số dư ví được tính lại. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Giao dịch tồn tại trong hệ thống. \\ \faintline
-\textbf{Post-condition} & Giao dịch được cập nhật hoặc xóa; số dư ví phản ánh đúng. \\ \faintline
-\textbf{Giả định} & Giao dịch cần sửa/xóa đang tồn tại và chưa bị đóng băng bởi snapshot. \\ \faintline
-\textbf{Trigger} & Người dùng chọn một giao dịch trong bảng lịch sử → ``Edit'' / ``Delete''. \\ \faintline
-\textbf{Frequency} & Trung bình. \\ \faintline
-\textbf{Priority} & \texttt{Core} · Must \\ \faintline
+\textbf{Tên} & Sửa / Xóa giao dịch (Edit / Delete Transaction) \\ 
+\textbf{Mô tả} & Người dùng chỉnh sửa hoặc xóa một giao dịch đã nhập; số dư ví được tính lại. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Giao dịch tồn tại trong hệ thống. \\ 
+\textbf{Post-condition} & Giao dịch được cập nhật hoặc xóa; số dư ví phản ánh đúng. \\ 
+\textbf{Giả định} & Giao dịch cần sửa/xóa đang tồn tại và chưa bị đóng băng bởi snapshot. \\ 
+\textbf{Trigger} & Người dùng chọn một giao dịch trong bảng lịch sử → ``Edit'' / ``Delete''. \\ 
+\textbf{Frequency} & Trung bình. \\ 
+\textbf{Priority} & \texttt{Core} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng chọn giao dịch từ danh sách.\\ 
 &2. Chọn hành động ``Edit'' hoặc ``Delete''.\\
 &3. \emph{Nếu Edit:} form hiển thị dữ liệu hiện tại; người dùng sửa \& lưu.\\
 &4. \emph{Nếu Delete:} hệ thống hỏi xác nhận. \\
 &5. Hệ thống cập nhật/xóa bản ghi. \\
-&6. Số dư ví được tính lại (giảm/trả lại giao dịch cũ). \\ \faintline
+&6. Số dư ví được tính lại (giảm/trả lại giao dịch cũ). \\ 
 \textbf{Exception Flow} & 4a. Người dùng hủy xác nhận → không xóa. \\
 \end{longtable}
 }
@@ -973,20 +997,20 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Xem lịch sử thu/chi (View Transaction History) \\ \faintline
-\textbf{Mô tả} & Người dùng xem danh sách giao dịch, lọc theo thời gian / ví / loại / nhóm / danh mục. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Hệ thống có dữ liệu giao dịch. \\ \faintline
-\textbf{Post-condition} & Hiển thị bảng giao dịch phù hợp bộ lọc, kèm tổng thu/chi. \\ \faintline
-\textbf{Giả định} & Hệ thống có dữ liệu giao dịch; bộ lọc có thể kết hợp (ngày, ví, type, group, category). \\ \faintline
-\textbf{Trigger} & Người dùng mở màn hình ``Transactions''. \\ \faintline
-\textbf{Frequency} & Rất thường xuyên. \\ \faintline
-\textbf{Priority} & \texttt{Core} · Must \\ \faintline
+\textbf{Tên} & Xem lịch sử thu/chi (View Transaction History) \\ 
+\textbf{Mô tả} & Người dùng xem danh sách giao dịch, lọc theo thời gian / ví / loại / nhóm / danh mục. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Hệ thống có dữ liệu giao dịch. \\ 
+\textbf{Post-condition} & Hiển thị bảng giao dịch phù hợp bộ lọc, kèm tổng thu/chi. \\ 
+\textbf{Giả định} & Hệ thống có dữ liệu giao dịch; bộ lọc có thể kết hợp (ngày, ví, type, group, category). \\ 
+\textbf{Trigger} & Người dùng mở màn hình ``Transactions''. \\ 
+\textbf{Frequency} & Rất thường xuyên. \\ 
+\textbf{Priority} & \texttt{Core} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng mở màn hình ``Transactions''.\\
 &2. Hệ thống hiển thị toàn bộ giao dịch.\\
 &3. Người dùng áp bộ lọc (khoảng ngày, ví, type, group, category).\\
 &4. Hệ thống lọc \& hiển thị danh sách.\\
-&5. Hệ thống hiển thị tổng thu, tổng chi ở cuối bảng. \\ \faintline
+&5. Hệ thống hiển thị tổng thu, tổng chi ở cuối bảng. \\ 
 \textbf{Alternate Flow} & 4a. Không có giao dịch phù hợp → thông báo ``No transactions match filter''. \\
 \end{longtable}
 }
@@ -1007,20 +1031,20 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Chuyển tiền nội bộ (Internal Transfer) \\ \faintline
-\textbf{Mô tả} & Người dùng chuyển tiền từ ví này sang ví khác; không tính là thu/chi. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Có ≥ 2 ví. \\ \faintline
-\textbf{Post-condition} & Ví nguồn giảm, ví đích tăng; không phát sinh bản ghi thu/chi. \\ \faintline
-\textbf{Giả định} & Có ≥ 2 ví; ví nguồn và ví đích khác nhau; số dư ví nguồn đủ để chuyển. \\ \faintline
-\textbf{Trigger} & Người dùng bấm ``Transfer Money''. \\ \faintline
-\textbf{Frequency} & Trung bình. \\ \faintline
-\textbf{Priority} & \texttt{Core} · Must \\ \faintline
+\textbf{Tên} & Chuyển tiền nội bộ (Internal Transfer) \\ 
+\textbf{Mô tả} & Người dùng chuyển tiền từ ví này sang ví khác; không tính là thu/chi. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Có ≥ 2 ví. \\ 
+\textbf{Post-condition} & Ví nguồn giảm, ví đích tăng; không phát sinh bản ghi thu/chi. \\ 
+\textbf{Giả định} & Có ≥ 2 ví; ví nguồn và ví đích khác nhau; số dư ví nguồn đủ để chuyển. \\ 
+\textbf{Trigger} & Người dùng bấm ``Transfer Money''. \\ 
+\textbf{Frequency} & Trung bình. \\ 
+\textbf{Priority} & \texttt{Core} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng mở form ``Transfer''.\\ 
 &2. Nhập ngày, chọn ví nguồn (from), ví đích (to), nhập số tiền.\\ 
 &3. Hệ thống kiểm tra \texttt{from ≠ to} và số dư ví nguồn đủ.\\
 &4. Hệ thống cập nhật: \texttt{from.balance -= amount}; \texttt{to.balance += amount}.\\
-&5. Lưu bản ghi chuyển khoản; thông báo thành công. \\ \faintline
+&5. Lưu bản ghi chuyển khoản; thông báo thành công. \\ 
 \textbf{Exception Flow} & 3a. \texttt{from == to} → lỗi ``Source and destination wallet must be different''. 3b. Số dư ví nguồn < amount → lỗi ``Insufficient balance''. \\
 \end{longtable}
 }
@@ -1043,20 +1067,20 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Phân loại thu/chi theo danh mục (Classify Transaction) \\ \faintline
-\textbf{Mô tả} & Người dùng gán một giao dịch vào danh mục phân cấp type → group → category. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Hệ thống có cấu hình danh mục. \\ \faintline
-\textbf{Post-condition} & Giao dịch được gán danh mục hợp lệ. \\ \faintline
-\textbf{Giả định} & Cấu hình danh mục đã tồn tại; \texttt{type}/\texttt{group}/\texttt{category} quan hệ 3 cấp khớp nhau. \\ \faintline
-\textbf{Trigger} & Người dùng nhập giao dịch mới hoặc sửa danh mục của giao dịch cũ. \\ \faintline
-\textbf{Frequency} & Rất thường xuyên (gắn với TXN-01). \\ \faintline
-\textbf{Priority} & \texttt{Core} · Must \\ \faintline
+\textbf{Tên} & Phân loại thu/chi theo danh mục (Classify Transaction) \\ 
+\textbf{Mô tả} & Người dùng gán một giao dịch vào danh mục phân cấp type → group → category. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Hệ thống có cấu hình danh mục. \\ 
+\textbf{Post-condition} & Giao dịch được gán danh mục hợp lệ. \\ 
+\textbf{Giả định} & Cấu hình danh mục đã tồn tại; \texttt{type}/\texttt{group}/\texttt{category} quan hệ 3 cấp khớp nhau. \\ 
+\textbf{Trigger} & Người dùng nhập giao dịch mới hoặc sửa danh mục của giao dịch cũ. \\ 
+\textbf{Frequency} & Rất thường xuyên (gắn với TXN-01). \\ 
+\textbf{Priority} & \texttt{Core} · Must \\ 
 \textbf{Main Flow} & 1. Hệ thống xác định \texttt{type} người dùng chọn.\\
 &2. Hệ thống lọc danh sách \texttt{group} theo \texttt{type}.\\
 &3. Người dùng chọn \texttt{group}.\\
 &4. Hệ thống lọc danh sách \texttt{category} theo \texttt{type} + \texttt{group}.\\
-&5. Người dùng chọn \texttt{category}; lưu phân loại. \\ \faintline
+&5. Người dùng chọn \texttt{category}; lưu phân loại. \\ 
 \textbf{Exception Flow} & 5a. Danh mục không tồn tại / không khớp group → lỗi ``Category mismatch''. \\
 \end{longtable}
 }
@@ -1077,15 +1101,15 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Quản lý danh mục phân loại (Manage Categories) \\ \faintline
-\textbf{Mô tả} & Người dùng thêm / sửa / xóa group, category trong danh mục. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Hệ thống đang ở màn hình quản lý danh mục. \\ \faintline
-\textbf{Post-condition} & Danh mục được cập nhật; dropdown và dữ liệu mới phản ánh đúng. \\ \faintline
-\textbf{Giả định} & Người dùng có quyền quản lý danh mục; thay đổi không làm hỏng dữ liệu giao dịch đã gán. \\ \faintline
-\textbf{Trigger} & Người dùng truy cập ``Manage Categories''. \\ \faintline
-\textbf{Frequency} & Thấp. \\ \faintline
-\textbf{Priority} & \texttt{Core} · Could \\ \faintline
+\textbf{Tên} & Quản lý danh mục phân loại (Manage Categories) \\ 
+\textbf{Mô tả} & Người dùng thêm / sửa / xóa group, category trong danh mục. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Hệ thống đang ở màn hình quản lý danh mục. \\ 
+\textbf{Post-condition} & Danh mục được cập nhật; dropdown và dữ liệu mới phản ánh đúng. \\ 
+\textbf{Giả định} & Người dùng có quyền quản lý danh mục; thay đổi không làm hỏng dữ liệu giao dịch đã gán. \\ 
+\textbf{Trigger} & Người dùng truy cập ``Manage Categories''. \\ 
+\textbf{Frequency} & Thấp. \\ 
+\textbf{Priority} & \texttt{Core} · Could \\ 
 \textbf{Main Flow} & 1. Người dùng chọn \texttt{type}.\\
 &2. Hệ thống hiển thị cây danh mục (group → category).\\
 &3. Người dùng thêm group mới / thêm category vào group / sửa tên / xóa.\\
@@ -1109,19 +1133,19 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Xem dashboard tổng quan (View Dashboard) \\ \faintline
-\textbf{Mô tả} & Người dùng xem tổng quan tài chính: tổng tài sản, cơ cấu ví, thu/chi theo tháng, quỹ mục tiêu, biểu đồ. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Hệ thống có dữ liệu giao dịch. \\ \faintline
-\textbf{Post-condition} & Dashboard hiển thị các chỉ số \& biểu đồ cập nhật. \\ \faintline
-\textbf{Giả định} & Hệ thống có dữ liệu giao dịch và cấu hình danh mục để tính toán; số liệu dùng \texttt{BigDecimal}. \\ \faintline
-\textbf{Trigger} & Người dùng mở ứng dụng (mặc định hiển thị dashboard). \\ \faintline
-\textbf{Frequency} & Rất thường xuyên. \\ \faintline
-\textbf{Priority} & \texttt{Core} · Must \\ \faintline
+\textbf{Tên} & Xem dashboard tổng quan (View Dashboard) \\ 
+\textbf{Mô tả} & Người dùng xem tổng quan tài chính: tổng tài sản, cơ cấu ví, thu/chi theo tháng, quỹ mục tiêu, biểu đồ. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Hệ thống có dữ liệu giao dịch. \\ 
+\textbf{Post-condition} & Dashboard hiển thị các chỉ số \& biểu đồ cập nhật. \\ 
+\textbf{Giả định} & Hệ thống có dữ liệu giao dịch và cấu hình danh mục để tính toán; số liệu dùng \texttt{BigDecimal}. \\ 
+\textbf{Trigger} & Người dùng mở ứng dụng (mặc định hiển thị dashboard). \\ 
+\textbf{Frequency} & Rất thường xuyên. \\ 
+\textbf{Priority} & \texttt{Core} · Must \\ 
 \textbf{Main Flow} & 1. Hệ thống tính tổng tài sản = wallets + savings + investments + receivable − payable.\\
 &2. Hệ thống tính thu/chi theo tháng hiện tại \& 12 tháng gần nhất.\\
 &3. Hệ thống hiển thị biểu đồ: donut cơ cấu tài sản, line dòng tiền, bar thu/chi theo nhóm.\\
-&4. Hệ thống hiển thị bảng thống kê tháng (income, expense, cash flow, savings rate). \\ \faintline
+&4. Hệ thống hiển thị bảng thống kê tháng (income, expense, cash flow, savings rate). \\ 
 \textbf{Exception Flow} & 4a. Không có dữ liệu → hiển thị dashboard trống + thông báo. \\
 \end{longtable}
 }
@@ -1142,19 +1166,19 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Quản lý công nợ (Manage Debts) \\ \faintline
-\textbf{Mô tả} & Người dùng ghi nhận các nghiệp vụ cho vay/đi vay, thu nợ, trả nợ, xóa nợ. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Có ít nhất 1 ví. \\ \faintline
-\textbf{Post-condition} & Công nợ được ghi nhận; receivable/payable \& số dư ví được cập nhật. \\ \faintline
-\textbf{Giả định} & Có ≥ 1 ví; các nghiệp vụ không vi phạm logic phải thu/phải trả. \\ \faintline
-\textbf{Trigger} & Người dùng truy cập ``Debts''. \\ \faintline
-\textbf{Frequency} & Trung bình. \\ \faintline
-\textbf{Priority} & \texttt{Deferred} · Must \\ \faintline
+\textbf{Tên} & Quản lý công nợ (Manage Debts) \\ 
+\textbf{Mô tả} & Người dùng ghi nhận các nghiệp vụ cho vay/đi vay, thu nợ, trả nợ, xóa nợ. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Có ít nhất 1 ví. \\ 
+\textbf{Post-condition} & Công nợ được ghi nhận; receivable/payable \& số dư ví được cập nhật. \\ 
+\textbf{Giả định} & Có ≥ 1 ví; các nghiệp vụ không vi phạm logic phải thu/phải trả. \\ 
+\textbf{Trigger} & Người dùng truy cập ``Debts''. \\ 
+\textbf{Frequency} & Trung bình. \\ 
+\textbf{Priority} & \texttt{Deferred} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng chọn loại nghiệp vụ (lend/borrow/collect/repay/write-off).\\
 &2. Nhập ngày, batch, người (person), số tiền, ví.\\
 &3. Hệ thống xác định nghiệp vụ: - \texttt{lend} → tăng receivable, giảm ví. -\texttt{borrow} → tăng payable, tăng ví. -\texttt{collect} → giảm receivable, tăng ví. -\texttt{repay} → giảm payable, giảm ví. -\texttt{write-off lend} → giảm receivable (xóa). -\texttt{write-off borrow} → giảm payable (xóa). \\
-&4. Hệ thống lưu \& cập nhật số dư ví. \\ \faintline
+&4. Hệ thống lưu \& cập nhật số dư ví. \\ 
 \textbf{Exception Flow} & 3a. Vi phạm logic (thu nợ > phải thu) → lỗi. \\
 \end{longtable}
 }
@@ -1175,20 +1199,20 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Quản lý sổ tiết kiệm (Manage Savings) \\ \faintline
-\textbf{Mô tả} & Người dùng quản lý các sổ tiết kiệm có kỳ hạn / không kỳ hạn, tính số dư \& lãi. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Có quỹ mục tiêu (goal fund). \\ \faintline
-\textbf{Post-condition} & Sổ tiết kiệm được lưu; số dư \& tiến độ tính đúng. \\ \faintline
-\textbf{Giả định} & Có ít nhất 1 quỹ mục tiêu; \texttt{term} có trong danh mục kỳ hạn; lãi suất là \texttt{BigDecimal}. \\ \faintline
-\textbf{Trigger} & Người dùng truy cập ``Savings''. \\ \faintline
-\textbf{Frequency} & Thấp--trung bình. \\ \faintline
-\textbf{Priority} & \texttt{Deferred} · Must \\ \faintline
+\textbf{Tên} & Quản lý sổ tiết kiệm (Manage Savings) \\ 
+\textbf{Mô tả} & Người dùng quản lý các sổ tiết kiệm có kỳ hạn / không kỳ hạn, tính số dư \& lãi. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Có quỹ mục tiêu (goal fund). \\ 
+\textbf{Post-condition} & Sổ tiết kiệm được lưu; số dư \& tiến độ tính đúng. \\ 
+\textbf{Giả định} & Có ít nhất 1 quỹ mục tiêu; \texttt{term} có trong danh mục kỳ hạn; lãi suất là \texttt{BigDecimal}. \\ 
+\textbf{Trigger} & Người dùng truy cập ``Savings''. \\ 
+\textbf{Frequency} & Thấp--trung bình. \\ 
+\textbf{Priority} & \texttt{Deferred} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng thêm sổ tiết kiệm: fund, principal, term, rate, start.\\
 &2. Hệ thống tra \texttt{term} để lấy số ngày.\\
 &3. Hệ thống tính \texttt{balance}: kỳ hạn cố định hoặc unlimited.\\
 &4. Hệ thống tính \texttt{process} (tiến độ kỳ hạn).\\
-&5. Hiển thị danh sách sổ tiết kiệm. \\ \faintline
+&5. Hiển thị danh sách sổ tiết kiệm. \\ 
 \textbf{Exception Flow} & 2a. \texttt{term} không có trong danh mục → lỗi ``Invalid term''. \\
 \end{longtable}
 }
@@ -1209,21 +1233,21 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Quản lý chứng chỉ quỹ (Manage Fund Certificates) \\ \faintline
-\textbf{Mô tả} & Người dùng quản lý danh mục đầu tư: stock/bond/balanced, nhập giá hiện tại, tính suất sinh lời năm. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Có quỹ mục tiêu. \\ \faintline
-\textbf{Post-condition} & Chứng chỉ quỹ được lưu; suất sinh lời \& lãi/lỗ tính đúng. \\ \faintline
-\textbf{Giả định} & Có ít nhất 1 quỹ mục tiêu; \texttt{principal > 0}; \texttt{start} hợp lệ. \\ \faintline
-\textbf{Trigger} & Người dùng truy cập ``Fund Certificates''. \\ \faintline
-\textbf{Frequency} & Thấp--trung bình. \\ \faintline
-\textbf{Priority} & \texttt{Deferred} · Must \\ \faintline
+\textbf{Tên} & Quản lý chứng chỉ quỹ (Manage Fund Certificates) \\ 
+\textbf{Mô tả} & Người dùng quản lý danh mục đầu tư: stock/bond/balanced, nhập giá hiện tại, tính suất sinh lời năm. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Có quỹ mục tiêu. \\ 
+\textbf{Post-condition} & Chứng chỉ quỹ được lưu; suất sinh lời \& lãi/lỗ tính đúng. \\ 
+\textbf{Giả định} & Có ít nhất 1 quỹ mục tiêu; \texttt{principal > 0}; \texttt{start} hợp lệ. \\ 
+\textbf{Trigger} & Người dùng truy cập ``Fund Certificates''. \\ 
+\textbf{Frequency} & Thấp--trung bình. \\ 
+\textbf{Priority} & \texttt{Deferred} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng thêm chứng chỉ quỹ: fund, name, type, principal, start.\\
 &2. Người dùng nhập \texttt{balance} hiện tại.\\
 &3. Hệ thống tính số năm nắm giữ = (today − start)/365.25.\\
 &4. Hệ thống tính \texttt{rate} = RATE(nper=năm, pmt=0, pv=−principal, fv=balance).\\
 &5. Hệ thống tính \texttt{interest} = balance − principal.\\
-&6. Hiển thị danh sách. \\ \faintline
+&6. Hiển thị danh sách. \\ 
 \textbf{Exception Flow} & 3a. \texttt{principal} ≤ 0 hoặc ngày bất hợp lệ → lỗi. \\
 \end{longtable}
 }
@@ -1244,21 +1268,21 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Quản lý quỹ mục tiêu (Manage Goal Funds) \\ \faintline
-\textbf{Mô tả} & Người dùng theo dõi các quỹ, tổng của từng quỹ và tiến độ so với mục tiêu. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Có sổ tiết kiệm \& chứng chỉ quỹ. \\ \faintline
-\textbf{Post-condition} & Mỗi quỹ hiển thị cash + saving + fund\_cert + total + tiến độ \%. \\ \faintline
-\textbf{Giả định} & Có ít nhất 1 sổ tiết kiệm và 1 chứng chỉ quỹ; \texttt{target} ≥ 0. \\ \faintline
-\textbf{Trigger} & Người dùng truy cập ``Goal Funds''. \\ \faintline
-\textbf{Frequency} & Trung bình. \\ \faintline
-\textbf{Priority} & \texttt{Deferred} · Must \\ \faintline
+\textbf{Tên} & Quản lý quỹ mục tiêu (Manage Goal Funds) \\ 
+\textbf{Mô tả} & Người dùng theo dõi các quỹ, tổng của từng quỹ và tiến độ so với mục tiêu. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Có sổ tiết kiệm \& chứng chỉ quỹ. \\ 
+\textbf{Post-condition} & Mỗi quỹ hiển thị cash + saving + fund\_cert + total + tiến độ \%. \\ 
+\textbf{Giả định} & Có ít nhất 1 sổ tiết kiệm và 1 chứng chỉ quỹ; \texttt{target} ≥ 0. \\ 
+\textbf{Trigger} & Người dùng truy cập ``Goal Funds''. \\ 
+\textbf{Frequency} & Trung bình. \\ 
+\textbf{Priority} & \texttt{Deferred} · Must \\ 
 \textbf{Main Flow} & 1. Hệ thống lấy danh sách quỹ.\\
 &2. Người dùng phân bổ tiền mặt vào quỹ (\texttt{funds\_cash}).\\
 &3. Với mỗi quỹ: tính \texttt{cash}, \texttt{saving}, \texttt{fund\_cert}.\\
 &4. Hệ thống tính \texttt{total} = cash + saving + fund\_cert.\\
 &5. Hệ thống lấy \texttt{target} \& tính \texttt{process} = total/target.\\
-&6. Hiển thị bảng + biểu đồ tiến độ. \\ \faintline
+&6. Hiển thị bảng + biểu đồ tiến độ. \\ 
 \textbf{Exception Flow} & 5a. \texttt{target} = 0 → hiển thị process = N/A. \\
 \end{longtable}
 }
@@ -1279,20 +1303,20 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Chốt số cuối tháng (Month-End Freeze) \\ \faintline
-\textbf{Mô tả} & Hệ thống đóng băng số liệu tháng cũ và thêm dòng tháng mới cho chuỗi tổng tài sản \& hiệu suất quỹ. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Hệ thống có dữ liệu. \\ \faintline
-\textbf{Post-condition} & Số liệu tháng cũ được đóng băng (formula → value). \\ \faintline
-\textbf{Giả định} & Hệ thống có dữ liệu; chỉ chốt 1 lần mỗi tháng. \\ \faintline
-\textbf{Trigger} & Cuối tháng / khi mở app hoặc người dùng bấm ``Freeze''. \\ \faintline
-\textbf{Frequency} & 1 lần mỗi tháng. \\ \faintline
-\textbf{Priority} & \texttt{Deferred} · Must \\ \faintline
+\textbf{Tên} & Chốt số cuối tháng (Month-End Freeze) \\ 
+\textbf{Mô tả} & Hệ thống đóng băng số liệu tháng cũ và thêm dòng tháng mới cho chuỗi tổng tài sản \& hiệu suất quỹ. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Hệ thống có dữ liệu. \\ 
+\textbf{Post-condition} & Số liệu tháng cũ được đóng băng (formula → value). \\ 
+\textbf{Giả định} & Hệ thống có dữ liệu; chỉ chốt 1 lần mỗi tháng. \\ 
+\textbf{Trigger} & Cuối tháng / khi mở app hoặc người dùng bấm ``Freeze''. \\ 
+\textbf{Frequency} & 1 lần mỗi tháng. \\ 
+\textbf{Priority} & \texttt{Deferred} · Must \\ 
 \textbf{Main Flow} & 1. Hệ thống lấy dòng cuối của bảng assets\_total.\\
 &2. So sánh tháng dòng cuối với tháng hiện tại.\\
 &3. Nếu dòng cuối ở tháng hiện tại \& chưa đóng băng → không làm gì.\\
 &4. Ngược lại: chuyển công thức dòng cuối → giá trị; thêm dòng mới với tháng +1.\\
-&5. Lặp lại cho bảng fund\_performance. \\ \faintline
+&5. Lặp lại cho bảng fund\_performance. \\ 
 \textbf{Exception Flow} & 2a. Tháng dòng cuối = tháng hiện tại nhưng đã đóng băng → không thêm trùng. \\
 \end{longtable}
 }
@@ -1315,20 +1339,20 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Import dữ liệu (Import Data) \\ \faintline
-\textbf{Mô tả} & Người dùng nhập dữ liệu từ file Excel/CSV. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Có file Excel/CSV đúng định dạng. \\ \faintline
-\textbf{Post-condition} & Dữ liệu được import vào hệ thống. \\ \faintline
-\textbf{Giả định} & Dữ liệu hợp lệ trước khi import. \\ \faintline
-\textbf{Trigger} & Người dùng bấm ``Import''. \\ \faintline
-\textbf{Frequency} & Thấp. \\ \faintline
-\textbf{Priority} & \texttt{Deferred} · Must \\ \faintline
+\textbf{Tên} & Import dữ liệu (Import Data) \\ 
+\textbf{Mô tả} & Người dùng nhập dữ liệu từ file Excel/CSV. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Có file Excel/CSV đúng định dạng. \\ 
+\textbf{Post-condition} & Dữ liệu được import vào hệ thống. \\ 
+\textbf{Giả định} & Dữ liệu hợp lệ trước khi import. \\ 
+\textbf{Trigger} & Người dùng bấm ``Import''. \\ 
+\textbf{Frequency} & Thấp. \\ 
+\textbf{Priority} & \texttt{Deferred} · Must \\ 
 \textbf{Main Flow} & 1. Người dùng chọn file.\\
 &2. Hệ thống đọc dữ liệu.\\
 &3. Hệ thống validate.\\
 &4. Hệ thống import vào đúng module tương ứng.\\
-&5. Thông báo kết quả. \\ \faintline
+&5. Thông báo kết quả. \\ 
 \textbf{Exception Flow} & 3a. File sai định dạng → lỗi ``Invalid file format''. 3b. Dòng dữ liệu lỗi → bỏ qua \& báo cáo. \\
 \end{longtable}
 }
@@ -1349,15 +1373,15 @@ Mô tả
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Tên} & Export dữ liệu \& báo cáo (Export Data / Report) \\ \faintline
-\textbf{Mô tả} & Người dùng xuất dữ liệu hoặc báo cáo ra file Excel/CSV/PDF. \\ \faintline
-\textbf{Actor} & Owner \\ \faintline
-\textbf{Pre-condition} & Hệ thống có dữ liệu cần xuất. \\ \faintline
-\textbf{Post-condition} & File xuất ra được tạo thành công. \\ \faintline
-\textbf{Giả định} & Hệ thống có dữ liệu; thư mục đích ghi được. \\ \faintline
-\textbf{Trigger} & Người dùng bấm ``Export''. \\ \faintline
-\textbf{Frequency} & Thấp. \\ \faintline
-\textbf{Priority} & \texttt{Deferred} · Should \\ \faintline
+\textbf{Tên} & Export dữ liệu \& báo cáo (Export Data / Report) \\ 
+\textbf{Mô tả} & Người dùng xuất dữ liệu hoặc báo cáo ra file Excel/CSV/PDF. \\ 
+\textbf{Actor} & Owner \\ 
+\textbf{Pre-condition} & Hệ thống có dữ liệu cần xuất. \\ 
+\textbf{Post-condition} & File xuất ra được tạo thành công. \\ 
+\textbf{Giả định} & Hệ thống có dữ liệu; thư mục đích ghi được. \\ 
+\textbf{Trigger} & Người dùng bấm ``Export''. \\ 
+\textbf{Frequency} & Thấp. \\ 
+\textbf{Priority} & \texttt{Deferred} · Should \\ 
 \textbf{Main Flow} & 1. Người dùng chọn loại báo cáo / phạm vi dữ liệu.\\
 &2. Chọn định dạng (Excel/CSV/PDF).\\
 &3. Hệ thống tạo file.\\
@@ -1375,91 +1399,160 @@ Mô tả
 Vì hệ thống chỉ có \textbf{một actor duy nhất (Owner)}, sơ đồ không vẽ ``nối từng UC vào actor''. Thay vào đó, sơ đồ tập trung vào \textbf{phân nhóm theo module}, \textbf{phân tầng \texttt{Core}/\texttt{Deferred}} và \textbf{quan hệ \texttt{include} giữa các use case}.
 \end{quote}
 
-\subsubsection{Hình 7.1 --- Tổng quan hệ thống (1 Actor + 2 tầng + các module)}\label{huxecnh-7.1-tux1ed5ng-quan-hux1ec7-thux1ed1ng-1-actor-2-tux1ea7ng-cuxe1c-module}
+% ============ HÌNH 7.1 ============
+\subsubsection{Hình 7.1 --- Tổng quan hệ thống (1 Actor + 2 tầng + các module)}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{flowchart TB}
-\NormalTok{    Owner(( Owner))}
+\vfill
 
-\NormalTok{    subgraph SYSTEM["PFMS — Personal Finance Management System"]}
-\NormalTok{        direction TB}
+\begin{figure}[htbp]
+\raggedright
+\begin{tikzpicture}[
+    node distance=0.8cm and 0.6cm,
+    actor/.style={draw=blue!70, fill=blue!10, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center, font=\bfseries, line width=1.2pt},
+    module/.style={draw=black, fill=gray!10, rounded corners, minimum width=2cm, minimum height=0.8cm, align=center, font=\small},
+    group/.style={draw=black, dashed, inner sep=0.5cm, rounded corners, fill=white},
+    label/.style={font=\bfseries\small},scale=0.9, transform shape
+]
 
-\NormalTok{        subgraph CORE[" Core — Phase 1"]}
-\NormalTok{            direction LR}
-\NormalTok{            WAL["Wallet"]}
-\NormalTok{            TXN["Transaction"]}
-\NormalTok{            TRF["Transfer"]}
-\NormalTok{            CAT["Category"]}
-\NormalTok{            DSH["Dashboard"]}
-\NormalTok{        end}
+% Actor
+\node[actor] (owner) at (-3.5,-4) {Owner};
 
-\NormalTok{        subgraph DEFERRED[" Deferred — Phase 2"]}
-\NormalTok{            direction LR}
-\NormalTok{            DBT["Debt"]}
-\NormalTok{            SAV["Saving"]}
-\NormalTok{            FCT["FundCert"]}
-\NormalTok{            GFD["GoalFund"]}
-\NormalTok{            SST["Snapshot"]}
-\NormalTok{            IEX["Import/Export"]}
-\NormalTok{        end}
-\NormalTok{    end}
+% System boundary
+\node[group, fit={(0,-1) (14,-7)}] (system) {};
+\node[label, above=0.2cm] at (system.north) {PFMS -- Personal Finance Management System};
 
-\NormalTok{    Owner \textless{}{-}{-}\textgreater{}|"thao tác"| SYSTEM}
-\end{Highlighting}
-\end{Shaded}
+% Core group
+\node[group, fit={(1,-2) (13,-4)}] (core) {};
+\node[label, above=0.1cm] at (core.north) {Core -- Phase 1};
 
-\subsubsection{\texorpdfstring{Hình 7.2 --- Chi tiết tầng Core (quan hệ \texttt{include})}{Hình 7.2 --- Chi tiết tầng Core (quan hệ include)}}\label{huxecnh-7.2-chi-tiux1ebft-tux1ea7ng-core-quan-hux1ec7-include}
+% Deferred group
+\node[group, fit={(1,-5) (13,-7)}] (deferred) {};
+\node[label, above=0.1cm] at (deferred.north) {Deferred -- Phase 2};
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{flowchart TB}
-\NormalTok{    Owner(( Owner))}
+% Core modules
+\node[module] (wal) at (2,-3) {Wallet};
+\node[module, right=of wal] (txn) {Transaction};
+\node[module, right=of txn] (trf) {Transfer};
+\node[module, right=of trf] (cat) {Category};
+\node[module, right=of cat] (dsh) {Dashboard};
 
-\NormalTok{    subgraph CORE[" Core — Phase 1"]}
-\NormalTok{        direction TB}
-\NormalTok{        TXN01["TXN{-}01: Ghi chép thu/chi"]}
-\NormalTok{        CAT01["CAT{-}01: Phân loại danh mục"]}
-\NormalTok{        TXN02["TXN{-}02: Sửa/Xóa giao dịch"]}
-\NormalTok{        TXN03["TXN{-}03: Xem lịch sử thu/chi"]}
-\NormalTok{        TRF01["TRF{-}01: Chuyển tiền nội bộ"]}
-\NormalTok{        WAL01["WAL{-}01: Xem số dư ví"]}
-\NormalTok{        CAT02["CAT{-}02: Quản lý danh mục"]}
-\NormalTok{        DSH01["DSH{-}01: Dashboard tổng quan"]}
-\NormalTok{    end}
+% Deferred modules
+\node[module] (dbt) at (1.5,-5) {Debt};
+\node[module, right=of dbt] (sav) {Saving};
+\node[module, right=of sav] (fct) {FundCert};
+\node[module, right=of fct] (gfd) {GoalFund};
+\node[module, right=of gfd] (sst) {Snapshot};
+\node[module, below=of fct] (iex) {Import/Export};
 
-\NormalTok{    Owner \textless{}{-}{-}\textgreater{} CORE}
+% Connection Actor -> System
+\draw[thick, blue!70, <->, >=Stealth] (owner.east) -- node[above, font=\small, pos=0.6] {thao tác} (system.west);
 
-\NormalTok{    TXN01 {-}. "include" .{-}\textgreater{} CAT01}
-\NormalTok{    TXN02 {-}. "include" .{-}\textgreater{} CAT01}
-\end{Highlighting}
-\end{Shaded}
+\end{tikzpicture}
 
-\subsubsection{\texorpdfstring{Hình 7.3 --- Chi tiết tầng Deferred (quan hệ \texttt{include})}{Hình 7.3 --- Chi tiết tầng Deferred (quan hệ include)}}\label{huxecnh-7.3-chi-tiux1ebft-tux1ea7ng-deferred-quan-hux1ec7-include}
+\vspace{0.5cm}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{flowchart TB}
-\NormalTok{    Owner(( Owner))}
+\end{figure}
 
-\NormalTok{    subgraph DEFERRED[" Deferred — Phase 2"]}
-\NormalTok{        direction TB}
-\NormalTok{        DBT01["DBT{-}01: Quản lý công nợ"]}
-\NormalTok{        SAV01["SAV{-}01: Sổ tiết kiệm"]}
-\NormalTok{        FCT01["FCT{-}01: Chứng chỉ quỹ"]}
-\NormalTok{        GFD01["GFD{-}01: Quỹ mục tiêu"]}
-\NormalTok{        SST01["SST{-}01: Chốt số cuối tháng"]}
-\NormalTok{        IEX01["IEX{-}01: Import dữ liệu"]}
-\NormalTok{        IEX02["IEX{-}02: Export dữ liệu"]}
-\NormalTok{    end}
+\vfill
 
-\NormalTok{    Owner \textless{}{-}{-}\textgreater{} DEFERRED}
+\clearpage
 
-\NormalTok{    GFD01 {-}. "include" .{-}\textgreater{} SAV01}
-\NormalTok{    GFD01 {-}. "include" .{-}\textgreater{} FCT01}
-\end{Highlighting}
-\end{Shaded}
+% ============ HÌNH 7.2 ============
+\subsubsection{Hình 7.2 --- Chi tiết tầng Core (quan hệ \texttt{include})}
 
+\vfill
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=0.6cm and 1cm,
+    actor/.style={draw=blue!70, fill=blue!10, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center, font=\bfseries, line width=1.2pt},
+    uc/.style={draw=black, fill=white, rounded corners, minimum width=3.5cm, minimum height=0.8cm, align=center, font=\small},
+    group/.style={draw=black, dashed, inner sep=0.5cm, rounded corners, fill=white},
+    label/.style={font=\bfseries\small}
+]
+
+% Actor
+\node[actor] (owner) at (-2,-6.25) {Owner};
+
+% Core group
+\node[group, fit={(1,-0.5) (10,-12)}] (core) {};
+\node[label, above=0.1cm] at (core.north) {Core -- Phase 1};
+
+% Use cases
+\node[uc] (txn01) at (3.5,-1.5) {TXN-01: Ghi chép thu/chi};
+\node[uc, below=of txn01] (cat01) {CAT-01: Phân loại danh mục};
+\node[uc, below=of cat01] (txn02) {TXN-02: Sửa/Xóa giao dịch};
+\node[uc, below=of txn02] (txn03) {TXN-03: Xem lịch sử thu/chi};
+\node[uc, below=of txn03] (trf01) {TRF-01: Chuyển tiền nội bộ};
+\node[uc, below=of trf01] (wal01) {WAL-01: Xem số dư ví};
+\node[uc, below=of wal01] (cat02) {CAT-02: Quản lý danh mục};
+\node[uc, below=of cat02] (dsh01) {DSH-01: Dashboard tổng quan};
+
+% Include relationships
+\draw[dashed, ->, >=Stealth, gray] (txn01.east) to[out=15,in=15] node[right, font=\tiny, pos=0.5] {<<include>>} (cat01.east);
+\draw[dashed, ->, >=Stealth, gray] (txn02.east) to[out=15,in=15] node[right, font=\tiny, pos=0.5] {<<include>>} (cat01.east);
+
+% Actor connection
+\draw[thick, blue!70, <->, >=Stealth] (owner.east) -- (core.west);
+
+\end{tikzpicture}
+
+\vspace{0.5cm}
+
+\end{figure}
+
+\vfill
+
+\clearpage
+
+% ============ HÌNH 7.3 ============
+\subsubsection{Hình 7.3 --- Chi tiết tầng Deferred (quan hệ \texttt{include})}
+
+\vfill
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=0.6cm and 1cm,
+    actor/.style={draw=blue!70, fill=blue!10, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center, font=\bfseries, line width=1.2pt},
+    uc/.style={draw=black, fill=white, rounded corners, minimum width=3.5cm, minimum height=0.8cm, align=center, font=\small},
+    group/.style={draw=black, dashed, inner sep=0.5cm, rounded corners, fill=white},
+    label/.style={font=\bfseries\small}
+]
+
+% Actor
+\node[actor] (owner) at (-2,-5.75) {Owner};
+
+% Deferred group
+\node[group, fit={(1.5,-0.5) (10,-11)}] (deferred) {};
+\node[label, above=0.1cm] at (deferred.north) {Deferred -- Phase 2};
+
+% Use cases
+\node[uc] (dbt01) at (3.5,-1.5) {DBT-01: Quản lý công nợ};
+\node[uc, below=of dbt01] (sav01) {SAV-01: Sổ tiết kiệm};
+\node[uc, below=of sav01] (fct01) {FCT-01: Chứng chỉ quỹ};
+\node[uc, below=of fct01] (gfd01) {GFD-01: Quỹ mục tiêu};
+\node[uc, below=of gfd01] (sst01) {SST-01: Chốt số cuối tháng};
+\node[uc, below=of sst01] (iex01) {IEX-01: Import dữ liệu};
+\node[uc, below=of iex01] (iex02) {IEX-02: Export dữ liệu};
+
+% Include relationships
+\draw[dashed, ->, >=Stealth, gray] (gfd01.east) to[out=15,in=15] node[right, font=\tiny, pos=0.5] {<<include>>} (sav01.east);
+\draw[dashed, ->, >=Stealth, gray] (gfd01.east) to[out=-15,in=-15] node[right, font=\tiny, pos=0.5] {<<include>>} (fct01.east);
+
+% Actor connection
+\draw[thick, blue!70, <->, >=Stealth] (owner.east) -- (deferred.west);
+
+\end{tikzpicture}
+
+\vspace{0.5cm}
+
+\end{figure}
+
+\vfill
+
+\clearpage
 \begin{center}\rule{1.0\linewidth}{0.5pt}\end{center}
 
 \subsection{Tổng kết}\label{tux1ed5ng-kux1ebft}
@@ -1472,11 +1565,11 @@ Hạng mục & Kết quả \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Đề tài} & Personal Finance Manager --- mở rộng từ Topic 10 (Basic) \\ \faintline
-\textbf{Use Case} & 15 UC (Format A đầy đủ) --- 8 Core + 7 Deferred \\ \faintline
-\textbf{Functional Requirements} & \textasciitilde40 FR (Must/Should/Could) \\ \faintline
-\textbf{Non-Functional Requirements} & \textasciitilde30 NFR (8 nhóm) \\ \faintline
-\textbf{Actor} & 1 (Owner, single-user) \\ \faintline
+\textbf{Đề tài} & Personal Finance Manager --- mở rộng từ Topic 10 (Basic) \\ 
+\textbf{Use Case} & 15 UC (Format A đầy đủ) --- 8 Core + 7 Deferred \\ 
+\textbf{Functional Requirements} & \textasciitilde40 FR (Must/Should/Could) \\ 
+\textbf{Non-Functional Requirements} & \textasciitilde30 NFR (8 nhóm) \\ 
+\textbf{Actor} & 1 (Owner, single-user) \\ 
 \textbf{Platform} & Desktop JavaFX \\
 \end{longtable}
 }
