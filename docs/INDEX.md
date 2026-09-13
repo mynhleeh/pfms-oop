@@ -14,6 +14,7 @@ docs/
 ├── academic/                                 # Yêu cầu đề bài và tiêu chí đánh giá môn học
 ├── domain/                                   # Dữ liệu mẫu và phân tích nghiệp vụ tài chính
 ├── deliverables/                             # Báo cáo và sản phẩm kỹ thuật của đồ án
+│   ├── analysis/                             # Khung tài liệu và phân tích hướng đối tượng (OOA)
 │   ├── requirements/                         # Đặc tả yêu cầu phần mềm và kịch bản ca sử dụng
 │   └── milestones/                           # Báo cáo kỹ thuật theo từng giai đoạn (OOA, OOD)
 └── reference/                                # Tài liệu kỹ thuật chuẩn và giáo trình tham khảo
@@ -36,6 +37,7 @@ docs/
 | Sản phẩm | Tập tin | Nội dung chính | Giai đoạn |
 |---|---|---|---|
 | Yêu cầu và ca sử dụng | [req-uc.md](./deliverables/requirements/req-uc.md) ([PDF](./deliverables/requirements/req-uc.pdf), [LaTeX](./deliverables/requirements/req-uc.tex)) | Đặc tả phạm vi hệ thống, danh sách tác nhân, 10 ca sử dụng chi tiết (luồng sự kiện, ngoại lệ, tiền điều kiện và hậu điều kiện). | Milestone 1 và xuyên suốt dự án |
+| Khung tài liệu OOA | [framework.md](./deliverables/analysis/framework.md) | Khung cấu trúc, phương pháp luận và tiêu chuẩn kỹ thuật cho báo cáo Phân tích Hướng đối tượng (Milestone 2). | Chuẩn bị Milestone 2 |
 | Báo cáo OOA | [milestone-2-ooa.md](./deliverables/milestones/milestone-2-ooa.md) | Mô hình miền (Domain Model), thẻ CRC (Class-Responsibility-Collaboration), các thuộc tính và ranh giới trách nhiệm của từng lớp. | Milestone 2 |
 | Báo cáo OOD và UML | [milestone-3-uml-design.md](./deliverables/milestones/milestone-3-uml-design.md) | Kiến trúc phân tầng (Model-Service-Repository), sơ đồ lớp, sơ đồ tuần tự cùng các mẫu thiết kế GRASP và GoF áp dụng trong hệ thống. | Milestone 3 |
 
