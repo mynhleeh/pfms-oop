@@ -12,21 +12,29 @@ Thư mục `docs/` gồm bốn phần chính:
 docs/
 ├── INDEX.md                                  # Mục lục tài liệu tổng hợp
 ├── academic/                                 # Yêu cầu đề bài và tiêu chí đánh giá môn học
+│   └── assignment-requirement.pdf            # Đề bài và thang điểm đánh giá 6 milestone
 ├── domain/                                   # Dữ liệu mẫu và phân tích nghiệp vụ tài chính
+│   ├── finance-mng.xlsm                      # Bảng tính Excel gốc theo dõi tài chính cá nhân
+│   └── finance-mng-description.md            # Thuyết minh chi tiết các sheet, công thức và dữ liệu
 ├── deliverables/                             # Báo cáo và sản phẩm kỹ thuật của đồ án
-│   ├── analysis/                             # Khung tài liệu và phân tích hướng đối tượng (OOA)
 │   ├── requirements/                         # Đặc tả yêu cầu phần mềm và kịch bản ca sử dụng
-│   └── milestones/                           # Báo cáo kỹ thuật theo từng giai đoạn (OOA, OOD)
+│   │   ├── req-uc.md                         # Đặc tả Use Case và yêu cầu chức năng (Markdown)
+│   │   ├── req-uc.pdf                        # Bản xuất PDF
+│   │   └── req-uc.tex                        # Bản nguồn LaTeX
+│   ├── analysis/                             # Phân tích hướng đối tượng (OOA, Milestone 2)
+│   │   └── framework.md                      # Khung tài liệu và quy chuẩn phân tích OOA
+│   └── design/                               # Thiết kế hướng đối tượng (OOD, Milestone 3 & 5)
+│       └── framework.md                      # Khung tài liệu và quy chuẩn vẽ sơ đồ UML (PlantUML)
 └── reference/                                # Tài liệu kỹ thuật chuẩn và giáo trình tham khảo
     ├── requirements-engineering/             # Chuẩn kỹ nghệ yêu cầu (IREB, ISO/IEC/IEEE 29148)
-    ├── software-design/                      # Thiết kế hướng đối tượng, UML và mẫu thiết kế
-    └── financial-patterns/                   # Mẫu thiết kế phần mềm kế toán và tài chính
+    ├── software-design/                      # Thiết kế hướng đối tượng, UML và mẫu thiết kế (Craig Larman)
+    └── financial-patterns/                   # Mẫu thiết kế phần mềm kế toán và tài chính (Martin Fowler)
 ```
 
 ## 2. Tài liệu học thuật và dữ liệu nghiệp vụ
 
 ### 2.1. Yêu cầu môn học (`academic/`)
-* [assignment-requirement.pdf](./academic/assignment-requirement.pdf): Đề bài môn học, gồm yêu cầu về lập trình hướng đối tượng (đóng gói, kế thừa, đa hình, trừu tượng), giao diện đồ họa, xử lý dữ liệu và thang điểm đánh giá.
+* [assignment-requirement.pdf](./academic/assignment-requirement.pdf): Đề bài môn học, gồm yêu cầu về lập trình hướng đối tượng (đóng gói, kế thừa, đa hình, trừu tượng), giao diện đồ họa, xử lý dữ liệu và thang điểm đánh giá 6 milestone.
 
 ### 2.2. Nghiệp vụ gốc (`domain/`)
 * [finance-mng.xlsm](./domain/finance-mng.xlsm): Bảng tính Excel mẫu theo dõi tài chính cá nhân gồm 10 sheet: Dashboard, Monthly, Accounts, Income, Expenses, Bills, Subscriptions, Savings, Investments, Debts.
@@ -34,12 +42,15 @@ docs/
 
 ## 3. Báo cáo và sản phẩm đồ án
 
-| Sản phẩm | Tập tin | Nội dung chính | Giai đoạn |
+Toàn bộ sản phẩm kỹ thuật và báo cáo tiến độ qua các giai đoạn được lưu trữ tập trung tại thư mục `deliverables/`:
+
+| Phân nhóm | Tập tin | Nội dung chính | Giai đoạn |
 |---|---|---|---|
-| Yêu cầu và ca sử dụng | [req-uc.md](./deliverables/requirements/req-uc.md) ([PDF](./deliverables/requirements/req-uc.pdf), [LaTeX](./deliverables/requirements/req-uc.tex)) | Đặc tả phạm vi hệ thống, danh sách tác nhân, 10 ca sử dụng chi tiết (luồng sự kiện, ngoại lệ, tiền điều kiện và hậu điều kiện). | Milestone 1 và xuyên suốt dự án |
-| Khung tài liệu OOA | [framework.md](./deliverables/analysis/framework.md) | Khung cấu trúc, phương pháp luận và tiêu chuẩn kỹ thuật cho báo cáo Phân tích Hướng đối tượng (Milestone 2). | Chuẩn bị Milestone 2 |
-| Báo cáo OOA | [milestone-2-ooa.md](./deliverables/milestones/milestone-2-ooa.md) | Mô hình miền (Domain Model), thẻ CRC (Class-Responsibility-Collaboration), các thuộc tính và ranh giới trách nhiệm của từng lớp. | Milestone 2 |
-| Báo cáo OOD và UML | [milestone-3-uml-design.md](./deliverables/milestones/milestone-3-uml-design.md) | Kiến trúc phân tầng (Model-Service-Repository), sơ đồ lớp, sơ đồ tuần tự cùng các mẫu thiết kế GRASP và GoF áp dụng trong hệ thống. | Milestone 3 |
+| Kỹ nghệ yêu cầu | [req-uc.md](./deliverables/requirements/req-uc.md) ([PDF](./deliverables/requirements/req-uc.pdf), [LaTeX](./deliverables/requirements/req-uc.tex)) | Đặc tả phạm vi hệ thống, danh sách tác nhân, 10 ca sử dụng chi tiết (luồng sự kiện, ngoại lệ, tiền điều kiện và hậu điều kiện). | Milestone 1 và xuyên suốt dự án |
+| Phân tích OOA | [framework.md](./deliverables/analysis/framework.md) | Khung cấu trúc, phương pháp luận trích xuất khái niệm, thẻ CRC, quy tắc nghiệp vụ và tiêu chuẩn kiểm định cho pha OOA. | Chuẩn bị Milestone 2 |
+| Thiết kế OOD | [framework.md](./deliverables/design/framework.md) | Khung cấu trúc, quy chuẩn vẽ sơ đồ UML bằng PlantUML, kiến trúc phân tầng 4 lớp, áp dụng 9 nguyên tắc GRASP, 5 nguyên lý SOLID và mẫu thiết kế GoF. | Chuẩn bị Milestone 3 & 5 |
+
+*Ghi chú:* Các báo cáo phân tích chi tiết của từng module nghiệp vụ sẽ được lưu tại thư mục `deliverables/analysis/`; các sơ đồ lớp và tuần tự chi tiết sẽ được lưu tại thư mục `deliverables/design/`.
 
 ## 4. Tài liệu tham khảo
 
@@ -51,7 +62,7 @@ Thư mục `reference/` tập hợp các tài liệu chuẩn và giáo trình th
 | Kỹ nghệ yêu cầu | [ireb-cpre-glossary.pdf](./reference/requirements-engineering/ireb-cpre-glossary.pdf) | IREB | Thống nhất thuật ngữ kỹ nghệ yêu cầu (Actor, Scenario, Precondition, Quality Requirement) cho tài liệu [req-uc.md](./deliverables/requirements/req-uc.md). |
 | Kỹ nghệ yêu cầu | [ireb-cpre-modeling-handbook.pdf](./reference/requirements-engineering/ireb-cpre-modeling-handbook.pdf) | IREB | Hướng dẫn vẽ sơ đồ Use Case và State Machine cho vòng đời giao dịch, hóa đơn và khoản nợ. |
 | Kỹ nghệ yêu cầu | [srs-template-iso-29148.md](./reference/requirements-engineering/srs-template-iso-29148.md) và [.pdf](./reference/requirements-engineering/srs-template-iso-29148.pdf) | ISO/IEC/IEEE | Mẫu đặc tả yêu cầu phần mềm theo chuẩn ISO/IEC/IEEE 29148. |
-| Thiết kế phần mềm | [applying-uml-and-patterns-3rd-edition.pdf](./reference/software-design/applying-uml-and-patterns-3rd-edition.pdf) | Craig Larman | Giáo trình phân tích và thiết kế hướng đối tượng (OOAD):<br>- Chương 9: Mô hình miền (Domain Model).<br>- Chương 16 đến 17: 9 nguyên tắc phân bổ trách nhiệm GRASP (Information Expert, Creator, Controller, Low Coupling, High Cohesion, Polymorphism, Pure Fabrication, Indirection, Protected Variations).<br>- Chương 26: Các mẫu thiết kế GoF (Strategy, Factory, Observer). |
+| Thiết kế phần mềm | [applying-uml-and-patterns-3rd-edition.pdf](./reference/software-design/applying-uml-and-patterns-3rd-edition.pdf) | Craig Larman | Giáo trình phân tích và thiết kế hướng đối tượng (OOAD):<br>- Chương 9: Mô hình miền (Domain Model).<br>- Chương 15: Sơ đồ tương tác tuần tự (Sequence Diagrams).<br>- Chương 16: Sơ đồ lớp thiết kế (Design Class Diagrams).<br>- Chương 16 đến 17, 25: 9 nguyên tắc phân bổ trách nhiệm GRASP (Information Expert, Creator, Controller, Low Coupling, High Cohesion, Polymorphism, Pure Fabrication, Indirection, Protected Variations).<br>- Chương 26: Các mẫu thiết kế GoF (Strategy, Factory, Observer).<br>- Chương 34: Kiến trúc phân tầng và Sơ đồ gói (Package Diagram). |
 | Mẫu thiết kế tài chính | [accounting-patterns-martin-fowler.pdf](./reference/financial-patterns/accounting-patterns-martin-fowler.pdf) | Martin Fowler | Mẫu thiết kế phần mềm kế toán và tài chính:<br>- Mô hình Account, Entry, Transaction nhằm giữ tính nhất quán số dư.<br>- Nguyên tắc ghi sổ kép (Double-Entry) khi chuyển khoản và cập nhật số dư giữa các tài khoản (tiền mặt, ngân hàng, tiết kiệm, nợ). |
 
 ## 5. Quy định mở rộng và đóng góp tài liệu
