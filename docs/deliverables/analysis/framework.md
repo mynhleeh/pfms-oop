@@ -1,8 +1,8 @@
 # Khung nội dung tài liệu phân tích hướng đối tượng (OOA)
 
-Tài liệu này hướng dẫn cấu trúc và cách viết báo cáo Phân tích Hướng đối tượng (OOA, Milestone 2) cho đồ án Quản lý Tài chính Cá nhân (PFMS).
+Tài liệu này hướng dẫn cấu trúc và cách viết báo cáo Phân tích Hướng đối tượng (OOA, Giai đoạn 2) cho hệ thống Quản lý Tài chính Cá nhân (PFMS).
 
-Tài liệu này chỉ phục vụ pha phân tích nghiệp vụ, không phải thiết kế phần mềm (OOD). Toàn bộ sơ đồ UML chi tiết như sơ đồ lớp với các kiểu dữ liệu lập trình, sơ đồ tuần tự các lời gọi hàm, hay kiến trúc phân tầng sẽ được làm riêng ở tài liệu Milestone 3. Tại đây, nhóm chỉ tập trung vào việc nhận diện đúng các đối tượng thực tế trong bài toán tài chính và làm rõ trách nhiệm của từng đối tượng.
+Tài liệu này chỉ phục vụ pha phân tích nghiệp vụ, không phải thiết kế phần mềm (OOD). Toàn bộ sơ đồ UML chi tiết như sơ đồ lớp với các kiểu dữ liệu lập trình, sơ đồ tuần tự các lời gọi hàm, hay kiến trúc phân tầng sẽ được làm riêng ở giai đoạn thiết kế OOD (Giai đoạn 3). Tại đây, nhóm chỉ tập trung vào việc nhận diện đúng các đối tượng thực tế trong bài toán tài chính và làm rõ trách nhiệm của từng đối tượng.
 
 ---
 
@@ -66,7 +66,7 @@ Ghi lại cách nhóm tìm ra các đối tượng từ văn bản mô tả 10 c
 ## 3. Từ điển khái niệm miền
 
 ### Mục đích cần đạt
-Định nghĩa rõ ràng từng đối tượng nghiệp vụ được giữ lại sau bước lọc, giúp cả nhóm và giảng viên hiểu thống nhất một nghĩa.
+Định nghĩa rõ ràng từng đối tượng nghiệp vụ được giữ lại sau bước lọc, giúp các thành viên trong nhóm và các bên liên quan thống nhất ngữ nghĩa nghiệp vụ.
 
 ### Hướng dẫn cách viết
 Với mỗi đối tượng, viết một đoạn ngắn từ 3 đến 5 dòng gồm:
@@ -113,7 +113,7 @@ Nếu muốn trực quan hóa, nhóm chỉ cần vẽ một sơ đồ khối kh�
 ## 5. Phân bổ trách nhiệm bằng thẻ CRC
 
 ### Mục đích cần đạt
-Xác định mỗi đối tượng sẽ tự quản lý những gì và phối hợp với ai để thực hiện công việc. Đây là nội dung trọng tâm của báo cáo Milestone 2 theo yêu cầu môn học.
+Xác định mỗi đối tượng sẽ tự quản lý những gì và phối hợp với ai để thực hiện công việc. Đây là nội dung trọng tâm của hồ sơ phân tích OOA (Giai đoạn 2).
 
 ### Hướng dẫn cách viết
 Sử dụng phương pháp thẻ CRC (Class, Responsibility, Collaborator). Mỗi đối tượng có một thẻ nhỏ chia làm hai cột:
@@ -144,7 +144,7 @@ Sử dụng phương pháp thẻ CRC (Class, Responsibility, Collaborator). Mỗ
 Quy định rõ các ràng buộc logic của hệ thống tài chính để bước thiết kế và cài đặt sau này không làm sai lệch số liệu.
 
 ### Hướng dẫn cách viết
-Tổng hợp các luật tính toán từ tài liệu [finance-mng-description.md](../../domain/finance-mng-description.md) thành danh sách quy tắc rõ ràng:
+Tổng hợp các luật tính toán từ tài liệu đặc tả yêu cầu và quy tắc tài chính [req-uc.md](../requirements/req-uc.md) thành danh sách quy tắc rõ ràng:
 * Quy tắc tính số dư: Số dư ví = Số dư ban đầu + Tổng thu - Tổng chi + Tiền chuyển đến - Tiền chuyển đi.
 * Ràng buộc chi tiêu: Ví tiền mặt hoặc ví ngân hàng thông thường không được phép có số dư âm, trừ trường hợp thấu chi có thỏa thuận trước.
 * Ràng buộc phân loại: Thu nhập chỉ được chọn các danh mục thuộc loại thu, chi tiêu chỉ được chọn các danh mục thuộc loại chi.
@@ -166,7 +166,7 @@ Tổng hợp các luật tính toán từ tài liệu [finance-mng-description.m
 Mô tả các trạng thái thay đổi theo thời gian của các thực thể phức tạp trong hệ thống.
 
 ### Hướng dẫn cách viết
-Trong đồ án này, hầu hết giao dịch thu chi chỉ phát sinh một lần rồi lưu lại. Tuy nhiên, có hai đối tượng có vòng đời kéo dài cần được mô tả kỹ:
+Trong hệ thống này, hầu hết giao dịch thu chi chỉ phát sinh một lần rồi lưu lại. Tuy nhiên, có hai đối tượng có vòng đời kéo dài cần được mô tả kỹ:
 * Khoản nợ (Debt): Trải qua các giai đoạn từ khi tạo khoản nợ (mới vay hoặc cho vay), trả dần từng phần, đến khi trả hết (tất toán) hoặc bị xóa nợ (không đòi được).
 * Sổ tiết kiệm (Saving): Trải qua các giai đoạn từ khi mở sổ, đang gửi trong kỳ hạn, đến ngày đáo hạn, rút trước hạn hoặc tái tục sang kỳ tiếp theo.
 
@@ -208,22 +208,22 @@ Lập bảng liệt kê 10 ca sử dụng từ [req-uc.md](../requirements/req-u
 ## 9. Bảng tự kiểm tra chất lượng phân tích
 
 ### Mục đích cần đạt
-Giúp nhóm tự rà soát lại toàn bộ báo cáo OOA trước khi nộp bài cho giảng viên, bảo đảm đúng trọng tâm phân tích hướng đối tượng của Milestone 2.
+Giúp nhóm tự rà soát lại toàn bộ báo cáo OOA trước khi hoàn tất hồ sơ phân tích OOA, bảo đảm đúng trọng tâm phân tích hướng đối tượng của Giai đoạn 2.
 
 ### Bảng kiểm tra tự đánh giá
 
 | Câu hỏi tự kiểm tra | Kết quả mong đợi | Đánh giá |
 |---|---|---|
-| Báo cáo có bị lẫn các lớp kỹ thuật như Controller, Service, Repository, DAO không? | Không có, các lớp này thuộc về OOD ở Milestone 3 | Đạt / Chưa |
+| Báo cáo có bị lẫn các lớp kỹ thuật như Controller, Service, Repository, DAO không? | Không có, các lớp này thuộc về OOD ở giai đoạn thiết kế OOD | Đạt / Chưa |
 | Báo cáo có bị lẫn các chi tiết giao diện như cửa sổ, bảng chọn, nút bấm không? | Không có, giao diện thuộc về pha thiết kế | Đạt / Chưa |
-| Tên các đối tượng có xuất phát từ ngữ cảnh đời thực của bài toán tài chính không? | Có, bám sát các khái niệm trong file Excel và Use Case | Đạt / Chưa |
+| Tên các đối tượng có xuất phát từ ngữ cảnh đời thực của bài toán tài chính không? | Có, bám sát các khái niệm tài chính thực tế và tài liệu Ca sử dụng (Use Case) | Đạt / Chưa |
 | Các trách nhiệm trong thẻ CRC có rõ ràng việc đối tượng tự làm và việc nó biết không? | Có, phân định rành mạch giữa Knowing và Doing | Đạt / Chưa |
 | Các phép tính tiền bạc có ghi chú dùng số thập phân chính xác không? | Có, toàn bộ quy ước dùng BigDecimal | Đạt / Chưa |
 | Phạm vi dữ liệu có bị lấn sân sang các module khác không? | Không có, các đối tượng chỉ giữ thông tin tự thân, điểm chạm liên module được giữ ở mức khái quát | Đạt / Chưa |
-| Có bị lạm dụng các sơ đồ UML chi tiết của pha thiết kế không? | Không, các sơ đồ UML chi tiết dành cho Milestone 3 | Đạt / Chưa |
+| Có bị lạm dụng các sơ đồ UML chi tiết của pha thiết kế không? | Không, các sơ đồ UML chi tiết dành cho giai đoạn thiết kế OOD (Giai đoạn 3) | Đạt / Chưa |
 
 ---
 
 ## Bước tiếp theo sau OOA
 
-Sau khi hoàn thiện báo cáo OOA theo khung trên và được thông qua ở Milestone 2, nhóm sẽ mang danh sách các đối tượng và trách nhiệm này sang Milestone 3 (UML Design & OOD). Ở Milestone 3, nhóm mới tiến hành vẽ sơ đồ lớp chi tiết, chọn các mẫu thiết kế hướng đối tượng (như Factory, Strategy, Observer) và phân chia các tầng mã nguồn cụ thể.
+Sau khi hoàn thiện báo cáo OOA theo khung trên và hoàn thành Giai đoạn 2 (OOA), nhóm sẽ sử dụng danh sách các đối tượng và trách nhiệm này cho Giai đoạn 3: Thiết kế Kiến trúc và Chi tiết (OOD). Ở giai đoạn OOD, nhóm sẽ tiến hành vẽ sơ đồ lớp chi tiết, chọn các mẫu thiết kế hướng đối tượng (như Factory, Strategy, Observer) và phân chia các tầng mã nguồn cụ thể.

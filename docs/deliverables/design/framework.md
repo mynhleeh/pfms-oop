@@ -1,14 +1,14 @@
 # Khung nội dung tài liệu thiết kế hướng đối tượng (OOD) và quy chuẩn UML
 
-Tài liệu này quy định khung cấu trúc chuẩn, phương pháp thiết kế hướng đối tượng (OOD) và quy chuẩn vẽ sơ đồ UML bằng PlantUML cho đồ án Quản lý Tài chính Cá nhân (PFMS).
+Tài liệu này quy định khung cấu trúc chuẩn, phương pháp thiết kế hướng đối tượng (OOD) và quy chuẩn vẽ sơ đồ UML bằng PlantUML cho hệ thống Quản lý Tài chính Cá nhân (PFMS).
 
-Tài liệu phục vụ trực tiếp cho việc lập báo cáo Milestone 3 (UML Design) và Milestone 5 (Design Improvement, SOLID và Design Patterns). Đây là giai đoạn chuyển tiếp từ không gian bài toán nghiệp vụ trong OOA sang không gian giải pháp kỹ thuật cụ thể bằng Java 17 và JavaFX.
+Tài liệu đóng vai trò là căn cứ kỹ thuật cho Giai đoạn 3: Thiết kế Kiến trúc và Chi tiết (OOD), áp dụng các nguyên lý SOLID và các mẫu thiết kế GoF. Đây là giai đoạn chuyển tiếp từ không gian bài toán nghiệp vụ trong OOA sang không gian giải pháp kỹ thuật cụ thể bằng Java 17 và JavaFX.
 
 ---
 
 ## Mục lục báo cáo OOD chuẩn
 
-Báo cáo thiết kế OOD của đồ án được tổ chức theo 10 phần sau:
+Tài liệu thiết kế OOD của hệ thống được tổ chức theo 10 phần sau:
 
 1. [Mục tiêu và phạm vi thiết kế](#1-mục-tiêu-và-phạm-vi-thiết-kế)
 2. [Ba nguyên tắc xây dựng sơ đồ UML](#2-ba-nguyên-tắc-xây-dựng-sơ-đồ-uml)
@@ -67,7 +67,7 @@ Sơ đồ thiết kế cần có bố cục thị giác gọn gàng, định hư
 Xác lập ranh giới trách nhiệm giữa các tầng của phần mềm, bảo đảm nguyên lý phụ thuộc một chiều và tính độc lập của logic nghiệp vụ với công nghệ giao diện và cơ sở dữ liệu.
 
 ### Mô hình 4 tầng chuẩn mực
-Đồ án áp dụng kiến trúc phân tầng chuẩn gồm:
+Hệ thống áp dụng kiến trúc phân tầng chuẩn gồm:
 * Tầng giao diện (Presentation Layer): Chứa các màn hình JavaFX (file FXML) và các lớp Controller điều khiển giao diện (ví dụ: `TransactionViewController`). Tầng này chỉ nhận thao tác người dùng, hiển thị dữ liệu và gọi xuống tầng dịch vụ.
 * Tầng dịch vụ (Service / Application Layer): Chứa các lớp Service (ví dụ: `WalletService`, `TransactionService`). Tầng này điều phối luồng nghiệp vụ, kiểm tra ràng buộc đầu vào và quản lý giao dịch.
 * Tầng miền nghiệp vụ (Domain Model Layer): Chứa các thực thể hạt nhân (Entity như `Wallet`, `Transaction`), các đối tượng giá trị (Value Object như `Money`, `DateRange`), các bảng liệt kê (Enum) và ngoại lệ nghiệp vụ. Tầng này hoàn toàn độc lập, không phụ thuộc vào bất kỳ tầng nào khác.
@@ -265,7 +265,7 @@ Trong báo cáo, nhóm cần có một mục riêng giải thích việc áp d�
 ## 7. Áp dụng nguyên lý SOLID và mẫu thiết kế GoF
 
 ### Mục đích cần đạt
-Chứng minh thiết kế đáp ứng các tiêu chuẩn công nghiệp về khả năng mở rộng, dễ bảo trì và tái sử dụng mã nguồn. Đây là nội dung cốt lõi của Milestone 5.
+Chứng minh thiết kế đáp ứng các tiêu chuẩn công nghiệp về khả năng mở rộng, dễ bảo trì và tái sử dụng mã nguồn. Đây là nội dung cốt lõi của giai đoạn hoàn thiện thiết kế kiến trúc.
 
 ### Hướng dẫn trình bày nguyên lý SOLID
 Với mỗi nguyên lý trong 5 nguyên lý SOLID, chỉ rõ một minh chứng cụ thể trong thiết kế:
@@ -278,7 +278,7 @@ Với mỗi nguyên lý trong 5 nguyên lý SOLID, chỉ rõ một minh chứng 
 ### Hướng dẫn áp dụng các mẫu thiết kế GoF
 Mỗi mẫu thiết kế khi đưa vào tài liệu phải có một sơ đồ PlantUML riêng (tuân thủ nguyên tắc 1 diagram = 1 purpose) kèm phần thuyết minh 3 ý: Bối cảnh bài toán, giải pháp thiết kế, và lợi ích mang lại.
 
-Ba mẫu thiết kế khuyến nghị cho đồ án:
+Ba mẫu thiết kế khuyến nghị cho hệ thống:
 1. Strategy Pattern: Áp dụng cho bài toán tính toán có nhiều thuật toán khác nhau, như tính lãi suất sổ tiết kiệm (không kỳ hạn, có kỳ hạn, bậc thang) hoặc định giá tài sản đầu tư.
 2. Factory Method Pattern: Áp dụng khi khởi tạo các loại giao dịch hoặc tài khoản có cấu trúc dữ liệu và điều kiện hợp lệ khác nhau.
 3. Observer Pattern: Áp dụng khi số dư một ví thay đổi, các thành phần hiển thị trên Dashboard hoặc tổng tài sản tự động nhận thông báo để cập nhật lại mà không cần liên kết cứng.
@@ -357,7 +357,7 @@ WRITTEN_OFF --> [*]
 ## 9. Quy ước kỹ thuật Java và dữ liệu tài chính
 
 ### Mục đích cần đạt
-Thiết lập các tiêu chuẩn mã nguồn sạch (Clean Code) để bước lập trình ở Milestone 4 không bị xung đột phong cách mã hóa và tránh lỗi tính toán tiền bạc.
+Thiết lập các tiêu chuẩn mã nguồn sạch (Clean Code) để bước lập trình ở giai đoạn cài đặt mã nguồn (Giai đoạn 4) không bị xung đột phong cách mã hóa và tránh lỗi tính toán tiền bạc.
 
 ### Quy chuẩn định danh và tổ chức mã nguồn
 * Đặt tên gói (Package): Viết thường toàn bộ, phân cấp theo kiến trúc phân tầng (ví dụ: `com.pfms.domain.wallet`, `com.pfms.service`, `com.pfms.repository`).
@@ -381,7 +381,7 @@ Không dùng các ngoại lệ chung chung như `RuntimeException` hay `Exceptio
 ## 10. Bảng tự kiểm tra chất lượng và barem đánh giá
 
 ### Mục đích cần đạt
-Cung cấp bảng kiểm định kỹ thuật để các thành viên tự rà soát tài liệu thiết kế trước khi nộp báo cáo Milestone 3 và Milestone 5, bảo đảm bám sát thang điểm 100 của đồ án.
+Cung cấp bảng kiểm định kỹ thuật để các thành viên tự rà soát tài liệu thiết kế trước khi hoàn tất hồ sơ thiết kế kiến trúc, bảo đảm thỏa mãn đầy đủ các tiêu chuẩn kỹ thuật của hệ thống.
 
 ### Bảng kiểm định chất lượng (Self-Audit Checklist)
 
@@ -402,4 +402,4 @@ Cung cấp bảng kiểm định kỹ thuật để các thành viên tự rà s
 
 ## Bước tiếp theo sau OOD
 
-Khi báo cáo thiết kế OOD được hoàn thiện và thông qua ở Milestone 3, nhóm sẽ chuyển sang Milestone 4 (Core Implementation). Trong Milestone 4, các thành viên sẽ trực tiếp lập trình các lớp Java theo đúng sơ đồ lớp và kiến trúc phân tầng đã định nghĩa trong tài liệu này, kèm theo các bài kiểm thử đơn vị JUnit 5 để bảo đảm chất lượng phần mềm.
+Khi tài liệu thiết kế OOD được hoàn thiện ở Giai đoạn 3, nhóm sẽ chuyển sang Giai đoạn 4: Cài đặt và Kiểm thử phần mềm (Implementation & Unit Testing). Trong giai đoạn này, các kỹ sư lập trình sẽ trực tiếp lập trình các lớp Java theo đúng sơ đồ lớp và kiến trúc phân tầng đã định nghĩa trong tài liệu này, kèm theo các bài kiểm thử đơn vị JUnit 5 để bảo đảm chất lượng phần mềm.

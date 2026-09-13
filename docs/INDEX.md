@@ -2,7 +2,7 @@
 
 Tài liệu này tổng hợp toàn bộ tài liệu của dự án Quản lý Tài chính Cá nhân (PFMS).
 
-Các tài liệu thiết kế, báo cáo môn học, dữ liệu nghiệp vụ và sách tham khảo được thống kê tại đây để tiện tra cứu khi phát triển hệ thống.
+Các tài liệu đặc tả yêu cầu, phân tích kiến trúc, thiết kế hướng đối tượng và tài liệu kỹ thuật tham khảo được thống kê tại đây để tiện tra cứu khi phát triển hệ thống.
 
 ## 1. Cấu trúc thư mục tài liệu
 
@@ -11,19 +11,16 @@ Thư mục `docs/` gồm bốn phần chính:
 ```
 docs/
 ├── INDEX.md                                  # Mục lục tài liệu tổng hợp
-├── academic/                                 # Yêu cầu đề bài và tiêu chí đánh giá môn học
-│   └── assignment-requirement.pdf            # Đề bài và thang điểm đánh giá 6 milestone
-├── domain/                                   # Dữ liệu mẫu và phân tích nghiệp vụ tài chính
-│   ├── finance-mng.xlsm                      # Bảng tính Excel gốc theo dõi tài chính cá nhân
-│   └── finance-mng-description.md            # Thuyết minh chi tiết các sheet, công thức và dữ liệu
-├── deliverables/                             # Báo cáo và sản phẩm kỹ thuật của đồ án
+├── academic/                                 # Tài liệu đề bài và mục tiêu bài toán gốc
+│   └── assignment-requirement.pdf            # Đề bài và các mốc phát triển kỹ thuật
+├── deliverables/                             # Tài liệu kỹ thuật và sản phẩm phát triển hệ thống
 │   ├── requirements/                         # Đặc tả yêu cầu phần mềm và kịch bản ca sử dụng
 │   │   ├── req-uc.md                         # Đặc tả Use Case và yêu cầu chức năng (Markdown)
 │   │   ├── req-uc.pdf                        # Bản xuất PDF
 │   │   └── req-uc.tex                        # Bản nguồn LaTeX
-│   ├── analysis/                             # Phân tích hướng đối tượng (OOA, Milestone 2)
+│   ├── analysis/                             # Phân tích hướng đối tượng (OOA, Giai đoạn 2)
 │   │   └── framework.md                      # Khung tài liệu và quy chuẩn phân tích OOA
-│   └── design/                               # Thiết kế hướng đối tượng (OOD, Milestone 3 & 5)
+│   └── design/                               # Thiết kế hướng đối tượng (OOD, Giai đoạn 3)
 │       └── framework.md                      # Khung tài liệu và quy chuẩn vẽ sơ đồ UML (PlantUML)
 └── reference/                                # Tài liệu kỹ thuật chuẩn và giáo trình tham khảo
     ├── requirements-engineering/             # Chuẩn kỹ nghệ yêu cầu (IREB, ISO/IEC/IEEE 29148)
@@ -31,24 +28,20 @@ docs/
     └── financial-patterns/                   # Mẫu thiết kế phần mềm kế toán và tài chính (Martin Fowler)
 ```
 
-## 2. Tài liệu học thuật và dữ liệu nghiệp vụ
+## 2. Tài liệu đặc tả bài toán gốc
 
-### 2.1. Yêu cầu môn học (`academic/`)
-* [assignment-requirement.pdf](./academic/assignment-requirement.pdf): Đề bài môn học, gồm yêu cầu về lập trình hướng đối tượng (đóng gói, kế thừa, đa hình, trừu tượng), giao diện đồ họa, xử lý dữ liệu và thang điểm đánh giá 6 milestone.
+### 2.1. Đề bài và mục tiêu kỹ thuật gốc (`academic/`)
+* [assignment-requirement.pdf](./academic/assignment-requirement.pdf): Đề bài gốc của hệ thống, gồm các yêu cầu về lập trình hướng đối tượng (đóng gói, kế thừa, đa hình, trừu tượng), giao diện đồ họa, xử lý dữ liệu và các mốc kỹ thuật của bài toán.
 
-### 2.2. Nghiệp vụ gốc (`domain/`)
-* [finance-mng.xlsm](./domain/finance-mng.xlsm): Bảng tính Excel mẫu theo dõi tài chính cá nhân gồm 10 sheet: Dashboard, Monthly, Accounts, Income, Expenses, Bills, Subscriptions, Savings, Investments, Debts.
-* [finance-mng-description.md](./domain/finance-mng-description.md): Thuyết minh chi tiết các sheet trong file Excel, bao gồm danh mục thu chi, điều kiện hợp lệ của dữ liệu và các công thức tính toán (số dư lũy kế, tỷ lệ tiết kiệm, phân bổ ngân sách).
-
-## 3. Báo cáo và sản phẩm đồ án
+## 3. Sản phẩm và tài liệu kỹ thuật qua các giai đoạn
 
 Toàn bộ sản phẩm kỹ thuật và báo cáo tiến độ qua các giai đoạn được lưu trữ tập trung tại thư mục `deliverables/`:
 
 | Phân nhóm | Tập tin | Nội dung chính | Giai đoạn |
 |---|---|---|---|
-| Kỹ nghệ yêu cầu | [req-uc.md](./deliverables/requirements/req-uc.md) ([PDF](./deliverables/requirements/req-uc.pdf), [LaTeX](./deliverables/requirements/req-uc.tex)) | Đặc tả phạm vi hệ thống, danh sách tác nhân, 10 ca sử dụng chi tiết (luồng sự kiện, ngoại lệ, tiền điều kiện và hậu điều kiện). | Milestone 1 và xuyên suốt dự án |
-| Phân tích OOA | [framework.md](./deliverables/analysis/framework.md) | Khung cấu trúc, phương pháp luận trích xuất khái niệm, thẻ CRC, quy tắc nghiệp vụ và tiêu chuẩn kiểm định cho pha OOA. | Chuẩn bị Milestone 2 |
-| Thiết kế OOD | [framework.md](./deliverables/design/framework.md) | Khung cấu trúc, quy chuẩn vẽ sơ đồ UML bằng PlantUML, kiến trúc phân tầng 4 lớp, áp dụng 9 nguyên tắc GRASP, 5 nguyên lý SOLID và mẫu thiết kế GoF. | Chuẩn bị Milestone 3 & 5 |
+| Kỹ nghệ yêu cầu | [req-uc.md](./deliverables/requirements/req-uc.md) ([PDF](./deliverables/requirements/req-uc.pdf), [LaTeX](./deliverables/requirements/req-uc.tex)) | Đặc tả phạm vi hệ thống, danh sách tác nhân, 10 ca sử dụng chi tiết (luồng sự kiện, ngoại lệ, tiền điều kiện và hậu điều kiện). | Giai đoạn 1 và xuyên suốt dự án |
+| Phân tích OOA | [framework.md](./deliverables/analysis/framework.md) | Khung cấu trúc, phương pháp luận trích xuất khái niệm, thẻ CRC, quy tắc nghiệp vụ và tiêu chuẩn kiểm định cho pha OOA. | Giai đoạn 2: Phân tích OOA |
+| Thiết kế OOD | [framework.md](./deliverables/design/framework.md) | Khung cấu trúc, quy chuẩn vẽ sơ đồ UML bằng PlantUML, kiến trúc phân tầng 4 lớp, áp dụng 9 nguyên tắc GRASP, 5 nguyên lý SOLID và mẫu thiết kế GoF. | Giai đoạn 3: Thiết kế OOD |
 
 *Ghi chú:* Các báo cáo phân tích chi tiết của từng module nghiệp vụ sẽ được lưu tại thư mục `deliverables/analysis/`; các sơ đồ lớp và tuần tự chi tiết sẽ được lưu tại thư mục `deliverables/design/`.
 
