@@ -24,7 +24,7 @@ docs/
 │       └── framework.md                      # Khung tài liệu và quy chuẩn vẽ sơ đồ UML (PlantUML)
 └── reference/                                # Tài liệu kỹ thuật chuẩn và giáo trình tham khảo
     ├── requirements-engineering/             # Chuẩn kỹ nghệ yêu cầu (IREB, ISO/IEC/IEEE 29148)
-    ├── software-design/                      # Thiết kế hướng đối tượng, UML và mẫu thiết kế (Craig Larman)
+    ├── software-design/                      # Thiết kế hướng đối tượng, UML và mẫu thiết kế (Craig Larman, Scott Ambler)
     └── financial-patterns/                   # Mẫu thiết kế phần mềm kế toán và tài chính (Martin Fowler)
 ```
 
@@ -56,6 +56,7 @@ Thư mục `reference/` tập hợp các tài liệu chuẩn và giáo trình th
 | Kỹ nghệ yêu cầu | [ireb-cpre-modeling-handbook.pdf](./reference/requirements-engineering/ireb-cpre-modeling-handbook.pdf) | IREB | Hướng dẫn vẽ sơ đồ Use Case và State Machine cho vòng đời giao dịch, hóa đơn và khoản nợ. |
 | Kỹ nghệ yêu cầu | [srs-template-iso-29148.md](./reference/requirements-engineering/srs-template-iso-29148.md) và [.pdf](./reference/requirements-engineering/srs-template-iso-29148.pdf) | ISO/IEC/IEEE | Mẫu đặc tả yêu cầu phần mềm theo chuẩn ISO/IEC/IEEE 29148. |
 | Thiết kế phần mềm | [applying-uml-and-patterns-3rd-edition.pdf](./reference/software-design/applying-uml-and-patterns-3rd-edition.pdf) | Craig Larman | Giáo trình phân tích và thiết kế hướng đối tượng (OOAD):<br>- Chương 9: Mô hình miền (Domain Model).<br>- Chương 15: Sơ đồ tương tác tuần tự (Sequence Diagrams).<br>- Chương 16: Sơ đồ lớp thiết kế (Design Class Diagrams).<br>- Chương 16 đến 17, 25: 9 nguyên tắc phân bổ trách nhiệm GRASP (Information Expert, Creator, Controller, Low Coupling, High Cohesion, Polymorphism, Pure Fabrication, Indirection, Protected Variations).<br>- Chương 26: Các mẫu thiết kế GoF (Strategy, Factory, Observer).<br>- Chương 34: Kiến trúc phân tầng và Sơ đồ gói (Package Diagram). |
+| Thiết kế phần mềm | [the-object-primer-scott-ambler.pdf](./reference/software-design/the-object-primer-scott-ambler.pdf) | Scott W. Ambler | Giáo trình phân tích và thiết kế hướng đối tượng thực hành (Agile Modeling):<br>- Mục 6.1: Kỹ thuật mô hình hóa ca sử dụng (System Use Case Modeling) và quy tắc bố cục sơ đồ.<br>- Mục 6.2: Sơ đồ tương tác tuần tự (Sequence Diagrams) từ Use Case sang Lớp.<br>- Mục 6.3: Sơ đồ lớp khái niệm (Conceptual Class Modeling).<br>- Mục 6.4: Sơ đồ hoạt động (Activity Diagrams). |
 | Mẫu thiết kế tài chính | [accounting-patterns-martin-fowler.pdf](./reference/financial-patterns/accounting-patterns-martin-fowler.pdf) | Martin Fowler | Mẫu thiết kế phần mềm kế toán và tài chính:<br>- Mô hình Account, Entry, Transaction nhằm giữ tính nhất quán số dư.<br>- Nguyên tắc ghi sổ kép (Double-Entry) khi chuyển khoản và cập nhật số dư giữa các tài khoản (tiền mặt, ngân hàng, tiết kiệm, nợ). |
 
 ## 5. Quy định mở rộng và đóng góp tài liệu
