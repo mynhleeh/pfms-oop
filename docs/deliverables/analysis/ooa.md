@@ -159,3 +159,151 @@ flowchart LR
     GoalFund["GoalFund"] -->|"1 phân bổ nhiều"| Saving["Saving"]
     GoalFund -->|"1 tích hợp nhiều"| FundCert["FundCertificate"]
 ```
+
+---
+
+## 5. Phân bổ trách nhiệm bằng thẻ CRC
+
+Phương pháp thẻ CRC (Class, Responsibility, Collaborator) được sử dụng để phân định rõ trách nhiệm nội tại của từng đối tượng. Cột trách nhiệm phân biệt giữa việc đối tượng biết (Knowing) và việc đối tượng tự thực hiện (Doing). Cột cộng tác viên xác định các đối tượng khác cần phối hợp.
+
+### 5.1 Thẻ CRC phân hệ Cốt lõi
+
+| Lớp: `Wallet` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã định danh, tên ví, loại ví và trạng thái hoạt động. | |
+| Biết số dư ban đầu và duy trì số dư khả dụng hiện tại. | |
+| Kiểm tra số dư khả dụng trước khi chi tiêu hoặc chuyển tiền. | |
+| Tự động cập nhật số dư khi nhận biến động giao dịch hoặc chuyển khoản. | `Transaction`, `Transfer` |
+| Ngăn chặn hành vi đóng hoặc xóa ví khi số dư hiện tại khác 0. | |
+
+| Lớp: `Transaction` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã giao dịch, ngày thực hiện, số tiền, loại luồng tiền và ghi chú. | |
+| Xác thực số tiền giao dịch phải là số dương lớn hơn 0. | |
+| Liên kết với danh mục phân loại chi tiết tương ứng. | `Category` |
+| Cung cấp dữ liệu biến động dòng tiền để ví tự cập nhật số dư. | `Wallet` |
+
+| Lớp: `Transfer` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã chuyển khoản, ngày chuyển, số tiền, mức phí dịch vụ và ghi chú. | |
+| Điều phối biến động giảm số dư ở ví nguồn và tăng số dư ở ví đích. | `Wallet` |
+| Kích hoạt tạo giao dịch chi tiêu độc lập khi có phát sinh phí chuyển tiền. | `Transaction` |
+| Xác thực ví nguồn và ví đích không được trùng nhau. | `Wallet` |
+
+| Lớp: `Group` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã nhóm, tên nhóm và loại luồng tiền gốc (Income hoặc Expense). | |
+| Quản lý danh sách các danh mục chi tiết trực thuộc nhóm. | `Category` |
+| Kiểm tra tính nhất quán về loại luồng tiền của các danh mục con. | `Category` |
+
+| Lớp: `Category` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã danh mục, tên danh mục, biểu tượng, màu sắc và trạng thái hiển thị. | |
+| Cung cấp nhãn phân loại phục vụ thống kê báo cáo cho giao dịch. | `Transaction` |
+| Tham chiếu đến nhóm nhu cầu cấp trên mà danh mục trực thuộc. | `Group` |
+
+### 5.2 Thẻ CRC phân hệ Mở rộng
+
+| Lớp: `Debt` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã khoản nợ, đối tác, số tiền vốn gốc, lãi suất năm và loại nghiệp vụ. | `Partner` |
+| Tự sinh lịch trả góp gồm các kỳ trả nợ khi khoản nợ được khởi tạo. | `RepaymentInstallment` |
+| Tự cập nhật trạng thái khoản nợ khi các kỳ hạn hoàn thành thanh toán. | `RepaymentInstallment` |
+| Xác thực số tiền vốn gốc lớn hơn 0 và lãi suất không âm. | |
+
+| Lớp: `RepaymentInstallment` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết số thứ tự kỳ, hạn thanh toán và số tiền dự kiến gồm gốc và lãi. | |
+| Tự xác định trạng thái theo thời gian hiện tại (Chưa đến hạn hoặc Quá hạn). | |
+| Tự cập nhật trạng thái Đã trả khi nhận đủ số tiền từ các lần thanh toán. | `DebtPayment` |
+
+| Lớp: `DebtPayment` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết ngày thanh toán, số tiền thực trả, thao tác xử lý và kỳ hạn liên quan. | `RepaymentInstallment` |
+| Xác thực số tiền thanh toán thực tế phải lớn hơn 0. | |
+| Kích hoạt biến động số dư trên chiếc ví được chỉ định thanh toán. | `Wallet` |
+
+| Lớp: `Partner` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã đối tác, tên đối tác, loại mối quan hệ và thông tin liên hệ. | |
+| Cung cấp danh sách toàn bộ các khoản vay và cho vay liên quan đến mình. | `Debt` |
+
+| Lớp: `DebtLedger` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết đối tác cần đối soát công nợ. | `Partner` |
+| Tính tổng số tiền phải thu từ các khoản cho vay trừ đi số tiền đã thu hồi. | `Debt` |
+| Tính tổng số tiền phải trả từ các khoản đi vay trừ đi số tiền đã trả. | `Debt` |
+| Tính số dư nợ ròng giữa chủ tài khoản và đối tác tại thời điểm hiện tại. | `Debt` |
+
+| Lớp: `Saving` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã sổ, vốn gốc, kỳ hạn gửi, lãi suất năm và ngày gửi. | |
+| Tự tính số dư hiện tại gồm tiền gốc và lãi tích lũy theo thời gian nắm giữ. | |
+| Tự tính tiến độ hoàn thành kỳ hạn gửi tiết kiệm. | |
+
+| Lớp: `FundCertificate` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã chứng chỉ, loại tài sản đầu tư, vốn gốc, ngày mua và giá thị trường. | |
+| Tự tính lãi hoặc lỗ bằng hiệu số giữa giá trị thị trường hiện tại và vốn gốc. | |
+| Tự tính tỷ suất sinh lời năm hóa dựa trên thời gian nắm giữ. | |
+
+| Lớp: `GoalFund` | |
+|---|---|
+| **Trách nhiệm (Responsibilities)** | **Cộng tác viên (Collaborators)** |
+| Biết mã quỹ, tên quỹ mục tiêu, số tiền mục tiêu và tiền mặt phân bổ. | |
+| Tự tính tổng giá trị quỹ bằng tổng tiền mặt, các sổ tiết kiệm và chứng chỉ quỹ. | `Saving`, `FundCertificate` |
+| Tự tính tỷ lệ phần trăm tiến độ đạt được so với số tiền mục tiêu đề ra. | |
+
+---
+
+## 6. Quy tắc nghiệp vụ và ràng buộc dữ liệu
+
+### 6.1 Quy tắc toàn hệ thống và tính toán chính xác
+
+| Mã quy tắc | Tên quy tắc | Đối tượng áp dụng | Nội dung quy tắc |
+|---|---|---|---|
+| `BR-SYS-01` | Độ chính xác tiền tệ | Toàn hệ thống | Mọi giá trị tiền tệ, số dư tài khoản và lãi suất bắt buộc sử dụng kiểu số thập phân chính xác (`BigDecimal`). Kết quả tính toán hiển thị được làm tròn đến 2 chữ số thập phân theo quy chuẩn kế toán. |
+
+### 6.2 Quy tắc phân hệ Ví tiền và Luân chuyển dòng tiền
+
+| Mã quy tắc | Tên quy tắc | Đối tượng áp dụng | Nội dung quy tắc |
+|---|---|---|---|
+| `BR-WAL-01` | Cân bằng số dư ví | `Wallet` | Số dư hiện tại = Số dư ban đầu + Tổng Thu - Tổng Chi + Tổng chuyển đến - Tổng chuyển đi +/- Biến động từ phân hệ nợ và quỹ đầu tư. |
+| `BR-WAL-02` | Ràng buộc số dư không âm | `Wallet` | Ví tiền mặt và tài khoản ngân hàng thông thường không được phép có số dư nhỏ hơn 0. Ví tín dụng được phép có số dư âm trong phạm vi hạn mức thấu chi được cấp. |
+| `BR-WAL-03` | An toàn khi đóng ví | `Wallet` | Hệ thống ngăn chặn xóa hoặc lưu trữ ví nếu số dư hiện tại khác 0. Chủ sở hữu phải chuyển hết tiền sang ví khác trước khi đóng ví. |
+| `BR-WAL-04` | Kiểm tra khả năng thanh toán | `Wallet`, `Transfer` | Hệ thống bắt buộc kiểm tra số dư khả dụng của ví nguồn trước khi xác nhận giao dịch chi tiêu hoặc chuyển tiền (ngoại trừ ví tín dụng). |
+| `BR-TXN-01` | Số tiền giao dịch dương | `Transaction` | Giá trị số tiền ghi nhận trong mỗi giao dịch thu chi bắt buộc phải là số dương lớn hơn 0. Bản chất làm tăng hoặc giảm số dư phụ thuộc vào Loại giao dịch (Income hoặc Expense). |
+| `BR-TXN-02` | Nhất quán loại luồng tiền | `Transaction` | Mỗi giao dịch bắt buộc phải gắn với danh mục thuộc cùng nhóm luồng tiền (giao dịch Thu chỉ chọn danh mục Thu, giao dịch Chi chỉ chọn danh mục Chi). |
+| `BR-CAT-01` | Toàn vẹn lịch sử danh mục | `Category` | Không cho phép xóa vĩnh viễn danh mục đã có giao dịch tham chiếu trong lịch sử. Hệ thống áp dụng cơ chế vô hiệu hóa (soft-delete) để ẩn danh mục khỏi danh sách lựa chọn mới. |
+| `BR-CAT-02` | Tính khả dụng của danh mục | `Category`, `Transaction` | Giao dịch mới chỉ được phép dán nhãn bằng các danh mục đang ở trạng thái hoạt động (Active). |
+| `BR-TRF-01` | Nguyên tắc bảo toàn chuyển khoản | `Transfer` | Số tiền trừ ở ví nguồn phải bằng chính xác số tiền cộng vào ví đích. Ví nguồn và ví đích bắt buộc không được trùng nhau. |
+| `BR-TRF-02` | Tách biệt phí chuyển khoản | `Transfer` | Phí dịch vụ phát sinh trong giao dịch chuyển khoản được ghi nhận thành một giao dịch chi tiêu độc lập trừ trực tiếp vào ví nguồn. |
+| `BR-TRF-03` | Đồng nhất loại tiền tệ | `Transfer` | Ví nguồn và ví đích phải sử dụng cùng một loại đơn vị tiền tệ. Trường hợp khác loại tiền tệ, hệ thống yêu cầu xác định tỷ giá quy đổi trước khi thực hiện. |
+
+### 6.3 Quy tắc phân hệ Công nợ và Quỹ tài chính
+
+| Mã quy tắc | Tên quy tắc | Đối tượng áp dụng | Nội dung quy tắc |
+|---|---|---|---|
+| `BR-DBT-01` | Vốn gốc khoản nợ dương | `Debt` | Số tiền vốn gốc của thỏa thuận vay hoặc cho vay bắt buộc phải lớn hơn 0. |
+| `BR-DBT-02` | Lãi đơn cố định theo ngày | `Debt` | Tiền lãi mỗi kỳ được tính theo công thức lãi đơn: `Tiền lãi = Gốc × Lãi suất năm × (Số ngày trong kỳ / 365)`. Hệ thống không áp dụng lãi kép cho các khoản vay cá nhân. |
+| `BR-DBT-03` | Khớp nối tổng kỳ trả nợ | `RepaymentInstallment` | Tổng số tiền dự kiến của toàn bộ các kỳ trong lịch trả nợ phải bằng đúng số tiền vốn gốc cộng tổng tiền lãi dự kiến của khoản nợ. |
+| `BR-DBT-04` | Giới hạn thanh toán kỳ | `DebtPayment` | Tổng số tiền các lần thanh toán thực tế cho một kỳ hạn không được vượt quá số tiền dự kiến phải trả của kỳ đó. |
+| `BR-DBT-05` | Tính chất trạng thái kết thúc | `Debt` | Khoản nợ đã chuyển sang trạng thái Đã tất toán hoặc Đã xóa nợ sẽ bị đóng băng, không được tạo thêm kỳ trả góp hoặc giao dịch thanh toán mới. |
+| `BR-PRT-01` | Toàn vẹn đối tác công nợ | `Partner` | Không cho phép xóa đối tác khỏi hệ thống nếu vẫn còn khoản nợ chưa tất toán gắn liền với đối tác đó. |
+| `BR-SAV-01` | Toàn vẹn kỳ hạn tiết kiệm | `Saving` | Giá trị kỳ hạn gửi tiết kiệm bắt buộc phải nằm trong danh mục các kỳ hạn đã được cấu hình sẵn trong hệ thống. |
+| `BR-FCT-01` | Vốn gốc đầu tư hợp lệ | `FundCertificate` | Vốn gốc đầu tư chứng chỉ quỹ bắt buộc phải lớn hơn 0, và ngày mua không được nằm ở tương lai so với ngày hiện tại. |
+| `BR-GFD-01` | An toàn tính toán tiến độ quỹ | `GoalFund` | Trường hợp số tiền mục tiêu của quỹ bằng 0, tỷ lệ phần trăm tiến độ được hiển thị ở trạng thái chưa xác định (N/A) thay vì thực hiện phép chia cho 0. |
+| `BR-GFD-02` | Toàn vẹn tài sản quỹ mục tiêu | `GoalFund` | Mỗi sổ tiết kiệm hoặc chứng chỉ quỹ chỉ được phép liên kết với tối đa một quỹ mục tiêu duy nhất tại một thời điểm. |
+
