@@ -307,3 +307,88 @@ Phương pháp thẻ CRC (Class, Responsibility, Collaborator) được sử d�
 | `BR-GFD-01` | An toàn tính toán tiến độ quỹ | `GoalFund` | Trường hợp số tiền mục tiêu của quỹ bằng 0, tỷ lệ phần trăm tiến độ được hiển thị ở trạng thái chưa xác định (N/A) thay vì thực hiện phép chia cho 0. |
 | `BR-GFD-02` | Toàn vẹn tài sản quỹ mục tiêu | `GoalFund` | Mỗi sổ tiết kiệm hoặc chứng chỉ quỹ chỉ được phép liên kết với tối đa một quỹ mục tiêu duy nhất tại một thời điểm. |
 
+---
+
+## 7. Vòng đời nghiệp vụ của các đối tượng chính
+
+### 7.1 Phân định tính chất vòng đời đối tượng
+Trong hệ thống tài chính cá nhân, các đối tượng được phân loại thành hai nhóm hành vi:
+- Nhóm sự kiện bất biến và danh mục tĩnh: Các đối tượng `Transaction` và `Transfer` là các sự kiện tài chính đã phát sinh, một khi đã lưu vết thì mang tính bất biến và không có chuyển đổi trạng thái rời rạc. Đối tượng `Wallet` duy trì số dư khả dụng liên tục theo thời gian thực mà không qua các bước trạng thái. Các đối tượng `Partner`, `DebtLedger`, `FundCertificate`, và `GoalFund` là danh mục tĩnh hoặc giá trị tài sản biến động liên tục theo thị trường. Do đó, các đối tượng này áp dụng ghi chú Không áp dụng (N/A) đối với máy trạng thái rời rạc theo quy định tại khung phân tích OOA.
+- Nhóm thực thể có vòng đời trạng thái rời rạc: Gồm `Debt` (Khoản nợ), `RepaymentInstallment` (Kỳ trả nợ), và `Saving` (Sổ tiết kiệm). Các thực thể này trải qua nhiều giai đoạn nghiệp vụ rõ ràng từ khi khởi tạo, thực hiện nghĩa vụ cho đến khi kết thúc.
+
+### 7.2 Vòng đời Khoản nợ (`Debt`)
+
+| Trạng thái hiện tại | Sự kiện kích hoạt | Điều kiện chuyển trạng thái | Trạng thái tiếp theo | Ý nghĩa nghiệp vụ |
+|---|---|---|---|---|
+| Mới phát sinh | Hệ thống sinh lịch trả góp | Khoản nợ vừa được tạo lập thành công | Đang trả dần | Bắt đầu theo dõi nghĩa vụ trả nợ theo từng kỳ hạn. |
+| Đang trả dần | Ghi nhận một giao dịch thanh toán nợ (`DebtPayment`) | Vẫn còn kỳ trả nợ chưa thanh toán đủ | Đang trả dần | Số dư nợ gốc và lãi giảm dần nhưng nghĩa vụ nợ chưa hoàn tất. |
+| Đang trả dần | Kỳ hạn cuối cùng được thanh toán đủ | Tổng số tiền đã thanh toán bằng gốc cộng tổng lãi dự kiến | Đã tất toán | Khoản nợ hoàn tất trọn vẹn, chấm dứt toàn bộ nghĩa vụ nợ. |
+| Đang trả dần hoặc Mới phát sinh | Chủ tài khoản xác nhận xử lý xóa nợ | Không có khả năng thu hồi hoặc có thỏa thuận miễn giảm nợ | Đã xóa nợ | Kết thúc theo dõi khoản nợ mà không thu hoặc trả đủ toàn bộ số tiền. |
+
+### 7.3 Vòng đời Kỳ trả nợ (`RepaymentInstallment`)
+
+| Trạng thái hiện tại | Sự kiện kích hoạt | Điều kiện chuyển trạng thái | Trạng thái tiếp theo | Ý nghĩa nghiệp vụ |
+|---|---|---|---|---|
+| Chưa đến hạn | Đến hạn thanh toán mà chưa nhận đủ tiền | Ngày hiện tại lớn hơn hoặc bằng ngày đến hạn của kỳ | Quá hạn | Cảnh báo nghĩa vụ thanh toán đã bị trễ hạn cần xử lý. |
+| Chưa đến hạn hoặc Quá hạn | Nhận đủ tiền thanh toán qua các giao dịch nợ | Tổng số tiền thanh toán thực tế bằng số tiền dự kiến của kỳ | Đã trả | Kỳ trả nợ hoàn tất nghĩa vụ, không còn tính vào dư nợ đến hạn. |
+
+### 7.4 Vòng đời Sổ tiết kiệm (`Saving`)
+
+| Trạng thái hiện tại | Sự kiện kích hoạt | Điều kiện chuyển trạng thái | Trạng thái tiếp theo | Ý nghĩa nghiệp vụ |
+|---|---|---|---|---|
+| Đang gửi | Đến ngày kết thúc kỳ hạn gửi | Ngày hiện tại bằng hoặc lớn hơn ngày đáo hạn | Đã đáo hạn | Sổ tiết kiệm sẵn sàng để rút toàn bộ gốc và lãi hoặc tái tục sang kỳ hạn mới. |
+
+---
+
+## 8. Bảng đối chiếu ca sử dụng với đối tượng
+
+Bảng ma trận đối chiếu nhằm kiểm tra tính đầy đủ của mô hình phân tích, bảo đảm mọi ca sử dụng đều có đối tượng tương ứng phụ trách và không có đối tượng nào bị dư thừa trong phạm vi hệ thống:
+
+| Mã Ca sử dụng | Tên ca sử dụng | Các đối tượng nghiệp vụ tham gia | Vai trò nghiệp vụ của các đối tượng |
+|---|---|---|---|
+| `WAL-01` | Xem số dư các ví | `Wallet`, `Transaction`, `Transfer`, `DebtPayment` | `Wallet` tổng hợp dòng tiền từ `Transaction`, luân chuyển từ `Transfer` và biến động từ `DebtPayment` để hiển thị số dư và tỷ trọng. |
+| `TXN-01` | Ghi chép giao dịch thu/chi | `Wallet`, `Transaction`, `Group`, `Category` | `Transaction` khởi tạo bản ghi thu chi, `Category` và `Group` cung cấp cấu trúc phân loại, `Wallet` điều chỉnh số dư khả dụng. |
+| `TXN-02` | Sửa / Xóa giao dịch | `Wallet`, `Transaction`, `Group`, `Category` | `Transaction` cập nhật hoặc đánh dấu hủy, `Wallet` tính toán bù trừ hoàn lại số dư tương ứng. |
+| `TXN-03` | Xem lịch sử thu/chi | `Wallet`, `Transaction`, `Group`, `Category` | Truy xuất tập hợp các `Transaction` theo bộ lọc thời gian, phân loại theo `Group` và `Category`. |
+| `TRF-01` | Chuyển tiền nội bộ giữa ví | `Wallet`, `Transfer`, `Transaction` | `Transfer` điều phối luân chuyển tiền giữa hai `Wallet`, kích hoạt tạo `Transaction` phụ nếu phát sinh phí dịch vụ. |
+| `CAT-01` | Phân loại thu/chi theo danh mục | `Transaction`, `Group`, `Category` | Ánh xạ sự kiện chi tiêu vào cơ cấu danh mục phân tầng để phục vụ theo dõi ngân sách. |
+| `CAT-02` | Quản lý danh mục phân loại | `Group`, `Category` | Quản trị dữ liệu danh mục gồm thêm mới, cập nhật thông tin hiển thị và vô hiệu hóa danh mục cũ. |
+| `DSH-01` | Xem dashboard tổng quan | `Wallet`, `Transaction`, `Group`, `Category`, `DebtLedger`, `GoalFund` | Tổng hợp số liệu tài sản từ `Wallet`, luồng tiền từ `Transaction`, nghĩa vụ ròng từ `DebtLedger` và tiến độ từ `GoalFund`. |
+| `DBT-01` | Quản lý công nợ | `Debt`, `RepaymentInstallment`, `DebtPayment`, `Partner`, `Wallet` | `Debt` quản lý thỏa thuận nợ, `RepaymentInstallment` chia kỳ, `DebtPayment` ghi nhận thanh toán và tác động đến `Wallet`. |
+| `FR-DBT-03`| Sao kê công nợ theo người | `Partner`, `Debt`, `DebtLedger` | `Partner` cung cấp thông tin đối tác, `DebtLedger` tổng hợp toàn bộ các `Debt` để kết xuất sao kê phải thu và phải trả. |
+| `SAV-01` | Quản lý sổ tiết kiệm | `Saving`, `GoalFund`, `Wallet` | `Saving` quản lý thông tin tiền gửi và tính lãi, `GoalFund` tích hợp giá trị tài sản, `Wallet` là nguồn trích tiền gửi ban đầu. |
+| `FCT-01` | Quản lý chứng chỉ quỹ đầu tư | `FundCertificate`, `GoalFund`, `Wallet` | `FundCertificate` theo dõi danh mục đầu tư và lãi lỗ thị trường, `GoalFund` tích hợp vào quỹ mục tiêu, `Wallet` thanh toán mua. |
+| `GFD-01` | Phân bổ & theo dõi quỹ mục tiêu | `GoalFund`, `Saving`, `FundCertificate`, `Wallet` | `GoalFund` nhận phân bổ tiền mặt từ `Wallet`, tổng hợp giá trị từ `Saving` và `FundCertificate` để tính toán tiến độ hoàn thành. |
+
+---
+
+## 9. Bảng tự kiểm tra chất lượng phân tích
+
+### 9.1 Bảng tự kiểm tra chất lượng phân tích Milestone 2
+
+| Câu hỏi tự kiểm tra | Tiêu chí đạt yêu cầu | Đánh giá | Ghi chú minh chứng |
+|---|---|---|---|
+| Báo cáo có bị lẫn các lớp kỹ thuật (Controller, Service, Repository, DAO) không? | Tuyệt đối không xuất hiện các lớp kỹ thuật này | Đạt | Toàn bộ 13 đối tượng đều là thực thể đời thực hoặc đối tượng giá trị miền tài chính. |
+| Báo cáo có bị lẫn chi tiết giao diện người dùng không? | Không đề cập nút bấm, form nhập liệu hay cửa sổ | Đạt | Các danh từ giao diện (form, button) đã được lọc bỏ hoàn toàn tại mục 2.2. |
+| Tên đối tượng có bám sát ngữ cảnh đời thực và Use Case không? | Bám sát thuật ngữ trong tài liệu req-uc.md và file Excel | Đạt | 13 đối tượng phản ánh chính xác các khái niệm tiền tệ, sổ sách, công nợ và đầu tư. |
+| Thẻ CRC có phân định rõ ràng việc đối tượng biết và việc đối tượng tự làm không? | Có sự tách bạch rành mạch giữa Knowing và Doing | Đạt | Cột Responsibilities trong 13 thẻ CRC tại mục 5 phân định rõ trách nhiệm thông tin và hành vi. |
+| Các phép tính tiền tệ có quy định sử dụng số thập phân chính xác không? | Bắt buộc quy ước kiểu dữ liệu BigDecimal | Đạt | Quy tắc `BR-SYS-01` và bảng từ điển mục 3 quy định rõ sử dụng `BigDecimal`. |
+| Phạm vi dữ liệu giữa các phân hệ có bị lấn sân nhau không? | Mỗi đối tượng chỉ quản lý dữ liệu tự thân, điểm chạm ở mức khái quát | Đạt | Mục 1.3 và 4.2 xác lập ranh giới điểm chạm rõ ràng qua giao dịch tiền tệ chung. |
+| Có bị lạm dụng các sơ đồ UML chi tiết của pha thiết kế không? | Không sử dụng sơ đồ lớp chi tiết có kiểu dữ liệu lập trình hay sơ đồ tuần tự hàm | Đạt | Sử dụng mô hình trực quan 2 tầng dạng khối khái niệm Mermaid đơn giản. |
+
+### 9.2 Đối chiếu tuân thủ 10 Quality Gates kỹ thuật
+
+| Cổng kiểm định | Tiêu chí kỹ thuật | Kết quả | Ghi chú xác thực |
+|---|---|---|---|
+| Gate 1: Ranh giới miền bài toán | Không rò rỉ thuật ngữ thiết kế OOD vào tài liệu OOA | Đạt | Không có Controller, Service, Repository, DAO, DTO hay cấu trúc bảng SQL. |
+| Gate 2: Nhất quán góc nhìn Diataxis | Tài liệu thuần túy thuộc góc nhìn Diataxis: Tài liệu giải thích và đặc tả miền (Explanation & Reference) | Đạt | Bố cục chuẩn xác theo 9 mục quy định tại framework.md, không giảng bài lý thuyết suông. |
+| Gate 3: Độ thuần nhất ngôn ngữ | Thuật ngữ kỹ thuật và văn bản tiếng Việt tự nhiên, không chèn dịch nghĩa kép vụng về | Đạt | Sử dụng thuật ngữ chuyên môn kế toán và tài chính chuẩn mực. |
+| Gate 4: Bộ lọc văn phong máy học | Loại bỏ hoàn toàn gạch ngang em-dash, mẫu câu đối lập giả tạo và bôi đậm đầu dòng cơ học | Đạt | Số lượng em-dash bằng 0; không có mẫu câu "không phải X mà là Y"; cấu trúc danh sách chuyển thành bảng biểu. |
+| Gate 5: Định chuẩn định danh mục | Đánh số thứ tự và mã định danh chuẩn mực | Đạt | Các quy tắc nghiệp vụ mang mã chuẩn `BR-SYS`, `BR-WAL`, `BR-TXN`, `BR-TRF`, `BR-CAT`, `BR-DBT`, `BR-PRT`, `BR-SAV`, `BR-FCT`, `BR-GFD`. |
+| Gate 6: Tính toàn vẹn công thức toán | Không chứa ký tự sổ dọc trần trong các công thức toán học | Đạt | Các biểu thức công thức sử dụng ký tự toán học chuẩn, không xung đột bảng Markdown. |
+| Gate 7: Vệ sinh khối mã và ký tự | Khối mã Mermaid sạch, không có khoảng trắng sau dấu backtick | Đạt | Toàn bộ các khối mermaid được định dạng chuẩn xác. |
+| Gate 8: Mô hình hóa trực quan hai tầng | Mỗi sơ đồ không vượt quá giới hạn nhận thức 9 node | Đạt | Sơ đồ Tầng 1 (5 nodes), Tầng 2a (5 nodes), Tầng 2b (8 nodes), 100% tuân thủ giới hạn nhỏ hơn hoặc bằng 9 nodes. |
+| Gate 9: Ma trận truy vết khép kín | 100% ca sử dụng được ánh xạ đầy đủ với các đối tượng miền | Đạt | Ma trận mục 8 ánh xạ trọn vẹn 11 ca sử dụng chính và 1 yêu cầu chức năng sao kê. |
+| Gate 10: Ranh giới thực tế và đánh đổi | Xác định rõ giới hạn của mô hình phân tích miền | Đạt | Ranh giới phân tích được xác lập rõ ràng tại mục 1.3, làm tiền đề chuyển giao cho pha OOD. |
+
+
