@@ -81,3 +81,81 @@ Hệ thống tài chính cá nhân được mô hình hóa qua 13 đối tượn
 | `Saving` | Sổ tiết kiệm | Khoản tiền gửi tiết kiệm tại tổ chức tín dụng có hoặc không có kỳ hạn, sinh lãi theo thời gian. | Mã sổ, mã quỹ mục tiêu liên kết, số tiền gửi ban đầu (`BigDecimal`), kỳ hạn gửi, lãi suất năm (`BigDecimal`), ngày gửi, trạng thái sổ. | Entity | Quản lý thông tin khoản tiền gửi tiết kiệm tự thân, không lưu thông tin chi tiết của ví nguồn. |
 | `FundCertificate` | Chứng chỉ quỹ đầu tư | Khoản đầu tư vào chứng chỉ quỹ mở hoặc cổ phiếu, có giá trị thị trường biến động liên tục. | Mã chứng chỉ, mã quỹ mục tiêu liên kết, mã giao dịch chứng chỉ, loại tài sản (Cổ phiếu, Trái phiếu, Cân bằng), vốn gốc (`BigDecimal`), ngày mua, giá trị thị trường hiện tại (`BigDecimal`). | Entity | Quản lý danh mục đầu tư và giá trị thị trường, không lưu lịch sử giao dịch của ví thanh toán. |
 | `GoalFund` | Quỹ mục tiêu | Quỹ tài chính do chủ tài khoản thiết lập để tích lũy tài sản cho mục tiêu cụ thể. | Mã quỹ, tên quỹ, số tiền mục tiêu (`BigDecimal`), số tiền mặt phân bổ trực tiếp (`BigDecimal`), ngày bắt đầu, ngày dự kiến hoàn thành. | Entity | Tổng hợp giá trị tài sản từ tiền mặt phân bổ, các sổ tiết kiệm và các chứng chỉ quỹ liên kết, không lưu trùng lặp số dư của tài sản thành phần. |
+
+---
+
+## 4. Mối quan hệ nghiệp vụ giữa các đối tượng
+
+### 4.1 Bảng tổng hợp quan hệ nghiệp vụ
+
+| Đối tượng A | Quan hệ | Đối tượng B | Số lượng (Bản số) | Ý nghĩa nghiệp vụ |
+|---|---|---|---|---|
+| `Wallet` | chứa | `Transaction` | 1 `Wallet` chứa 0 hoặc nhiều `Transaction` | Mỗi khoản thu hoặc chi bắt buộc phải gắn với một ví cụ thể để xác định nguồn tiền biến động. |
+| `Transaction` | thuộc | `Category` | 1 `Transaction` thuộc đúng 1 `Category` | Mọi giao dịch thu chi đều cần nhãn phân loại phục vụ thống kê chi tiêu và lập ngân sách. |
+| `Category` | thuộc | `Group` | 1 `Category` thuộc đúng 1 `Group` | Các danh mục chi tiết được gom nhóm vào nhóm nhu cầu lớn tương ứng với luồng tiền gốc. |
+| `Transfer` | luân chuyển giữa | `Wallet` | 1 `Transfer` liên kết đúng 2 `Wallet` | Chuyển tiền nội bộ làm giảm số dư ví nguồn và tăng số dư ví đích của cùng một người dùng. |
+| `Transfer` | phát sinh phí qua | `Transaction` | 1 `Transfer` kích hoạt 0 hoặc 1 `Transaction` | Trường hợp chuyển khoản có tính phí dịch vụ, phí chuyển được ghi nhận thành một giao dịch chi độc lập trừ vào ví nguồn. |
+| `Partner` | tham gia | `Debt` | 1 `Partner` có 0 hoặc nhiều `Debt` | Một đối tác có thể có nhiều thỏa thuận vay hoặc cho vay với chủ tài khoản theo thời gian. |
+| `Debt` | chia thành | `RepaymentInstallment` | 1 `Debt` có 1 hoặc nhiều `RepaymentInstallment` | Khoản nợ được chia thành nhiều kỳ thanh toán theo lịch trả góp đã thỏa thuận. |
+| `RepaymentInstallment` | nhận thanh toán từ | `DebtPayment` | 1 `RepaymentInstallment` có 0 hoặc nhiều `DebtPayment` | Một kỳ hạn có thể được thanh toán một lần, nhiều lần, hoặc xử lý xóa nợ khi không đòi được. |
+| `Partner` | tổng hợp đối soát | `DebtLedger` | 1 `Partner` tương ứng đúng 1 `DebtLedger` | Sổ nợ được tính toán tức thời từ toàn bộ các khoản nợ của đối tác đó để xác định dư nợ ròng. |
+| `GoalFund` | phân bổ vào | `Saving` | 1 `GoalFund` chứa 0 hoặc nhiều `Saving` | Quỹ mục tiêu gom nhóm các sổ tiết kiệm phục vụ cùng một mục tiêu tài chính. |
+| `GoalFund` | phân bổ vào | `FundCertificate` | 1 `GoalFund` chứa 0 hoặc nhiều `FundCertificate` | Quỹ mục tiêu tích hợp các khoản đầu tư chứng chỉ quỹ để theo dõi tiến độ tổng thể. |
+| `DebtPayment` | tác động số dư | `Wallet` | Nhiều `DebtPayment` tác động đến 1 `Wallet` | Điểm chạm liên phân hệ: Mỗi giao dịch trả nợ hoặc thu nợ làm biến động số dư của chiếc ví được chọn thanh toán. |
+
+### 4.2 Điểm chạm liên phân hệ (Inter-subsystem Touchpoints)
+Các phân hệ trong hệ thống tương tác với nhau qua ba điểm chạm dữ liệu chính:
+- Điểm chạm thanh toán nợ: Khi phát sinh một sự kiện trả nợ (giảm tiền) hoặc thu nợ (tăng tiền) trong `DebtPayment`, số dư của `Wallet` được điều chỉnh thông qua một biến động dòng tiền tương ứng.
+- Điểm chạm phân bổ quỹ mục tiêu: Khi chủ tài khoản trích tiền mặt từ `Wallet` để đưa vào `GoalFund` (khoản mục `funds_cash`), số dư ví thanh toán giảm tương ứng với số tiền phân bổ.
+- Điểm chạm gửi tiết kiệm và mua chứng chỉ quỹ: Khi khởi tạo một `Saving` hoặc `FundCertificate`, dòng tiền xuất phát từ một `Wallet` xác định. Khi sổ tiết kiệm đáo hạn hoặc chứng chỉ quỹ được bán, dòng tiền quay trở lại ví đích được chỉ định.
+
+### 4.3 Mô hình trực quan hai tầng (Tiered Visual Modeling)
+
+Nhằm đảm bảo tính trực quan và tuân thủ giới hạn nhận thức tối đa 9 node trong một biểu đồ, kiến trúc quan hệ được phân rã thành hai tầng mô hình hóa:
+
+#### Sơ đồ Tầng 1: Tổng quan tương tác giữa các phân hệ nghiệp vụ
+
+Biểu đồ mô tả luồng tương tác cấp cao giữa nơi giữ tiền trung tâm và các phân hệ chức năng:
+
+```mermaid
+flowchart TD
+    Wallet["Wallet (Ví tiền & Tài khoản)"]
+    CoreSub["Core (Giao dịch thu chi & Chuyển khoản)"]
+    DebtSub["Debt (Công nợ & Lịch trả góp)"]
+    FundSub["Funds (Sổ tiết kiệm & Chứng chỉ quỹ)"]
+    GoalSub["GoalFund (Quỹ mục tiêu tích lũy)"]
+
+    CoreSub -->|"Cập nhật thu/chi và chuyển khoản"| Wallet
+    DebtSub -.->|"DebtPayment làm biến động số dư"| Wallet
+    FundSub -.->|"Nguồn tiền gửi và tiền rút"| Wallet
+    GoalSub -.->|"Phân bổ tiền mặt trực tiếp"| Wallet
+    FundSub -->|"Tích hợp giá trị tài sản"| GoalSub
+```
+
+#### Sơ đồ Tầng 2a: Chi tiết cấu trúc phân hệ Cốt lõi
+
+Biểu đồ mô tả cấu trúc quan hệ nội tại của 5 đối tượng cốt lõi:
+
+```mermaid
+flowchart TD
+    Group["Group (Nhóm nhu cầu)"] -->|"1 chứa nhiều"| Category["Category (Danh mục)"]
+    Category -->|"1 dán nhãn nhiều"| Transaction["Transaction (Giao dịch)"]
+    Wallet["Wallet (Ví tiền)"] -->|"1 chứa nhiều"| Transaction
+    Wallet -->|"2 tham gia 1"| Transfer["Transfer (Chuyển khoản)"]
+    Transfer -.->|"Phát sinh phí dịch vụ"| Transaction
+```
+
+#### Sơ đồ Tầng 2b: Chi tiết cấu trúc phân hệ Mở rộng
+
+Biểu đồ mô tả cấu trúc quan hệ của 8 đối tượng thuộc phân hệ Công nợ và Quỹ tài chính:
+
+```mermaid
+flowchart LR
+    Partner["Partner"] -->|"1 có nhiều"| Debt["Debt"]
+    Debt -->|"1 chia thành nhiều"| Installment["RepaymentInstallment"]
+    Installment -->|"1 nhận nhiều"| Payment["DebtPayment"]
+    Partner -->|"1 tổng hợp thành"| Ledger["DebtLedger"]
+
+    GoalFund["GoalFund"] -->|"1 phân bổ nhiều"| Saving["Saving"]
+    GoalFund -->|"1 tích hợp nhiều"| FundCert["FundCertificate"]
+```
