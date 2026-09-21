@@ -26,11 +26,14 @@
 \usetikzlibrary{arrows.meta}
 \usepackage[hidelinks,unicode,pdftitle={Báo cáo Phân tích Hướng đối tượng (OOA)}]{hyperref}
 
+% Cấu hình hiển thị Mục lục mở rộng cấp subsection với đường chấm ....
 \renewcommand{\contentsname}{Mục lục}
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \renewcommand{\cftsecfont}{\bfseries}
 \renewcommand{\cftsecleader}{\bfseries\cftdotfill{\cftdotsep}}
 \renewcommand{\cftsecpagefont}{\bfseries}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecpagefont}{\normalfont}
 
 \titleformat{\section}
   {\Large\bfseries}
@@ -97,7 +100,7 @@
     \vspace*{\fill}
     \begin{center}
         \IfFileExists{logo-PTIT.jpg}{\includegraphics[width=7cm]{logo-PTIT.jpg}}{\mbox{}}\\[1.5cm]
-        {\Huge \textbf{Personal Finance Management}} \\[1.5cm]
+        {\Huge \textbf{Hệ thống Quản lý Tài chính Cá nhân}} \\[1.5cm]
         {\huge \textbf{Nhóm 3}} \\[0.5cm]
         Lê Anh Minh -- B24DCCE180 \\
         Ứng Trọng Trình -- B24DCCE271 \\
@@ -108,11 +111,9 @@
 \end{titlepage}
 
 \begin{center}
-  {\LARGE\bfseries\sffamily Hệ thống Quản lý Tài chính Cá nhân (PFMS)\par}
+  {\LARGE\bfseries\sffamily Phân tích hướng đối tượng\par}
   \vspace{0.6em}
 \end{center}
-
-Tài liệu này tổng hợp kết quả phân tích hướng đối tượng cho Hệ thống Quản lý Tài chính Cá nhân (PFMS), bao gồm đầy đủ phân hệ Cốt lõi (Core) và phân hệ Mở rộng (Deferred).
 
 \tableofcontents
 
