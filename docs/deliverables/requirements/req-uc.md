@@ -1,4 +1,4 @@
-# Tài liệu Đặc tả Yêu cầu Phần mềm và Ca sử dụng Personal Finance Management System (PFMS)
+# Đặc tả Yêu cầu Phần mềm và Ca sử dụng Hệ thống Quản lý Tài chính Cá nhân (PFMS)
 
 > **HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG (PTIT)**  
 
@@ -36,14 +36,14 @@
   - [3.7 BR-FIN-07: Quy tắc theo dõi công nợ](#37-br-fin-07-quy-tắc-theo-dõi-công-nợ)
   - [3.8 BR-FIN-08: Quy tắc phân bổ quỹ mục tiêu](#38-br-fin-08-quy-tắc-phân-bổ-quỹ-mục-tiêu)
 - [4. Yêu cầu chức năng chi tiết](#4-yêu-cầu-chức-năng-chi-tiết)
-  - [4.1 FR-WAL: Phân hệ Quản lý ví tiền](#41-fr-wal-phân-hệ-quản-lý-ví-tiền)
+  - [4.1 FR-WAL: Phân hệ Ví tiền](#41-fr-wal-phân-hệ-ví-tiền)
   - [4.2 FR-TXN: Phân hệ Ghi nhận thu chi](#42-fr-txn-phân-hệ-ghi-nhận-thu-chi)
   - [4.3 FR-TRF: Phân hệ Chuyển tiền nội bộ](#43-fr-trf-phân-hệ-chuyển-tiền-nội-bộ)
   - [4.4 FR-CAT: Phân hệ Danh mục phân loại](#44-fr-cat-phân-hệ-danh-mục-phân-loại)
-  - [4.5 FR-DEBT: Phân hệ Quản lý công nợ](#45-fr-debt-phân-hệ-quản-lý-công-nợ)
-  - [4.6 FR-SAV: Phân hệ Quản lý sổ tiết kiệm](#46-fr-sav-phân-hệ-quản-lý-sổ-tiết-kiệm)
+  - [4.5 FR-DEBT: Phân hệ Công nợ](#45-fr-debt-phân-hệ-công-nợ)
+  - [4.6 FR-SAV: Phân hệ Sổ tiết kiệm](#46-fr-sav-phân-hệ-sổ-tiết-kiệm)
   - [4.7 FR-INV: Phân hệ Chứng chỉ quỹ đầu tư](#47-fr-inv-phân-hệ-chứng-chỉ-quỹ-đầu-tư)
-  - [4.8 FR-FND: Phân hệ Quản lý quỹ mục tiêu](#48-fr-fnd-phân-hệ-quản-lý-quỹ-mục-tiêu)
+  - [4.8 FR-FND: Phân hệ Quỹ mục tiêu](#48-fr-fnd-phân-hệ-quỹ-mục-tiêu)
   - [4.9 FR-REP: Phân hệ Thống kê và Báo cáo](#49-fr-rep-phân-hệ-thống-kê-và-báo-cáo)
   - [4.10 FR-DAT: Phân hệ Xuất nhập và Sao lưu dữ liệu](#410-fr-dat-phân-hệ-xuất-nhập-và-sao-lưu-dữ-liệu)
 - [5. Yêu cầu phi chức năng](#5-yêu-cầu-phi-chức-năng)
@@ -53,28 +53,58 @@
   - [5.4 NFR-04: Khả năng bảo trì và kiến trúc hướng đối tượng](#54-nfr-04-khả-năng-bảo-trì-và-kiến-trúc-hướng-đối-tượng)
   - [5.5 NFR-05: Tính khả dụng và trải nghiệm người dùng](#55-nfr-05-tính-khả-dụng-và-trải-nghiệm-người-dùng)
   - [5.6 NFR-06: Tính tương thích và môi trường thực thi](#56-nfr-06-tính-tương-thích-và-môi-trường-thực-thi)
-- [6. Đặc tả 10 Ca sử dụng chi tiết](#6-đặc-tả-10-ca-sử-dụng-chi-tiết)
-  - [6.1 UC01: Quản lý ví tiền](#61-uc01-quản-lý-ví-tiền)
-  - [6.2 UC02: Ghi nhận và quản lý giao dịch thu chi](#62-uc02-ghi-nhận-và-quản-lý-giao-dịch-thu-chi)
-  - [6.3 UC03: Chuyển tiền nội bộ giữa các ví](#63-uc03-chuyển-tiền-nội-bộ-giữa-các-ví)
-  - [6.4 UC04: Thiết lập và quản lý danh mục phân loại thu chi 3 cấp](#64-uc04-thiết-lập-và-quản-lý-danh-mục-phân-loại-thu-chi-3-cấp)
-  - [6.5 UC05: Quản lý công nợ](#65-uc05-quản-lý-công-nợ)
-  - [6.6 UC06: Quản lý sổ tiết kiệm có kỳ hạn và tính toán lãi suất](#66-uc06-quản-lý-sổ-tiết-kiệm-có-kỳ-hạn-và-tính-toán-lãi-suất)
-  - [6.7 UC07: Quản lý danh mục chứng chỉ quỹ đầu tư và biến động NAV](#67-uc07-quản-lý-danh-mục-chứng-chỉ-quỹ-đầu-tư-và-biến-động-nav)
-  - [6.8 UC08: Quản lý quỹ mục tiêu tài chính và phân bổ dòng tiền](#68-uc08-quản-lý-quỹ-mục-tiêu-tài-chính-và-phân-bổ-dòng-tiền)
-  - [6.9 UC09: Tra cứu bảng thống kê dòng tiền trượt 12 tháng và phân tích tỷ lệ tiết kiệm](#69-uc09-tra-cứu-bảng-thống-kê-dòng-tiền-trượt-12-tháng-và-phân-tích-tỷ-lệ-tiết-kiệm)
-  - [6.10 UC10: Sao lưu, xuất và nhập dữ liệu tài chính](#610-uc10-sao-lưu-xuất-và-nhập-dữ-liệu-tài-chính)
+- [6. Đặc tả 40 Ca sử dụng chi tiết](#6-đặc-tả-40-ca-sử-dụng-chi-tiết)
+  - [6.1 UC-WAL-01: Tạo ví tiền mới](#61-uc-wal-01-tạo-ví-tiền-mới)
+  - [6.2 UC-WAL-02: Theo dõi số dư động và cơ cấu phân bổ ví](#62-uc-wal-02-theo-dõi-số-dư-động-và-cơ-cấu-phân-bổ-ví)
+  - [6.3 UC-WAL-03: Cập nhật thông tin ví tiền](#63-uc-wal-03-cập-nhật-thông-tin-ví-tiền)
+  - [6.4 UC-WAL-04: Điều chỉnh số dư ví](#64-uc-wal-04-điều-chỉnh-số-dư-ví)
+  - [6.5 UC-TXN-01: Ghi nhận giao dịch thu chi](#65-uc-txn-01-ghi-nhận-giao-dịch-thu-chi)
+  - [6.6 UC-TXN-02: Tra cứu và lọc lịch sử giao dịch](#66-uc-txn-02-tra-cứu-và-lọc-lịch-sử-giao-dịch)
+  - [6.7 UC-TXN-03: Chỉnh sửa giao dịch thu chi](#67-uc-txn-03-chỉnh-sửa-giao-dịch-thu-chi)
+  - [6.8 UC-TXN-04: Xóa giao dịch thu chi](#68-uc-txn-04-xóa-giao-dịch-thu-chi)
+  - [6.9 UC-TRF-01: Chuyển tiền nội bộ giữa hai ví](#69-uc-trf-01-chuyển-tiền-nội-bộ-giữa-hai-ví)
+  - [6.10 UC-TRF-02: Tra cứu lịch sử chuyển tiền](#610-uc-trf-02-tra-cứu-lịch-sử-chuyển-tiền)
+  - [6.11 UC-TRF-03: Hủy giao dịch chuyển tiền](#611-uc-trf-03-hủy-giao-dịch-chuyển-tiền)
+  - [6.12 UC-CAT-01: Bổ sung danh mục phân loại mới](#612-uc-cat-01-bổ-sung-danh-mục-phân-loại-mới)
+  - [6.13 UC-CAT-02: Đổi tên danh mục](#613-uc-cat-02-đổi-tên-danh-mục)
+  - [6.14 UC-CAT-03: Thay đổi trạng thái hoạt động của danh mục](#614-uc-cat-03-thay-đổi-trạng-thái-hoạt-động-của-danh-mục)
+  - [6.15 UC-CAT-04: Xóa danh mục chưa phát sinh giao dịch](#615-uc-cat-04-xóa-danh-mục-chưa-phát-sinh-giao-dịch)
+  - [6.16 UC-DEBT-01: Ghi nhận và thu hồi khoản cho vay](#616-uc-debt-01-ghi-nhận-và-thu-hồi-khoản-cho-vay)
+  - [6.17 UC-DEBT-02: Ghi nhận và trả khoản đi vay](#617-uc-debt-02-ghi-nhận-và-trả-khoản-đi-vay)
+  - [6.18 UC-DEBT-03: Xóa nợ khó đòi phi tiền mặt](#618-uc-debt-03-xóa-nợ-khó-đòi-phi-tiền-mặt)
+  - [6.19 UC-SAV-01: Mở sổ tiết kiệm mới](#619-uc-sav-01-mở-sổ-tiết-kiệm-mới)
+  - [6.20 UC-SAV-02: Tất toán sổ tiết kiệm đúng hạn](#620-uc-sav-02-tất-toán-sổ-tiết-kiệm-đúng-hạn)
+  - [6.21 UC-SAV-03: Tất toán sổ tiết kiệm trước hạn](#621-uc-sav-03-tất-toán-sổ-tiết-kiệm-trước-hạn)
+  - [6.22 UC-SAV-04: Nạp thêm tiền vào sổ tích lũy](#622-uc-sav-04-nạp-thêm-tiền-vào-sổ-tích-lũy)
+  - [6.23 UC-SAV-05: Theo dõi tiến độ và giá trị tích lũy sổ tiết kiệm](#623-uc-sav-05-theo-dõi-tiến-độ-và-giá-trị-tích-lũy-sổ-tiết-kiệm)
+  - [6.24 UC-SAV-06: Tái tục sổ tiết kiệm với điều khoản mới](#624-uc-sav-06-tái-tục-sổ-tiết-kiệm-với-điều-khoản-mới)
+  - [6.25 UC-INV-01: Mua chứng chỉ quỹ](#625-uc-inv-01-mua-chứng-chỉ-quỹ)
+  - [6.26 UC-INV-02: Bán chứng chỉ quỹ](#626-uc-inv-02-bán-chứng-chỉ-quỹ)
+  - [6.27 UC-INV-03: Cập nhật NAV thị trường](#627-uc-inv-03-cập-nhật-nav-thị-trường)
+  - [6.28 UC-INV-04: Phân tích hiệu suất danh mục đầu tư](#628-uc-inv-04-phân-tích-hiệu-suất-danh-mục-đầu-tư)
+  - [6.29 UC-FND-01: Thiết lập quỹ mục tiêu mới](#629-uc-fnd-01-thiết-lập-quỹ-mục-tiêu-mới)
+  - [6.30 UC-FND-02: Theo dõi tiến độ các quỹ mục tiêu](#630-uc-fnd-02-theo-dõi-tiến-độ-các-quỹ-mục-tiêu)
+  - [6.31 UC-FND-03: Điều chỉnh hạn mức mục tiêu của quỹ](#631-uc-fnd-03-điều-chỉnh-hạn-mức-mục-tiêu-của-quỹ)
+  - [6.32 UC-FND-04: Tái phân bổ tài sản giữa các quỹ](#632-uc-fnd-04-tái-phân-bổ-tài-sản-giữa-các-quỹ)
+  - [6.33 UC-FND-05: Đóng quỹ mục tiêu](#633-uc-fnd-05-đóng-quỹ-mục-tiêu)
+  - [6.34 UC-REP-01: Thống kê dòng tiền trượt 12 tháng](#634-uc-rep-01-thống-kê-dòng-tiền-trượt-12-tháng)
+  - [6.35 UC-REP-02: Báo cáo cơ cấu thu chi theo nhóm và danh mục](#635-uc-rep-02-báo-cáo-cơ-cấu-thu-chi-theo-nhóm-và-danh-mục)
+  - [6.36 UC-REP-03: Báo cáo giá trị tài sản ròng](#636-uc-rep-03-báo-cáo-giá-trị-tài-sản-ròng)
+  - [6.37 UC-REP-04: Sao kê công nợ chi tiết theo đối tác](#637-uc-rep-04-sao-kê-công-nợ-chi-tiết-theo-đối-tác)
+  - [6.38 UC-DAT-01: Xuất dữ liệu tài chính](#638-uc-dat-01-xuất-dữ-liệu-tài-chính)
+  - [6.39 UC-DAT-02: Nhập và phục hồi dữ liệu](#639-uc-dat-02-nhập-và-phục-hồi-dữ-liệu)
+  - [6.40 UC-DAT-03: Kiểm toán toàn vẹn dữ liệu](#640-uc-dat-03-kiểm-toán-toàn-vẹn-dữ-liệu)
 - [7. Sơ đồ Ca sử dụng hệ thống](#7-sơ-đồ-ca-sử-dụng-hệ-thống)
   - [7.1 Sơ đồ Ca sử dụng tổng quan kiến trúc phân hệ (Tầng 1)](#71-sơ-đồ-ca-sử-dụng-tổng-quan-kiến-trúc-phân-hệ-tầng-1)
   - [7.2 Sơ đồ Ca sử dụng phân rã chi tiết theo 4 phân hệ nghiệp vụ (Tầng 2)](#72-sơ-đồ-ca-sử-dụng-phân-rã-chi-tiết-theo-4-phân-hệ-nghiệp-vụ-tầng-2)
     - [7.2.1 Phân hệ Quản lý Dòng tiền và Thanh khoản](#721-phân-hệ-quản-lý-dòng-tiền-và-thanh-khoản)
     - [7.2.2 Phân hệ Sổ tiết kiệm và Đầu tư tài chính](#722-phân-hệ-sổ-tiết-kiệm-và-đầu-tư-tài-chính)
-    - [7.2.3 Phân hệ Công nợ và Quản lý Quỹ mục tiêu](#723-phân-hệ-công-nợ-và-quản-lý-quỹ-mục-tiêu)
+    - [7.2.3 Phân hệ Công nợ và Quỹ mục tiêu](#723-phân-hệ-công-nợ-và-quỹ-mục-tiêu)
     - [7.2.4 Phân hệ Thống kê, Báo cáo và Quản trị dữ liệu](#724-phân-hệ-thống-kê-báo-cáo-và-quản-trị-dữ-liệu)
 - [8. Ma trận kiểm chứng và truy vết yêu cầu (RTM)](#8-ma-trận-kiểm-chứng-và-truy-vết-yêu-cầu-rtm)
   - [8.1 Ma trận truy vết yêu cầu 4 chiều](#81-ma-trận-truy-vết-yêu-cầu-4-chiều)
   - [8.2 Ma trận phương pháp kiểm chứng yêu cầu](#82-ma-trận-phương-pháp-kiểm-chứng-yêu-cầu)
-    - [8.2.1 Ma trận phương pháp kiểm chứng yêu cầu chức năng (39 FRs)](#821-ma-trận-phương-pháp-kiểm-chứng-yêu-cầu-chức-năng-39-frs)
+    - [8.2.1 Ma trận phương pháp kiểm chứng yêu cầu chức năng (41 FRs)](#821-ma-trận-phương-pháp-kiểm-chứng-yêu-cầu-chức-năng-41-frs)
     - [8.2.2 Ma trận phương pháp kiểm chứng yêu cầu phi chức năng (6 NFRs)](#822-ma-trận-phương-pháp-kiểm-chứng-yêu-cầu-phi-chức-năng-6-nfrs)
 - [9. Tổng kết đặc tả yêu cầu](#9-tổng-kết-đặc-tả-yêu-cầu)
 
@@ -84,7 +114,7 @@
 
 ### 1.1 Mục đích tài liệu
 
-Tài liệu này là bản đặc tả yêu cầu phần mềm (Software Requirements Specification, SRS) xác định phạm vi chức năng, các bất biến nghiệp vụ tài chính và tiêu chí kiểm chứng cho hệ thống Quản lý Tài chính Cá nhân (PFMS). Bản đặc tả thiết lập căn cứ kỹ thuật cho việc thiết kế kiến trúc, cài đặt mã nguồn trên nền tảng Java 17 LTS và kiểm thử tự động bằng JUnit 5.
+Tài liệu này là tài liệu Software Requirements Specification (SRS) xác định phạm vi chức năng, các bất biến nghiệp vụ tài chính và tiêu chí kiểm chứng cho hệ thống Quản lý Tài chính Cá nhân (PFMS). Bản đặc tả thiết lập căn cứ kỹ thuật cho việc thiết kế kiến trúc, cài đặt mã nguồn trên nền tảng Java 17 LTS và kiểm thử tự động bằng JUnit 5.
 
 ### 1.2 Phạm vi sản phẩm
 
@@ -96,14 +126,14 @@ Bảng phạm vi xử lý kỹ thuật:
 
 | STT | Phân hệ nghiệp vụ | Mã định danh | Phạm vi xử lý kỹ thuật |
 | --- | --- | --- | --- |
-| 1 | Quản lý ví tiền | FR-WAL | Khởi tạo và quản trị 6 ví tài khoản mặc định theo dữ liệu nguồn (`cash`, `mb bank`, `timo`, `vietcombank`, `msb`, `shopee pay`), hỗ trợ mở rộng thêm ví thẻ tín dụng (`CREDIT`) có hạn mức thấu chi, theo dõi số dư khả dụng và tính toán tỷ trọng phân bổ tài sản thanh khoản. |
+| 1 | Ví tiền | FR-WAL | Khởi tạo và quản trị 6 ví tài khoản mặc định theo dữ liệu nguồn (`cash`, `mb bank`, `timo`, `vietcombank`, `msb`, `shopee pay`), hỗ trợ mở rộng thêm ví thẻ tín dụng (`CREDIT`) có hạn mức thấu chi, theo dõi số dư khả dụng và tính toán tỷ trọng phân bổ tài sản thanh khoản. |
 | 2 | Ghi nhận thu chi | FR-TXN | Ghi nhật ký giao dịch thu nhập và chi phí phát sinh, liên kết trực tiếp với ví thanh toán, cập nhật biến động số dư tức thời. |
 | 3 | Chuyển tiền nội bộ | FR-TRF | Điều chuyển giá trị giữa các ví nội bộ theo nguyên tắc ghi sổ kép đối ứng, bảo toàn tổng lượng tiền mặt trong hệ thống. |
 | 4 | Danh mục phân loại | FR-CAT | Chuẩn hóa cây phân loại 3 cấp gồm Loại, Nhóm nhu cầu và Danh mục chi tiết. |
-| 5 | Quản lý công nợ | FR-DEBT | Giám sát các khoản phải thu và phải trả (đi vay) theo từng đối tác, ghi nhận hoàn ứng và xử lý xóa nợ. |
-| 6 | Quản lý sổ tiết kiệm | FR-SAV | Theo dõi các khoản tiền gửi có kỳ hạn và không kỳ hạn, tính toán tiền lãi theo ngày thực tế, xử lý tất toán đúng hạn và trước hạn. |
+| 5 | Công nợ | FR-DEBT | Giám sát các khoản phải thu và phải trả (đi vay) theo từng đối tác, ghi nhận hoàn ứng và xử lý xóa nợ. |
+| 6 | Sổ tiết kiệm | FR-SAV | Theo dõi các khoản tiền gửi có kỳ hạn và không kỳ hạn, tính toán tiền lãi theo ngày thực tế, xử lý tất toán đúng hạn và trước hạn. |
 | 7 | Chứng chỉ quỹ đầu tư | FR-INV | Định giá danh mục đầu tư theo giá thị trường dựa trên NAV, theo dõi lãi lỗ chưa thực hiện và tỷ suất sinh lời. |
-| 8 | Quản lý quỹ mục tiêu | FR-FND | Quy hoạch tài sản từ tiền mặt, sổ tiết kiệm và chứng chỉ quỹ vào 4 quỹ mục tiêu độc lập, giám sát tỷ lệ hoàn thành mục tiêu. |
+| 8 | Quỹ mục tiêu | FR-FND | Quy hoạch tài sản từ tiền mặt, sổ tiết kiệm và chứng chỉ quỹ vào 4 quỹ mục tiêu độc lập, giám sát tỷ lệ hoàn thành mục tiêu. |
 | 9 | Thống kê và báo cáo | FR-REP | Tự động hóa chuỗi thống kê 12 tháng trượt theo ngày hệ thống, tổng hợp dòng tiền ròng, tỷ lệ tiết kiệm và cơ cấu chi tiêu. |
 | 10 | Quản lý dữ liệu và sao lưu | FR-DAT | Lưu trữ dữ liệu cục bộ trên tệp tin, hỗ trợ xuất và nhập dữ liệu để bảo vệ dữ liệu khi vận hành. |
 
@@ -185,7 +215,7 @@ PFMS quản lý tài chính cá nhân dựa trên các nguyên tắc kỹ thuậ
 ```mermaid
 flowchart TD
     subgraph CoreTx ["1. Giao dịch & Quản lý dòng tiền cơ sở"]
-        W["Quản lý Ví tiền\n(6 ví mặc định)"]
+        W["Ví tiền\n(6 ví mặc định)"]
         IE["Ghi nhận Thu chi\n(Thu nhập và Chi phí)"]
         TR["Chuyển tiền nội bộ\n(Ghi sổ kép đồng thời)"]
     end
@@ -193,7 +223,7 @@ flowchart TD
     INV{"BỘ LÕI BẢO TOÀN DÒNG TIỀN VÀ SỐ DƯ\n(Bảo toàn số dư)"}
 
     subgraph Assets ["2. Cấu phần Tài sản & Đầu tư"]
-        DEBT["Quản lý Công nợ\n(Vay, Thu, Trả)"]
+        DEBT["Công nợ\n(Vay, Thu, Trả)"]
         SAV["Sổ Tiết kiệm\n(Tính lãi kỳ hạn)"]
         INV_F["Chứng chỉ quỹ Đầu tư\n(NAV, Lợi nhuận)"]
     end
@@ -326,17 +356,17 @@ $$
 | Tham số | Quy chuẩn kỹ thuật bắt buộc |
 | --- | --- |
 | Kiểu dữ liệu lưu trữ | `java.math.BigDecimal` cho toàn bộ các trường số tiền, số dư, đơn giá và tỷ lệ. Cấm sử dụng kiểu số thực nguyên thủy hoặc lớp bao bọc (`float`, `double`, `Float`, `Double`). |
-| Phương thức khởi tạo | Bắt buộc sử dụng `new BigDecimal(String)` hoặc `BigDecimal.valueOf(long)` / `BigDecimal.valueOf(double)`. Nghiêm cấm sử dụng constructor `new BigDecimal(double)` do giữ nguyên sai số nhị phân của số thực nhị phân. |
+| Phương thức khởi tạo | Bắt buộc khởi tạo giá trị số học từ chuỗi ký tự thập phân chính xác hoặc từ giá trị nguyên. Nghiêm cấm khởi tạo trực tiếp từ số thực nhị phân do giữ nguyên sai số nhị phân của số thực nhị phân. |
 | Quy chuẩn Scale tiền tệ | Tiền tệ giao dịch và số dư hiển thị cho VNĐ sử dụng scale = 0 (số nguyên đồng) hoặc scale = 2 (lưu trữ số học nội bộ chuẩn tiền tệ). |
 | Quy chuẩn Scale đầu tư | Số lượng chứng chỉ quỹ, đơn giá NAV và các tỷ lệ phần trăm trung gian sử dụng scale tối thiểu = 4 (khuyến nghị scale = 6 trong phép tính trung gian). |
-| Chế độ làm tròn | Các phép chia không hết bắt buộc chỉ định tường minh tham số scale và chế độ làm tròn `RoundingMode.HALF_EVEN` (Banker's rounding) để triệt tiêu độ lệch thống kê tích lũy, hoặc `RoundingMode.HALF_UP` cho các phép tính lãi thương mại. |
-| Phép chia số học | Cấm gọi phương thức `divide(BigDecimal divisor)` không kèm tham số scale và `RoundingMode`. |
+| Chế độ làm tròn | Các phép chia không hết bắt buộc chỉ định tường minh tham số scale và quy tắc làm tròn ngân hàng, làm tròn đến số chẵn gần nhất khi giá trị nằm giữa hai mức (`RoundingMode.HALF_EVEN`) để triệt tiêu độ lệch thống kê tích lũy, hoặc quy tắc làm tròn lên khi giá trị nằm giữa hai mức (`RoundingMode.HALF_UP`) cho các phép tính lãi thương mại. |
+| Phép chia số học | Cấm thực hiện phép chia giữa hai giá trị số học chính xác mà không kèm tham số scale và quy tắc làm tròn tường minh. |
 
 #### Quy tắc xử lý vi phạm
 
-1. Khi phát hiện dữ liệu đầu vào sử dụng kiểu `float` hoặc `double` trong các API nghiệp vụ: Hệ thống từ chối xử lý và ném ngoại lệ `IllegalArgumentException` kèm thông báo lỗi định dạng kiểu số học.
-2. Khi phát hiện phép chia không xác định scale hoặc rounding mode gây số thập phân vô hạn tuần hoàn: Hệ thống ném ngoại lệ `ArithmeticException`, tự động chặn giao dịch và ghi log cảnh báo lỗi thuật toán.
-3. Khi tổng các giá trị thành phần sau phân bổ không khớp với giá trị tổng ban đầu: Hệ thống tự động bù sai số lẻ vào phần tử có giá trị lớn nhất hoặc ném ngoại lệ `FinancialPrecisionException` nếu sai số vượt ngưỡng 0.01 đơn vị tiền tệ.
+1. Khi phát hiện dữ liệu đầu vào sử dụng kiểu số thực nhị phân trong các API nghiệp vụ: Hệ thống từ chối xử lý và báo lỗi nghiệp vụ định dạng kiểu số học không hợp lệ.
+2. Khi phát hiện phép chia không xác định scale hoặc quy tắc làm tròn gây số thập phân vô hạn tuần hoàn: Hệ thống báo lỗi nghiệp vụ phép toán số học không xác định, tự động chặn giao dịch và ghi log cảnh báo lỗi thuật toán.
+3. Khi tổng các giá trị thành phần sau phân bổ không khớp với giá trị tổng ban đầu: Hệ thống tự động bù sai số lẻ vào phần tử có giá trị lớn nhất hoặc báo lỗi nghiệp vụ vượt ngưỡng sai số nếu sai số vượt ngưỡng 0.01 đơn vị tiền tệ.
 
 ### 3.2 BR-FIN-02: Quy tắc bảo toàn số dư ví
 
@@ -350,7 +380,7 @@ $$
 #### Biểu thức bất biến hình thức
 
 1. Công thức bảo toàn số dư động: Xét ví $w$ tại thời điểm quan sát $T$, số dư khả dụng $Balance_w(T)$ được tính toán theo biểu thức:
-$$Balance_w(T) = Balance_w(0) + \sum_{t \le T} Income_w(t) - \sum_{t \le T} Expense_w(t) + \sum_{t \le T} TransferIn_w(t) - \sum_{t \le T} TransferOut_w(t) + \sum_{t \le T} Borrow_w(t) - \sum_{t \le T} Repay_w(t) - \sum_{t \le T} Lend_w(t) + \sum_{t \le T} Collect_w(t)$$
+$$Balance_w(T) = Balance_w(0) + \sum_{t \le T} Income_w(t) - \sum_{t \le T} Expense_w(t) + \sum_{t \le T} TransferIn_w(t) - \sum_{t \le T} TransferOut_w(t) + \sum_{t \le T} Borrow_w(t) - \sum_{t \le T} Repay_w(t) - \sum_{t \le T} Lend_w(t) + \sum_{t \le T} Collect_w(t) + \sum_{t \le T} Adjustment_w(t)$$
 
 Trong đó:
 
@@ -363,6 +393,7 @@ Trong đó:
 - $Repay_w(t)$: Khoản tiền trích xuất từ ví $w$ để trả nợ đã vay (dòng tiền âm).
 - $Lend_w(t)$: Khoản tiền trích xuất từ ví $w$ cho đối tác vay (dòng tiền âm).
 - $Collect_w(t)$: Khoản tiền thu hồi nợ cho vay chuyển về nhập vào ví $w$ (dòng tiền dương).
+- $Adjustment_w(t)$: Chênh lệch dương hoặc âm phát sinh từ một bút toán điều chỉnh số dư ghi nhận theo FR-WAL-05, không thuộc bất kỳ luồng thu, chi, chuyển khoản, vay hoặc trả nợ nào.
 
 2. Ranh giới dòng tiền phi tiền mặt: Các nghiệp vụ xóa nợ (`write-off lend`) và miễn trừ nợ (`write-off borrow`) chỉ tác động lên sổ cái công nợ, không tạo ra dòng tiền vật lý ra hoặc vào ví:
 $$\Delta Balance_w(\text{write-off lend}) = 0$$
@@ -376,6 +407,7 @@ $$\Delta Balance_w(\text{write-off borrow}) = 0$$
     $$
     Balance_w(T) \ge -Limit_w, \quad \forall T
     $$
+4. Ràng buộc bút toán điều chỉnh: Mỗi lần điều chỉnh số dư theo FR-WAL-05 bắt buộc sinh một bản ghi độc lập và bất biến chứa số dư trước điều chỉnh, số dư sau điều chỉnh, giá trị chênh lệch $Adjustment_w(t)$, thời điểm ghi nhận và lý do điều chỉnh. Cơ chế điều chỉnh chỉ áp dụng cho ví có `type` thuộc tập hợp {`CASH`, `BANK`, `E_WALLET`, `CREDIT`}; không áp dụng cho số dư dẫn xuất từ các thực thể `SavingAccount`, `FundCertificate` hoặc `FinancialGoal` vì các thực thể này không thuộc lớp `Wallet` và có cơ chế cập nhật giá trị riêng theo BR-FIN-05, BR-FIN-06 và BR-FIN-08.
 
 #### Ràng buộc kỹ thuật và xử lý số học
 
@@ -387,7 +419,7 @@ $$\Delta Balance_w(\text{write-off borrow}) = 0$$
 
 #### Quy tắc xử lý vi phạm
 
-1. Khi một giao dịch khiến số dư khả dụng của ví rơi vào trạng thái âm ($Balance_w < 0$ với ví thông thường hoặc $Balance_w < -Limit_w$ với thẻ tín dụng): Hệ thống từ chối thực thi giao dịch, hoàn nguyên trạng thái bộ nhớ và ném ngoại lệ `InsufficientBalanceException`.
+1. Khi một giao dịch khiến số dư khả dụng của ví rơi vào trạng thái âm ($Balance_w < 0$ với ví thông thường hoặc $Balance_w < -Limit_w$ với thẻ tín dụng): Hệ thống từ chối thực thi giao dịch, hoàn nguyên trạng thái bộ nhớ và báo lỗi nghiệp vụ số dư ví không đủ.
 2. Thông báo lỗi phản hồi: `"Giao dịch bị từ chối: Số dư ví không đủ để thực hiện thao tác (Số dư hiện tại: [current], Số tiền yêu cầu: [requested])."`
 
 ### 3.3 BR-FIN-03: Quy tắc ghi sổ kép khi chuyển khoản nội bộ
@@ -424,7 +456,7 @@ $$
 
 | Tham số | Quy chuẩn kỹ thuật bắt buộc |
 | --- | --- |
-| Tính bất khả phân | Hai bút toán trừ ví nguồn và cộng ví đích phải được đóng gói trong cùng một khối giao dịch nguyên tử. Nếu một trong hai bút toán thất bại, toàn bộ giao dịch phải được hoàn nguyên về trạng thái ban đầu (Rollback). |
+| Tính bất khả phân | Hai bút toán trừ ví nguồn và cộng ví đích phải được đóng gói trong cùng một khối giao dịch nguyên tử. Nếu một trong hai bút toán thất bại, toàn bộ giao dịch phải được hoàn nguyên về trạng thái ban đầu. |
 | Phân định thực thể | Ví nguồn và ví đích bắt buộc khác nhau: $w_{src} \ne w_{dst}$. |
 | Ràng buộc giá trị chuyển | Số tiền chuyển $A$ phải lớn hơn 0 ($A > 0$). Phí chuyển tiền $Fee$ phải không âm ($Fee \ge 0$). |
 | Ràng buộc thanh khoản nguồn | Ví nguồn phải thỏa mãn điều kiện số dư trước khi trừ: $Balance_{w_{src}} \ge A + Fee$ (hoặc không vượt quá hạn mức thấu chi đối với thẻ tín dụng). |
@@ -432,10 +464,10 @@ $$
 
 #### Quy tắc xử lý vi phạm
 
-1. Khi ví nguồn trùng ví đích ($w_{src} = w_{dst}$): Hệ thống từ chối tạo giao dịch và ném ngoại lệ `SameWalletTransferException`.
-2. Khi số tiền chuyển không hợp lệ ($A \le 0$ hoặc $Fee < 0$): Hệ thống từ chối và ném ngoại lệ `InvalidAmountException`.
-3. Khi ví nguồn không đủ số dư để chi trả khoản tiền chuyển cùng phí ($Balance_{w_{src}} < A + Fee$): Hệ thống từ chối và ném ngoại lệ `InsufficientBalanceException`.
-4. Khi khối giao dịch toàn vẹn gặp sự cố giữa chừng: Hệ thống hoàn nguyên trạng thái (Rollback), bảo đảm không thất thoát hoặc phát sinh sai lệch tiền tệ.
+1. Khi ví nguồn trùng ví đích ($w_{src} = w_{dst}$): Hệ thống từ chối thực thi và báo lỗi nghiệp vụ ví nguồn trùng ví đích.
+2. Khi số tiền chuyển không hợp lệ ($A \le 0$ hoặc $Fee < 0$): Hệ thống từ chối và báo lỗi nghiệp vụ số tiền không hợp lệ.
+3. Khi ví nguồn không đủ số dư để chi trả khoản tiền chuyển cùng phí ($Balance_{w_{src}} < A + Fee$): Hệ thống từ chối và báo lỗi nghiệp vụ số dư ví không đủ.
+4. Khi khối giao dịch toàn vẹn gặp sự cố giữa chừng: Hệ thống hoàn nguyên trạng thái, bảo đảm không thất thoát hoặc phát sinh sai lệch tiền tệ.
 
 ### 3.4 BR-FIN-04: Quy tắc phân cấp danh mục thu chi 3 cấp
 
@@ -451,14 +483,8 @@ $$
 1. Cấu trúc cây phân cấp 3 tầng:
 $$\text{Type} \xrightarrow{1:N} \text{Group} \xrightarrow{1:N} \text{Category}$$
 2. Ràng buộc quan hệ cha - con duy nhất:
-  - Mỗi danh mục chi tiết $c \in \text{Categories}$ trực thuộc duy nhất một nhóm cha $g \in \text{Groups}$:
-    $$
-    \forall c \in \text{Categories}, \quad \exists! g \in \text{Groups}: \text{parent}(c) = g
-    $$
-  - Mỗi nhóm $g \in \text{Groups}$ trực thuộc duy nhất một loại gốc $t \in \text{Types}$:
-    $$
-    \forall g \in \text{Groups}, \quad \exists! t \in \text{Types}: \text{parent}(g) = t
-    $$
+  - Mỗi danh mục chi tiết chỉ được gán vào đúng một Nhóm nhu cầu cha tại một thời điểm.
+  - Mỗi Nhóm nhu cầu chỉ được gán vào đúng một Loại thu chi gốc tại một thời điểm.
   - Ràng buộc nút mồ côi: Danh mục con bắt buộc phải trực thuộc một nhóm cha hợp lệ.
 3. Tập giá trị định danh chuẩn:
   - Tầng 1: $\text{Type} \in \{\text{Income}, \text{Expense}\}$.
@@ -477,9 +503,9 @@ $$\text{Type} \xrightarrow{1:N} \text{Group} \xrightarrow{1:N} \text{Category}$$
 
 #### Quy tắc xử lý vi phạm
 
-1. Khi người dùng cố gắng xóa danh mục cha đang chứa danh mục con: Hệ thống từ chối thao tác và ném ngoại lệ `NonEmptyGroupDeletionException`.
-2. Khi người dùng cố gắng xóa danh mục đã được gắn vào giao dịch lịch sử: Hệ thống từ chối xóa vật lý, ném ngoại lệ `ReferentialIntegrityException` và gợi ý chuyển sang trạng thái ngưng hoạt động (`Archived`).
-3. Khi người dùng cố gắng chuyển đổi thuộc tính `Type` của danh mục đã phát sinh dữ liệu: Hệ thống từ chối và ném ngoại lệ `CategoryTypeImmutableException`.
+1. Khi người dùng cố gắng xóa danh mục cha đang chứa danh mục con: Hệ thống từ chối thao tác và báo lỗi nghiệp vụ nhóm danh mục chưa rỗng.
+2. Khi người dùng cố gắng xóa danh mục đã được gắn vào giao dịch lịch sử: Hệ thống từ chối xóa vật lý, báo lỗi nghiệp vụ vi phạm toàn vẹn tham chiếu và gợi ý chuyển sang trạng thái ngưng hoạt động (`Archived`).
+3. Khi người dùng cố gắng chuyển đổi thuộc tính `Type` của danh mục đã phát sinh dữ liệu: Hệ thống từ chối và báo lỗi nghiệp vụ thuộc tính loại danh mục bất biến.
 
 ### 3.5 BR-FIN-05: Quy tắc tính lãi tiết kiệm có kỳ hạn
 
@@ -512,10 +538,16 @@ $$\text{Type} \xrightarrow{1:N} \text{Group} \xrightarrow{1:N} \text{Category}$$
     $$
     Process = \min\left(1.0, \frac{Days}{TermDays}\right)
     $$
-  - Lãi dự kiến toàn kỳ theo hợp đồng:
-    $$
-    ExpectedInterest = \frac{Principal \times Rate \times TermDays}{365}
-    $$
+  - Phương thức tính lãi ($interestMethod$) áp dụng cho khoản gửi có kỳ hạn, thuộc tập hợp {`SIMPLE`, `COMPOUND_MONTHLY`, `PREPAID`, `POSTPAID`}, mặc định `SIMPLE` khi không chỉ định. Lãi dự kiến toàn kỳ theo hợp đồng $ExpectedInterest$ được tính theo từng phương thức:
+    - `SIMPLE` hoặc `POSTPAID` (lãi đơn, trả lãi khi tất toán):
+      $$
+      ExpectedInterest = \frac{Principal \times Rate \times TermDays}{365}
+      $$
+    - `PREPAID` (lãi trả trước, khấu trừ ngay khi mở sổ): $ExpectedInterest$ tính theo công thức lãi đơn nêu trên, được khấu trừ khỏi số tiền trích từ ví ngay tại thời điểm mở sổ theo FR-SAV-01, số dư danh nghĩa của sổ vẫn ghi nhận đủ $Principal$.
+    - `COMPOUND_MONTHLY` (lãi kép vốn hóa hàng tháng):
+      $$
+      ExpectedInterest = Principal \times \left[\left(1 + \frac{Rate}{12}\right)^{n} - 1\right], \quad n = \left\lfloor \frac{TermDays}{30} \right\rfloor
+      $$
   - Số dư danh nghĩa ghi nhận tại thời điểm quan sát:
     $$
     Balance = Principal + (ExpectedInterest \times Process)
@@ -525,6 +557,7 @@ $$\text{Type} \xrightarrow{1:N} \text{Group} \xrightarrow{1:N} \text{Category}$$
     $$
     Payout_{mature} = Principal + ExpectedInterest
     $$
+    Đối với `interestMethod` = `PREPAID`, $ExpectedInterest$ đã được khấu trừ khi mở sổ nên $Payout_{mature} = Principal$.
   - Tất toán trước hạn ($Days < TermDays$): Toàn bộ lãi kỳ hạn dự kiến bị hủy bỏ; hệ thống áp dụng hồi tố lãi suất không kỳ hạn ($DemandRate$) theo số ngày thực gửi:
     $$
     Payout_{early} = Principal + \frac{Principal \times DemandRate \times Days}{365}
@@ -533,19 +566,22 @@ $$\text{Type} \xrightarrow{1:N} \text{Group} \xrightarrow{1:N} \text{Category}$$
     $$
     InterestLoss = (ExpectedInterest \times Process) - \frac{Principal \times DemandRate \times Days}{365}
     $$
+5. Quy tắc tái tục sổ tiết kiệm theo FR-SAV-05: Tái tục chỉ được thực hiện ngay sau khi tất toán đúng hạn ($Days \ge TermDays$), sử dụng một phần hoặc toàn bộ giá trị $Payout_{mature}$ làm vốn gốc $Principal'$ của một sổ tiết kiệm mới ($0 < Principal' \le Payout_{mature}$). Sổ nguồn chuyển trạng thái `CLOSED` vĩnh viễn; sổ mới được cấp `savingId` độc lập, kỳ hạn, lãi suất và `interestMethod` mới do người dùng chỉ định lại, không kế thừa lịch sử lãi của sổ nguồn. Phần chênh lệch $Payout_{mature} - Principal'$ (nếu có) được ghi nhận vào ví thanh toán do người dùng chỉ định.
 
 #### Ràng buộc kỹ thuật và xử lý số học
 
 | Tham số | Quy chuẩn kỹ thuật bắt buộc |
 | --- | --- |
 | Cơ sở quy ước năm | Cơ sở tính lãi quy ước chuẩn là 365 ngày trong một năm ($BaseDays = 365$). |
-| Độ chính xác số học | Số vốn gốc $Principal$, tiền lãi và giá trị nhận về $Payout$ tính toán bằng `BigDecimal` với scale = 2 và `RoundingMode.HALF_EVEN`. Tỷ lệ lãi suất $Rate$ và $DemandRate$ duy trì scale tối thiểu = 4 (ví dụ 0.0650 biểu thị 6.5%/năm). |
-| Điều kiện tiền kiểm | $Principal > 0$; $Rate \ge 0$; $DemandRate \ge 0$; $StartDate \le CurrentDate$. |
+| Độ chính xác số học | Số vốn gốc $Principal$, tiền lãi và giá trị nhận về $Payout$ tính toán bằng `BigDecimal` với scale = 2 và `RoundingMode.HALF_EVEN`. Tỷ lệ lãi suất $Rate$ và $DemandRate$ duy trì scale tối thiểu = 4 (ví dụ 0.0650 biểu thị 6.5%/năm). Số kỳ vốn hóa $n$ của phương thức `COMPOUND_MONTHLY` là số nguyên không âm, tính bằng phép chia lấy phần nguyên. |
+| Điều kiện tiền kiểm | $Principal > 0$; $Rate \ge 0$; $DemandRate \ge 0$; $StartDate \le CurrentDate$; $interestMethod$ thuộc tập hợp {`SIMPLE`, `COMPOUND_MONTHLY`, `PREPAID`, `POSTPAID`}. |
 
 #### Quy tắc xử lý vi phạm
 
-1. Khi dữ liệu mở sổ vi phạm ràng buộc tiền kiểm ($Principal \le 0$ hoặc $Rate < 0$): Hệ thống từ chối mở sổ và ném ngoại lệ `InvalidSavingsParameterException`.
-2. Khi ngày tất toán nhỏ hơn ngày gửi sổ ($SettlementDate < StartDate$): Hệ thống từ chối thao tác và ném ngoại lệ `InvalidSettlementDateException`.
+1. Khi dữ liệu mở sổ vi phạm ràng buộc tiền kiểm ($Principal \le 0$ hoặc $Rate < 0$): Hệ thống từ chối mở sổ và báo lỗi nghiệp vụ tham số mở sổ tiết kiệm không hợp lệ.
+2. Khi ngày tất toán nhỏ hơn ngày gửi sổ ($SettlementDate < StartDate$): Hệ thống từ chối thao tác và báo lỗi nghiệp vụ ngày tất toán không hợp lệ.
+3. Khi người dùng yêu cầu tái tục một sổ tiết kiệm chưa đến hạn ($Days < TermDays$): Hệ thống từ chối và báo lỗi nghiệp vụ sổ tiết kiệm chưa đủ điều kiện tái tục.
+4. Khi vốn gốc tái tục vượt quá giá trị tất toán của sổ nguồn ($Principal' > Payout_{mature}$): Hệ thống từ chối và báo lỗi nghiệp vụ vốn gốc tái tục vượt quá giá trị tất toán.
 
 ### 3.6 BR-FIN-06: Quy tắc định giá chứng chỉ quỹ đầu tư
 
@@ -565,7 +601,7 @@ Trong đó `stock` là quỹ cổ phiếu, `bond` là quỹ trái phiếu, và `
 Số lượng đơn vị quỹ ($Units$) nhận được từ vốn gốc đầu tư $Principal$ và giá trị tài sản ròng khớp lệnh ($BuyNAV$):
 $$Units = \frac{Principal}{BuyNAV}$$
 
-$Units$ được làm tròn với scale = 4 theo chế độ `RoundingMode.HALF_EVEN`.
+$Units$ được làm tròn với scale = 4 theo quy tắc làm tròn ngân hàng, làm tròn đến số chẵn gần nhất khi giá trị nằm giữa hai mức (`RoundingMode.HALF_EVEN`).
 3. Định giá theo giá thị trường:
 Tại ngày định giá với giá trị tài sản ròng hiện hành $CurrentNAV$, giá trị thị trường của khoản đầu tư ($MarketValue$) là:
 
@@ -599,8 +635,8 @@ Số ngày nắm giữ khoản đầu tư: $HoldDays = \max(0, CurrentDate - Sta
 
 #### Quy tắc xử lý vi phạm
 
-1. Khi giá trị $BuyNAV \le 0$ hoặc $CurrentNAV \le 0$: Hệ thống từ chối ghi nhận hoặc định giá, ném ngoại lệ `InvalidNAVException`.
-2. Khi vốn đầu tư ban đầu $Principal \le 0$: Hệ thống từ chối tạo lô đầu tư và ném ngoại lệ `InvalidInvestmentPrincipalException`.
+1. Khi giá trị $BuyNAV \le 0$ hoặc $CurrentNAV \le 0$: Hệ thống từ chối ghi nhận hoặc định giá, báo lỗi nghiệp vụ đơn giá NAV không hợp lệ.
+2. Khi vốn đầu tư ban đầu $Principal \le 0$: Hệ thống từ chối tạo lô đầu tư và báo lỗi nghiệp vụ vốn đầu tư không hợp lệ.
 
 ### 3.7 BR-FIN-07: Quy tắc theo dõi công nợ
 
@@ -650,9 +686,9 @@ $$Payable_{total} = \sum_{p \in Persons} Payable_p \ge 0$$
 
 #### Quy tắc xử lý vi phạm
 
-1. Khi người dùng nhập số tiền thu nợ lớn hơn số dư phải thu hiện tại của đối tác ($\text{Amount}_{collect} > Receivable_p$): Hệ thống từ chối ghi nhận và ném ngoại lệ `DebtOverpaymentException` kèm thông báo dư nợ không đủ.
-2. Khi người dùng nhập số tiền trả nợ lớn hơn số dư phải trả hiện tại đối với chủ nợ ($\text{Amount}_{repay} > Payable_p$): Hệ thống từ chối ghi nhận và ném ngoại lệ `DebtOverpaymentException`.
-3. Khi giao dịch nợ thiếu thông tin đối tác hoặc số tiền không dương ($\text{Amount} \le 0$): Hệ thống từ chối và ném ngoại lệ `InvalidDebtTransactionException`.
+1. Khi người dùng nhập số tiền thu nợ lớn hơn số dư phải thu hiện tại của đối tác ($\text{Amount}_{collect} > Receivable_p$): Hệ thống từ chối ghi nhận và báo lỗi nghiệp vụ số tiền vượt quá dư nợ kèm thông báo dư nợ không đủ.
+2. Khi người dùng nhập số tiền trả nợ lớn hơn số dư phải trả hiện tại đối với chủ nợ ($\text{Amount}_{repay} > Payable_p$): Hệ thống từ chối ghi nhận và báo lỗi nghiệp vụ số tiền vượt quá dư nợ.
+3. Khi giao dịch nợ thiếu thông tin đối tác hoặc số tiền không dương ($\text{Amount} \le 0$): Hệ thống từ chối và báo lỗi nghiệp vụ giao dịch công nợ không hợp lệ.
 
 ### 3.8 BR-FIN-08: Quy tắc phân bổ quỹ mục tiêu
 
@@ -686,17 +722,7 @@ $$
 
 Khi $Process \ge 100$, hệ thống ghi nhận quỹ mục tiêu đã hoàn thành chỉ tiêu tài chính.
 4. Bất biến không tính trùng tài sản:
-Mỗi sổ tiết kiệm $s$ và mỗi lô chứng chỉ quỹ $c$ chỉ được phép gán quyền sở hữu vào tối đa một quỹ mục tiêu tại một thời điểm:
-
-$$
-\forall s \in \text{Savings}, \quad \sum_{f \in \text{Funds}} \mathbb{I}(s \in Savings_f) \le 1
-$$
-
-$$
-\forall c \in \text{FundCerts}, \quad \sum_{f \in \text{Funds}} \mathbb{I}(c \in FundCerts_f) \le 1
-$$
-
-Trong đó $\mathbb{I}(\cdot)$ là hàm chỉ thị nhận giá trị 1 nếu điều kiện đúng và 0 nếu điều kiện sai.
+Mỗi sổ tiết kiệm hoặc khoản chứng chỉ quỹ chỉ được liên kết với tối đa một quỹ mục tiêu tại một thời điểm.
 5. Bất biến bảo toàn tài sản khi tái phân bổ quỹ:
 Khi chuyển quyền sở hữu của một tài sản $a$ (sổ tiết kiệm hoặc chứng chỉ quỹ) từ quỹ $f_1$ sang quỹ $f_2$:
 
@@ -722,19 +748,19 @@ $$
 
 #### Quy tắc xử lý vi phạm
 
-1. Khi người dùng gán một sổ tiết kiệm hoặc chứng chỉ quỹ đã thuộc quỹ $f_1$ sang quỹ $f_2$ mà chưa gỡ liên kết hoặc chuyển quyền hợp lệ: Hệ thống từ chối và ném ngoại lệ `AssetAlreadyAllocatedException`.
-2. Khi người dùng thiết lập số tiền mục tiêu âm ($Target < 0$): Hệ thống từ chối và ném ngoại lệ `InvalidGoalTargetException`.
-3. Khi phân bổ số tiền mặt âm vào quỹ ($Cash_{fund} < 0$): Hệ thống từ chối và ném ngoại lệ `InvalidCashAllocationException`.
+1. Khi người dùng gán một sổ tiết kiệm hoặc chứng chỉ quỹ đã thuộc quỹ $f_1$ sang quỹ $f_2$ mà chưa gỡ liên kết hoặc chuyển quyền hợp lệ: Hệ thống từ chối và báo lỗi nghiệp vụ tài sản đã được phân bổ cho quỹ khác.
+2. Khi người dùng thiết lập số tiền mục tiêu âm ($Target < 0$): Hệ thống từ chối và báo lỗi nghiệp vụ số tiền mục tiêu không hợp lệ.
+3. Khi phân bổ số tiền mặt âm vào quỹ ($Cash_{fund} < 0$): Hệ thống từ chối và báo lỗi nghiệp vụ số tiền mặt phân bổ không hợp lệ.
 
 ---
 
 ## 4. YÊU CẦU CHỨC NĂNG CHI TIẾT
 
-Phần này đặc tả 39 yêu cầu chức năng cho 10 phân hệ nghiệp vụ của Hệ thống Quản lý Tài chính Cá nhân (PFMS). Mỗi yêu cầu chức năng được chuẩn hóa theo cấu trúc các trường thông tin: Mã, Tên, Phân hệ nghiệp vụ, Ca sử dụng tham chiếu, Mô tả kỹ thuật, Dữ liệu đầu vào, Quy tắc xử lý và ràng buộc, Dữ liệu đầu ra, và Tiêu chí nghiệm thu.
+Phần này đặc tả 41 yêu cầu chức năng cho 10 phân hệ nghiệp vụ của Hệ thống Quản lý Tài chính Cá nhân (PFMS). Mỗi yêu cầu chức năng được chuẩn hóa theo cấu trúc các trường thông tin: Mã, Tên, Phân hệ nghiệp vụ, Ca sử dụng tham chiếu, Mô tả kỹ thuật, Dữ liệu đầu vào, Quy tắc xử lý và ràng buộc, Dữ liệu đầu ra, và Tiêu chí nghiệm thu.
 
-### 4.1 FR-WAL: Phân hệ Quản lý ví tiền
+### 4.1 FR-WAL: Phân hệ Ví tiền
 
-Phân hệ Quản lý ví tiền theo dõi toàn bộ các nguồn tiền thanh khoản của người dùng, bao gồm tiền mặt, tài khoản thanh toán ngân hàng, ví điện tử và thẻ tín dụng. Hệ thống cung cấp sẵn 6 ví tài khoản mặc định ban đầu (`cash`, `mb bank`, `timo`, `vietcombank`, `msb`, `shopee pay`) và cho phép người dùng tùy biến khởi tạo thêm ví mới. Phân hệ duy trì tính bất biến số dư ví theo quy tắc BR-FIN-02 và phản ánh cơ cấu thanh khoản tức thời.
+Phân hệ Ví tiền theo dõi toàn bộ các nguồn tiền thanh khoản của người dùng, bao gồm tiền mặt, tài khoản thanh toán ngân hàng, ví điện tử và thẻ tín dụng. Hệ thống cung cấp sẵn 6 ví tài khoản mặc định ban đầu (`cash`, `mb bank`, `timo`, `vietcombank`, `msb`, `shopee pay`) và cho phép người dùng tùy biến khởi tạo thêm ví mới. Phân hệ duy trì tính bất biến số dư ví theo quy tắc BR-FIN-02 và phản ánh cơ cấu thanh khoản tức thời.
 
 #### 4.1.1 FR-WAL-01: Khởi tạo ví tiền mới
 
@@ -744,8 +770,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-WAL-01 |
 | Tên | Khởi tạo ví tiền mới |
-| Phân hệ nghiệp vụ | Quản lý ví tiền (FR-WAL) |
-| Ca sử dụng tham chiếu | UC01: Quản lý ví tiền |
+| Phân hệ nghiệp vụ | Ví tiền (FR-WAL) |
+| Ca sử dụng tham chiếu | UC-WAL-01 đến UC-WAL-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tạo ví tài chính mới để theo dõi tiền mặt, tài khoản ngân hàng, ví điện tử hoặc thẻ tín dụng với số dư ban đầu xác định. |
 
 Dữ liệu đầu vào:
@@ -759,8 +785,8 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra tính duy nhất của tên ví: Hệ thống cắt tỉa khoảng trắng ở hai đầu và so sánh không phân biệt chữ hoa, chữ thường với danh sách ví hiện có. Nếu trùng lặp, hệ thống từ chối và ném ngoại lệ `DuplicateWalletNameException`.
-2. Xác thực số dư ban đầu: Kiểm tra ràng buộc $initialBalance \ge 0$ đối với các loại ví thông thường (`CASH`, `BANK`, `E_WALLET`). Nếu số dư ban đầu âm trên ví không phải thẻ tín dụng, hệ thống ném ngoại lệ `InvalidInitialBalanceException`.
+1. Kiểm tra tính duy nhất của tên ví: Hệ thống cắt tỉa khoảng trắng ở hai đầu và so sánh không phân biệt chữ hoa, chữ thường với danh sách ví hiện có. Nếu trùng lặp, hệ thống từ chối và báo lỗi nghiệp vụ tên ví đã tồn tại.
+2. Xác thực số dư ban đầu: Kiểm tra ràng buộc $initialBalance \ge 0$ đối với các loại ví thông thường (`CASH`, `BANK`, `E_WALLET`). Nếu số dư ban đầu âm trên ví không phải thẻ tín dụng, hệ thống báo lỗi nghiệp vụ số dư ban đầu không hợp lệ.
 3. Chuẩn hóa số học: Áp dụng quy tắc BR-FIN-01, chuyển đổi số dư ban đầu về kiểu `BigDecimal` với scale chuẩn là 2 chữ số thập phân, chế độ làm tròn `RoundingMode.HALF_EVEN`.
 4. Xác lập trạng thái mặc định: Gán trạng thái hoạt động ban đầu của ví là `ACTIVE`. Khi hệ thống được khởi tạo lần đầu, hệ thống được nạp trước 6 ví mặc định: `cash` (loại `CASH`), `mb bank`, `timo`, `vietcombank`, `msb` (loại `BANK`), và `shopee pay` (loại `E_WALLET`) với số dư ban đầu bằng 0.00.
 5. Thiết lập số dư gốc sổ cái: Khởi tạo số dư gốc $Balance_w(0) = initialBalance$ theo quy tắc BR-FIN-02. Khoản này là số dư khởi điểm của sổ cái, không sinh bản ghi thu chi trong sổ nhật ký giao dịch.
@@ -779,8 +805,8 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-WAL-01.1 | Người dùng nhập tên "MB Bank", loại `BANK`, số dư ban đầu 5,000,000 VNĐ. | Hệ thống tạo thành công ví mới có trạng thái `ACTIVE`, số dư khả dụng hiển thị đúng 5,000,000.00 VNĐ. |
-| TC-WAL-01.2 | Đã tồn tại ví "MB Bank", người dùng tạo ví mới với tên "mb bank" hoặc " MB Bank ". | Hệ thống từ chối tạo bản ghi, ném lỗi `DuplicateWalletNameException`, thông báo tên ví đã tồn tại. |
-| TC-WAL-01.3 | Người dùng nhập số dư ban đầu -500,000 VNĐ cho ví loại `CASH` hoặc `BANK`. | Hệ thống từ chối tạo bản ghi, ném lỗi `InvalidInitialBalanceException`, thông báo số dư ban đầu không được nhỏ hơn 0. |
+| TC-WAL-01.2 | Đã tồn tại ví "MB Bank", người dùng tạo ví mới với tên "mb bank" hoặc " MB Bank ". | Hệ thống từ chối tạo bản ghi, báo lỗi nghiệp vụ tên ví đã tồn tại, thông báo tên ví đã tồn tại. |
+| TC-WAL-01.3 | Người dùng nhập số dư ban đầu -500,000 VNĐ cho ví loại `CASH` hoặc `BANK`. | Hệ thống từ chối tạo bản ghi, báo lỗi nghiệp vụ số dư ban đầu không hợp lệ, thông báo số dư ban đầu không được nhỏ hơn 0. |
 | TC-WAL-01.4 | Người dùng tạo ví loại `CREDIT` với số dư ban đầu -2,000,000 VNĐ phản ánh dư nợ hiện hữu. | Hệ thống chấp nhận tạo ví thẻ tín dụng với số dư âm tương ứng. |
 
 #### 4.1.2 FR-WAL-02: Xem danh sách và chi tiết số dư động
@@ -791,8 +817,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-WAL-02 |
 | Tên | Xem danh sách và số dư ví động |
-| Phân hệ nghiệp vụ | Quản lý ví tiền (FR-WAL) |
-| Ca sử dụng tham chiếu | UC01: Quản lý ví tiền |
+| Phân hệ nghiệp vụ | Ví tiền (FR-WAL) |
+| Ca sử dụng tham chiếu | UC-WAL-01 đến UC-WAL-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống truy vấn danh sách các ví tiền và tính toán số dư khả dụng động tại thời điểm tra cứu dựa trên toàn bộ lịch sử biến động dòng tiền. |
 
 Dữ liệu đầu vào:
@@ -807,7 +833,7 @@ Quy tắc xử lý và ràng buộc:
 2. Tính toán số dư động tức thời: Với mỗi ví $w$, hệ thống tính toán số dư khả dụng $Balance_w(T)$ theo đúng công thức bảo toàn số dư BR-FIN-02:
 $$Balance_w(T) = Balance_w(0) + \sum Income - \sum Expense + \sum TransferIn - \sum TransferOut + \sum Borrow - \sum Repay - \sum Lend + \sum Collect$$
 3. Ràng buộc không lưu trữ số dư tĩnh: Hệ thống không lưu trường số dư tĩnh cho phép ghi đè trực tiếp; mọi giá trị số dư hiển thị đều là kết quả tổng hợp tức thời từ số dư ban đầu và các giao dịch hợp lệ.
-4. Tính tổng số dư thanh khoản toàn hệ thống: Tổng hợp số dư của toàn bộ các ví `ACTIVE` bằng phương thức `BigDecimal.add()`, bảo đảm sai số bằng 0.00 VNĐ theo BR-FIN-01.
+4. Tính tổng số dư thanh khoản toàn hệ thống: Tổng hợp số dư của toàn bộ các ví `ACTIVE` bằng phép cộng dồn số học chính xác tuyệt đối, bảo đảm sai số bằng 0.00 VNĐ theo BR-FIN-01.
 5. Sắp xếp hiển thị: Danh sách ví được sắp xếp theo tên hoặc theo thứ tự phân loại mặc định (tiền mặt, ngân hàng, ví điện tử, thẻ tín dụng).
 
 Dữ liệu đầu ra:
@@ -834,8 +860,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-WAL-03 |
 | Tên | Cập nhật thông tin ví tiền |
-| Phân hệ nghiệp vụ | Quản lý ví tiền (FR-WAL) |
-| Ca sử dụng tham chiếu | UC01: Quản lý ví tiền |
+| Phân hệ nghiệp vụ | Ví tiền (FR-WAL) |
+| Ca sử dụng tham chiếu | UC-WAL-01 đến UC-WAL-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống cập nhật các thuộc tính phi tài chính của ví tiền bao gồm tên gọi, mô tả và trạng thái hoạt động; nghiêm cấm chỉnh sửa trực tiếp trường số dư khả dụng. |
 
 Dữ liệu đầu vào:
@@ -849,13 +875,13 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra tồn tại: Tìm kiếm ví theo `walletId`. Nếu không tìm thấy, hệ thống ném ngoại lệ `WalletNotFoundException`.
-2. Kiểm tra tính duy nhất của tên mới: Nếu tên ví thay đổi, kiểm tra tên mới không trùng với các ví khác trong hệ thống (cắt khoảng trắng thừa, so sánh không phân biệt hoa thường). Nếu trùng lặp, ném ngoại lệ `DuplicateWalletNameException`.
+1. Kiểm tra tồn tại: Tìm kiếm ví theo `walletId`. Nếu không tìm thấy, hệ thống báo lỗi nghiệp vụ không tìm thấy ví.
+2. Kiểm tra tính duy nhất của tên mới: Nếu tên ví thay đổi, kiểm tra tên mới không trùng với các ví khác trong hệ thống (cắt khoảng trắng thừa, so sánh không phân biệt hoa thường). Nếu trùng lặp, báo lỗi nghiệp vụ tên ví đã tồn tại.
 3. Kiểm tra điều kiện chuyển trạng thái `ARCHIVED`:
   - Tính số dư động hiện tại của ví theo BR-FIN-02.
   - Nếu số dư khác 0, hệ thống hiển thị cảnh báo khuyến nghị chuyển hết tiền khỏi ví trước khi lưu trữ, nhưng vẫn cho phép lưu trữ nếu người dùng xác nhận.
   - Ví ở trạng thái `ARCHIVED` bị khóa, không được phép chọn làm ví nguồn hoặc ví đích trong các giao dịch phát sinh mới (thu, chi, chuyển tiền, cho vay, đi vay, thu nợ, trả nợ).
-4. Bất biến bất khả sửa đổi số dư: Hệ thống cấm cung cấp giao diện hoặc phương thức cho phép sửa đổi trường `currentBalance` hoặc `initialBalance` sau khi ví đã phát sinh giao dịch lịch sử.
+4. Bất biến bất khả sửa đổi số dư: Hệ thống cấm cung cấp giao diện hoặc phương thức cho phép sửa đổi trực tiếp trường `currentBalance` hoặc `initialBalance`. Trường hợp cần thay đổi số dư ngoài các luồng giao dịch tiêu chuẩn, người dùng bắt buộc thực hiện qua chức năng điều chỉnh số dư quy định tại FR-WAL-05, không được thao tác ghi đè trực tiếp trên bản ghi ví.
 5. Cập nhật và lưu trữ: Ghi nhận các thông tin thay đổi vào tệp dữ liệu lưu trữ.
 
 Dữ liệu đầu ra:
@@ -872,7 +898,7 @@ Tiêu chí nghiệm thu:
 | --- | --- | --- |
 | TC-WAL-03.1 | Người dùng đổi tên ví "Timo Bank" thành "Timo Digital". | Hệ thống lưu tên mới và cập nhật tên trên toàn bộ giao diện mà số dư ví không đổi. |
 | TC-WAL-03.2 | Người dùng chuyển một ví có số dư về trạng thái `ARCHIVED`. | Hệ thống cảnh báo số dư khác 0; sau khi xác nhận, ví chuyển sang `ARCHIVED` và không còn xuất hiện trong dropdown lựa chọn ví khi thêm giao dịch mới. |
-| TC-WAL-03.3 | Người dùng gửi yêu cầu chỉnh sửa số dư trực tiếp qua API hoặc dịch vụ nội bộ. | Hệ thống từ chối và ném ngoại lệ `DirectBalanceModificationException`. |
+| TC-WAL-03.3 | Người dùng gửi yêu cầu chỉnh sửa số dư trực tiếp qua API hoặc dịch vụ nội bộ. | Hệ thống từ chối và báo lỗi nghiệp vụ chỉnh sửa số dư trực tiếp trái phép. |
 
 #### 4.1.4 FR-WAL-04: Thống kê cơ cấu tài sản theo ví
 
@@ -882,8 +908,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-WAL-04 |
 | Tên | Thống kê cơ cấu tài sản theo ví |
-| Phân hệ nghiệp vụ | Quản lý ví tiền (FR-WAL) |
-| Ca sử dụng tham chiếu | UC01: Quản lý ví tiền |
+| Phân hệ nghiệp vụ | Ví tiền (FR-WAL) |
+| Ca sử dụng tham chiếu | UC-WAL-01 đến UC-WAL-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống phân tích và tính toán tỷ trọng phần trăm giá trị lưu trữ tại từng ví so với tổng lượng tiền mặt thanh khoản trong toàn bộ hệ thống. |
 
 Dữ liệu đầu vào:
@@ -899,8 +925,8 @@ Quy tắc xử lý và ràng buộc:
 $$TotalWallets = \sum_{w \in ActiveWallets} Balance_w(T)$$
 3. Tính tỷ trọng từng ví theo công thức:
 $$Rate_w = \begin{cases} \frac{Balance_w(T)}{TotalWallets} \times 100, & \text{khi } TotalWallets > 0 \\ 0.00, & \text{khi } TotalWallets = 0 \end{cases}$$
-4. Chuẩn hóa độ chính xác số học: Thực hiện phép chia bằng phương thức `BigDecimal.divide()` với scale tối thiểu là 4 chữ số thập phân, chỉ định tường minh `RoundingMode.HALF_EVEN` theo BR-FIN-01. Định dạng kết quả hiển thị với 2 chữ số thập phân kèm ký hiệu `%`.
-5. Xử lý an toàn khi tổng số dư bằng 0: Khi $TotalWallets = 0$, gán tỷ trọng của mọi ví bằng 0.00%, không để phát sinh lỗi chia cho 0 (`ArithmeticException`).
+4. Chuẩn hóa độ chính xác số học: Thực hiện phép chia số học chính xác với scale tối thiểu là 4 chữ số thập phân, chỉ định tường minh quy tắc làm tròn ngân hàng, làm tròn đến số chẵn gần nhất khi giá trị nằm giữa hai mức (`RoundingMode.HALF_EVEN`) theo BR-FIN-01. Định dạng kết quả hiển thị với 2 chữ số thập phân kèm ký hiệu `%`.
+5. Xử lý an toàn khi tổng số dư bằng 0: Khi $TotalWallets = 0$, gán tỷ trọng của mọi ví bằng 0.00%, không thực hiện phép chia cho 0 để tránh phát sinh lỗi nghiệp vụ phép toán số học không xác định.
 6. Sắp xếp kết quả: Sắp xếp danh sách ví theo thứ tự tỷ trọng giảm dần để làm rõ các tài khoản nắm giữ phần lớn thanh khoản.
 
 Dữ liệu đầu ra:
@@ -919,6 +945,55 @@ Tiêu chí nghiệm thu:
 | TC-WAL-04.2 | Khi tổng số dư toàn bộ các ví bằng 0.00 VNĐ. | Tỷ trọng hiển thị của từng ví là 0.00%, hệ thống không phát sinh lỗi chia cho 0. |
 | TC-WAL-04.3 | Cho 3 ví có số dư lần lượt 1,000,000 VNĐ, 1,000,000 VNĐ và 1,000,000 VNĐ (tổng 3,000,000 VNĐ). | Tỷ trọng mỗi ví được tính là 33.33%, tổng tỷ trọng xấp xỉ không làm sai lệch số dư thực tế. |
 
+#### 4.1.5 FR-WAL-05: Điều chỉnh số dư ví
+
+Bảng thông tin yêu cầu:
+
+| Thuộc tính | Đặc tả kỹ thuật |
+| --- | --- |
+| Mã | FR-WAL-05 |
+| Tên | Điều chỉnh số dư ví |
+| Phân hệ nghiệp vụ | Ví tiền (FR-WAL) |
+| Ca sử dụng tham chiếu | UC-WAL-04 (chi tiết xem Mục 8.1) |
+| Mô tả kỹ thuật | Hệ thống ghi nhận một bút toán điều chỉnh có thể truy vết để đưa số dư khả dụng của ví về đúng giá trị thực tế quan sát được, không thuộc bất kỳ luồng thu, chi hoặc chuyển khoản tiêu chuẩn nào, theo quy tắc BR-FIN-02. |
+
+Dữ liệu đầu vào:
+
+| Tham số | Kiểu dữ liệu | Ràng buộc giá trị | Bắt buộc / Tùy chọn |
+| --- | --- | --- | --- |
+| `walletId` | String | Mã định danh ví cần điều chỉnh, ví ở trạng thái `ACTIVE`, `type` thuộc {`CASH`, `BANK`, `E_WALLET`, `CREDIT`}. | Bắt buộc |
+| `observedBalance` | BigDecimal | Số dư thực tế người dùng quan sát được, chuẩn hóa scale 2, chế độ làm tròn `RoundingMode.HALF_EVEN`. | Bắt buộc |
+| `reason` | String | Lý do điều chỉnh, độ dài từ 1 đến 255 ký tự sau khi cắt khoảng trắng. | Bắt buộc |
+| `adjustedAt` | LocalDate | Ngày ghi nhận điều chỉnh. Mặc định: ngày hiện tại. | Tùy chọn |
+
+Quy tắc xử lý và ràng buộc:
+
+1. Kiểm tra tồn tại và trạng thái ví: Tìm ví theo `walletId`. Nếu không tồn tại, báo lỗi nghiệp vụ không tìm thấy ví. Nếu ví ở trạng thái `ARCHIVED`, từ chối và báo lỗi nghiệp vụ ví đã lưu trữ không thể điều chỉnh.
+2. Kiểm tra loại ví hợp lệ: Nếu `type` của ví không thuộc tập hợp {`CASH`, `BANK`, `E_WALLET`, `CREDIT`}, hệ thống từ chối và báo lỗi nghiệp vụ loại ví không hỗ trợ điều chỉnh số dư.
+3. Kiểm tra lý do bắt buộc: Nếu `reason` rỗng hoặc chỉ chứa khoảng trắng, hệ thống từ chối và báo lỗi nghiệp vụ thiếu lý do điều chỉnh.
+4. Tính giá trị chênh lệch điều chỉnh theo BR-FIN-02:
+$$Adjustment_w = observedBalance - Balance_w(T)$$
+5. Ràng buộc số dư sau điều chỉnh: Nếu ví có `type` thuộc {`CASH`, `BANK`, `E_WALLET`} và `observedBalance` < 0, hệ thống từ chối và báo lỗi nghiệp vụ số dư điều chỉnh không hợp lệ. Nếu ví có `type` = `CREDIT` và `observedBalance` < $-Limit_w$, hệ thống từ chối và báo lỗi nghiệp vụ số dư điều chỉnh vượt hạn mức thấu chi.
+6. Khi $Adjustment_w = 0$: Hệ thống từ chối ghi nhận và báo lỗi nghiệp vụ số dư quan sát trùng số dư hiện tại, không tạo bút toán rỗng.
+7. Ghi nhận bút toán điều chỉnh: Tạo bản ghi bất biến gồm `walletId`, số dư trước điều chỉnh $Balance_w(T)$, số dư sau điều chỉnh `observedBalance`, giá trị `Adjustment_w`, `reason`, `adjustedAt`. Cập nhật số dư động của ví theo công thức BR-FIN-02.
+
+Dữ liệu đầu ra:
+
+| Thành phần | Đặc tả kỹ thuật |
+| --- | --- |
+| Bản ghi dữ liệu | Bản ghi bút toán điều chỉnh lưu vào danh sách bản ghi `adjustments` kèm số dư ví sau điều chỉnh. |
+| Biến động số dư | Số dư ví thay đổi đúng bằng giá trị $Adjustment_w$; tổng tài sản ròng $NetWorth$ biến động tương ứng. |
+| Thông báo phản hồi | Thông báo điều chỉnh số dư thành công kèm số dư trước và sau điều chỉnh. |
+
+Tiêu chí nghiệm thu:
+
+| Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
+| --- | --- | --- |
+| TC-WAL-05.1 | Cho ví "Tiền mặt" có số dư hệ thống ghi nhận 2,000,000.00 VNĐ, thực tế đếm được 1,750,000.00 VNĐ. Người dùng điều chỉnh với lý do "Kiểm kê tiền mặt định kỳ". | Hệ thống tạo bút toán điều chỉnh $Adjustment = -250,000.00$ VNĐ, số dư ví cập nhật còn 1,750,000.00 VNĐ. |
+| TC-WAL-05.2 | Người dùng gửi yêu cầu điều chỉnh với trường `reason` để trống. | Hệ thống từ chối và báo lỗi nghiệp vụ thiếu lý do điều chỉnh. |
+| TC-WAL-05.3 | Người dùng gửi yêu cầu điều chỉnh với `observedBalance` bằng đúng số dư hiện tại của ví. | Hệ thống từ chối ghi nhận và báo lỗi nghiệp vụ số dư quan sát trùng số dư hiện tại. |
+| TC-WAL-05.4 | Người dùng gửi yêu cầu điều chỉnh trên một ví đang ở trạng thái `ARCHIVED`. | Hệ thống từ chối và báo lỗi nghiệp vụ ví đã lưu trữ không thể điều chỉnh. |
+
 ### 4.2 FR-TXN: Phân hệ Ghi nhận thu chi
 
 Phân hệ Ghi nhận thu chi quản lý sổ nhật ký các luồng tiền phát sinh hàng ngày của người dùng. Phân hệ kết nối biến động số dư với cấu trúc phân loại thu chi 3 cấp và bảo đảm số dư ví phản ánh chính xác theo quy tắc BR-FIN-02.
@@ -932,7 +1007,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-TXN-01 |
 | Tên | Tạo mới giao dịch thu nhập |
 | Phân hệ nghiệp vụ | Ghi nhận thu chi (FR-TXN) |
-| Ca sử dụng tham chiếu | UC02: Ghi nhận và quản lý giao dịch thu chi |
+| Ca sử dụng tham chiếu | UC-TXN-01 đến UC-TXN-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống ghi nhận khoản thu nhập thực tế, làm tăng số dư của ví nhận tiền và gán nhãn phân loại vào danh mục thu nhập tương ứng. |
 
 Dữ liệu đầu vào:
@@ -947,9 +1022,9 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực số tiền: Kiểm tra điều kiện $amount > 0$. Nếu $amount \le 0$, ném ngoại lệ `InvalidTransactionAmountException`. Chuẩn hóa $amount$ về scale = 2 theo BR-FIN-01.
-2. Xác thực ví nhận tiền: Tìm kiếm ví theo `walletId`. Nếu không tồn tại hoặc ví có trạng thái `ARCHIVED`, ném ngoại lệ `WalletInactiveException`.
-3. Xác thực danh mục thu nhập: Truy vấn danh mục theo `categoryId`. Kiểm tra thuộc tính phân loại cấp 1: danh mục bắt buộc thuộc nhánh `Type = Income` theo BR-FIN-04. Nếu danh mục thuộc `Type = Expense`, hệ thống từ chối và ném ngoại lệ `CategoryTypeMismatchException`.
+1. Xác thực số tiền: Kiểm tra điều kiện $amount > 0$. Nếu $amount \le 0$, báo lỗi nghiệp vụ số tiền giao dịch không hợp lệ. Chuẩn hóa $amount$ về scale = 2 theo BR-FIN-01.
+2. Xác thực ví nhận tiền: Tìm kiếm ví theo `walletId`. Nếu không tồn tại hoặc ví có trạng thái `ARCHIVED`, báo lỗi nghiệp vụ ví không ở trạng thái hoạt động.
+3. Xác thực danh mục thu nhập: Truy vấn danh mục theo `categoryId`. Kiểm tra thuộc tính phân loại cấp 1: danh mục bắt buộc thuộc nhánh `Type = Income` theo BR-FIN-04. Nếu danh mục thuộc `Type = Expense`, hệ thống từ chối và báo lỗi nghiệp vụ loại danh mục không khớp.
 4. Tạo bản ghi giao dịch: Tạo bản ghi mới trong bảng nhật ký giao dịch (`transactions`) với mã định danh duy nhất (`txnId`), loại giao dịch `Income`, ngày, số tiền, ví nhận, nhóm và danh mục.
 5. Cập nhật số dư ví: Áp dụng quy tắc bảo toàn số dư BR-FIN-02, số dư khả dụng của ví nhận tiền tăng thêm đúng bằng số tiền thu nhập: $Balance_w(t) = Balance_w(t-1) + amount$.
 6. Đồng bộ thống kê: Kích hoạt cơ chế cập nhật tự động các chỉ số tổng hợp thu nhập tháng và tỷ lệ tiết kiệm liên quan.
@@ -967,9 +1042,9 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-TXN-01.1 | Cho ví "Vietcombank" có số dư 10,000,000 VNĐ. Người dùng ghi nhận thu nhập lương 15,000,000 VNĐ vào ví Vietcombank với danh mục "Lương". | Hệ thống ghi nhận thành công, số dư ví Vietcombank cập nhật thành 25,000,000.00 VNĐ. |
-| TC-TXN-01.2 | Người dùng nhập số tiền thu nhập bằng 0 hoặc số âm (-2,000,000 VNĐ). | Hệ thống từ chối giao dịch, ném lỗi `InvalidTransactionAmountException`. |
-| TC-TXN-01.3 | Người dùng chọn danh mục "Ăn uống" (thuộc `Type = Expense`) cho giao dịch thu nhập. | Hệ thống từ chối ghi nhận, ném lỗi `CategoryTypeMismatchException`. |
-| TC-TXN-01.4 | Người dùng chọn ví đã lưu trữ (`ARCHIVED`) làm ví nhận tiền. | Hệ thống từ chối và ném lỗi `WalletInactiveException`. |
+| TC-TXN-01.2 | Người dùng nhập số tiền thu nhập bằng 0 hoặc số âm (-2,000,000 VNĐ). | Hệ thống từ chối giao dịch, báo lỗi nghiệp vụ số tiền giao dịch không hợp lệ. |
+| TC-TXN-01.3 | Người dùng chọn danh mục "Ăn uống" (thuộc `Type = Expense`) cho giao dịch thu nhập. | Hệ thống từ chối ghi nhận, báo lỗi nghiệp vụ loại danh mục không khớp. |
+| TC-TXN-01.4 | Người dùng chọn ví đã lưu trữ (`ARCHIVED`) làm ví nhận tiền. | Hệ thống từ chối và báo lỗi nghiệp vụ ví không ở trạng thái hoạt động. |
 
 #### 4.2.2 FR-TXN-02: Tạo mới giao dịch chi tiêu
 
@@ -980,7 +1055,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-TXN-02 |
 | Tên | Tạo mới giao dịch chi tiêu |
 | Phân hệ nghiệp vụ | Ghi nhận thu chi (FR-TXN) |
-| Ca sử dụng tham chiếu | UC02: Ghi nhận và quản lý giao dịch thu chi |
+| Ca sử dụng tham chiếu | UC-TXN-01 đến UC-TXN-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống ghi nhận khoản chi tiêu tiêu dùng hoặc thanh toán sinh hoạt, kiểm tra số dư ví chi tiền, làm giảm số dư của ví và phân loại vào danh mục chi tiêu tương ứng. |
 
 Dữ liệu đầu vào:
@@ -995,14 +1070,14 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực số tiền: Kiểm tra điều kiện $amount > 0$. Nếu $amount \le 0$, ném ngoại lệ `InvalidTransactionAmountException`. Chuẩn hóa $amount$ về scale = 2 theo BR-FIN-01.
-2. Xác thực ví chi tiền: Tìm kiếm ví theo `walletId`. Nếu không tồn tại hoặc ví có trạng thái `ARCHIVED`, ném ngoại lệ `WalletInactiveException`.
-3. Xác thực danh mục chi tiêu: Truy vấn danh mục theo `categoryId`. Kiểm tra danh mục bắt buộc thuộc nhánh `Type = Expense` theo BR-FIN-04. Nếu danh mục thuộc `Type = Income`, ném ngoại lệ `CategoryTypeMismatchException`.
+1. Xác thực số tiền: Kiểm tra điều kiện $amount > 0$. Nếu $amount \le 0$, báo lỗi nghiệp vụ số tiền giao dịch không hợp lệ. Chuẩn hóa $amount$ về scale = 2 theo BR-FIN-01.
+2. Xác thực ví chi tiền: Tìm kiếm ví theo `walletId`. Nếu không tồn tại hoặc ví có trạng thái `ARCHIVED`, báo lỗi nghiệp vụ ví không ở trạng thái hoạt động.
+3. Xác thực danh mục chi tiêu: Truy vấn danh mục theo `categoryId`. Kiểm tra danh mục bắt buộc thuộc nhánh `Type = Expense` theo BR-FIN-04. Nếu danh mục thuộc `Type = Income`, báo lỗi nghiệp vụ loại danh mục không khớp.
 4. Kiểm tra khả năng chi trả của ví:
   - Với ví thông thường (`CASH`, `BANK`, `E_WALLET`): Kiểm tra bất biến số dư không âm theo BR-FIN-02:
    $$Balance_{wallet} - amount \ge 0$$
 
-   Nếu $Balance_{wallet} < amount$, hệ thống từ chối giao dịch và ném ngoại lệ `InsufficientBalanceException`.
+   Nếu $Balance_{wallet} < amount$, hệ thống từ chối giao dịch và báo lỗi nghiệp vụ số dư ví không đủ.
   - Với thẻ tín dụng (`CREDIT`): Cho phép số dư ví sau chi tiêu mang giá trị âm trong phạm vi hạn mức tín dụng được thiết lập.
 5. Tạo bản ghi giao dịch: Lưu bản ghi mới vào danh sách bản ghi `transactions` với mã `txnId`, loại `Expense`, ngày, số tiền, ví chi, nhóm và danh mục.
 6. Cập nhật số dư ví: Trừ trực tiếp số tiền chi tiêu khỏi số dư ví: $Balance_w(t) = Balance_w(t-1) - amount$. Tổng thanh khoản toàn hệ thống giảm tương ứng.
@@ -1020,9 +1095,9 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-TXN-02.1 | Cho ví "Tiền mặt" có số dư 500,000 VNĐ. Người dùng ghi nhận chi tiêu 120,000 VNĐ cho danh mục "Ăn trưa". | Hệ thống ghi nhận thành công, số dư ví Tiền mặt còn lại 380,000.00 VNĐ. |
-| TC-TXN-02.2 | Cho ví "Tiền mặt" có số dư 200,000 VNĐ. Người dùng nhập khoản chi 350,000 VNĐ. | Hệ thống từ chối giao dịch, ném lỗi `InsufficientBalanceException`, thông báo số dư ví không đủ chi trả. |
+| TC-TXN-02.2 | Cho ví "Tiền mặt" có số dư 200,000 VNĐ. Người dùng nhập khoản chi 350,000 VNĐ. | Hệ thống từ chối giao dịch, báo lỗi nghiệp vụ số dư ví không đủ, thông báo số dư ví không đủ chi trả. |
 | TC-TXN-02.3 | Cho ví "Credit Card" loại `CREDIT` có số dư 0.00 VNĐ. Người dùng ghi nhận chi tiêu mua sắm 2,500,000 VNĐ. | Hệ thống chấp nhận giao dịch, số dư ví thẻ tín dụng chuyển thành -2,500,000.00 VNĐ. |
-| TC-TXN-02.4 | Người dùng chọn danh mục thuộc nhóm thu nhập (`Type = Income`) cho giao dịch chi tiêu. | Hệ thống từ chối, ném lỗi `CategoryTypeMismatchException`. |
+| TC-TXN-02.4 | Người dùng chọn danh mục thuộc nhóm thu nhập (`Type = Income`) cho giao dịch chi tiêu. | Hệ thống từ chối, báo lỗi nghiệp vụ loại danh mục không khớp. |
 
 #### 4.2.3 FR-TXN-03: Tra cứu và lọc lịch sử giao dịch
 
@@ -1033,7 +1108,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-TXN-03 |
 | Tên | Tra cứu và lọc lịch sử giao dịch |
 | Phân hệ nghiệp vụ | Ghi nhận thu chi (FR-TXN) |
-| Ca sử dụng tham chiếu | UC02: Ghi nhận và quản lý giao dịch thu chi |
+| Ca sử dụng tham chiếu | UC-TXN-01 đến UC-TXN-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tìm kiếm, lọc đa tiêu chí và tổng hợp số liệu trên sổ nhật ký giao dịch thu chi để phục vụ đối soát và phân tích tài chính. |
 
 Dữ liệu đầu vào:
@@ -1073,7 +1148,7 @@ Tiêu chí nghiệm thu:
 | --- | --- | --- |
 | TC-TXN-03.1 | Người dùng lọc giao dịch từ ngày 01/08/2026 đến 31/08/2026 với `type = EXPENSE`. | Hệ thống trả về danh sách toàn bộ các giao dịch chi tiêu trong tháng 8/2026; tổng chi tiêu hiển thị khớp chính xác tổng số tiền của các giao dịch đó. |
 | TC-TXN-03.2 | Người dùng nhập từ khóa "tiền điện". | Hệ thống trả về toàn bộ các giao dịch có chứa cụm từ "tiền điện" trong phần ghi chú, không phân biệt chữ hoa hay chữ thường. |
-| TC-TXN-03.3 | Người dùng nhập khoảng ngày có `fromDate` sau `toDate`. | Hệ thống từ chối truy vấn và ném ngoại lệ `InvalidDateRangeException`. |
+| TC-TXN-03.3 | Người dùng nhập khoảng ngày có `fromDate` sau `toDate`. | Hệ thống từ chối truy vấn và báo lỗi nghiệp vụ khoảng ngày không hợp lệ. |
 
 #### 4.2.4 FR-TXN-04: Chỉnh sửa giao dịch thu chi
 
@@ -1084,7 +1159,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-TXN-04 |
 | Tên | Chỉnh sửa giao dịch thu chi |
 | Phân hệ nghiệp vụ | Ghi nhận thu chi (FR-TXN) |
-| Ca sử dụng tham chiếu | UC02: Ghi nhận và quản lý giao dịch thu chi |
+| Ca sử dụng tham chiếu | UC-TXN-01 đến UC-TXN-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống cập nhật thông tin của giao dịch đã lưu, thực hiện hoàn nguyên tác động số dư ví cũ và áp dụng số dư ví mới trong một thao tác toàn vẹn để bảo toàn tính toàn vẹn của sổ cái. |
 
 Dữ liệu đầu vào:
@@ -1100,15 +1175,15 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra tồn tại giao dịch: Tìm bản ghi theo `txnId`. Nếu không tìm thấy, ném ngoại lệ `TransactionNotFoundException`.
+1. Kiểm tra tồn tại giao dịch: Tìm bản ghi theo `txnId`. Nếu không tìm thấy, báo lỗi nghiệp vụ không tìm thấy giao dịch.
 2. Bất biến loại giao dịch: Nghiêm cấm thay đổi loại giao dịch `Type` (không cho phép chuyển giao dịch `Income` thành `Expense` hoặc ngược lại trong thao tác sửa; nếu cần đổi loại, người dùng phải xóa và tạo mới). Danh mục mới `categoryId` bắt buộc khớp với `Type` của giao dịch gốc theo BR-FIN-04.
 3. Hoàn nguyên số dư ví cũ:
-  - Nếu giao dịch cũ là `Income`: Trừ số tiền cũ khỏi ví cũ. Kiểm tra số dư ví cũ sau khi trừ: với ví thông thường, nếu $Balance_{oldWallet} - amount_{old} < 0$, ném ngoại lệ `InsufficientBalanceException` và hủy thao tác.
+  - Nếu giao dịch cũ là `Income`: Trừ số tiền cũ khỏi ví cũ. Kiểm tra số dư ví cũ sau khi trừ: với ví thông thường, nếu $Balance_{oldWallet} - amount_{old} < 0$, báo lỗi nghiệp vụ số dư ví không đủ và hủy thao tác.
   - Nếu giao dịch cũ là `Expense`: Cộng số tiền cũ trả lại ví cũ: $Balance_{oldWallet} + amount_{old}$.
 4. Áp dụng tác động lên ví mới:
   - Nếu giao dịch mới là `Income`: Cộng số tiền mới vào ví mới: $Balance_{newWallet} + amount_{new}$.
-  - Nếu giao dịch mới là `Expense`: Kiểm tra số dư ví mới: với ví thông thường, yêu cầu $Balance_{newWallet} - amount_{new} \ge 0$. Nếu không đủ, ném ngoại lệ `InsufficientBalanceException` và hủy toàn bộ thao tác.
-5. Thực thi toàn vẹn: Các bước hoàn nguyên ví cũ, áp dụng ví mới và cập nhật bản ghi giao dịch phải được thực hiện trong một khối giao dịch toàn vẹn duy nhất. Nếu xảy ra lỗi tại bất kỳ bước nào, toàn bộ trạng thái phải được hoàn nguyên về ban đầu (Rollback).
+  - Nếu giao dịch mới là `Expense`: Kiểm tra số dư ví mới: với ví thông thường, yêu cầu $Balance_{newWallet} - amount_{new} \ge 0$. Nếu không đủ, báo lỗi nghiệp vụ số dư ví không đủ và hủy toàn bộ thao tác.
+5. Thực thi toàn vẹn: Các bước hoàn nguyên ví cũ, áp dụng ví mới và cập nhật bản ghi giao dịch phải được thực hiện trong một khối giao dịch toàn vẹn duy nhất. Nếu xảy ra lỗi tại bất kỳ bước nào, toàn bộ trạng thái phải được hoàn nguyên về ban đầu.
 
 Dữ liệu đầu ra:
 
@@ -1123,8 +1198,8 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-TXN-04.1 | Cho giao dịch chi 100,000 VNĐ từ ví A. Người dùng sửa thành chi 150,000 VNĐ từ ví B (ví B có đủ tiền). | Hệ thống hoàn trả 100,000 VNĐ vào ví A và trừ 150,000 VNĐ khỏi ví B, cập nhật thông tin giao dịch thành công. |
-| TC-TXN-04.2 | Người dùng sửa giao dịch chi tiêu tăng số tiền từ 200,000 VNĐ lên 800,000 VNĐ trong khi ví chỉ còn số dư khả dụng 300,000 VNĐ. | Hệ thống từ chối cập nhật, ném lỗi `InsufficientBalanceException`, trạng thái giao dịch và số dư ví giữ nguyên vẹn. |
-| TC-TXN-04.3 | Người dùng cố gắng thay đổi danh mục sang nhánh `Type` đối lập. | Hệ thống từ chối thao tác, ném lỗi `CategoryTypeMismatchException`. |
+| TC-TXN-04.2 | Người dùng sửa giao dịch chi tiêu tăng số tiền từ 200,000 VNĐ lên 800,000 VNĐ trong khi ví chỉ còn số dư khả dụng 300,000 VNĐ. | Hệ thống từ chối cập nhật, báo lỗi nghiệp vụ số dư ví không đủ, trạng thái giao dịch và số dư ví giữ nguyên vẹn. |
+| TC-TXN-04.3 | Người dùng cố gắng thay đổi danh mục sang nhánh `Type` đối lập. | Hệ thống từ chối thao tác, báo lỗi nghiệp vụ loại danh mục không khớp. |
 
 #### 4.2.5 FR-TXN-05: Xóa giao dịch thu chi
 
@@ -1135,7 +1210,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-TXN-05 |
 | Tên | Xóa giao dịch thu chi |
 | Phân hệ nghiệp vụ | Ghi nhận thu chi (FR-TXN) |
-| Ca sử dụng tham chiếu | UC02: Ghi nhận và quản lý giao dịch thu chi |
+| Ca sử dụng tham chiếu | UC-TXN-01 đến UC-TXN-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống xóa bản ghi giao dịch khỏi sổ nhật ký và hoàn nguyên số dư của ví tiền liên quan về trạng thái trước khi giao dịch phát sinh. |
 
 Dữ liệu đầu vào:
@@ -1147,9 +1222,9 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra tồn tại giao dịch: Tìm kiếm theo `txnId`. Nếu không tồn tại, ném ngoại lệ `TransactionNotFoundException`.
+1. Kiểm tra tồn tại giao dịch: Tìm kiếm theo `txnId`. Nếu không tồn tại, báo lỗi nghiệp vụ không tìm thấy giao dịch.
 2. Xác thực điều kiện hoàn nguyên số dư theo BR-FIN-02:
-  - Nếu giao dịch cần xóa là `Income`: Việc xóa khoản thu nhập yêu cầu phải trừ $amount$ khỏi ví đã nhận. Hệ thống kiểm tra số dư hiện tại của ví: với ví thông thường, nếu $Balance_{wallet} - amount < 0$, việc xóa bị từ chối để bảo vệ bất biến số dư không âm, hệ thống ném ngoại lệ `InsufficientBalanceException`.
+  - Nếu giao dịch cần xóa là `Income`: Việc xóa khoản thu nhập yêu cầu phải trừ $amount$ khỏi ví đã nhận. Hệ thống kiểm tra số dư hiện tại của ví: với ví thông thường, nếu $Balance_{wallet} - amount < 0$, việc xóa bị từ chối để bảo vệ bất biến số dư không âm, hệ thống báo lỗi nghiệp vụ số dư ví không đủ.
   - Nếu giao dịch cần xóa là `Expense`: Hoàn trả $amount$ vào số dư của ví chi tiền: $Balance_{wallet} = Balance_{wallet} + amount$.
 3. Xóa bản ghi: Xóa bản ghi giao dịch khỏi danh sách bản ghi `transactions`.
 4. Cập nhật thống kê: Kích hoạt đồng bộ hóa lại các chỉ số thống kê thu chi và tỷ lệ tiết kiệm tháng liên quan. Thao tác hoàn nguyên và xóa bản ghi được thực hiện trong một khối giao dịch toàn vẹn.
@@ -1167,7 +1242,7 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-TXN-05.1 | Cho ví "MB Bank" có số dư 4,500,000 VNĐ sau khi ghi nhận một khoản chi 500,000 VNĐ. Khi người dùng xóa giao dịch chi này. | Số dư ví MB Bank tự động phục hồi về đúng 5,000,000.00 VNĐ. |
-| TC-TXN-05.2 | Cho ví có số dư hiện tại 200,000 VNĐ, người dùng yêu cầu xóa một giao dịch thu nhập 1,000,000 VNĐ trước đó của ví này. | Hệ thống từ chối xóa và ném lỗi `InsufficientBalanceException` do việc trừ tiền sẽ làm âm số dư ví. |
+| TC-TXN-05.2 | Cho ví có số dư hiện tại 200,000 VNĐ, người dùng yêu cầu xóa một giao dịch thu nhập 1,000,000 VNĐ trước đó của ví này. | Hệ thống từ chối xóa và báo lỗi nghiệp vụ số dư ví không đủ do việc trừ tiền sẽ làm âm số dư ví. |
 | TC-TXN-05.3 | Người dùng gửi yêu cầu xóa nhưng tham số `confirmed = false`. | Hệ thống không thực hiện xóa và giữ nguyên dữ liệu. |
 
 ### 4.3 FR-TRF: Phân hệ Chuyển tiền nội bộ
@@ -1183,7 +1258,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-TRF-01 |
 | Tên | Chuyển tiền giữa hai ví nội bộ |
 | Phân hệ nghiệp vụ | Chuyển tiền nội bộ (FR-TRF) |
-| Ca sử dụng tham chiếu | UC03: Chuyển tiền nội bộ giữa các ví |
+| Ca sử dụng tham chiếu | UC-TRF-01 đến UC-TRF-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống điều chuyển lượng tiền tệ chỉ định từ ví nguồn sang ví đích trong cùng hệ thống, ghi nhận cặp bút toán đối ứng cân bằng mà không làm thay đổi tổng tài sản ròng. |
 
 Dữ liệu đầu vào:
@@ -1198,16 +1273,16 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực số tiền chuyển: Kiểm tra $amount > 0$. Nếu $amount \le 0$, ném ngoại lệ `InvalidTransferAmountException`. Chuẩn hóa scale = 2 theo BR-FIN-01.
-2. Ràng buộc hai ví phân biệt: Kiểm tra $fromWalletId \ne toWalletId$. Nếu ví nguồn trùng ví đích, hệ thống từ chối và ném ngoại lệ `SameWalletTransferException`.
-3. Xác thực trạng thái ví: Cả hai ví nguồn và đích bắt buộc tồn tại và đang ở trạng thái `ACTIVE`. Nếu một trong hai ví bị `ARCHIVED`, ném ngoại lệ `WalletInactiveException`.
+1. Xác thực số tiền chuyển: Kiểm tra $amount > 0$. Nếu $amount \le 0$, báo lỗi nghiệp vụ số tiền chuyển không hợp lệ. Chuẩn hóa scale = 2 theo BR-FIN-01.
+2. Ràng buộc hai ví phân biệt: Kiểm tra $fromWalletId \ne toWalletId$. Nếu ví nguồn trùng ví đích, hệ thống từ chối và báo lỗi nghiệp vụ ví nguồn trùng ví đích.
+3. Xác thực trạng thái ví: Cả hai ví nguồn và đích bắt buộc tồn tại và đang ở trạng thái `ACTIVE`. Nếu một trong hai ví bị `ARCHIVED`, báo lỗi nghiệp vụ ví không ở trạng thái hoạt động.
 4. Kiểm tra số dư ví nguồn: Theo BR-FIN-02 và BR-FIN-03, với ví nguồn thông thường (`CASH`, `BANK`, `E_WALLET`), số dư khả dụng phải thỏa mãn:
 $$Balance_{from} - amount \ge 0$$
-Nếu số dư không đủ, hệ thống ném ngoại lệ `InsufficientBalanceException`.
+Nếu số dư không đủ, hệ thống báo lỗi nghiệp vụ số dư ví không đủ.
 5. Ghi sổ kép đồng thời:
   - Trừ đúng $amount$ khỏi số dư ví nguồn: $Balance_{from} = Balance_{from} - amount$.
   - Cộng đúng $amount$ vào số dư ví đích: $Balance_{to} = Balance_{to} + amount$.
-  - Hai thao tác cập nhật số dư và việc tạo bản ghi chuyển tiền trong danh sách bản ghi `transfers` phải nằm trong cùng một giao dịch xử lý tệp an toàn duy nhất. Nếu có lỗi, toàn bộ giao dịch được hoàn nguyên (Rollback).
+  - Hai thao tác cập nhật số dư và việc tạo bản ghi chuyển tiền trong danh sách bản ghi `transfers` phải nằm trong cùng một giao dịch xử lý tệp an toàn duy nhất. Nếu có lỗi, toàn bộ giao dịch được hoàn nguyên.
 6. Bảo toàn thanh khoản: Giao dịch chuyển tiền nội bộ thuần túy không tính vào thu nhập (`Income`) hoặc chi tiêu (`Expense`) của kỳ báo cáo. Tổng số dư toàn bộ các ví trước và sau giao dịch được bảo toàn: $\Delta \sum Balance = 0$.
 
 Dữ liệu đầu ra:
@@ -1223,9 +1298,9 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-TRF-01.1 | Cho ví "MB Bank" có 5,000,000 VNĐ và ví "Tiền mặt" có 1,000,000 VNĐ. Người dùng chuyển 2,000,000 VNĐ từ MB Bank sang Tiền mặt. | Sau giao dịch, số dư MB Bank là 3,000,000.00 VNĐ, Tiền mặt là 3,000,000.00 VNĐ, tổng số dư hai ví giữ nguyên 6,000,000.00 VNĐ. |
-| TC-TRF-01.2 | Người dùng chọn ví nguồn trùng với ví đích (`fromWalletId == toWalletId`). | Hệ thống từ chối và ném lỗi `SameWalletTransferException`. |
-| TC-TRF-01.3 | Cho ví nguồn có số dư 1,500,000 VNĐ, người dùng thực hiện chuyển 2,000,000 VNĐ. | Hệ thống từ chối và ném lỗi `InsufficientBalanceException`. |
-| TC-TRF-01.4 | Người dùng nhập số tiền chuyển bằng 0 hoặc số âm (-500,000 VNĐ). | Hệ thống từ chối và ném lỗi `InvalidTransferAmountException`. |
+| TC-TRF-01.2 | Người dùng chọn ví nguồn trùng với ví đích (`fromWalletId == toWalletId`). | Hệ thống từ chối và báo lỗi nghiệp vụ ví nguồn trùng ví đích. |
+| TC-TRF-01.3 | Cho ví nguồn có số dư 1,500,000 VNĐ, người dùng thực hiện chuyển 2,000,000 VNĐ. | Hệ thống từ chối và báo lỗi nghiệp vụ số dư ví không đủ. |
+| TC-TRF-01.4 | Người dùng nhập số tiền chuyển bằng 0 hoặc số âm (-500,000 VNĐ). | Hệ thống từ chối và báo lỗi nghiệp vụ số tiền chuyển không hợp lệ. |
 
 #### 4.3.2 FR-TRF-02: Ghi nhận phí chuyển tiền phát sinh
 
@@ -1236,7 +1311,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-TRF-02 |
 | Tên | Ghi nhận phí chuyển tiền phát sinh |
 | Phân hệ nghiệp vụ | Chuyển tiền nội bộ (FR-TRF) |
-| Ca sử dụng tham chiếu | UC03: Chuyển tiền nội bộ giữa các ví |
+| Ca sử dụng tham chiếu | UC-TRF-01 đến UC-TRF-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tự động ghi nhận giao dịch chi tiêu độc lập cho khoản phí dịch vụ chuyển tiền phát sinh từ ví nguồn, liên kết với giao dịch chuyển tiền theo quy tắc BR-FIN-03. |
 
 Dữ liệu đầu vào:
@@ -1252,7 +1327,7 @@ Quy tắc xử lý và ràng buộc:
 1. Kiểm tra năng lực chi trả tổng thể của ví nguồn: Khi $fee > 0$, hệ thống kiểm tra số dư ví nguồn phải đủ cho cả số tiền chuyển và khoản phí:
 $$Balance_{from} \ge amount + fee$$
 
-  Nếu số dư ví nguồn nhỏ hơn $amount + fee$, hệ thống từ chối toàn bộ giao dịch chuyển tiền và ném ngoại lệ `InsufficientBalanceException`.
+  Nếu số dư ví nguồn nhỏ hơn $amount + fee$, hệ thống từ chối toàn bộ giao dịch chuyển tiền và báo lỗi nghiệp vụ số dư ví không đủ.
 2. Phân tách hạch toán độc lập: Khoản phí $fee$ không được trừ gộp vào số tiền chuyển $amount$, mà được hạch toán thành 2 giao dịch phân biệt trong cùng một khối giao dịch toàn vẹn:
   - Giao dịch chuyển tiền nội bộ số tiền $amount$ từ ví nguồn sang ví đích (bảo toàn thanh khoản).
   - Giao dịch chi tiêu (`Expense`) số tiền $fee$ từ ví nguồn, gán danh mục $feeCategoryId$, lưu trường tham chiếu `linkedTransferId = transferId`.
@@ -1271,7 +1346,7 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-TRF-02.1 | Cho ví nguồn có số dư 2,000,000 VNĐ, chuyển 1,000,000 VNĐ sang ví đích với phí 5,500 VNĐ. | Sau giao dịch, ví nguồn còn lại chính xác 994,500.00 VNĐ, ví đích tăng 1,000,000.00 VNĐ, và hệ thống ghi nhận một giao dịch chi tiêu phí ngân hàng 5,500.00 VNĐ. |
-| TC-TRF-02.2 | Cho ví nguồn có đúng 1,000,000 VNĐ, thực hiện chuyển 1,000,000 VNĐ với phí 5,500 VNĐ. | Hệ thống từ chối toàn bộ giao dịch do tổng số tiền cần trừ (1,005,500 VNĐ) vượt quá số dư khả dụng, ném lỗi `InsufficientBalanceException`. |
+| TC-TRF-02.2 | Cho ví nguồn có đúng 1,000,000 VNĐ, thực hiện chuyển 1,000,000 VNĐ với phí 5,500 VNĐ. | Hệ thống từ chối toàn bộ giao dịch do tổng số tiền cần trừ (1,005,500 VNĐ) vượt quá số dư khả dụng, báo lỗi nghiệp vụ số dư ví không đủ. |
 | TC-TRF-02.3 | Chuyển tiền với phí $fee = 0.00$ VNĐ. | Hệ thống chỉ tạo bản ghi chuyển tiền, không sinh bản ghi chi tiêu phí thừa. |
 
 #### 4.3.3 FR-TRF-03: Lịch sử và hủy chuyển tiền nội bộ
@@ -1283,7 +1358,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-TRF-03 |
 | Tên | Lịch sử và hủy chuyển tiền nội bộ |
 | Phân hệ nghiệp vụ | Chuyển tiền nội bộ (FR-TRF) |
-| Ca sử dụng tham chiếu | UC03: Chuyển tiền nội bộ giữa các ví |
+| Ca sử dụng tham chiếu | UC-TRF-01 đến UC-TRF-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống hiển thị lịch sử chuyển tiền nội bộ và cho phép hủy bỏ giao dịch chuyển tiền, tự động hoàn nguyên số dư của cả hai ví đối ứng và khoản phí đi kèm nếu có. |
 
 Dữ liệu đầu vào:
@@ -1295,11 +1370,11 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra tồn tại và trạng thái: Tìm bản ghi chuyển tiền theo `transferId`. Nếu không tìm thấy, ném `TransferNotFoundException`. Nếu giao dịch đã bị hủy trước đó, ném `TransferAlreadyCancelledException`.
+1. Kiểm tra tồn tại và trạng thái: Tìm bản ghi chuyển tiền theo `transferId`. Nếu không tìm thấy, báo lỗi nghiệp vụ không tìm thấy giao dịch chuyển tiền. Nếu giao dịch đã bị hủy trước đó, báo lỗi nghiệp vụ giao dịch chuyển tiền đã bị hủy trước đó.
 2. Kiểm tra điều kiện hoàn nguyên tại ví đích: Ví đích phải có đủ số dư khả dụng để trừ lại số tiền đã nhận từ giao dịch chuyển tiền:
 $$Balance_{to} - amount \ge 0$$
 
-  Nếu ví đích đã chi tiêu dẫn tới số dư hiện tại nhỏ hơn $amount$, hệ thống từ chối hủy và ném ngoại lệ `InsufficientBalanceForReversalException`.
+  Nếu ví đích đã chi tiêu dẫn tới số dư hiện tại nhỏ hơn $amount$, hệ thống từ chối hủy và báo lỗi nghiệp vụ số dư ví đích không đủ để hoàn nguyên.
 3. Khôi phục số dư đối ứng đồng thời:
   - Hoàn trả số tiền $amount$ vào số dư của ví nguồn: $Balance_{from} = Balance_{from} + amount$.
   - Thu hồi số tiền $amount$ khỏi số dư của ví đích: $Balance_{to} = Balance_{to} - amount$.
@@ -1319,8 +1394,8 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-TRF-03.1 | Cho giao dịch chuyển 2,000,000 VNĐ từ ví A sang ví B kèm phí 3,300 VNĐ. Khi người dùng hủy giao dịch thành công. | Ví A được cộng lại 2,003,300.00 VNĐ, ví B bị trừ 2,000,000.00 VNĐ, bản ghi chi tiêu phí bị hủy. |
-| TC-TRF-03.2 | Cho ví B sau khi nhận 2,000,000 VNĐ đã chi tiêu hết tiền và chỉ còn lại 500,000 VNĐ. Khi người dùng yêu cầu hủy chuyển tiền. | Hệ thống từ chối và ném lỗi `InsufficientBalanceForReversalException`. |
-| TC-TRF-03.3 | Người dùng yêu cầu hủy một giao dịch chuyển tiền đã ở trạng thái `CANCELLED`. | Hệ thống từ chối và ném lỗi `TransferAlreadyCancelledException`. |
+| TC-TRF-03.2 | Cho ví B sau khi nhận 2,000,000 VNĐ đã chi tiêu hết tiền và chỉ còn lại 500,000 VNĐ. Khi người dùng yêu cầu hủy chuyển tiền. | Hệ thống từ chối và báo lỗi nghiệp vụ số dư ví đích không đủ để hoàn nguyên. |
+| TC-TRF-03.3 | Người dùng yêu cầu hủy một giao dịch chuyển tiền đã ở trạng thái `CANCELLED`. | Hệ thống từ chối và báo lỗi nghiệp vụ giao dịch chuyển tiền đã bị hủy trước đó. |
 
 ### 4.4 FR-CAT: Phân hệ Danh mục phân loại
 
@@ -1335,7 +1410,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-CAT-01 |
 | Tên | Khởi tạo và quản lý cấu trúc phân loại 3 cấp |
 | Phân hệ nghiệp vụ | Danh mục phân loại (FR-CAT) |
-| Ca sử dụng tham chiếu | UC04: Thiết lập và quản lý danh mục phân loại thu chi 3 cấp |
+| Ca sử dụng tham chiếu | UC-CAT-01 đến UC-CAT-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống thiết lập và duy trì cây phân loại tài chính chuẩn 3 cấp gồm Cấp 1: Loại luồng tiền, Cấp 2: Nhóm nhu cầu, Cấp 3: Danh mục cụ thể theo quy tắc BR-FIN-04. |
 
 Dữ liệu đầu vào:
@@ -1376,7 +1451,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-CAT-02 |
 | Tên | Tùy biến danh mục người dùng |
 | Phân hệ nghiệp vụ | Danh mục phân loại (FR-CAT) |
-| Ca sử dụng tham chiếu | UC04: Thiết lập và quản lý danh mục phân loại thu chi 3 cấp |
+| Ca sử dụng tham chiếu | UC-CAT-01 đến UC-CAT-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống cho phép người dùng bổ sung các danh mục chi tiết mới hoặc ẩn các danh mục không còn nhu cầu sử dụng mà không làm gián đoạn tính toàn vẹn dữ liệu. |
 
 Dữ liệu đầu vào:
@@ -1391,8 +1466,8 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực nhóm cha: Kiểm tra sự tồn tại của `groupId`. Nếu không tìm thấy nhóm cha, ném ngoại lệ `CategoryGroupNotFoundException`.
-2. Kiểm tra tính duy nhất của tên: Kiểm tra tên danh mục mới không trùng lặp với các danh mục khác trong cùng nhóm cha (cắt khoảng trắng thừa, so sánh không phân biệt chữ hoa, chữ thường). Nếu trùng, ném ngoại lệ `DuplicateCategoryNameException`.
+1. Xác thực nhóm cha: Kiểm tra sự tồn tại của `groupId`. Nếu không tìm thấy nhóm cha, báo lỗi nghiệp vụ không tìm thấy nhóm danh mục.
+2. Kiểm tra tính duy nhất của tên: Kiểm tra tên danh mục mới không trùng lặp với các danh mục khác trong cùng nhóm cha (cắt khoảng trắng thừa, so sánh không phân biệt chữ hoa, chữ thường). Nếu trùng, báo lỗi nghiệp vụ tên danh mục đã tồn tại trong nhóm.
 3. Tạo bản ghi danh mục: Gán mã định danh duy nhất (`categoryId`), liên kết với nhóm cha và lưu bản ghi vào bảng danh mục.
 4. Xử lý cờ kích hoạt `isActive`:
   - Khi người dùng chuyển `isActive` sang `false`, danh mục được chuyển sang trạng thái ẩn.
@@ -1412,7 +1487,7 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-CAT-02.1 | Người dùng thêm danh mục "Thú cưng" vào nhóm "personal & leisure". | Danh mục mới được tạo thành công và xuất hiện trong danh sách lựa chọn khi ghi nhận chi tiêu. |
-| TC-CAT-02.2 | Người dùng thêm danh mục trùng tên với danh mục đã có trong cùng một nhóm. | Hệ thống từ chối và ném lỗi `DuplicateCategoryNameException`. |
+| TC-CAT-02.2 | Người dùng thêm danh mục trùng tên với danh mục đã có trong cùng một nhóm. | Hệ thống từ chối và báo lỗi nghiệp vụ tên danh mục đã tồn tại trong nhóm. |
 | TC-CAT-02.3 | Người dùng đặt danh mục "Chơi gôn" sang trạng thái ẩn (`isActive = false`). | Danh mục không còn hiển thị trong danh sách lựa chọn khi thêm giao dịch mới, nhưng các giao dịch cũ gắn với "Chơi gôn" vẫn hiển thị đầy đủ tên danh mục. |
 
 #### 4.4.3 FR-CAT-03: Ràng buộc toàn vẹn khi sửa và xóa danh mục
@@ -1424,7 +1499,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-CAT-03 |
 | Tên | Ràng buộc toàn vẹn khi sửa và xóa danh mục |
 | Phân hệ nghiệp vụ | Danh mục phân loại (FR-CAT) |
-| Ca sử dụng tham chiếu | UC04: Thiết lập và quản lý danh mục phân loại thu chi 3 cấp |
+| Ca sử dụng tham chiếu | UC-CAT-01 đến UC-CAT-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống kiểm soát việc chỉnh sửa và xóa danh mục phân loại để bảo vệ tính toàn vẹn lịch sử và tính nhất quán của báo cáo tài chính theo quy tắc BR-FIN-04. |
 
 Dữ liệu đầu vào:
@@ -1439,14 +1514,14 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra tồn tại đối tượng: Tìm bản ghi theo `targetId` và `targetType`. Nếu không tồn tại, ném `CategoryNotFoundException` hoặc `CategoryGroupNotFoundException`.
+1. Kiểm tra tồn tại đối tượng: Tìm bản ghi theo `targetId` và `targetType`. Nếu không tồn tại, hệ thống báo lỗi nghiệp vụ không tìm thấy danh mục hoặc không tìm thấy nhóm danh mục tương ứng.
 2. Ràng buộc đối với hành vi XÓA (`DELETE`):
   - Kiểm tra lịch sử giao dịch: Hệ thống quét danh sách bản ghi `transactions` để kiểm tra xem danh mục (hoặc nhóm) đã từng phát sinh bất kỳ giao dịch nào hay chưa.
-  - Nếu đã phát sinh giao dịch: Nghiêm cấm xóa vĩnh viễn khỏi tệp dữ liệu. Hệ thống từ chối xóa, ném ngoại lệ `ReferentialIntegrityException`, và hướng dẫn người dùng chuyển sang trạng thái ẩn (`isActive = false`).
+  - Nếu đã phát sinh giao dịch: Nghiêm cấm xóa vĩnh viễn khỏi tệp dữ liệu. Hệ thống từ chối xóa, báo lỗi nghiệp vụ vi phạm toàn vẹn tham chiếu, và hướng dẫn người dùng chuyển sang trạng thái ẩn (`isActive = false`).
   - Nếu chưa từng phát sinh giao dịch: Cho phép xóa vĩnh viễn bản ghi khỏi tệp dữ liệu.
-  - Với Group: Không cho phép xóa Group nếu nhóm vẫn còn chứa ít nhất một Category con trực thuộc. Hệ thống ném ngoại lệ `NonEmptyGroupDeletionException`.
+  - Với Group: Không cho phép xóa Group nếu nhóm vẫn còn chứa ít nhất một Category con trực thuộc. Hệ thống báo lỗi nghiệp vụ nhóm danh mục chưa rỗng.
 3. Ràng buộc đối với hành vi SỬA (`RENAME` / `CHANGE_PARENT`):
-  - Bất biến loại luồng tiền: Cấm thay đổi thuộc tính `Type` (từ Income sang Expense hoặc ngược lại) của một Group hoặc Category nếu đã có giao dịch liên kết. Nếu người dùng cố gắng chuyển nhóm cha sang một Group thuộc Type khác, hệ thống ném ngoại lệ `CategoryTypeImmutableException`.
+  - Bất biến loại luồng tiền: Cấm thay đổi thuộc tính `Type` (từ Income sang Expense hoặc ngược lại) của một Group hoặc Category nếu đã có giao dịch liên kết. Nếu người dùng cố gắng chuyển nhóm cha sang một Group thuộc Type khác, hệ thống báo lỗi nghiệp vụ thuộc tính loại danh mục bất biến.
   - Đổi tên: Cho phép đổi tên danh mục hoặc nhóm nếu tên mới không trùng lặp trong cùng phạm vi cha. Việc đổi tên áp dụng trên các hiển thị mới mà không làm thay đổi mã định danh nội bộ (`categoryId`, `groupId`) và không làm ảnh hưởng các liên kết khóa ngoại lịch sử.
 
 Dữ liệu đầu ra:
@@ -1461,14 +1536,14 @@ Tiêu chí nghiệm thu:
 
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
-| TC-CAT-03.1 | Cho danh mục "Ăn uống" đã liên kết với 50 giao dịch chi tiêu trong quá khứ. Khi người dùng yêu cầu xóa danh mục này. | Hệ thống từ chối thao tác, ném lỗi `ReferentialIntegrityException`, gợi ý chuyển sang ẩn danh mục. |
+| TC-CAT-03.1 | Cho danh mục "Ăn uống" đã liên kết với 50 giao dịch chi tiêu trong quá khứ. Khi người dùng yêu cầu xóa danh mục này. | Hệ thống từ chối thao tác, báo lỗi nghiệp vụ vi phạm toàn vẹn tham chiếu, gợi ý chuyển sang ẩn danh mục. |
 | TC-CAT-03.2 | Cho danh mục "Học vẽ" vừa được tạo và chưa phát sinh giao dịch nào. Khi người dùng chọn xóa. | Hệ thống xóa hoàn toàn bản ghi khỏi tệp dữ liệu. |
-| TC-CAT-03.3 | Người dùng yêu cầu xóa nhóm "personal & leisure" trong khi nhóm vẫn còn 5 danh mục con. | Hệ thống từ chối xóa và ném lỗi `NonEmptyGroupDeletionException`. |
-| TC-CAT-03.4 | Người dùng cố gắng chuyển danh mục chi tiêu "Xăng xe" sang nhóm thu nhập "employment". | Hệ thống chặn lại và ném lỗi `CategoryTypeImmutableException`. |
+| TC-CAT-03.3 | Người dùng yêu cầu xóa nhóm "personal & leisure" trong khi nhóm vẫn còn 5 danh mục con. | Hệ thống từ chối xóa và báo lỗi nghiệp vụ nhóm danh mục chưa rỗng. |
+| TC-CAT-03.4 | Người dùng cố gắng chuyển danh mục chi tiêu "Xăng xe" sang nhóm thu nhập "employment". | Hệ thống chặn lại và báo lỗi nghiệp vụ thuộc tính loại danh mục bất biến. |
 
-### 4.5 FR-DEBT: Phân hệ Quản lý công nợ
+### 4.5 FR-DEBT: Phân hệ Công nợ
 
-Phân hệ Quản lý công nợ theo dõi các quyền đòi nợ (khoản phải thu) và nghĩa vụ tài chính (khoản phải trả) phát sinh giữa người dùng với các cá nhân, tổ chức bên ngoài theo quy tắc BR-FIN-07.
+Phân hệ Công nợ theo dõi các quyền đòi nợ (khoản phải thu) và nghĩa vụ tài chính (khoản phải trả) phát sinh giữa người dùng với các cá nhân, tổ chức bên ngoài theo quy tắc BR-FIN-07.
 
 #### 4.5.1 FR-DEBT-01: Ghi nhận khoản cho vay
 
@@ -1478,8 +1553,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-DEBT-01 |
 | Tên | Ghi nhận khoản cho vay |
-| Phân hệ nghiệp vụ | Quản lý công nợ (FR-DEBT) |
-| Ca sử dụng tham chiếu | UC05: Quản lý công nợ |
+| Phân hệ nghiệp vụ | Công nợ (FR-DEBT) |
+| Ca sử dụng tham chiếu | UC-DEBT-01 đến UC-DEBT-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống trích xuất tiền từ ví thanh toán chỉ định để ghi nhận khoản cho đối tác vay, làm giảm số dư ví xuất tiền và tăng giá trị tài sản khoản phải thu của đối tác theo quy tắc BR-FIN-07. |
 
 Dữ liệu đầu vào:
@@ -1495,8 +1570,8 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực tham số đầu vào: Kiểm tra số tiền $amount > 0$, chuỗi định danh người vay `person` không rỗng và ví xuất tiền tồn tại với trạng thái `ACTIVE`. Nếu dữ liệu không hợp lệ, hệ thống ném ngoại lệ `InvalidDebtTransactionException`.
-2. Kiểm tra khả năng chi trả của ví theo BR-FIN-02: Hệ thống kiểm tra điều kiện số dư khả dụng $Balance_{wallet} - amount \ge 0$ đối với ví thanh toán thông thường (`CASH`, `BANK`, `E_WALLET`). Nếu số dư không đủ chi trả, hệ thống ném ngoại lệ `InsufficientBalanceException` và từ chối thực thi.
+1. Xác thực tham số đầu vào: Kiểm tra số tiền $amount > 0$, chuỗi định danh người vay `person` không rỗng và ví xuất tiền tồn tại với trạng thái `ACTIVE`. Nếu dữ liệu không hợp lệ, hệ thống báo lỗi nghiệp vụ giao dịch công nợ không hợp lệ.
+2. Kiểm tra khả năng chi trả của ví theo BR-FIN-02: Hệ thống kiểm tra điều kiện số dư khả dụng $Balance_{wallet} - amount \ge 0$ đối với ví thanh toán thông thường (`CASH`, `BANK`, `E_WALLET`). Nếu số dư không đủ chi trả, hệ thống báo lỗi nghiệp vụ số dư ví không đủ và từ chối thực thi.
 3. Cập nhật số dư ví xuất tiền theo BR-FIN-02:
 $$Balance_{wallet}(t) = Balance_{wallet}(t-1) - amount$$
 4. Cập nhật nợ phải thu của cá nhân `person` theo BR-FIN-07:
@@ -1519,8 +1594,8 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-DEBT-01.1 | Cho ví "MB Bank" có số dư 10,000,000.00 VNĐ. Người dùng ghi nhận cho "Nguyễn Văn A" vay 3,000,000.00 VNĐ từ ví MB Bank. | Hệ thống trừ số dư ví MB Bank còn 7,000,000.00 VNĐ, ghi nhận $Receivable_{A} = 3,000,000.00$ VNĐ, không tăng chỉ số Expense trong báo cáo tháng. |
-| TC-DEBT-01.2 | Cho ví có số dư 1,000,000.00 VNĐ. Người dùng ghi nhận cho vay 1,500,000.00 VNĐ. | Hệ thống từ chối giao dịch, ném `InsufficientBalanceException`, số dư ví và công nợ giữ nguyên. |
-| TC-DEBT-01.3 | Người dùng nhập số tiền cho vay bằng 0 hoặc số âm. | Hệ thống từ chối và ném lỗi `InvalidDebtTransactionException`. |
+| TC-DEBT-01.2 | Cho ví có số dư 1,000,000.00 VNĐ. Người dùng ghi nhận cho vay 1,500,000.00 VNĐ. | Hệ thống từ chối giao dịch, báo lỗi nghiệp vụ số dư ví không đủ, số dư ví và công nợ giữ nguyên. |
+| TC-DEBT-01.3 | Người dùng nhập số tiền cho vay bằng 0 hoặc số âm. | Hệ thống từ chối và báo lỗi nghiệp vụ giao dịch công nợ không hợp lệ. |
 
 #### 4.5.2 FR-DEBT-02: Ghi nhận khoản đi vay
 
@@ -1530,8 +1605,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-DEBT-02 |
 | Tên | Ghi nhận khoản đi vay |
-| Phân hệ nghiệp vụ | Quản lý công nợ (FR-DEBT) |
-| Ca sử dụng tham chiếu | UC05: Quản lý công nợ |
+| Phân hệ nghiệp vụ | Công nợ (FR-DEBT) |
+| Ca sử dụng tham chiếu | UC-DEBT-01 đến UC-DEBT-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống ghi nhận khoản tiền người dùng đi vay từ chủ nợ, cộng tiền vào ví thanh toán chỉ định và làm tăng nghĩa vụ nợ phải trả theo quy tắc BR-FIN-07. |
 
 Dữ liệu đầu vào:
@@ -1547,7 +1622,7 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực dữ liệu đầu vào: Kiểm tra số tiền $amount > 0$, tên chủ nợ `person` không được để trống và ví nhận tiền tồn tại ở trạng thái `ACTIVE`. Nếu vi phạm, hệ thống ném ngoại lệ `InvalidDebtTransactionException`.
+1. Xác thực dữ liệu đầu vào: Kiểm tra số tiền $amount > 0$, tên chủ nợ `person` không được để trống và ví nhận tiền tồn tại ở trạng thái `ACTIVE`. Nếu vi phạm, hệ thống báo lỗi nghiệp vụ giao dịch công nợ không hợp lệ.
 2. Cộng số tiền vay vào ví nhận tiền theo BR-FIN-02:
 $$Balance_{wallet}(t) = Balance_{wallet}(t-1) + amount$$
 3. Tăng nghĩa vụ nợ phải trả đối với chủ nợ `person` theo BR-FIN-07:
@@ -1570,7 +1645,7 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-DEBT-02.1 | Cho ví "Tiền mặt" có số dư 1,000,000.00 VNĐ. Người dùng ghi nhận vay của "Trần Thị B" 5,000,000.00 VNĐ nhận vào ví Tiền mặt. | Hệ thống cộng số dư ví Tiền mặt thành 6,000,000.00 VNĐ, tăng nghĩa vụ nợ $Payable_{B} = 5,000,000.00$ VNĐ, không làm tăng thu nhập trong báo cáo tháng. |
-| TC-DEBT-02.2 | Người dùng nhập số tiền đi vay bằng 0 hoặc bỏ trống tên chủ nợ. | Hệ thống từ chối thao tác và ném `InvalidDebtTransactionException`. |
+| TC-DEBT-02.2 | Người dùng nhập số tiền đi vay bằng 0 hoặc bỏ trống tên chủ nợ. | Hệ thống từ chối thao tác và báo lỗi nghiệp vụ giao dịch công nợ không hợp lệ. |
 
 #### 4.5.3 FR-DEBT-03: Thu hồi nợ cho vay
 
@@ -1580,8 +1655,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-DEBT-03 |
 | Tên | Thu hồi nợ cho vay |
-| Phân hệ nghiệp vụ | Quản lý công nợ (FR-DEBT) |
-| Ca sử dụng tham chiếu | UC05: Quản lý công nợ |
+| Phân hệ nghiệp vụ | Công nợ (FR-DEBT) |
+| Ca sử dụng tham chiếu | UC-DEBT-01 đến UC-DEBT-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống ghi nhận việc đối tác hoàn trả tiền nợ cho người dùng, cộng tiền vào ví thanh toán chỉ định và giảm trừ khoản phải thu đối ứng theo quy tắc BR-FIN-07. |
 
 Dữ liệu đầu vào:
@@ -1598,7 +1673,7 @@ Quy tắc xử lý và ràng buộc:
 
 1. Xác định số dư nợ phải thu hiện tại của cá nhân `person` theo BR-FIN-07:
 $$Receivable_{person} = \sum Lend_{person} - \sum Collect_{person} - \sum \text{WriteOffLend}_{person}$$
-2. Kiểm tra ràng buộc trần thu nợ: Số tiền thu hồi không được vượt quá số dư nợ phải thu hiện tại ($amount \le Receivable_{person}$). Nếu $amount > Receivable_{person}$, hệ thống ném ngoại lệ `DebtOverpaymentException` và từ chối ghi nhận.
+2. Kiểm tra ràng buộc trần thu nợ: Số tiền thu hồi không được vượt quá số dư nợ phải thu hiện tại ($amount \le Receivable_{person}$). Nếu $amount > Receivable_{person}$, hệ thống báo lỗi nghiệp vụ số tiền vượt quá dư nợ và từ chối ghi nhận.
 3. Cộng số tiền $amount$ vào số dư ví nhận tiền theo BR-FIN-02:
 $$Balance_{wallet}(t) = Balance_{wallet}(t-1) + amount$$
 4. Giảm số dư nợ phải thu của cá nhân `person` theo BR-FIN-07:
@@ -1619,7 +1694,7 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-DEBT-03.1 | Cho đối tác A đang nợ 3,000,000.00 VNĐ. Người dùng thu hồi 1,500,000.00 VNĐ vào ví MB Bank. | Số dư ví MB Bank tăng 1,500,000.00 VNĐ, số nợ còn phải thu của A giảm xuống đúng 1,500,000.00 VNĐ. |
-| TC-DEBT-03.2 | Cho đối tác A đang nợ 1,000,000.00 VNĐ. Người dùng nhập số tiền thu nợ 1,200,000.00 VNĐ. | Hệ thống chặn giao dịch, ném `DebtOverpaymentException`, hiển thị thông báo thu vượt quá dư nợ gốc. |
+| TC-DEBT-03.2 | Cho đối tác A đang nợ 1,000,000.00 VNĐ. Người dùng nhập số tiền thu nợ 1,200,000.00 VNĐ. | Hệ thống chặn giao dịch, báo lỗi nghiệp vụ số tiền vượt quá dư nợ, hiển thị thông báo thu vượt quá dư nợ gốc. |
 | TC-DEBT-03.3 | Thu hồi toàn bộ số nợ còn lại ($amount = Receivable_{person}$). | Hệ thống cập nhật $Receivable_{person} = 0.00$ VNĐ, đánh dấu công nợ với đối tác đã thanh toán đủ. |
 
 #### 4.5.4 FR-DEBT-04: Trả nợ đi vay
@@ -1630,8 +1705,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-DEBT-04 |
 | Tên | Trả nợ đi vay |
-| Phân hệ nghiệp vụ | Quản lý công nợ (FR-DEBT) |
-| Ca sử dụng tham chiếu | UC05: Quản lý công nợ |
+| Phân hệ nghiệp vụ | Công nợ (FR-DEBT) |
+| Ca sử dụng tham chiếu | UC-DEBT-01 đến UC-DEBT-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống trích xuất tiền từ ví thanh toán để hoàn trả một phần hoặc toàn bộ số nợ đã vay cho chủ nợ, giảm trừ nghĩa vụ nợ phải trả theo quy tắc BR-FIN-07. |
 
 Dữ liệu đầu vào:
@@ -1648,8 +1723,8 @@ Quy tắc xử lý và ràng buộc:
 
 1. Xác định nghĩa vụ nợ phải trả hiện tại đối với chủ nợ `person` theo BR-FIN-07:
 $$Payable_{person} = \sum Borrow_{person} - \sum Repay_{person} - \sum \text{WriteOffBorrow}_{person}$$
-2. Kiểm tra ràng buộc trần trả nợ: Số tiền trả nợ không được vượt quá nghĩa vụ nợ hiện tại ($amount \le Payable_{person}$). Nếu vượt quá, hệ thống ném ngoại lệ `DebtOverpaymentException` và từ chối giao dịch.
-3. Kiểm tra số dư ví trích tiền theo BR-FIN-02: Hệ thống kiểm tra $Balance_{wallet} - amount \ge 0$ đối với ví thông thường. Nếu số dư không đủ chi trả, ném ngoại lệ `InsufficientBalanceException`.
+2. Kiểm tra ràng buộc trần trả nợ: Số tiền trả nợ không được vượt quá nghĩa vụ nợ hiện tại ($amount \le Payable_{person}$). Nếu vượt quá, hệ thống báo lỗi nghiệp vụ số tiền vượt quá dư nợ và từ chối giao dịch.
+3. Kiểm tra số dư ví trích tiền theo BR-FIN-02: Hệ thống kiểm tra $Balance_{wallet} - amount \ge 0$ đối với ví thông thường. Nếu số dư không đủ chi trả, báo lỗi nghiệp vụ số dư ví không đủ.
 4. Trừ số tiền $amount$ khỏi ví trích tiền theo BR-FIN-02:
 $$Balance_{wallet}(t) = Balance_{wallet}(t-1) - amount$$
 5. Giảm nghĩa vụ nợ phải trả đối với chủ nợ `person` theo BR-FIN-07:
@@ -1669,8 +1744,8 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-DEBT-04.1 | Cho nợ chủ nợ B là 5,000,000.00 VNĐ và ví Timo có số dư 4,000,000.00 VNĐ. Người dùng trả nợ cho B 2,000,000.00 VNĐ từ ví Timo. | Ví Timo còn lại 2,000,000.00 VNĐ, nợ còn lại đối với B giảm xuống 3,000,000.00 VNĐ. |
-| TC-DEBT-04.2 | Người dùng thực hiện trả nợ 6,000,000.00 VNĐ cho chủ nợ B trong khi nợ thực tế chỉ còn 5,000,000.00 VNĐ. | Hệ thống từ chối giao dịch và ném lỗi `DebtOverpaymentException`. |
-| TC-DEBT-04.3 | Người dùng trả nợ 3,000,000.00 VNĐ từ ví có số dư chỉ 1,000,000.00 VNĐ. | Hệ thống từ chối và ném lỗi `InsufficientBalanceException`. |
+| TC-DEBT-04.2 | Người dùng thực hiện trả nợ 6,000,000.00 VNĐ cho chủ nợ B trong khi nợ thực tế chỉ còn 5,000,000.00 VNĐ. | Hệ thống từ chối giao dịch và báo lỗi nghiệp vụ số tiền vượt quá dư nợ. |
+| TC-DEBT-04.3 | Người dùng trả nợ 3,000,000.00 VNĐ từ ví có số dư chỉ 1,000,000.00 VNĐ. | Hệ thống từ chối và báo lỗi nghiệp vụ số dư ví không đủ. |
 
 #### 4.5.5 FR-DEBT-05: Xóa nợ khó đòi và miễn trừ nợ
 
@@ -1680,8 +1755,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-DEBT-05 |
 | Tên | Xóa nợ khó đòi và miễn trừ nợ |
-| Phân hệ nghiệp vụ | Quản lý công nợ (FR-DEBT) |
-| Ca sử dụng tham chiếu | UC05: Quản lý công nợ |
+| Phân hệ nghiệp vụ | Công nợ (FR-DEBT) |
+| Ca sử dụng tham chiếu | UC-DEBT-01 đến UC-DEBT-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống thực hiện bút toán điều chỉnh kế toán đối với các khoản nợ cho vay không thể thu hồi (xóa nợ xấu) hoặc các khoản nợ đi vay được chủ nợ tha thứ (miễn trừ nghĩa vụ), không làm biến động số dư các ví tiền theo quy tắc BR-FIN-07. |
 
 Dữ liệu đầu vào:
@@ -1696,15 +1771,15 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực lý do: Tham số `note` bắt buộc chứa nội dung giải trình căn cứ xóa nợ. Nếu để trống, hệ thống ném ngoại lệ `InvalidDebtTransactionException`.
+1. Xác thực lý do: Tham số `note` bắt buộc chứa nội dung giải trình căn cứ xóa nợ. Nếu để trống, hệ thống báo lỗi nghiệp vụ giao dịch công nợ không hợp lệ.
 2. Xử lý trường hợp xóa nợ cho vay (`WRITE_OFF_LEND`):
-  - Kiểm tra hạn mức xóa nợ: $amount \le Receivable_{person}$. Nếu vượt quá số dư phải thu còn lại, hệ thống từ chối và ném `DebtOverpaymentException`.
+  - Kiểm tra hạn mức xóa nợ: $amount \le Receivable_{person}$. Nếu vượt quá số dư phải thu còn lại, hệ thống từ chối và báo lỗi nghiệp vụ số tiền vượt quá dư nợ.
   - Giảm số dư phải thu của đối tác: $Receivable_{person}(t) = Receivable_{person}(t-1) - amount$.
   - Giảm tổng nợ phải thu toàn hệ thống $Receivable_{total}$.
   - Ràng buộc phi tiền mặt: Không thay đổi số dư của bất kỳ ví thanh toán nào theo BR-FIN-02 và BR-FIN-07.
   - Ghi nhận khoản tổn thất tài sản vào báo cáo phân tích tài chính.
 3. Xử lý trường hợp được miễn trừ nợ đi vay (`WRITE_OFF_BORROW`):
-  - Kiểm tra hạn mức miễn trừ: $amount \le Payable_{person}$. Nếu vượt quá số dư nợ còn lại, hệ thống từ chối và ném `DebtOverpaymentException`.
+  - Kiểm tra hạn mức miễn trừ: $amount \le Payable_{person}$. Nếu vượt quá số dư nợ còn lại, hệ thống từ chối và báo lỗi nghiệp vụ số tiền vượt quá dư nợ.
   - Giảm số dư phải trả đối với chủ nợ: $Payable_{person}(t) = Payable_{person}(t-1) - amount$.
   - Giảm tổng nợ phải trả toàn hệ thống $Payable_{total}$.
   - Ràng buộc phi tiền mặt: Không thay đổi số dư của bất kỳ ví tiền nào theo BR-FIN-02 và BR-FIN-07.
@@ -1724,12 +1799,12 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-DEBT-05.1 | Đối tác A còn nợ 1,000,000.00 VNĐ nhưng mất khả năng thanh toán. Người dùng ghi nhận `WRITE_OFF_LEND` 1,000,000.00 VNĐ kèm lý do. | Nợ phải thu của A về 0.00 VNĐ, tổng Receivable giảm 1,000,000.00 VNĐ, số dư mọi ví tiền được giữ nguyên. |
-| TC-DEBT-05.2 | Người dùng thực hiện xóa nợ với số tiền lớn hơn số dư nợ còn lại của đối tác. | Hệ thống từ chối và ném lỗi `DebtOverpaymentException`. |
-| TC-DEBT-05.3 | Người dùng thực hiện xóa nợ mà để trống trường lý do (`note`). | Hệ thống từ chối và ném lỗi `InvalidDebtTransactionException`. |
+| TC-DEBT-05.2 | Người dùng thực hiện xóa nợ với số tiền lớn hơn số dư nợ còn lại của đối tác. | Hệ thống từ chối và báo lỗi nghiệp vụ số tiền vượt quá dư nợ. |
+| TC-DEBT-05.3 | Người dùng thực hiện xóa nợ mà để trống trường lý do (`note`). | Hệ thống từ chối và báo lỗi nghiệp vụ giao dịch công nợ không hợp lệ. |
 
-### 4.6 FR-SAV: Phân hệ Quản lý sổ tiết kiệm
+### 4.6 FR-SAV: Phân hệ Sổ tiết kiệm
 
-Phân hệ Quản lý sổ tiết kiệm theo dõi các khoản tiền gửi tiết kiệm có kỳ hạn và không kỳ hạn tại các ngân hàng thương mại, tự động tính toán tiền lãi dự kiến và xử lý tất toán theo đúng quy chế ngân hàng tại quy tắc BR-FIN-05.
+Phân hệ Sổ tiết kiệm theo dõi các khoản tiền gửi tiết kiệm có kỳ hạn và không kỳ hạn tại các ngân hàng thương mại, tự động tính toán tiền lãi dự kiến và xử lý tất toán theo đúng quy chế ngân hàng tại quy tắc BR-FIN-05.
 
 #### 4.6.1 FR-SAV-01: Mở sổ tiết kiệm mới
 
@@ -1739,8 +1814,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-SAV-01 |
 | Tên | Mở sổ tiết kiệm mới |
-| Phân hệ nghiệp vụ | Quản lý sổ tiết kiệm (FR-SAV) |
-| Ca sử dụng tham chiếu | UC06: Quản lý sổ tiết kiệm có kỳ hạn và tính toán lãi suất |
+| Phân hệ nghiệp vụ | Sổ tiết kiệm (FR-SAV) |
+| Ca sử dụng tham chiếu | UC-SAV-01 đến UC-SAV-05 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống trích xuất tiền từ ví thanh toán chỉ định để mở sổ tiền gửi tiết kiệm mới, thiết lập vốn gốc, kỳ hạn, lãi suất cam kết và liên kết quỹ mục tiêu theo quy tắc BR-FIN-05 và BR-FIN-08. |
 
 Dữ liệu đầu vào:
@@ -1751,22 +1826,23 @@ Dữ liệu đầu vào:
 | `principal` | BigDecimal | Số vốn gốc gửi $principal > 0$, chuẩn hóa scale 2, chế độ làm tròn `RoundingMode.HALF_EVEN`. | Bắt buộc |
 | `term` | String | Chuỗi kỳ hạn thuộc tập hợp chuẩn hóa: `unlimited`, `1M`, `3M`, `6M`, `12M`, `24M`, `36M`, `60M`. | Bắt buộc |
 | `rate` | BigDecimal | Lãi suất cam kết (%/năm), $rate \ge 0$, scale tối thiểu 4 (ví dụ: 6.50% lưu là 6.5000). | Bắt buộc |
+| `interestMethod` | Enum | Thuộc tập hợp: `SIMPLE`, `COMPOUND_MONTHLY`, `PREPAID`, `POSTPAID` theo BR-FIN-05. Mặc định `SIMPLE` khi `term` khác `unlimited` và không chỉ định. | Tùy chọn |
 | `start` | LocalDate | Ngày bắt đầu gửi tiền, $start \le currentDate$. Mặc định: ngày hiện tại. | Bắt buộc |
 | `walletId` | String | Mã định danh ví trích tiền, ví ở trạng thái `ACTIVE`. | Bắt buộc |
 | `fund` | String | Mã quỹ mục tiêu liên kết (`emergency`, `health`, `target`, `retirement` hoặc tên quỹ hợp lệ). | Tùy chọn |
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực tham số tiền kiểm: Kiểm tra $principal > 0$ và $rate \ge 0$. Nếu vi phạm, hệ thống ném ngoại lệ `InvalidSavingsParameterException`.
-2. Kiểm tra số dư ví trích tiền theo BR-FIN-02: Hệ thống kiểm tra $Balance_{wallet} - principal \ge 0$ đối với ví thông thường. Nếu số dư khả dụng không đủ, hệ thống ném `InsufficientBalanceException` và từ chối mở sổ.
-3. Trừ vốn gốc $principal$ khỏi ví trích tiền theo BR-FIN-02:
-$$Balance_{wallet}(t) = Balance_{wallet}(t-1) - principal$$
+1. Xác thực tham số tiền kiểm: Kiểm tra $principal > 0$ và $rate \ge 0$. Nếu vi phạm, hệ thống báo lỗi nghiệp vụ tham số mở sổ tiết kiệm không hợp lệ.
+2. Kiểm tra số dư ví trích tiền theo BR-FIN-02: Hệ thống kiểm tra $Balance_{wallet} - principal \ge 0$ đối với ví thông thường. Nếu số dư khả dụng không đủ, hệ thống báo lỗi nghiệp vụ số dư ví không đủ và từ chối mở sổ.
+3. Trừ tiền khỏi ví trích tiền theo BR-FIN-02: Nếu `interestMethod` = `PREPAID`, hệ thống tính trước $ExpectedInterest$ theo công thức lãi đơn tại BR-FIN-05 và trừ $principal - ExpectedInterest$ khỏi ví; với các phương thức còn lại, trừ đủ $principal$:
+$$Balance_{wallet}(t) = Balance_{wallet}(t-1) - principal + \begin{cases} ExpectedInterest, & interestMethod = PREPAID \\ 0, & \text{ngược lại} \end{cases}$$
 4. Quy đổi số ngày kỳ hạn ($TermDays$) theo bảng chuẩn hóa tại BR-FIN-05:
   - `unlimited`: 0 ngày.
   - `1M`: 30 ngày; `3M`: 90 ngày; `6M`: 180 ngày; `12M`: 365 ngày; `24M`: 730 ngày; `36M`: 1095 ngày; `60M`: 1825 ngày.
 5. Xác định ngày đáo hạn:
 $$MaturityDate = \begin{cases} start + TermDays, & \text{khi } TermDays > 0 \\ \text{null}, & \text{khi } TermDays = 0 \end{cases}$$
-6. Khởi tạo bản ghi sổ tiết kiệm: Cấp phát mã định danh duy nhất `savingId`, trạng thái `OPEN`, số dư danh nghĩa ban đầu $Balance = principal$.
+6. Khởi tạo bản ghi sổ tiết kiệm: Cấp phát mã định danh duy nhất `savingId`, trạng thái `OPEN`, `interestMethod` đã xác thực, số dư danh nghĩa ban đầu $Balance = principal$.
 7. Thiết lập liên kết quỹ mục tiêu: Nếu tham số `fund` được cung cấp, gán mã quỹ cho sổ tiết kiệm và cập nhật cấu phần tiết kiệm của quỹ theo quy tắc không tính trùng BR-FIN-08.
 
 Dữ liệu đầu ra:
@@ -1782,8 +1858,9 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-SAV-01.1 | Cho ví "Vietcombank" có số dư 50,000,000.00 VNĐ. Người dùng mở sổ 30,000,000.00 VNĐ kỳ hạn `6M` (180 ngày), lãi suất 6.00%/năm tại Vietcombank. | Ví VCB giảm còn 20,000,000.00 VNĐ, sổ tiết kiệm được tạo thành công với vốn gốc 30,000,000.00 VNĐ, ngày đáo hạn bằng $start + 180$ ngày, trạng thái `OPEN`. |
-| TC-SAV-01.2 | Người dùng mở sổ với số tiền 25,000,000.00 VNĐ từ ví chỉ có số dư khả dụng 10,000,000.00 VNĐ. | Hệ thống từ chối và ném `InsufficientBalanceException`. |
-| TC-SAV-01.3 | Người dùng nhập vốn gốc bằng 0 hoặc số âm. | Hệ thống từ chối và ném `InvalidSavingsParameterException`. |
+| TC-SAV-01.2 | Người dùng mở sổ với số tiền 25,000,000.00 VNĐ từ ví chỉ có số dư khả dụng 10,000,000.00 VNĐ. | Hệ thống từ chối và báo lỗi nghiệp vụ số dư ví không đủ. |
+| TC-SAV-01.3 | Người dùng nhập vốn gốc bằng 0 hoặc số âm. | Hệ thống từ chối và báo lỗi nghiệp vụ tham số mở sổ tiết kiệm không hợp lệ. |
+| TC-SAV-01.4 | Cho ví "ACB" có số dư 30,000,000.00 VNĐ. Người dùng mở sổ 20,000,000.00 VNĐ kỳ hạn `12M` (365 ngày), lãi suất 6.00%/năm, `interestMethod` = `PREPAID`. | Hệ thống tính $ExpectedInterest$ = 1,200,000.00 VNĐ, trừ ví ACB đúng 18,800,000.00 VNĐ (còn 11,200,000.00 VNĐ), sổ tiết kiệm ghi nhận vốn gốc danh nghĩa đủ 20,000,000.00 VNĐ. |
 
 #### 4.6.2 FR-SAV-02: Tính toán tiền lãi dự kiến và theo dõi kỳ hạn
 
@@ -1793,8 +1870,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-SAV-02 |
 | Tên | Tính lãi dự kiến và theo dõi kỳ hạn |
-| Phân hệ nghiệp vụ | Quản lý sổ tiết kiệm (FR-SAV) |
-| Ca sử dụng tham chiếu | UC06: Quản lý sổ tiết kiệm có kỳ hạn và tính toán lãi suất |
+| Phân hệ nghiệp vụ | Sổ tiết kiệm (FR-SAV) |
+| Ca sử dụng tham chiếu | UC-SAV-01 đến UC-SAV-05 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tự động tính toán số ngày đã gửi thực tế, tiến độ thời gian kỳ hạn, tiền lãi dự kiến toàn kỳ và giá trị danh nghĩa của sổ tiết kiệm tại thời điểm quan sát theo quy tắc BR-FIN-05. |
 
 Dữ liệu đầu vào:
@@ -1854,8 +1931,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-SAV-03 |
 | Tên | Tất toán sổ tiết kiệm đúng hạn |
-| Phân hệ nghiệp vụ | Quản lý sổ tiết kiệm (FR-SAV) |
-| Ca sử dụng tham chiếu | UC06: Quản lý sổ tiết kiệm có kỳ hạn và tính toán lãi suất |
+| Phân hệ nghiệp vụ | Sổ tiết kiệm (FR-SAV) |
+| Ca sử dụng tham chiếu | UC-SAV-01 đến UC-SAV-05 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống đóng sổ tiết kiệm khi đã đến hoặc quá ngày đáo hạn, nhận trọn vẹn vốn gốc và 100% tiền lãi cam kết chuyển về ví thanh toán chỉ định theo quy tắc BR-FIN-05. |
 
 Dữ liệu đầu vào:
@@ -1868,7 +1945,7 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra trạng thái sổ: Sổ tiết kiệm phải đang ở trạng thái `OPEN`. Nếu sổ đã đóng trước đó, hệ thống ném ngoại lệ `IllegalStateException`.
+1. Kiểm tra trạng thái sổ: Sổ tiết kiệm phải đang ở trạng thái `OPEN`. Nếu sổ đã đóng trước đó, hệ thống báo lỗi nghiệp vụ trạng thái đối tượng không hợp lệ cho thao tác.
 2. Xác thực điều kiện tất toán đúng hạn: Ngày tất toán phải lớn hơn hoặc bằng ngày đáo hạn ($settleDate \ge MaturityDate$, tương đương $Days \ge TermDays$). Nếu $settleDate < MaturityDate$, hệ thống từ chối thực hiện và yêu cầu chuyển sang quy trình tất toán trước hạn (FR-SAV-04).
 3. Tính tổng số tiền thực nhận theo BR-FIN-05:
 $$Payout = Principal + ExpectedInterest = Principal + \frac{Principal \times Rate \times TermDays}{365}$$
@@ -1901,8 +1978,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-SAV-04 |
 | Tên | Tất toán sổ tiết kiệm trước hạn |
-| Phân hệ nghiệp vụ | Quản lý sổ tiết kiệm (FR-SAV) |
-| Ca sử dụng tham chiếu | UC06: Quản lý sổ tiết kiệm có kỳ hạn và tính toán lãi suất |
+| Phân hệ nghiệp vụ | Sổ tiết kiệm (FR-SAV) |
+| Ca sử dụng tham chiếu | UC-SAV-01 đến UC-SAV-05 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống xử lý tất toán rút tiền trước ngày đáo hạn, áp dụng cơ chế hồi tố lãi suất không kỳ hạn, tính toán số tiền lãi bị thiệt hại và chuyển tiền thực nhận về ví thanh toán theo quy tắc BR-FIN-05. |
 
 Dữ liệu đầu vào:
@@ -1951,6 +2028,55 @@ Tiêu chí nghiệm thu:
 | TC-SAV-04.1 | Cho sổ 100,000,000.00 VNĐ kỳ hạn 365 ngày lãi suất 6.00%/năm, gửi được 90 ngày thì tất toán trước hạn với lãi không kỳ hạn 0.20%/năm. | Hệ thống tính lãi thực nhận là $(100,000,000 \times 0.002 \times 90) / 365 = 49,315.07$ VNĐ; ví nhận được cộng 100,049,315.07 VNĐ; cảnh báo lãi dự kiến bị mất là $(6,000,000 \times 90 / 365) - 49,315.07 = 1,430,136.98$ VNĐ. |
 | TC-SAV-04.2 | Người dùng yêu cầu tất toán trước hạn nhưng tham số `confirmed` là `false`. | Hệ thống trả về thông số tài chính để người dùng xem xét, không thay đổi số dư ví và giữ nguyên trạng thái sổ tiết kiệm. |
 
+#### 4.6.5 FR-SAV-05: Tái tục sổ tiết kiệm với điều khoản mới
+
+Bảng thông tin yêu cầu:
+
+| Thuộc tính | Đặc tả kỹ thuật |
+| --- | --- |
+| Mã | FR-SAV-05 |
+| Tên | Tái tục sổ tiết kiệm với điều khoản mới |
+| Phân hệ nghiệp vụ | Sổ tiết kiệm (FR-SAV) |
+| Ca sử dụng tham chiếu | UC-SAV-06 (chi tiết xem Mục 8.1) |
+| Mô tả kỹ thuật | Hệ thống đóng một sổ tiết kiệm đã tất toán đúng hạn và mở một sổ tiết kiệm mới với kỳ hạn, lãi suất và phương thức lãi do người dùng chỉ định lại, trích một phần hoặc toàn bộ giá trị tất toán làm vốn gốc mới theo quy tắc BR-FIN-05. |
+
+Dữ liệu đầu vào:
+
+| Tham số | Kiểu dữ liệu | Ràng buộc giá trị | Bắt buộc / Tùy chọn |
+| --- | --- | --- | --- |
+| `sourceSavingId` | String | Mã sổ tiết kiệm nguồn, bắt buộc đang ở trạng thái `SETTLED_MATURED`. | Bắt buộc |
+| `rolloverAmount` | BigDecimal | Vốn gốc tái tục cho sổ mới, $0 < rolloverAmount \le Payout_{mature}$ của sổ nguồn. | Bắt buộc |
+| `walletId` | String | Mã định danh ví hiện đang giữ khoản tất toán của sổ nguồn, ví ở trạng thái `ACTIVE`, $Balance_{wallet} \ge rolloverAmount$. | Bắt buộc |
+| `newTerm` | String | Kỳ hạn mới, cùng miền giá trị với `term` tại FR-SAV-01. | Bắt buộc |
+| `newRate` | BigDecimal | Lãi suất cam kết mới (%/năm), $newRate \ge 0$. | Bắt buộc |
+| `newInterestMethod` | Enum | Phương thức lãi mới theo BR-FIN-05, thuộc {`SIMPLE`, `COMPOUND_MONTHLY`, `PREPAID`, `POSTPAID`}. | Bắt buộc |
+| `bank` | String | Tên ngân hàng hoặc tổ chức tín dụng cho sổ mới. Mặc định: giữ nguyên ngân hàng của sổ nguồn. | Tùy chọn |
+
+Quy tắc xử lý và ràng buộc:
+
+1. Kiểm tra điều kiện tái tục theo BR-FIN-05: Sổ nguồn `sourceSavingId` phải đang ở trạng thái `SETTLED_MATURED`. Nếu sổ chưa tất toán đúng hạn hoặc đang ở trạng thái khác, hệ thống từ chối và báo lỗi nghiệp vụ sổ tiết kiệm chưa đủ điều kiện tái tục.
+2. Kiểm tra vốn gốc tái tục: Nếu $rolloverAmount > Payout_{mature}$ đã ghi nhận của sổ nguồn, hệ thống từ chối và báo lỗi nghiệp vụ vốn gốc tái tục vượt quá giá trị tất toán.
+3. Kiểm tra số dư ví trích tiền theo BR-FIN-02: Nếu $Balance_{wallet} < rolloverAmount$, hệ thống báo lỗi nghiệp vụ số dư ví không đủ và từ chối tái tục.
+4. Trừ $rolloverAmount$ khỏi ví trích tiền theo BR-FIN-02, sau đó thực thi lại toàn bộ quy tắc khởi tạo sổ mới của FR-SAV-01 với `principal = rolloverAmount`, `term = newTerm`, `rate = newRate`, `interestMethod = newInterestMethod`.
+5. Gắn nhãn truy vết: Sổ mới lưu trường `rolledFrom = sourceSavingId` để phục vụ truy vết lịch sử, không kế thừa số ngày gửi hay lãi suất của sổ nguồn.
+6. Xử lý phần chênh lệch: Phần $Payout_{mature} - rolloverAmount$ (nếu có) vẫn giữ nguyên trong ví theo BR-FIN-02, không phát sinh bút toán bổ sung.
+
+Dữ liệu đầu ra:
+
+| Thành phần | Đặc tả kỹ thuật |
+| --- | --- |
+| Bản ghi dữ liệu | Đối tượng sổ tiết kiệm mới (`SavingAccount`) với mã `savingId` mới, trạng thái `OPEN`, trường `rolledFrom` trỏ về sổ nguồn. |
+| Biến động số dư | Số dư ví trích tiền giảm $rolloverAmount$; tổng tài sản sổ tiết kiệm $Savings$ tăng $rolloverAmount$; tổng tài sản ròng $NetWorth$ giữ nguyên tại thời điểm tái tục. |
+| Thông báo phản hồi | Thông báo tái tục thành công kèm thông tin sổ mới (kỳ hạn, lãi suất, phương thức lãi, ngày đáo hạn) và số tiền còn lại trong ví nếu tái tục một phần. |
+
+Tiêu chí nghiệm thu:
+
+| Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
+| --- | --- | --- |
+| TC-SAV-05.1 | Sổ nguồn đã tất toán đúng hạn với $Payout_{mature}$ = 51,479,452.05 VNĐ tại ví MB Bank. Người dùng tái tục toàn bộ với kỳ hạn `12M`, lãi suất 6.50%/năm, `interestMethod` = `SIMPLE`. | Ví MB Bank giảm đúng 51,479,452.05 VNĐ, sổ mới được tạo với vốn gốc 51,479,452.05 VNĐ, trạng thái `OPEN`, `rolledFrom` trỏ về sổ nguồn. |
+| TC-SAV-05.2 | Sổ nguồn đang ở trạng thái `OPEN` (chưa tất toán). Người dùng yêu cầu tái tục. | Hệ thống từ chối và báo lỗi nghiệp vụ sổ tiết kiệm chưa đủ điều kiện tái tục. |
+| TC-SAV-05.3 | Sổ nguồn có $Payout_{mature}$ = 30,000,000.00 VNĐ. Người dùng nhập `rolloverAmount` = 35,000,000.00 VNĐ. | Hệ thống từ chối và báo lỗi nghiệp vụ vốn gốc tái tục vượt quá giá trị tất toán. |
+
 ### 4.7 FR-INV: Phân hệ Chứng chỉ quỹ đầu tư
 
 Phân hệ Chứng chỉ quỹ đầu tư quản lý các tài sản đầu tư tài chính của người dùng, định giá danh mục theo giá thị trường dựa trên NAV và theo dõi tỷ suất sinh lời thực tế theo quy tắc BR-FIN-06.
@@ -1964,7 +2090,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-INV-01 |
 | Tên | Ghi nhận lệnh mua chứng chỉ quỹ |
 | Phân hệ nghiệp vụ | Chứng chỉ quỹ đầu tư (FR-INV) |
-| Ca sử dụng tham chiếu | UC07: Quản lý danh mục chứng chỉ quỹ đầu tư và biến động NAV |
+| Ca sử dụng tham chiếu | UC-INV-01 đến UC-INV-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống trích xuất tiền từ ví thanh toán chỉ định để mua chứng chỉ quỹ mở, tính toán số lượng đơn vị quỹ sở hữu theo đơn giá NAV khớp lệnh và ghi nhận vào danh mục đầu tư theo quy tắc BR-FIN-06. |
 
 Dữ liệu đầu vào:
@@ -1981,8 +2107,8 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra tiền điều kiện: Xác thực $principal > 0$ và $buyNav > 0$. Nếu $buyNav \le 0$, ném `InvalidNAVException`. Nếu $principal \le 0$, ném `InvalidInvestmentPrincipalException`.
-2. Kiểm tra số dư ví trích tiền theo BR-FIN-02: Hệ thống kiểm tra $Balance_{wallet} - principal \ge 0$. Nếu không đủ số dư chi trả, ném `InsufficientBalanceException`.
+1. Kiểm tra tiền điều kiện: Xác thực $principal > 0$ và $buyNav > 0$. Nếu $buyNav \le 0$, báo lỗi nghiệp vụ đơn giá NAV không hợp lệ. Nếu $principal \le 0$, báo lỗi nghiệp vụ vốn đầu tư không hợp lệ.
+2. Kiểm tra số dư ví trích tiền theo BR-FIN-02: Hệ thống kiểm tra $Balance_{wallet} - principal \ge 0$. Nếu không đủ số dư chi trả, báo lỗi nghiệp vụ số dư ví không đủ.
 3. Trừ số vốn $principal$ khỏi ví trích tiền theo BR-FIN-02:
 $$Balance_{wallet}(t) = Balance_{wallet}(t-1) - principal$$
 4. Tính toán số lượng đơn vị quỹ ($Units$) sở hữu theo BR-FIN-06:
@@ -2005,8 +2131,8 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-INV-01.1 | Cho ví "Timo" có số dư 20,000,000.00 VNĐ. Người dùng mua chứng chỉ quỹ DCDS với số tiền 10,000,000.00 VNĐ tại NAV 50,000.00 VNĐ/CCQ. | Ví Timo giảm còn 10,000,000.00 VNĐ, hệ thống ghi nhận sở hữu đúng 200.0000 CCQ DCDS, trạng thái `HOLDING`. |
-| TC-INV-01.2 | Người dùng nhập vốn đầu tư lớn hơn số dư khả dụng của ví trích tiền. | Hệ thống từ chối và ném `InsufficientBalanceException`. |
-| TC-INV-01.3 | Người dùng nhập đơn giá NAV bằng 0 hoặc số âm. | Hệ thống từ chối và ném `InvalidNAVException`. |
+| TC-INV-01.2 | Người dùng nhập vốn đầu tư lớn hơn số dư khả dụng của ví trích tiền. | Hệ thống từ chối và báo lỗi nghiệp vụ số dư ví không đủ. |
+| TC-INV-01.3 | Người dùng nhập đơn giá NAV bằng 0 hoặc số âm. | Hệ thống từ chối và báo lỗi nghiệp vụ đơn giá NAV không hợp lệ. |
 
 #### 4.7.2 FR-INV-02: Cập nhật giá trị tài sản ròng (NAV)
 
@@ -2017,7 +2143,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-INV-02 |
 | Tên | Cập nhật giá trị tài sản ròng (NAV) |
 | Phân hệ nghiệp vụ | Chứng chỉ quỹ đầu tư (FR-INV) |
-| Ca sử dụng tham chiếu | UC07: Quản lý danh mục chứng chỉ quỹ đầu tư và biến động NAV |
+| Ca sử dụng tham chiếu | UC-INV-01 đến UC-INV-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống cập nhật đơn giá NAV thị trường mới nhất của các mã chứng chỉ quỹ, tự động định giá lại toàn bộ các lô quỹ đang nắm giữ theo cơ chế Mark-to-Market và lưu lịch sử hiệu suất quỹ theo quy tắc BR-FIN-06. |
 
 Dữ liệu đầu vào:
@@ -2030,7 +2156,7 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực đơn giá NAV: Kiểm tra $latestNav > 0$. Nếu nhỏ hơn hoặc bằng 0, ném `InvalidNAVException` và từ chối cập nhật.
+1. Xác thực đơn giá NAV: Kiểm tra $latestNav > 0$. Nếu nhỏ hơn hoặc bằng 0, báo lỗi nghiệp vụ đơn giá NAV không hợp lệ và từ chối cập nhật.
 2. Truy vấn danh mục nắm giữ: Tìm tất cả các bản ghi đầu tư trong danh sách `fund_certs` có mã quỹ là `name` và đang ở trạng thái `HOLDING`.
 3. Định giá lại theo giá thị trường theo BR-FIN-06:
 $$MarketValue = Units \times latestNav$$
@@ -2053,7 +2179,7 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-INV-02.1 | Cho lô chứng chỉ quỹ DCDS sở hữu 200.0000 CCQ với NAV mua 50,000.00 VNĐ (giá trị ban đầu 10,000,000.00 VNĐ). Người dùng cập nhật NAV mới là 55,000.00 VNĐ. | Giá trị thị trường hiện tại của lô quỹ tự động tăng lên 11,000,000.00 VNĐ. |
-| TC-INV-02.2 | Người dùng nhập NAV mới bằng 0 hoặc số âm. | Hệ thống từ chối cập nhật và ném `InvalidNAVException`. |
+| TC-INV-02.2 | Người dùng nhập NAV mới bằng 0 hoặc số âm. | Hệ thống từ chối cập nhật và báo lỗi nghiệp vụ đơn giá NAV không hợp lệ. |
 
 #### 4.7.3 FR-INV-03: Định giá thị trường và tính lãi lỗ chưa thực hiện
 
@@ -2064,7 +2190,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-INV-03 |
 | Tên | Định giá thị trường và tính lãi lỗ chưa thực hiện |
 | Phân hệ nghiệp vụ | Chứng chỉ quỹ đầu tư (FR-INV) |
-| Ca sử dụng tham chiếu | UC07: Quản lý danh mục chứng chỉ quỹ đầu tư và biến động NAV |
+| Ca sử dụng tham chiếu | UC-INV-01 đến UC-INV-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tự động tính toán lãi lỗ chưa thực hiện, tỷ suất lợi nhuận tuyệt đối và suất sinh lời quy đổi năm CAGR cho từng khoản đầu tư và toàn bộ danh mục theo quy tắc BR-FIN-06. |
 
 Dữ liệu đầu vào:
@@ -2114,7 +2240,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-INV-04 |
 | Tên | Ghi nhận bán chứng chỉ quỹ |
 | Phân hệ nghiệp vụ | Chứng chỉ quỹ đầu tư (FR-INV) |
-| Ca sử dụng tham chiếu | UC07: Quản lý danh mục chứng chỉ quỹ đầu tư và biến động NAV |
+| Ca sử dụng tham chiếu | UC-INV-01 đến UC-INV-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống ghi nhận giao dịch bán một phần hoặc toàn bộ chứng chỉ quỹ đang nắm giữ, kết chuyển tiền ròng về ví thanh toán chỉ định, đóng vị thế và ghi nhận lãi lỗ thực tế đã hiện thực hóa theo quy tắc BR-FIN-06 và BR-FIN-02. |
 
 Dữ liệu đầu vào:
@@ -2130,7 +2256,7 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra số lượng bán hợp lệ: $sellUnits \le Units$ hiện có của lô quỹ. Nếu $sellUnits > Units$, hệ thống ném ngoại lệ `IllegalArgumentException` và từ chối lệnh bán.
+1. Kiểm tra số lượng bán hợp lệ: $sellUnits \le Units$ hiện có của lô quỹ. Nếu $sellUnits > Units$, hệ thống báo lỗi nghiệp vụ tham số đầu vào không hợp lệ và từ chối lệnh bán.
 2. Tính tổng số tiền thu về gộp từ lệnh bán:
 $$GrossProceeds = sellUnits \times sellNav$$
 3. Tính số tiền ròng thực nhận sau thuế và phí:
@@ -2161,11 +2287,11 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-INV-04.1 | Cho khoản đầu tư sở hữu 200.0000 CCQ với tổng giá vốn 10,000,000.00 VNĐ. Người dùng bán 100.0000 CCQ tại giá 60,000.00 VNĐ/CCQ, phí 0.00 VNĐ về ví MB Bank. | Ví MB Bank tăng 6,000,000.00 VNĐ, lợi nhuận thực hiện ghi nhận là +1,000,000.00 VNĐ, lô quỹ còn lại 100.0000 CCQ với giá vốn 5,000,000.00 VNĐ. |
-| TC-INV-04.2 | Người dùng nhập số lượng bán lớn hơn số lượng CCQ hiện có trong tài khoản. | Hệ thống từ chối và ném lỗi `IllegalArgumentException`. |
+| TC-INV-04.2 | Người dùng nhập số lượng bán lớn hơn số lượng CCQ hiện có trong tài khoản. | Hệ thống từ chối và báo lỗi nghiệp vụ tham số đầu vào không hợp lệ. |
 
-### 4.8 FR-FND: Phân hệ Quản lý quỹ mục tiêu
+### 4.8 FR-FND: Phân hệ Quỹ mục tiêu
 
-Phân hệ Quản lý quỹ mục tiêu thiết lập cơ chế quy hoạch và tổng hợp các nguồn lực tài chính đa dạng (tiền mặt thanh khoản, sổ tiết kiệm và chứng chỉ quỹ đầu tư) để phục vụ các mục tiêu dài hạn của người dùng theo quy tắc BR-FIN-08.
+Phân hệ Quỹ mục tiêu thiết lập cơ chế quy hoạch và tổng hợp các nguồn lực tài chính đa dạng (tiền mặt thanh khoản, sổ tiết kiệm và chứng chỉ quỹ đầu tư) để phục vụ các mục tiêu dài hạn của người dùng theo quy tắc BR-FIN-08.
 
 #### 4.8.1 FR-FND-01: Thiết lập quỹ tài chính mục tiêu
 
@@ -2175,8 +2301,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-FND-01 |
 | Tên | Thiết lập quỹ tài chính mục tiêu |
-| Phân hệ nghiệp vụ | Quản lý quỹ mục tiêu (FR-FND) |
-| Ca sử dụng tham chiếu | UC08: Quản lý quỹ mục tiêu tài chính và phân bổ dòng tiền |
+| Phân hệ nghiệp vụ | Quỹ mục tiêu (FR-FND) |
+| Ca sử dụng tham chiếu | UC-FND-01 đến UC-FND-05 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống khởi tạo quỹ tài chính mục tiêu mới thuộc 4 nhóm chuẩn hóa hoặc quỹ tùy biến, xác định số tiền đích cần tích lũy và thời hạn hoàn thành theo quy tắc BR-FIN-08. |
 
 Dữ liệu đầu vào:
@@ -2191,8 +2317,8 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra tính duy nhất: Mã `fundCode` không được trùng lặp với các quỹ đã tồn tại trong hệ thống. Nếu trùng lặp, hệ thống ném `DuplicateFundCodeException`.
-2. Xác thực số tiền mục tiêu: Ràng buộc $targetAmount \ge 0$. Nếu $targetAmount < 0$, hệ thống ném ngoại lệ `InvalidGoalTargetException`.
+1. Kiểm tra tính duy nhất: Mã `fundCode` không được trùng lặp với các quỹ đã tồn tại trong hệ thống. Nếu trùng lặp, hệ thống báo lỗi nghiệp vụ mã quỹ đã tồn tại.
+2. Xác thực số tiền mục tiêu: Ràng buộc $targetAmount \ge 0$. Nếu $targetAmount < 0$, hệ thống báo lỗi nghiệp vụ số tiền mục tiêu không hợp lệ.
 3. Xử lý trường hợp đặc biệt $targetAmount = 0$: Hệ thống ghi nhận đây là quỹ theo dõi tích lũy mở (không giới hạn trần tích lũy), tiến độ khởi tạo quy ước là 100.00% khi số dư không âm.
 4. Khởi tạo cấu trúc tài sản quỹ: Thiết lập 3 cấu phần tài sản ban đầu đều bằng 0.00 VNĐ:
   - Tiền mặt phân bổ: $Cash_{fund} = 0.00$ VNĐ (lưu trong danh mục `funds_cash`).
@@ -2213,8 +2339,8 @@ Tiêu chí nghiệm thu:
 | Mã | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | --- | --- | --- |
 | TC-FND-01.1 | Người dùng tạo quỹ "emergency" với tên "Quỹ dự phòng khẩn cấp", mục tiêu 60,000,000.00 VNĐ. | Hệ thống lưu thành công với tổng tài sản ban đầu 0.00 VNĐ và tiến độ hiển thị 0.00%. |
-| TC-FND-01.2 | Người dùng nhập số tiền mục tiêu là số âm (-10,000,000.00 VNĐ). | Hệ thống từ chối và ném `InvalidGoalTargetException`. |
-| TC-FND-01.3 | Người dùng tạo quỹ có `fundCode` đã tồn tại trong hệ thống. | Hệ thống từ chối và ném `DuplicateFundCodeException`. |
+| TC-FND-01.2 | Người dùng nhập số tiền mục tiêu là số âm (-10,000,000.00 VNĐ). | Hệ thống từ chối và báo lỗi nghiệp vụ số tiền mục tiêu không hợp lệ. |
+| TC-FND-01.3 | Người dùng tạo quỹ có `fundCode` đã tồn tại trong hệ thống. | Hệ thống từ chối và báo lỗi nghiệp vụ mã quỹ đã tồn tại. |
 
 #### 4.8.2 FR-FND-02: Phân bổ tài sản vào quỹ mục tiêu
 
@@ -2224,8 +2350,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-FND-02 |
 | Tên | Phân bổ tài sản vào quỹ mục tiêu |
-| Phân hệ nghiệp vụ | Quản lý quỹ mục tiêu (FR-FND) |
-| Ca sử dụng tham chiếu | UC08: Quản lý quỹ mục tiêu tài chính và phân bổ dòng tiền |
+| Phân hệ nghiệp vụ | Quỹ mục tiêu (FR-FND) |
+| Ca sử dụng tham chiếu | UC-FND-01 đến UC-FND-05 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống phân bổ các nguồn tài sản gồm tiền mặt dành riêng, sổ tiết kiệm và chứng chỉ quỹ đầu tư vào từng quỹ mục tiêu, bảo đảm bất biến không tính trùng tài sản theo quy tắc BR-FIN-08. |
 
 Dữ liệu đầu vào:
@@ -2239,13 +2365,10 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực tham số tiền mặt: Kiểm tra $cashAmount \ge 0$. Nếu âm, ném `InvalidCashAllocationException`. Kiểm tra tổng tiền mặt phân bổ cho mọi quỹ không vượt quá tổng số dư thanh khoản khả dụng trên toàn bộ các ví:
+1. Xác thực tham số tiền mặt: Kiểm tra $cashAmount \ge 0$. Nếu âm, báo lỗi nghiệp vụ số tiền mặt phân bổ không hợp lệ. Kiểm tra tổng tiền mặt phân bổ cho mọi quỹ không vượt quá tổng số dư thanh khoản khả dụng trên toàn bộ các ví:
 $$\sum_{f \in Funds} Cash_f \le \sum_{w \in Wallets} Balance_w$$
 2. Cập nhật tiền mặt phân bổ: Lưu giá trị $cashAmount$ vào danh mục `funds_cash` cho quỹ tương ứng.
-3. Bất biến không tính trùng tài sản theo BR-FIN-08:
-  - Mỗi sổ tiết kiệm $s$ và mỗi lô chứng chỉ quỹ $c$ chỉ được phép thuộc về duy nhất một quỹ mục tiêu tại một thời điểm:
-   $$\forall s \in Savings, \quad \sum_{f \in Funds} \mathbb{I}(s \in Savings_f) \le 1$$
-   $$\forall c \in FundCerts, \quad \sum_{f \in Funds} \mathbb{I}(c \in FundCerts_f) \le 1$$
+3. Bất biến không tính trùng tài sản theo BR-FIN-08: Mỗi sổ tiết kiệm hoặc khoản chứng chỉ quỹ chỉ được liên kết với tối đa một quỹ mục tiêu tại một thời điểm.
 4. Cơ chế chuyển dịch quyền sở hữu tài sản: Nếu sổ tiết kiệm hoặc chứng chỉ quỹ trước đó đang liên kết với quỹ $f_{old}$, hệ thống tự động gỡ bỏ liên kết khỏi $f_{old}$ và gán vào quỹ mới `fundCode`, bảo đảm tổng tài sản toàn hệ thống được bảo toàn theo BR-FIN-08:
 $$\Delta Total_{f_{old}} = -Balance_a, \quad \Delta Total_{fundCode} = +Balance_a, \quad \Delta \sum Total = 0$$
 5. Tự động tính toán lại tiến độ tích lũy của các quỹ bị ảnh hưởng.
@@ -2274,8 +2397,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-FND-03 |
 | Tên | Theo dõi tiến độ tích lũy quỹ |
-| Phân hệ nghiệp vụ | Quản lý quỹ mục tiêu (FR-FND) |
-| Ca sử dụng tham chiếu | UC08: Quản lý quỹ mục tiêu tài chính và phân bổ dòng tiền |
+| Phân hệ nghiệp vụ | Quỹ mục tiêu (FR-FND) |
+| Ca sử dụng tham chiếu | UC-FND-01 đến UC-FND-05 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tự động tổng hợp giá trị hiện tại của 3 cấu phần tài sản và tính toán tỷ lệ phần trăm hoàn thành mục tiêu, xử lý an toàn điều kiện chia cho 0 theo quy tắc BR-FIN-08. |
 
 Dữ liệu đầu vào:
@@ -2332,8 +2455,8 @@ Bảng thông tin yêu cầu:
 | --- | --- |
 | Mã | FR-FND-04 |
 | Tên | Điều chỉnh và tái phân bổ quỹ mục tiêu |
-| Phân hệ nghiệp vụ | Quản lý quỹ mục tiêu (FR-FND) |
-| Ca sử dụng tham chiếu | UC08: Quản lý quỹ mục tiêu tài chính và phân bổ dòng tiền |
+| Phân hệ nghiệp vụ | Quỹ mục tiêu (FR-FND) |
+| Ca sử dụng tham chiếu | UC-FND-01 đến UC-FND-05 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống cho phép điều chỉnh số tiền mục tiêu, hạn chót hoàn thành hoặc tái điều chuyển tỷ trọng phân bổ tài sản giữa các quỹ, bảo toàn tổng giá trị tài sản theo quy tắc BR-FIN-08. |
 
 Dữ liệu đầu vào:
@@ -2347,7 +2470,7 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Xác thực số tiền mục tiêu mới: Ràng buộc $newTarget \ge 0$. Nếu âm, hệ thống ném `InvalidGoalTargetException`.
+1. Xác thực số tiền mục tiêu mới: Ràng buộc $newTarget \ge 0$. Nếu âm, hệ thống báo lỗi nghiệp vụ số tiền mục tiêu không hợp lệ.
 2. Cập nhật thông tin quỹ: Ghi nhận $newTarget$ và $newDeadline$ vào danh sách `funds`.
 3. Cập nhật tiền mặt phân bổ: Nếu có tham số $newCashAmount$, cập nhật giá trị mới vào danh mục `funds_cash`, kiểm tra không vượt tổng tiền mặt khả dụng trên các ví.
 4. Tính toán lại tức thời: Hệ thống tính toán lại ngay lập tức tỷ lệ tiến độ $Process$ và trạng thái hoàn thành dựa trên $newTarget$.
@@ -2381,7 +2504,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-REP-01 |
 | Tên | Bảng thống kê dòng tiền trượt 12 tháng |
 | Phân hệ nghiệp vụ | Thống kê và Báo cáo (FR-REP) |
-| Ca sử dụng tham chiếu | UC09: Tra cứu bảng thống kê dòng tiền trượt 12 tháng và phân tích tỷ lệ tiết kiệm |
+| Ca sử dụng tham chiếu | UC-REP-01 đến UC-REP-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tự động tổng hợp và hiển thị chuỗi thời gian 12 tháng gần nhất tự động trượt theo ngày hệ thống, tính toán tổng thu nhập, tổng chi tiêu, dòng tiền thuần và tỷ lệ tiết kiệm từng tháng theo quy tắc BR-FIN-01. |
 
 Dữ liệu đầu vào:
@@ -2432,7 +2555,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-REP-02 |
 | Tên | Báo cáo cơ cấu thu chi theo nhóm và danh mục |
 | Phân hệ nghiệp vụ | Thống kê và Báo cáo (FR-REP) |
-| Ca sử dụng tham chiếu | UC09: Tra cứu bảng thống kê dòng tiền trượt 12 tháng và phân tích tỷ lệ tiết kiệm |
+| Ca sử dụng tham chiếu | UC-REP-01 đến UC-REP-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tổng hợp, phân tích tỷ trọng và so sánh biến động cơ cấu thu nhập hoặc chi tiêu theo 2 tầng phân cấp gồm Nhóm nhu cầu và Danh mục chi tiết theo quy tắc BR-FIN-04. |
 
 Dữ liệu đầu vào:
@@ -2487,7 +2610,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-REP-03 |
 | Tên | Báo cáo tổng tài sản và giá trị tài sản ròng |
 | Phân hệ nghiệp vụ | Thống kê và Báo cáo (FR-REP) |
-| Ca sử dụng tham chiếu | UC09: Tra cứu bảng thống kê dòng tiền trượt 12 tháng và phân tích tỷ lệ tiết kiệm |
+| Ca sử dụng tham chiếu | UC-REP-01 đến UC-REP-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống tổng hợp 5 cấu phần tài sản tại thời điểm quan sát để xác định Giá trị tài sản ròng và phân tích cơ cấu phân bổ tài sản tổng thể theo quy tắc kế toán chuẩn mực. |
 
 Dữ liệu đầu vào:
@@ -2549,7 +2672,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-REP-04 |
 | Tên | Sao kê công nợ chi tiết theo đối tác |
 | Phân hệ nghiệp vụ | Thống kê và Báo cáo (FR-REP) |
-| Ca sử dụng tham chiếu | UC09: Tra cứu bảng thống kê dòng tiền trượt 12 tháng và phân tích tỷ lệ tiết kiệm |
+| Ca sử dụng tham chiếu | UC-REP-01 đến UC-REP-04 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống lập bảng sao kê chi tiết toàn bộ lịch sử phát sinh và số dư công nợ lũy kế đối ứng với từng cá nhân đối tác theo trình tự thời gian theo quy tắc BR-FIN-07. |
 
 Dữ liệu đầu vào:
@@ -2601,7 +2724,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-DAT-01 |
 | Tên | Xuất dữ liệu tài chính |
 | Phân hệ nghiệp vụ | Xuất nhập và Sao lưu dữ liệu (FR-DAT) |
-| Ca sử dụng tham chiếu | UC10: Sao lưu, xuất và nhập dữ liệu tài chính |
+| Ca sử dụng tham chiếu | UC-DAT-01 đến UC-DAT-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống xuất toàn bộ hoặc từng phần dữ liệu sổ cái, danh mục và cấu hình ra các tệp tin cục bộ theo định dạng tiêu chuẩn (JSON hoặc CSV) chuẩn UTF-8 phục vụ lưu trữ hoặc chia sẻ dữ liệu. |
 
 Dữ liệu đầu vào:
@@ -2646,7 +2769,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-DAT-02 |
 | Tên | Nhập và phục hồi dữ liệu |
 | Phân hệ nghiệp vụ | Xuất nhập và Sao lưu dữ liệu (FR-DAT) |
-| Ca sử dụng tham chiếu | UC10: Sao lưu, xuất và nhập dữ liệu tài chính |
+| Ca sử dụng tham chiếu | UC-DAT-01 đến UC-DAT-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống nạp và phục hồi dữ liệu từ tệp sao lưu, thực hiện quy trình kiểm định toàn vẹn 4 bước và cơ chế giao dịch toàn vẹn (All-or-Nothing hoặc Rollback) trước khi ghi vào hệ thống. |
 
 Dữ liệu đầu vào:
@@ -2658,13 +2781,13 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý và ràng buộc:
 
-1. Kiểm tra cấu trúc tệp: Đọc tệp và phân tích cú pháp (Parse JSON hoặc CSV). Nếu tệp hỏng, sai cấu trúc hoặc không đúng chuẩn UTF-8, hệ thống từ chối nạp và ném `InvalidDataFormatException`.
+1. Kiểm tra cấu trúc tệp: Đọc tệp và phân tích cú pháp (Parse JSON hoặc CSV). Nếu tệp hỏng, sai cấu trúc hoặc không đúng chuẩn UTF-8, hệ thống từ chối nạp và báo lỗi nghiệp vụ định dạng dữ liệu không hợp lệ.
 2. Quy trình kiểm định toàn vẹn 4 bước:
   - Bước 1 (Kiểm tra định dạng): Xác thực các trường bắt buộc, định dạng ngày tháng (YYYY-MM-DD), chuỗi số học hợp lệ.
   - Bước 2 (Toàn vẹn danh mục theo BR-FIN-04): Mọi `categoryId` trong các giao dịch phải tham chiếu tới một danh mục hợp lệ có thuộc tính `Type` tương thích.
   - Bước 3 (Toàn vẹn ví tiền): Mọi giao dịch, chuyển tiền, công nợ, tiết kiệm, đầu tư phải tham chiếu tới ví tồn tại trong danh sách ví.
   - Bước 4 (Kiểm tra bất biến số dư không âm theo BR-FIN-02): Đảm bảo sau khi phục hồi dữ liệu, không có ví thông thường nào bị rơi vào trạng thái số dư âm.
-3. Cơ chế giao dịch toàn vẹn: Nếu phát hiện bất kỳ lỗi vi phạm nào trong 4 bước kiểm định, hệ thống hoàn nguyên toàn bộ quá trình nhập (Rollback), bảo toàn 100% trạng thái dữ liệu hiện hữu và trả về danh sách chi tiết các lỗi dữ liệu.
+3. Cơ chế giao dịch toàn vẹn: Nếu phát hiện bất kỳ lỗi vi phạm nào trong 4 bước kiểm định, hệ thống hoàn nguyên toàn bộ quá trình nhập, bảo toàn 100% trạng thái dữ liệu hiện hữu và trả về danh sách chi tiết các lỗi dữ liệu.
 4. Áp dụng dữ liệu: Khi dữ liệu hợp lệ hoàn toàn, ghi dữ liệu vào hệ thống và tự động kích hoạt tính toán lại toàn bộ số dư động, quỹ mục tiêu và các bảng thống kê trượt 12 tháng.
 
 Dữ liệu đầu ra:
@@ -2692,7 +2815,7 @@ Bảng thông tin yêu cầu:
 | Mã | FR-DAT-03 |
 | Tên | Kiểm tra tính toàn vẹn dữ liệu |
 | Phân hệ nghiệp vụ | Xuất nhập và Sao lưu dữ liệu (FR-DAT) |
-| Ca sử dụng tham chiếu | UC10: Sao lưu, xuất và nhập dữ liệu tài chính |
+| Ca sử dụng tham chiếu | UC-DAT-01 đến UC-DAT-03 (chi tiết theo từng FR xem Mục 8.1) |
 | Mô tả kỹ thuật | Hệ thống cung cấp công cụ tự động quét, kiểm toán và đối soát toàn bộ 4 bất biến tài chính của hệ thống để phát hiện sớm các sai lệch số dư, bút toán mất cân bằng hoặc mâu thuẫn dữ liệu. |
 
 Dữ liệu đầu vào:
@@ -2753,14 +2876,14 @@ Bảng phân loại thuộc tính chất lượng:
 Mô tả yêu cầu kỹ thuật:
 
 1. Chuẩn hóa kiểu dữ liệu số học:
-Tất cả các trường dữ liệu số, biến trung gian và phép tính liên quan đến số tiền giao dịch, số dư ví, lãi suất tiết kiệm, số lượng chứng chỉ quỹ, đơn giá NAV và tổng tài sản bắt buộc sử dụng lớp `java.math.BigDecimal`. Cấm hoàn toàn việc khai báo hoặc sử dụng các kiểu dữ liệu số thực dấu chấm động nhị phân nguyên thủy hoặc lớp bao bọc (`float`, `double`, `Float`, `Double`) trong toàn bộ các cấu trúc dữ liệu miền, các thuật toán tính toán và lưu trữ dữ liệu. Quy định này loại bỏ hoàn toàn sai số làm tròn số thực nhị phân cơ số 2 của số học dấu chấm động.
+Tất cả các trường dữ liệu số, biến trung gian và phép tính liên quan đến số tiền giao dịch, số dư ví, lãi suất tiết kiệm, số lượng chứng chỉ quỹ, đơn giá NAV và tổng tài sản bắt buộc sử dụng kiểu số học thập phân có độ chính xác tùy ý (không giới hạn số chữ số, không quy đổi sang nhị phân trung gian). Cấm hoàn toàn việc sử dụng kiểu dữ liệu số thực dấu chấm động nhị phân trong toàn bộ các cấu trúc dữ liệu miền, các thuật toán tính toán và lưu trữ dữ liệu. Quy định này loại bỏ hoàn toàn sai số làm tròn số thực nhị phân cơ số 2 của số học dấu chấm động.
 2. Quy chuẩn khởi tạo, độ chính xác thập phân và chế độ làm tròn:
-  - Khởi tạo đối tượng: Bắt buộc sử dụng `new BigDecimal(String)` hoặc các phương thức tĩnh `BigDecimal.valueOf(long)` và `BigDecimal.valueOf(double)`. Nghiêm cấm sử dụng hàm khởi tạo `new BigDecimal(double)` do giữ nguyên sai số nhị phân của số thực.
+  - Khởi tạo giá trị số: Bắt buộc khởi tạo từ biểu diễn chuỗi thập phân chính xác của số tiền. Nghiêm cấm khởi tạo trực tiếp từ giá trị số thực dấu chấm động do giữ nguyên sai số nhị phân của số thực.
   - Quy chuẩn Scale giao dịch tiền tệ: Đối với các giao dịch tiền tệ nội tệ (VNĐ), giá trị hiển thị sử dụng scale = 0 (số nguyên đồng), giá trị lưu trữ và xử lý số học nội bộ sử dụng scale = 2 (2 chữ số thập phân).
-  - Quy chuẩn Scale chứng chỉ quỹ và tỷ lệ: Đối với số lượng chứng chỉ quỹ đầu tư (`FundCertificate`) và đơn giá NAV trên một đơn vị quỹ, bắt buộc sử dụng scale tối thiểu là 4 chữ số thập phân (khuyến nghị scale = 6 cho các phép tính trung gian).
-  - Chế độ làm tròn: Khi thực hiện phép chia (`divide`), quy đổi lãi suất ngày (`annualRate / 365`), hoặc tính thuế phí, hệ thống bắt buộc chỉ định tường minh tham số scale và chế độ làm tròn `RoundingMode.HALF_EVEN` (làm tròn ngân hàng) để triệt tiêu độ lệch thống kê tích lũy, hoặc `RoundingMode.HALF_UP` cho các phép tính lãi thương mại. Cấm gọi phương thức chia thiếu tham số scale và rounding mode để tránh phát sinh ngoại lệ `ArithmeticException` khi kết quả là số thập phân vô hạn tuần hoàn.
+  - Quy chuẩn Scale chứng chỉ quỹ và tỷ lệ: Đối với số lượng chứng chỉ quỹ đầu tư và đơn giá NAV trên một đơn vị quỹ, bắt buộc sử dụng scale tối thiểu là 4 chữ số thập phân (khuyến nghị scale = 6 cho các phép tính trung gian).
+  - Chế độ làm tròn: Khi thực hiện phép chia, quy đổi lãi suất ngày (`annualRate / 365`), hoặc tính thuế phí, hệ thống bắt buộc chỉ định tường minh tham số scale và chế độ làm tròn ngân hàng (`RoundingMode.HALF_EVEN`, làm tròn đến số chẵn gần nhất khi giá trị nằm giữa hai mức) để triệt tiêu độ lệch thống kê tích lũy, hoặc chế độ làm tròn lên (`RoundingMode.HALF_UP`) cho các phép tính lãi thương mại. Cấm thực hiện phép chia thiếu tham số scale và chế độ làm tròn để tránh phát sinh lỗi số học khi kết quả là số thập phân vô hạn tuần hoàn.
 3. Kiểm soát sai số tích lũy:
-Sai số phát sinh từ mọi chuỗi phép tính trong từng giao dịch và trên toàn bộ sổ cái tổng hợp phải bằng 0.00 VNĐ. Khi phân bổ một giá trị tổng thành các phần lẻ, hệ thống tự động bù sai số làm tròn vào phần tử có giá trị lớn nhất hoặc ném ngoại lệ `FinancialPrecisionException` nếu sai số vượt ngưỡng 0.01 đơn vị tiền tệ.
+Sai số phát sinh từ mọi chuỗi phép tính trong từng giao dịch và trên toàn bộ sổ cái tổng hợp phải bằng 0.00 VNĐ. Khi phân bổ một giá trị tổng thành các phần lẻ, hệ thống tự động bù sai số làm tròn vào phần tử có giá trị lớn nhất hoặc từ chối thao tác kèm báo lỗi nghiệp vụ Sai số vượt ngưỡng cho phép nếu sai số vượt ngưỡng 0.01 đơn vị tiền tệ.
 4. Toàn vẹn dữ liệu và bảo toàn số dư theo BR-FIN-02:
 Tại mọi thời điểm trạng thái $t$, số dư khả dụng của từng ví tiền luôn thỏa mãn phương trình bảo toàn:
 $$Balance_{wallet}(t) = Balance_{wallet}(0) + \sum_{k=1}^{n} Income_k - \sum_{j=1}^{m} Expense_j + \sum_{p=1}^{u} TransferIn_p - \sum_{q=1}^{v} TransferOut_q + \sum Borrow - \sum Repay - \sum Lend + \sum Collect$$
@@ -2777,13 +2900,13 @@ Bảng chỉ số đo lường định lượng và ngưỡng nghiệm thu:
 | Tỷ lệ sai lệch ghi sổ kép chuyển khoản BR-FIN-03 | $\lvert \sum Debit - \sum Credit \rvert$ | $0.00$ VNĐ |
 | Độ chính xác Scale giao dịch tiền tệ VNĐ | Số chữ số thập phân lưu trữ và hiển thị | Scale = 0 (hiển thị) / Scale = 2 (lưu trữ nội bộ) |
 | Độ chính xác Scale chứng chỉ quỹ và NAV | Số chữ số thập phân đơn vị quỹ và NAV | Scale $\ge 4$ (tối thiểu 4 chữ số thập phân) |
-| Tỷ lệ chỉ định tường minh RoundingMode trong phép chia | Số phép chia `BigDecimal.divide()` có tham số làm tròn | $100.00\%$ |
+| Tỷ lệ chỉ định tường minh quy tắc làm tròn trong phép chia | Số phép chia số học chính xác có kèm tham số scale và quy tắc làm tròn | $100.00\%$ |
 
 Bảng phương pháp và công cụ kiểm chứng:
 
 | Phương pháp nghiệm thu | Công cụ kỹ thuật đo lường | Quy trình kiểm chứng |
 | --- | --- | --- |
-| Soát xét kỹ thuật | Checkstyle, ArchUnit, SonarQube | Quét mã nguồn tĩnh đối với toàn bộ các gói `model`, `domain`, `service` để phát hiện khai báo kiểu `float`, `double` hoặc lời gọi hàm `new BigDecimal(double)`; kiểm tra các lệnh chia `divide()` thiếu `RoundingMode`. |
+| Soát xét kỹ thuật | Công cụ phân tích mã nguồn tĩnh | Quét toàn bộ mã nguồn tầng miền và tầng dịch vụ để phát hiện khai báo kiểu số thực dấu chấm động hoặc khởi tạo số học chính xác trực tiếp từ số thực nhị phân; kiểm tra các phép chia thiếu tham số scale và quy tắc làm tròn. |
 | Kiểm thử tự động | JUnit 5 | Thực thi bộ kiểm thử giá trị biên số học (giao dịch giá trị lớn $10^{14}$ VNĐ, chia tỷ lệ lãi suất ngày lẻ, phân bổ chứng chỉ quỹ lô lẻ) và kiểm thử độ bền với chuỗi 100,000 giao dịch liên tiếp để đối chiếu số dư tính toán với số dư thực tế. |
 
 ---
@@ -2840,19 +2963,19 @@ Bảng phân loại thuộc tính chất lượng:
 
 Mô tả yêu cầu kỹ thuật:
 
-1. Cơ chế ghi tệp an toàn chống hỏng (Safe File Write):
+1. Cơ chế ghi tệp an toàn chống hỏng:
 Để ngăn ngừa tình trạng hỏng hóc hoặc thất thoát tệp dữ liệu khi phát sinh sự cố ngắt nguồn, tắt hệ điều hành đột ngột hoặc tiến trình bị buộc dừng, hệ thống áp dụng quy trình ghi tệp 3 bước:
   - Bước 1 (Ghi tệp tạm thời): Ghi toàn bộ nội dung dữ liệu JSON cập nhật ra một tệp tạm thời (phần mở rộng `.tmp`) nằm trong cùng thư mục lưu trữ với tệp đích.
   - Bước 2 (Đồng bộ đĩa vật lý): Đồng bộ cưỡng bức toàn bộ khối dữ liệu từ bộ đệm của hệ điều hành xuống đĩa lưu trữ vật lý để triệt tiêu nguy cơ mất mát dữ liệu khi ngắt điện đột ngột.
   - Bước 3 (Hoán đổi tệp an toàn): Thực hiện thao tác hoán đổi tệp nguyên tử (`ATOMIC_MOVE`) để thay thế tệp dữ liệu chính thức bằng tệp tạm. Nếu hệ thống tệp không hỗ trợ cờ hoán đổi nguyên tử, hệ thống tự động sao lưu tệp gốc sang tệp dự phòng `.bak` trước khi thực hiện thay thế.
 2. Tự động sao lưu và xoay vòng dữ liệu:
 Hệ thống tự động kích hoạt tạo bản sao lưu dữ liệu có gắn nhãn thời gian theo định dạng `backup_YYYYMMDD_HHMMSS.json` tại thư mục cô lập `backups/` trong các trường hợp:
-  - Trước khi thực hiện các tác vụ có nguy cơ ghi đè dữ liệu quy mô lớn (phục hồi dữ liệu từ tệp nhập ngoài theo UC10, thiết lập lại hệ thống).
+  - Trước khi thực hiện các tác vụ có nguy cơ ghi đè dữ liệu quy mô lớn (phục hồi dữ liệu từ tệp nhập ngoài theo UC-DAT-02, thiết lập lại hệ thống).
   - Duy trì tối thiểu 5 bản sao lưu xoay vòng gần nhất, tự động xóa các bản sao lưu cũ vượt quá giới hạn để tiết kiệm dung lượng lưu trữ.
 3. Cơ chế phục hồi toàn vẹn:
-Khi nạp dữ liệu từ tệp lưu trữ hoặc bản sao lưu, hệ thống kiểm tra tính toàn vẹn trước khi cập nhật vào bộ nhớ làm việc. Trường hợp tệp sai cấu trúc JSON, vi phạm khóa ngoại danh mục hoặc sai lệch bất biến số dư, toàn bộ tiến trình nạp bị hủy bỏ (Rollback), giữ nguyên trạng thái dữ liệu trước đó và hiển thị thông báo lỗi chi tiết.
-4. Quản lý và xử lý ngoại lệ I/O:
-Mọi thao tác đọc ghi hệ thống tệp bắt buộc bao bọc trong các khối xử lý ngoại lệ `IOException`, `SecurityException`. Trường hợp ổ đĩa đầy hoặc thư mục bị khóa quyền ghi, hệ thống giữ nguyên trạng tệp dữ liệu gốc và thông báo lỗi rõ ràng tới người dùng.
+Khi nạp dữ liệu từ tệp lưu trữ hoặc bản sao lưu, hệ thống kiểm tra tính toàn vẹn trước khi cập nhật vào bộ nhớ làm việc. Trường hợp tệp sai cấu trúc JSON, vi phạm khóa ngoại danh mục hoặc sai lệch bất biến số dư, toàn bộ tiến trình nạp bị hủy bỏ, giữ nguyên trạng thái dữ liệu trước đó và hiển thị thông báo lỗi chi tiết.
+4. Quản lý và xử lý lỗi đọc ghi tệp:
+Mọi thao tác đọc ghi hệ thống tệp bắt buộc kiểm soát và bắt lỗi đầy đủ. Trường hợp ổ đĩa đầy hoặc thư mục bị khóa quyền ghi, hệ thống giữ nguyên trạng tệp dữ liệu gốc và thông báo lỗi rõ ràng tới người dùng.
 
 Bảng chỉ số đo lường định lượng và ngưỡng nghiệm thu:
 
@@ -2979,7 +3102,7 @@ Bảng phân loại thuộc tính chất lượng:
 Mô tả yêu cầu kỹ thuật:
 
 1. Môi trường thực thi tiêu chuẩn:
-Ứng dụng vận hành trên nền tảng máy ảo Java Virtual Machine (JVM) tương thích với phiên bản Java Development Kit (JDK) 17 Long-Term Support (LTS) trở lên, bảo đảm tính ổn định lâu dài và hỗ trợ các tính năng chuẩn hóa của Java hiện đại cùng thư viện thời gian chuẩn `java.time`.
+Ứng dụng vận hành trên nền tảng Java Virtual Machine (JVM) tương thích với phiên bản Java Development Kit (JDK) 17 Long-Term Support (LTS) trở lên, bảo đảm tính ổn định lâu dài và hỗ trợ các tính năng chuẩn hóa của Java hiện đại cùng thư viện thời gian chuẩn `java.time`.
 2. Độc lập nền tảng hệ điều hành:
 Ứng dụng đóng gói độc lập và thực thi đồng nhất trên cả 3 hệ điều hành máy tính cá nhân phổ biến: Microsoft Windows 10/11 (64-bit), macOS (kiến trúc Intel x86_64 và Apple Silicon ARM64), và các bản phân phối Linux thông dụng (Ubuntu 20.04+, Fedora 36+, Debian 11+) mà không cần thay đổi mã nguồn hoặc biên dịch lại theo từng hệ điều hành.
 3. Chuẩn hóa thao tác đường dẫn hệ thống tệp:
@@ -3008,9 +3131,9 @@ Bảng phương pháp và công cụ kiểm chứng:
 
 ---
 
-## 6. ĐẶC TẢ 10 CA SỬ DỤNG CHI TIẾT
+## 6. ĐẶC TẢ 40 CA SỬ DỤNG CHI TIẾT
 
-Phần này đặc tả chi tiết 10 ca sử dụng của Hệ thống Quản lý Tài chính Cá nhân (PFMS) theo định dạng ca sử dụng chi tiết. Mỗi ca sử dụng bao gồm đầy đủ 10 trường thông tin kỹ thuật:
+Phần này đặc tả chi tiết 40 ca sử dụng của Hệ thống Quản lý Tài chính Cá nhân (PFMS) theo định dạng ca sử dụng chi tiết. Mỗi ca sử dụng bao gồm đầy đủ 10 trường thông tin kỹ thuật:
 
 1. Mã và Tên ca sử dụng
 2. Tác nhân chính: Owner
@@ -3023,21 +3146,21 @@ Phần này đặc tả chi tiết 10 ca sử dụng của Hệ thống Quản l
 9. Các luồng ngoại lệ
 10. Quy tắc nghiệp vụ đặc thù
 
-Toàn bộ các ca sử dụng được thiết kế xoay quanh tác nhân duy nhất là Chủ sở hữu, tuân thủ các bất biến tài chính được xác lập tại Mục 3 và các yêu cầu chức năng tại Mục 4.
+Toàn bộ các ca sử dụng được thiết kế xoay quanh tác nhân duy nhất là Chủ sở hữu, tuân thủ các bất biến tài chính được xác lập tại Mục 3 và các yêu cầu chức năng tại Mục 4. Mỗi ca sử dụng thể hiện đúng một mục tiêu hoàn chỉnh mang lại giá trị đo lường được cho Owner; các luồng rẽ nhánh chỉ còn giữ lại biến thể hợp lệ của cùng một mục tiêu hoặc luồng lỗi, không còn tồn tại luồng rẽ nhánh dạng thao tác quản trị độc lập.
 
-### 6.1 UC01: Quản lý ví tiền
+### 6.1 UC-WAL-01: Tạo ví tiền mới
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC01 |
-| Tên | Quản lý ví tiền |
+| Mã | UC-WAL-01 |
+| Tên | Tạo ví tiền mới |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
-| Các bên liên quan và mối quan tâm | Theo dõi số dư các nguồn tiền thanh khoản, cơ cấu phân bổ tài sản và lịch sử biến động tiền mặt. |
-| Mô tả tóm tắt | Tạo ví tài chính mới, theo dõi số dư khả dụng tính toán theo thời gian thực từ lịch sử dòng tiền, xem cơ cấu phân bổ tài sản thanh khoản, cập nhật thông tin và lưu trữ ví. |
-| Điều kiện kích hoạt | Người dùng mở phân hệ Quản lý ví tiền để thiết lập ví mới, tra cứu hoặc tái cơ cấu nguồn tiền. |
+| Các bên liên quan và mối quan tâm | Thiết lập đầy đủ các nguồn tiền thanh khoản để phục vụ ghi chép giao dịch và tính toán tổng tài sản. |
+| Mô tả tóm tắt | Tạo ví tài chính mới với loại ví, số dư ban đầu và ghi chú mô tả; khởi tạo bất biến số dư ban đầu và cập nhật ngay bảng cơ cấu phân bổ tài sản. |
+| Điều kiện kích hoạt | Người dùng cần bổ sung một nguồn tiền thanh khoản mới vào hệ thống. |
 
 **Tiền điều kiện:**
 
@@ -3049,7 +3172,7 @@ Bảng thuộc tính ca sử dụng:
 
 1. Ví tiền mới được lưu trữ trong tệp dữ liệu với trạng thái `ACTIVE` và số dư ban đầu hợp lệ.
 2. Bất biến số dư ví theo `BR-FIN-02` được bảo đảm; tổng tài sản thanh khoản toàn hệ thống được cập nhật tức thời.
-3. Bảng cơ cấu phân bổ tài sản phản ánh đúng tỷ trọng của từng ví theo `FR-WAL-04`.
+3. Bảng cơ cấu phân bổ tài sản phản ánh đúng tỷ trọng của ví mới theo `FR-WAL-04`.
 
 #### Luồng sự kiện chính
 
@@ -3058,47 +3181,20 @@ Bảng thuộc tính ca sử dụng:
 3. Người dùng nhập tên ví, chọn loại ví từ danh sách thả xuống, nhập số dư ban đầu (hoặc giữ giá trị mặc định là 0), và nhập ghi chú mô tả (nếu có).
 4. Người dùng xác nhận lưu thông tin ví mới.
 5. Hệ thống xác thực dữ liệu đầu vào: kiểm tra tên ví không rỗng và không trùng lặp với tên ví đã có trong hệ thống (so sánh không phân biệt chữ hoa, chữ thường sau khi cắt khoảng trắng thừa), kiểm tra số dư ban đầu không âm đối với các ví thuộc loại `CASH`, `BANK`, `E_WALLET`.
-6. Hệ thống tạo đối tượng ví mới trong tệp dữ liệu với mã định danh duy nhất (`walletId`), gán trạng thái `ACTIVE`, chuẩn hóa số dư ban đầu về kiểu `BigDecimal` có scale là 2 chữ số thập phân theo quy tắc `BR-FIN-01`.
+6. Hệ thống tạo đối tượng ví mới trong tệp dữ liệu với mã định danh duy nhất (`walletId`), gán trạng thái `ACTIVE`, chuẩn hóa số dư ban đầu về kiểu dữ liệu tài chính chính xác tuyệt đối có scale là 2 chữ số thập phân theo quy tắc `BR-FIN-01`.
 7. Hệ thống tính toán lại số dư động của ví mới và tổng số dư thanh khoản toàn hệ thống theo quy tắc `BR-FIN-02`.
 8. Hệ thống cập nhật bảng tỷ trọng cơ cấu tài sản theo từng ví theo quy tắc `FR-WAL-04`.
 9. Hệ thống thông báo tạo ví thành công, cập nhật danh sách ví trên màn hình và làm mới bảng cơ cấu tài sản.
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 2a: Xem danh sách ví và chi tiết số dư động
-
-1. Người dùng mở màn hình danh sách ví, tùy chọn áp dụng bộ lọc trạng thái (`ACTIVE`, `ARCHIVED` hoặc `ALL`).
-2. Hệ thống quét toàn bộ lịch sử dòng tiền của từng ví thỏa mãn điều kiện lọc, áp dụng công thức `BR-FIN-02` để tính số dư khả dụng thực tế tại thời điểm truy vấn.
-3. Hệ thống tổng hợp tổng số dư tiền mặt thanh khoản bằng phương thức `BigDecimal.add()`.
-4. Hệ thống hiển thị danh sách ví kèm số dư động, loại ví, trạng thái và tổng số dư khả dụng toàn hệ thống ở chân danh sách.
-
-##### Luồng 2b: Cập nhật thông tin ví tiền
-
-1. Người dùng yêu cầu điều chỉnh thông tin của một ví xác định từ danh sách.
-2. Hệ thống hiển thị biểu mẫu chỉnh sửa cho phép sửa Tên ví, Ghi chú mô tả và Trạng thái hoạt động (`ACTIVE` hoặc `ARCHIVED`). Trường số dư bị khóa hoàn toàn, không cho phép can thiệp trực tiếp.
-3. Người dùng cập nhật thông tin và xác nhận lưu thay đổi.
-4. Hệ thống kiểm tra tên ví mới không trùng lặp với các ví khác đang tồn tại.
-5. Hệ thống ghi nhận thông tin cập nhật vào tệp dữ liệu và hiển thị thông báo thành công.
-
-##### Luồng 2c: Lưu trữ ví không còn sử dụng
-
-1. Tại bước 3 của luồng 2b, Người dùng chuyển trạng thái ví từ `ACTIVE` sang `ARCHIVED`.
-2. Hệ thống kiểm tra số dư khả dụng hiện tại của ví. Nếu số dư khác 0, hệ thống hiển thị hộp thoại cảnh báo: ví vẫn còn số dư, khuyến nghị điều chuyển hết tiền trước khi lưu trữ, nhưng vẫn cho phép Người dùng lựa chọn tiếp tục hoặc hủy bỏ.
-3. Người dùng xác nhận tiếp tục lưu trữ.
-4. Hệ thống cập nhật trạng thái ví thành `ARCHIVED`, ẩn ví này khỏi danh sách chọn ví trong các chức năng tạo giao dịch mới, nhưng tiếp tục duy trì dữ liệu trong các báo cáo lịch sử.
-
-##### Luồng 2d: Xem phân tích cơ cấu tài sản thanh khoản
-
-1. Người dùng chọn tab "Cơ cấu phân bổ ví".
-2. Hệ thống tính tổng số dư tất cả các ví đang `ACTIVE`: $TotalWallets = \sum Balance_w$.
-3. Nếu $TotalWallets > 0$, hệ thống tính tỷ trọng phần trăm từng ví theo công thức: $Rate_w = (Balance_w / TotalWallets) \times 100\%$, sử dụng `BigDecimal.divide()` với `RoundingMode.HALF_EVEN` và scale tối thiểu 4 chữ số thập phân, định dạng 2 chữ số thập phân ra giao diện.
-4. Hệ thống sắp xếp các ví theo thứ tự tỷ trọng giảm dần và hiển thị dưới dạng bảng dữ liệu kèm biểu đồ trực quan.
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu tạo ví mới.
 
 #### Các luồng ngoại lệ
 
 ##### Luồng ngoại lệ 5a: Trùng tên ví đã tồn tại
 
-1. Tại bước 5 của luồng chính (hoặc bước 4 của luồng 2b), hệ thống phát hiện tên ví đã tồn tại trong hệ thống (so sánh không phân biệt chữ hoa, chữ thường sau khi cắt khoảng trắng thừa).
+1. Tại bước 5 của luồng chính, hệ thống phát hiện tên ví đã tồn tại trong hệ thống (so sánh không phân biệt chữ hoa, chữ thường sau khi cắt khoảng trắng thừa).
 2. Hệ thống hủy bỏ thao tác ghi dữ liệu, đánh dấu trường tên ví bị lỗi và hiển thị thông báo lỗi: "Tên ví này đã tồn tại trong hệ thống. Vui lòng chọn một tên khác".
 3. Người dùng cung cấp lại tên ví hợp lệ hoặc hủy bỏ yêu cầu.
 
@@ -3108,36 +3204,198 @@ Bảng thuộc tính ca sử dụng:
 2. Hệ thống chặn thao tác tạo ví và hiển thị thông báo lỗi: "Số dư khởi tạo của ví tiền mặt, ngân hàng hoặc ví điện tử không được nhỏ hơn 0".
 3. Người dùng điều chỉnh lại số dư ban đầu lớn hơn hoặc bằng 0.
 
-##### Luồng ngoại lệ 5c: Cố ý chỉnh sửa trực tiếp số dư ví
-
-1. Nếu hệ thống phát hiện yêu cầu sửa đổi trực tiếp trường số dư khả dụng (`currentBalance` hoặc `initialBalance`) của một ví đã có giao dịch lịch sử.
-2. Hệ thống từ chối thực thi, ném ngoại lệ vi phạm bất biến dữ liệu tài chính và ghi nhật ký cảnh báo an toàn.
-
-##### Luồng ngoại lệ 2d3a: Tổng số dư toàn bộ các ví bằng 0 khi tính cơ cấu
-
-1. Tại bước 3 của luồng 2d, hệ thống ghi nhận $TotalWallets = 0$.
-2. Hệ thống gán tỷ trọng của toàn bộ các ví bằng 0.00%, không thực hiện phép chia cho 0 để tránh phát sinh ngoại lệ `ArithmeticException`.
-
 #### Quy tắc nghiệp vụ đặc thù
 
 1. Bất biến bảo toàn số dư theo `BR-FIN-02`: Số dư của ví luôn bằng số dư ban đầu cộng tổng thu nhập, chuyển đến, đi vay, thu nợ trừ tổng chi tiêu, chuyển đi, trả nợ, cho vay.
-2. Bất biến tính toán tài chính `BR-FIN-01`: Bắt buộc sử dụng `BigDecimal`, cấm dùng kiểu số thực `double` hoặc `float`.
-3. Bất biến toàn vẹn dữ liệu: Không hỗ trợ xóa vật lý ví tiền nếu ví đó đã phát sinh giao dịch trong sổ nhật ký giao dịch, sổ chuyển tiền hoặc sổ công nợ. Chỉ hỗ trợ chuyển trạng thái `ARCHIVED`.
-4. Phù hợp các yêu cầu chức năng: `FR-WAL-01`, `FR-WAL-02`, `FR-WAL-03`, `FR-WAL-04`.
+2. Bất biến tính toán tài chính `BR-FIN-01`: Bắt buộc sử dụng kiểu dữ liệu tài chính chính xác tuyệt đối, cấm dùng kiểu số thực có sai số làm tròn nhị phân.
+3. Phù hợp các yêu cầu chức năng: `FR-WAL-01`, `FR-WAL-02`, `FR-WAL-03`, `FR-WAL-04`.
 
-### 6.2 UC02: Ghi nhận và quản lý giao dịch thu chi
+### 6.2 UC-WAL-02: Theo dõi số dư động và cơ cấu phân bổ ví
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC02 |
-| Tên | Ghi nhận và quản lý giao dịch thu chi |
+| Mã | UC-WAL-02 |
+| Tên | Theo dõi số dư động và cơ cấu phân bổ ví |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Theo dõi số dư khả dụng của từng ví theo thời gian thực và cơ cấu phân bổ tài sản thanh khoản giữa các ví. |
+| Mô tả tóm tắt | Xem danh sách ví kèm số dư khả dụng tính toán theo thời gian thực từ lịch sử dòng tiền, đồng thời phân tích tỷ trọng phân bổ tài sản thanh khoản giữa các ví đang hoạt động. |
+| Điều kiện kích hoạt | Người dùng cần tra cứu số dư hiện tại của các ví hoặc phân tích cơ cấu phân bổ tài sản. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống PFMS đã khởi chạy và nạp thành công tệp dữ liệu cục bộ.
+2. Owner đang ở giao diện Quản lý ví tiền.
+
+**Hậu điều kiện thành công:**
+
+1. Số dư khả dụng của từng ví được tính toán chính xác theo `BR-FIN-02` tại thời điểm truy vấn.
+2. Bảng tỷ trọng cơ cấu phân bổ tài sản phản ánh đúng theo `FR-WAL-04`.
+
+#### Luồng sự kiện chính
+
+1. Người dùng mở màn hình danh sách ví, tùy chọn áp dụng bộ lọc trạng thái (`ACTIVE`, `ARCHIVED` hoặc `ALL`).
+2. Hệ thống quét toàn bộ lịch sử dòng tiền của từng ví thỏa mãn điều kiện lọc, áp dụng công thức `BR-FIN-02` để tính số dư khả dụng thực tế tại thời điểm truy vấn.
+3. Hệ thống tổng hợp tổng số dư tiền mặt thanh khoản bằng phép cộng số học chính xác tuyệt đối trên toàn bộ các ví thỏa mãn điều kiện lọc.
+4. Hệ thống hiển thị danh sách ví kèm số dư động, loại ví, trạng thái và tổng số dư khả dụng toàn hệ thống ở chân danh sách.
+
+#### Các luồng rẽ nhánh
+
+##### Luồng rẽ nhánh: Xem phân tích cơ cấu tài sản thanh khoản
+
+1. Người dùng chọn tab "Cơ cấu phân bổ ví".
+2. Hệ thống tính tổng số dư tất cả các ví đang `ACTIVE`: $TotalWallets = \sum Balance_w$.
+3. Nếu $TotalWallets > 0$, hệ thống tính tỷ trọng phần trăm từng ví theo công thức: $Rate_w = (Balance_w / TotalWallets) \times 100\%$, sử dụng phép chia số học chính xác với quy tắc làm tròn ngân hàng (làm tròn đến số chẵn gần nhất khi giá trị nằm giữa hai mức) và scale tối thiểu 4 chữ số thập phân, định dạng 2 chữ số thập phân ra giao diện.
+4. Hệ thống sắp xếp các ví theo thứ tự tỷ trọng giảm dần và hiển thị dưới dạng bảng dữ liệu kèm biểu đồ trực quan.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 3a: Tổng số dư toàn bộ các ví bằng 0 khi tính cơ cấu
+
+1. Tại bước 3 của luồng rẽ nhánh "Xem phân tích cơ cấu tài sản thanh khoản", hệ thống ghi nhận $TotalWallets = 0$.
+2. Hệ thống gán tỷ trọng của toàn bộ các ví bằng 0.00%, không thực hiện phép chia cho 0.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến bảo toàn số dư theo `BR-FIN-02`: Số dư động của ví luôn được tính lại từ lịch sử dòng tiền tại thời điểm truy vấn.
+2. Bất biến tính toán tài chính `BR-FIN-01`: Toàn bộ phép cộng, phép chia sử dụng kiểu dữ liệu tài chính chính xác tuyệt đối.
+3. Phù hợp các yêu cầu chức năng: `FR-WAL-02`, `FR-WAL-04`.
+
+### 6.3 UC-WAL-03: Cập nhật thông tin ví tiền
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-WAL-03 |
+| Tên | Cập nhật thông tin ví tiền |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Điều chỉnh thông tin mô tả của ví và chuyển trạng thái lưu trữ khi ví không còn sử dụng, không làm sai lệch bất biến số dư. |
+| Mô tả tóm tắt | Cập nhật tên ví, ghi chú mô tả và trạng thái hoạt động của ví; khi chuyển trạng thái sang lưu trữ, hệ thống cảnh báo số dư còn lại và ẩn ví khỏi các danh sách chọn ví cho giao dịch mới trong khi vẫn bảo toàn dữ liệu lịch sử. |
+| Điều kiện kích hoạt | Người dùng cần điều chỉnh thông tin của một ví đã tồn tại hoặc đưa một ví không còn sử dụng vào trạng thái lưu trữ. |
+
+**Tiền điều kiện:**
+
+1. Ví cần cập nhật đã tồn tại trong hệ thống.
+2. Owner đang ở giao diện Quản lý ví tiền.
+
+**Hậu điều kiện thành công:**
+
+1. Thông tin ví (tên, ghi chú, trạng thái hoạt động) được cập nhật chính xác trong tệp dữ liệu.
+2. Số dư ví không bị thay đổi qua thao tác cập nhật thông tin.
+3. Khi chuyển trạng thái sang `ARCHIVED`, ví bị ẩn khỏi danh sách chọn ví cho giao dịch mới nhưng vẫn hiển thị đầy đủ trong các báo cáo lịch sử.
+
+#### Luồng sự kiện chính
+
+1. Người dùng yêu cầu điều chỉnh thông tin của một ví xác định từ danh sách.
+2. Hệ thống hiển thị biểu mẫu chỉnh sửa cho phép sửa Tên ví, Ghi chú mô tả và Trạng thái hoạt động (`ACTIVE` hoặc `ARCHIVED`). Trường số dư bị khóa hoàn toàn, không cho phép can thiệp trực tiếp.
+3. Người dùng cập nhật thông tin và xác nhận lưu thay đổi.
+4. Hệ thống kiểm tra tên ví mới không trùng lặp với các ví khác đang tồn tại.
+5. Hệ thống ghi nhận thông tin cập nhật vào tệp dữ liệu và hiển thị thông báo thành công.
+
+#### Các luồng rẽ nhánh
+
+##### Luồng rẽ nhánh: Chuyển trạng thái lưu trữ ví không còn sử dụng
+
+1. Tại bước 3 của luồng chính, Người dùng chuyển trạng thái ví từ `ACTIVE` sang `ARCHIVED`.
+2. Hệ thống kiểm tra số dư khả dụng hiện tại của ví. Nếu số dư khác 0, hệ thống hiển thị hộp thoại cảnh báo: ví vẫn còn số dư, khuyến nghị điều chuyển hết tiền trước khi lưu trữ, nhưng vẫn cho phép Người dùng lựa chọn tiếp tục hoặc hủy bỏ.
+3. Người dùng xác nhận tiếp tục lưu trữ.
+4. Hệ thống cập nhật trạng thái ví thành `ARCHIVED`, ẩn ví này khỏi danh sách chọn ví trong các chức năng tạo giao dịch mới, nhưng tiếp tục duy trì dữ liệu trong các báo cáo lịch sử.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Trùng tên ví đã tồn tại
+
+1. Tại bước 4 của luồng chính, hệ thống phát hiện tên ví mới trùng với tên ví khác đã tồn tại trong hệ thống (so sánh không phân biệt chữ hoa, chữ thường sau khi cắt khoảng trắng thừa).
+2. Hệ thống hủy bỏ thao tác ghi dữ liệu và hiển thị thông báo lỗi: "Tên ví này đã tồn tại trong hệ thống. Vui lòng chọn một tên khác".
+3. Người dùng cung cấp lại tên ví hợp lệ hoặc hủy bỏ yêu cầu.
+
+##### Luồng ngoại lệ: Cố ý chỉnh sửa trực tiếp số dư ví
+
+1. Hệ thống phát hiện yêu cầu sửa đổi trực tiếp trường số dư khả dụng (`currentBalance` hoặc `initialBalance`) của một ví đã có giao dịch lịch sử.
+2. Hệ thống từ chối thực thi thao tác, ghi nhận cảnh báo vi phạm bất biến dữ liệu tài chính và ghi nhật ký an toàn.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến toàn vẹn dữ liệu: Không hỗ trợ xóa vật lý ví tiền nếu ví đó đã phát sinh giao dịch trong sổ nhật ký giao dịch, sổ chuyển tiền hoặc sổ công nợ. Chỉ hỗ trợ chuyển trạng thái `ARCHIVED`.
+2. Bất biến tính toán tài chính `BR-FIN-01`: Trường số dư chỉ được thay đổi gián tiếp thông qua các nghiệp vụ phát sinh dòng tiền, không cho phép can thiệp trực tiếp.
+3. Phù hợp các yêu cầu chức năng: `FR-WAL-01`, `FR-WAL-03`.
+
+### 6.4 UC-WAL-04: Điều chỉnh số dư ví
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-WAL-04 |
+| Tên | Điều chỉnh số dư ví |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Đưa số dư ghi nhận trong hệ thống khớp với số dư thực tế quan sát được (kiểm kê tiền mặt, đối soát sao kê ngân hàng) mà vẫn giữ được dấu vết kiểm toán của khoản chênh lệch. |
+| Mô tả tóm tắt | Ghi nhận một bút toán điều chỉnh số dư có thể truy vết khi số dư thực tế của ví lệch khỏi số dư hệ thống đang lưu, không thông qua bất kỳ giao dịch thu, chi hay chuyển khoản tiêu chuẩn nào. |
+| Điều kiện kích hoạt | Người dùng phát hiện chênh lệch giữa số dư thực tế và số dư hệ thống của một ví đang hoạt động. |
+
+**Tiền điều kiện:**
+
+1. Ví cần điều chỉnh đã tồn tại và đang ở trạng thái `ACTIVE`, `type` thuộc {`CASH`, `BANK`, `E_WALLET`, `CREDIT`}.
+2. Owner đang ở giao diện Quản lý ví tiền.
+
+**Hậu điều kiện thành công:**
+
+1. Số dư động của ví khớp với `observedBalance` do người dùng nhập.
+2. Một bản ghi bút toán điều chỉnh bất biến được lưu vào tệp dữ liệu, thể hiện số dư trước, số dư sau, giá trị chênh lệch và lý do điều chỉnh.
+
+#### Luồng sự kiện chính
+
+1. Người dùng chọn một ví đang hoạt động và chọn thao tác "Điều chỉnh số dư".
+2. Hệ thống hiển thị số dư hiện tại của ví theo BR-FIN-02 và yêu cầu người dùng nhập số dư thực tế quan sát được cùng lý do điều chỉnh.
+3. Người dùng nhập `observedBalance` và `reason`, xác nhận điều chỉnh.
+4. Hệ thống tính giá trị chênh lệch `Adjustment` theo FR-WAL-05 và hiển thị bản xem trước số dư sau điều chỉnh để người dùng xác nhận lần cuối.
+5. Người dùng xác nhận. Hệ thống ghi nhận bút toán điều chỉnh, cập nhật số dư động của ví và hiển thị thông báo điều chỉnh thành công.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu điều chỉnh số dư.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 3a: Thiếu lý do điều chỉnh
+
+1. Tại bước 3 của luồng chính, người dùng để trống hoặc chỉ nhập khoảng trắng vào trường `reason`.
+2. Hệ thống từ chối xác nhận và hiển thị thông báo: "Vui lòng nhập lý do điều chỉnh số dư".
+
+##### Luồng ngoại lệ 4a: Số dư quan sát trùng số dư hiện tại
+
+1. Tại bước 4 của luồng chính, hệ thống tính $Adjustment = 0$.
+2. Hệ thống từ chối ghi nhận bút toán rỗng và hiển thị thông báo: "Số dư bạn nhập trùng với số dư hệ thống đang ghi nhận, không có chênh lệch cần điều chỉnh".
+
+##### Luồng ngoại lệ 4b: Số dư điều chỉnh vi phạm ràng buộc trạng thái
+
+1. Tại bước 4 của luồng chính, hệ thống phát hiện `observedBalance` vi phạm ràng buộc trạng thái số dư khả dụng của BR-FIN-02 (âm đối với ví tiêu chuẩn, hoặc vượt hạn mức thấu chi đối với ví thẻ tín dụng).
+2. Hệ thống từ chối ghi nhận và hiển thị thông báo nêu rõ ràng buộc số dư tối thiểu cho phép của loại ví tương ứng.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến bảo toàn số dư theo `BR-FIN-02`: Bút toán điều chỉnh là một số hạng độc lập trong công thức số dư động, không thay thế hay xóa bỏ lịch sử dòng tiền đã ghi nhận trước đó.
+2. Bất biến kiểm toán: Bản ghi điều chỉnh là bất biến, không cho phép sửa hoặc xóa sau khi đã ghi nhận.
+3. Phù hợp các yêu cầu chức năng: `FR-WAL-05`.
+
+### 6.5 UC-TXN-01: Ghi nhận giao dịch thu chi
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-TXN-01 |
+| Tên | Ghi nhận giao dịch thu chi |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
 | Các bên liên quan và mối quan tâm | Ghi nhận biến động thu chi, phân loại theo danh mục và đồng bộ số dư ví. |
-| Mô tả tóm tắt | Ghi nhận phát sinh thu nhập và chi tiêu, phân loại theo cây danh mục 3 cấp, liên kết với ví thanh toán tương ứng; tra cứu, lọc lịch sử giao dịch đa tiêu chí; chỉnh sửa hoặc xóa giao dịch với cơ chế hoàn nguyên số dư tự động để bảo toàn sổ cái. |
-| Điều kiện kích hoạt | Người dùng ghi chép giao dịch thu chi mới hoặc tra cứu, điều chỉnh nhật ký tài chính. |
+| Mô tả tóm tắt | Ghi nhận phát sinh thu nhập hoặc chi tiêu, phân loại theo cây danh mục 3 cấp, liên kết với ví thanh toán tương ứng và cập nhật số dư ví tức thời. |
+| Điều kiện kích hoạt | Người dùng ghi chép một giao dịch thu chi mới phát sinh trong thực tế. |
 
 **Tiền điều kiện:**
 
@@ -3161,7 +3419,7 @@ Bảng thuộc tính ca sử dụng:
 5. Người dùng chọn ngày giao dịch, chọn ví thanh toán (đang ở trạng thái `ACTIVE`), chọn danh mục chi tiết, nhập số tiền giao dịch ($amount > 0$) và nhập ghi chú mô tả nội dung chi tiêu.
 6. Người dùng xác nhận lưu giao dịch thu chi mới.
 7. Hệ thống xác thực dữ liệu:
-  - Số tiền giao dịch $amount$ phải lớn hơn 0 và được chuẩn hóa về kiểu `BigDecimal` scale 2 theo quy tắc `BR-FIN-01`.
+  - Số tiền giao dịch $amount$ phải lớn hơn 0 và được chuẩn hóa về kiểu dữ liệu tài chính chính xác tuyệt đối scale 2 theo quy tắc `BR-FIN-01`.
   - Danh mục được chọn phải đang ở trạng thái hoạt động (`isActive = true`) và thuộc đúng loại `Expense` theo quy tắc `BR-FIN-04`.
   - Kiểm tra số dư ví theo `BR-FIN-02`: Nếu ví không phải loại thẻ tín dụng (`CREDIT`), hệ thống kiểm tra số dư khả dụng bảo đảm điều kiện $Balance_{wallet} - amount \ge 0$.
 8. Hệ thống tạo bản ghi giao dịch mới trong danh sách bản ghi `transactions` kèm mã `txnId` duy nhất.
@@ -3171,7 +3429,7 @@ Bảng thuộc tính ca sử dụng:
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 3a: Ghi nhận giao dịch Thu nhập
+##### Luồng rẽ nhánh: Ghi nhận giao dịch Thu nhập
 
 1. Tại bước 3 của luồng chính, Người dùng chọn Loại giao dịch là `Income`.
 2. Hệ thống tải động danh sách các Nhóm nhu cầu và Danh mục thuộc `Type = Income` (ví dụ: tiền lương, tiền thưởng, lãi đầu tư).
@@ -3179,42 +3437,15 @@ Bảng thuộc tính ca sử dụng:
 4. Tại bước 7 của luồng chính, hệ thống kiểm tra danh mục thuộc `Type = Income` và số tiền $amount > 0$ (không cần kiểm tra số dư ví phải đủ để trừ).
 5. Tại bước 9 của luồng chính, hệ thống cộng số tiền $amount$ vào số dư khả dụng của ví nhận tiền: $Balance_{wallet}(t) = Balance_{wallet}(t-1) + amount$.
 
-##### Luồng 2a: Tra cứu và lọc lịch sử giao dịch đa tiêu chí
-
-1. Người dùng mở màn hình "Nhật ký giao dịch" và thiết lập bộ lọc: khoảng thời gian (`fromDate`, `toDate`), danh sách ví, loại giao dịch (`ALL`, `INCOME`, `EXPENSE`), nhóm danh mục, danh mục chi tiết, từ khóa tìm kiếm trong ghi chú.
-2. Hệ thống áp dụng kết hợp logic AND trên toàn bộ các tiêu chí lọc, thực hiện truy vấn và phân trang kết quả (mặc định 50 bản ghi mỗi trang, sắp xếp ngày giao dịch giảm dần).
-3. Hệ thống tính toán tổng số tiền thu nhập, tổng số tiền chi tiêu và dòng tiền thuần (Cash Flow = Tổng thu nhập - Tổng chi tiêu) trên tập kết quả lọc bằng `BigDecimal`.
-4. Hệ thống hiển thị bảng danh sách giao dịch kèm tổng số bản ghi và khối tổng hợp tài chính tương ứng.
-
-##### Luồng 2b: Chỉnh sửa giao dịch đã lưu
-
-1. Người dùng yêu cầu điều chỉnh thông tin của một giao dịch xác định từ sổ nhật ký.
-2. Hệ thống nạp thông tin giao dịch hiện tại lên biểu mẫu chỉnh sửa.
-3. Người dùng sửa đổi các trường cần thiết (thay đổi số tiền, đổi ví thanh toán hoặc đổi danh mục) và xác nhận lưu cập nhật.
-4. Hệ thống thực hiện hoàn nguyên số dư ví cũ theo quy tắc `BR-FIN-02`: nếu giao dịch cũ là `Income` thì trừ số tiền cũ khỏi ví cũ; nếu giao dịch cũ là `Expense` thì cộng hoàn trả số tiền cũ vào ví cũ.
-5. Hệ thống kiểm tra tính hợp lệ của giao dịch mới đối với ví mới: nếu là `Expense`, bảo đảm $Balance_{newWallet} - newAmount \ge 0$.
-6. Nếu hợp lệ, hệ thống áp dụng số tiền mới vào ví mới (cộng nếu `Income`, trừ nếu `Expense`), cập nhật bản ghi giao dịch trong tệp dữ liệu trong cùng một khối giao dịch toàn vẹn.
-7. Hệ thống thông báo cập nhật thành công và đồng bộ lại số dư các ví liên quan.
-
-##### Luồng 2c: Xóa giao dịch thu chi
-
-1. Người dùng gửi yêu cầu xóa một giao dịch thu chi khỏi hệ thống.
-2. Hệ thống hiển thị hộp thoại cảnh báo xác nhận việc xóa giao dịch và nêu rõ tác động hoàn nguyên số dư ví.
-3. Người dùng xác nhận đồng ý xóa.
-4. Hệ thống kiểm tra điều kiện hoàn nguyên: nếu giao dịch là `Income`, việc trừ lại tiền khỏi ví không làm cho số dư ví bị âm ($Balance_{wallet} - amount \ge 0$).
-5. Hệ thống hoàn nguyên số dư ví (trừ tiền nếu xóa giao dịch thu, cộng trả lại tiền nếu xóa giao dịch chi) theo quy tắc `BR-FIN-02`.
-6. Hệ thống xóa bản ghi khỏi danh sách bản ghi `transactions` và cập nhật lại các báo cáo thống kê tháng.
-7. Hệ thống hiển thị thông báo xóa giao dịch thành công.
-
 #### Các luồng ngoại lệ
 
 ##### Luồng ngoại lệ 7a: Số tiền giao dịch nhỏ hơn hoặc bằng 0
 
-1. Tại bước 7 của luồng chính (hoặc bước 5 của luồng 2b), hệ thống phát hiện số tiền nhập vào $\le 0$ hoặc không đúng định dạng số học.
+1. Tại bước 7 của luồng chính, hệ thống phát hiện số tiền nhập vào $\le 0$ hoặc không đúng định dạng số học.
 2. Hệ thống từ chối lưu và hiển thị thông báo: "Số tiền giao dịch phải là một số dương lớn hơn 0".
 3. Người dùng nhập lại số tiền hợp lệ.
 
-##### Luồng ngoại lệ 7b: Số dư ví không đủ chi trả (Thiếu hụt số dư ví)
+##### Luồng ngoại lệ 7b: Số dư ví không đủ chi trả
 
 1. Tại bước 7 của luồng chính, hệ thống phát hiện ví chi tiền không phải là thẻ tín dụng và số dư khả dụng nhỏ hơn số tiền cần chi trả ($Balance_{wallet} < amount$).
 2. Hệ thống từ chối thực hiện giao dịch, hiển thị thông báo: "Số dư khả dụng của ví không đủ để thực hiện khoản chi tiêu này".
@@ -3226,31 +3457,174 @@ Bảng thuộc tính ca sử dụng:
 2. Hệ thống chặn thao tác và hiển thị cảnh báo: "Danh mục không hợp lệ hoặc không tương thích với loại luồng tiền đã chọn".
 3. Người dùng chọn lại danh mục hợp lệ từ cây danh mục.
 
-##### Luồng ngoại lệ 2c4a: Không thể xóa giao dịch thu nhập do làm âm số dư ví
-
-1. Tại bước 4 của luồng 2c, hệ thống phát hiện việc xóa giao dịch thu nhập sẽ làm số dư ví hiện tại rơi vào số âm (do tiền từ khoản thu này đã được chi tiêu hoặc chuyển đi trong các giao dịch kế tiếp).
-2. Hệ thống từ chối thao tác xóa và hiển thị thông báo: "Không thể xóa giao dịch thu nhập này vì sẽ làm số dư ví bị âm. Vui lòng kiểm tra lại các khoản chi tiêu liên quan của ví trước khi thực hiện".
-
 #### Quy tắc nghiệp vụ đặc thù
 
 1. Bảo toàn số dư ví theo `BR-FIN-02`: Mọi giao dịch thu chi đều phải phản ánh trực tiếp vào số dư ví tương ứng.
 2. Bất biến phân cấp danh mục `BR-FIN-04`: Mọi giao dịch phải được phân loại theo cấu trúc 3 cấp và bảo đảm tính tương thích của `Type`.
-3. Độ chính xác tài chính `BR-FIN-01`: Xử lý toàn bộ bằng `BigDecimal`, không phát sinh sai số làm tròn.
-4. Tính toàn vẹn khi chỉnh sửa và xóa: Thao tác sửa hoặc xóa giao dịch bảo đảm đồng bộ hoàn nguyên số dư ví và cập nhật sổ cái trong cùng một khối giao dịch toàn vẹn; nếu phát sinh lỗi, hệ thống tự động hoàn nguyên toàn bộ (Rollback).
-5. Phù hợp các yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-03`, `FR-TXN-04`, `FR-TXN-05`.
+3. Độ chính xác tài chính `BR-FIN-01`: Xử lý toàn bộ bằng kiểu dữ liệu tài chính chính xác tuyệt đối, không phát sinh sai số làm tròn.
+4. Phù hợp các yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-03`, `FR-TXN-04`, `FR-TXN-05`.
 
-### 6.3 UC03: Chuyển tiền nội bộ giữa các ví
+### 6.6 UC-TXN-02: Tra cứu và lọc lịch sử giao dịch
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC03 |
-| Tên | Chuyển tiền nội bộ giữa các ví |
+| Mã | UC-TXN-02 |
+| Tên | Tra cứu và lọc lịch sử giao dịch |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Tra cứu, đối chiếu lịch sử thu chi theo nhiều tiêu chí kết hợp. |
+| Mô tả tóm tắt | Tra cứu và lọc lịch sử giao dịch đa tiêu chí theo khoảng thời gian, ví, loại giao dịch, danh mục và từ khóa ghi chú, kèm tổng hợp dòng tiền thuần trên tập kết quả lọc. |
+| Điều kiện kích hoạt | Người dùng cần tra cứu hoặc đối soát lại các giao dịch thu chi đã ghi nhận. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống đã có ít nhất một giao dịch được ghi nhận trong danh sách bản ghi `transactions`.
+2. Owner đang ở màn hình Quản lý Giao dịch thu chi.
+
+**Hậu điều kiện thành công:**
+
+1. Bảng danh sách giao dịch phản ánh đúng tập kết quả thỏa mãn toàn bộ các tiêu chí lọc.
+2. Khối tổng hợp tài chính (tổng thu nhập, tổng chi tiêu, dòng tiền thuần) được tính chính xác theo `BR-FIN-01` trên tập kết quả lọc.
+
+#### Luồng sự kiện chính
+
+1. Người dùng mở màn hình "Nhật ký giao dịch" và thiết lập bộ lọc: khoảng thời gian (`fromDate`, `toDate`), danh sách ví, loại giao dịch (`ALL`, `INCOME`, `EXPENSE`), nhóm danh mục, danh mục chi tiết, từ khóa tìm kiếm trong ghi chú.
+2. Hệ thống áp dụng kết hợp logic AND trên toàn bộ các tiêu chí lọc, thực hiện truy vấn và phân trang kết quả (mặc định 50 bản ghi mỗi trang, sắp xếp ngày giao dịch giảm dần).
+3. Hệ thống tính toán tổng số tiền thu nhập, tổng số tiền chi tiêu và dòng tiền thuần (Cash Flow = Tổng thu nhập - Tổng chi tiêu) trên tập kết quả lọc bằng kiểu dữ liệu tài chính chính xác tuyệt đối.
+4. Hệ thống hiển thị bảng danh sách giao dịch kèm tổng số bản ghi và khối tổng hợp tài chính tương ứng.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu tra cứu lịch sử giao dịch.
+
+#### Các luồng ngoại lệ
+
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài việc trả về tập kết quả rỗng khi không có giao dịch nào thỏa mãn tiêu chí lọc.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Độ chính xác tài chính `BR-FIN-01`: Toàn bộ phép tổng hợp thực hiện bằng kiểu dữ liệu tài chính chính xác tuyệt đối.
+2. Phù hợp các yêu cầu chức năng: `FR-TXN-02`.
+
+### 6.7 UC-TXN-03: Chỉnh sửa giao dịch thu chi
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-TXN-03 |
+| Tên | Chỉnh sửa giao dịch thu chi |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Điều chỉnh nội dung một giao dịch đã ghi nhận mà không làm sai lệch số dư sổ cái. |
+| Mô tả tóm tắt | Chỉnh sửa số tiền, ví thanh toán hoặc danh mục của một giao dịch đã lưu, với cơ chế hoàn nguyên số dư ví cũ và áp dụng số dư mới trong cùng một khối giao dịch toàn vẹn. |
+| Điều kiện kích hoạt | Người dùng cần điều chỉnh lại thông tin của một giao dịch đã ghi nhận trước đó. |
+
+**Tiền điều kiện:**
+
+1. Giao dịch cần chỉnh sửa đã tồn tại trong danh sách bản ghi `transactions`.
+2. Owner đang ở màn hình Quản lý Giao dịch thu chi.
+
+**Hậu điều kiện thành công:**
+
+1. Bản ghi giao dịch được cập nhật với thông tin mới trong tệp dữ liệu.
+2. Số dư ví cũ và ví mới liên quan được đồng bộ hóa chính xác theo quy tắc `BR-FIN-02`.
+3. Số dư của ví thông thường không âm sau khi áp dụng giao dịch đã chỉnh sửa.
+
+#### Luồng sự kiện chính
+
+1. Người dùng yêu cầu điều chỉnh thông tin của một giao dịch xác định từ sổ nhật ký.
+2. Hệ thống nạp thông tin giao dịch hiện tại lên biểu mẫu chỉnh sửa.
+3. Người dùng sửa đổi các trường cần thiết (thay đổi số tiền, đổi ví thanh toán hoặc đổi danh mục) và xác nhận lưu cập nhật.
+4. Hệ thống thực hiện hoàn nguyên số dư ví cũ theo quy tắc `BR-FIN-02`: nếu giao dịch cũ là `Income` thì trừ số tiền cũ khỏi ví cũ; nếu giao dịch cũ là `Expense` thì cộng hoàn trả số tiền cũ vào ví cũ.
+5. Hệ thống kiểm tra tính hợp lệ của giao dịch mới đối với ví mới: nếu là `Expense`, bảo đảm $Balance_{newWallet} - newAmount \ge 0$.
+6. Nếu hợp lệ, hệ thống áp dụng số tiền mới vào ví mới (cộng nếu `Income`, trừ nếu `Expense`), cập nhật bản ghi giao dịch trong tệp dữ liệu trong cùng một khối giao dịch toàn vẹn.
+7. Hệ thống thông báo cập nhật thành công và đồng bộ lại số dư các ví liên quan.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu chỉnh sửa giao dịch.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 5a: Số tiền giao dịch mới nhỏ hơn hoặc bằng 0
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện số tiền mới nhập vào $\le 0$ hoặc không đúng định dạng số học.
+2. Hệ thống từ chối lưu và hiển thị thông báo: "Số tiền giao dịch phải là một số dương lớn hơn 0".
+3. Người dùng nhập lại số tiền hợp lệ.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Tính toàn vẹn khi chỉnh sửa: Thao tác sửa giao dịch bảo đảm đồng bộ hoàn nguyên số dư ví cũ và áp dụng số dư mới trong cùng một khối giao dịch toàn vẹn; nếu phát sinh lỗi, hệ thống tự động hoàn nguyên toàn bộ.
+2. Độ chính xác tài chính `BR-FIN-01`: Toàn bộ phép cộng, trừ số dư sử dụng kiểu dữ liệu tài chính chính xác tuyệt đối.
+3. Phù hợp các yêu cầu chức năng: `FR-TXN-03`.
+
+### 6.8 UC-TXN-04: Xóa giao dịch thu chi
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-TXN-04 |
+| Tên | Xóa giao dịch thu chi |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Loại bỏ một giao dịch ghi nhận sai mà không làm sai lệch số dư sổ cái. |
+| Mô tả tóm tắt | Xóa một giao dịch thu chi đã lưu, hoàn nguyên số dư ví tương ứng và cập nhật lại các báo cáo thống kê tháng. |
+| Điều kiện kích hoạt | Người dùng cần loại bỏ một giao dịch đã ghi nhận sai hoặc không còn hợp lệ. |
+
+**Tiền điều kiện:**
+
+1. Giao dịch cần xóa đã tồn tại trong danh sách bản ghi `transactions`.
+2. Owner đang ở màn hình Quản lý Giao dịch thu chi.
+
+**Hậu điều kiện thành công:**
+
+1. Bản ghi giao dịch bị xóa khỏi danh sách bản ghi `transactions`.
+2. Số dư ví liên quan được hoàn nguyên chính xác theo quy tắc `BR-FIN-02`.
+3. Các báo cáo thống kê tháng liên quan được cập nhật lại tức thời.
+
+#### Luồng sự kiện chính
+
+1. Người dùng gửi yêu cầu xóa một giao dịch thu chi khỏi hệ thống.
+2. Hệ thống hiển thị hộp thoại cảnh báo xác nhận việc xóa giao dịch và nêu rõ tác động hoàn nguyên số dư ví.
+3. Người dùng xác nhận đồng ý xóa.
+4. Hệ thống kiểm tra điều kiện hoàn nguyên: nếu giao dịch là `Income`, việc trừ lại tiền khỏi ví không làm cho số dư ví bị âm ($Balance_{wallet} - amount \ge 0$).
+5. Hệ thống hoàn nguyên số dư ví (trừ tiền nếu xóa giao dịch thu, cộng trả lại tiền nếu xóa giao dịch chi) theo quy tắc `BR-FIN-02`.
+6. Hệ thống xóa bản ghi khỏi danh sách bản ghi `transactions` và cập nhật lại các báo cáo thống kê tháng.
+7. Hệ thống hiển thị thông báo xóa giao dịch thành công.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu xóa giao dịch.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Không thể xóa giao dịch thu nhập do làm âm số dư ví
+
+1. Tại bước 4 của luồng chính, hệ thống phát hiện việc xóa giao dịch thu nhập sẽ làm số dư ví hiện tại rơi vào số âm (do tiền từ khoản thu này đã được chi tiêu hoặc chuyển đi trong các giao dịch kế tiếp).
+2. Hệ thống từ chối thao tác xóa và hiển thị thông báo: "Không thể xóa giao dịch thu nhập này vì sẽ làm số dư ví bị âm. Vui lòng kiểm tra lại các khoản chi tiêu liên quan của ví trước khi thực hiện".
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Tính toàn vẹn khi xóa: Thao tác xóa giao dịch bảo đảm đồng bộ hoàn nguyên số dư ví trong cùng một khối giao dịch toàn vẹn; nếu phát sinh lỗi, hệ thống tự động hoàn nguyên toàn bộ.
+2. Bảo toàn số dư ví theo `BR-FIN-02`: Việc xóa giao dịch không được phép làm số dư ví thông thường trở nên âm.
+3. Phù hợp các yêu cầu chức năng: `FR-TXN-04`.
+
+### 6.9 UC-TRF-01: Chuyển tiền nội bộ giữa hai ví
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-TRF-01 |
+| Tên | Chuyển tiền nội bộ giữa hai ví |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
 | Các bên liên quan và mối quan tâm | Điều chuyển vốn giữa các ví nội bộ, bảo toàn tổng thanh khoản và hạch toán chi phí chuyển tiền phát sinh. |
-| Mô tả tóm tắt | Điều chuyển giá trị tiền tệ giữa hai ví thanh khoản nội bộ trong hệ thống (rút tiền từ tài khoản ngân hàng về ví tiền mặt, hoặc chuyển khoản giữa hai tài khoản ngân hàng); áp dụng nguyên lý ghi sổ kép đối ứng: tự động trừ ví nguồn, cộng ví đích và tách khoản phí chuyển tiền phát sinh (nếu có) thành khoản chi phí độc lập, bảo toàn tổng tài sản thanh khoản. |
+| Mô tả tóm tắt | Điều chuyển giá trị tiền tệ giữa hai ví thanh khoản nội bộ trong hệ thống; áp dụng nguyên lý ghi sổ kép đối ứng: tự động trừ ví nguồn, cộng ví đích và tách khoản phí chuyển tiền phát sinh (nếu có) thành khoản chi phí độc lập, bảo toàn tổng tài sản thanh khoản. |
 | Điều kiện kích hoạt | Người dùng cần điều chuyển số dư giữa các ví hoặc ghi nhận giao dịch chuyển tiền đã phát sinh thực tế. |
 
 **Tiền điều kiện:**
@@ -3277,7 +3651,7 @@ Bảng thuộc tính ca sử dụng:
 7. Người dùng cung cấp ghi chú mô tả (nếu có) và xác nhận thực thi lệnh chuyển tiền.
 8. Hệ thống xác thực nghiệp vụ:
   - Kiểm tra ví nguồn phải khác ví đích ($fromWalletId \ne toWalletId$).
-  - Kiểm tra số tiền chuyển $amount > 0$ và phí chuyển tiền $fee \ge 0$, chuẩn hóa về kiểu `BigDecimal` scale 2 theo quy tắc `BR-FIN-01`.
+  - Kiểm tra số tiền chuyển $amount > 0$ và phí chuyển tiền $fee \ge 0$, chuẩn hóa về kiểu dữ liệu tài chính chính xác tuyệt đối scale 2 theo quy tắc `BR-FIN-01`.
   - Kiểm tra năng lực thanh toán của ví nguồn theo `BR-FIN-02`: $Balance_{from} \ge amount + fee$.
 9. Hệ thống thực hiện ghi sổ kép đồng thời theo quy tắc `BR-FIN-03`:
   - Trừ số tiền $amount$ khỏi số dư ví nguồn $fromWalletId$.
@@ -3289,29 +3663,11 @@ Bảng thuộc tính ca sử dụng:
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 6a: Chuyển tiền không mất phí ($fee = 0$)
+##### Luồng rẽ nhánh: Chuyển tiền không mất phí ($fee = 0$)
 
 1. Tại bước 6 của luồng chính, Người dùng giữ nguyên mức phí bằng 0 (hoặc để trống).
 2. Hệ thống chỉ thực hiện ghi sổ kép đối ứng trừ $amount$ ở ví nguồn và cộng $amount$ ở ví đích.
 3. Hệ thống không sinh bản ghi chi tiêu phí liên kết; tổng số dư toàn bộ các ví trước và sau giao dịch được bảo toàn ($\Delta \sum Balance = 0$).
-
-##### Luồng 2a: Xem lịch sử chuyển tiền nội bộ
-
-1. Người dùng mở tab "Lịch sử chuyển tiền".
-2. Hệ thống hiển thị danh sách các lần chuyển tiền nội bộ đã thực hiện, sắp xếp theo thứ tự ngày giảm dần, hiển thị rõ ví nguồn, ví đích, số tiền chuyển, phí dịch vụ và trạng thái.
-
-##### Luồng 2b: Hủy bỏ giao dịch chuyển tiền nội bộ
-
-1. Tại danh sách lịch sử chuyển tiền, Người dùng yêu cầu hoàn nguyên một lệnh chuyển tiền đã ghi nhận.
-2. Hệ thống hiển thị hộp thoại xác nhận hủy, liệt kê chi tiết các khoản hoàn nguyên sẽ diễn ra.
-3. Người dùng xác nhận hoàn nguyên giao dịch.
-4. Hệ thống kiểm tra điều kiện hoàn nguyên tại ví đích theo quy tắc `FR-TRF-03`: số dư khả dụng của ví đích lớn hơn hoặc bằng số tiền đã nhận ($Balance_{to} \ge amount$).
-5. Hệ thống thực hiện khôi phục số dư đối ứng đồng thời:
-  - Cộng trả lại $amount$ vào số dư ví nguồn.
-  - Trừ $amount$ khỏi số dư ví đích.
-  - Nếu giao dịch có phí chuyển tiền liên kết, hệ thống hoàn trả $fee$ vào ví nguồn và xóa bản ghi chi tiêu phí trong danh sách `transactions`.
-6. Hệ thống cập nhật trạng thái của bản ghi chuyển tiền sang `CANCELLED` (hoặc xóa khỏi sổ chuyển tiền).
-7. Hệ thống hiển thị thông báo hủy chuyển tiền thành công và cập nhật lại số dư hai ví.
 
 #### Các luồng ngoại lệ
 
@@ -3327,43 +3683,130 @@ Bảng thuộc tính ca sử dụng:
 2. Hệ thống thông báo lỗi: "Số tiền chuyển phải là một số dương lớn hơn 0".
 3. Người dùng nhập lại số tiền hợp lệ.
 
-##### Luồng ngoại lệ 8c: Số dư ví nguồn không đủ thanh toán ($Balance_{from} < amount + fee$)
+##### Luồng ngoại lệ 8c: Số dư ví nguồn không đủ thanh toán
 
-1. Tại bước 8 của luồng chính, hệ thống tính tổng nghĩa vụ cần trừ tại ví nguồn là $amount + fee$ và phát hiện vượt quá số dư khả dụng hiện tại của ví nguồn.
+1. Tại bước 8 của luồng chính, hệ thống tính tổng nghĩa vụ cần trừ tại ví nguồn là $amount + fee$ và phát hiện vượt quá số dư khả dụng hiện tại của ví nguồn ($Balance_{from} < amount + fee$).
 2. Hệ thống từ chối thực hiện và hiển thị thông báo lỗi: "Số dư ví nguồn không đủ để thực hiện chuyển tiền".
 3. Người dùng có thể nạp thêm tiền vào ví nguồn, giảm số tiền chuyển hoặc chọn ví nguồn khác.
 
-##### Luồng ngoại lệ 9a: Lỗi một vế trong quá trình ghi sổ kép (Lỗi hệ thống hoặc lỗi ghi tệp)
+##### Luồng ngoại lệ 9a: Lỗi một vế trong quá trình ghi sổ kép
 
 1. Trong quá trình thực thi bước 9 hoặc bước 10 của luồng chính, nếu thao tác trừ tiền ở ví nguồn thành công nhưng thao tác cộng tiền ở ví đích bị gián đoạn do lỗi kỹ thuật.
-2. Hệ thống tự động kích hoạt cơ chế Rollback toàn bộ transaction, hủy bỏ thao tác trừ tiền ở ví nguồn, khôi phục trạng thái trước giao dịch.
+2. Hệ thống tự động kích hoạt cơ chế Rollback toàn bộ giao dịch, hủy bỏ thao tác trừ tiền ở ví nguồn, khôi phục trạng thái trước giao dịch.
 3. Hệ thống ghi nhật ký lỗi chi tiết và hiển thị thông báo: "Giao dịch chuyển tiền bị gián đoạn và đã được phục hồi nguyên trạng để bảo toàn dữ liệu tài sản. Vui lòng thử lại sau".
-
-##### Luồng ngoại lệ 2b4a: Ví đích không đủ số dư để hoàn nguyên khi hủy giao dịch
-
-1. Tại bước 4 của luồng 2b, hệ thống phát hiện số dư khả dụng hiện tại của ví đích nhỏ hơn số tiền đã nhận từ giao dịch chuyển tiền ($Balance_{to} < amount$) do ví đích đã dùng tiền này để chi tiêu trong các giao dịch tiếp theo.
-2. Hệ thống từ chối thao tác hủy và hiển thị thông báo: "Không thể hủy giao dịch chuyển tiền này vì ví đích không còn đủ số dư để hoàn trả".
 
 #### Quy tắc nghiệp vụ đặc thù
 
 1. Bất biến ghi sổ kép theo `BR-FIN-03`: Tổng tài sản trên toàn bộ các ví được bảo toàn đối với giao dịch chuyển tiền thuần túy ($\Delta \sum Balance = 0$).
 2. Bất biến tách biệt phí dịch vụ: Khoản phí ngân hàng bắt buộc phải được hạch toán thành một giao dịch chi tiêu (`Expense`) riêng biệt, không được khấu trừ gộp làm sai lệch số tiền chuyển thực nhận của ví đích.
-3. Bất biến số học `BR-FIN-01`: Toàn bộ các bước tính toán trừ cộng số dư đều thực hiện qua `BigDecimal`.
-4. Phù hợp các yêu cầu chức năng: `FR-TRF-01`, `FR-TRF-02`, `FR-TRF-03`.
+3. Bất biến số học `BR-FIN-01`: Toàn bộ các bước tính toán trừ cộng số dư đều thực hiện bằng kiểu dữ liệu tài chính chính xác tuyệt đối.
+4. Phù hợp các yêu cầu chức năng: `FR-TRF-01`.
 
-### 6.4 UC04: Thiết lập và quản lý danh mục phân loại thu chi 3 cấp
+### 6.10 UC-TRF-02: Tra cứu lịch sử chuyển tiền
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC04 |
-| Tên | Thiết lập và quản lý danh mục phân loại thu chi 3 cấp |
+| Mã | UC-TRF-02 |
+| Tên | Tra cứu lịch sử chuyển tiền |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
-| Các bên liên quan và mối quan tâm | Phân nhóm dòng tiền theo cấu trúc phân cấp, phản ánh cơ cấu chi tiêu và bảo toàn dữ liệu lịch sử. |
-| Mô tả tóm tắt | Khởi tạo và duyệt cây phân cấp danh mục 3 cấp (Type -> Group -> Category), bổ sung danh mục chi tiết, đổi tên danh mục và quản lý vòng đời (kích hoạt hoặc ẩn); kiểm soát ràng buộc toàn vẹn lịch sử, cấm xóa vật lý danh mục đã phát sinh dữ liệu giao dịch theo quy tắc `BR-FIN-04`. |
-| Điều kiện kích hoạt | Người dùng mở màn hình Cấu hình danh mục để xem cấu trúc phân loại hoặc bổ sung danh mục mới phục vụ ghi chép thu chi. |
+| Các bên liên quan và mối quan tâm | Đối soát lại các lệnh chuyển tiền nội bộ đã thực hiện giữa các ví. |
+| Mô tả tóm tắt | Xem danh sách các lần chuyển tiền nội bộ đã thực hiện, kèm ví nguồn, ví đích, số tiền chuyển, phí dịch vụ và trạng thái. |
+| Điều kiện kích hoạt | Người dùng cần tra cứu lại lịch sử các lệnh chuyển tiền nội bộ đã thực hiện. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống đã có ít nhất một bản ghi trong danh sách `transfers`.
+2. Owner đang ở giao diện Chuyển tiền nội bộ.
+
+**Hậu điều kiện thành công:**
+
+1. Danh sách lịch sử chuyển tiền được hiển thị đầy đủ và chính xác theo thứ tự thời gian.
+
+#### Luồng sự kiện chính
+
+1. Người dùng mở tab "Lịch sử chuyển tiền".
+2. Hệ thống hiển thị danh sách các lần chuyển tiền nội bộ đã thực hiện, sắp xếp theo thứ tự ngày giảm dần, hiển thị rõ ví nguồn, ví đích, số tiền chuyển, phí dịch vụ và trạng thái.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu tra cứu lịch sử chuyển tiền.
+
+#### Các luồng ngoại lệ
+
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài việc hiển thị danh sách rỗng khi chưa có lệnh chuyển tiền nào được ghi nhận.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Phù hợp các yêu cầu chức năng: `FR-TRF-02`.
+
+### 6.11 UC-TRF-03: Hủy giao dịch chuyển tiền
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-TRF-03 |
+| Tên | Hủy giao dịch chuyển tiền |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Hoàn nguyên một lệnh chuyển tiền ghi nhận sai mà không làm sai lệch số dư hai ví liên quan. |
+| Mô tả tóm tắt | Hủy bỏ một lệnh chuyển tiền nội bộ đã ghi nhận, khôi phục số dư đối ứng tại ví nguồn và ví đích, hoàn trả khoản phí chuyển tiền liên kết (nếu có). |
+| Điều kiện kích hoạt | Người dùng cần hoàn nguyên một lệnh chuyển tiền đã ghi nhận sai hoặc không còn hợp lệ. |
+
+**Tiền điều kiện:**
+
+1. Lệnh chuyển tiền cần hủy đã tồn tại trong danh sách bản ghi `transfers`.
+2. Owner đang ở giao diện Chuyển tiền nội bộ.
+
+**Hậu điều kiện thành công:**
+
+1. Số dư ví nguồn và ví đích được khôi phục đối ứng chính xác theo quy tắc `BR-FIN-03`.
+2. Bản ghi chuyển tiền chuyển sang trạng thái `CANCELLED` (hoặc bị xóa khỏi sổ chuyển tiền).
+
+#### Luồng sự kiện chính
+
+1. Tại danh sách lịch sử chuyển tiền, Người dùng yêu cầu hoàn nguyên một lệnh chuyển tiền đã ghi nhận.
+2. Hệ thống hiển thị hộp thoại xác nhận hủy, liệt kê chi tiết các khoản hoàn nguyên sẽ diễn ra.
+3. Người dùng xác nhận hoàn nguyên giao dịch.
+4. Hệ thống kiểm tra điều kiện hoàn nguyên tại ví đích theo quy tắc `FR-TRF-03`: số dư khả dụng của ví đích lớn hơn hoặc bằng số tiền đã nhận ($Balance_{to} \ge amount$).
+5. Hệ thống thực hiện khôi phục số dư đối ứng đồng thời:
+  - Cộng trả lại $amount$ vào số dư ví nguồn.
+  - Trừ $amount$ khỏi số dư ví đích.
+  - Nếu giao dịch có phí chuyển tiền liên kết, hệ thống hoàn trả $fee$ vào ví nguồn và xóa bản ghi chi tiêu phí trong danh sách `transactions`.
+6. Hệ thống cập nhật trạng thái của bản ghi chuyển tiền sang `CANCELLED` (hoặc xóa khỏi sổ chuyển tiền).
+7. Hệ thống hiển thị thông báo hủy chuyển tiền thành công và cập nhật lại số dư hai ví.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu hủy giao dịch chuyển tiền.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Ví đích không đủ số dư để hoàn nguyên khi hủy giao dịch
+
+1. Tại bước 4 của luồng chính, hệ thống phát hiện số dư khả dụng hiện tại của ví đích nhỏ hơn số tiền đã nhận từ giao dịch chuyển tiền ($Balance_{to} < amount$) do ví đích đã dùng tiền này để chi tiêu trong các giao dịch tiếp theo.
+2. Hệ thống từ chối thao tác hủy và hiển thị thông báo: "Không thể hủy giao dịch chuyển tiền này vì ví đích không còn đủ số dư để hoàn trả".
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến ghi sổ kép theo `BR-FIN-03`: Hoàn nguyên chuyển tiền phải khôi phục đối ứng chính xác tại cả ví nguồn và ví đích.
+2. Phù hợp các yêu cầu chức năng: `FR-TRF-03`.
+### 6.12 UC-CAT-01: Bổ sung danh mục phân loại mới
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-CAT-01 |
+| Tên | Bổ sung danh mục phân loại mới |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Mở rộng cây danh mục phân loại 3 cấp để phản ánh sát hơn cơ cấu thu chi thực tế. |
+| Mô tả tóm tắt | Bổ sung một danh mục chi tiết mới vào một Nhóm nhu cầu đã tồn tại trong cây phân cấp Type -> Group -> Category. |
+| Điều kiện kích hoạt | Người dùng cần thêm một danh mục phân loại mới phục vụ ghi chép thu chi. |
 
 **Tiền điều kiện:**
 
@@ -3374,7 +3817,6 @@ Bảng thuộc tính ca sử dụng:
 
 1. Danh mục mới được thêm vào đúng Group cha và thừa hưởng thuộc tính `Type` tương ứng.
 2. Tính toàn vẹn của cây danh mục 3 cấp được bảo toàn: không có danh mục mồ côi, không trùng lặp tên trong cùng một nhóm cha.
-3. Các danh mục liên kết với giao dịch lịch sử không bị thay đổi loại hoặc xóa khỏi hệ thống.
 
 #### Luồng sự kiện chính
 
@@ -3393,40 +3835,13 @@ Bảng thuộc tính ca sử dụng:
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 2a: Đổi tên danh mục chi tiết
-
-1. Người dùng chọn một danh mục cụ thể trên cây phân cấp và yêu cầu đổi tên hiển thị.
-2. Hệ thống hiển thị hộp thoại cho phép chỉnh sửa tên hiển thị.
-3. Người dùng nhập tên mới và xác nhận lưu.
-4. Hệ thống kiểm tra tên mới không trùng lặp với các danh mục khác trong cùng nhóm.
-5. Hệ thống cập nhật tên danh mục trong tệp dữ liệu. Toàn bộ các giao dịch trong quá khứ liên kết với `categoryId` này sẽ tự động hiển thị theo tên mới mà không bị phá vỡ liên kết khóa ngoại.
-6. Hệ thống hiển thị thông báo đổi tên thành công.
-
-##### Luồng 2b: Ẩn hoặc ngừng sử dụng danh mục
-
-1. Người dùng chọn một danh mục không còn nhu cầu sử dụng và chọn thao tác "Ngừng sử dụng (Ẩn)".
-2. Hệ thống cập nhật trường `isActive = false` của danh mục.
-3. Hệ thống loại bỏ danh mục này khỏi danh sách gợi ý khi tạo giao dịch mới, đồng thời hiển thị ký hiệu đánh dấu danh mục đã bị ẩn trên cây quản lý.
-4. Mọi báo cáo thống kê lịch sử của các tháng trước có chứa giao dịch thuộc danh mục này vẫn hiển thị dữ liệu bình thường, bảo đảm tính liên tục của số liệu tài chính.
-
-##### Luồng 2c: Kích hoạt lại danh mục đã bị ẩn
-
-1. Người dùng chọn một danh mục đang ở trạng thái ẩn (`isActive = false`) và yêu cầu kích hoạt lại danh mục.
-2. Hệ thống cập nhật cờ `isActive = true`. Danh mục xuất hiện trở lại trong danh sách lựa chọn khi thêm giao dịch mới.
-
-##### Luồng 2d: Xóa danh mục chưa phát sinh giao dịch
-
-1. Người dùng gửi yêu cầu xóa một danh mục khỏi hệ thống phân loại.
-2. Hệ thống quét bảng nhật ký `transactions` để kiểm tra sự tồn tại của các giao dịch tham chiếu tới `categoryId` này.
-3. Nếu hoàn toàn chưa có giao dịch nào liên kết, hệ thống hiển thị hộp thoại xác nhận xóa vĩnh viễn.
-4. Người dùng xác nhận xóa.
-5. Hệ thống thực hiện xóa vĩnh viễn bản ghi danh mục khỏi tệp dữ liệu và thông báo xóa thành công.
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu bổ sung danh mục mới.
 
 #### Các luồng ngoại lệ
 
 ##### Luồng ngoại lệ 6a: Trùng tên danh mục trong cùng một nhóm
 
-1. Tại bước 6 của luồng chính (hoặc bước 4 của luồng 2a), hệ thống phát hiện tên danh mục nhập vào trùng với tên của một danh mục đã tồn tại trong cùng Nhóm cha.
+1. Tại bước 6 của luồng chính, hệ thống phát hiện tên danh mục nhập vào trùng với tên của một danh mục đã tồn tại trong cùng Nhóm cha.
 2. Hệ thống từ chối lưu và hiển thị thông báo lỗi: "Tên danh mục này đã tồn tại trong nhóm. Vui lòng đặt tên khác".
 3. Người dùng điều chỉnh lại tên danh mục.
 
@@ -3435,50 +3850,188 @@ Bảng thuộc tính ca sử dụng:
 1. Tại bước 6 của luồng chính, hệ thống phát hiện mã nhóm cha `groupId` không tồn tại trong danh mục hệ thống.
 2. Hệ thống từ chối tạo và thông báo lỗi cấu trúc: "Không tìm thấy nhóm nhu cầu cha hợp lệ".
 
-##### Luồng ngoại lệ 2d3a: Cố gắng xóa danh mục đã phát sinh giao dịch lịch sử
+#### Quy tắc nghiệp vụ đặc thù
 
-1. Tại bước 3 của luồng 2d, hệ thống phát hiện đã có ít nhất một bản ghi giao dịch trong danh sách `transactions` đang liên kết với danh mục này.
-2. Hệ thống từ chối xóa vật lý bản ghi và hiển thị hộp thoại thông báo: "Danh mục này đã có dữ liệu giao dịch phát sinh trong lịch sử và không thể xóa để bảo toàn dữ liệu sổ cái. Bạn có muốn chuyển danh mục này sang trạng thái ẩn (ngừng sử dụng) hay không?".
-3. Nếu Người dùng chọn đồng ý ẩn, hệ thống chuyển hướng thực hiện luồng 2b; nếu Người dùng chọn hủy, hệ thống giữ nguyên trạng thái danh mục.
+1. Bất biến cấu trúc 3 cấp theo `BR-FIN-04`: Luôn bảo đảm cây phân cấp Type -> Group -> Category nguyên vẹn, không tồn tại nút mồ côi.
+2. Phù hợp các yêu cầu chức năng: `FR-CAT-01`.
 
-##### Luồng ngoại lệ 2a3a: Cố ý thay đổi loại luồng tiền của danh mục đã có giao dịch
+### 6.13 UC-CAT-02: Đổi tên danh mục
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-CAT-02 |
+| Tên | Đổi tên danh mục |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Cập nhật tên hiển thị của danh mục mà không phá vỡ liên kết với các giao dịch lịch sử. |
+| Mô tả tóm tắt | Đổi tên hiển thị của một danh mục chi tiết đã tồn tại trong cây phân cấp, bảo đảm toàn bộ các giao dịch quá khứ liên kết với danh mục này tự động hiển thị theo tên mới. |
+| Điều kiện kích hoạt | Người dùng cần chỉnh sửa tên hiển thị của một danh mục đã tồn tại. |
+
+**Tiền điều kiện:**
+
+1. Danh mục cần đổi tên đã tồn tại trong cây phân cấp.
+2. Owner đang ở giao diện Quản lý Danh mục.
+
+**Hậu điều kiện thành công:**
+
+1. Tên hiển thị của danh mục được cập nhật trong tệp dữ liệu.
+2. Toàn bộ các giao dịch trong quá khứ liên kết với `categoryId` này tiếp tục giữ nguyên liên kết khóa ngoại và hiển thị theo tên mới.
+
+#### Luồng sự kiện chính
+
+1. Người dùng chọn một danh mục cụ thể trên cây phân cấp và yêu cầu đổi tên hiển thị.
+2. Hệ thống hiển thị hộp thoại cho phép chỉnh sửa tên hiển thị.
+3. Người dùng nhập tên mới và xác nhận lưu.
+4. Hệ thống kiểm tra tên mới không trùng lặp với các danh mục khác trong cùng nhóm.
+5. Hệ thống cập nhật tên danh mục trong tệp dữ liệu. Toàn bộ các giao dịch trong quá khứ liên kết với `categoryId` này sẽ tự động hiển thị theo tên mới mà không bị phá vỡ liên kết khóa ngoại.
+6. Hệ thống hiển thị thông báo đổi tên thành công.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu đổi tên danh mục.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Trùng tên danh mục trong cùng một nhóm
+
+1. Tại bước 4 của luồng chính, hệ thống phát hiện tên mới nhập vào trùng với tên của một danh mục đã tồn tại trong cùng Nhóm cha.
+2. Hệ thống từ chối lưu và hiển thị thông báo lỗi: "Tên danh mục này đã tồn tại trong nhóm. Vui lòng đặt tên khác".
+3. Người dùng điều chỉnh lại tên danh mục.
+
+##### Luồng ngoại lệ: Cố ý thay đổi loại luồng tiền của danh mục đã có giao dịch
 
 1. Nếu có yêu cầu chuyển đổi một danh mục từ nhóm Chi tiêu sang nhóm Thu nhập (hoặc ngược lại) khi danh mục đó đã có giao dịch trong quá khứ.
 2. Hệ thống từ chối thao tác, thông báo lỗi vi phạm bất biến phân loại thu chi theo quy tắc `BR-FIN-04` và từ chối thay đổi.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Bất biến cấu trúc 3 cấp theo `BR-FIN-04`: Luôn bảo đảm cây phân cấp Type -> Group -> Category nguyên vẹn, không tồn tại nút mồ côi.
-2. Bất biến bảo toàn lịch sử giao dịch: Danh mục đã phát sinh dữ liệu trong sổ cái không được phép xóa vật lý (chỉ cho phép ẩn qua cờ `isActive`).
-3. Bất biến tính nhất quán của Loại: Không cho phép chuyển đổi nhánh gốc giữa Thu nhập và Chi tiêu đối với danh mục đã có giao dịch để tránh sai lệch báo cáo dòng tiền quá khứ.
-4. Phù hợp các yêu cầu chức năng: `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`.
+1. Bất biến bảo toàn lịch sử giao dịch: Việc đổi tên danh mục không được phá vỡ liên kết khóa ngoại với các giao dịch lịch sử.
+2. Bất biến tính nhất quán của Loại theo `BR-FIN-04`: Không cho phép chuyển đổi nhánh gốc giữa Thu nhập và Chi tiêu đối với danh mục đã có giao dịch để tránh sai lệch báo cáo dòng tiền quá khứ.
+3. Phù hợp các yêu cầu chức năng: `FR-CAT-02`.
 
-### 6.5 UC05: Quản lý công nợ
+### 6.14 UC-CAT-03: Thay đổi trạng thái hoạt động của danh mục
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC05 |
-| Tên | Quản lý công nợ |
+| Mã | UC-CAT-03 |
+| Tên | Thay đổi trạng thái hoạt động của danh mục |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
-| Các bên liên quan và mối quan tâm | Theo dõi các nghĩa vụ tài chính hai chiều (phải thu và phải trả), kiểm soát dư nợ theo từng đối tác, ghi nhận hoàn ứng và xóa nợ không làm sai lệch số dư sổ cái hay báo cáo thu chi. |
-| Mô tả tóm tắt | Ghi nhận và quản lý các khoản phải thu và phải trả (đi vay) theo từng đối tác; theo dõi tiến trình hoàn ứng (thu hồi nợ, trả nợ); xử lý xóa nợ khó đòi phi tiền mặt và tra cứu sao kê công nợ chi tiết theo đối tượng theo quy tắc BR-FIN-07. |
-| Điều kiện kích hoạt | Người dùng phát sinh giao dịch cho vay, đi vay, thu nợ, trả nợ bằng tiền mặt hoặc cần đối soát, xóa nợ với đối tác. |
+| Các bên liên quan và mối quan tâm | Ẩn danh mục không còn nhu cầu sử dụng hoặc kích hoạt lại danh mục khi có nhu cầu trở lại, mà không làm mất dữ liệu lịch sử. |
+| Mô tả tóm tắt | Chuyển đổi cờ trạng thái hoạt động (`isActive`) của một danh mục giữa hai trạng thái ẩn và kích hoạt, kiểm soát danh mục nào xuất hiện trong danh sách chọn khi ghi nhận giao dịch mới mà không ảnh hưởng đến báo cáo lịch sử. |
+| Điều kiện kích hoạt | Người dùng cần ngừng sử dụng tạm thời một danh mục hoặc kích hoạt lại một danh mục đã bị ẩn trước đó. |
 
 **Tiền điều kiện:**
 
-1. Hệ thống có ít nhất một ví tiền ở trạng thái `ACTIVE` (đối với các nghiệp vụ phát sinh dòng tiền mặt).
-2. Đối với nghiệp vụ thu hồi nợ hoặc trả nợ, đối tác phải đang có số dư nợ tương ứng lớn hơn 0.
+1. Danh mục cần đổi trạng thái đã tồn tại trong cây phân cấp.
+2. Owner đang ở giao diện Quản lý Danh mục.
+
+**Hậu điều kiện thành công:**
+
+1. Cờ `isActive` của danh mục được cập nhật chính xác trong tệp dữ liệu.
+2. Mọi báo cáo thống kê lịch sử của các tháng trước có chứa giao dịch thuộc danh mục này vẫn hiển thị dữ liệu bình thường, bảo đảm tính liên tục của số liệu tài chính.
+
+#### Luồng sự kiện chính
+
+1. Người dùng chọn một danh mục không còn nhu cầu sử dụng và chọn thao tác "Ngừng sử dụng (Ẩn)".
+2. Hệ thống cập nhật trường `isActive = false` của danh mục.
+3. Hệ thống loại bỏ danh mục này khỏi danh sách gợi ý khi tạo giao dịch mới, đồng thời hiển thị ký hiệu đánh dấu danh mục đã bị ẩn trên cây quản lý.
+4. Mọi báo cáo thống kê lịch sử của các tháng trước có chứa giao dịch thuộc danh mục này vẫn hiển thị dữ liệu bình thường, bảo đảm tính liên tục của số liệu tài chính.
+
+#### Các luồng rẽ nhánh
+
+##### Luồng rẽ nhánh: Kích hoạt lại danh mục đã bị ẩn
+
+1. Người dùng chọn một danh mục đang ở trạng thái ẩn (`isActive = false`) và yêu cầu kích hoạt lại danh mục.
+2. Hệ thống cập nhật cờ `isActive = true`. Danh mục xuất hiện trở lại trong danh sách lựa chọn khi thêm giao dịch mới.
+
+#### Các luồng ngoại lệ
+
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài các kiểm tra tồn tại danh mục đã liệt kê ở luồng sự kiện chính.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến bảo toàn lịch sử giao dịch: Việc ẩn hoặc kích hoạt lại danh mục không làm thay đổi hoặc xóa bỏ dữ liệu giao dịch lịch sử đã liên kết.
+2. Phù hợp các yêu cầu chức năng: `FR-CAT-03`.
+
+### 6.15 UC-CAT-04: Xóa danh mục chưa phát sinh giao dịch
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-CAT-04 |
+| Tên | Xóa danh mục chưa phát sinh giao dịch |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Loại bỏ vĩnh viễn một danh mục dư thừa mà không làm mất dữ liệu giao dịch lịch sử. |
+| Mô tả tóm tắt | Xóa vĩnh viễn một danh mục khỏi cây phân cấp khi danh mục này hoàn toàn chưa phát sinh bất kỳ giao dịch nào trong sổ nhật ký. |
+| Điều kiện kích hoạt | Người dùng cần loại bỏ vĩnh viễn một danh mục dư thừa chưa từng được sử dụng. |
+
+**Tiền điều kiện:**
+
+1. Danh mục cần xóa đã tồn tại trong cây phân cấp.
+2. Owner đang ở giao diện Quản lý Danh mục.
+
+**Hậu điều kiện thành công:**
+
+1. Danh mục bị xóa vĩnh viễn khỏi tệp dữ liệu nếu chưa có giao dịch nào tham chiếu tới.
+2. Các danh mục liên kết với giao dịch lịch sử không bị xóa khỏi hệ thống.
+
+#### Luồng sự kiện chính
+
+1. Người dùng gửi yêu cầu xóa một danh mục khỏi hệ thống phân loại.
+2. Hệ thống quét bảng nhật ký `transactions` để kiểm tra sự tồn tại của các giao dịch tham chiếu tới `categoryId` này.
+3. Nếu hoàn toàn chưa có giao dịch nào liên kết, hệ thống hiển thị hộp thoại xác nhận xóa vĩnh viễn.
+4. Người dùng xác nhận xóa.
+5. Hệ thống thực hiện xóa vĩnh viễn bản ghi danh mục khỏi tệp dữ liệu và thông báo xóa thành công.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu xóa danh mục.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 3a: Cố gắng xóa danh mục đã phát sinh giao dịch lịch sử
+
+1. Tại bước 3 của luồng chính, hệ thống phát hiện đã có ít nhất một bản ghi giao dịch trong danh sách `transactions` đang liên kết với danh mục này.
+2. Hệ thống từ chối xóa vật lý bản ghi và hiển thị hộp thoại thông báo: "Danh mục này đã có dữ liệu giao dịch phát sinh trong lịch sử và không thể xóa để bảo toàn dữ liệu sổ cái. Bạn có muốn chuyển danh mục này sang trạng thái ẩn (ngừng sử dụng) hay không?".
+3. Nếu Người dùng chọn đồng ý ẩn, hệ thống chuyển hướng thực hiện ca sử dụng `UC-CAT-03` (Thay đổi trạng thái hoạt động của danh mục); nếu Người dùng chọn hủy, hệ thống giữ nguyên trạng thái danh mục.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến bảo toàn lịch sử giao dịch: Danh mục đã phát sinh dữ liệu trong sổ cái không được phép xóa vật lý (chỉ cho phép ẩn qua cờ `isActive`).
+2. Phù hợp các yêu cầu chức năng: `FR-CAT-03`.
+### 6.16 UC-DEBT-01: Ghi nhận và thu hồi khoản cho vay
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-DEBT-01 |
+| Tên | Ghi nhận và thu hồi khoản cho vay |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Theo dõi nghĩa vụ phải thu theo từng người vay, từ thời điểm phát sinh khoản cho vay đến khi thu hồi hoàn tất. |
+| Mô tả tóm tắt | Ghi nhận một khoản cho vay mới đối với một cá nhân, trích tiền từ ví thanh khoản; theo dõi và thu hồi dần khoản nợ phải thu này về ví theo quy tắc trần thu nợ `BR-FIN-07`. |
+| Điều kiện kích hoạt | Người dùng phát sinh khoản cho vay bằng tiền mặt mới, hoặc cần thu hồi một phần hay toàn bộ khoản nợ phải thu đã có với một người vay. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống có ít nhất một ví tiền ở trạng thái `ACTIVE`.
+2. Đối với nghiệp vụ thu hồi nợ, đối tác phải đang có số dư nợ phải thu lớn hơn 0.
 3. Owner đang ở giao diện Quản lý Công nợ.
 
 **Hậu điều kiện thành công:**
 
-1. Bản ghi công nợ mới được lưu vào danh sách bản ghi `debt` với loại nghiệp vụ chính xác (`lend`, `borrow`, `collect`, `repay`, `write-off lend`, `write-off borrow`).
-2. Số dư ví liên quan được đồng bộ hóa tức thời theo quy tắc `BR-FIN-02` (đối với nghiệp vụ tiền mặt); nghiệp vụ xóa nợ không làm thay đổi số dư ví.
-3. Số dư nợ chi tiết của đối tác và tổng chỉ số $Receivable$, $Payable$ toàn hệ thống được tính toán theo `BR-FIN-07`.
-4. Bất biến số dư nợ không âm luôn được thỏa mãn: không thu nợ vượt quá nợ phải thu, không trả nợ vượt quá nợ phải trả.
+1. Bản ghi công nợ mới được lưu vào danh sách bản ghi `debt` với loại nghiệp vụ chính xác (`lend` hoặc `collect`).
+2. Số dư ví liên quan được đồng bộ hóa tức thời theo quy tắc `BR-FIN-02`.
+3. Số dư nợ phải thu của đối tác và tổng chỉ số $Receivable$ toàn hệ thống được tính toán theo `BR-FIN-07`.
+4. Bất biến số dư nợ không âm luôn được thỏa mãn: không thu nợ vượt quá nợ phải thu.
 
 #### Luồng sự kiện chính
 
@@ -3488,7 +4041,7 @@ Bảng thuộc tính ca sử dụng:
 4. Người dùng xác nhận ghi nhận khoản cho vay mới.
 5. Hệ thống xác thực dữ liệu:
   - Tên người vay không được để trống (độ dài từ 1 đến 100 ký tự).
-  - Số tiền cho vay $amount$ phải lớn hơn 0, chuẩn hóa về kiểu `BigDecimal` scale 2 theo quy tắc `BR-FIN-01`.
+  - Số tiền cho vay $amount$ phải lớn hơn 0, chuẩn hóa về kiểu dữ liệu tài chính chính xác tuyệt đối scale 2 theo quy tắc `BR-FIN-01`.
   - Kiểm tra số dư ví xuất tiền theo `BR-FIN-02`: $Balance_{wallet} - amount \ge 0$.
 6. Hệ thống thực hiện ghi sổ nghiệp vụ:
   - Trừ số tiền $amount$ khỏi số dư khả dụng của ví xuất tiền theo quy tắc `BR-FIN-02`.
@@ -3499,18 +4052,7 @@ Bảng thuộc tính ca sử dụng:
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 2a: Ghi nhận khoản Đi vay
-
-1. Người dùng chọn chức năng "Ghi nhận khoản đi vay".
-2. Hệ thống hiển thị biểu mẫu nhập: Ngày vay (mặc định hôm nay), Mã đợt vay (tùy chọn), Tên chủ nợ (`person`), Số tiền vay, Ví nhận tiền, Ghi chú mô tả.
-3. Người dùng cung cấp thông tin hợp lệ ($amount > 0$, ví nhận tiền đang ở trạng thái `ACTIVE`) và xác nhận lưu khoản đi vay.
-4. Hệ thống xác thực dữ liệu: tên chủ nợ không để trống, số tiền $amount > 0$ chuẩn hóa kiểu `BigDecimal` theo quy tắc `BR-FIN-01`.
-5. Hệ thống cộng số tiền $amount$ vào số dư khả dụng của ví nhận tiền theo quy tắc `BR-FIN-02`.
-6. Hệ thống tăng nghĩa vụ nợ phải trả đối với chủ nợ: $Payable_{person}(t) = Payable_{person}(t-1) + amount$.
-7. Hệ thống lưu bản ghi công nợ loại `borrow` vào danh sách bản ghi `debt` kèm mã `debtId` duy nhất, cập nhật tổng $Payable$ toàn hệ thống. Khoản tiền này không tính vào doanh thu tiêu dùng (`Income`).
-8. Hệ thống hiển thị thông báo ghi nhận khoản đi vay thành công và làm mới giao diện theo dõi công nợ.
-
-##### Luồng 2b: Thu hồi nợ cho vay
+##### Luồng rẽ nhánh: Thu hồi nợ cho vay
 
 1. Người dùng chọn một người vay trong danh sách nợ phải thu và yêu cầu thu hồi nợ.
 2. Hệ thống hiển thị số dư nợ phải thu còn lại của người này và mở biểu mẫu thu nợ: Ngày thu (mặc định hôm nay), Số tiền thu, Ví nhận tiền (danh sách ví `ACTIVE`), Ghi chú.
@@ -3521,7 +4063,80 @@ Bảng thuộc tính ca sử dụng:
 7. Nếu $Receivable_{person} = 0$, hệ thống đánh dấu trạng thái công nợ của người này là đã hoàn tất (`PAID`).
 8. Hệ thống lưu bản ghi loại `collect` vào danh sách bản ghi `debt` và hiển thị thông báo thành công kèm dư nợ còn lại.
 
-##### Luồng 2c: Trả nợ đi vay
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 5a: Tên đối tác để trống
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện trường tên đối tác `person` để trống hoặc chỉ chứa khoảng trắng.
+2. Hệ thống từ chối lưu và báo lỗi: "Tên đối tác không được để trống. Vui lòng nhập tên người vay".
+3. Người dùng nhập tên đối tác hợp lệ.
+
+##### Luồng ngoại lệ 5b: Số tiền cho vay nhỏ hơn hoặc bằng 0
+
+1. Tại bước 5 của luồng chính (hoặc bước 3 của luồng thu hồi nợ), hệ thống phát hiện $amount \le 0$ hoặc sai định dạng số học.
+2. Hệ thống báo lỗi: "Số tiền giao dịch phải là một số dương lớn hơn 0".
+3. Người dùng nhập lại số tiền hợp lệ.
+
+##### Luồng ngoại lệ 5c: Số dư ví xuất tiền không đủ
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện số dư khả dụng của ví xuất tiền nhỏ hơn số tiền cho vay ($Balance_{wallet} < amount$).
+2. Hệ thống từ chối thực thi và hiển thị thông báo: "Số dư ví trích tiền không đủ để thực hiện giao dịch công nợ".
+3. Người dùng chọn ví xuất tiền khác hoặc điều chỉnh giảm số tiền cho vay.
+
+##### Luồng ngoại lệ 4a: Thu hồi nợ vượt quá dư nợ phải thu
+
+1. Tại bước 4 của luồng rẽ nhánh "Thu hồi nợ cho vay", hệ thống phát hiện số tiền thu nợ lớn hơn số dư nợ phải thu còn lại của người vay ($amount > Receivable_{person}$).
+2. Hệ thống từ chối và thông báo lỗi: "Số tiền thu hồi không được vượt quá số dư nợ gốc hiện tại của đối tác".
+3. Người dùng điều chỉnh lại số tiền thu nợ chính xác.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến số dư nợ không âm theo `BR-FIN-07`: $Receivable \ge 0$ tại mọi cấp độ (toàn hệ thống và từng cá nhân).
+2. Bất biến dòng tiền ví theo `BR-FIN-02`: Nghiệp vụ `lend` và `collect` tác động trực tiếp đến số dư ví.
+3. Bất biến độc lập với thu chi tiêu dùng: Cho vay và thu nợ không phải là chi tiêu hoặc thu nhập, không tính gộp vào báo cáo kết quả hoạt động tiêu dùng hàng tháng.
+4. Phù hợp các yêu cầu chức năng: `FR-DEBT-01`, `FR-DEBT-02`.
+
+### 6.17 UC-DEBT-02: Ghi nhận và trả khoản đi vay
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-DEBT-02 |
+| Tên | Ghi nhận và trả khoản đi vay |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Theo dõi nghĩa vụ phải trả theo từng chủ nợ, từ thời điểm phát sinh khoản đi vay đến khi hoàn trả hoàn tất. |
+| Mô tả tóm tắt | Ghi nhận một khoản đi vay mới từ một chủ nợ, cộng tiền vào ví thanh khoản; theo dõi và hoàn trả dần khoản nợ phải trả này theo quy tắc trần trả nợ `BR-FIN-07`. |
+| Điều kiện kích hoạt | Người dùng phát sinh khoản đi vay bằng tiền mặt mới, hoặc cần trả một phần hay toàn bộ khoản nợ phải trả đã có với một chủ nợ. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống có ít nhất một ví tiền ở trạng thái `ACTIVE`.
+2. Đối với nghiệp vụ trả nợ, đối tác phải đang có số dư nợ phải trả lớn hơn 0.
+3. Owner đang ở giao diện Quản lý Công nợ.
+
+**Hậu điều kiện thành công:**
+
+1. Bản ghi công nợ mới được lưu vào danh sách bản ghi `debt` với loại nghiệp vụ chính xác (`borrow` hoặc `repay`).
+2. Số dư ví liên quan được đồng bộ hóa tức thời theo quy tắc `BR-FIN-02`.
+3. Số dư nợ phải trả của đối tác và tổng chỉ số $Payable$ toàn hệ thống được tính toán theo `BR-FIN-07`.
+4. Bất biến số dư nợ không âm luôn được thỏa mãn: không trả nợ vượt quá nợ phải trả.
+
+#### Luồng sự kiện chính
+
+1. Người dùng chọn chức năng "Ghi nhận khoản đi vay".
+2. Hệ thống hiển thị biểu mẫu nhập: Ngày vay (mặc định hôm nay), Mã đợt vay (tùy chọn), Tên chủ nợ (`person`), Số tiền vay, Ví nhận tiền, Ghi chú mô tả.
+3. Người dùng cung cấp thông tin hợp lệ ($amount > 0$, ví nhận tiền đang ở trạng thái `ACTIVE`) và xác nhận lưu khoản đi vay.
+4. Hệ thống xác thực dữ liệu: tên chủ nợ không để trống, số tiền $amount > 0$ chuẩn hóa kiểu dữ liệu tài chính chính xác tuyệt đối theo quy tắc `BR-FIN-01`.
+5. Hệ thống cộng số tiền $amount$ vào số dư khả dụng của ví nhận tiền theo quy tắc `BR-FIN-02`.
+6. Hệ thống tăng nghĩa vụ nợ phải trả đối với chủ nợ: $Payable_{person}(t) = Payable_{person}(t-1) + amount$.
+7. Hệ thống lưu bản ghi công nợ loại `borrow` vào danh sách bản ghi `debt` kèm mã `debtId` duy nhất, cập nhật tổng $Payable$ toàn hệ thống. Khoản tiền này không tính vào doanh thu tiêu dùng (`Income`).
+8. Hệ thống hiển thị thông báo ghi nhận khoản đi vay thành công và làm mới giao diện theo dõi công nợ.
+
+#### Các luồng rẽ nhánh
+
+##### Luồng rẽ nhánh: Trả nợ đi vay
 
 1. Người dùng chọn một chủ nợ trong danh sách nợ phải trả và yêu cầu trả nợ.
 2. Hệ thống hiển thị dư nợ phải trả hiện tại và biểu mẫu trả nợ: Ngày trả (mặc định hôm nay), Số tiền trả, Ví trích tiền (danh sách ví `ACTIVE`), Ghi chú.
@@ -3532,81 +4147,103 @@ Bảng thuộc tính ca sử dụng:
 7. Nếu $Payable_{person} = 0$, hệ thống đánh dấu trạng thái đã hoàn tất trả nợ (`PAID`).
 8. Hệ thống lưu bản ghi loại `repay` vào danh sách bản ghi `debt` và hiển thị thông báo thành công kèm dư nợ còn lại.
 
-##### Luồng 2d: Xóa nợ khó đòi phi tiền mặt
-
-1. Người dùng chọn một khoản nợ không thể thu hồi hoặc được chủ nợ miễn trừ nghĩa vụ và chọn chức năng "Xóa nợ".
-2. Người dùng chọn loại hình xóa nợ (`write-off lend` nếu là khoản cho vay mất khả năng thu hồi, hoặc `write-off borrow` nếu được chủ nợ xóa nợ), nhập số tiền xóa nợ ($amount > 0$), và bắt buộc nhập lý do xóa nợ vào ô ghi chú.
-3. Hệ thống kiểm tra số tiền xóa nợ không vượt quá dư nợ hiện tại của đối tác ($amount \le Receivable_{person}$ hoặc $amount \le Payable_{person}$).
-4. Hệ thống ghi giảm số dư nợ của đối tác tương ứng theo quy tắc `BR-FIN-07`: nếu cho vay thì trừ $Receivable_{person}$, nếu đi vay thì trừ $Payable_{person}$.
-5. Hệ thống giữ nguyên số dư của toàn bộ các ví tiền mặt (nghiệp vụ phi tiền mặt theo BR-FIN-02).
-6. Hệ thống lưu bản ghi công nợ loại `write-off lend` hoặc `write-off borrow` vào danh sách bản ghi `debt` và thông báo hoàn tất xóa nợ.
-
-##### Luồng 2e: Xem danh sách và bảng tổng hợp công nợ
-
-1. Người dùng chọn chức năng "Bảng tổng hợp công nợ" hoặc chọn một cá nhân đối tác cụ thể để xem chi tiết.
-2. Hệ thống tổng hợp số liệu toàn hệ thống: tổng nợ phải thu ($Receivable = \sum Receivable_{person}$), tổng nợ phải trả ($Payable = \sum Payable_{person}$).
-3. Nếu chọn đối tác cụ thể, hệ thống lọc toàn bộ các bản ghi trong danh sách `debt` có trường `person` tương ứng, sắp xếp theo trình tự thời gian tăng dần.
-4. Hệ thống tính số dư nợ lũy kế sau từng giao dịch và tổng hợp: Tổng cho vay, Tổng đã thu hồi, Dư nợ phải thu còn lại, Tổng đã vay, Tổng đã trả, Dư nợ phải trả còn lại.
-5. Hệ thống hiển thị bảng sao kê chi tiết phục vụ việc đối soát và theo dõi nghĩa vụ tài chính.
-
 #### Các luồng ngoại lệ
 
-##### Luồng ngoại lệ 5a: Tên đối tác để trống
+##### Luồng ngoại lệ 4a: Tên đối tác để trống
 
-1. Tại bước 5 của luồng chính (hoặc bước 4 của luồng 2a), hệ thống phát hiện trường tên đối tác `person` để trống hoặc chỉ chứa khoảng trắng.
-2. Hệ thống từ chối lưu và báo lỗi: "Tên đối tác không được để trống. Vui lòng nhập tên người vay hoặc chủ nợ".
+1. Tại bước 4 của luồng chính, hệ thống phát hiện trường tên đối tác `person` để trống hoặc chỉ chứa khoảng trắng.
+2. Hệ thống từ chối lưu và báo lỗi: "Tên đối tác không được để trống. Vui lòng nhập tên chủ nợ".
 3. Người dùng nhập tên đối tác hợp lệ.
 
-##### Luồng ngoại lệ 5b: Số tiền nợ nhỏ hơn hoặc bằng 0
+##### Luồng ngoại lệ 4b: Số tiền vay nhỏ hơn hoặc bằng 0
 
-1. Tại bước 5 của luồng chính (hoặc các luồng rẽ nhánh), hệ thống phát hiện $amount \le 0$ hoặc sai định dạng số học.
+1. Tại bước 4 của luồng chính (hoặc bước 3 của luồng trả nợ), hệ thống phát hiện $amount \le 0$ hoặc sai định dạng số học.
 2. Hệ thống báo lỗi: "Số tiền giao dịch phải là một số dương lớn hơn 0".
 3. Người dùng nhập lại số tiền hợp lệ.
 
-##### Luồng ngoại lệ 5c: Số dư ví trích tiền không đủ
+##### Luồng ngoại lệ 4c: Số dư ví trích tiền không đủ khi trả nợ
 
-1. Tại bước 5 của luồng chính (hoặc bước 4 của luồng 2c), hệ thống phát hiện số dư khả dụng của ví trích tiền nhỏ hơn số tiền giao dịch ($Balance_{wallet} < amount$).
+1. Tại bước 4 của luồng rẽ nhánh "Trả nợ đi vay", hệ thống phát hiện số dư khả dụng của ví trích tiền nhỏ hơn số tiền trả nợ ($Balance_{wallet} < amount$).
 2. Hệ thống từ chối thực thi và hiển thị thông báo: "Số dư ví trích tiền không đủ để thực hiện giao dịch công nợ".
-3. Người dùng chọn ví trích tiền khác hoặc điều chỉnh giảm số tiền giao dịch.
+3. Người dùng chọn ví trích tiền khác hoặc điều chỉnh giảm số tiền trả nợ.
 
-##### Luồng ngoại lệ 2b4a: Thu hồi nợ vượt quá dư nợ phải thu
+##### Luồng ngoại lệ 4d: Trả nợ vượt quá dư nợ phải trả
 
-1. Tại bước 4 của luồng 2b, hệ thống phát hiện số tiền thu nợ lớn hơn số dư nợ phải thu còn lại của người vay ($amount > Receivable_{person}$).
-2. Hệ thống từ chối và thông báo lỗi: "Số tiền thu hồi không được vượt quá số dư nợ gốc hiện tại của đối tác".
-3. Người dùng điều chỉnh lại số tiền thu nợ chính xác.
-
-##### Luồng ngoại lệ 2c4a: Trả nợ vượt quá dư nợ phải trả
-
-1. Tại bước 4 của luồng 2c, hệ thống phát hiện số tiền trả nợ lớn hơn nghĩa vụ nợ phải trả còn lại đối với chủ nợ ($amount > Payable_{person}$).
+1. Tại bước 4 của luồng rẽ nhánh "Trả nợ đi vay", hệ thống phát hiện số tiền trả nợ lớn hơn nghĩa vụ nợ phải trả còn lại đối với chủ nợ ($amount > Payable_{person}$).
 2. Hệ thống từ chối và thông báo lỗi: "Số tiền hoàn trả không được vượt quá nghĩa vụ nợ hiện tại đối với chủ nợ".
 3. Người dùng điều chỉnh lại số tiền trả nợ.
 
-##### Luồng ngoại lệ 2d3a: Xóa nợ vượt quá dư nợ hiện tại
-
-1. Tại bước 3 của luồng 2d, số tiền xóa nợ nhập vào vượt quá số dư nợ hiện tại của đối tác ($amount > Receivable_{person}$ hoặc $amount > Payable_{person}$).
-2. Hệ thống từ chối và báo lỗi: "Số tiền xóa nợ vượt quá giới hạn dư nợ cho phép của đối tác".
-3. Người dùng điều chỉnh lại số tiền xóa nợ.
-
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Bất biến số dư nợ không âm theo `BR-FIN-07`: $Receivable \ge 0$ và $Payable \ge 0$ tại mọi cấp độ (toàn hệ thống và từng cá nhân).
-2. Bất biến dòng tiền ví theo `BR-FIN-02`: Nghiệp vụ `lend`, `borrow`, `collect`, `repay` tác động trực tiếp đến số dư ví; trong khi nghiệp vụ `write-off` không làm thay đổi số dư ví.
-3. Bất biến độc lập với thu chi tiêu dùng: Cho vay và thu nợ không phải là chi tiêu hoặc thu nhập; đi vay và trả nợ không phải là thu nhập hoặc chi tiêu. Không tính gộp vào báo cáo kết quả hoạt động tiêu dùng hàng tháng.
-4. Phù hợp các yêu cầu chức năng: `FR-DEBT-01`, `FR-DEBT-02`, `FR-DEBT-03`, `FR-DEBT-04`, `FR-DEBT-05`, `FR-REP-04`.
+1. Bất biến số dư nợ không âm theo `BR-FIN-07`: $Payable \ge 0$ tại mọi cấp độ (toàn hệ thống và từng cá nhân).
+2. Bất biến dòng tiền ví theo `BR-FIN-02`: Nghiệp vụ `borrow` và `repay` tác động trực tiếp đến số dư ví.
+3. Bất biến độc lập với thu chi tiêu dùng: Đi vay và trả nợ không phải là thu nhập hoặc chi tiêu, không tính gộp vào báo cáo kết quả hoạt động tiêu dùng hàng tháng.
+4. Phù hợp các yêu cầu chức năng: `FR-DEBT-01`, `FR-DEBT-03`.
 
-### 6.6 UC06: Quản lý sổ tiết kiệm có kỳ hạn và tính toán lãi suất
+### 6.18 UC-DEBT-03: Xóa nợ khó đòi phi tiền mặt
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC06 |
-| Tên | Quản lý sổ tiết kiệm có kỳ hạn và tính lãi suất |
+| Mã | UC-DEBT-03 |
+| Tên | Xóa nợ khó đòi phi tiền mặt |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
-| Các bên liên quan và mối quan tâm | Theo dõi tiến độ kỳ hạn, tiền lãi tích lũy từng sổ tiết kiệm, thực hiện tất toán đúng hạn hoặc trước hạn và đồng bộ hóa tài sản với quỹ mục tiêu. |
-| Mô tả tóm tắt | Mở sổ tiết kiệm mới trích vốn từ ví thanh khoản; tự động theo dõi tiến độ kỳ hạn, tính toán tiền lãi dự kiến tích lũy và giá trị ghi nhận hiện tại; thực hiện tất toán đúng hạn hoặc tất toán trước hạn với cơ chế hồi tố lãi suất không kỳ hạn theo quy tắc BR-FIN-05; quản lý nạp thêm tích lũy và đồng bộ liên kết quỹ mục tiêu theo BR-FIN-08. |
-| Điều kiện kích hoạt | Người dùng mở sổ tiết kiệm mới, kiểm tra tình trạng sinh lời hoặc thực hiện tất toán sổ (đúng hạn hoặc trước hạn) để thu hồi tiền về ví. |
+| Các bên liên quan và mối quan tâm | Đóng lại một khoản nợ không thể thu hồi hoặc được miễn trừ mà không làm sai lệch số dư ví tiền mặt. |
+| Mô tả tóm tắt | Ghi giảm số dư nợ của một đối tác khi khoản nợ được xác định không thể thu hồi hoặc được chủ nợ miễn trừ, mà không tác động đến số dư của bất kỳ ví tiền mặt nào. |
+| Điều kiện kích hoạt | Người dùng xác định một khoản nợ không còn khả năng thu hồi hoặc được miễn trừ nghĩa vụ và cần đóng khoản nợ đó khỏi sổ theo dõi. |
+
+**Tiền điều kiện:**
+
+1. Đối tác đang có số dư nợ phải thu hoặc phải trả tương ứng lớn hơn 0.
+2. Owner đang ở giao diện Quản lý Công nợ.
+
+**Hậu điều kiện thành công:**
+
+1. Bản ghi công nợ mới được lưu vào danh sách bản ghi `debt` với loại `write-off lend` hoặc `write-off borrow`.
+2. Số dư nợ của đối tác được ghi giảm chính xác theo quy tắc `BR-FIN-07`.
+3. Số dư của toàn bộ các ví tiền mặt không bị thay đổi bởi nghiệp vụ xóa nợ.
+
+#### Luồng sự kiện chính
+
+1. Người dùng chọn một khoản nợ không thể thu hồi hoặc được chủ nợ miễn trừ nghĩa vụ và chọn chức năng "Xóa nợ".
+2. Người dùng chọn loại hình xóa nợ (`write-off lend` nếu là khoản cho vay mất khả năng thu hồi, hoặc `write-off borrow` nếu được chủ nợ xóa nợ), nhập số tiền xóa nợ ($amount > 0$), và bắt buộc nhập lý do xóa nợ vào ô ghi chú.
+3. Hệ thống kiểm tra số tiền xóa nợ không vượt quá dư nợ hiện tại của đối tác ($amount \le Receivable_{person}$ hoặc $amount \le Payable_{person}$).
+4. Hệ thống ghi giảm số dư nợ của đối tác tương ứng theo quy tắc `BR-FIN-07`: nếu cho vay thì trừ $Receivable_{person}$, nếu đi vay thì trừ $Payable_{person}$.
+5. Hệ thống giữ nguyên số dư của toàn bộ các ví tiền mặt (nghiệp vụ phi tiền mặt theo `BR-FIN-02`).
+6. Hệ thống lưu bản ghi công nợ loại `write-off lend` hoặc `write-off borrow` vào danh sách bản ghi `debt` và thông báo hoàn tất xóa nợ.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu xóa nợ khó đòi.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 3a: Xóa nợ vượt quá dư nợ hiện tại
+
+1. Tại bước 3 của luồng chính, số tiền xóa nợ nhập vào vượt quá số dư nợ hiện tại của đối tác ($amount > Receivable_{person}$ hoặc $amount > Payable_{person}$).
+2. Hệ thống từ chối và báo lỗi: "Số tiền xóa nợ vượt quá giới hạn dư nợ cho phép của đối tác".
+3. Người dùng điều chỉnh lại số tiền xóa nợ.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến số dư nợ không âm theo `BR-FIN-07`: Số tiền xóa nợ không được vượt quá dư nợ hiện tại của đối tác.
+2. Bất biến dòng tiền ví theo `BR-FIN-02`: Nghiệp vụ `write-off` không làm thay đổi số dư ví.
+3. Phù hợp các yêu cầu chức năng: `FR-DEBT-04`, `FR-DEBT-05`.
+### 6.19 UC-SAV-01: Mở sổ tiết kiệm mới
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-SAV-01 |
+| Tên | Mở sổ tiết kiệm mới |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Trích vốn từ ví thanh khoản để mở một sổ tiết kiệm có kỳ hạn hoặc không kỳ hạn, tùy chọn liên kết với một quỹ mục tiêu. |
+| Mô tả tóm tắt | Mở sổ tiết kiệm mới bằng cách trích vốn gốc từ ví thanh khoản, xác định kỳ hạn, lãi suất cam kết và ngày đáo hạn dự kiến; tùy chọn liên kết sổ với một quỹ mục tiêu theo quy tắc `BR-FIN-08`. |
+| Điều kiện kích hoạt | Người dùng cần mở một sổ tiết kiệm mới để sinh lời cho một khoản vốn nhàn rỗi. |
 
 **Tiền điều kiện:**
 
@@ -3616,11 +4253,8 @@ Bảng thuộc tính ca sử dụng:
 
 **Hậu điều kiện thành công:**
 
-1. Khi mở sổ: Sổ tiết kiệm mới được lưu vào danh sách `savings` với trạng thái `OPEN`, số dư ví trích tiền giảm đúng bằng số vốn gốc $Principal$ theo `BR-FIN-02`.
-2. Khi theo dõi: Hệ thống phản ánh chính xác số ngày gửi thực tế $Days$, tiến độ kỳ hạn $Process$, lãi dự kiến toàn kỳ $ExpectedInterest$ và giá trị hiện tại $Balance$ theo `BR-FIN-05`.
-3. Khi tất toán đúng hạn: Sổ tiết kiệm chuyển trạng thái `SETTLED_MATURED`, ví thanh khoản nhận trọn vẹn $Payout = Principal + ExpectedInterest$.
-4. Khi tất toán trước hạn: Sổ tiết kiệm chuyển trạng thái `SETTLED_EARLY`, ví thanh khoản nhận $Payout = Principal + ActualInterest$ (theo lãi suất không kỳ hạn), phần chênh lệch lãi kỳ hạn bị hủy bỏ.
-5. Liên kết quỹ mục tiêu tài chính (nếu có) được cập nhật đồng bộ theo `BR-FIN-08`.
+1. Sổ tiết kiệm mới được lưu vào danh sách `savings` với trạng thái `OPEN`, số dư ví trích tiền giảm đúng bằng số vốn gốc $Principal$ theo `BR-FIN-02`.
+2. Liên kết quỹ mục tiêu tài chính (nếu có) được cập nhật đồng bộ theo `BR-FIN-08`.
 
 #### Luồng sự kiện chính
 
@@ -3630,7 +4264,7 @@ Bảng thuộc tính ca sử dụng:
 4. Người dùng xác nhận khởi tạo sổ tiết kiệm mới.
 5. Hệ thống xác thực nghiệp vụ:
   - Tên ngân hàng không được để trống (độ dài từ 1 đến 100 ký tự).
-  - Số vốn gốc $principal > 0$ và lãi suất $rate > 0$, chuẩn hóa về kiểu `BigDecimal` theo quy tắc `BR-FIN-01`.
+  - Số vốn gốc $principal > 0$ và lãi suất $rate > 0$, chuẩn hóa về kiểu dữ liệu tài chính chính xác tuyệt đối theo quy tắc `BR-FIN-01`.
   - Kiểm tra kỳ hạn thuộc danh mục hợp lệ và tra cứu số ngày kỳ hạn ($TermDays$) từ danh mục kỳ hạn `database.term`.
   - Kiểm tra số dư khả dụng của ví trích tiền theo quy tắc `BR-FIN-02`: $Balance_{wallet} - principal \ge 0$.
 6. Hệ thống thực hiện bút toán trích tiền: Trừ số vốn gốc $principal$ khỏi số dư khả dụng của ví trích tiền được chọn.
@@ -3641,7 +4275,59 @@ Bảng thuộc tính ca sử dụng:
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 2a: Tất toán sổ tiết kiệm đúng hạn
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu mở sổ tiết kiệm mới.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 5a: Số vốn gốc nhỏ hơn hoặc bằng 0
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện $principal \le 0$.
+2. Hệ thống báo lỗi: "Số tiền vốn gốc gửi tiết kiệm phải là số dương lớn hơn 0".
+3. Người dùng nhập lại số tiền hợp lệ.
+
+##### Luồng ngoại lệ 5b: Số dư ví trích tiền không đủ
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện số dư khả dụng của ví nguồn nhỏ hơn số vốn gốc gửi tiết kiệm ($Balance_{wallet} < principal$).
+2. Hệ thống từ chối mở sổ và hiển thị thông báo lỗi: "Số dư khả dụng của ví nguồn không đủ để trích nợ mở sổ tiết kiệm".
+3. Người dùng chọn ví nguồn khác có đủ tiền hoặc điều chỉnh giảm số vốn gốc.
+
+##### Luồng ngoại lệ 5c: Lãi suất hoặc kỳ hạn không hợp lệ
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện lãi suất $rate \le 0$ hoặc kỳ hạn được chọn không tồn tại trong bảng chuẩn hóa `database.term`.
+2. Hệ thống từ chối mở sổ và thông báo lỗi: "Lãi suất cam kết và kỳ hạn gửi không hợp lệ. Vui lòng kiểm tra lại".
+3. Người dùng chọn lại kỳ hạn chuẩn và nhập lãi suất hợp lệ.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến bảo toàn số dư ví `BR-FIN-02`: Mở sổ làm giảm số dư ví nguồn đúng bằng số vốn gốc.
+2. Bất biến liên kết quỹ mục tiêu `BR-FIN-08`: Mỗi sổ tiết kiệm chỉ được liên kết với tối đa một quỹ mục tiêu tại một thời điểm để tránh tính trùng lặp tài sản.
+3. Phù hợp các yêu cầu chức năng: `FR-SAV-01`.
+
+### 6.20 UC-SAV-02: Tất toán sổ tiết kiệm đúng hạn
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-SAV-02 |
+| Tên | Tất toán sổ tiết kiệm đúng hạn |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Thu hồi trọn vẹn vốn gốc và tiền lãi cam kết khi sổ tiết kiệm đã đến hoặc quá ngày đáo hạn. |
+| Mô tả tóm tắt | Tất toán một sổ tiết kiệm đã đến hoặc quá ngày đáo hạn, chuyển trọn vẹn vốn gốc cộng tiền lãi cam kết toàn kỳ về một ví thanh khoản, đóng sổ và ngừng tính lãi. |
+| Điều kiện kích hoạt | Ngày hiện tại đã đến hoặc quá ngày đáo hạn của một sổ tiết kiệm đang mở và Người dùng yêu cầu tất toán. |
+
+**Tiền điều kiện:**
+
+1. Sổ tiết kiệm đang ở trạng thái `OPEN` và ngày hiện tại đã đến hoặc quá ngày đáo hạn ($currentDate \ge MaturityDate$).
+2. Owner đang ở giao diện phân hệ Quản lý Sổ tiết kiệm.
+
+**Hậu điều kiện thành công:**
+
+1. Sổ tiết kiệm chuyển trạng thái `SETTLED_MATURED`, ví thanh khoản nhận trọn vẹn $Payout = Principal + ExpectedInterest$.
+2. Liên kết quỹ mục tiêu tài chính (nếu có) được gỡ bỏ và cập nhật đồng bộ theo `BR-FIN-08`.
+
+#### Luồng sự kiện chính
 
 1. Tại danh sách sổ tiết kiệm, Người dùng chọn một sổ đang mở có ngày hiện tại đã đến hoặc quá ngày đáo hạn ($currentDate \ge MaturityDate$) và yêu cầu tất toán đúng hạn.
 2. Hệ thống hiển thị biểu mẫu tất toán đúng hạn gồm: Mã sổ, Ngân hàng, Vốn gốc, Lãi suất, Số ngày gửi thực tế, Tiền lãi cam kết trọn kỳ ($ExpectedInterest$), Tổng số tiền thực nhận ($Payout = Principal + ExpectedInterest$), và danh sách chọn Ví thanh khoản nhận tiền.
@@ -3652,7 +4338,53 @@ Bảng thuộc tính ca sử dụng:
 7. Nếu sổ có liên kết với quỹ mục tiêu, hệ thống tự động gỡ liên kết sổ tiết kiệm khỏi quỹ mục tiêu đó theo quy tắc `BR-FIN-08`, trừ giá trị sổ khỏi quỹ tương ứng.
 8. Hệ thống hiển thị thông báo tất toán thành công kèm biên lai tóm tắt số tiền vốn gốc và tiền lãi đã nhập ví.
 
-##### Luồng 2b: Tất toán sổ tiết kiệm trước hạn
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu tất toán đúng hạn. Trường hợp cần rút vốn trước ngày đáo hạn thuộc phạm vi ca sử dụng độc lập `UC-SAV-03`.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ: Cố ý tất toán sổ tiết kiệm đã đóng
+
+1. Người dùng chọn thao tác tất toán trên một sổ tiết kiệm đã ở trạng thái `SETTLED_MATURED` hoặc `SETTLED_EARLY`.
+2. Hệ thống từ chối thực thi và thông báo: "Sổ tiết kiệm này đã được tất toán trước đó và không thể thực hiện lại".
+
+##### Luồng ngoại lệ 4a: Tất toán đúng hạn khi sổ chưa đến ngày đáo hạn
+
+1. Tại bước 4 của luồng chính, nếu có yêu cầu gọi lệnh tất toán đúng hạn nhưng ngày hiện tại vẫn trước ngày đáo hạn ($currentDate < MaturityDate$).
+2. Hệ thống từ chối thao tác và thông báo: "Sổ tiết kiệm chưa đến ngày đáo hạn cam kết. Vui lòng sử dụng chức năng Tất toán trước hạn nếu có nhu cầu rút vốn ngay".
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến tính toán lãi tiết kiệm `BR-FIN-05`: Lãi suất tính trên cơ sở 365 ngày/năm; áp dụng quy tắc làm tròn ngân hàng (làm tròn đến số chẵn gần nhất khi giá trị nằm giữa hai mức).
+2. Bất biến trạng thái vòng đời sổ tiết kiệm: Chuyển dịch trạng thái tuân thủ nghiêm ngặt máy trạng thái từ `OPEN` sang `SETTLED_MATURED`. Không cho phép tái kích hoạt sổ đã tất toán.
+3. Phù hợp các yêu cầu chức năng: `FR-SAV-02`.
+
+### 6.21 UC-SAV-03: Tất toán sổ tiết kiệm trước hạn
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-SAV-03 |
+| Tên | Tất toán sổ tiết kiệm trước hạn |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Rút vốn khỏi sổ tiết kiệm trước ngày đáo hạn, chấp nhận cơ chế hồi tố lãi suất không kỳ hạn theo `BR-FIN-05`. |
+| Mô tả tóm tắt | Tất toán một sổ tiết kiệm đang mở trước ngày đáo hạn, tính lại tiền lãi thực nhận theo lãi suất không kỳ hạn hồi tố, chuyển vốn gốc cộng lãi thực nhận về một ví thanh khoản và đóng sổ. |
+| Điều kiện kích hoạt | Người dùng cần rút vốn khỏi một sổ tiết kiệm đang mở trước khi đến ngày đáo hạn. |
+
+**Tiền điều kiện:**
+
+1. Sổ tiết kiệm đang ở trạng thái `OPEN` và ngày hiện tại chưa đến ngày đáo hạn ($currentDate < MaturityDate$).
+2. Owner đang ở giao diện phân hệ Quản lý Sổ tiết kiệm.
+
+**Hậu điều kiện thành công:**
+
+1. Sổ tiết kiệm chuyển trạng thái `SETTLED_EARLY`, ví thanh khoản nhận $Payout = Principal + ActualInterest$ (theo lãi suất không kỳ hạn), phần chênh lệch lãi kỳ hạn bị hủy bỏ.
+2. Liên kết quỹ mục tiêu tài chính (nếu có) được gỡ bỏ và cập nhật đồng bộ theo `BR-FIN-08`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn một sổ tiết kiệm đang mở nhưng chưa đến ngày đáo hạn ($currentDate < MaturityDate$) và yêu cầu tất toán trước hạn.
 2. Hệ thống hiển thị hộp thoại cảnh báo tất toán trước hạn kèm biểu mẫu nhập: Ngày tất toán (mặc định hôm nay), Lãi suất không kỳ hạn áp dụng hồi tố (`demandRate`, mặc định 0.2%/năm, cho phép chỉnh sửa), Ví nhận tiền, và ô đánh dấu bắt buộc "Tôi hiểu và chấp nhận mất quyền hưởng lãi suất có kỳ hạn".
@@ -3680,7 +4412,55 @@ Bảng thuộc tính ca sử dụng:
 7. Hệ thống gỡ liên kết sổ tiết kiệm khỏi quỹ mục tiêu liên quan (nếu có) theo quy tắc `BR-FIN-08`.
 8. Hệ thống hiển thị thông báo tất toán trước hạn hoàn tất, ghi nhận vào sổ nhật ký tài chính.
 
-##### Luồng 2c: Nạp thêm tiền vào sổ tích lũy định kỳ
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu tất toán trước hạn. Trường hợp sổ đã đến hoặc quá ngày đáo hạn thuộc phạm vi ca sử dụng độc lập `UC-SAV-02`.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ: Cố ý tất toán sổ tiết kiệm đã đóng
+
+1. Người dùng chọn thao tác tất toán trên một sổ tiết kiệm đã ở trạng thái `SETTLED_MATURED` hoặc `SETTLED_EARLY`.
+2. Hệ thống từ chối thực thi và thông báo: "Sổ tiết kiệm này đã được tất toán trước đó và không thể thực hiện lại".
+
+##### Luồng ngoại lệ 4a: Chưa xác nhận chấp nhận mất lãi khi tất toán trước hạn
+
+1. Tại bước 4 của luồng chính, Người dùng chưa tích chọn ô xác nhận cam kết chấp nhận mất lãi kỳ hạn.
+2. Hệ thống vô hiệu hóa nút xác nhận và hiển thị nhắc nhở yêu cầu người dùng xác nhận điều khoản trước khi tiếp tục.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến tính toán lãi tiết kiệm `BR-FIN-05`: Lãi suất tính trên cơ sở 365 ngày/năm; áp dụng quy tắc làm tròn ngân hàng.
+2. Bất biến trạng thái vòng đời sổ tiết kiệm: Chuyển dịch trạng thái từ `OPEN` sang `SETTLED_EARLY`. Không cho phép tái kích hoạt sổ đã tất toán.
+3. Phù hợp các yêu cầu chức năng: `FR-SAV-02`.
+
+### 6.22 UC-SAV-04: Nạp thêm tiền vào sổ tích lũy
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-SAV-04 |
+| Tên | Nạp thêm tiền vào sổ tích lũy |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Tăng vốn gốc của một sổ tiết kiệm tích lũy đang mở bằng cách trích thêm tiền từ ví thanh khoản. |
+| Mô tả tóm tắt | Nạp thêm tiền vào một sổ tiết kiệm tích lũy đang mở, trích tiền từ ví trích tiền và tăng vốn gốc của sổ, cập nhật lại tiến độ và lãi dự kiến. |
+| Điều kiện kích hoạt | Người dùng cần nạp thêm tiền vào một sổ tiết kiệm tích lũy định kỳ đang mở. |
+
+**Tiền điều kiện:**
+
+1. Sổ tiết kiệm tích lũy đang ở trạng thái `OPEN`.
+2. Hệ thống có ít nhất một ví tiền ở trạng thái `ACTIVE` đủ số dư để trích nạp thêm.
+3. Owner đang ở giao diện phân hệ Quản lý Sổ tiết kiệm.
+
+**Hậu điều kiện thành công:**
+
+1. Vốn gốc của sổ tiết kiệm tăng đúng bằng số tiền nạp thêm.
+2. Số dư ví trích tiền giảm đúng bằng số tiền nạp thêm theo `BR-FIN-02`.
+3. Tiến độ và lãi dự kiến của sổ tiết kiệm được cập nhật lại theo `BR-FIN-05`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn một sổ tiết kiệm thuộc gói tích lũy mở và chọn chức năng "Nạp thêm tiền tích lũy".
 2. Hệ thống hiển thị biểu mẫu nạp tiền: Số tiền nạp thêm ($amount > 0$), Ngày nạp (mặc định hôm nay), Ví trích tiền (danh sách ví `ACTIVE`), Ghi chú.
@@ -3690,7 +4470,54 @@ Bảng thuộc tính ca sử dụng:
 6. Hệ thống lưu vết giao dịch nạp tích lũy và cập nhật lại tiến độ, lãi dự kiến của sổ tiết kiệm theo `BR-FIN-05`.
 7. Hệ thống hiển thị thông báo nạp tiền thành công và cập nhật số dư vốn gốc mới của sổ tiết kiệm.
 
-##### Luồng 2d: Xem danh sách sổ tiết kiệm và tính toán giá trị tích lũy theo thời gian thực
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu nạp thêm tiền tích lũy.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 3a: Số tiền nạp thêm nhỏ hơn hoặc bằng 0
+
+1. Tại bước 3 của luồng chính, hệ thống phát hiện $amount \le 0$.
+2. Hệ thống báo lỗi: "Số tiền nạp thêm vào sổ tiết kiệm phải là số dương lớn hơn 0".
+3. Người dùng nhập lại số tiền hợp lệ.
+
+##### Luồng ngoại lệ 4a: Số dư ví trích tiền không đủ
+
+1. Tại bước 4 của luồng chính, hệ thống phát hiện số dư khả dụng của ví trích tiền nhỏ hơn số tiền muốn nạp thêm ($Balance_{wallet} < amount$).
+2. Hệ thống từ chối nạp và hiển thị thông báo lỗi: "Số dư khả dụng của ví nguồn không đủ để nạp thêm vào sổ tiết kiệm".
+3. Người dùng chọn ví nguồn khác có đủ tiền hoặc điều chỉnh giảm số tiền nạp thêm.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến bảo toàn số dư ví `BR-FIN-02`: Nạp thêm tiền làm giảm số dư ví trích tiền đúng bằng số tiền nạp thêm.
+2. Bất biến tính toán lãi tiết kiệm `BR-FIN-05`: Vốn gốc tăng thêm phải được đưa vào công thức tính lãi dự kiến kể từ thời điểm nạp.
+3. Phù hợp các yêu cầu chức năng: `FR-SAV-03`.
+
+### 6.23 UC-SAV-05: Theo dõi tiến độ và giá trị tích lũy sổ tiết kiệm
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-SAV-05 |
+| Tên | Theo dõi tiến độ và giá trị tích lũy sổ tiết kiệm |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Nắm bắt tiến độ kỳ hạn và giá trị tích lũy hiện tại của toàn bộ danh mục sổ tiết kiệm theo thời gian thực. |
+| Mô tả tóm tắt | Xem danh sách sổ tiết kiệm kèm tiến độ kỳ hạn, số ngày còn lại và giá trị tích lũy hiện tại được tính toán tự động theo thời gian thực. |
+| Điều kiện kích hoạt | Người dùng cần tra cứu tiến độ và giá trị hiện tại của các sổ tiết kiệm đang nắm giữ. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống đã có ít nhất một sổ tiết kiệm trong danh sách `savings`.
+2. Owner đang ở giao diện phân hệ Quản lý Sổ tiết kiệm.
+
+**Hậu điều kiện thành công:**
+
+1. Hệ thống phản ánh chính xác số ngày gửi thực tế $Days$, tiến độ kỳ hạn $Process$, lãi dự kiến toàn kỳ $ExpectedInterest$ và giá trị hiện tại $Balance$ theo `BR-FIN-05` cho mọi sổ đang `OPEN`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng mở màn hình danh sách sổ tiết kiệm, chọn bộ lọc trạng thái (`OPEN`, `SETTLED_MATURED`, `SETTLED_EARLY`, hoặc `ALL`).
 2. Với từng sổ tiết kiệm đang ở trạng thái `OPEN`, hệ thống lấy ngày hệ thống hiện tại ($currentDate$) và tự động tính toán theo quy tắc `BR-FIN-05`:
@@ -3712,65 +4539,91 @@ Bảng thuộc tính ca sử dụng:
     $$
     RemainingDays = \max(0, TermDays - Days)
     $$
-3. Hệ thống tổng hợp tổng vốn gốc đang gửi, tổng lãi dự kiến và tổng giá trị hiện tại của toàn bộ danh mục tiết kiệm bằng phương thức `BigDecimal.add()`.
+3. Hệ thống tổng hợp tổng vốn gốc đang gửi, tổng lãi dự kiến và tổng giá trị hiện tại của toàn bộ danh mục tiết kiệm bằng phép cộng số học chính xác tuyệt đối.
 4. Hệ thống hiển thị bảng danh sách sổ tiết kiệm kèm thanh tiến độ thời gian, số ngày còn lại, lãi tích lũy và các nút chức năng thao tác tương ứng.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu theo dõi tiến độ tích lũy.
 
 #### Các luồng ngoại lệ
 
-##### Luồng ngoại lệ 5a: Số vốn gốc hoặc số tiền gửi ban đầu nhỏ hơn hoặc bằng 0
-
-1. Tại bước 5 của luồng chính (hoặc bước 4 của luồng 2c), hệ thống phát hiện $principal \le 0$ hoặc $amount \le 0$.
-2. Hệ thống báo lỗi: "Số tiền vốn gốc gửi tiết kiệm phải là số dương lớn hơn 0".
-3. Người dùng nhập lại số tiền hợp lệ.
-
-##### Luồng ngoại lệ 5b: Số dư ví trích tiền không đủ
-
-1. Tại bước 5 của luồng chính (hoặc bước 4 của luồng 2c), hệ thống phát hiện số dư khả dụng của ví nguồn nhỏ hơn số vốn gốc gửi tiết kiệm ($Balance_{wallet} < principal$).
-2. Hệ thống từ chối mở sổ và hiển thị thông báo lỗi: "Số dư khả dụng của ví nguồn không đủ để trích nợ mở sổ tiết kiệm".
-3. Người dùng chọn ví nguồn khác có đủ tiền hoặc điều chỉnh giảm số vốn gốc.
-
-##### Luồng ngoại lệ 5c: Lãi suất hoặc kỳ hạn không hợp lệ
-
-1. Tại bước 5 của luồng chính, hệ thống phát hiện lãi suất $rate \le 0$ hoặc kỳ hạn được chọn không tồn tại trong bảng chuẩn hóa `database.term`.
-2. Hệ thống từ chối mở sổ và thông báo lỗi: "Lãi suất cam kết và kỳ hạn gửi không hợp lệ. Vui lòng kiểm tra lại".
-3. Người dùng chọn lại kỳ hạn chuẩn và nhập lãi suất hợp lệ.
-
-##### Luồng ngoại lệ 2a2a: Cố ý tất toán sổ tiết kiệm đã đóng
-
-1. Người dùng chọn thao tác tất toán trên một sổ tiết kiệm đã ở trạng thái `SETTLED_MATURED` hoặc `SETTLED_EARLY`.
-2. Hệ thống từ chối thực thi và thông báo: "Sổ tiết kiệm này đã được tất toán trước đó và không thể thực hiện lại".
-
-##### Luồng ngoại lệ 2a4a: Tất toán đúng hạn khi sổ chưa đến ngày đáo hạn
-
-1. Tại bước 4 của luồng 2a, nếu có yêu cầu gọi lệnh tất toán đúng hạn nhưng ngày hiện tại vẫn trước ngày đáo hạn ($currentDate < MaturityDate$).
-2. Hệ thống từ chối thao tác và thông báo: "Sổ tiết kiệm chưa đến ngày đáo hạn cam kết. Vui lòng sử dụng chức năng Tất toán trước hạn nếu có nhu cầu rút vốn ngay".
-
-##### Luồng ngoại lệ 2b4a: Chưa xác nhận chấp nhận mất lãi khi tất toán trước hạn
-
-1. Tại bước 4 của luồng 2b, Người dùng chưa tích chọn ô xác nhận cam kết chấp nhận mất lãi kỳ hạn.
-2. Hệ thống vô hiệu hóa nút xác nhận và hiển thị nhắc nhở yêu cầu người dùng xác nhận điều khoản trước khi tiếp tục.
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài việc hiển thị danh sách rỗng khi chưa có sổ tiết kiệm nào được mở.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Bất biến tính toán lãi tiết kiệm `BR-FIN-05`: Lãi suất tính trên cơ sở 365 ngày/năm; làm tròn bằng `BigDecimal` với `RoundingMode.HALF_EVEN`.
-2. Bất biến bảo toàn số dư ví `BR-FIN-02`: Mở sổ làm giảm số dư ví nguồn; tất toán làm tăng số dư ví đích đúng bằng số tiền thực nhận $Payout$.
-3. Bất biến liên kết quỹ mục tiêu `BR-FIN-08`: Mỗi sổ tiết kiệm chỉ được liên kết với tối đa một quỹ mục tiêu tại một thời điểm để tránh tính trùng lặp tài sản.
-4. Bất biến trạng thái vòng đời sổ tiết kiệm: Chuyển dịch trạng thái tuân thủ nghiêm ngặt máy trạng thái từ `OPEN` sang `SETTLED_MATURED` hoặc `OPEN` sang `SETTLED_EARLY`. Không cho phép tái kích hoạt sổ đã tất toán.
-5. Phù hợp các yêu cầu chức năng: `FR-SAV-01`, `FR-SAV-02`, `FR-SAV-03`, `FR-SAV-04`.
+1. Bất biến tính toán lãi tiết kiệm `BR-FIN-05`: Lãi suất tính trên cơ sở 365 ngày/năm, tiến độ kỳ hạn không vượt quá 1.0.
+2. Phù hợp các yêu cầu chức năng: `FR-SAV-04`.
 
-### 6.7 UC07: Quản lý danh mục chứng chỉ quỹ đầu tư và biến động NAV
+### 6.24 UC-SAV-06: Tái tục sổ tiết kiệm với điều khoản mới
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC07 |
-| Tên | Quản lý danh mục chứng chỉ quỹ đầu tư và biến động NAV |
+| Mã | UC-SAV-06 |
+| Tên | Tái tục sổ tiết kiệm với điều khoản mới |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
-| Các bên liên quan và mối quan tâm | Quản trị danh mục chứng chỉ quỹ, theo dõi biến động NAV theo thị trường, xác định hiệu suất sinh lời và ghi nhận lợi nhuận thực tế khi bán chứng chỉ quỹ. |
-| Mô tả tóm tắt | Ghi nhận lệnh mua chứng chỉ quỹ mở, trích tiền từ ví thanh khoản và tính toán số lượng đơn vị quỹ sở hữu; cập nhật định kỳ giá trị tài sản ròng (NAV) theo thị trường; định giá danh mục theo nguyên tắc Mark-to-Market, xác định lãi lỗ chưa thực hiện và tỷ suất sinh lời quy đổi năm CAGR theo BR-FIN-06; ghi nhận lệnh bán chứng chỉ quỹ và kết chuyển tiền về ví. |
-| Điều kiện kích hoạt | Người dùng giao dịch mua/bán chứng chỉ quỹ, cập nhật NAV mới nhất hoặc tra cứu hiệu suất danh mục đầu tư. |
+| Các bên liên quan và mối quan tâm | Tiếp tục gửi tiết kiệm khoản tiền vừa tất toán với kỳ hạn, lãi suất hoặc phương thức lãi mới phù hợp hơn với biểu lãi suất hiện hành, thay vì phải rút tiền ra và mở sổ mới thủ công. |
+| Điều kiện kích hoạt | Người dùng vừa tất toán đúng hạn một sổ tiết kiệm và muốn gửi tiếp một phần hoặc toàn bộ số tiền nhận được với điều khoản mới. |
+
+**Tiền điều kiện:**
+
+1. Sổ tiết kiệm nguồn đã tất toán đúng hạn, đang ở trạng thái `SETTLED_MATURED`.
+2. Ví đang giữ khoản tất toán của sổ nguồn có số dư khả dụng đủ cho vốn gốc tái tục mong muốn.
+
+**Hậu điều kiện thành công:**
+
+1. Sổ tiết kiệm nguồn giữ nguyên trạng thái `SETTLED_MATURED`, không bị chỉnh sửa thêm.
+2. Một sổ tiết kiệm mới được tạo với `savingId` độc lập, trạng thái `OPEN`, trường `rolledFrom` trỏ về sổ nguồn.
+3. Số dư ví trích tiền giảm đúng bằng vốn gốc tái tục.
+
+#### Luồng sự kiện chính
+
+1. Ngay sau khi hoàn tất luồng tất toán đúng hạn của UC-SAV-02, hệ thống hiển thị tùy chọn "Tái tục sổ tiết kiệm" bên cạnh số tiền vừa nhận được.
+2. Người dùng chọn tái tục và nhập vốn gốc tái tục mong muốn, kỳ hạn mới, lãi suất mới và phương thức lãi mới.
+3. Hệ thống hiển thị bản xem trước: vốn gốc tái tục, ngày đáo hạn dự kiến của sổ mới và số tiền còn lại trong ví sau khi trích vốn gốc.
+4. Người dùng xác nhận. Hệ thống trừ vốn gốc tái tục khỏi ví, đóng sổ nguồn ở trạng thái `SETTLED_MATURED` (không thay đổi thêm) và khởi tạo sổ tiết kiệm mới theo FR-SAV-05.
+5. Hệ thống hiển thị thông báo tái tục thành công kèm thông tin sổ mới.
+
+#### Các luồng rẽ nhánh
+
+##### Luồng rẽ nhánh: Tái tục một phần giá trị tất toán
+
+1. Tại bước 2 của luồng chính, người dùng nhập vốn gốc tái tục nhỏ hơn toàn bộ giá trị tất toán.
+2. Hệ thống trích đúng phần vốn gốc tái tục để mở sổ mới, phần chênh lệch còn lại vẫn giữ nguyên trong ví theo BR-FIN-02.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 1a: Sổ nguồn chưa đủ điều kiện tái tục
+
+1. Người dùng cố gắng tái tục một sổ tiết kiệm chưa được tất toán đúng hạn (đang `OPEN`, `SETTLED_EARLY` hoặc trạng thái khác).
+2. Hệ thống từ chối và hiển thị thông báo: "Chỉ có thể tái tục sổ tiết kiệm đã tất toán đúng hạn."
+
+##### Luồng ngoại lệ 2a: Vốn gốc tái tục vượt quá giá trị tất toán
+
+1. Tại bước 2 của luồng chính, người dùng nhập vốn gốc tái tục lớn hơn giá trị tất toán của sổ nguồn.
+2. Hệ thống từ chối và hiển thị thông báo nêu rõ giới hạn tối đa cho phép tái tục.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến tính toán lãi tiết kiệm `BR-FIN-05`: Sổ mới không kế thừa số ngày gửi hay lãi suất của sổ nguồn, được tính lãi độc lập kể từ ngày mở sổ mới.
+2. Phù hợp các yêu cầu chức năng: `FR-SAV-05`.
+
+### 6.25 UC-INV-01: Mua chứng chỉ quỹ
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-INV-01 |
+| Tên | Mua chứng chỉ quỹ |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Trích vốn từ ví thanh khoản để mua chứng chỉ quỹ mở, ghi nhận đúng số lượng đơn vị quỹ sở hữu. |
+| Mô tả tóm tắt | Ghi nhận lệnh mua chứng chỉ quỹ mở, trích tiền từ ví thanh khoản và tính toán số lượng đơn vị quỹ sở hữu; tùy chọn liên kết khoản đầu tư với một quỹ mục tiêu theo `BR-FIN-08`. |
+| Điều kiện kích hoạt | Người dùng cần đầu tư một khoản vốn vào một mã chứng chỉ quỹ mở. |
 
 **Tiền điều kiện:**
 
@@ -3780,10 +4633,7 @@ Bảng thuộc tính ca sử dụng:
 
 **Hậu điều kiện thành công:**
 
-1. Khi mua CCQ: Bản ghi đầu tư mới được lưu vào danh sách `fund_certs` với trạng thái `HOLDING`, số lượng đơn vị quỹ $Units = Principal / buyNav$ được tính với độ chính xác tối thiểu 4 chữ số thập phân, số dư ví trích tiền giảm đúng bằng số vốn đầu tư theo `BR-FIN-02`.
-2. Khi cập nhật NAV: Giá trị thị trường hiện tại của toàn bộ các lô quỹ cùng mã được tính lại tức thời: $Balance = Units \times latestNav$ theo `BR-FIN-06`, lưu lịch sử vào `fund_performance`.
-3. Khi tra cứu: Lãi lỗ chưa thực hiện $UnrealizedPL$, tỷ suất lợi nhuận tuyệt đối và suất sinh lời quy đổi năm $AnnualizedRate$ (nếu $HoldDays \ge 30$) được tính toán chính xác theo `BR-FIN-06`.
-4. Khi bán CCQ: Số tiền thu về $Proceeds = sellUnits \times sellNav$ được cộng vào ví nhận tiền; số lượng CCQ nắm giữ và vốn gốc được khấu trừ theo phương pháp tỷ trọng bình quân; lợi nhuận thực tế $RealizedPL$ được ghi nhận; nếu bán hết thì chuyển trạng thái sang `CLOSED`.
+1. Bản ghi đầu tư mới được lưu vào danh sách `fund_certs` với trạng thái `HOLDING`, số lượng đơn vị quỹ $Units = Principal / buyNav$ được tính với độ chính xác tối thiểu 4 chữ số thập phân, số dư ví trích tiền giảm đúng bằng số vốn đầu tư theo `BR-FIN-02`.
 
 #### Luồng sự kiện chính
 
@@ -3793,12 +4643,12 @@ Bảng thuộc tính ca sử dụng:
 4. Người dùng xác nhận thực hiện lệnh mua chứng chỉ quỹ.
 5. Hệ thống xác thực nghiệp vụ:
   - Mã chứng chỉ quỹ không được để trống (độ dài từ 1 đến 50 ký tự, tự động chuyển thành chữ hoa).
-  - Số tiền đầu tư $principal > 0$ và đơn giá NAV $buyNav > 0$, chuẩn hóa về kiểu `BigDecimal` theo quy tắc `BR-FIN-01`.
+  - Số tiền đầu tư $principal > 0$ và đơn giá NAV $buyNav > 0$, chuẩn hóa về kiểu dữ liệu tài chính chính xác tuyệt đối theo quy tắc `BR-FIN-01`.
   - Kiểm tra số dư ví trích tiền theo `BR-FIN-02`: $Balance_{wallet} - principal \ge 0$.
 6. Hệ thống trừ số tiền vốn đầu tư $principal$ khỏi số dư khả dụng của ví trích tiền.
 7. Hệ thống tính số lượng chứng chỉ quỹ mua được theo quy tắc `BR-FIN-06`:
 $$Units = \frac{principal}{buyNav}$$
-Kết quả được lưu trữ với scale tối thiểu 4 chữ số thập phân, sử dụng `RoundingMode.HALF_EVEN`.
+Kết quả được lưu trữ với scale tối thiểu 4 chữ số thập phân, áp dụng quy tắc làm tròn ngân hàng (làm tròn đến số chẵn gần nhất khi giá trị nằm giữa hai mức).
 8. Hệ thống tạo bản ghi đầu tư mới trong danh sách `fund_certs` với mã `certId` duy nhất, lưu trữ các trường: `name`, `type`, `start`, `principal`, `buyNav`, `units`, `currentNav = buyNav`, `balance = principal`, trạng thái `HOLDING`, và `fund` liên kết.
 9. Hệ thống ghi nhận điểm dữ liệu đầu tiên vào bảng lịch sử hiệu suất `fund_performance` (ngày giao dịch, mã quỹ, NAV mua).
 10. Nếu có chỉ định quỹ mục tiêu, hệ thống đồng bộ hóa giá trị tài sản đầu tư vào quỹ theo quy tắc `BR-FIN-08`.
@@ -3806,7 +4656,54 @@ Kết quả được lưu trữ với scale tối thiểu 4 chữ số thập ph
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 2a: Bán chứng chỉ quỹ (Tất toán một phần hoặc toàn bộ)
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu mua chứng chỉ quỹ.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 5a: Đơn giá NAV hoặc số tiền mua nhỏ hơn hoặc bằng 0
+
+1. Tại bước 5 của luồng chính, hệ thống ghi nhận $principal \le 0$ hoặc $buyNav \le 0$.
+2. Hệ thống báo lỗi: "Đơn giá NAV và số tiền giao dịch phải là các số dương lớn hơn 0".
+3. Người dùng nhập lại đơn giá hoặc số tiền hợp lệ.
+
+##### Luồng ngoại lệ 5b: Số dư ví thanh toán không đủ
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện $Balance_{wallet} < principal$.
+2. Hệ thống từ chối lệnh mua và hiển thị thông báo: "Số dư ví nguồn không đủ để mua chứng chỉ quỹ".
+3. Người dùng đổi ví khác hoặc giảm số vốn mua.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến định giá theo thị trường `BR-FIN-06`: Số lượng đơn vị quỹ mua được luôn bằng tích số nghịch đảo giữa vốn đầu tư và đơn giá NAV mua.
+2. Bất biến độ chính xác số học `BR-FIN-01`: Số lượng đơn vị quỹ $Units$ được duy trì scale tối thiểu là 4 chữ số thập phân.
+3. Bất biến bảo toàn dòng tiền `BR-FIN-02`: Mua chứng chỉ quỹ làm giảm số dư ví nguồn đúng bằng $Principal$.
+4. Bất biến liên kết tài sản quỹ mục tiêu `BR-FIN-08`: Mỗi khoản đầu tư chứng chỉ quỹ chỉ được thuộc về duy nhất một quỹ mục tiêu.
+5. Phù hợp các yêu cầu chức năng: `FR-INV-01`.
+
+### 6.26 UC-INV-02: Bán chứng chỉ quỹ
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-INV-02 |
+| Tên | Bán chứng chỉ quỹ |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Tất toán một phần hoặc toàn bộ khoản đầu tư chứng chỉ quỹ, xác định chính xác lợi nhuận thực tế hiện thực hóa. |
+| Mô tả tóm tắt | Bán một phần hoặc toàn bộ số lượng chứng chỉ quỹ đang nắm giữ trong một khoản đầu tư, kết chuyển tiền thu về một ví thanh khoản và ghi nhận lợi nhuận thực tế đã hiện thực hóa. |
+| Điều kiện kích hoạt | Người dùng cần bán một phần hoặc toàn bộ một khoản đầu tư chứng chỉ quỹ đang nắm giữ. |
+
+**Tiền điều kiện:**
+
+1. Khoản đầu tư cần bán đang ở trạng thái `HOLDING` với số lượng đơn vị quỹ lớn hơn 0.
+2. Owner đang ở giao diện phân hệ Quản lý Chứng chỉ quỹ đầu tư.
+
+**Hậu điều kiện thành công:**
+
+1. Số tiền thu về $Proceeds = sellUnits \times sellNav$ được cộng vào ví nhận tiền; số lượng chứng chỉ quỹ nắm giữ và vốn gốc được khấu trừ theo phương pháp tỷ trọng bình quân; lợi nhuận thực tế $RealizedPL$ được ghi nhận; nếu bán hết thì chuyển trạng thái sang `CLOSED`.
+
+#### Luồng sự kiện chính
 
 1. Tại bảng danh mục đầu tư, Người dùng chọn một khoản đầu tư cụ thể và yêu cầu bán chứng chỉ quỹ.
 2. Hệ thống hiển thị biểu mẫu bán gồm: Mã quỹ, Loại tài sản, Số lượng chứng chỉ quỹ hiện có ($Units$), Vốn gốc ban đầu ($Principal$), Giá vốn bình quân ($BuyNAV$), Ngày bán (mặc định hôm nay), Số lượng chứng chỉ quỹ muốn bán (`sellUnits`), Đơn giá bán NAV (`sellNav`), Ví nhận tiền (`walletId`, danh sách ví `ACTIVE`), Ghi chú.
@@ -3833,7 +4730,60 @@ Kết quả được lưu trữ với scale tối thiểu 4 chữ số thập ph
 8. Nếu khoản đầu tư có liên kết quỹ mục tiêu, hệ thống cập nhật lại giá trị quỹ theo quy tắc `BR-FIN-08`.
 9. Hệ thống thông báo hoàn tất giao dịch bán, hiển thị biên lai tóm tắt gồm số tiền thu về, lãi hoặc lỗ thực tế và số lượng chứng chỉ quỹ còn lại.
 
-##### Luồng 2b: Cập nhật đơn giá NAV thị trường định kỳ
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu bán chứng chỉ quỹ.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 3a: Đơn giá bán hoặc số lượng bán không hợp lệ
+
+1. Tại bước 3 của luồng chính, hệ thống ghi nhận $sellNav \le 0$.
+2. Hệ thống báo lỗi: "Đơn giá NAV bán phải là số dương lớn hơn 0".
+3. Người dùng nhập lại đơn giá hợp lệ.
+
+##### Luồng ngoại lệ: Cố ý bán khoản đầu tư đã đóng
+
+1. Người dùng chọn thao tác bán trên khoản đầu tư đã có số lượng bằng 0 và trạng thái `CLOSED`.
+2. Hệ thống từ chối thực hiện và thông báo: "Khoản đầu tư này đã được bán hết và tất toán toàn bộ".
+
+##### Luồng ngoại lệ 4a: Bán số lượng chứng chỉ quỹ vượt quá số dư nắm giữ
+
+1. Tại bước 4 của luồng chính, Người dùng nhập số lượng bán lớn hơn số lượng chứng chỉ quỹ đang có trong khoản đầu tư ($sellUnits > Units$).
+2. Hệ thống từ chối và thông báo: "Số lượng chứng chỉ quỹ bán vượt quá số lượng hiện đang nắm giữ".
+3. Người dùng điều chỉnh số lượng bán nhỏ hơn hoặc bằng số lượng hiện có.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến định giá theo thị trường `BR-FIN-06`: Giá vốn của lượng chứng chỉ quỹ bán được khấu trừ theo phương pháp tỷ trọng bình quân trên tổng số lượng đang nắm giữ.
+2. Bất biến bảo toàn dòng tiền `BR-FIN-02`: Bán chứng chỉ quỹ làm tăng số dư ví đích đúng bằng $Proceeds$.
+3. Bất biến liên kết tài sản quỹ mục tiêu `BR-FIN-08`: Giá trị quỹ mục tiêu liên kết phải được cập nhật lại đồng thời với giao dịch bán.
+4. Phù hợp các yêu cầu chức năng: `FR-INV-02`, `FR-INV-04`.
+
+### 6.27 UC-INV-03: Cập nhật NAV thị trường
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-INV-03 |
+| Tên | Cập nhật NAV thị trường |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Định giá lại danh mục đầu tư theo nguyên tắc Mark-to-Market khi có đơn giá NAV mới công bố trên thị trường. |
+| Mô tả tóm tắt | Cập nhật đơn giá NAV thị trường mới nhất cho một mã chứng chỉ quỹ, định giá lại toàn bộ các khoản đầu tư đang nắm giữ thuộc mã quỹ đó theo nguyên tắc Mark-to-Market. |
+| Điều kiện kích hoạt | Người dùng nhận được đơn giá NAV mới công bố trên thị trường cho một mã chứng chỉ quỹ đang nắm giữ. |
+
+**Tiền điều kiện:**
+
+1. Có ít nhất một khoản đầu tư đang ở trạng thái `HOLDING` thuộc mã chứng chỉ quỹ cần cập nhật.
+2. Owner đang ở giao diện phân hệ Quản lý Chứng chỉ quỹ đầu tư.
+
+**Hậu điều kiện thành công:**
+
+1. Giá trị thị trường hiện tại của toàn bộ các lô quỹ cùng mã được tính lại tức thời: $Balance = Units \times latestNav$ theo `BR-FIN-06`, lưu lịch sử vào `fund_performance`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn chức năng "Cập nhật NAV thị trường".
 2. Hệ thống hiển thị biểu mẫu cập nhật: Danh sách chọn Mã chứng chỉ quỹ đang nắm giữ, Ngày cập nhật (`updateDate`, mặc định hôm nay), Đơn giá NAV mới nhất (`latestNav`).
@@ -3847,7 +4797,48 @@ Cập nhật trường `currentNav = latestNav` và `balance = Balance`.
 8. Nếu các khoản đầu tư này có liên kết với quỹ mục tiêu, hệ thống cập nhật lại tổng giá trị tích lũy của quỹ mục tiêu tương ứng theo quy tắc `BR-FIN-08`.
 9. Hệ thống thông báo cập nhật NAV thành công và làm mới bảng định giá danh mục đầu tư trên màn hình.
 
-##### Luồng 2c: Xem phân tích danh mục đầu tư và hiệu suất sinh lời
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu cập nhật NAV thị trường.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Đơn giá NAV mới nhỏ hơn hoặc bằng 0
+
+1. Tại bước 4 của luồng chính, hệ thống ghi nhận $latestNav \le 0$.
+2. Hệ thống báo lỗi: "Đơn giá NAV cập nhật phải là số dương lớn hơn 0".
+3. Người dùng nhập lại đơn giá hợp lệ.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến định giá theo thị trường `BR-FIN-06`: Giá trị ghi nhận $Balance$ luôn phản ánh tích số giữa số lượng đơn vị quỹ và NAV tại ngày định giá gần nhất.
+2. Bất biến liên kết tài sản quỹ mục tiêu `BR-FIN-08`: Định giá lại phải kéo theo cập nhật đồng bộ giá trị quỹ mục tiêu liên kết.
+3. Phù hợp các yêu cầu chức năng: `FR-INV-03`.
+
+### 6.28 UC-INV-04: Phân tích hiệu suất danh mục đầu tư
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-INV-04 |
+| Tên | Phân tích hiệu suất danh mục đầu tư |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Đánh giá hiệu suất sinh lời của toàn bộ danh mục chứng chỉ quỹ đang nắm giữ. |
+| Mô tả tóm tắt | Phân tích lãi lỗ chưa thực hiện, tỷ suất sinh lời tuyệt đối và suất sinh lời quy đổi năm (CAGR) của từng khoản đầu tư và toàn bộ danh mục theo `BR-FIN-06`. |
+| Điều kiện kích hoạt | Người dùng cần đánh giá hiệu suất sinh lời hiện tại của danh mục đầu tư chứng chỉ quỹ. |
+
+**Tiền điều kiện:**
+
+1. Có ít nhất một khoản đầu tư đang ở trạng thái `HOLDING`.
+2. Owner đang ở giao diện phân hệ Quản lý Chứng chỉ quỹ đầu tư.
+
+**Hậu điều kiện thành công:**
+
+1. Lãi lỗ chưa thực hiện $UnrealizedPL$, tỷ suất lợi nhuận tuyệt đối và suất sinh lời quy đổi năm $AnnualizedRate$ (nếu $HoldDays \ge 30$) được tính toán chính xác theo `BR-FIN-06`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng truy cập tab "Danh mục đầu tư và Hiệu suất".
 2. Hệ thống nạp danh sách toàn bộ các khoản đầu tư đang nắm giữ (`HOLDING`), lấy ngày hiện tại ($currentDate$) và tính toán các chỉ số cho từng khoản theo quy tắc `BR-FIN-06`:
@@ -3866,64 +4857,43 @@ Cập nhật trường `currentNav = latestNav` và `balance = Balance`.
 3. Hệ thống tổng hợp các chỉ tiêu toàn danh mục: Tổng vốn đầu tư ban đầu, Tổng giá trị thị trường hiện tại, Tổng lãi lỗ danh nghĩa toàn danh mục, Tỷ trọng phân bổ theo từng loại quỹ (`STOCK`, `BOND`, `BALANCE`).
 4. Hệ thống hiển thị bảng dữ liệu chi tiết kèm các đồ thị phân bổ tỷ trọng và đường cong tăng trưởng NAV theo thời gian.
 
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu phân tích hiệu suất danh mục.
+
 #### Các luồng ngoại lệ
 
-##### Luồng ngoại lệ 5a: Đơn giá NAV hoặc số tiền mua nhỏ hơn hoặc bằng 0
-
-1. Tại bước 5 của luồng chính (hoặc bước 4 của luồng 2b, bước 3 của luồng 2a), hệ thống ghi nhận $principal \le 0$, $buyNav \le 0$, $latestNav \le 0$, hoặc $sellNav \le 0$.
-2. Hệ thống báo lỗi: "Đơn giá NAV và số tiền giao dịch phải là các số dương lớn hơn 0".
-3. Người dùng nhập lại đơn giá hoặc số tiền hợp lệ.
-
-##### Luồng ngoại lệ 5b: Số dư ví thanh toán không đủ
-
-1. Tại bước 5 của luồng chính, hệ thống phát hiện $Balance_{wallet} < principal$.
-2. Hệ thống từ chối lệnh mua và hiển thị thông báo: "Số dư ví nguồn không đủ để mua chứng chỉ quỹ".
-3. Người dùng đổi ví khác hoặc giảm số vốn mua.
-
-##### Luồng ngoại lệ 2a2a: Cố ý bán khoản đầu tư đã đóng
-
-1. Người dùng chọn thao tác bán trên khoản đầu tư đã có số lượng bằng 0 và trạng thái `CLOSED`.
-2. Hệ thống từ chối thực hiện và thông báo: "Khoản đầu tư này đã được bán hết và tất toán toàn bộ".
-
-##### Luồng ngoại lệ 2a3a: Bán số lượng chứng chỉ quỹ vượt quá số dư nắm giữ
-
-1. Tại bước 4 của luồng 2a, Người dùng nhập số lượng bán lớn hơn số lượng chứng chỉ quỹ đang có trong khoản đầu tư ($sellUnits > Units$).
-2. Hệ thống từ chối và thông báo: "Số lượng chứng chỉ quỹ bán vượt quá số lượng hiện đang nắm giữ".
-3. Người dùng điều chỉnh số lượng bán nhỏ hơn hoặc bằng số lượng hiện có.
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài việc hiển thị ghi chú khi số ngày nắm giữ chưa đủ 30 ngày để quy đổi năm.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Bất biến định giá theo thị trường `BR-FIN-06`: Giá trị ghi nhận $Balance$ luôn phản ánh tích số giữa số lượng đơn vị quỹ và NAV tại ngày định giá gần nhất.
-2. Bất biến độ chính xác số học `BR-FIN-01`: Số lượng đơn vị quỹ $Units$ được duy trì scale tối thiểu là 4 chữ số thập phân; số tiền quy đổi và lợi nhuận làm tròn theo `RoundingMode.HALF_EVEN`.
-3. Bất biến bảo toàn dòng tiền `BR-FIN-02`: Mua CCQ làm giảm số dư ví nguồn đúng bằng $Principal$; bán CCQ làm tăng số dư ví đích đúng bằng $Proceeds$.
-4. Bất biến liên kết tài sản quỹ mục tiêu `BR-FIN-08`: Mỗi khoản đầu tư CCQ chỉ được thuộc về duy nhất một quỹ mục tiêu để bảo đảm không tính trùng lặp tài sản.
-5. Phù hợp các yêu cầu chức năng: `FR-INV-01`, `FR-INV-02`, `FR-INV-03`, `FR-INV-04`.
-
-### 6.8 UC08: Quản lý quỹ mục tiêu tài chính và phân bổ dòng tiền
+1. Bất biến định giá theo thị trường `BR-FIN-06`: Suất sinh lời quy đổi năm chỉ được tính khi số ngày nắm giữ đạt tối thiểu 30 ngày để tránh sai lệch thống kê số mũ.
+2. Phù hợp các yêu cầu chức năng: `FR-INV-04`.
+### 6.29 UC-FND-01: Thiết lập quỹ mục tiêu mới
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC08 |
-| Tên | Quản lý quỹ mục tiêu tài chính và phân bổ dòng tiền |
+| Mã | UC-FND-01 |
+| Tên | Thiết lập quỹ mục tiêu mới |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
-| Các bên liên quan và mối quan tâm | Quy hoạch mục tiêu tích lũy, phân bổ tài sản vào từng quỹ cụ thể và theo dõi tiến độ hoàn thành mà không làm thay đổi số dư sổ cái. |
-| Mô tả tóm tắt | Thiết lập các quỹ mục tiêu tài chính độc lập (quỹ khẩn cấp, quỹ hưu trí, quỹ mua sắm, quỹ tùy chỉnh); phân bổ tài sản đa kênh gồm 3 cấu phần (tiền mặt phân bổ từ danh mục `funds_cash`, sổ tiết kiệm liên kết, chứng chỉ quỹ liên kết) theo quy tắc BR-FIN-08; theo dõi tiến độ tích lũy theo thời gian thực; điều chỉnh hạn mức mục tiêu, tái phân bổ tài sản và đóng quỹ. |
-| Điều kiện kích hoạt | Người dùng thiết lập mục tiêu tích lũy mới, phân bổ tài sản vào các mục tiêu hoặc tái cân bằng danh mục quỹ mục tiêu. |
+| Các bên liên quan và mối quan tâm | Quy hoạch một mục tiêu tích lũy mới và phân bổ tài sản ban đầu vào mục tiêu đó mà không làm thay đổi số dư sổ cái. |
+| Mô tả tóm tắt | Thiết lập một quỹ mục tiêu tài chính mới với hạn mức cần tích lũy, sau đó phân bổ tài sản ban đầu từ 3 cấu phần (tiền mặt, sổ tiết kiệm liên kết, chứng chỉ quỹ liên kết) theo quy tắc `BR-FIN-08`. |
+| Điều kiện kích hoạt | Người dùng cần thiết lập một mục tiêu tích lũy tài chính mới. |
 
 **Tiền điều kiện:**
 
-1. Hệ thống đã khởi tạo sẵn cấu trúc 4 quỹ chuẩn (`emergency`, `retirement`, `car`, `travel` hoặc `health`) hoặc cho phép tạo thêm quỹ tùy chỉnh.
+1. Hệ thống đã khởi tạo sẵn cấu trúc 4 quỹ chuẩn (`emergency`, `health`, `target`, `retirement`) hoặc cho phép tạo thêm quỹ tùy chỉnh.
 2. Owner đang ở giao diện phân hệ Quản lý Quỹ mục tiêu tài chính.
 
 **Hậu điều kiện thành công:**
 
-1. Quỹ mục tiêu mới hoặc thông tin cập nhật được lưu vào danh sách bản ghi `funds` với mã định danh `fundCode` duy nhất.
+1. Quỹ mục tiêu mới được lưu vào danh sách bản ghi `funds` với mã định danh `fundCode` duy nhất.
 2. Tổng giá trị tích lũy của quỹ $Total_{fund}$ được tính toán tự động từ 3 cấu phần ($Cash_{fund} + \sum Balance_{savings} + \sum Balance_{fundCerts}$) theo quy tắc `BR-FIN-08`.
-3. Tiến độ hoàn thành $Process$ được tính toán chính xác; tự động hiển thị trạng thái "ĐÃ HOÀN THÀNH" khi $Process \ge 100\%$.
-4. Nguyên tắc không tính trùng tài sản: không có sổ tiết kiệm hay khoản CCQ nào liên kết với hai quỹ cùng lúc.
+3. Tiến độ hoàn thành $Process$ được tính toán chính xác.
+4. Nguyên tắc không tính trùng tài sản: không có sổ tiết kiệm hay khoản chứng chỉ quỹ nào liên kết với hai quỹ cùng lúc.
 5. Tổng lượng tiền mặt phân bổ trên toàn bộ các quỹ mục tiêu không vượt quá tổng số dư tiền mặt khả dụng trên tất cả các ví thanh khoản của hệ thống.
 
 #### Luồng sự kiện chính
@@ -3935,7 +4905,7 @@ Bảng thuộc tính ca sử dụng:
 5. Hệ thống xác thực dữ liệu:
   - Mã quỹ `fundCode` không trùng lặp với các quỹ đã có trong hệ thống (chuỗi không khoảng trắng, tự động chuyển chữ thường).
   - Tên quỹ không được để trống (độ dài từ 1 đến 100 ký tự).
-  - Số tiền mục tiêu $targetAmount \ge 0$, chuẩn hóa về kiểu `BigDecimal` theo quy tắc `BR-FIN-01`.
+  - Số tiền mục tiêu $targetAmount \ge 0$, chuẩn hóa về kiểu dữ liệu tài chính chính xác tuyệt đối theo quy tắc `BR-FIN-01`.
 6. Hệ thống tạo bản ghi quỹ mới trong danh sách `funds` với 3 cấu phần ban đầu bằng 0 ($Cash = 0, Savings = 0, FundCerts = 0$), tiến độ ban đầu $Process = 0.00\%$.
 7. Hệ thống chuyển sang màn hình "Phân bổ tài sản vào quỹ" và hiển thị các nguồn lực tài sản khả dụng:
   - Số dư tiền mặt khả dụng chưa phân bổ trong hệ thống:
@@ -3956,10 +4926,69 @@ $$Process = \frac{Total_{fund}}{targetAmount} \times 100$$
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 2a: Xem danh sách và theo dõi tiến độ các quỹ mục tiêu
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu thiết lập quỹ mục tiêu mới, do bước phân bổ tài sản ban đầu là một chuỗi liền mạch không thể tách rời trong cùng một phiên với bước khởi tạo quỹ.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 5a: Số tiền mục tiêu nhỏ hơn 0
+
+1. Tại bước 5 của luồng chính, Người dùng nhập số tiền mục tiêu là số âm ($targetAmount < 0$).
+2. Hệ thống từ chối và thông báo lỗi: "Số tiền mục tiêu phải là số lớn hơn hoặc bằng 0".
+3. Người dùng nhập lại số tiền mục tiêu hợp lệ.
+
+##### Luồng ngoại lệ 5b: Trùng mã quỹ mục tiêu
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện mã quỹ `fundCode` đã tồn tại trong hệ thống.
+2. Hệ thống báo lỗi trùng mã và yêu cầu Người dùng nhập mã định danh khác.
+3. Người dùng nhập lại mã quỹ duy nhất.
+
+##### Luồng ngoại lệ 10a: Phân bổ tiền mặt vượt quá tổng số dư tiền mặt chưa phân bổ
+
+1. Tại bước 10 của luồng chính, hệ thống phát hiện số tiền mặt người dùng muốn phân bổ vào quỹ lớn hơn số dư tiền mặt chưa phân bổ ($cashAmount > UnallocatedCash$).
+2. Hệ thống từ chối phân bổ và thông báo: "Số tiền mặt phân bổ vượt quá tổng lượng tiền mặt khả dụng hiện có trên tất cả các ví".
+3. Người dùng giảm số tiền mặt phân bổ hoặc nạp thêm tiền vào các ví.
+
+##### Luồng ngoại lệ 10b: Liên kết trùng lặp tài sản vào nhiều quỹ khác nhau
+
+1. Tại bước 10 của luồng chính, hệ thống phát hiện một sổ tiết kiệm hoặc khoản chứng chỉ quỹ đang được chọn đã thuộc về một quỹ mục tiêu khác và người dùng chưa xác nhận chuyển quyền sở hữu.
+2. Hệ thống hiển thị hộp thoại cảnh báo: "Tài sản này đang thuộc về quỹ khác. Bạn có muốn chuyển tài sản sang quỹ này không? Thao tác này sẽ làm giảm giá trị của quỹ cũ".
+3. Nếu Người dùng chọn Đồng ý, hệ thống tự động gỡ khỏi quỹ cũ và gán sang quỹ mới theo quy tắc `BR-FIN-08`; nếu Người dùng chọn Hủy, hệ thống giữ nguyên liên kết cũ.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến cấu trúc 3 cấu phần theo `BR-FIN-08`: Giá trị quỹ luôn bằng tổng đại số chính xác của 3 cấu phần ($Cash + Savings + FundCerts$).
+2. Bất biến không tính trùng tài sản: Mỗi sổ tiết kiệm và khoản chứng chỉ quỹ chỉ được thuộc về duy nhất một quỹ mục tiêu tại một thời điểm.
+3. Bất biến hạn mức tiền mặt: Tổng tiền mặt phân bổ trên toàn bộ các quỹ không vượt quá tổng số dư tiền mặt trên toàn bộ các ví ($\sum Cash_{funds} \le \sum Balance_{wallets}$).
+4. Độc lập kế toán: Quỹ mục tiêu là thực thể quy hoạch kế hoạch, không phải là ví tiền thực tế; việc tạo quỹ mục tiêu không làm thay đổi tổng tài sản ròng hay số dư khả dụng thực tế của ví.
+5. Phù hợp các yêu cầu chức năng: `FR-FND-01`.
+
+### 6.30 UC-FND-02: Theo dõi tiến độ các quỹ mục tiêu
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-FND-02 |
+| Tên | Theo dõi tiến độ các quỹ mục tiêu |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Nắm bắt tiến độ hoàn thành và cơ cấu tài sản của toàn bộ danh sách quỹ mục tiêu. |
+| Mô tả tóm tắt | Xem tổng quan tiến độ tích lũy của toàn bộ danh sách quỹ mục tiêu, phân rã theo 3 cấu phần tài sản và phân loại trạng thái đã đạt mục tiêu hay đang tích lũy. |
+| Điều kiện kích hoạt | Người dùng cần tra cứu tiến độ hoàn thành hiện tại của các quỹ mục tiêu. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống đã có ít nhất một quỹ mục tiêu trong danh sách `funds`.
+2. Owner đang ở giao diện phân hệ Quản lý Quỹ mục tiêu tài chính.
+
+**Hậu điều kiện thành công:**
+
+1. Tiến độ hoàn thành $Process$ được tính toán chính xác; tự động hiển thị trạng thái "ĐÃ HOÀN THÀNH" khi $Process \ge 100\%$.
+
+#### Luồng sự kiện chính
 
 1. Người dùng mở màn hình tổng quan "Quỹ mục tiêu tài chính".
-2. Hệ thống quét dữ liệu và tính toán động các chỉ số cho toàn bộ danh sách quỹ (4 quỹ chuẩn: `Emergency`, `Retirement`, `Car`, `Travel` hoặc `Health` và các quỹ tùy chỉnh):
+2. Hệ thống quét dữ liệu và tính toán động các chỉ số cho toàn bộ danh sách quỹ (4 quỹ chuẩn: `Emergency`, `Health`, `Target`, `Retirement` và các quỹ tùy chỉnh):
   - Cấu phần tiền mặt: Lấy giá trị $Cash_{fund}$ từ danh mục `funds_cash`.
   - Cấu phần sổ tiết kiệm: Quét danh sách `savings` có `fund = fundCode` và trạng thái `OPEN`, lấy tổng $Balance_s$ tính theo `FR-SAV-02`.
   - Cấu phần đầu tư: Quét danh sách `fund_certs` có `fund = fundCode` và trạng thái `HOLDING`, lấy tổng $Balance_c$ định giá theo `FR-INV-03`.
@@ -3969,7 +4998,45 @@ $$Process = \frac{Total_{fund}}{targetAmount} \times 100$$
 3. Hệ thống phân loại trạng thái quỹ: Nếu $Process \ge 100\%$, gắn nhãn "ĐÃ ĐẠT MỤC TIÊU"; nếu $Process < 100\%$, gắn nhãn "ĐANG TÍCH LŨY".
 4. Hệ thống hiển thị bảng so sánh tổng hợp, biểu đồ tiến độ thanh ngang và phân rã màu sắc cho 3 cấu phần tài sản của từng quỹ.
 
-##### Luồng 2b: Cập nhật cấu hình quỹ mục tiêu
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu theo dõi tiến độ các quỹ mục tiêu.
+
+#### Các luồng ngoại lệ
+
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài việc hiển thị danh sách rỗng khi chưa có quỹ mục tiêu nào được thiết lập.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến cấu trúc 3 cấu phần theo `BR-FIN-08`: Tổng tài sản tích lũy luôn bằng tổng đại số chính xác của 3 cấu phần.
+2. Phù hợp các yêu cầu chức năng: `FR-FND-02`.
+
+### 6.31 UC-FND-03: Điều chỉnh hạn mức mục tiêu của quỹ
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-FND-03 |
+| Tên | Điều chỉnh hạn mức mục tiêu của quỹ |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Cập nhật lại số tiền mục tiêu hoặc hạn chót của một quỹ mà không làm thay đổi số dư tài sản thực tế. |
+| Mô tả tóm tắt | Điều chỉnh tên quỹ, số tiền mục tiêu mới hoặc hạn chót mới của một quỹ mục tiêu đã tồn tại, tính toán lại tỷ lệ tiến độ tương ứng. |
+| Điều kiện kích hoạt | Người dùng cần thay đổi hạn mức tích lũy hoặc hạn chót của một quỹ mục tiêu đã thiết lập. |
+
+**Tiền điều kiện:**
+
+1. Quỹ mục tiêu cần điều chỉnh đã tồn tại trong danh sách `funds`.
+2. Owner đang ở giao diện phân hệ Quản lý Quỹ mục tiêu tài chính.
+
+**Hậu điều kiện thành công:**
+
+1. Hạn mức mục tiêu và hạn chót mới được cập nhật trong danh sách `funds`.
+2. Tỷ lệ tiến độ $Process$ được tính toán lại chính xác theo hạn mức mới.
+3. Số dư thực tế của ví tiền, sổ tiết kiệm hay chứng chỉ quỹ không bị thay đổi bởi thao tác này.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn một quỹ mục tiêu và yêu cầu điều chỉnh mục tiêu tích lũy.
 2. Hệ thống hiển thị biểu mẫu cho phép sửa: Tên quỹ (`fundName`), Số tiền mục tiêu mới (`newTarget`), Hạn chót mới (`newDeadline`), Ghi chú định hướng.
@@ -3979,7 +5046,48 @@ $$Process = \frac{Total_{fund}}{targetAmount} \times 100$$
 6. Thao tác này không làm thay đổi số dư thực tế của ví tiền, sổ tiết kiệm hay chứng chỉ quỹ.
 7. Hệ thống thông báo điều chỉnh thành công và cập nhật tỷ lệ tiến độ mới.
 
-##### Luồng 2c: Điều chỉnh phân bổ tài sản vào quỹ (Tái phân bổ tài sản)
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu điều chỉnh hạn mức quỹ.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Số tiền mục tiêu mới nhỏ hơn 0
+
+1. Tại bước 4 của luồng chính, Người dùng nhập số tiền mục tiêu mới là số âm ($newTarget < 0$).
+2. Hệ thống từ chối và thông báo lỗi: "Số tiền mục tiêu phải là số lớn hơn hoặc bằng 0".
+3. Người dùng nhập lại số tiền mục tiêu hợp lệ.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Độc lập kế toán: Việc điều chỉnh hạn mức mục tiêu không làm thay đổi tổng tài sản ròng hay số dư khả dụng thực tế của ví.
+2. Phù hợp các yêu cầu chức năng: `FR-FND-03`.
+
+### 6.32 UC-FND-04: Tái phân bổ tài sản giữa các quỹ
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-FND-04 |
+| Tên | Tái phân bổ tài sản giữa các quỹ |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Dịch chuyển tiền mặt, sổ tiết kiệm hoặc chứng chỉ quỹ từ quỹ mục tiêu này sang quỹ mục tiêu khác mà không làm thay đổi tổng tài sản toàn hệ thống. |
+| Mô tả tóm tắt | Chuyển giao hạn mức tiền mặt hoặc quyền liên kết của một sổ tiết kiệm, khoản chứng chỉ quỹ từ Quỹ A sang Quỹ B, tính toán lại tổng tài sản và tiến độ của cả hai quỹ. |
+| Điều kiện kích hoạt | Người dùng cần tái cơ cấu tài sản giữa hai hoặc nhiều quỹ mục tiêu đã thiết lập. |
+
+**Tiền điều kiện:**
+
+1. Cả hai quỹ tham gia tái phân bổ đã tồn tại trong danh sách `funds`.
+2. Owner đang ở giao diện phân hệ Quản lý Quỹ mục tiêu tài chính.
+
+**Hậu điều kiện thành công:**
+
+1. Tổng tài sản $Total$ và tiến độ $Process$ của cả Quỹ A và Quỹ B được tính toán lại chính xác.
+2. Tổng tài sản toàn hệ thống được bảo toàn qua thao tác tái phân bổ.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn chức năng "Tái phân bổ tài sản giữa các quỹ" hoặc điều chỉnh phân bổ của một quỹ.
 2. Hệ thống hiển thị bảng chuyển giao tài sản:
@@ -3993,7 +5101,50 @@ $$Process = \frac{Total_{fund}}{targetAmount} \times 100$$
 6. Hệ thống tính toán lại $Total$ và $Process$ của cả hai Quỹ A và Quỹ B. Tổng tài sản toàn hệ thống được bảo toàn.
 7. Hệ thống hiển thị thông báo tái phân bổ hoàn tất kèm bảng so sánh trước và sau khi tái cơ cấu.
 
-##### Luồng 2d: Đóng hoặc xóa quỹ mục tiêu
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu tái phân bổ tài sản.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Trích tiền mặt vượt quá số tiền hiện có của Quỹ A
+
+1. Tại bước 4 của luồng chính, hệ thống phát hiện số tiền mặt muốn trích khỏi Quỹ A vượt quá số tiền mặt hiện có của Quỹ A ($amount > Cash_A$).
+2. Hệ thống từ chối tái phân bổ và thông báo: "Số tiền mặt trích khỏi quỹ vượt quá số dư hiện có của quỹ nguồn".
+3. Người dùng điều chỉnh lại số tiền chuyển giao.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến không tính trùng tài sản theo `BR-FIN-08`: Sau tái phân bổ, mỗi sổ tiết kiệm và khoản chứng chỉ quỹ chỉ thuộc về duy nhất một quỹ mục tiêu.
+2. Bất biến hạn mức tiền mặt: Tổng tiền mặt phân bổ trên toàn bộ các quỹ không vượt quá tổng số dư tiền mặt trên toàn bộ các ví.
+3. Phù hợp các yêu cầu chức năng: `FR-FND-04`.
+
+### 6.33 UC-FND-05: Đóng quỹ mục tiêu
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-FND-05 |
+| Tên | Đóng quỹ mục tiêu |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Giải phóng toàn bộ tài sản đã phân bổ vào một quỹ không còn nhu cầu theo dõi, không làm mất tiền mặt hay tài sản thực tế. |
+| Mô tả tóm tắt | Đóng hoặc xóa một quỹ mục tiêu không còn nhu cầu theo dõi, gỡ bỏ toàn bộ liên kết tài sản và hoàn trả hạn mức tiền mặt phân bổ về trạng thái chưa phân bổ. |
+| Điều kiện kích hoạt | Người dùng cần đóng hoặc xóa một quỹ mục tiêu không còn nhu cầu theo dõi. |
+
+**Tiền điều kiện:**
+
+1. Quỹ mục tiêu cần đóng đã tồn tại trong danh sách `funds`.
+2. Owner đang ở giao diện phân hệ Quản lý Quỹ mục tiêu tài chính.
+
+**Hậu điều kiện thành công:**
+
+1. Số tiền mặt phân bổ của quỹ được hoàn trả về hạn mức tiền mặt khả dụng chưa phân bổ.
+2. Toàn bộ các sổ tiết kiệm và khoản chứng chỉ quỹ liên kết được gỡ bỏ liên kết (`fund = null`).
+3. Bản ghi quỹ bị xóa khỏi danh sách `funds` hoặc chuyển trạng thái `CLOSED`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn một quỹ mục tiêu không còn nhu cầu theo dõi và chọn chức năng "Đóng / Xóa quỹ mục tiêu".
 2. Hệ thống hiển thị hộp thoại xác nhận kèm cảnh báo: việc xóa quỹ sẽ gỡ bỏ toàn bộ liên kết tài sản và giải phóng hạn mức tiền mặt phân bổ về trạng thái chưa phân bổ, không làm mất tiền mặt hay tài sản thực tế.
@@ -4005,53 +5156,31 @@ $$Process = \frac{Total_{fund}}{targetAmount} \times 100$$
 5. Hệ thống xóa bản ghi quỹ khỏi danh sách `funds` (hoặc chuyển trạng thái `CLOSED`).
 6. Hệ thống làm mới giao diện tổng quan các quỹ mục tiêu và thông báo đóng quỹ thành công.
 
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu đóng quỹ mục tiêu.
+
 #### Các luồng ngoại lệ
 
-##### Luồng ngoại lệ 10a: Phân bổ tiền mặt vượt quá tổng số dư tiền mặt chưa phân bổ
-
-1. Tại bước 10 của luồng chính (hoặc bước 4 của luồng 2c), hệ thống phát hiện số tiền mặt người dùng muốn phân bổ vào quỹ lớn hơn số dư tiền mặt chưa phân bổ ($cashAmount > UnallocatedCash$).
-2. Hệ thống từ chối phân bổ và thông báo: "Số tiền mặt phân bổ vượt quá tổng lượng tiền mặt khả dụng hiện có trên tất cả các ví".
-3. Người dùng giảm số tiền mặt phân bổ hoặc nạp thêm tiền vào các ví.
-
-##### Luồng ngoại lệ 10b: Liên kết trùng lặp tài sản vào nhiều quỹ khác nhau
-
-1. Tại bước 10 của luồng chính, hệ thống phát hiện một sổ tiết kiệm hoặc khoản chứng chỉ quỹ đang được chọn đã thuộc về một quỹ mục tiêu khác và người dùng chưa xác nhận chuyển quyền sở hữu.
-2. Hệ thống hiển thị hộp thoại cảnh báo: "Tài sản này đang thuộc về quỹ khác. Bạn có muốn chuyển tài sản sang quỹ này không? Thao tác này sẽ làm giảm giá trị của quỹ cũ".
-3. Nếu Người dùng chọn Đồng ý, hệ thống tự động gỡ khỏi quỹ cũ và gán sang quỹ mới theo quy tắc `BR-FIN-08`; nếu Người dùng chọn Hủy, hệ thống giữ nguyên liên kết cũ.
-
-##### Luồng ngoại lệ 5a: Số tiền mục tiêu nhỏ hơn 0
-
-1. Tại bước 5 của luồng chính (hoặc bước 4 của luồng 2b), Người dùng nhập số tiền mục tiêu là số âm ($targetAmount < 0$).
-2. Hệ thống từ chối và thông báo lỗi: "Số tiền mục tiêu phải là số lớn hơn hoặc bằng 0".
-3. Người dùng nhập lại số tiền mục tiêu hợp lệ.
-
-##### Luồng ngoại lệ 5b: Trùng mã quỹ mục tiêu
-
-1. Tại bước 5 của luồng chính, hệ thống phát hiện mã quỹ `fundCode` đã tồn tại trong hệ thống.
-2. Hệ thống báo lỗi trùng mã và yêu cầu Người dùng nhập mã định danh khác.
-3. Người dùng nhập lại mã quỹ duy nhất.
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài các kiểm tra tồn tại quỹ đã liệt kê ở luồng sự kiện chính.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Bất biến cấu trúc 3 cấu phần theo `BR-FIN-08`: Giá trị quỹ luôn bằng tổng đại số chính xác của 3 cấu phần ($Cash + Savings + FundCerts$).
-2. Bất biến không tính trùng tài sản: Mỗi sổ tiết kiệm và khoản CCQ chỉ được thuộc về duy nhất một quỹ mục tiêu tại một thời điểm.
-3. Bất biến hạn mức tiền mặt: Tổng tiền mặt phân bổ trên toàn bộ các quỹ không vượt quá tổng số dư tiền mặt trên toàn bộ các ví ($\sum Cash_{funds} \le \sum Balance_{wallets}$).
-4. Độc lập kế toán: Quỹ mục tiêu là thực thể quy hoạch kế hoạch, không phải là ví tiền thực tế; việc tạo, sửa, xóa quỹ mục tiêu không làm thay đổi tổng tài sản ròng hay số dư khả dụng thực tế của ví.
-5. Phù hợp các yêu cầu chức năng: `FR-FND-01`, `FR-FND-02`, `FR-FND-03`, `FR-FND-04`.
-
-### 6.9 UC09: Tra cứu bảng thống kê dòng tiền trượt 12 tháng và phân tích tỷ lệ tiết kiệm
+1. Độc lập kế toán: Việc đóng quỹ mục tiêu không làm thay đổi tổng tài sản ròng hay số dư khả dụng thực tế của ví, sổ tiết kiệm hay chứng chỉ quỹ.
+2. Phù hợp các yêu cầu chức năng: `FR-FND-04`.
+### 6.34 UC-REP-01: Thống kê dòng tiền trượt 12 tháng
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC09 |
-| Tên | Thống kê dòng tiền trượt 12 tháng và phân tích tỷ lệ tiết kiệm |
+| Mã | UC-REP-01 |
+| Tên | Thống kê dòng tiền trượt 12 tháng |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
-| Các bên liên quan và mối quan tâm | Đánh giá tình hình tài chính định kỳ qua chuỗi dòng tiền 12 tháng gần nhất, phân tích tỷ lệ tiết kiệm, cơ cấu thu chi theo nhóm và danh mục, kiểm soát giá trị tài sản ròng Net Worth và sao kê công nợ chi tiết theo đối tác. |
-| Mô tả tóm tắt | Tổng hợp chuỗi thời gian dòng tiền 12 tháng trượt tự động từ thời điểm hiện tại tương ứng danh mục thống kê `months_stat`, tính toán thu nhập, chi tiêu, dòng tiền thuần và tỷ lệ tiết kiệm bằng `BigDecimal` theo quy tắc BR-FIN-01 và FR-REP-01; phân tích cơ cấu thu chi 2 tầng phân cấp theo nhóm và danh mục kèm so sánh biến động với tháng liền trước theo FR-REP-02; hợp nhất báo cáo tổng tài sản và giá trị tài sản ròng 5 cấu phần theo FR-REP-03; cung cấp sao kê công nợ chi tiết theo đối tác theo FR-REP-04. |
-| Điều kiện kích hoạt | Người dùng mở phân hệ Thống kê và Báo cáo tài chính để đánh giá dòng tiền định kỳ, theo dõi biến động thu chi hoặc lập kế hoạch tài chính. |
+| Các bên liên quan và mối quan tâm | Đánh giá tình hình tài chính định kỳ qua chuỗi dòng tiền 12 tháng gần nhất và tỷ lệ tiết kiệm tương ứng. |
+| Mô tả tóm tắt | Tổng hợp chuỗi thời gian dòng tiền 12 tháng trượt tự động từ thời điểm hiện tại tương ứng danh mục thống kê `months_stat`, tính toán thu nhập, chi tiêu, dòng tiền thuần và tỷ lệ tiết kiệm theo quy tắc `BR-FIN-01` và `FR-REP-01`. |
+| Điều kiện kích hoạt | Người dùng cần đánh giá dòng tiền định kỳ trong 12 tháng gần nhất. |
 
 **Tiền điều kiện:**
 
@@ -4061,34 +5190,76 @@ Bảng thuộc tính ca sử dụng:
 **Hậu điều kiện thành công:**
 
 1. Bảng thống kê `months_stat` gồm đúng 12 dòng liên tục lùi từ tháng hiện tại được tổng hợp đầy đủ, không để trống trường dữ liệu nào.
-2. Dòng tiền thuần $CashFlow = Income - Expense$ và Tỷ lệ tiết kiệm $SavingsRate$ được tính toán chính xác bằng `BigDecimal` theo quy tắc `FR-REP-01`.
-3. Báo cáo cơ cấu thu chi 2 tầng phân cấp (Nhóm nhu cầu -> Danh mục) phản ánh chính xác tỷ trọng và biến động so với tháng liền kề theo `FR-REP-02`.
-4. Báo cáo Giá trị tài sản ròng hợp nhất chính xác 5 cấu phần (Wallets + Savings + Investments + Receivable - Payable) theo `FR-REP-03`.
-5. Sao kê công nợ theo đối tác phản ánh đúng lịch sử lũy kế và số dư nợ còn lại theo `FR-REP-04`.
+2. Dòng tiền thuần $CashFlow = Income - Expense$ và Tỷ lệ tiết kiệm $SavingsRate$ được tính toán chính xác theo quy tắc `FR-REP-01`.
 
 #### Luồng sự kiện chính
 
 1. Người dùng chọn chức năng "Bảng thống kê dòng tiền trượt 12 tháng".
-2. Hệ thống tự động xác định mốc thời gian hiện tại từ đồng hồ hệ thống (`LocalDate.now()`), trích xuất năm và tháng hiện tại ($YearMonth_{now}$).
+2. Hệ thống tự động xác định mốc thời gian hiện tại từ đồng hồ hệ thống, trích xuất năm và tháng hiện tại ($YearMonth_{now}$).
 3. Hệ thống tạo danh sách 12 mốc tháng liên tục từ $YearMonth_{now} - 11$ đến $YearMonth_{now}$, sắp xếp theo trình tự thời gian tăng dần (neo tháng hiện tại ở dòng cuối cùng).
 4. Với từng tháng $m$ trong chuỗi 12 tháng, hệ thống duyệt danh sách bản ghi `transactions`:
   - Lọc các giao dịch có ngày nằm trong khoảng từ ngày đầu tháng đến ngày cuối tháng của tháng $m$.
   - Tính tổng thu nhập: $Income_m = \sum Amount$ của các giao dịch có `Type = Income`.
   - Tính tổng chi tiêu: $Expense_m = \sum Amount$ của các giao dịch có `Type = Expense`.
-5. Hệ thống tính toán các chỉ số phái sinh cho từng tháng bằng `BigDecimal` theo quy tắc `FR-REP-01`:
+5. Hệ thống tính toán các chỉ số phái sinh cho từng tháng theo quy tắc `FR-REP-01`:
   - Dòng tiền thuần:
     $$CashFlow_m = Income_m - Expense_m$$
   - Tỷ lệ tiết kiệm:
     $$
     SavingsRate_m = \begin{cases} \left(\frac{CashFlow_m}{Income_m}\right) \times 100\%, & \text{khi } Income_m > 0 \\ 0.00\%, & \text{khi } Income_m \le 0 \end{cases}
     $$
-    Sử dụng `RoundingMode.HALF_EVEN` với scale hiển thị là 2 chữ số thập phân.
+    Áp dụng quy tắc làm tròn ngân hàng với scale hiển thị là 2 chữ số thập phân.
 6. Hệ thống tính tổng lũy kế và mức bình quân tháng của chuỗi 12 tháng: Tổng thu nhập 12 tháng, Tổng chi tiêu 12 tháng, Dòng tiền thuần tích lũy, và Tỷ lệ tiết kiệm bình quân.
 7. Hệ thống hiển thị bảng dữ liệu `months_stat` gồm 12 dòng kèm dòng tổng cộng và bình quân ở chân bảng, đồng thời hiển thị biểu đồ trực quan kết hợp cột thu chi và đường biểu diễn dòng tiền thuần.
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 2a: Xem báo cáo cơ cấu thu chi theo Nhóm và Danh mục
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu thống kê dòng tiền trượt 12 tháng.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Tháng hoàn toàn không có giao dịch phát sinh
+
+1. Tại bước 4 của luồng chính, hệ thống ghi nhận trong một tháng $m$ nào đó không có bất kỳ giao dịch thu chi nào phát sinh ($Income_m = 0$ và $Expense_m = 0$).
+2. Hệ thống hiển thị giá trị số tiền là "0.00 VNĐ", không để trống ô dữ liệu hoặc gán giá trị null.
+3. Hệ thống gán $CashFlow_m = 0.00$ và $SavingsRate_m = 0.00\%$, bảo đảm bảng dữ liệu 12 tháng luôn liên tục và không gây lỗi giao diện.
+
+##### Luồng ngoại lệ 5a: Tháng có thu nhập bằng 0 nhưng chi tiêu lớn hơn 0
+
+1. Tại bước 5 của luồng chính, hệ thống phát hiện $Income_m = 0$ nhưng $Expense_m > 0$ (người dùng không có thu nhập phát sinh trong tháng nhưng vẫn có chi tiêu sinh hoạt).
+2. Nếu thực hiện phép chia trực tiếp để tính $SavingsRate$, hệ thống sẽ gặp lỗi chia cho 0.
+3. Theo quy tắc xử lý biên `FR-REP-01`, hệ thống áp dụng hàm từng nhánh, gán $SavingsRate_m = 0.00\%$, hiển thị dòng tiền thuần âm ($CashFlow_m = -Expense_m$) và đưa ra chỉ báo thâm hụt ngân sách.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến chuỗi thời gian trượt 12 tháng theo `FR-REP-01`: Bảng thống kê luôn gồm đúng 12 tháng liên tục lùi từ tháng hiện tại, tự động thích ứng với ngày hệ thống mà không cần cập nhật thủ công.
+2. Bất biến tính toán tài chính theo `BR-FIN-01`: Toàn bộ các chỉ số thu nhập, chi tiêu, dòng tiền thuần đều tính toán bằng kiểu dữ liệu tài chính chính xác tuyệt đối, áp dụng quy tắc làm tròn ngân hàng với scale 2, không phát sinh sai số làm tròn.
+3. Phù hợp các yêu cầu chức năng: `FR-REP-01`.
+
+### 6.35 UC-REP-02: Báo cáo cơ cấu thu chi theo nhóm và danh mục
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-REP-02 |
+| Tên | Báo cáo cơ cấu thu chi theo nhóm và danh mục |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Phân tích cơ cấu thu chi 2 tầng phân cấp theo nhóm và danh mục, đối chiếu biến động so với tháng liền trước. |
+| Mô tả tóm tắt | Phân tích cơ cấu thu chi 2 tầng phân cấp theo Nhóm nhu cầu và Danh mục chi tiết trong một tháng được chọn, kèm so sánh biến động với tháng liền trước theo `FR-REP-02`. |
+| Điều kiện kích hoạt | Người dùng cần phân tích cơ cấu thu chi theo nhóm và danh mục của một tháng cụ thể. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống đã khởi chạy và nạp thành công tệp dữ liệu giao dịch.
+2. Owner đang ở giao diện phân hệ Thống kê và Báo cáo tài chính.
+
+**Hậu điều kiện thành công:**
+
+1. Báo cáo cơ cấu thu chi 2 tầng phân cấp (Nhóm nhu cầu -> Danh mục) phản ánh chính xác tỷ trọng và biến động so với tháng liền kề theo `FR-REP-02`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn tab "Cơ cấu thu chi", chọn tháng cần phân tích (mặc định tháng hiện tại) và chọn loại luồng tiền (`EXPENSE` hoặc `INCOME`).
 2. Hệ thống quét các giao dịch trong tháng được chọn có loại tương ứng.
@@ -4109,7 +5280,46 @@ Bảng thuộc tính ca sử dụng:
 5. Hệ thống sắp xếp các danh mục theo số tiền chi tiêu giảm dần.
 6. Hệ thống hiển thị bảng Pivot phân cấp kèm biểu đồ tròn cơ cấu chi tiêu.
 
-##### Luồng 2b: Xem báo cáo tổng tài sản và giá trị tài sản ròng
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu phân tích cơ cấu thu chi.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 4a: Tháng trước không có chi tiêu khi so sánh biến động
+
+1. Tại bước 4 của luồng chính, hệ thống phát hiện tháng trước không có chi tiêu trong danh mục này ($Amount_{tháng\_trước} = 0$) nhưng tháng này có chi tiêu ($Amount_{tháng\_này} > 0$).
+2. Hệ thống hiển thị chênh lệch tuyệt đối $\Delta Amount = Amount_{tháng\_này}$ và hiển thị tỷ lệ biến động là "Mới" (hoặc N/A), tránh thực hiện phép chia cho 0.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến tính toán tài chính theo `BR-FIN-01`: Toàn bộ các phép tổng hợp và tỷ trọng phần trăm tính bằng kiểu dữ liệu tài chính chính xác tuyệt đối.
+2. Phù hợp các yêu cầu chức năng: `FR-REP-02`.
+
+### 6.36 UC-REP-03: Báo cáo giá trị tài sản ròng
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-REP-03 |
+| Tên | Báo cáo giá trị tài sản ròng |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Kiểm soát giá trị tài sản ròng hợp nhất từ toàn bộ 5 cấu phần tài sản và nghĩa vụ của hệ thống. |
+| Mô tả tóm tắt | Hợp nhất báo cáo tổng tài sản và giá trị tài sản ròng từ 5 cấu phần (ví thanh khoản, sổ tiết kiệm, danh mục đầu tư, khoản phải thu, khoản phải trả) theo `FR-REP-03`. |
+| Điều kiện kích hoạt | Người dùng cần tra cứu giá trị tài sản ròng hiện tại của toàn hệ thống. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống đã khởi chạy và nạp thành công tệp dữ liệu giao dịch.
+2. Owner đang ở giao diện phân hệ Thống kê và Báo cáo tài chính.
+
+**Hậu điều kiện thành công:**
+
+1. Báo cáo Giá trị tài sản ròng hợp nhất chính xác 5 cấu phần (Wallets + Savings + Investments + Receivable - Payable) theo `FR-REP-03`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn tab "Báo cáo tài sản ròng".
 2. Hệ thống truy vấn đồng thời 5 cấu phần tài sản tại thời điểm hiện tại theo quy tắc `FR-REP-03`:
@@ -4125,58 +5335,78 @@ $$TotalAssets = Wallets + Savings + Investments + Receivable$$
 $$Share_i = \left(\frac{Asset_i}{TotalAssets}\right) \times 100$$
 5. Hệ thống hiển thị bảng cân đối tài sản cá nhân kèm biểu đồ thể hiện tỷ trọng phân bổ tài sản.
 
-##### Luồng 2c: Tra cứu sao kê công nợ chi tiết theo đối tác
+#### Các luồng rẽ nhánh
 
-1. Người dùng chọn tab "Sao kê công nợ đối tác" và chọn một cá nhân cụ thể từ danh sách đối tác có phát sinh giao dịch nợ (hoặc áp dụng bộ lọc `OUTSTANDING` hoặc `ALL`).
-2. Hệ thống trích xuất toàn bộ các bản ghi trong danh sách `debt` liên quan đến cá nhân này, sắp xếp theo thứ tự ngày tăng dần theo quy tắc `FR-REP-04`.
-3. Với từng giao dịch, hệ thống tính số dư nợ lũy kế:
-  - Nghiệp vụ cho vay (`lend`): Tăng dư nợ phải thu.
-  - Nghiệp vụ thu hồi nợ (`collect`) hoặc xóa nợ cho vay (`write-off lend`): Giảm dư nợ phải thu.
-  - Nghiệp vụ đi vay (`borrow`): Tăng dư nợ phải trả.
-  - Nghiệp vụ trả nợ (`repay`) hoặc được xóa nợ đi vay (`write-off borrow`): Giảm dư nợ phải trả.
-4. Hệ thống tổng kết: Tổng đã cho vay ($\sum Lend$), Tổng đã thu hồi ($\sum Collect$), Dư nợ phải thu còn lại ($Receivable_p$), Tổng đã vay ($\sum Borrow$), Tổng đã trả ($\sum Repay$), Dư nợ phải trả còn lại ($Payable_p$).
-5. Hệ thống hiển thị bảng sao kê chi tiết phục vụ đối soát.
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu báo cáo giá trị tài sản ròng.
 
 #### Các luồng ngoại lệ
 
-##### Luồng ngoại lệ 4a: Tháng hoàn toàn không có giao dịch phát sinh
-
-1. Tại bước 4 của luồng chính, hệ thống ghi nhận trong một tháng $m$ nào đó không có bất kỳ giao dịch thu chi nào phát sinh ($Income_m = 0$ và $Expense_m = 0$).
-2. Hệ thống hiển thị giá trị số tiền là "0.00 VNĐ", không để trống ô dữ liệu hoặc gán giá trị null.
-3. Hệ thống gán $CashFlow_m = 0.00$ và $SavingsRate_m = 0.00\%$, bảo đảm bảng dữ liệu 12 tháng luôn liên tục và không gây lỗi giao diện.
-
-##### Luồng ngoại lệ 5a: Tháng có thu nhập bằng 0 nhưng chi tiêu lớn hơn 0
-
-1. Tại bước 5 của luồng chính, hệ thống phát hiện $Income_m = 0$ nhưng $Expense_m > 0$ (người dùng không có thu nhập phát sinh trong tháng nhưng vẫn có chi tiêu sinh hoạt).
-2. Nếu thực hiện phép chia trực tiếp để tính $SavingsRate$, hệ thống sẽ gặp lỗi `ArithmeticException` do chia cho 0.
-3. Theo quy tắc xử lý biên `FR-REP-01`, hệ thống áp dụng hàm từng nhánh, gán $SavingsRate_m = 0.00\%$, hiển thị dòng tiền thuần âm ($CashFlow_m = -Expense_m$) và đưa ra chỉ báo thâm hụt ngân sách.
-
-##### Luồng ngoại lệ 2a4a: Tháng trước không có chi tiêu khi so sánh biến động
-
-1. Tại bước 4 của luồng 2a, hệ thống phát hiện tháng trước không có chi tiêu trong danh mục này ($Amount_{tháng\_trước} = 0$) nhưng tháng này có chi tiêu ($Amount_{tháng\_này} > 0$).
-2. Hệ thống hiển thị chênh lệch tuyệt đối $\Delta Amount = Amount_{tháng\_này}$ và hiển thị tỷ lệ biến động là "Mới" (hoặc N/A), tránh thực hiện phép chia cho 0.
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài trường hợp toàn bộ 5 cấu phần đều bằng 0, khi đó hệ thống hiển thị $NetWorth = 0.00$ VNĐ.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Bất biến chuỗi thời gian trượt 12 tháng theo `FR-REP-01`: Bảng thống kê luôn gồm đúng 12 tháng liên tục lùi từ tháng hiện tại, tự động thích ứng với ngày hệ thống mà không cần cập nhật thủ công.
-2. Bất biến tính toán tài chính theo `BR-FIN-01`: Toàn bộ các chỉ số thu nhập, chi tiêu, dòng tiền thuần, tài sản ròng đều tính toán qua `BigDecimal`, sử dụng `RoundingMode.HALF_EVEN` với scale 2, không phát sinh sai số làm tròn.
-3. Bất biến Giá trị tài sản ròng theo `FR-REP-03`: Luôn bảo đảm cân bằng kế toán giữa 5 cấu phần, phản ánh trung thực toàn bộ tài sản thanh khoản, tài sản đầu tư, tiền gửi tiết kiệm và nghĩa vụ công nợ.
-4. Bất biến nhất quán công nợ theo `FR-REP-04` và `BR-FIN-07`: Tổng số dư nợ phải thu và phải trả trên sao kê của toàn bộ các đối tác phải khớp chính xác với chỉ số $Receivable$ và $Payable$ trên báo cáo Net Worth toàn hệ thống.
-5. Phù hợp các yêu cầu chức năng: `FR-REP-01`, `FR-REP-02`, `FR-REP-03`, `FR-REP-04`.
+1. Bất biến Giá trị tài sản ròng theo `FR-REP-03`: Luôn bảo đảm cân bằng kế toán giữa 5 cấu phần, phản ánh trung thực toàn bộ tài sản thanh khoản, tài sản đầu tư, tiền gửi tiết kiệm và nghĩa vụ công nợ.
+2. Phù hợp các yêu cầu chức năng: `FR-REP-03`.
 
-### 6.10 UC10: Sao lưu, xuất và nhập dữ liệu tài chính
+### 6.37 UC-REP-04: Sao kê công nợ chi tiết theo đối tác
 
 Bảng thuộc tính ca sử dụng:
 
 | Thuộc tính | Đặc tả chi tiết |
 | --- | --- |
-| Mã | UC10 |
-| Tên | Sao lưu, xuất và nhập dữ liệu tài chính |
+| Mã | UC-REP-04 |
+| Tên | Sao kê công nợ chi tiết theo đối tác |
 | Tác nhân chính | Chủ sở hữu |
 | Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
-| Các bên liên quan và mối quan tâm | Lưu trữ dữ liệu tài chính cục bộ, xuất dữ liệu ra định dạng mở, phục hồi dữ liệu từ bản sao lưu và kiểm toán đối soát các bất biến tài chính. |
-| Mô tả tóm tắt | Xuất dữ liệu sổ cái (toàn phần hoặc từng phần) ra định dạng JSON/CSV, duy trì độ chính xác của `BigDecimal` theo FR-DAT-01. Nhập và phục hồi dữ liệu qua quy trình kiểm định 4 bước (cú pháp, danh mục theo BR-FIN-04, ví tiền và số dư không âm theo BR-FIN-02) kèm cơ chế hoàn nguyên tự động theo FR-DAT-02. Cung cấp công cụ kiểm toán đối soát để phát hiện sai lệch số dư hoặc bút toán mất cân bằng theo FR-DAT-03. |
-| Điều kiện kích hoạt | Người dùng cần sao lưu định kỳ, xuất dữ liệu ra tệp định dạng mở, phục hồi dữ liệu từ bản sao lưu hoặc chạy kiểm toán tính toàn vẹn hệ thống. |
+| Các bên liên quan và mối quan tâm | Đối soát lịch sử công nợ lũy kế theo từng đối tác và tổng hợp nghĩa vụ công nợ toàn hệ thống. |
+| Mô tả tóm tắt | Tra cứu sao kê công nợ lũy kế theo từng đối tác hoặc xem tổng hợp nghĩa vụ công nợ toàn hệ thống, phản ánh đúng số dư nợ còn lại theo `FR-REP-04` và `BR-FIN-07`. |
+| Điều kiện kích hoạt | Người dùng cần đối soát công nợ với một đối tác cụ thể hoặc tra cứu tổng hợp công nợ toàn hệ thống. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống đã có ít nhất một bản ghi trong danh sách `debt`.
+2. Owner đang ở giao diện phân hệ Thống kê và Báo cáo tài chính (hoặc Quản lý Công nợ).
+
+**Hậu điều kiện thành công:**
+
+1. Sao kê công nợ theo đối tác phản ánh đúng lịch sử lũy kế và số dư nợ còn lại theo `FR-REP-04`.
+2. Tổng số dư nợ phải thu và phải trả trên sao kê của toàn bộ các đối tác khớp chính xác với chỉ số $Receivable$ và $Payable$ trên báo cáo Net Worth toàn hệ thống.
+
+#### Luồng sự kiện chính
+
+1. Người dùng chọn chức năng "Sao kê công nợ đối tác", có thể xem tổng hợp toàn hệ thống hoặc chọn một cá nhân đối tác cụ thể từ danh sách đối tác có phát sinh giao dịch nợ (áp dụng bộ lọc `OUTSTANDING` hoặc `ALL`).
+2. Nếu xem tổng hợp toàn hệ thống, hệ thống tính tổng nợ phải thu ($Receivable = \sum Receivable_{person}$) và tổng nợ phải trả ($Payable = \sum Payable_{person}$) trên toàn bộ đối tác.
+3. Nếu chọn một đối tác cụ thể, hệ thống trích xuất toàn bộ các bản ghi trong danh sách `debt` liên quan đến cá nhân này, sắp xếp theo thứ tự ngày tăng dần theo quy tắc `FR-REP-04`.
+4. Với từng giao dịch, hệ thống tính số dư nợ lũy kế: nghiệp vụ cho vay (`lend`) tăng dư nợ phải thu; nghiệp vụ thu hồi nợ (`collect`) hoặc xóa nợ cho vay (`write-off lend`) giảm dư nợ phải thu; nghiệp vụ đi vay (`borrow`) tăng dư nợ phải trả; nghiệp vụ trả nợ (`repay`) hoặc được xóa nợ đi vay (`write-off borrow`) giảm dư nợ phải trả.
+5. Hệ thống tổng kết theo từng đối tác: Tổng đã cho vay, Tổng đã thu hồi, Dư nợ phải thu còn lại, Tổng đã vay, Tổng đã trả, Dư nợ phải trả còn lại.
+6. Hệ thống hiển thị bảng sao kê chi tiết phục vụ đối soát và theo dõi nghĩa vụ tài chính.
+
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu sao kê công nợ theo đối tác.
+
+#### Các luồng ngoại lệ
+
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài việc hiển thị sao kê rỗng khi đối tác được chọn chưa từng có giao dịch công nợ.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến nhất quán công nợ theo `FR-REP-04` và `BR-FIN-07`: Tổng số dư nợ phải thu và phải trả trên sao kê của toàn bộ các đối tác phải khớp chính xác với chỉ số $Receivable$ và $Payable$ trên báo cáo Net Worth toàn hệ thống.
+2. Phù hợp các yêu cầu chức năng: `FR-REP-04`.
+
+### 6.38 UC-DAT-01: Xuất dữ liệu tài chính
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-DAT-01 |
+| Tên | Xuất dữ liệu tài chính |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Sao lưu dữ liệu tài chính cục bộ ra định dạng mở, bảo toàn tuyệt đối độ chính xác số học. |
+| Mô tả tóm tắt | Xuất dữ liệu sổ cái (toàn phần hoặc từng phần) ra định dạng JSON hoặc CSV, duy trì độ chính xác của các trường số học tài chính theo `FR-DAT-01`. |
+| Điều kiện kích hoạt | Người dùng cần sao lưu định kỳ hoặc xuất dữ liệu ra tệp định dạng mở. |
 
 **Tiền điều kiện:**
 
@@ -4185,10 +5415,7 @@ Bảng thuộc tính ca sử dụng:
 
 **Hậu điều kiện thành công:**
 
-1. Khi xuất dữ liệu: Tệp sao lưu được tạo thành công với mã hóa UTF-8, các trường số học `BigDecimal` được lưu dưới dạng chuỗi số học đầy đủ chữ số (không bị làm tròn, không dùng ký hiệu khoa học), tệp đặt tên tự động theo cấu trúc `pfms_export_{scope}_{yyyyMMdd_HHmmss}.{ext}` theo quy tắc `FR-DAT-01`.
-2. Khi nhập dữ liệu: Dữ liệu từ tệp sao lưu được phục hồi trọn vẹn vào hệ thống theo chế độ đã chọn (`OVERWRITE` hoặc `MERGE`), toàn bộ các bất biến số dư `BR-FIN-02`, ghi sổ kép `BR-FIN-03` và danh mục `BR-FIN-04` được thỏa mãn.
-3. Nếu tệp nhập chứa dữ liệu lỗi: Toàn bộ thao tác bị hủy bỏ và rollback nguyên trạng, dữ liệu hệ thống hiện tại không bị thay đổi hoặc làm sai lệch.
-4. Khi kiểm toán: Báo cáo kiểm toán toàn vẹn dữ liệu phản ánh trung thực trạng thái của 4 quy tắc bất biến hệ thống theo `FR-DAT-03`.
+1. Tệp sao lưu được tạo thành công với mã hóa UTF-8, các trường số học được lưu dưới dạng chuỗi số học đầy đủ chữ số (không bị làm tròn, không dùng ký hiệu khoa học), tệp đặt tên tự động theo cấu trúc `pfms_export_{scope}_{yyyyMMdd_HHmmss}.{ext}` theo quy tắc `FR-DAT-01`.
 
 #### Luồng sự kiện chính
 
@@ -4201,7 +5428,7 @@ Bảng thuộc tính ca sử dụng:
 4. Người dùng xác nhận bắt đầu tiến trình xuất dữ liệu.
 5. Hệ thống trích xuất toàn bộ dữ liệu hiện tại từ tệp dữ liệu: ví tiền, danh mục phân loại, nhật ký thu chi, chuyển tiền nội bộ, công nợ, sổ tiết kiệm, chứng chỉ quỹ, quỹ mục tiêu.
 6. Hệ thống chuyển đổi các thực thể miền sang cấu trúc JSON tiêu chuẩn:
-  - Chuẩn hóa toàn bộ các trường `BigDecimal` thành chuỗi số học chính xác (ví dụ: `"50000000.00"`), cấm chuyển đổi sang kiểu `Double` hoặc ký hiệu số mũ khoa học (`5.0E7`) theo quy tắc `FR-DAT-01`.
+  - Chuẩn hóa toàn bộ các trường số học tài chính thành chuỗi số học chính xác (ví dụ: `"50000000.00"`), cấm chuyển đổi sang kiểu số thực có sai số hoặc ký hiệu số mũ khoa học (`5.0E7`) theo quy tắc `FR-DAT-01`.
   - Định dạng các trường ngày tháng theo định dạng `yyyy-MM-dd`.
 7. Hệ thống tạo tên tệp theo quy tắc: `pfms_export_full_{yyyyMMdd_HHmmss}.json`.
 8. Hệ thống ghi tệp an toàn xuống đĩa cứng với bảng mã UTF-8 không BOM.
@@ -4210,7 +5437,46 @@ Bảng thuộc tính ca sử dụng:
 
 #### Các luồng rẽ nhánh
 
-##### Luồng 2a: Nhập và phục hồi dữ liệu từ tệp sao lưu
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu xuất dữ liệu tài chính.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 8a: Lỗi quyền ghi tệp hoặc ổ đĩa đầy khi xuất dữ liệu
+
+1. Tại bước 8 của luồng chính, hệ thống không thể ghi tệp xuống thư mục chỉ định do không đủ quyền truy cập hệ thống tệp hoặc ổ đĩa đã hết dung lượng lưu trữ.
+2. Hệ thống phát hiện lỗi ghi tệp, hiển thị thông báo: "Không thể lưu tệp dữ liệu vào thư mục đã chọn do lỗi quyền truy cập hoặc ổ đĩa đầy. Vui lòng chọn thư mục khác".
+3. Thao tác xuất bị hủy bỏ và không để lại tệp rác trên đĩa cứng.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Bất biến bảo toàn độ chính xác số học theo `FR-DAT-01`: Không làm tròn hoặc sử dụng ký hiệu khoa học đối với trường dữ liệu số học tài chính khi xuất tệp sao lưu.
+2. Phù hợp các yêu cầu chức năng: `FR-DAT-01`.
+
+### 6.39 UC-DAT-02: Nhập và phục hồi dữ liệu
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-DAT-02 |
+| Tên | Nhập và phục hồi dữ liệu |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Phục hồi dữ liệu tài chính từ một tệp sao lưu đã xuất trước đó mà không làm sai lệch các bất biến tài chính hiện hành. |
+| Mô tả tóm tắt | Nhập và phục hồi dữ liệu từ một tệp sao lưu qua quy trình kiểm định toàn vẹn 4 bước (cú pháp, danh mục theo `BR-FIN-04`, ví tiền và số dư không âm theo `BR-FIN-02`) kèm cơ chế hoàn nguyên tự động theo `FR-DAT-02`. |
+| Điều kiện kích hoạt | Người dùng cần phục hồi dữ liệu từ một tệp sao lưu đã có trước đó. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống PFMS đang hoạt động bình thường, có quyền đọc trên tệp sao lưu được chỉ định.
+2. Owner đang ở giao diện phân hệ Sao lưu và Quản lý dữ liệu.
+
+**Hậu điều kiện thành công:**
+
+1. Dữ liệu từ tệp sao lưu được phục hồi trọn vẹn vào hệ thống theo chế độ đã chọn (`OVERWRITE` hoặc `MERGE`), toàn bộ các bất biến số dư `BR-FIN-02`, ghi sổ kép `BR-FIN-03` và danh mục `BR-FIN-04` được thỏa mãn.
+2. Nếu tệp nhập chứa dữ liệu lỗi: Toàn bộ thao tác bị hủy bỏ và hoàn nguyên nguyên trạng, dữ liệu hệ thống hiện tại không bị thay đổi hoặc làm sai lệch.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn chức năng "Nhập dữ liệu từ tệp sao lưu".
 2. Hệ thống hiển thị biểu mẫu nhập dữ liệu: Hộp thoại chọn tệp sao lưu từ máy tính (`.json` hoặc `.csv`), và Tùy chọn chế độ nhập (`OVERWRITE`: ghi đè toàn bộ, hoặc `MERGE`: hợp nhất bổ sung).
@@ -4229,7 +5495,59 @@ Bảng thuộc tính ca sử dụng:
   - Kích hoạt tính toán lại toàn bộ số dư động, quỹ mục tiêu và các bảng thống kê trượt 12 tháng.
 8. Hệ thống hiển thị báo cáo tổng kết nhập dữ liệu thành công: số lượng ví, giao dịch, sổ tiết kiệm, chứng chỉ quỹ đã được phục hồi nguyên vẹn.
 
-##### Luồng 2b: Kiểm toán đối soát toàn vẹn dữ liệu
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu nhập và phục hồi dữ liệu.
+
+#### Các luồng ngoại lệ
+
+##### Luồng ngoại lệ 5a: Người dùng hủy bỏ thao tác khi được cảnh báo ghi đè
+
+1. Tại bước 4 của luồng chính, trước cảnh báo ghi đè toàn bộ dữ liệu, Người dùng chọn "Hủy bỏ".
+2. Hệ thống dừng thao tác nhập, đóng hộp thoại và giữ nguyên hiện trạng dữ liệu.
+
+##### Luồng ngoại lệ 6a: Tệp sao lưu không đúng định dạng cú pháp hoặc bị hỏng
+
+1. Tại bước 6 của luồng chính, hệ thống đọc tệp và phát hiện tệp tin bị lỗi định dạng JSON (thiếu dấu ngoặc, tệp rỗng, hoặc sai chuẩn mã hóa ký tự).
+2. Hệ thống hủy bỏ tiến trình nạp và thông báo lỗi: "Tệp sao lưu bị lỗi cấu trúc cú pháp hoặc bị hỏng dữ liệu. Vui lòng kiểm tra lại tệp nguồn".
+3. Dữ liệu hiện tại trong hệ thống được bảo toàn.
+
+##### Luồng ngoại lệ 6b: Dữ liệu trong tệp vi phạm bất biến kế toán
+
+1. Tại bước 6 của luồng chính, hệ thống phát hiện ít nhất một lỗi vi phạm: ví dụ giao dịch chi tiêu trỏ tới một ví không tồn tại, hoặc lịch sử giao dịch trong tệp làm cho số dư ví tiền mặt bị âm ($Balance_{wallet} < 0$).
+2. Hệ thống lập tức hủy bỏ toàn bộ quá trình nhập, không ghi bất kỳ bản ghi nào vào tệp dữ liệu.
+3. Hệ thống hiển thị bảng thông báo lỗi chi tiết: liệt kê số dòng bị lỗi, loại vi phạm (vi phạm khóa ngoại hoặc vi phạm bất biến số dư `BR-FIN-02`) để người dùng sửa chữa tệp trước khi thử lại.
+
+#### Quy tắc nghiệp vụ đặc thù
+
+1. Tính toàn vẹn giao dịch tệp: Quá trình nhập dữ liệu phải tuân thủ nguyên tắc All-or-Nothing; nếu xuất hiện bất kỳ lỗi nào, toàn bộ quá trình phải được hoàn nguyên về trạng thái trước đó.
+2. Bất biến kiểm định 4 bước theo `FR-DAT-02`: Không nạp dữ liệu vào tệp dữ liệu nếu chưa vượt qua đầy đủ 4 bước kiểm tra cấu trúc, danh mục theo `BR-FIN-04`, ví và số dư không âm theo `BR-FIN-02`.
+3. Phù hợp các yêu cầu chức năng: `FR-DAT-02`.
+
+### 6.40 UC-DAT-03: Kiểm toán toàn vẹn dữ liệu
+
+Bảng thuộc tính ca sử dụng:
+
+| Thuộc tính | Đặc tả chi tiết |
+| --- | --- |
+| Mã | UC-DAT-03 |
+| Tên | Kiểm toán toàn vẹn dữ liệu |
+| Tác nhân chính | Chủ sở hữu |
+| Phạm vi và Cấp độ | Hệ thống PFMS, Mục tiêu người dùng |
+| Các bên liên quan và mối quan tâm | Đối soát độc lập 4 bất biến tài chính cốt lõi của hệ thống để phát hiện sớm sai lệch dữ liệu. |
+| Mô tả tóm tắt | Chạy công cụ kiểm toán đối soát độc lập để phát hiện sai lệch số dư ví, mất cân bằng bút toán chuyển tiền, liên kết danh mục mồ côi hoặc vi phạm bất biến công nợ theo `FR-DAT-03`. |
+| Điều kiện kích hoạt | Người dùng cần chạy kiểm toán tính toàn vẹn dữ liệu định kỳ hoặc khi nghi ngờ có sai lệch. |
+
+**Tiền điều kiện:**
+
+1. Hệ thống PFMS đang hoạt động bình thường, có quyền đọc trên tệp dữ liệu cục bộ.
+2. Owner đang ở giao diện phân hệ Sao lưu và Quản lý dữ liệu.
+
+**Hậu điều kiện thành công:**
+
+1. Báo cáo kiểm toán toàn vẹn dữ liệu phản ánh trung thực trạng thái của 4 quy tắc bất biến hệ thống theo `FR-DAT-03`.
+
+#### Luồng sự kiện chính
 
 1. Người dùng chọn chức năng "Kiểm toán toàn vẹn dữ liệu".
 2. Hệ thống tự động kích hoạt tiến trình quét toàn bộ tệp dữ liệu, thực hiện kiểm tra tuần tự 4 quy tắc bất biến theo quy tắc `FR-DAT-03`:
@@ -4241,38 +5559,18 @@ Bảng thuộc tính ca sử dụng:
 4. Nếu tất cả đều ĐẠT, hệ thống hiển thị dấu tích xanh và thông báo: "Dữ liệu hệ thống nhất quán và bảo toàn dữ liệu".
 5. Nếu phát hiện sai lệch, hệ thống đánh dấu đỏ, liệt kê chi tiết mã giao dịch, số tiền chênh lệch và hướng dẫn người dùng biện pháp xử lý.
 
+#### Các luồng rẽ nhánh
+
+Không phát sinh luồng rẽ nhánh nghiệp vụ nào khác ngoài luồng sự kiện chính đối với mục tiêu kiểm toán toàn vẹn dữ liệu.
+
 #### Các luồng ngoại lệ
 
-##### Luồng ngoại lệ 6a: Tệp sao lưu không đúng định dạng cú pháp hoặc bị hỏng
-
-1. Tại bước 6 của luồng 2a, hệ thống đọc tệp và phát hiện tệp tin bị lỗi định dạng JSON (thiếu dấu ngoặc, tệp rỗng, hoặc sai chuẩn mã hóa ký tự).
-2. Hệ thống hủy bỏ tiến trình nạp, ném ngoại lệ `InvalidDataFormatException` và thông báo lỗi: "Tệp sao lưu bị lỗi cấu trúc cú pháp hoặc bị hỏng dữ liệu. Vui lòng kiểm tra lại tệp nguồn".
-3. Dữ liệu hiện tại trong hệ thống được bảo toàn.
-
-##### Luồng ngoại lệ 2a6a: Dữ liệu trong tệp vi phạm bất biến kế toán
-
-1. Tại bước 6 của luồng 2a, hệ thống phát hiện ít nhất một lỗi vi phạm: ví dụ giao dịch chi tiêu trỏ tới một ví không tồn tại, hoặc lịch sử giao dịch trong tệp làm cho số dư ví tiền mặt bị âm ($Balance_{wallet} < 0$).
-2. Hệ thống lập tức hủy bỏ toàn bộ quá trình nhập, không ghi bất kỳ bản ghi nào vào tệp dữ liệu (Rollback).
-3. Hệ thống hiển thị bảng thông báo lỗi chi tiết: liệt kê số dòng bị lỗi, loại vi phạm (vi phạm khóa ngoại hoặc vi phạm bất biến số dư `BR-FIN-02`) để người dùng sửa chữa tệp trước khi thử lại.
-
-##### Luồng ngoại lệ 2a5a: Người dùng hủy bỏ thao tác khi được cảnh báo ghi đè
-
-1. Tại bước 4 của luồng 2a, trước cảnh báo ghi đè toàn bộ dữ liệu, Người dùng chọn "Hủy bỏ".
-2. Hệ thống dừng thao tác nhập, đóng hộp thoại và giữ nguyên hiện trạng dữ liệu.
-
-##### Luồng ngoại lệ 8a: Lỗi quyền ghi tệp hoặc ổ đĩa đầy khi xuất dữ liệu
-
-1. Tại bước 8 của luồng chính, hệ thống không thể ghi tệp xuống thư mục chỉ định do không đủ quyền truy cập hệ thống tệp hoặc ổ đĩa đã hết dung lượng lưu trữ.
-2. Hệ thống bắt ngoại lệ `IOException`, hiển thị thông báo: "Không thể lưu tệp dữ liệu vào thư mục đã chọn do lỗi quyền truy cập hoặc ổ đĩa đầy. Vui lòng chọn thư mục khác".
-3. Thao tác xuất bị hủy bỏ và không để lại tệp rác trên đĩa cứng.
+Không phát sinh luồng ngoại lệ nghiệp vụ đặc thù bổ sung ngoài việc phân loại mức độ nghiêm trọng của sai lệch đã liệt kê ở luồng sự kiện chính.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Bất biến bảo toàn độ chính xác số học theo `FR-DAT-01`: Không làm tròn hoặc sử dụng ký hiệu khoa học đối với trường dữ liệu `BigDecimal` khi xuất và nhập tệp sao lưu.
-2. Tính toàn vẹn giao dịch tệp: Quá trình nhập dữ liệu phải tuân thủ nguyên tắc All-or-Nothing; nếu xuất hiện bất kỳ lỗi nào, toàn bộ quá trình phải được hoàn nguyên (Rollback) về trạng thái trước đó.
-3. Bất biến kiểm định 4 bước theo `FR-DAT-02`: Không nạp dữ liệu vào tệp dữ liệu nếu chưa vượt qua đầy đủ 4 bước kiểm tra cấu trúc, danh mục theo `BR-FIN-04`, ví và số dư không âm theo `BR-FIN-02`.
-4. Bất biến đối soát kiểm toán theo `FR-DAT-03`: Công cụ kiểm toán độc lập bảo đảm kiểm tra tự động 4 bất biến số dư ví, ghi sổ kép chuyển tiền, cây danh mục và số dư công nợ.
-5. Phù hợp các yêu cầu chức năng: `FR-DAT-01`, `FR-DAT-02`, `FR-DAT-03`.
+1. Bất biến đối soát kiểm toán theo `FR-DAT-03`: Công cụ kiểm toán độc lập bảo đảm kiểm tra tự động 4 bất biến số dư ví, ghi sổ kép chuyển tiền, cây danh mục và số dư công nợ.
+2. Phù hợp các yêu cầu chức năng: `FR-DAT-03`.
 
 ---
 
@@ -4280,14 +5578,13 @@ Bảng thuộc tính ca sử dụng:
 
 Hệ thống sơ đồ ca sử dụng của PFMS xác lập ranh giới chức năng, phân nhóm gói nghiệp vụ và trực quan hóa tương tác giữa tác nhân Owner với hệ thống theo cấu trúc 2 tầng:
 
-- **Tầng 1 (Mục 7.1):** Sơ đồ tổng quan kiến trúc phân hệ thể hiện ranh giới hệ thống, tác nhân Owner và 4 gói nghiệp vụ chứa 10 ca sử dụng cốt lõi (UC01 đến UC10).
-- **Tầng 2 (Mục 7.2):** Bốn sơ đồ phân hệ chi tiết tương ứng với 4 gói nghiệp vụ, làm rõ các ca sử dụng thành phần, điểm mở rộng (`<<extend>>`) và các ghi chú ràng buộc nghiệp vụ chi phối chuẩn UML.
+Tầng 1 (Mục 7.1) là sơ đồ tổng quan kiến trúc phân hệ, thể hiện ranh giới hệ thống, tác nhân Owner và 4 phân hệ nghiệp vụ chứa 40 ca sử dụng (`UC-WAL`, `UC-TXN`, `UC-TRF`, `UC-CAT`, `UC-SAV`, `UC-INV`, `UC-DEBT`, `UC-FND`, `UC-REP`, `UC-DAT`). Tầng 2 (Mục 7.2) gồm tám sơ đồ phân rã chi tiết, trực quan hóa từng nhóm domain, làm rõ các ca sử dụng thành phần, điểm mở rộng (`<<extend>>`) và các ghi chú ràng buộc nghiệp vụ chi phối chuẩn UML. Phân hệ 1 (15 UC) và Phân hệ 2 (10 UC) vượt giới hạn 9 nút/sơ đồ nên mỗi phân hệ được tách thành các sơ đồ con theo domain (`WAL`, `TXN`, `TRF`, `CAT` cho Phân hệ 1; `SAV`, `INV` cho Phân hệ 2); Phân hệ 3, 4 giữ nguyên mỗi phân hệ 1 sơ đồ do số lượng ca sử dụng trong mỗi phân hệ không vượt ngưỡng.
 
-Phân bổ 10 ca sử dụng cốt lõi theo 4 gói nghiệp vụ:
-- Gói 1: Dòng tiền và Thanh khoản: UC01, UC02, UC03, UC04.
-- Gói 2: Sổ tiết kiệm và Đầu tư tài chính: UC06, UC07.
-- Gói 3: Công nợ và Quản lý Quỹ mục tiêu: UC05, UC08.
-- Gói 4: Thống kê, Báo cáo và Quản trị dữ liệu: UC09, UC10.
+Phân bổ 40 ca sử dụng theo 4 phân hệ nghiệp vụ:
+- Phân hệ 1: Dòng tiền và Thanh khoản: `UC-WAL-01..04`, `UC-TXN-01..04`, `UC-TRF-01..03`, `UC-CAT-01..04` (15 UC).
+- Phân hệ 2: Sổ tiết kiệm và Đầu tư tài chính: `UC-SAV-01..06`, `UC-INV-01..04` (10 UC).
+- Phân hệ 3: Công nợ và Quỹ mục tiêu: `UC-DEBT-01..03`, `UC-FND-01..05` (8 UC).
+- Phân hệ 4: Thống kê, Báo cáo và Quản trị dữ liệu: `UC-REP-01..04`, `UC-DAT-01..03` (7 UC).
 
 ---
 
@@ -4300,10 +5597,10 @@ flowchart LR
     Owner(("Chủ sở hữu hệ thống"))
 
     subgraph PFMS ["Hệ thống Quản lý Tài chính Cá nhân (PFMS)"]
-        PKG1["Phân hệ 1: Dòng tiền và Thanh khoản<br/>(UC01, UC02, UC03, UC04)"]
-        PKG2["Phân hệ 2: Sổ tiết kiệm và Đầu tư tài chính<br/>(UC06, UC07)"]
-        PKG3["Phân hệ 3: Công nợ và Quản lý Quỹ mục tiêu<br/>(UC05, UC08)"]
-        PKG4["Phân hệ 4: Thống kê, Báo cáo và Quản trị dữ liệu<br/>(UC09, UC10)"]
+        PKG1["Phân hệ 1: Dòng tiền và Thanh khoản<br/>(15 UC: WAL, TXN, TRF, CAT)"]
+        PKG2["Phân hệ 2: Sổ tiết kiệm và Đầu tư tài chính<br/>(10 UC: SAV, INV)"]
+        PKG3["Phân hệ 3: Công nợ và Quỹ mục tiêu<br/>(8 UC: DEBT, FND)"]
+        PKG4["Phân hệ 4: Thống kê, Báo cáo và Quản trị dữ liệu<br/>(7 UC: REP, DAT)"]
     end
 
     Owner --> PKG1
@@ -4319,20 +5616,20 @@ flowchart LR
 
 #### Phân tích kiến trúc phân hệ Tầng 1
 
-##### Bảng phân bổ 10 Ca sử dụng cốt lõi theo Mục tiêu Tác nhân
+##### Bảng phân bổ 40 Ca sử dụng theo Mục tiêu Tác nhân
 
-| Gói nghiệp vụ (Package) | Mã UC | Tên Ca sử dụng Cốt lõi | Mục tiêu nghiệp vụ của Tác nhân | Bất biến nghiệp vụ chi phối |
+| Phân hệ | Mã UC | Tên Ca sử dụng | Mục tiêu nghiệp vụ của Tác nhân | Bất biến nghiệp vụ chi phối |
 |---|:---:|---|---|---|
-| **Phân hệ 1:** Dòng tiền & Thanh khoản | **UC01** | Quản lý ví tiền | Theo dõi danh sách các nguồn tiền thanh khoản tức thời và kiểm soát hạn mức khả dụng | `BR-FIN-01`, `BR-FIN-02` |
-| | **UC02** | Ghi nhận thu chi | Nhập phát sinh thu nhập và chi phí hàng ngày, gán nhãn phân loại chuẩn hóa | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04` |
-| | **UC03** | Chuyển tiền nội bộ | Điều chuyển dòng tiền giữa hai ví thanh khoản, tự động cân bằng đối ứng hai vế | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03` |
-| | **UC04** | Quản lý danh mục 3 cấp | Thiết lập cây cấu trúc phân loại thu chi để phục vụ thống kê báo cáo chuẩn | `BR-FIN-04` |
-| **Phân hệ 2:** Sổ tiết kiệm & Đầu tư | **UC06** | Quản lý sổ tiết kiệm | Tích lũy vốn có kỳ hạn, giám sát lãi dự kiến và xử lý tất toán tiền gửi | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-05` |
-| | **UC07** | Quản lý chứng chỉ quỹ đầu tư | Đầu tư chứng chỉ quỹ, cập nhật biến động NAV và đo lường tỷ suất sinh lời thị trường | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-06` |
-| **Phân hệ 3:** Công nợ & Quỹ mục tiêu | **UC05** | Quản lý công nợ | Quản lý nghĩa vụ nợ phải thu và nợ phải trả theo từng đối tác giao dịch | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-07` |
-| | **UC08** | Quản lý quỹ mục tiêu | Gom cụm tài sản đa thành phần để theo dõi tiến độ hoàn thành mục tiêu tài chính | `BR-FIN-01`, `BR-FIN-08` |
-| **Phân hệ 4:** Báo cáo & Quản trị | **UC09** | Thống kê & Phân tích tài chính | Tổng hợp dòng tiền trượt 12 tháng, cơ cấu chi tiêu và giá trị tài sản ròng | `BR-FIN-01`, `FR-REP-01` đến `FR-REP-04` |
-| | **UC10** | Sao lưu & Quản trị dữ liệu | Lưu trữ dữ liệu sổ cái an toàn cục bộ, phục hồi tệp và kiểm toán toàn vẹn | `BR-FIN-01`, `FR-DAT-01` đến `FR-DAT-03` |
+| **Phân hệ 1:** Dòng tiền & Thanh khoản | `UC-WAL-01..04` | Tạo, theo dõi, cập nhật và điều chỉnh số dư ví tiền | Duy trì các nguồn tiền thanh khoản tức thời và kiểm soát số dư khả dụng | `BR-FIN-01`, `BR-FIN-02` |
+| | `UC-TXN-01..04` | Ghi nhận, tra cứu, chỉnh sửa và xóa giao dịch thu chi | Nhập phát sinh thu nhập và chi phí hàng ngày, gán nhãn phân loại chuẩn hóa | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04` |
+| | `UC-TRF-01..03` | Chuyển tiền, tra cứu và hủy giao dịch chuyển tiền nội bộ | Điều chuyển dòng tiền giữa hai ví thanh khoản, tự động cân bằng đối ứng hai vế | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03` |
+| | `UC-CAT-01..04` | Bổ sung, đổi tên, đổi trạng thái và xóa danh mục | Thiết lập cây cấu trúc phân loại thu chi 3 cấp phục vụ thống kê báo cáo chuẩn | `BR-FIN-04` |
+| **Phân hệ 2:** Sổ tiết kiệm & Đầu tư | `UC-SAV-01..06` | Mở, tất toán đúng hạn, tất toán trước hạn, nạp thêm, theo dõi và tái tục sổ tiết kiệm | Tích lũy vốn có kỳ hạn, giám sát lãi dự kiến và xử lý tất toán tiền gửi | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-05` |
+| | `UC-INV-01..04` | Mua, bán, cập nhật NAV và phân tích hiệu suất chứng chỉ quỹ | Đầu tư chứng chỉ quỹ, cập nhật biến động NAV và đo lường tỷ suất sinh lời thị trường | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-06` |
+| **Phân hệ 3:** Công nợ & Quỹ mục tiêu | `UC-DEBT-01..03` | Cho vay và thu hồi, đi vay và trả nợ, xóa nợ khó đòi | Quản lý nghĩa vụ nợ phải thu và nợ phải trả theo từng đối tác giao dịch | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-07` |
+| | `UC-FND-01..05` | Thiết lập, theo dõi, điều chỉnh, tái phân bổ và đóng quỹ mục tiêu | Gom cụm tài sản đa thành phần để theo dõi tiến độ hoàn thành mục tiêu tài chính | `BR-FIN-01`, `BR-FIN-08` |
+| **Phân hệ 4:** Báo cáo & Quản trị | `UC-REP-01..04` | Thống kê dòng tiền, cơ cấu thu chi, tài sản ròng và sao kê công nợ | Tổng hợp dòng tiền trượt 12 tháng, cơ cấu chi tiêu, tài sản ròng và tình trạng công nợ theo đối tác | `BR-FIN-01`, `FR-REP-01` đến `FR-REP-04` |
+| | `UC-DAT-01..03` | Xuất, nhập phục hồi và kiểm toán toàn vẹn dữ liệu | Lưu trữ dữ liệu sổ cái an toàn cục bộ, phục hồi tệp và kiểm toán toàn vẹn | `BR-FIN-01`, `FR-DAT-01` đến `FR-DAT-03` |
 
 ---
 
@@ -4340,107 +5637,245 @@ flowchart LR
 
 ---
 
-##### 7.2.1 Phân hệ Quản lý Dòng tiền và Thanh khoản
+#### 7.2.1a Nhóm Ví tiền (WAL)
 
-Phân hệ quản lý toàn bộ các nguồn tiền thanh khoản tức thời (`cash`, tài khoản ngân hàng, ví điện tử, thẻ tín dụng), ghi nhận các phát sinh thu chi hàng ngày, chuyển khoản nội bộ và duy trì cây danh mục phân loại 3 cấp.
+Nhóm quản lý các nguồn tiền thanh khoản tức thời (`cash`, tài khoản ngân hàng, ví điện tử, thẻ tín dụng), thuộc Phân hệ 1: Dòng tiền và Thanh khoản.
 
 ```mermaid
 flowchart LR
     Owner(("Chủ sở hữu"))
 
-    subgraph CashflowSubsystem ["Phân hệ Quản lý Dòng tiền và Thanh khoản"]
-        UC01(["UC01: Quản lý ví tiền"])
-        UC02(["UC02: Ghi nhận thu chi"])
-        UC03(["UC03: Chuyển tiền nội bộ"])
-        UC03_Fee(["UC03.1: Ghi nhận phí chuyển tiền"])
-        UC04(["UC04: Thiết lập danh mục 3 cấp"])
+    subgraph WalletGroup ["Nhóm Ví tiền (WAL)"]
+        UC_WAL_01(["UC-WAL-01: Tạo ví tiền mới"])
+        UC_WAL_02(["UC-WAL-02: Theo dõi số dư động và cơ cấu phân bổ ví"])
+        UC_WAL_03(["UC-WAL-03: Cập nhật thông tin ví tiền"])
+        UC_WAL_04(["UC-WAL-04: Điều chỉnh số dư ví"])
 
-        Note_Liquidity[/"Ràng buộc nghiệp vụ:<br/>• BR-FIN-02: Bảo toàn số dư ví (Balance >= 0)<br/>• BR-FIN-03: Ghi sổ kép đối ứng chuyển khoản<br/>• BR-FIN-04: Toàn vẹn cây danh mục 3 cấp"/]
+        Note_Wallet[/"Ràng buộc nghiệp vụ:<br/>• BR-FIN-01: Kiểu dữ liệu tài chính chính xác tuyệt đối<br/>• BR-FIN-02: Bảo toàn số dư ví (Balance >= 0)"/]
     end
 
-    Owner --> UC01
-    Owner --> UC02
-    Owner --> UC03
-    Owner --> UC04
+    Owner --> UC_WAL_01
+    Owner --> UC_WAL_02
+    Owner --> UC_WAL_03
+    Owner --> UC_WAL_04
 
-    UC03_Fee -.->|"<<extend>><br/>[Khi Fee > 0]"| UC03
-    Note_Liquidity -.- UC02
-    Note_Liquidity -.- UC03
+    Note_Wallet -.- UC_WAL_02
+    Note_Wallet -.- UC_WAL_03
+    Note_Wallet -.- UC_WAL_04
 
     classDef actor fill:#E8F4FD,stroke:#2B6CB0,stroke-width:2px,color:#1A365D;
     classDef default fill:#FFFFFF,stroke:#2B6CB0,stroke-width:1.5px,color:#2D3748;
-    classDef extend fill:#FFFBEB,stroke:#D97706,stroke-width:1.5px,stroke-dasharray: 3 3,color:#78350F;
     classDef note fill:#F8FAFC,stroke:#64748B,stroke-width:1px,stroke-dasharray: 2 2,color:#334155;
 
     class Owner actor;
-    class UC03_Fee extend;
-    class Note_Liquidity note;
+    class Note_Wallet note;
 ```
 
-##### Cấu trúc ca sử dụng và ràng buộc phân hệ
+##### Cấu trúc ca sử dụng và ràng buộc nhóm
 
-- **Các ca sử dụng thành phần:**
-  - `UC01: Quản lý ví tiền`: Khởi tạo, theo dõi số dư động và cập nhật thông tin ví thanh khoản.
-  - `UC02: Ghi nhận thu chi`: Nhập giao dịch thu nhập, chi phí hàng ngày, tra cứu, chỉnh sửa và xóa giao dịch có hoàn nguyên số dư.
-  - `UC03: Chuyển tiền nội bộ`: Điều chuyển dòng tiền giữa hai ví và quản lý lịch sử chuyển tiền.
-  - `UC04: Thiết lập danh mục 3 cấp`: Quản trị cây cấu trúc phân loại thu chi `Type -> Group -> Category`.
-- **Quan hệ mở rộng:** `UC03.1 Ghi nhận phí chuyển tiền` mở rộng `UC03 Chuyển tiền nội bộ` tại Điểm mở rộng `[Phí giao dịch phát sinh]` khi `[Fee > 0]`. Luồng mở rộng trích thêm khoản chi phí từ ví nguồn mà không thay đổi số tiền thực nhận ở ví đích.
-- **Ràng buộc nghiệp vụ:** Neo giữ các bất biến bảo toàn số dư ví (`BR-FIN-02`), ghi sổ kép đối ứng (`BR-FIN-03`) và khóa ngoại cây danh mục (`BR-FIN-04`).
+| Thành phần | Mô tả |
+|---|---|
+| Ca sử dụng thành phần | `UC-WAL-01: Tạo ví tiền mới`: Khởi tạo ví thanh khoản mới với số dư ban đầu.<br/>`UC-WAL-02: Theo dõi số dư động và cơ cấu phân bổ ví`: Quan sát số dư khả dụng theo thời gian thực và tỷ trọng phân bổ giữa các ví.<br/>`UC-WAL-03: Cập nhật thông tin ví tiền`: Chỉnh sửa thuộc tính ví, bao gồm chuyển đổi trạng thái lưu trữ như một luồng thay thế của việc cập nhật.<br/>`UC-WAL-04: Điều chỉnh số dư ví`: Ghi nhận bút toán điều chỉnh có thể truy vết khi số dư thực tế lệch khỏi số dư hệ thống. |
+| Quan hệ mở rộng | Không có quan hệ `<<extend>>` trong nhóm này. |
+| Ràng buộc nghiệp vụ | Neo giữ bất biến kiểu dữ liệu tài chính chính xác tuyệt đối (`BR-FIN-01`) và bảo toàn số dư ví không âm (`BR-FIN-02`). |
+
+---
+
+#### 7.2.1b Nhóm Giao dịch thu chi (TXN)
+
+Nhóm ghi nhận, tra cứu, chỉnh sửa và xóa các phát sinh thu nhập và chi phí hàng ngày, thuộc Phân hệ 1: Dòng tiền và Thanh khoản.
+
+```mermaid
+flowchart LR
+    Owner(("Chủ sở hữu"))
+
+    subgraph TxnGroup ["Nhóm Giao dịch thu chi (TXN)"]
+        UC_TXN_01(["UC-TXN-01: Ghi nhận giao dịch thu chi"])
+        UC_TXN_02(["UC-TXN-02: Tra cứu và lọc lịch sử giao dịch"])
+        UC_TXN_03(["UC-TXN-03: Chỉnh sửa giao dịch thu chi"])
+        UC_TXN_04(["UC-TXN-04: Xóa giao dịch thu chi"])
+
+        Note_Txn[/"Ràng buộc nghiệp vụ:<br/>• BR-FIN-02: Bảo toàn số dư ví khi hoàn nguyên giao dịch<br/>• BR-FIN-04: Toàn vẹn cây danh mục 3 cấp gắn với giao dịch"/]
+    end
+
+    Owner --> UC_TXN_01
+    Owner --> UC_TXN_02
+    Owner --> UC_TXN_03
+    Owner --> UC_TXN_04
+
+    Note_Txn -.- UC_TXN_01
+    Note_Txn -.- UC_TXN_03
+    Note_Txn -.- UC_TXN_04
+
+    classDef actor fill:#E8F4FD,stroke:#2B6CB0,stroke-width:2px,color:#1A365D;
+    classDef default fill:#FFFFFF,stroke:#2B6CB0,stroke-width:1.5px,color:#2D3748;
+    classDef note fill:#F8FAFC,stroke:#64748B,stroke-width:1px,stroke-dasharray: 2 2,color:#334155;
+
+    class Owner actor;
+    class Note_Txn note;
+```
+
+##### Cấu trúc ca sử dụng và ràng buộc nhóm
+
+| Thành phần | Mô tả |
+|---|---|
+| Ca sử dụng thành phần | `UC-TXN-01: Ghi nhận giao dịch thu chi`: Nhập giao dịch thu nhập hoặc chi phí hàng ngày, gán nhãn danh mục chuẩn hóa.<br/>`UC-TXN-02: Tra cứu và lọc lịch sử giao dịch`: Truy vấn danh sách giao dịch theo khoảng thời gian, ví, danh mục.<br/>`UC-TXN-03: Chỉnh sửa giao dịch thu chi`: Cập nhật số tiền, danh mục hoặc ghi chú của giao dịch đã ghi nhận, hoàn nguyên số dư ví trước khi ghi lại.<br/>`UC-TXN-04: Xóa giao dịch thu chi`: Loại bỏ giao dịch khỏi sổ cái và hoàn nguyên số dư ví liên quan. |
+| Quan hệ mở rộng | Không có quan hệ `<<extend>>` trong nhóm này. |
+| Ràng buộc nghiệp vụ | Bảo toàn số dư ví khi hoàn nguyên giao dịch (`BR-FIN-02`) và khóa ngoại cây danh mục 3 cấp (`BR-FIN-04`). |
+
+---
+
+#### 7.2.1c Nhóm Chuyển tiền (TRF)
+
+Nhóm điều chuyển dòng tiền giữa hai ví thanh khoản nội bộ và quản trị lịch sử chuyển tiền, thuộc Phân hệ 1: Dòng tiền và Thanh khoản.
+
+```mermaid
+flowchart LR
+    Owner(("Chủ sở hữu"))
+
+    subgraph TrfGroup ["Nhóm Chuyển tiền (TRF)"]
+        UC_TRF_01(["UC-TRF-01: Chuyển tiền nội bộ giữa hai ví"])
+        UC_TRF_02(["UC-TRF-02: Tra cứu lịch sử chuyển tiền"])
+        UC_TRF_03(["UC-TRF-03: Hủy giao dịch chuyển tiền"])
+
+        Note_Trf[/"Ràng buộc nghiệp vụ:<br/>• BR-FIN-02: Bảo toàn số dư ví nguồn khả dụng<br/>• BR-FIN-03: Ghi sổ kép đối ứng chuyển khoản"/]
+    end
+
+    Owner --> UC_TRF_01
+    Owner --> UC_TRF_02
+    Owner --> UC_TRF_03
+
+    Note_Trf -.- UC_TRF_01
+    Note_Trf -.- UC_TRF_03
+
+    classDef actor fill:#E8F4FD,stroke:#2B6CB0,stroke-width:2px,color:#1A365D;
+    classDef default fill:#FFFFFF,stroke:#2B6CB0,stroke-width:1.5px,color:#2D3748;
+    classDef note fill:#F8FAFC,stroke:#64748B,stroke-width:1px,stroke-dasharray: 2 2,color:#334155;
+
+    class Owner actor;
+    class Note_Trf note;
+```
+
+##### Cấu trúc ca sử dụng và ràng buộc nhóm
+
+| Thành phần | Mô tả |
+|---|---|
+| Ca sử dụng thành phần | `UC-TRF-01: Chuyển tiền nội bộ giữa hai ví`: Điều chuyển giá trị tiền tệ giữa ví nguồn và ví đích, hạch toán phí chuyển tiền (nếu có) như một bước trong luồng chính.<br/>`UC-TRF-02: Tra cứu lịch sử chuyển tiền`: Truy vấn danh sách các bản ghi chuyển tiền đã thực hiện.<br/>`UC-TRF-03: Hủy giao dịch chuyển tiền`: Hoàn nguyên bút toán kép của một giao dịch chuyển tiền đã ghi nhận. |
+| Quan hệ mở rộng | Không có quan hệ `<<extend>>` trong nhóm này. Khoản phí chuyển tiền đã được gộp vào luồng chính của `UC-TRF-01` (không còn là nhánh mở rộng riêng). |
+| Ràng buộc nghiệp vụ | Neo giữ bất biến số dư ví khả dụng (`BR-FIN-02`) và ghi sổ kép đối ứng (`BR-FIN-03`). |
+
+---
+
+#### 7.2.1d Nhóm Danh mục (CAT)
+
+Nhóm quản trị cây cấu trúc phân loại thu chi 3 cấp `Type -> Group -> Category`, thuộc Phân hệ 1: Dòng tiền và Thanh khoản.
+
+```mermaid
+flowchart LR
+    Owner(("Chủ sở hữu"))
+
+    subgraph CatGroup ["Nhóm Danh mục (CAT)"]
+        UC_CAT_01(["UC-CAT-01: Bổ sung danh mục phân loại mới"])
+        UC_CAT_02(["UC-CAT-02: Đổi tên danh mục"])
+        UC_CAT_03(["UC-CAT-03: Thay đổi trạng thái hoạt động của danh mục"])
+        UC_CAT_04(["UC-CAT-04: Xóa danh mục chưa phát sinh giao dịch"])
+
+        Note_Cat[/"Ràng buộc nghiệp vụ:<br/>• BR-FIN-04: Toàn vẹn cây danh mục 3 cấp, mỗi danh mục thuộc đúng một nhóm cha"/]
+    end
+
+    Owner --> UC_CAT_01
+    Owner --> UC_CAT_02
+    Owner --> UC_CAT_03
+    Owner --> UC_CAT_04
+
+    Note_Cat -.- UC_CAT_01
+    Note_Cat -.- UC_CAT_04
+
+    classDef actor fill:#E8F4FD,stroke:#2B6CB0,stroke-width:2px,color:#1A365D;
+    classDef default fill:#FFFFFF,stroke:#2B6CB0,stroke-width:1.5px,color:#2D3748;
+    classDef note fill:#F8FAFC,stroke:#64748B,stroke-width:1px,stroke-dasharray: 2 2,color:#334155;
+
+    class Owner actor;
+    class Note_Cat note;
+```
+
+##### Cấu trúc ca sử dụng và ràng buộc nhóm
+
+| Thành phần | Mô tả |
+|---|---|
+| Ca sử dụng thành phần | `UC-CAT-01: Bổ sung danh mục phân loại mới`: Tạo mới nút danh mục trong cây phân loại 3 cấp.<br/>`UC-CAT-02: Đổi tên danh mục`: Cập nhật tên hiển thị của một danh mục hiện có.<br/>`UC-CAT-03: Thay đổi trạng thái hoạt động của danh mục`: Kích hoạt hoặc vô hiệu hóa danh mục cho các giao dịch mới.<br/>`UC-CAT-04: Xóa danh mục chưa phát sinh giao dịch`: Loại bỏ danh mục khỏi cây phân loại khi chưa có giao dịch nào tham chiếu. |
+| Quan hệ mở rộng | Không có quan hệ `<<extend>>` trong nhóm này. |
+| Ràng buộc nghiệp vụ | Khóa ngoại cây danh mục 3 cấp, mỗi danh mục thuộc đúng một nhóm cha (`BR-FIN-04`). |
 
 ---
 
 #### 7.2.2 Phân hệ Sổ tiết kiệm và Đầu tư tài chính
 
-Phân hệ quản trị các tài sản tài chính trung và dài hạn gồm tiền gửi tiết kiệm có kỳ hạn tại ngân hàng thương mại và danh mục chứng chỉ quỹ đầu tư mở.
+Phân hệ quản trị các tài sản tài chính trung và dài hạn gồm tiền gửi tiết kiệm có kỳ hạn tại ngân hàng thương mại và danh mục chứng chỉ quỹ đầu tư mở. Phân hệ này gồm 10 ca sử dụng, vượt giới hạn 9 nút cho một sơ đồ duy nhất khi tính cả tác nhân Owner, nên được tách thành hai sơ đồ con theo domain nghiệp vụ.
+
+##### 7.2.2a Nhóm Sổ tiết kiệm (SAV)
 
 ```mermaid
 flowchart LR
     Owner(("Chủ sở hữu"))
 
-    subgraph WealthSubsystem ["Phân hệ Sổ tiết kiệm và Đầu tư tài chính"]
-        UC06_Open(["UC06.1: Mở sổ tiết kiệm"])
-        UC06_Mature(["UC06.2: Tất toán sổ đúng hạn"])
-        UC06_Early(["UC06.3: Tất toán sổ trước hạn"])
-        UC07_Buy(["UC07.1: Mua chứng chỉ quỹ"])
-        UC07_Sell(["UC07.2: Bán chứng chỉ quỹ"])
-        UC07_NAV(["UC07.3: Cập nhật NAV và định giá"])
-
-        Note_Wealth[/"Ràng buộc nghiệp vụ:<br/>• BR-FIN-05: Lãi tiết kiệm chuẩn 365 ngày/năm, tất toán trước hạn hồi tố DemandRate<br/>• BR-FIN-06: Định giá Mark-to-Market theo NAV, tính CAGR khi HoldDays >= 30 ngày"/]
+    subgraph SavingsSubsystem ["Nhóm Sổ tiết kiệm"]
+        UC_SAV_01(["UC-SAV-01: Mở sổ tiết kiệm mới"])
+        UC_SAV_02(["UC-SAV-02: Tất toán sổ tiết kiệm đúng hạn"])
+        UC_SAV_03(["UC-SAV-03: Tất toán sổ tiết kiệm trước hạn"])
+        UC_SAV_04(["UC-SAV-04: Nạp thêm tiền vào sổ tích lũy"])
+        UC_SAV_05(["UC-SAV-05: Theo dõi tiến độ và giá trị tích lũy sổ tiết kiệm"])
+        UC_SAV_06(["UC-SAV-06: Tái tục sổ tiết kiệm với điều khoản mới"])
     end
 
-    Owner --> UC06_Open
-    Owner --> UC06_Mature
-    Owner --> UC07_Buy
-    Owner --> UC07_Sell
-    Owner --> UC07_NAV
-
-    UC06_Early -.->|"<<extend>><br/>[Trước hạn]"| UC06_Mature
-    Note_Wealth -.- UC06_Mature
-    Note_Wealth -.- UC07_NAV
+    Owner --> UC_SAV_01
+    Owner --> UC_SAV_02
+    Owner --> UC_SAV_03
+    Owner --> UC_SAV_04
+    Owner --> UC_SAV_05
+    Owner --> UC_SAV_06
 
     classDef actor fill:#E8F4FD,stroke:#2B6CB0,stroke-width:2px,color:#1A365D;
     classDef default fill:#FFFFFF,stroke:#2B6CB0,stroke-width:1.5px,color:#2D3748;
-    classDef extend fill:#FFFBEB,stroke:#D97706,stroke-width:1.5px,stroke-dasharray: 3 3,color:#78350F;
-    classDef note fill:#F8FAFC,stroke:#64748B,stroke-width:1px,stroke-dasharray: 2 2,color:#334155;
 
     class Owner actor;
-    class UC06_Early extend;
-    class Note_Wealth note;
+```
+
+##### 7.2.2b Nhóm Chứng chỉ quỹ đầu tư (INV)
+
+```mermaid
+flowchart LR
+    Owner(("Chủ sở hữu"))
+
+    subgraph InvestmentSubsystem ["Nhóm Chứng chỉ quỹ đầu tư"]
+        UC_INV_01(["UC-INV-01: Mua chứng chỉ quỹ"])
+        UC_INV_02(["UC-INV-02: Bán chứng chỉ quỹ"])
+        UC_INV_03(["UC-INV-03: Cập nhật NAV thị trường"])
+        UC_INV_04(["UC-INV-04: Phân tích hiệu suất danh mục đầu tư"])
+    end
+
+    Owner --> UC_INV_01
+    Owner --> UC_INV_02
+    Owner --> UC_INV_03
+    Owner --> UC_INV_04
+
+    classDef actor fill:#E8F4FD,stroke:#2B6CB0,stroke-width:2px,color:#1A365D;
+    classDef default fill:#FFFFFF,stroke:#2B6CB0,stroke-width:1.5px,color:#2D3748;
+
+    class Owner actor;
 ```
 
 ##### Cấu trúc ca sử dụng và ràng buộc phân hệ
 
-- **Các ca sử dụng thành phần:**
-  - Nhóm Sổ tiết kiệm gồm `UC06.1 Mở sổ tiết kiệm`, `UC06.2 Tất toán sổ đúng hạn`, và theo dõi tiền lãi tích lũy theo ngày thực gửi.
-  - Nhóm Chứng chỉ quỹ gồm `UC07.1 Mua chứng chỉ quỹ`, `UC07.2 Bán chứng chỉ quỹ`, và `UC07.3 Cập nhật NAV và định giá danh mục`.
-- **Quan hệ mở rộng:** `UC06.3 Tất toán sổ tiết kiệm trước hạn` mở rộng `UC06.2 Tất toán sổ tiết kiệm đúng hạn` tại Điểm mở rộng `[Thời điểm tất toán]` khi `[SettlementDate < MaturityDate]`. Luồng mở rộng áp dụng hồi tố lãi suất không kỳ hạn theo `BR-FIN-05`.
-- **Ràng buộc nghiệp vụ:**
-  - `BR-FIN-05`: Công thức tính lãi theo chuẩn 365 ngày/năm và quy tắc tất toán đúng hạn/trước hạn.
-  - `BR-FIN-06`: Định giá Mark-to-Market theo NAV và điều kiện tính suất sinh lời quy đổi năm CAGR ($HoldDays \ge 30$ ngày).
+| Thành phần | Mô tả |
+|---|---|
+| Ca sử dụng thành phần | Nhóm Sổ tiết kiệm gồm `UC-SAV-01 Mở sổ tiết kiệm mới`, `UC-SAV-02 Tất toán sổ tiết kiệm đúng hạn`, `UC-SAV-03 Tất toán sổ tiết kiệm trước hạn`, `UC-SAV-04 Nạp thêm tiền vào sổ tích lũy`, `UC-SAV-05 Theo dõi tiến độ và giá trị tích lũy sổ tiết kiệm` và `UC-SAV-06 Tái tục sổ tiết kiệm với điều khoản mới`.<br/>Nhóm Chứng chỉ quỹ gồm `UC-INV-01 Mua chứng chỉ quỹ`, `UC-INV-02 Bán chứng chỉ quỹ`, `UC-INV-03 Cập nhật NAV thị trường` và `UC-INV-04 Phân tích hiệu suất danh mục đầu tư`. |
+| Quan hệ mở rộng | Không có quan hệ `<<extend>>` trong phân hệ này. `UC-SAV-02 Tất toán sổ tiết kiệm đúng hạn` và `UC-SAV-03 Tất toán sổ tiết kiệm trước hạn` là hai ca sử dụng độc lập, loại trừ lẫn nhau tại cùng một thời điểm trên cùng một sổ tiết kiệm, cùng chia sẻ tiền điều kiện sổ đang ở trạng thái `OPEN` nhưng phân biệt bằng điều kiện kích hoạt khác nhau ($currentDate \ge MaturityDate$ so với $currentDate < MaturityDate$); không tồn tại đường nối UML nào giữa hai ca sử dụng này. `UC-SAV-06 Tái tục sổ tiết kiệm với điều khoản mới` là một mục tiêu độc lập của Owner, chỉ khả thi về mặt tiền điều kiện sau khi `UC-SAV-02` hoàn tất, nhưng không được mô hình hóa bằng quan hệ `<<include>>` hay `<<extend>>` vì đây là một lựa chọn nghiệp vụ riêng biệt của người dùng, không phải một bước con bắt buộc của tất toán. |
+| Ràng buộc nghiệp vụ | `BR-FIN-05`: Công thức tính lãi theo chuẩn 365 ngày/năm, chi phối cả `UC-SAV-02` và `UC-SAV-03`; tất toán trước hạn áp dụng hồi tố lãi suất không kỳ hạn; tái tục (`UC-SAV-06`) chỉ khả thi khi sổ nguồn đang ở trạng thái `SETTLED_MATURED`.<br/>`BR-FIN-06`: Định giá Mark-to-Market theo NAV, chi phối `UC-INV-03` và điều kiện tính suất sinh lời quy đổi năm CAGR ($HoldDays \ge 30$ ngày) trong `UC-INV-04`. |
 
 ---
 
-#### 7.2.3 Phân hệ Công nợ và Quản lý Quỹ mục tiêu
+#### 7.2.3 Phân hệ Công nợ và Quỹ mục tiêu
 
 Phân hệ quản lý hai nhánh nghĩa vụ tài chính cá nhân gồm quan hệ công nợ đối tác (phải thu và phải trả) và quy hoạch nguồn lực tài sản vào các quỹ mục tiêu độc lập.
 
@@ -4448,50 +5883,43 @@ Phân hệ quản lý hai nhánh nghĩa vụ tài chính cá nhân gồm quan h�
 flowchart LR
     Owner(("Chủ sở hữu"))
 
-    subgraph DebtsGoalsSubsystem ["Phân hệ Công nợ và Quản lý Quỹ mục tiêu"]
-        UC05_Lend(["UC05.1: Quản lý cho vay và thu hồi nợ"])
-        UC05_Borrow(["UC05.2: Quản lý đi vay và trả nợ"])
-        UC05_WriteOff(["UC05.3: Xóa nợ khó đòi phi tiền mặt"])
-        UC08_Init(["UC08.1: Thiết lập quỹ tài chính mục tiêu"])
-        UC08_Alloc(["UC08.2: Phân bổ tài sản 3 cấu phần"])
-        UC08_Track(["UC08.3: Theo dõi tiến độ và tái phân bổ"])
-
-        Note_DebtsGoals[/"Ràng buộc nghiệp vụ:<br/>• BR-FIN-07: Bất biến công nợ, trần thu/trả nợ, xóa nợ phi tiền mặt<br/>• BR-FIN-08: Quỹ 3 cấu phần, không tính trùng, bảo toàn khi tái phân bổ"/]
+    subgraph DebtsGoalsSubsystem ["Phân hệ Công nợ và Quỹ mục tiêu"]
+        UC_DEBT_01(["UC-DEBT-01: Ghi nhận và thu hồi khoản cho vay"])
+        UC_DEBT_02(["UC-DEBT-02: Ghi nhận và trả khoản đi vay"])
+        UC_DEBT_03(["UC-DEBT-03: Xóa nợ khó đòi phi tiền mặt"])
+        UC_FND_01(["UC-FND-01: Thiết lập quỹ mục tiêu mới"])
+        UC_FND_02(["UC-FND-02: Theo dõi tiến độ các quỹ mục tiêu"])
+        UC_FND_03(["UC-FND-03: Điều chỉnh hạn mức mục tiêu của quỹ"])
+        UC_FND_04(["UC-FND-04: Tái phân bổ tài sản giữa các quỹ"])
+        UC_FND_05(["UC-FND-05: Đóng quỹ mục tiêu"])
     end
 
-    Owner --> UC05_Lend
-    Owner --> UC05_Borrow
-    Owner --> UC08_Init
-    Owner --> UC08_Alloc
-    Owner --> UC08_Track
+    Owner --> UC_DEBT_01
+    Owner --> UC_DEBT_02
+    Owner --> UC_FND_01
+    Owner --> UC_FND_02
+    Owner --> UC_FND_03
+    Owner --> UC_FND_04
+    Owner --> UC_FND_05
 
-    UC05_WriteOff -.->|"<<extend>><br/>[Vỡ nợ]"| UC05_Lend
-    UC05_WriteOff -.->|"<<extend>><br/>[Miễn trừ]"| UC05_Borrow
-
-    Note_DebtsGoals -.- UC05_WriteOff
-    Note_DebtsGoals -.- UC08_Alloc
+    UC_DEBT_03 -.->|"<<extend>><br/>[Vỡ nợ]"| UC_DEBT_01
+    UC_DEBT_03 -.->|"<<extend>><br/>[Miễn trừ]"| UC_DEBT_02
 
     classDef actor fill:#E8F4FD,stroke:#2B6CB0,stroke-width:2px,color:#1A365D;
     classDef default fill:#FFFFFF,stroke:#2B6CB0,stroke-width:1.5px,color:#2D3748;
     classDef extend fill:#FFFBEB,stroke:#D97706,stroke-width:1.5px,stroke-dasharray: 3 3,color:#78350F;
-    classDef note fill:#F8FAFC,stroke:#64748B,stroke-width:1px,stroke-dasharray: 2 2,color:#334155;
 
     class Owner actor;
-    class UC05_WriteOff extend;
-    class Note_DebtsGoals note;
+    class UC_DEBT_03 extend;
 ```
 
 ##### Cấu trúc ca sử dụng và ràng buộc phân hệ
 
-- **Các ca sử dụng thành phần:**
-  - Nhánh Công nợ gồm `UC05.1 Quản lý cho vay và thu hồi nợ`, `UC05.2 Quản lý đi vay và trả nợ`. Chức năng sao kê công nợ chi tiết được tập trung xử lý tại `UC09.4` thuộc Phân hệ Thống kê và Báo cáo.
-  - Nhánh Quỹ mục tiêu gồm `UC08.1 Thiết lập quỹ tài chính mục tiêu`, `UC08.2 Phân bổ tài sản 3 cấu phần`, và `UC08.3 Theo dõi tiến độ và tái phân bổ`.
-- **Quan hệ mở rộng:** `UC05.3 Xóa nợ khó đòi phi tiền mặt` mở rộng hai ca sử dụng cơ sở:
-  - Mở rộng `UC05.1 Quản lý cho vay và thu hồi nợ` tại Điểm mở rộng `[Mất khả năng hoàn trả]` khi `[Đối tác vỡ nợ không thể thu hồi]`. Luồng mở rộng giảm số dư phải thu mà không tạo dòng tiền vào ví.
-  - Mở rộng `UC05.2 Quản lý đi vay và trả nợ` tại Điểm mở rộng `[Miễn trừ nghĩa vụ nợ]` khi `[Được chủ nợ xóa bớt nợ]`. Luồng mở rộng giảm số nợ phải trả mà không trích xuất tiền từ ví.
-- **Ràng buộc nghiệp vụ:**
-  - `BR-FIN-07`: Bất biến dư nợ không âm, trần thu nợ hoặc trả nợ và đặc tính phi tiền mặt của thao tác xóa nợ.
-  - `BR-FIN-08`: Công thức tổng hợp tài sản 3 cấu phần, bất biến không tính trùng tài sản và bảo toàn tài sản khi tái phân bổ.
+| Thành phần | Mô tả |
+|---|---|
+| Ca sử dụng thành phần | Nhánh Công nợ gồm `UC-DEBT-01 Ghi nhận và thu hồi khoản cho vay` và `UC-DEBT-02 Ghi nhận và trả khoản đi vay`. Chức năng sao kê công nợ chi tiết theo đối tác được tập trung xử lý tại `UC-REP-04` thuộc Phân hệ 4, không còn liên hệ nào với các ca sử dụng của phân hệ này trên sơ đồ.<br/>Nhánh Quỹ mục tiêu gồm `UC-FND-01 Thiết lập quỹ mục tiêu mới`, `UC-FND-02 Theo dõi tiến độ các quỹ mục tiêu`, `UC-FND-03 Điều chỉnh hạn mức mục tiêu của quỹ`, `UC-FND-04 Tái phân bổ tài sản giữa các quỹ` và `UC-FND-05 Đóng quỹ mục tiêu`. |
+| Quan hệ mở rộng | `UC-DEBT-03 Xóa nợ khó đòi phi tiền mặt` mở rộng hai ca sử dụng cơ sở:<br/>Mở rộng `UC-DEBT-01 Ghi nhận và thu hồi khoản cho vay` tại Điểm mở rộng `[Mất khả năng hoàn trả]` khi `[Đối tác vỡ nợ không thể thu hồi]`. Luồng mở rộng giảm số dư phải thu mà không tạo dòng tiền vào ví.<br/>Mở rộng `UC-DEBT-02 Ghi nhận và trả khoản đi vay` tại Điểm mở rộng `[Miễn trừ nghĩa vụ nợ]` khi `[Được chủ nợ xóa bớt nợ]`. Luồng mở rộng giảm số nợ phải trả mà không trích xuất tiền từ ví. |
+| Ràng buộc nghiệp vụ | `BR-FIN-07`: Bất biến dư nợ không âm, trần thu nợ hoặc trả nợ và đặc tính phi tiền mặt của thao tác xóa nợ.<br/>`BR-FIN-08`: Công thức tổng hợp tài sản 3 cấu phần, bất biến không tính trùng tài sản và bảo toàn tài sản khi tái phân bổ. |
 
 ---
 
@@ -4504,27 +5932,27 @@ flowchart LR
     Owner(("Chủ sở hữu"))
 
     subgraph AnalyticsAdminSubsystem ["Phân hệ Thống kê, Báo cáo và Quản trị dữ liệu"]
-        UC09_1(["UC09.1: Bảng thống kê dòng tiền trượt 12 tháng"])
-        UC09_2(["UC09.2: Báo cáo cơ cấu thu chi 2 tầng"])
-        UC09_3(["UC09.3: Báo cáo tài sản ròng 5 cấu phần"])
-        UC09_4(["UC09.4: Sao kê chi tiết công nợ theo đối tác"])
-        UC10_1(["UC10.1: Xuất dữ liệu tài chính"])
-        UC10_2(["UC10.2: Nhập và phục hồi dữ liệu"])
-        UC10_3(["UC10.3: Kiểm toán đối soát toàn vẹn dữ liệu"])
+        UC_REP_01(["UC-REP-01: Thống kê dòng tiền trượt 12 tháng"])
+        UC_REP_02(["UC-REP-02: Báo cáo cơ cấu thu chi theo nhóm và danh mục"])
+        UC_REP_03(["UC-REP-03: Báo cáo giá trị tài sản ròng"])
+        UC_REP_04(["UC-REP-04: Sao kê công nợ chi tiết theo đối tác"])
+        UC_DAT_01(["UC-DAT-01: Xuất dữ liệu tài chính"])
+        UC_DAT_02(["UC-DAT-02: Nhập và phục hồi dữ liệu"])
+        UC_DAT_03(["UC-DAT-03: Kiểm toán toàn vẹn dữ liệu"])
 
         Note_Admin[/"Ràng buộc nghiệp vụ:<br/>• FR-REP-01: Dòng tiền trượt 12 tháng, phép chia an toàn<br/>• FR-REP-03: Cân đối tài sản ròng 5 cấu phần, sai số = 0<br/>• FR-DAT-02: Kiểm định toàn vẹn 4 bước và hoàn nguyên tự động"/]
     end
 
-    Owner --> UC09_1
-    Owner --> UC09_2
-    Owner --> UC09_3
-    Owner --> UC09_4
-    Owner --> UC10_1
-    Owner --> UC10_2
-    Owner --> UC10_3
+    Owner --> UC_REP_01
+    Owner --> UC_REP_02
+    Owner --> UC_REP_03
+    Owner --> UC_REP_04
+    Owner --> UC_DAT_01
+    Owner --> UC_DAT_02
+    Owner --> UC_DAT_03
 
-    Note_Admin -.- UC09_3
-    Note_Admin -.- UC10_2
+    Note_Admin -.- UC_REP_03
+    Note_Admin -.- UC_DAT_02
 
     classDef actor fill:#E8F4FD,stroke:#2B6CB0,stroke-width:2px,color:#1A365D;
     classDef default fill:#FFFFFF,stroke:#2B6CB0,stroke-width:1.5px,color:#2D3748;
@@ -4536,24 +5964,20 @@ flowchart LR
 
 ##### Cấu trúc ca sử dụng và ràng buộc phân hệ
 
-- **Các ca sử dụng thành phần:**
-  - Nhánh Thống kê báo cáo gồm `UC09.1 Bảng thống kê dòng tiền trượt 12 tháng`, `UC09.2 Báo cáo cơ cấu thu chi 2 tầng`, `UC09.3 Báo cáo tài sản ròng 5 cấu phần`, và `UC09.4 Sao kê chi tiết công nợ theo đối tác`.
-  - Nhánh Quản trị dữ liệu gồm `UC10.1 Xuất dữ liệu tài chính`, `UC10.2 Nhập và phục hồi dữ liệu`, và `UC10.3 Kiểm toán đối soát toàn vẹn dữ liệu`.
-- **Tương tác tác nhân:** Tác nhân Owner tương tác trực tiếp với cả 7 ca sử dụng. Thao tác kiểm toán toàn vẹn dữ liệu (`UC10.3`) vận hành độc lập, cho phép kích hoạt theo nhu cầu đối soát sổ cái.
-- **Ràng buộc nghiệp vụ:**
-  - `FR-REP-01`: Chuỗi 12 tháng liên tục neo theo ngày hệ thống và phép chia an toàn khi tính tỷ lệ tiết kiệm.
-  - `FR-REP-03`: Bảng cân đối tài sản ròng 5 cấu phần với sai số đại số bằng 0.00 VNĐ.
-  - `FR-DAT-02`: Quy trình kiểm định 4 bước khi nhập dữ liệu và cơ chế hoàn nguyên tự động khi phát sinh lỗi.
+| Thành phần | Mô tả |
+|---|---|
+| Ca sử dụng thành phần | Nhánh Thống kê báo cáo gồm `UC-REP-01 Thống kê dòng tiền trượt 12 tháng`, `UC-REP-02 Báo cáo cơ cấu thu chi theo nhóm và danh mục`, `UC-REP-03 Báo cáo giá trị tài sản ròng` và `UC-REP-04 Sao kê công nợ chi tiết theo đối tác`.<br/>Nhánh Quản trị dữ liệu gồm `UC-DAT-01 Xuất dữ liệu tài chính`, `UC-DAT-02 Nhập và phục hồi dữ liệu` và `UC-DAT-03 Kiểm toán toàn vẹn dữ liệu`. |
+| Tương tác tác nhân | Tác nhân Owner tương tác trực tiếp với cả 7 ca sử dụng. `UC-REP-04` thuộc hẳn domain báo cáo, không còn liên hệ nào với các ca sử dụng công nợ (`UC-DEBT`) của Phân hệ 3 trên sơ đồ. Thao tác kiểm toán toàn vẹn dữ liệu (`UC-DAT-03`) vận hành độc lập, cho phép kích hoạt theo nhu cầu đối soát sổ cái. |
+| Ràng buộc nghiệp vụ | `FR-REP-01`: Chuỗi 12 tháng liên tục neo theo ngày hệ thống và phép chia an toàn khi tính tỷ lệ tiết kiệm.<br/>`FR-REP-03`: Bảng cân đối tài sản ròng 5 cấu phần với sai số đại số bằng 0.00 VNĐ.<br/>`FR-DAT-02`: Quy trình kiểm định 4 bước khi nhập dữ liệu và cơ chế hoàn nguyên tự động khi phát sinh lỗi. |
 
 ---
-
 ## 8. MA TRẬN KIỂM CHỨNG VÀ TRUY VẾT YÊU CẦU (RTM)
 
 Phần này thiết lập ma trận truy vết và phương pháp kiểm chứng yêu cầu giữa mục tiêu, phân hệ, ca sử dụng và các thực thể miền. Ma trận cung cấp cơ sở kỹ thuật để:
 
-1. Xác nhận tính đầy đủ: Mọi mục tiêu hệ thống (G1 đến G5) đều chuyển hóa thành các yêu cầu chức năng (FR-WAL đến FR-DAT) và hiện thực hóa qua các ca sử dụng (UC01 đến UC10).
+1. Xác nhận tính đầy đủ: Mọi mục tiêu hệ thống (G1 đến G5) đều chuyển hóa thành các yêu cầu chức năng (FR-WAL đến FR-DAT) và hiện thực hóa qua các ca sử dụng (UC-WAL-01 đến UC-DAT-03).
 2. Định hướng thực thể miền nghiệp vụ: Thiết lập mối liên kết trực tiếp giữa các yêu cầu chức năng với các thực thể nghiệp vụ cốt lõi của hệ thống.
-3. Kiểm soát chất lượng nghiệm thu: Xác định phương pháp kiểm chứng cụ thể (Soát xét, Kiểm thử, Trình diễn, Phân tích) cùng tiêu chí nghiệm thu tương ứng cho toàn bộ 39 yêu cầu chức năng và 6 yêu cầu phi chức năng.
+3. Kiểm soát chất lượng nghiệm thu: Xác định phương pháp kiểm chứng cụ thể (Soát xét, Kiểm thử, Trình diễn, Phân tích) cùng tiêu chí nghiệm thu tương ứng cho toàn bộ 41 yêu cầu chức năng và 6 yêu cầu phi chức năng.
 
 ---
 
@@ -4562,51 +5986,53 @@ Phần này thiết lập ma trận truy vết và phương pháp kiểm chứng
 Bảng dưới đây đối chiếu 4 chiều kỹ thuật của hệ thống:
 
 1. Mục tiêu hệ thống: 5 mục tiêu từ Mục 2.2 (`G1` đến `G5`).
-2. Phân hệ nghiệp vụ và Yêu cầu chức năng: 39 yêu cầu chức năng từ Mục 4 (`FR-WAL-01` đến `FR-DAT-03`).
-3. Ca sử dụng tham chiếu (UC ID): 10 ca sử dụng chi tiết từ Mục 6 (`UC01` đến `UC10`).
+2. Phân hệ nghiệp vụ và Yêu cầu chức năng: 41 yêu cầu chức năng từ Mục 4 (`FR-WAL-01` đến `FR-DAT-03`).
+3. Ca sử dụng tham chiếu (UC ID): 40 ca sử dụng chi tiết từ Mục 6, đánh mã theo cú pháp `UC-<DOMAIN>-NN` (`UC-WAL-01` đến `UC-DAT-03`), phân bổ qua 10 phân hệ nghiệp vụ `WAL`, `TXN`, `TRF`, `CAT`, `DEBT`, `SAV`, `INV`, `FND`, `REP`, `DAT`.
 4. Thực thể miền nghiệp vụ: Các thực thể nghiệp vụ xuất phát từ ngữ cảnh tài chính thực tế của hệ thống (`Wallet`, `Transaction`, `Transfer`, `Category`, `Debt`, `SavingAccount`, `FundCertificate`, `FinancialGoal`, `MonthlyStat`, `FinancialLedger`).
 
 | Mã mục tiêu | Phân hệ nghiệp vụ | Mã yêu cầu | Tên chức năng | Ca sử dụng tham chiếu | Thực thể miền nghiệp vụ |
 | --- | --- | --- | --- | --- | --- |
-| G2, G1 | Quản lý ví tiền | FR-WAL-01 | Khởi tạo ví tiền mới | UC01 | `Wallet` |
-| G2 | Quản lý ví tiền | FR-WAL-02 | Xem danh sách và chi tiết số dư động | UC01 | `Wallet` |
-| G2 | Quản lý ví tiền | FR-WAL-03 | Cập nhật thông tin ví tiền | UC01 | `Wallet` |
-| G2 | Quản lý ví tiền | FR-WAL-04 | Thống kê cơ cấu tài sản theo ví | UC01 | `Wallet` |
-| G1, G5 | Ghi nhận thu chi | FR-TXN-01 | Tạo mới giao dịch thu nhập | UC02 | `Transaction`, `Wallet`, `Category` |
-| G1, G5 | Ghi nhận thu chi | FR-TXN-02 | Tạo mới giao dịch chi tiêu | UC02 | `Transaction`, `Wallet`, `Category` |
-| G1 | Ghi nhận thu chi | FR-TXN-03 | Tra cứu và lọc lịch sử giao dịch | UC02 | `Transaction`, `Wallet`, `Category` |
-| G1, G5 | Ghi nhận thu chi | FR-TXN-04 | Chỉnh sửa giao dịch thu chi | UC02 | `Transaction`, `Wallet`, `Category` |
-| G1, G5 | Ghi nhận thu chi | FR-TXN-05 | Xóa giao dịch thu chi | UC02 | `Transaction`, `Wallet` |
-| G1, G5 | Chuyển tiền nội bộ | FR-TRF-01 | Chuyển tiền giữa hai ví nội bộ | UC03 | `Transfer`, `Wallet` |
-| G1, G5 | Chuyển tiền nội bộ | FR-TRF-02 | Ghi nhận phí chuyển tiền phát sinh | UC03 | `Transfer`, `Transaction`, `Wallet` |
-| G1, G5 | Chuyển tiền nội bộ | FR-TRF-03 | Lịch sử và hủy chuyển tiền nội bộ | UC03 | `Transfer`, `Wallet` |
-| G1 | Danh mục phân loại | FR-CAT-01 | Khởi tạo và quản lý cấu trúc phân loại 3 cấp | UC04 | `Category` |
-| G1 | Danh mục phân loại | FR-CAT-02 | Tùy biến danh mục người dùng | UC04 | `Category` |
-| G1 | Danh mục phân loại | FR-CAT-03 | Ràng buộc toàn vẹn khi sửa và xóa danh mục | UC04 | `Category`, `Transaction` |
-| G3, G2 | Quản lý công nợ | FR-DEBT-01 | Ghi nhận khoản cho vay | UC05 | `Debt`, `Wallet`, `Transaction` |
-| G3, G2 | Quản lý công nợ | FR-DEBT-02 | Ghi nhận khoản đi vay | UC05 | `Debt`, `Wallet`, `Transaction` |
-| G3, G2 | Quản lý công nợ | FR-DEBT-03 | Thu hồi nợ cho vay | UC05 | `Debt`, `Wallet`, `Transaction` |
-| G3, G2 | Quản lý công nợ | FR-DEBT-04 | Trả nợ đi vay | UC05 | `Debt`, `Wallet`, `Transaction` |
-| G3, G2 | Quản lý công nợ | FR-DEBT-05 | Xóa nợ khó đòi và miễn trừ nợ | UC05 | `Debt` |
-| G3, G2 | Quản lý sổ tiết kiệm | FR-SAV-01 | Mở sổ tiết kiệm mới | UC06 | `SavingAccount`, `Wallet`, `Transaction` |
-| G3, G5 | Quản lý sổ tiết kiệm | FR-SAV-02 | Tính toán tiền lãi dự kiến và theo dõi kỳ hạn | UC06 | `SavingAccount` |
-| G3, G2, G5 | Quản lý sổ tiết kiệm | FR-SAV-03 | Tất toán sổ tiết kiệm đúng hạn | UC06 | `SavingAccount`, `Wallet`, `Transaction` |
-| G3, G2, G5 | Quản lý sổ tiết kiệm | FR-SAV-04 | Tất toán sổ tiết kiệm trước hạn | UC06 | `SavingAccount`, `Wallet`, `Transaction` |
-| G3, G2 | Chứng chỉ quỹ đầu tư | FR-INV-01 | Ghi nhận lệnh mua chứng chỉ quỹ | UC07 | `FundCertificate`, `Wallet`, `Transaction` |
-| G3, G2 | Chứng chỉ quỹ đầu tư | FR-INV-02 | Cập nhật giá trị tài sản ròng (NAV) | UC07 | `FundCertificate` |
-| G3, G2, G5 | Chứng chỉ quỹ đầu tư | FR-INV-03 | Định giá thị trường và tính lãi lỗ chưa thực hiện | UC07 | `FundCertificate` |
-| G3, G2, G5 | Chứng chỉ quỹ đầu tư | FR-INV-04 | Ghi nhận bán chứng chỉ quỹ | UC07 | `FundCertificate`, `Wallet`, `Transaction` |
-| G4, G2 | Quản lý quỹ mục tiêu | FR-FND-01 | Thiết lập quỹ tài chính mục tiêu | UC08 | `FinancialGoal` |
-| G4, G2 | Quản lý quỹ mục tiêu | FR-FND-02 | Phân bổ tài sản vào quỹ mục tiêu | UC08 | `FinancialGoal`, `Wallet`, `SavingAccount`, `FundCertificate` |
-| G4, G2 | Quản lý quỹ mục tiêu | FR-FND-03 | Theo dõi tiến độ tích lũy quỹ | UC08 | `FinancialGoal` |
-| G4, G2 | Quản lý quỹ mục tiêu | FR-FND-04 | Điều chỉnh và tái phân bổ quỹ mục tiêu | UC08 | `FinancialGoal` |
-| G1, G5 | Thống kê và báo cáo | FR-REP-01 | Bảng thống kê dòng tiền trượt 12 tháng | UC09 | `MonthlyStat`, `Transaction` |
-| G1 | Thống kê và báo cáo | FR-REP-02 | Báo cáo cơ cấu thu chi theo nhóm và danh mục | UC09 | `MonthlyStat`, `Category`, `Transaction` |
-| G2, G5 | Thống kê và báo cáo | FR-REP-03 | Báo cáo tổng tài sản và giá trị tài sản ròng | UC09 | `FinancialLedger`, `Wallet`, `SavingAccount`, `FundCertificate`, `Debt` |
-| G3 | Thống kê và báo cáo | FR-REP-04 | Sao kê công nợ chi tiết theo đối tác | UC09 | `Debt` |
-| G2, G5 | Quản lý dữ liệu | FR-DAT-01 | Xuất dữ liệu tài chính | UC10 | `FinancialLedger` |
-| G2, G5 | Quản lý dữ liệu | FR-DAT-02 | Nhập dữ liệu và phục hồi | UC10 | `FinancialLedger` |
-| G5 | Quản lý dữ liệu | FR-DAT-03 | Kiểm tra tính toàn vẹn dữ liệu | UC10 | `FinancialLedger` |
+| G2, G1 | Ví tiền | FR-WAL-01 | Khởi tạo ví tiền mới | UC-WAL-01, UC-WAL-03 | `Wallet` |
+| G2 | Ví tiền | FR-WAL-02 | Xem danh sách và chi tiết số dư động | UC-WAL-01, UC-WAL-02 | `Wallet` |
+| G2 | Ví tiền | FR-WAL-03 | Cập nhật thông tin ví tiền | UC-WAL-01, UC-WAL-03 | `Wallet` |
+| G2 | Ví tiền | FR-WAL-04 | Thống kê cơ cấu tài sản theo ví | UC-WAL-01, UC-WAL-02 | `Wallet` |
+| G2 | Ví tiền | FR-WAL-05 | Điều chỉnh số dư ví | UC-WAL-04 | `Wallet` |
+| G1, G5 | Ghi nhận thu chi | FR-TXN-01 | Tạo mới giao dịch thu nhập | UC-TXN-01 | `Transaction`, `Wallet`, `Category` |
+| G1, G5 | Ghi nhận thu chi | FR-TXN-02 | Tạo mới giao dịch chi tiêu | UC-TXN-01, UC-TXN-02 | `Transaction`, `Wallet`, `Category` |
+| G1 | Ghi nhận thu chi | FR-TXN-03 | Tra cứu và lọc lịch sử giao dịch | UC-TXN-01, UC-TXN-03 | `Transaction`, `Wallet`, `Category` |
+| G1, G5 | Ghi nhận thu chi | FR-TXN-04 | Chỉnh sửa giao dịch thu chi | UC-TXN-01, UC-TXN-04 | `Transaction`, `Wallet`, `Category` |
+| G1, G5 | Ghi nhận thu chi | FR-TXN-05 | Xóa giao dịch thu chi | UC-TXN-01 | `Transaction`, `Wallet` |
+| G1, G5 | Chuyển tiền nội bộ | FR-TRF-01 | Chuyển tiền giữa hai ví nội bộ | UC-TRF-01 | `Transfer`, `Wallet` |
+| G1, G5 | Chuyển tiền nội bộ | FR-TRF-02 | Ghi nhận phí chuyển tiền phát sinh | UC-TRF-01, UC-TRF-02 | `Transfer`, `Transaction`, `Wallet` |
+| G1, G5 | Chuyển tiền nội bộ | FR-TRF-03 | Lịch sử và hủy chuyển tiền nội bộ | UC-TRF-02, UC-TRF-03 | `Transfer`, `Wallet` |
+| G1 | Danh mục phân loại | FR-CAT-01 | Khởi tạo và quản lý cấu trúc phân loại 3 cấp | UC-CAT-01 | `Category` |
+| G1 | Danh mục phân loại | FR-CAT-02 | Tùy biến danh mục người dùng | UC-CAT-02 | `Category` |
+| G1 | Danh mục phân loại | FR-CAT-03 | Ràng buộc toàn vẹn khi sửa và xóa danh mục | UC-CAT-03, UC-CAT-04 | `Category`, `Transaction` |
+| G3, G2 | Công nợ | FR-DEBT-01 | Ghi nhận khoản cho vay | UC-DEBT-01 | `Debt`, `Wallet`, `Transaction` |
+| G3, G2 | Công nợ | FR-DEBT-02 | Ghi nhận khoản đi vay | UC-DEBT-02 | `Debt`, `Wallet`, `Transaction` |
+| G3, G2 | Công nợ | FR-DEBT-03 | Thu hồi nợ cho vay | UC-DEBT-01 | `Debt`, `Wallet`, `Transaction` |
+| G3, G2 | Công nợ | FR-DEBT-04 | Trả nợ đi vay | UC-DEBT-02 | `Debt`, `Wallet`, `Transaction` |
+| G3, G2 | Công nợ | FR-DEBT-05 | Xóa nợ khó đòi và miễn trừ nợ | UC-DEBT-03 | `Debt` |
+| G3, G2 | Sổ tiết kiệm | FR-SAV-01 | Mở sổ tiết kiệm mới | UC-SAV-01 | `SavingAccount`, `Wallet`, `Transaction` |
+| G3, G5 | Sổ tiết kiệm | FR-SAV-02 | Tính toán tiền lãi dự kiến và theo dõi kỳ hạn | UC-SAV-02, UC-SAV-03 | `SavingAccount` |
+| G3, G2, G5 | Sổ tiết kiệm | FR-SAV-03 | Tất toán sổ tiết kiệm đúng hạn | UC-SAV-04 | `SavingAccount`, `Wallet`, `Transaction` |
+| G3, G2, G5 | Sổ tiết kiệm | FR-SAV-04 | Tất toán sổ tiết kiệm trước hạn | UC-SAV-05 | `SavingAccount`, `Wallet`, `Transaction` |
+| G3, G5 | Sổ tiết kiệm | FR-SAV-05 | Tái tục sổ tiết kiệm với điều khoản mới | UC-SAV-06 | `SavingAccount`, `Wallet` |
+| G3, G2 | Chứng chỉ quỹ đầu tư | FR-INV-01 | Ghi nhận lệnh mua chứng chỉ quỹ | UC-INV-01 | `FundCertificate`, `Wallet`, `Transaction` |
+| G3, G2 | Chứng chỉ quỹ đầu tư | FR-INV-02 | Cập nhật giá trị tài sản ròng (NAV) | UC-INV-02 | `FundCertificate` |
+| G3, G2, G5 | Chứng chỉ quỹ đầu tư | FR-INV-03 | Định giá thị trường và tính lãi lỗ chưa thực hiện | UC-INV-03 | `FundCertificate` |
+| G3, G2, G5 | Chứng chỉ quỹ đầu tư | FR-INV-04 | Ghi nhận bán chứng chỉ quỹ | UC-INV-02, UC-INV-04 | `FundCertificate`, `Wallet`, `Transaction` |
+| G4, G2 | Quỹ mục tiêu | FR-FND-01 | Thiết lập quỹ tài chính mục tiêu | UC-FND-01 | `FinancialGoal` |
+| G4, G2 | Quỹ mục tiêu | FR-FND-02 | Phân bổ tài sản vào quỹ mục tiêu | UC-FND-02 | `FinancialGoal`, `Wallet`, `SavingAccount`, `FundCertificate` |
+| G4, G2 | Quỹ mục tiêu | FR-FND-03 | Theo dõi tiến độ tích lũy quỹ | UC-FND-03 | `FinancialGoal` |
+| G4, G2 | Quỹ mục tiêu | FR-FND-04 | Điều chỉnh và tái phân bổ quỹ mục tiêu | UC-FND-04, UC-FND-05 | `FinancialGoal` |
+| G1, G5 | Thống kê và báo cáo | FR-REP-01 | Bảng thống kê dòng tiền trượt 12 tháng | UC-REP-01 | `MonthlyStat`, `Transaction` |
+| G1 | Thống kê và báo cáo | FR-REP-02 | Báo cáo cơ cấu thu chi theo nhóm và danh mục | UC-REP-02 | `MonthlyStat`, `Category`, `Transaction` |
+| G2, G5 | Thống kê và báo cáo | FR-REP-03 | Báo cáo tổng tài sản và giá trị tài sản ròng | UC-REP-03 | `FinancialLedger`, `Wallet`, `SavingAccount`, `FundCertificate`, `Debt` |
+| G3 | Thống kê và báo cáo | FR-REP-04 | Sao kê công nợ chi tiết theo đối tác | UC-REP-04 | `Debt` |
+| G2, G5 | Dữ liệu | FR-DAT-01 | Xuất dữ liệu tài chính | UC-DAT-01 | `FinancialLedger` |
+| G2, G5 | Dữ liệu | FR-DAT-02 | Nhập dữ liệu và phục hồi | UC-DAT-02 | `FinancialLedger` |
+| G5 | Dữ liệu | FR-DAT-03 | Kiểm tra tính toàn vẹn dữ liệu | UC-DAT-03 | `FinancialLedger` |
 
 ---
 
@@ -4621,7 +6047,7 @@ Các phương pháp kiểm chứng được phân định thành 4 loại hình 
 | D | Trình diễn hoạt động | Demonstration | Vận hành chức năng trực tiếp trên giao diện tương tác người dùng để quan sát hành vi, luồng xử lý và kết quả đầu ra theo kịch bản sử dụng thực tế. |
 | A | Phân tích định lượng | Analysis | Đánh giá các chỉ số kỹ thuật thông qua công cụ phân tích dữ liệu, tính toán thống kê, profiling hiệu năng và đo lường độ bao phủ mã nguồn (JMH, VisualVM, JaCoCo). |
 
-#### 8.2.1 Ma trận phương pháp kiểm chứng yêu cầu chức năng (39 FRs)
+#### 8.2.1 Ma trận phương pháp kiểm chứng yêu cầu chức năng (41 FRs)
 
 | Mã yêu cầu | Tên chức năng | Phương pháp chính | Môi trường và công cụ kiểm chứng | Tiêu chí nghiệm thu kỹ thuật |
 | --- | --- | --- | --- | --- |
@@ -4629,6 +6055,7 @@ Các phương pháp kiểm chứng được phân định thành 4 loại hình 
 | FR-WAL-02 | Xem danh sách và chi tiết số dư động | T, D | JUnit 5 / JavaFX UI | Hiển thị chính xác danh sách ví và số dư động theo đúng công thức BR-FIN-02 |
 | FR-WAL-03 | Cập nhật thông tin ví tiền | T, D | JUnit 5 / JavaFX UI | Cập nhật tên ví và trạng thái; cấm đổi trực tiếp số dư khả dụng |
 | FR-WAL-04 | Thống kê cơ cấu tài sản theo ví | T, D | JUnit 5 / JavaFX UI | Tính toán chính xác tỷ trọng phần trăm số dư từng ví trên tổng tài sản thanh khoản |
+| FR-WAL-05 | Điều chỉnh số dư ví | T, D | JUnit 5 / JavaFX UI | Bút toán điều chỉnh ghi đúng chênh lệch $Adjustment_w$, bắt buộc lý do, từ chối khi chênh lệch bằng 0 |
 | FR-TXN-01 | Tạo mới giao dịch thu nhập | T, D | JUnit 5 / JavaFX UI | Số tiền > 0, danh mục Type = Income; số dư ví nhận tăng đúng bằng số tiền thu |
 | FR-TXN-02 | Tạo mới giao dịch chi tiêu | T, D | JUnit 5 / JavaFX UI | Số tiền > 0, danh mục Type = Expense, số dư ví chi đủ thanh toán; trừ số dư ví chính xác |
 | FR-TXN-03 | Tra cứu và lọc lịch sử giao dịch | T, D | JUnit 5 / JavaFX UI | Lọc chính xác theo khoảng ngày, ví, danh mục, từ khóa; tính đúng tổng thu chi |
@@ -4649,6 +6076,7 @@ Các phương pháp kiểm chứng được phân định thành 4 loại hình 
 | FR-SAV-02 | Tính toán tiền lãi dự kiến và theo dõi kỳ hạn | T, A | JUnit 5 / Analysis | Tính đúng tiền lãi dự kiến theo công thức BR-FIN-05; phân loại trạng thái đáo hạn chuẩn |
 | FR-SAV-03 | Tất toán sổ tiết kiệm đúng hạn | T, D | JUnit 5 / JavaFX UI | Cộng cả gốc và đủ lãi có kỳ hạn vào ví nhận; chuyển trạng thái sổ sang CLOSED |
 | FR-SAV-04 | Tất toán sổ tiết kiệm trước hạn | T, D | JUnit 5 / JavaFX UI | Cộng gốc và tính lãi không kỳ hạn theo số ngày thực gửi; tất toán an toàn |
+| FR-SAV-05 | Tái tục sổ tiết kiệm với điều khoản mới | T, D | JUnit 5 / JavaFX UI | Chỉ tái tục sổ đã `SETTLED_MATURED`; vốn gốc tái tục không vượt giá trị tất toán; sổ mới tính lãi độc lập theo điều khoản mới |
 | FR-INV-01 | Ghi nhận lệnh mua chứng chỉ quỹ | T, D | JUnit 5 / JavaFX UI | Trừ tiền ví mua; tính chính xác số lượng chứng chỉ quỹ khớp lệnh với scale 4 |
 | FR-INV-02 | Cập nhật giá trị tài sản ròng (NAV) | T, D | JUnit 5 / JavaFX UI | Lưu lịch sử biến động NAV theo ngày; cập nhật giá trị thị trường của danh mục quỹ |
 | FR-INV-03 | Định giá thị trường và tính lãi lỗ chưa thực hiện | T, A | JUnit 5 / Analysis | Tính đúng giá trị hiện tại theo NAV mới nhất, tỷ suất sinh lời và lãi lỗ chưa thực hiện |
@@ -4688,10 +6116,10 @@ Bảng tổng hợp các thành phần đặc tả:
 | :--- | :--- | :---: | :--- |
 | Mục tiêu hệ thống | G1 đến G5 | 5 | Tiêu chí đo kiểm định lượng |
 | Quy tắc nghiệp vụ tài chính | BR-FIN-01 đến BR-FIN-08 | 8 | Bất biến mô hình hóa bằng công thức toán học |
-| Yêu cầu chức năng | FR-WAL-01 đến FR-DAT-03 | 39 | Phân bổ qua 10 phân hệ nghiệp vụ |
+| Yêu cầu chức năng | FR-WAL-01 đến FR-DAT-03 | 41 | Phân bổ qua 10 phân hệ nghiệp vụ |
 | Yêu cầu phi chức năng | NFR-01 đến NFR-06 | 6 | Phân loại theo ISO/IEC 25010 kèm ngưỡng kiểm thử |
-| Ca sử dụng chi tiết | UC01 đến UC10 | 10 | Đầy đủ kịch bản chính, luồng ngoại lệ và điều kiện biên |
-| Sơ đồ ca sử dụng | Tầng 1 tổng quan và 4 phân hệ Tầng 2 | 5 | Chuẩn mô hình hóa OMG UML |
-| Ma trận kiểm chứng (RTM) | Truy vết 4 chiều và phương pháp I, T, D, A | 45 | Phủ kín 100% yêu cầu chức năng và phi chức năng |
+| Ca sử dụng chi tiết | UC-WAL-01 đến UC-DAT-03 | 40 | Đầy đủ kịch bản chính, luồng ngoại lệ và điều kiện biên |
+| Sơ đồ ca sử dụng | Tầng 1 tổng quan và 8 sơ đồ con Tầng 2 | 9 | Chuẩn mô hình hóa OMG UML, mỗi sơ đồ tối đa 9 nút |
+| Ma trận kiểm chứng (RTM) | Truy vết 4 chiều và phương pháp I, T, D, A | 47 | Phủ kín 100% yêu cầu chức năng và phi chức năng |
 
-Nội dung trên là tài liệu cơ sở (baseline) cho giai đoạn thiết kế và cài đặt hệ thống.
+Nội dung trên là tài liệu cơ sở cho giai đoạn thiết kế và cài đặt hệ thống.
