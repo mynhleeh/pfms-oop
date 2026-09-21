@@ -26,14 +26,21 @@
 \usetikzlibrary{arrows.meta}
 \usepackage[hidelinks,unicode,pdftitle={Báo cáo Phân tích Hướng đối tượng (OOA)}]{hyperref}
 
-% Cấu hình hiển thị Mục lục mở rộng cấp subsection với đường chấm ....
+
 \renewcommand{\contentsname}{Mục lục}
 \setcounter{tocdepth}{2}
-\renewcommand{\cftsecfont}{\bfseries}
+
+
+\renewcommand{\cftsecfont}{\bfseries}               
+\renewcommand{\cftsecaftersnum}{.}                  
 \renewcommand{\cftsecleader}{\bfseries\cftdotfill{\cftdotsep}}
-\renewcommand{\cftsecpagefont}{\bfseries}
+\renewcommand{\cftsecpagefont}{\bfseries}           
+
+\renewcommand{\cftsubsecfont}{\normalfont}       
+\renewcommand{\cftsubsecpresnum}{\bfseries}         
+\renewcommand{\cftsubsecaftersnum}{.}              
 \renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
-\renewcommand{\cftsubsecpagefont}{\normalfont}
+\renewcommand{\cftsubsecpagefont}{\bfseries}        
 
 \titleformat{\section}
   {\Large\bfseries}
