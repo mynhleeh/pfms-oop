@@ -2,7 +2,7 @@
 
 Tài liệu này tổng hợp toàn bộ tài liệu của dự án Quản lý Tài chính Cá nhân (PFMS).
 
-Các tài liệu thiết kế, báo cáo môn học, dữ liệu nghiệp vụ và sách tham khảo được thống kê tại đây để tiện tra cứu khi phát triển hệ thống.
+Các tài liệu đặc tả yêu cầu, phân tích kiến trúc, thiết kế hướng đối tượng và tài liệu kỹ thuật tham khảo được thống kê tại đây để tiện tra cứu khi phát triển hệ thống.
 
 ## 1. Cấu trúc thư mục tài liệu
 
@@ -11,12 +11,9 @@ Thư mục `docs/` gồm bốn phần chính:
 ```
 docs/
 ├── INDEX.md                                  # Mục lục tài liệu tổng hợp
-├── academic/                                 # Yêu cầu đề bài và tiêu chí đánh giá môn học
-│   └── assignment-requirement.pdf            # Đề bài và thang điểm đánh giá 6 milestone
-├── domain/                                   # Dữ liệu mẫu và phân tích nghiệp vụ tài chính
-│   ├── finance-mng.xlsm                      # Bảng tính Excel gốc theo dõi tài chính cá nhân
-│   └── finance-mng-description.md            # Thuyết minh chi tiết các sheet, công thức và dữ liệu
-├── deliverables/                             # Báo cáo và sản phẩm kỹ thuật của đồ án
+├── academic/                                 # Tài liệu đề bài và mục tiêu bài toán gốc
+│   └── assignment-requirement.pdf            # Đề bài và các mốc phát triển kỹ thuật
+├── deliverables/                             # Tài liệu kỹ thuật và sản phẩm phát triển hệ thống
 │   ├── requirements/                         # Đặc tả yêu cầu phần mềm và kịch bản ca sử dụng
 │   │   ├── req-uc.md                         # Đặc tả Use Case và yêu cầu chức năng (Markdown)
 │   │   ├── req-uc.pdf                        # Bản xuất PDF
@@ -28,20 +25,16 @@ docs/
 │       └── framework.md                      # Khung tài liệu và quy chuẩn vẽ sơ đồ UML (PlantUML)
 └── reference/                                # Tài liệu kỹ thuật chuẩn và giáo trình tham khảo
     ├── requirements-engineering/             # Chuẩn kỹ nghệ yêu cầu (IREB, ISO/IEC/IEEE 29148)
-    ├── software-design/                      # Thiết kế hướng đối tượng, UML và mẫu thiết kế (Craig Larman)
+    ├── software-design/                      # Thiết kế hướng đối tượng, UML và mẫu thiết kế (Craig Larman, Scott Ambler)
     └── financial-patterns/                   # Mẫu thiết kế phần mềm kế toán và tài chính (Martin Fowler)
 ```
 
-## 2. Tài liệu học thuật và dữ liệu nghiệp vụ
+## 2. Tài liệu đặc tả bài toán gốc
 
-### 2.1. Yêu cầu môn học (`academic/`)
-* [assignment-requirement.pdf](./academic/assignment-requirement.pdf): Đề bài môn học, gồm yêu cầu về lập trình hướng đối tượng (đóng gói, kế thừa, đa hình, trừu tượng), giao diện đồ họa, xử lý dữ liệu và thang điểm đánh giá 6 milestone.
+### 2.1. Đề bài và mục tiêu kỹ thuật gốc (`academic/`)
+* [assignment-requirement.pdf](./academic/assignment-requirement.pdf): Đề bài gốc của hệ thống, gồm các yêu cầu về lập trình hướng đối tượng (đóng gói, kế thừa, đa hình, trừu tượng), giao diện đồ họa, xử lý dữ liệu và các mốc kỹ thuật của bài toán.
 
-### 2.2. Nghiệp vụ gốc (`domain/`)
-* [finance-mng.xlsm](./domain/finance-mng.xlsm): Bảng tính Excel mẫu theo dõi tài chính cá nhân gồm 10 sheet: Dashboard, Monthly, Accounts, Income, Expenses, Bills, Subscriptions, Savings, Investments, Debts.
-* [finance-mng-description.md](./domain/finance-mng-description.md): Thuyết minh chi tiết các sheet trong file Excel, bao gồm danh mục thu chi, điều kiện hợp lệ của dữ liệu và các công thức tính toán (số dư lũy kế, tỷ lệ tiết kiệm, phân bổ ngân sách).
-
-## 3. Báo cáo và sản phẩm đồ án
+## 3. Sản phẩm và tài liệu kỹ thuật qua các giai đoạn
 
 Toàn bộ sản phẩm kỹ thuật và báo cáo tiến độ qua các giai đoạn được lưu trữ tập trung tại thư mục `deliverables/`:
 
@@ -65,6 +58,7 @@ Thư mục `reference/` tập hợp các tài liệu chuẩn và giáo trình th
 | Kỹ nghệ yêu cầu | [ireb-cpre-modeling-handbook.pdf](./reference/requirements-engineering/ireb-cpre-modeling-handbook.pdf) | IREB | Hướng dẫn vẽ sơ đồ Use Case và State Machine cho vòng đời giao dịch, hóa đơn và khoản nợ. |
 | Kỹ nghệ yêu cầu | [srs-template-iso-29148.md](./reference/requirements-engineering/srs-template-iso-29148.md) và [.pdf](./reference/requirements-engineering/srs-template-iso-29148.pdf) | ISO/IEC/IEEE | Mẫu đặc tả yêu cầu phần mềm theo chuẩn ISO/IEC/IEEE 29148. |
 | Thiết kế phần mềm | [applying-uml-and-patterns-3rd-edition.pdf](./reference/software-design/applying-uml-and-patterns-3rd-edition.pdf) | Craig Larman | Giáo trình phân tích và thiết kế hướng đối tượng (OOAD):<br>- Chương 9: Mô hình miền (Domain Model).<br>- Chương 15: Sơ đồ tương tác tuần tự (Sequence Diagrams).<br>- Chương 16: Sơ đồ lớp thiết kế (Design Class Diagrams).<br>- Chương 16 đến 17, 25: 9 nguyên tắc phân bổ trách nhiệm GRASP (Information Expert, Creator, Controller, Low Coupling, High Cohesion, Polymorphism, Pure Fabrication, Indirection, Protected Variations).<br>- Chương 26: Các mẫu thiết kế GoF (Strategy, Factory, Observer).<br>- Chương 34: Kiến trúc phân tầng và Sơ đồ gói (Package Diagram). |
+| Thiết kế phần mềm | [the-object-primer-scott-ambler.pdf](./reference/software-design/the-object-primer-scott-ambler.pdf) | Scott W. Ambler | Giáo trình phân tích và thiết kế hướng đối tượng thực hành (Agile Modeling):<br>- Mục 6.1: Kỹ thuật mô hình hóa ca sử dụng (System Use Case Modeling) và quy tắc bố cục sơ đồ.<br>- Mục 6.2: Sơ đồ tương tác tuần tự (Sequence Diagrams) từ Use Case sang Lớp.<br>- Mục 6.3: Sơ đồ lớp khái niệm (Conceptual Class Modeling).<br>- Mục 6.4: Sơ đồ hoạt động (Activity Diagrams). |
 | Mẫu thiết kế tài chính | [accounting-patterns-martin-fowler.pdf](./reference/financial-patterns/accounting-patterns-martin-fowler.pdf) | Martin Fowler | Mẫu thiết kế phần mềm kế toán và tài chính:<br>- Mô hình Account, Entry, Transaction nhằm giữ tính nhất quán số dư.<br>- Nguyên tắc ghi sổ kép (Double-Entry) khi chuyển khoản và cập nhật số dư giữa các tài khoản (tiền mặt, ngân hàng, tiết kiệm, nợ). |
 
 ## 5. Quy định mở rộng và đóng góp tài liệu
