@@ -4,6 +4,7 @@
 \documentclass[11pt,a4paper]{article}
 
 \usepackage{graphicx}
+\usepackage{float}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc}
@@ -22,100 +23,99 @@
   \usepackage{mathptmx}
 \else
   \usepackage{fontspec}
-  \setmainfont{Helvetica Neue}
-  \setsansfont{Helvetica Neue}
-  \setmonofont{Menlo}
+  \setmainfont{Latin Modern Roman}
+  \setsansfont{Latin Modern Sans}
+  \setmonofont{Latin Modern Mono}
   \usepackage{unicode-math}
 \fi
-
-\usepackage{textcomp}
-\usepackage{lmodern}
-
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath}
-}{}
-
-\makeatletter
-\@ifundefined{KOMAClassName}{
-  \IfFileExists{parskip.sty}{
-    \usepackage{parskip}
-  }{
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{
-  \KOMAoptions{parskip=half}}
-\makeatother
-
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-\IfFileExists{fvextra.sty}{
-  \usepackage{fvextra}
-  \RecustomVerbatimEnvironment{Highlighting}{Verbatim}{
-    commandchars=\\\{\},
-    fontsize=\small,
-    breaklines=true,
-    breakanywhere=true}
-}{}
-
-\newenvironment{Shaded}{}{}
-\newcommand{\AlertTok}[1]{#1}
-\newcommand{\AnnotationTok}[1]{#1}
-\newcommand{\AttributeTok}[1]{#1}
-\newcommand{\BaseNTok}[1]{#1}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{#1}
-\newcommand{\CommentTok}[1]{#1}
-\newcommand{\CommentVarTok}[1]{#1}
-\newcommand{\ConstantTok}[1]{#1}
-\newcommand{\ControlFlowTok}[1]{#1}
-\newcommand{\DataTypeTok}[1]{#1}
-\newcommand{\DecValTok}[1]{#1}
-\newcommand{\DocumentationTok}[1]{#1}
-\newcommand{\ErrorTok}[1]{#1}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{#1}
-\newcommand{\FunctionTok}[1]{#1}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{#1}
-\newcommand{\KeywordTok}[1]{#1}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{#1}
-\newcommand{\OtherTok}[1]{#1}
-\newcommand{\PreprocessorTok}[1]{#1}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{#1}
-\newcommand{\SpecialStringTok}[1]{#1}
-\newcommand{\StringTok}[1]{#1}
-\newcommand{\VariableTok}[1]{#1}
-\newcommand{\VerbatimStringTok}[1]{#1}
-\newcommand{\WarningTok}[1]{#1}
-
-\usepackage{longtable,booktabs,array}
-\setlength{\arrayrulewidth}{0.4pt}
-\setlength{\tabcolsep}{4pt}
-\AtBeginEnvironment{longtable}{\footnotesize\sloppy}
-\newcounter{none}
-\usepackage{calc}
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-
-\usepackage{enumitem}
-\setlistdepth{9}
-\renewlist{itemize}{itemize}{9}
-\renewlist{enumerate}{enumerate}{9}
-\setlist[itemize]{label=\textbullet}
-\setlist[enumerate]{label=\arabic*.}
-
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
 \setlength{\emergencystretch}{3em}
+  \usepackage{textcomp}
+  \usepackage{lmodern}
+
+  \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+  \IfFileExists{microtype.sty}{
+    \usepackage[]{microtype}
+    \UseMicrotypeSet[protrusion]{basicmath}
+  }{}
+
+  \makeatletter
+  \@ifundefined{KOMAClassName}{
+    \IfFileExists{parskip.sty}{
+      \usepackage{parskip}
+    }{
+      \setlength{\parindent}{0pt}
+      \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+  }{
+    \KOMAoptions{parskip=half}}
+  \makeatother
+
+  \usepackage{color}
+  \usepackage{fancyvrb}
+  \newcommand{\VerbBar}{|}
+  \newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+  \IfFileExists{fvextra.sty}{
+    \usepackage{fvextra}
+    \RecustomVerbatimEnvironment{Highlighting}{Verbatim}{
+      commandchars=\\\{\},
+      fontsize=\small,
+      breaklines=true,
+      breakanywhere=true}
+  }{}
+
+  \newenvironment{Shaded}{}{}
+  \newcommand{\AlertTok}[1]{#1}
+  \newcommand{\AnnotationTok}[1]{#1}
+  \newcommand{\AttributeTok}[1]{#1}
+  \newcommand{\BaseNTok}[1]{#1}
+  \newcommand{\BuiltInTok}[1]{#1}
+  \newcommand{\CharTok}[1]{#1}
+  \newcommand{\CommentTok}[1]{#1}
+  \newcommand{\CommentVarTok}[1]{#1}
+  \newcommand{\ConstantTok}[1]{#1}
+  \newcommand{\ControlFlowTok}[1]{#1}
+  \newcommand{\DataTypeTok}[1]{#1}
+  \newcommand{\DecValTok}[1]{#1}
+  \newcommand{\DocumentationTok}[1]{#1}
+  \newcommand{\ErrorTok}[1]{#1}
+  \newcommand{\ExtensionTok}[1]{#1}
+  \newcommand{\FloatTok}[1]{#1}
+  \newcommand{\FunctionTok}[1]{#1}
+  \newcommand{\ImportTok}[1]{#1}
+  \newcommand{\InformationTok}[1]{#1}
+  \newcommand{\KeywordTok}[1]{#1}
+  \newcommand{\NormalTok}[1]{#1}
+  \newcommand{\OperatorTok}[1]{#1}
+  \newcommand{\OtherTok}[1]{#1}
+  \newcommand{\PreprocessorTok}[1]{#1}
+  \newcommand{\RegionMarkerTok}[1]{#1}
+  \newcommand{\SpecialCharTok}[1]{#1}
+  \newcommand{\SpecialStringTok}[1]{#1}
+  \newcommand{\StringTok}[1]{#1}
+  \newcommand{\VariableTok}[1]{#1}
+  \newcommand{\VerbatimStringTok}[1]{#1}
+  \newcommand{\WarningTok}[1]{#1}
+
+  \usepackage{longtable,booktabs,array}
+  \setlength{\arrayrulewidth}{0.4pt}
+  \setlength{\tabcolsep}{4pt}
+  \AtBeginEnvironment{longtable}{\footnotesize\sloppy}
+  \newcounter{none}
+  \usepackage{calc}
+  \usepackage{etoolbox}
+  \makeatletter
+  \patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+  \makeatother
+
+  \usepackage{enumitem}
+  \setlistdepth{9}
+  \renewlist{itemize}{itemize}{9}
+  \renewlist{enumerate}{enumerate}{9}
+  \setlist[itemize]{label=\textbullet}
+  \setlist[enumerate]{label=\arabic*.}
+
+  \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+  \makesavenoteenv{longtable}
 \providecommand{\tightlist}{
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \usepackage{bookmark}
@@ -141,6 +141,13 @@
 \setlength{\cftbeforesubsecskip}{2pt}
 
 \usepackage{titlesec}
+\usepackage{needspace}
+
+\newif\ifsmartsectionbreak
+\smartsectionbreakfalse
+\newcommand{\EnableSmartSectionBreaks}{\smartsectionbreaktrue}
+\pretocmd{\subsubsection}{\ifsmartsectionbreak\Needspace{0.5\textheight}\fi}{}{}
+\pretocmd{\paragraph}{\ifsmartsectionbreak\Needspace{0.5\textheight}\fi}{}{}
 
 \titleformat{\section}
   {\LARGE\bfseries}
@@ -169,9 +176,9 @@
 \thispagestyle{empty}
 \begin{tikzpicture}[remember picture,overlay]
   \draw[line width=1pt]
-    ([xshift=1.25cm,yshift=-1.25cm]current page.north west)
+    ([xshift=1.5cm,yshift=-1.5cm]current page.north west)
     rectangle
-    ([xshift=-1.25cm,yshift=1.25cm]current page.south east);
+    ([xshift=-1.5cm,yshift=1.5cm]current page.south east);
 \end{tikzpicture}
 
 \centering
@@ -695,69 +702,63 @@ DESCRIPTION)}\label{2-muxf4-tux1ea3-tux1ed5ng-quuxe1t-hux1ec7-thux1ed1ng-overall
 \subsubsection{2.1 Bối cảnh hệ
 thống}\label{21-bux1ed1i-cux1ea3nh-hux1ec7-thux1ed1ng}
 
-Hệ thống Quản lý Tài chính Cá nhân (PFMS) được nghiên cứu và phát triển
-độc lập từ đầu nhằm cung cấp một giải pháp phần mềm quản trị tài chính
-cá nhân toàn diện, có tính kỷ luật cao và bảo toàn dữ liệu nghiêm ngặt
-cho người dùng cá nhân (vai trò Chủ sở hữu: Owner). Trong bối cảnh tài
-chính hiện đại, một cá nhân thường sở hữu nhiều kênh phân bổ tài sản
-(tiền mặt, tài khoản ngân hàng, sổ tiết kiệm có kỳ hạn, danh mục chứng
-chỉ quỹ đầu tư) đi kèm các nghĩa vụ công nợ và các mục tiêu tích lũy tài
-chính dài hạn. Việc quản trị phân tán hoặc sử dụng các công cụ ghi chép
-rời rạc dễ dẫn tới nguy cơ mất cân đối dòng tiền, sai lệch số dư và
-thiếu hụt cái nhìn tổng thể về bức tranh tài chính.
+Hệ thống Quản lý Tài chính Cá nhân (PFMS) là ứng dụng độc lập dành cho
+người dùng cá nhân (Owner), hỗ trợ quản lý tập trung tiền mặt, tài khoản
+ngân hàng, tiết kiệm, đầu tư, công nợ và các mục tiêu tài chính. Hệ thống
+giúp theo dõi dòng tiền, bảo toàn số dư và cung cấp cái nhìn tổng thể về
+tình hình tài chính.
 
-PFMS được xây dựng nhằm giải quyết bài toán trên thông qua các định
-hướng kỹ thuật nền tảng:
+PFMS được xây dựng theo ba định hướng kỹ thuật chính:
 
 \begin{itemize}
 \tightlist
 \item
-  Chuẩn hóa mô hình tài chính kế toán hướng đối tượng: Ứng dụng các mẫu
-  kế toán chuẩn mực (Accounting Patterns của Martin Fowler), thiết lập
-  tính bất biến số dư ví và áp dụng nguyên lý ghi sổ kép cho giao dịch
-  chuyển tiền nhằm bảo đảm tính chính xác tuyệt đối.
+  Chuẩn hóa mô hình tài chính hướng đối tượng, áp dụng Accounting
+  Patterns, bất biến số dư ví và ghi sổ kép để bảo đảm tính chính xác.
 \item
-  Phân bổ tài sản và tổng hợp tài sản ròng theo thời gian thực: Tự động
-  tổng hợp tài sản ròng (Net Worth) qua 5 cấu phần tài sản và nghĩa vụ
-  nợ, phân tích xu hướng dòng tiền trượt 12 tháng.
+  Tổng hợp tài sản ròng (Net Worth) từ các cấu phần tài sản và nghĩa vụ
+  nợ, đồng thời phân tích xu hướng dòng tiền trong 12 tháng gần nhất.
 \item
-  Kiến trúc phần mềm độc lập, an toàn và toàn vẹn: Xây dựng bằng ngôn
-  ngữ Java 17, thiết kế tách biệt 4 phân tầng kiến trúc, lưu trữ dữ liệu
-  an toàn trên máy cục bộ với cơ chế ghi tệp nguyên tử và sao lưu tự
-  động, hoàn toàn độc lập và không phụ thuộc vào bất kỳ phần mềm văn
-  phòng trung gian nào.
+  Xây dựng bằng Java 17 với kiến trúc bốn tầng, lưu trữ cục bộ an toàn
+  bằng cơ chế ghi tệp nguyên tử và sao lưu tự động.
 \end{itemize}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{flowchart TD}
-\NormalTok{    subgraph CoreTx ["1. Giao dịch \& Quản lý dòng tiền cơ sở"]}
-\NormalTok{        W["Quản lý Ví tiền\textless{}br/\textgreater{}(6 ví mặc định)"]}
-\NormalTok{        IE["Ghi nhận Thu chi\textless{}br/\textgreater{}(Income / Expense)"]}
-\NormalTok{        TR["Chuyển tiền nội bộ\textless{}br/\textgreater{}(Ghi sổ kép nguyên tử)"]}
-\NormalTok{    end}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  scale=1.0,
+  transform shape,
+  node distance=8mm and 5mm,
+  box/.style={draw, rounded corners=2pt, align=center, minimum height=10mm,
+    text width=31mm, inner sep=3pt, font=\small},
+  group/.style={draw, rounded corners=3pt, thick, inner sep=6mm, align=center},
+  arrow/.style={-{Latex[length=3mm]}, thick}
+]
+  \node[box] (wallet) {Quản lý Ví tiền\\\scriptsize(6 ví mặc định)};
+  \node[box, right=of wallet] (income) {Ghi nhận Thu chi\\\scriptsize(Income / Expense)};
+  \node[box, right=of income] (transfer) {Chuyển tiền nội bộ\\\scriptsize(Ghi sổ kép nguyên tử)};
+  \node[group, fit=(wallet)(income)(transfer), label={[font=\small\bfseries,xshift = -30mm]above:1. Giao dịch và Quản lý dòng tiền cơ sở}] (core) {};
 
-\NormalTok{    INV\{"BỘ LÕI BẢO TOÀN DÒNG TIỀN VÀ SỐ DƯ\textless{}br/\textgreater{}(Balance Invariant)"\}}
+  \node[box, below=13mm of core, fill=orange!12, draw=orange!80!black, thick,
+    text width=48mm] (invariant) {\textbf{BỘ LÕI BẢO TOÀN DÒNG TIỀN VÀ SỐ DƯ}\\\scriptsize(Balance Invariant)};
 
-\NormalTok{    subgraph Assets ["2. Cấu phần Tài sản \& Đầu tư"]}
-\NormalTok{        DEBT["Quản lý Công nợ\textless{}br/\textgreater{}(Vay, Thu, Trả)"]}
-\NormalTok{        SAV["Sổ Tiết kiệm\textless{}br/\textgreater{}(Tính lãi kỳ hạn)"]}
-\NormalTok{        INV\_F["Chứng chỉ quỹ Đầu tư\textless{}br/\textgreater{}(NAV, Lợi nhuận)"]}
-\NormalTok{    end}
+  \node[box, below=18mm of invariant, xshift=-38mm] (debt) {Quản lý Công nợ\\\scriptsize(Vay, Thu, Trả)};
+  \node[box, right=of debt] (saving) {Sổ Tiết kiệm\\\scriptsize(Tính lãi kỳ hạn)};
+  \node[box, right=of saving] (fund) {Chứng chỉ quỹ Đầu tư\\\scriptsize(NAV, Lợi nhuận)};
+  \node[group, fit=(debt)(saving)(fund), label={[font=\small\bfseries,xshift = -35mm]above:2. Cấu phần Tài sản và Đầu tư}] (assets) {};
 
-\NormalTok{    GOAL["QUỸ MỤC TIÊU TÀI CHÍNH\textless{}br/\textgreater{}(Emergency, Health, Target, Retire)"]}
-\NormalTok{    REP["BÁO CÁO THỐNG KÊ 12 THÁNG \& SAO LƯU DỮ LIỆU CỤC BỘ"]}
+  \node[box, below=15mm of assets, fill=green!10, draw=green!50!black,
+    text width=60mm] (goal) {\textbf{QUỸ MỤC TIÊU TÀI CHÍNH}\\\scriptsize(Emergency, Health, Target, Retire)};
+  \node[box, below=of goal, fill=blue!8, draw=blue!70!black,
+    text width=70mm] (report) {\textbf{BÁO CÁO THỐNG KÊ 12 THÁNG}\\\scriptsize và sao lưu dữ liệu cục bộ};
 
-\NormalTok{    CoreTx {-}{-}\textgreater{} INV}
-\NormalTok{    INV {-}{-}\textgreater{} Assets}
-\NormalTok{    Assets {-}{-}\textgreater{} GOAL}
-\NormalTok{    GOAL {-}{-}\textgreater{} REP}
-
-\NormalTok{    style INV fill:\#f9f0ea,stroke:\#d97706,stroke{-}width:2px}
-\NormalTok{    style GOAL fill:\#ecfdf5,stroke:\#059669,stroke{-}width:1px}
-\NormalTok{    style REP fill:\#eff6ff,stroke:\#2563eb,stroke{-}width:1px}
-\end{Highlighting}
-\end{Shaded}
+  \draw[arrow] (core.south) -- (invariant.north);
+  \draw[arrow] (invariant.south) -- (assets.north);
+  \draw[arrow] (assets.south) -- (goal.north);
+  \draw[arrow] (goal.south) -- (report.north);
+\end{tikzpicture}
+\caption{Kiến trúc tổng quan các cấu phần tài chính của PFMS}
+\end{figure}
 
 \subsubsection{2.2 Mục tiêu hệ thống (System
 Goals)}\label{22-mux1ee5c-tiuxeau-hux1ec7-thux1ed1ng-system-goals}
@@ -822,6 +823,8 @@ Hệ thống phục vụ duy nhất một nhóm tác nhân:
   thị trường chứng chỉ quỹ, kiểm tra tiến độ quỹ mục tiêu và phân tích
   báo cáo tài chính.
 \end{itemize}
+
+\newpage
 
 \subsubsection{2.4 Ràng buộc kỹ thuật, giả định và sự phụ
 thuộc}\label{24-ruxe0ng-buux1ed9c-kux1ef9-thuux1eadt-giux1ea3-ux111ux1ecbnh-vuxe0-sux1ef1-phux1ee5-thuux1ed9c}
@@ -926,6 +929,20 @@ bộ các phép tính số học trong hệ thống PFMS.
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Cấm sử dụng số thực dấu chấm động nhị phân:}\\
+  \begin{center}
+  \begin{tikzpicture}[scale=0.84, transform shape, node distance=3mm and 3mm,
+    rule/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=8mm, text width=29mm, inner sep=2pt, font=\small},
+    arrow/.style={-{Latex[length=2.5mm]}, thick}]
+    \node[rule, fill=red!8] (acc1) {Không dùng\\\texttt{float/double}};
+    \node[rule, fill=blue!8, right=of acc1] (acc2) {Dùng\\\texttt{BigDecimal}};
+    \node[rule, fill=orange!12, right=of acc2] (acc3) {Scale và\\RoundingMode};
+    \node[rule, fill=green!10, right=of acc3] (acc4) {Sai số tuyệt đối\\bằng 0};
+    \draw[arrow] (acc1) -- (acc2);
+    \draw[arrow] (acc2) -- (acc3);
+    \draw[arrow] (acc3) -- (acc4);
+  \end{tikzpicture}
+  \end{center}
   Nghiêm cấm khai báo và sử dụng các kiểu dữ liệu nguyên thủy
   \texttt{float} và \texttt{double}, cũng như các lớp bao bọc
   \texttt{java.lang.Float} và \texttt{java.lang.Double} cho bất kỳ
@@ -978,6 +995,8 @@ bộ các phép tính số học trong hệ thống PFMS.
   khoản.
 \end{enumerate}
 
+\newpage
+
 \subsubsection{3.2 Quy tắc bảo toàn số dư ví
 (BR-FIN-02)}\label{32-quy-tux1eafc-bux1ea3o-touxe0n-sux1ed1-dux1b0-vuxed-br-fin-02}
 
@@ -989,6 +1008,20 @@ của toàn bộ lịch sử các dòng tiền tác động trực tiếp đến
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Công thức bất biến số dư ví:}\\
+  \begin{center}
+  \begin{tikzpicture}[node distance=4mm and 4mm,
+    rule/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=8mm, text width=30mm, inner sep=2pt, font=\small},
+    arrow/.style={-{Latex[length=2.5mm]}, thick}]
+    \node[rule, fill=gray!12] (bal1) {Số dư ban đầu};
+    \node[rule, fill=blue!8, right=of bal1] (bal2) {Thu, chi, chuyển ví\\và công nợ};
+    \node[rule, fill=orange!12, right=of bal2] (bal3) {Tổng hợp dòng tiền\\theo thời điểm \(T\)};
+    \node[rule, fill=green!10, right=of bal3] (bal4) {\(Balance_w(T) \ge 0\)};
+    \draw[arrow] (bal1) -- (bal2);
+    \draw[arrow] (bal2) -- (bal3);
+    \draw[arrow] (bal3) -- (bal4);
+  \end{tikzpicture}
+  \end{center}
   Xét một ví tiền \(w\) bất kỳ tại thời điểm quan sát \(T\), số dư khả
   dụng \(Balance_w(T)\) được xác định duy nhất thông qua công thức toán
   học sau:
@@ -1074,6 +1107,24 @@ thanh khoản.
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Cặp bút toán đối ứng cân bằng:}\\
+  \begin{center}
+  \begin{tikzpicture}[node distance=4mm and 4mm,
+    rule/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=9mm, text width=29mm, inner sep=2pt, font=\small},
+    arrow/.style={-{Latex[length=2.5mm]}, thick}]
+    \node[rule, fill=gray!12] (dbl1) {Ví nguồn\\\(w_{src}\)};
+    \node[rule, fill=red!8, right=of dbl1] (dbl2) {Ghi giảm\\\(-A\)};
+    \node[rule, fill=green!10, right=of dbl2] (dbl3) {Ví đích\\\(w_{dst}\)};
+    \node[rule, fill=blue!8, right=of dbl3] (dbl4) {Ghi tăng\\\(+A\)};
+    \draw[arrow] (dbl1) -- (dbl2);
+    \draw[arrow] (dbl2) -- (dbl3);
+    \draw[arrow] (dbl3) -- (dbl4);
+    \node[rule, fill=orange!12, below=15mm of dbl2, text width=58mm] (dbl5)
+      {Tổng tài sản ví không đổi\\Phí chuyển tiền là giao dịch chi riêng};
+    \draw[arrow] (dbl2.south) -- (dbl5.north);
+    \draw[arrow] (dbl4.south) |- (dbl5.east);
+  \end{tikzpicture}
+  \end{center}
   Mỗi hành vi chuyển tiền từ ví nguồn \(w_{src}\) sang ví đích
   \(w_{dst}\) với số tiền chuyển \(A > 0\) phải được thực hiện thông qua
   hai bút toán đối ứng:
@@ -1124,6 +1175,8 @@ thanh khoản.
   \end{itemize}
 \end{enumerate}
 
+\newpage
+
 \subsubsection{3.4 Quy tắc phân cấp danh mục thu chi 3 cấp
 (BR-FIN-04)}\label{34-quy-tux1eafc-phuxe2n-cux1ea5p-danh-mux1ee5c-thu-chi-3-cux1ea5p-br-fin-04}
 
@@ -1135,6 +1188,31 @@ chính đa chiều.
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Cấu trúc phân cấp 3 cấp:}
+
+  \begin{center}
+  \begin{tikzpicture}[
+    node distance=7mm and 9mm,
+    level/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=9mm, text width=35mm, inner sep=3pt, font=\small},
+    value/.style={draw, rounded corners=2pt, align=center,
+      minimum height=8mm, text width=32mm, inner sep=3pt, font=\small},
+    arrow/.style={-{Latex[length=2.5mm]}, thick}
+  ]
+    \node[level, fill=gray!12] (root) {Danh mục thu chi};
+    \node[level, fill=orange!12, below=of root] (type) {Cấp 1: Type\\\scriptsize Loại giao dịch};
+    \node[value, fill=green!10, below left=of type] (income) {Income\\\scriptsize Thu nhập};
+    \node[value, fill=red!8, below right=of type] (expense) {Expense\\\scriptsize Chi tiêu};
+    \node[level, fill=blue!8, below=12mm of type] (group) {Cấp 2: Group\\\scriptsize Nhóm nhu cầu tài chính};
+    \node[level, fill=violet!8, below=of group] (category) {Cấp 3: Category\\\scriptsize Danh mục chi tiết};
+
+    \draw[arrow] (root) -- (type);
+    \draw[arrow] (type) -- (income);
+    \draw[arrow] (type) -- (expense);
+    \draw[arrow] (income.south) |- (group.west);
+    \draw[arrow] (expense.south) |- (group.east);
+    \draw[arrow] (group) -- (category);
+  \end{tikzpicture}
+  \end{center}
 
   \begin{itemize}
   \tightlist
@@ -1210,6 +1288,20 @@ Hệ thống chuẩn hóa quy tắc tính toán lãi suất cho các sổ tiết
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Quy đổi kỳ hạn và mốc thời gian:}\\
+  \begin{center}
+  \begin{tikzpicture}[scale=0.84, transform shape, node distance=3mm and 3mm,
+    rule/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=8mm, text width=35mm, inner sep=2pt, font=\small},
+    arrow/.style={-{Latex[length=2.5mm]}, thick}]
+    \node[rule, fill=gray!12] (sav1) {Principal, Rate,\\Term, Start};
+    \node[rule, fill=blue!8, right=of sav1] (sav2) {Tính số ngày\\\(Days\)};
+    \node[rule, fill=orange!12, right=of sav2] (sav3) {Tính lãi và\\\(Balance\)};
+    \node[rule, fill=green!10, right=of sav3] (sav4) {Tất toán đúng hạn\\hoặc trước hạn};
+    \draw[arrow] (sav1) -- (sav2);
+    \draw[arrow] (sav2) -- (sav3);
+    \draw[arrow] (sav3) -- (sav4);
+  \end{tikzpicture}
+  \end{center}
   Kỳ hạn gửi tiền (\texttt{term}) được quy đổi thành số ngày thực tế dựa
   trên bảng tham chiếu chuẩn:
 
@@ -1279,6 +1371,20 @@ tài sản đầu tư theo biến động thị trường thực tế.
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Phân loại danh mục chứng chỉ quỹ:}\\
+  \begin{center}
+  \begin{tikzpicture}[node distance=4mm and 4mm,
+    rule/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=8mm, text width=30mm, inner sep=2pt, font=\small},
+    arrow/.style={-{Latex[length=2.5mm]}, thick}]
+    \node[rule, fill=gray!12] (fund1) {Loại quỹ\\Stock / Bond / Balance};
+    \node[rule, fill=blue!8, right=of fund1] (fund2) {Units\\và NAV};
+    \node[rule, fill=orange!12, right=of fund2] (fund3) {\(Balance = Units \times NAV\)};
+    \node[rule, fill=green!10, right=of fund3] (fund4) {Lãi/lỗ\\và lợi suất năm};
+    \draw[arrow] (fund1) -- (fund2);
+    \draw[arrow] (fund2) -- (fund3);
+    \draw[arrow] (fund3) -- (fund4);
+  \end{tikzpicture}
+  \end{center}
   Hệ thống hỗ trợ 3 nhóm tài sản đầu tư:
 
   \begin{itemize}
@@ -1335,11 +1441,55 @@ tài sản đầu tư theo biến động thị trường thực tế.
   \end{itemize}
 \end{enumerate}
 
+\newpage
+
 \subsubsection{3.7 Quy tắc theo dõi công nợ
 (BR-FIN-07)}\label{37-quy-tux1eafc-theo-duxf5i-cuxf4ng-nux1ee3-br-fin-07}
 
 Hệ thống quản lý công nợ cá nhân chặt chẽ nhằm phân định rõ quyền sở hữu
 tài sản và nghĩa vụ nợ đối ứng với từng đối tượng cụ thể.
+
+\begin{center}
+  \begin{tikzpicture}[
+    node distance=6mm and 8mm,
+    root/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=9mm, text width=48mm, inner sep=3pt, font=\small},
+    branch/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=9mm, text width=43mm, inner sep=3pt, font=\small},
+    operation/.style={draw, rounded corners=2pt, align=center,
+      minimum height=8mm, text width=37mm, inner sep=3pt, font=\small},
+    arrow/.style={-{Latex[length=2.5mm]}, thick}
+  ]
+    \node[root, fill=gray!12] (debt) {Theo dõi công nợ cá nhân};
+    \node[branch, fill=green!10, below left=10mm of debt] (receivable)
+      {\textbf{Receivable}\\\scriptsize Khoản phải thu\\\scriptsize Tăng tài sản ròng};
+    \node[branch, fill=red!8, below right=10mm of debt] (payable)
+      {\textbf{Payable}\\\scriptsize Khoản phải trả\\\scriptsize Giảm tài sản ròng};
+
+    \node[operation, below=of receivable] (lend)
+      {\texttt{lend}\\\scriptsize Cho vay};
+    \node[operation, below=of lend] (collect)
+      {\texttt{collect}\\\scriptsize Thu hồi nợ};
+    \node[operation, below=of collect] (writeofflend)
+      {\texttt{write-off lend}\\\scriptsize Xóa nợ cho vay};
+
+    \node[operation, below=of payable] (borrow)
+      {\texttt{borrow}\\\scriptsize Đi vay};
+    \node[operation, below=of borrow] (repay)
+      {\texttt{repay}\\\scriptsize Trả nợ};
+    \node[operation, below=of repay] (writeoffborrow)
+      {\texttt{write-off borrow}\\\scriptsize Được xóa nợ đi vay};
+
+    \draw[arrow] (debt) -- (receivable);
+    \draw[arrow] (debt) -- (payable);
+    \draw[arrow] (receivable) -- (lend);
+    \draw[arrow] (lend) -- (collect);
+    \draw[arrow] (collect) -- (writeofflend);
+    \draw[arrow] (payable) -- (borrow);
+    \draw[arrow] (borrow) -- (repay);
+    \draw[arrow] (repay) -- (writeoffborrow);
+  \end{tikzpicture}
+  \end{center}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1423,6 +1573,20 @@ sản rời rạc vào các kế hoạch dài hạn cụ thể của cá nhân.
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Các quỹ mục tiêu tiêu chuẩn:}\\
+  \begin{center}
+  \begin{tikzpicture}[node distance=4mm and 4mm,
+    rule/.style={draw, rounded corners=2pt, thick, align=center,
+      minimum height=8mm, text width=30mm, inner sep=2pt, font=\small},
+    arrow/.style={-{Latex[length=2.5mm]}, thick}]
+    \node[rule, fill=gray!12] (goal1) {Nguồn tài sản\\Ví, tiết kiệm, quỹ đầu tư};
+    \node[rule, fill=blue!8, right=of goal1] (goal2) {Phân bổ vào mục tiêu\\Emergency / Health};
+    \node[rule, fill=orange!12, right=of goal2] (goal3) {Theo dõi tiến độ\\và số dư mục tiêu};
+    \node[rule, fill=green!10, right=of goal3] (goal4) {Kiểm tra không\\phân bổ vượt nguồn};
+    \draw[arrow] (goal1) -- (goal2);
+    \draw[arrow] (goal2) -- (goal3);
+    \draw[arrow] (goal3) -- (goal4);
+  \end{tikzpicture}
+  \end{center}
   Hệ thống khởi tạo 4 quỹ mục tiêu tiêu chuẩn phục vụ các trụ cột an
   toàn tài chính:
 
@@ -1482,6 +1646,7 @@ sản rời rạc vào các kế hoạch dài hạn cụ thể của cá nhân.
 \end{enumerate}
 
 \clearpage
+\EnableSmartSectionBreaks
 \subsection{4. YÊU CẦU CHỨC NĂNG CHI TIẾT (FUNCTIONAL
 REQUIREMENTS)}\label{4-yuxeau-cux1ea7u-chux1ee9c-nux103ng-chi-tiux1ebft-functional-requirements}
 
@@ -1669,6 +1834,8 @@ mới}\label{411-yuxeau-cux1ea7u-fr-wal-01-khux1edfi-tux1ea1o-vuxed-tiux1ec1n-mu
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.1.3 Yêu cầu FR-WAL-03: Cập nhật thông tin ví
 tiền}\label{413-yuxeau-cux1ea7u-fr-wal-03-cux1eadp-nhux1eadt-thuxf4ng-tin-vuxed-tiux1ec1n}
 
@@ -1756,6 +1923,8 @@ tiền}\label{413-yuxeau-cux1ea7u-fr-wal-03-cux1eadp-nhux1eadt-thuxf4ng-tin-vuxe
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.1.4 Yêu cầu FR-WAL-04: Thống kê cơ cấu tài sản theo
 ví}\label{414-yuxeau-cux1ea7u-fr-wal-04-thux1ed1ng-kuxea-cux1a1-cux1ea5u-tuxe0i-sux1ea3n-theo-vuxed}
 
@@ -1826,6 +1995,8 @@ ví}\label{414-yuxeau-cux1ea7u-fr-wal-04-thux1ed1ng-kuxea-cux1a1-cux1ea5u-tuxe0i
     (\texttt{ArithmeticException}).
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \subsubsection{4.2 Phân hệ Ghi nhận thu chi
 (FR-TXN)}\label{42-phuxe2n-hux1ec7-ghi-nhux1eadn-thu-chi-fr-txn}
@@ -1928,6 +2099,8 @@ nhập}\label{421-yuxeau-cux1ea7u-fr-txn-01-tux1ea1o-mux1edbi-giao-dux1ecbch-thu
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.2.2 Yêu cầu FR-TXN-02: Tạo mới giao dịch chi
 tiêu}\label{422-yuxeau-cux1ea7u-fr-txn-02-tux1ea1o-mux1edbi-giao-dux1ecbch-chi-tiuxeau}
 
@@ -2018,6 +2191,8 @@ tiêu}\label{422-yuxeau-cux1ea7u-fr-txn-02-tux1ea1o-mux1edbi-giao-dux1ecbch-chi-
     mức cho phép.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \paragraph{4.2.3 Yêu cầu FR-TXN-03: Tra cứu và lọc lịch sử giao
 dịch}\label{423-yuxeau-cux1ea7u-fr-txn-03-tra-cux1ee9u-vuxe0-lux1ecdc-lux1ecbch-sux1eed-giao-dux1ecbch}
@@ -2110,6 +2285,8 @@ dịch}\label{423-yuxeau-cux1ea7u-fr-txn-03-tra-cux1ee9u-vuxe0-lux1ecdc-lux1ecbc
     chú, không phân biệt hoa thường.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \paragraph{4.2.4 Yêu cầu FR-TXN-04: Chỉnh sửa giao dịch thu
 chi}\label{424-yuxeau-cux1ea7u-fr-txn-04-chux1ec9nh-sux1eeda-giao-dux1ecbch-thu-chi}
@@ -2223,6 +2400,8 @@ chi}\label{424-yuxeau-cux1ea7u-fr-txn-04-chux1ec9nh-sux1eeda-giao-dux1ecbch-thu-
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.2.5 Yêu cầu FR-TXN-05: Xóa giao dịch thu
 chi}\label{425-yuxeau-cux1ea7u-fr-txn-05-xuxf3a-giao-dux1ecbch-thu-chi}
 
@@ -2308,6 +2487,8 @@ chi}\label{425-yuxeau-cux1ea7u-fr-txn-05-xuxf3a-giao-dux1ecbch-thu-chi}
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \subsubsection{4.3 Phân hệ Chuyển tiền nội bộ
 (FR-TRF)}\label{43-phuxe2n-hux1ec7-chuyux1ec3n-tiux1ec1n-nux1ed9i-bux1ed9-fr-trf}
 
@@ -2316,8 +2497,8 @@ ví nội bộ của người dùng theo nguyên tắc ghi sổ kép đối ứn
 Fowler, bảo đảm tính bất biến tổng tài sản thanh khoản theo quy tắc
 BR-FIN-03.
 
-\paragraph{4.3.1 Yêu cầu FR-TRF-01: Chuyển tiền giữa hai ví nội
-bộ}\label{431-yuxeau-cux1ea7u-fr-trf-01-chuyux1ec3n-tiux1ec1n-giux1eefa-hai-vuxed-nux1ed9i-bux1ed9}
+\paragraph{4.3.1 Yêu cầu FR-TRF-01: Chuyển tiền giữa hai ví nội bộ}
+\label{431-yuxeau-cux1ea7u-fr-trf-01-chuyux1ec3n-tiux1ec1n-giux1eefa-hai-vuxed-nux1ed9i-bux1ed9}
 
 \begin{itemize}
 \tightlist
@@ -2420,6 +2601,8 @@ bộ}\label{431-yuxeau-cux1ea7u-fr-trf-01-chuyux1ec3n-tiux1ec1n-giux1eefa-hai-vu
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.3.2 Yêu cầu FR-TRF-02: Ghi nhận phí chuyển tiền phát
 sinh}\label{432-yuxeau-cux1ea7u-fr-trf-02-ghi-nhux1eadn-phuxed-chuyux1ec3n-tiux1ec1n-phuxe1t-sinh}
 
@@ -2508,6 +2691,8 @@ sinh}\label{432-yuxeau-cux1ea7u-fr-trf-02-ghi-nhux1eadn-phuxed-chuyux1ec3n-tiux1
     (1,005,500 VNĐ) vượt quá số dư hiện có.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \paragraph{4.3.3 Yêu cầu FR-TRF-03: Lịch sử và hủy chuyển tiền nội
 bộ}\label{433-yuxeau-cux1ea7u-fr-trf-03-lux1ecbch-sux1eed-vuxe0-hux1ee7y-chuyux1ec3n-tiux1ec1n-nux1ed9i-bux1ed9}
@@ -2599,6 +2784,8 @@ bộ}\label{433-yuxeau-cux1ea7u-fr-trf-03-lux1ecbch-sux1eed-vuxe0-hux1ee7y-chuyu
     không đủ để thực hiện hoàn nguyên.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \subsubsection{4.4 Phân hệ Danh mục phân loại
 (FR-CAT)}\label{44-phuxe2n-hux1ec7-danh-mux1ee5c-phuxe2n-loux1ea1i-fr-cat}
@@ -2697,6 +2884,8 @@ cấp}\label{441-yuxeau-cux1ea7u-fr-cat-01-khux1edfi-tux1ea1o-vuxe0-quux1ea3n-lu
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.4.2 Yêu cầu FR-CAT-02: Tùy biến danh mục người
 dùng}\label{442-yuxeau-cux1ea7u-fr-cat-02-tuxf9y-biux1ebfn-danh-mux1ee5c-ngux1b0ux1eddi-duxf9ng}
 
@@ -2779,6 +2968,8 @@ dùng}\label{442-yuxeau-cux1ea7u-fr-cat-02-tuxf9y-biux1ebfn-danh-mux1ee5c-ngux1b
     trong danh sách lựa chọn khi thêm giao dịch mới.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \paragraph{4.4.3 Yêu cầu FR-CAT-03: Ràng buộc toàn vẹn khi sửa và xóa
 danh
@@ -2880,6 +3071,8 @@ mục}\label{443-yuxeau-cux1ea7u-fr-cat-03-ruxe0ng-buux1ed9c-touxe0n-vux1eb9n-kh
     thích loại luồng tiền (Type mismatch).
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \subsubsection{4.5 Phân hệ Quản lý công nợ
 (FR-DEBT)}\label{45-phuxe2n-hux1ec7-quux1ea3n-luxfd-cuxf4ng-nux1ee3-fr-debt}
@@ -2983,6 +3176,8 @@ với các cá nhân, tổ chức bên ngoài theo quy tắc BR-FIN-07.
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.5.2 Yêu cầu FR-DEBT-02: Ghi nhận khoản đi vay
 (Borrow)}\label{452-yuxeau-cux1ea7u-fr-debt-02-ghi-nhux1eadn-khoux1ea3n-ux111i-vay-borrow}
 
@@ -3075,6 +3270,8 @@ với các cá nhân, tổ chức bên ngoài theo quy tắc BR-FIN-07.
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.5.3 Yêu cầu FR-DEBT-03: Thu hồi nợ cho vay
 (Collect)}\label{453-yuxeau-cux1ea7u-fr-debt-03-thu-hux1ed3i-nux1ee3-cho-vay-collect}
 
@@ -3163,6 +3360,8 @@ với các cá nhân, tổ chức bên ngoài theo quy tắc BR-FIN-07.
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.5.4 Yêu cầu FR-DEBT-04: Trả nợ đi vay
 (Repay)}\label{454-yuxeau-cux1ea7u-fr-debt-04-trux1ea3-nux1ee3-ux111i-vay-repay}
 
@@ -3250,6 +3449,8 @@ với các cá nhân, tổ chức bên ngoài theo quy tắc BR-FIN-07.
     thị thông báo lỗi cụ thể.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \paragraph{4.5.5 Yêu cầu FR-DEBT-05: Xóa nợ khó đòi và miễn trừ nợ
 (Write-off)}\label{455-yuxeau-cux1ea7u-fr-debt-05-xuxf3a-nux1ee3-khuxf3-ux111uxf2i-vuxe0-miux1ec5n-trux1eeb-nux1ee3-write-off}
@@ -3359,6 +3560,8 @@ với các cá nhân, tổ chức bên ngoài theo quy tắc BR-FIN-07.
     xóa nợ vượt quá dư nợ thực tế.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \subsubsection{4.6 Phân hệ Quản lý sổ tiết kiệm
 (FR-SAV)}\label{46-phuxe2n-hux1ec7-quux1ea3n-luxfd-sux1ed5-tiux1ebft-kiux1ec7m-fr-sav}
@@ -3476,6 +3679,8 @@ mới}\label{461-yuxeau-cux1ea7u-fr-sav-01-mux1edf-sux1ed5-tiux1ebft-kiux1ec7m-m
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.6.2 Yêu cầu FR-SAV-02: Tính toán tiền lãi dự kiến và theo
 dõi kỳ
 hạn}\label{462-yuxeau-cux1ea7u-fr-sav-02-tuxednh-touxe1n-tiux1ec1n-luxe3i-dux1ef1-kiux1ebfn-vuxe0-theo-duxf5i-kux1ef3-hux1ea1n}
@@ -3575,6 +3780,8 @@ hạn}\label{462-yuxeau-cux1ea7u-fr-sav-02-tuxednh-touxe1n-tiux1ec1n-luxe3i-dux1
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.6.3 Yêu cầu FR-SAV-03: Tất toán sổ tiết kiệm đúng
 hạn}\label{463-yuxeau-cux1ea7u-fr-sav-03-tux1ea5t-touxe1n-sux1ed5-tiux1ebft-kiux1ec7m-ux111uxfang-hux1ea1n}
 
@@ -3660,6 +3867,8 @@ hạn}\label{463-yuxeau-cux1ea7u-fr-sav-03-tux1ea5t-touxe1n-sux1ed5-tiux1ebft-ki
     đến ngày đáo hạn cam kết.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \paragraph{4.6.4 Yêu cầu FR-SAV-04: Tất toán sổ tiết kiệm trước
 hạn}\label{464-yuxeau-cux1ea7u-fr-sav-04-tux1ea5t-touxe1n-sux1ed5-tiux1ebft-kiux1ec7m-trux1b0ux1edbc-hux1ea1n}
@@ -3775,6 +3984,8 @@ hạn}\label{464-yuxeau-cux1ea7u-fr-sav-04-tux1ea5t-touxe1n-sux1ed5-tiux1ebft-ki
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \subsubsection{4.7 Phân hệ Chứng chỉ quỹ đầu tư
 (FR-INV)}\label{47-phuxe2n-hux1ec7-chux1ee9ng-chux1ec9-quux1ef9-ux111ux1ea7u-tux1b0-fr-inv}
 
@@ -3880,6 +4091,8 @@ quỹ}\label{471-yuxeau-cux1ea7u-fr-inv-01-ghi-nhux1eadn-lux1ec7nh-mua-chux1ee9n
   \end{itemize}
 \end{itemize}
 
+\newpage
+
 \paragraph{4.7.2 Yêu cầu FR-INV-02: Cập nhật giá trị tài sản ròng (NAV
 Update)}\label{472-yuxeau-cux1ea7u-fr-inv-02-cux1eadp-nhux1eadt-giuxe1-trux1ecb-tuxe0i-sux1ea3n-ruxf2ng-nav-update}
 
@@ -3963,6 +4176,8 @@ Update)}\label{472-yuxeau-cux1ea7u-fr-inv-02-cux1eadp-nhux1eadt-giuxe1-trux1ecb-
     chối cập nhật và báo lỗi đơn giá NAV phải lớn hơn 0.
   \end{itemize}
 \end{itemize}
+
+\newpage
 
 \paragraph{4.7.3 Yêu cầu FR-INV-03: Định giá thị trường và tính lãi lỗ
 chưa thực
@@ -9322,6 +9537,7 @@ Sơ đồ tổng thể bao quát toàn bộ 10 ca sử dụng cốt lõi của h
 Owner với ranh giới hệ thống, cũng như các quan hệ phụ thuộc cấu trúc
 giữa các ca sử dụng.
 
+\iffalse
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{@startuml}
@@ -9422,6 +9638,58 @@ giữa các ca sử dụng.
 \NormalTok{@enduml}
 \end{Highlighting}
 \end{Shaded}
+\fi
+
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  subsystem/.style={draw, rounded corners=3pt, thick, align=left,
+    text width=48mm, minimum height=62mm, inner sep=5mm, font=\scriptsize},
+  actor/.style={draw, ellipse, fill=blue!8, align=center, text width=25mm,
+    minimum height=12mm, font=\small},
+  arrow/.style={-{Latex[length=2.5mm]}, thick},
+  system/.style={draw, rounded corners=5pt, very thick, inner sep=9mm}
+]
+  \node[subsystem, fill=blue!5] (p1) {\centering\textbf{Dòng tiền và Thanh khoản}\\
+    \scriptsize(Cashflow \& Liquidity)\\[4pt]
+    \raggedright
+    \textbf{UC01} Quản lý ví tiền\\
+    \textbf{UC02} Ghi nhận thu chi\\
+    \textbf{UC03} Chuyển tiền nội bộ\\
+    \textbf{UC04} Quản lý danh mục 3 cấp\\[3pt]
+    \textit{Kiểm tra số dư ví nguồn}\\
+    \textit{Ghi nhận phí chuyển tiền}};
+
+  \node[subsystem, fill=green!5, right=7mm of p1] (p2) {\centering\textbf{Tích lũy, Đầu tư và Nghĩa vụ}\\
+    \scriptsize(Wealth \& Liabilities)\\[4pt]
+    \raggedright
+    \textbf{UC05} Quản lý công nợ\\
+    \textbf{UC06} Quản lý sổ tiết kiệm\\
+    \textbf{UC07} Quản lý chứng chỉ quỹ\\
+    \textbf{UC08} Quản lý quỹ mục tiêu\\[3pt]
+    \textit{Xóa nợ khó đòi}\\
+    \textit{Tất toán sổ trước hạn}\\
+    \textit{Tổng hợp tài sản 3 cấu phần}};
+
+  \node[subsystem, fill=orange!7, right=7mm of p2] (p3) {\centering\textbf{Báo cáo, Phân tích và Quản trị}\\
+    \scriptsize(Analytics \& Administration)\\[4pt]
+    \raggedright
+    \textbf{UC09} Thống kê và phân tích\\
+    \textbf{UC10} Sao lưu và quản trị dữ liệu\\[3pt]
+    \textit{Kiểm toán toàn vẹn dữ liệu}\\[8pt]
+    \textbf{Quan hệ dữ liệu:}\\
+    UC09 truy vấn dòng tiền 12 tháng\\
+    UC10 kiểm định dữ liệu 4 bước};
+
+  \node[system, fit=(p1)(p2)(p3), label={[font=\small\bfseries]above:Personal Finance Management System (PFMS)}] (pfms) {};
+  \node[actor, left=13mm of p1] (owner) {Chủ sở hữu\\(Owner)};
+  \draw[arrow] (owner) -- (pfms.west);
+  \draw[arrow, dashed] (p2.west) to[bend left=12] node[above, font=\tiny]{cập nhật số dư ví} (p1.east);
+  \draw[arrow, dashed] (p3.south) to[out=270, in=270]
+    node[below, font=\tiny]{truy vấn và kiểm định} (p1.south);
+\end{tikzpicture}%
+}
+\end{center}
 
 \paragraph{Phân tích kiến trúc và quan hệ ca sử dụng tổng
 thể}\label{phuxe2n-tuxedch-kiux1ebfn-truxfac-vuxe0-quan-hux1ec7-ca-sux1eed-dux1ee5ng-tux1ed5ng-thux1ec3}
@@ -9570,6 +9838,7 @@ Phân vùng này bao gồm 4 ca sử dụng cốt lõi: \texttt{UC01},
 suất tương tác cao nhất trong hệ thống, bảo đảm quản trị chặt chẽ từng
 đơn vị tiền tệ thanh khoản và phân loại chi tiêu chính xác.
 
+\iffalse
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{@startuml}
@@ -9674,6 +9943,35 @@ suất tương tác cao nhất trong hệ thống, bảo đảm quản trị ch�
 \NormalTok{@enduml}
 \end{Highlighting}
 \end{Shaded}
+\fi
+
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=2pt, thick, align=left, text width=55mm,
+    inner sep=5mm, font=\scriptsize},
+  actor/.style={draw, ellipse, fill=blue!8, align=center, text width=25mm,
+    minimum height=12mm, font=\small},
+  arrow/.style={-{Latex[length=2.5mm]}, thick}]
+  \node[box, fill=blue!5] (cash) {\centering\textbf{Phân vùng Dòng tiền và Ví tiền}\\
+    \scriptsize(Cashflow \& Liquidity)\\[4pt]
+    \raggedright
+    \textbf{UC01} Quản lý ví tiền\\
+    UC01.1 Khởi tạo ví; UC01.2 Tra cứu số dư\\
+    UC01.3 Cập nhật; UC01.4 Phân tích tài sản\\[3pt]
+    \textbf{UC02} Ghi nhận thu chi\\
+    UC02.1 Thu; UC02.2 Chi; UC02.3 Tra cứu\\
+    UC02.4 Sửa; UC02.5 Xóa\\[3pt]
+    \textbf{UC03} Chuyển tiền nội bộ\\
+    UC03.1 Chuyển; UC03.2 Phí; UC03.3 Hủy\\[3pt]
+    \textbf{UC04} Danh mục phân loại 3 cấp\\
+    UC04.1 Khởi tạo; UC04.2 Tùy biến; UC04.3 Toàn vẹn\\[3pt]
+    \textit{Kiểm tra số dư và ghi sổ kép là các ca include}};
+  \node[actor, left=12mm of cash] (cashowner) {Chủ sở hữu\\(Owner)};
+  \draw[arrow] (cashowner) -- (cash.west);
+\end{tikzpicture}%
+}
+\end{center}
 
 \subparagraph{Phân tích chi tiết Phân vùng Dòng tiền và Ví
 tiền}\label{phuxe2n-tuxedch-chi-tiux1ebft-phuxe2n-vuxf9ng-duxf2ng-tiux1ec1n-vuxe0-vuxed-tiux1ec1n}
@@ -9741,6 +10039,7 @@ Phân vùng này bao gồm 4 ca sử dụng: \texttt{UC05}, \texttt{UC06},
 trúc tài sản dài hạn, danh mục đầu tư tăng trưởng, các hợp đồng tiền gửi
 tiết kiệm và nghĩa vụ công nợ cá nhân.
 
+\iffalse
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{@startuml}
@@ -9854,6 +10153,38 @@ tiết kiệm và nghĩa vụ công nợ cá nhân.
 \NormalTok{@enduml}
 \end{Highlighting}
 \end{Shaded}
+\fi
+
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=2pt, thick, align=left, text width=47mm,
+    inner sep=4mm, font=\scriptsize},
+  actor/.style={draw, ellipse, fill=blue!8, align=center, text width=25mm,
+    minimum height=12mm, font=\small},
+  arrow/.style={-{Latex[length=2.5mm]}, thick}]
+  \node[box, fill=green!5] (wealth) {\centering\textbf{Tích lũy, Đầu tư và Nghĩa vụ}\\
+    \scriptsize(Wealth \& Liabilities)\\[4pt]
+    \raggedright
+    \textbf{UC05} Quản lý công nợ\\
+    UC05.1 Cho vay; UC05.2 Đi vay\\
+    UC05.3 Thu nợ; UC05.4 Trả nợ\\
+    UC05.5 Xóa nợ\\[3pt]
+    \textbf{UC06} Quản lý sổ tiết kiệm\\
+    UC06.1 Mở sổ; UC06.2 Tính lãi\\
+    UC06.3 Đúng hạn; UC06.4 Trước hạn\\[3pt]
+    \textbf{UC07} Quản lý chứng chỉ quỹ\\
+    UC07.1 Mua; UC07.2 Cập nhật NAV\\
+    UC07.3 Định giá; UC07.4 Bán\\[3pt]
+    \textbf{UC08} Quản lý quỹ mục tiêu\\
+    UC08.1 Thiết lập; UC08.2 Phân bổ\\
+    UC08.3 Theo dõi; UC08.4 Tái phân bổ\\[3pt]
+    \textit{Kiểm soát dư nợ, lãi suất, số lượng và hạn mức phân bổ}};
+  \node[actor, left=12mm of wealth] (wealthowner) {Chủ sở hữu\\(Owner)};
+  \draw[arrow] (wealthowner) -- (wealth.west);
+\end{tikzpicture}%
+}
+\end{center}
 
 \subparagraph{Phân tích chi tiết Phân vùng Tích lũy, Đầu tư và Nghĩa vụ
 tài
@@ -9919,6 +10250,7 @@ Phân vùng này bao gồm 2 ca sử dụng chiến lược: \texttt{UC09} và
 toàn diện sức khỏe tài chính và thiết lập cơ chế phòng vệ dữ liệu an
 toàn cho người dùng.
 
+\iffalse
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{@startuml}
@@ -10001,6 +10333,34 @@ toàn cho người dùng.
 \NormalTok{@enduml}
 \end{Highlighting}
 \end{Shaded}
+\fi
+
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=2pt, thick, align=left, text width=56mm,
+    inner sep=5mm, font=\scriptsize},
+  actor/.style={draw, ellipse, fill=blue!8, align=center, text width=25mm,
+    minimum height=12mm, font=\small},
+  arrow/.style={-{Latex[length=2.5mm]}, thick}]
+  \node[box, fill=orange!7] (analytics) {\centering\textbf{Báo cáo, Phân tích và Quản trị}\\
+    \scriptsize(Analytics \& Administration)\\[4pt]
+    \raggedright
+    \textbf{UC09} Thống kê và phân tích\\
+    UC09.1 Dòng tiền trượt 12 tháng\\
+    UC09.2 Cơ cấu thu chi 2 tầng\\
+    UC09.3 Net Worth 5 cấu phần\\
+    UC09.4 Sao kê công nợ đối tác\\[3pt]
+    \textit{Xử lý cửa sổ trượt, chia an toàn và hợp nhất tài sản}\\[4pt]
+    \textbf{UC10} Quản trị dữ liệu và sao lưu\\
+    UC10.1 Xuất JSON/CSV; UC10.2 Nhập và phục hồi\\
+    UC10.3 Kiểm toán toàn vẹn dữ liệu\\[3pt]
+    \textit{Kiểm định 4 bước, giao dịch nguyên tử và BigDecimal}};
+  \node[actor, left=12mm of analytics] (analyticsowner) {Chủ sở hữu\\(Owner)};
+  \draw[arrow] (analyticsowner) -- (analytics.west);
+\end{tikzpicture}%
+}
+\end{center}
 
 \subparagraph{Phân tích chi tiết Phân vùng Báo cáo, Phân tích và Quản
 trị dữ
