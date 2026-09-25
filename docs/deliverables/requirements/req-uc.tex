@@ -12,6 +12,8 @@
 \usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
 
 \usepackage{xcolor}
+\definecolor{ptitblue}{RGB}{0,51,153}
+\definecolor{emerald}{RGB}{5,150,105}
 \usepackage{colortbl}
 \usepackage{amsmath,amssymb}
 \setcounter{secnumdepth}{-\maxdimen}
@@ -174,46 +176,65 @@
 
 \begin{titlepage}
 \thispagestyle{empty}
-\begin{tikzpicture}[remember picture,overlay]
-  \draw[line width=1pt]
-    ([xshift=1.5cm,yshift=-1.5cm]current page.north west)
+\begin{tikzpicture}[remember picture, overlay]
+  \draw[line width=1.6pt, ptitblue]
+    ([xshift=1.2cm, yshift=-1.2cm]current page.north west)
     rectangle
-    ([xshift=-1.5cm,yshift=1.5cm]current page.south east);
+    ([xshift=-1.2cm, yshift=1.2cm]current page.south east);
+  \draw[line width=0.5pt, ptitblue]
+    ([xshift=1.45cm, yshift=-1.45cm]current page.north west)
+    rectangle
+    ([xshift=-1.45cm, yshift=1.45cm]current page.south east);
 \end{tikzpicture}
 
 \centering
-\vspace*{2.2cm}
+\vspace*{1.2cm}
+{\fontsize{13}{16}\selectfont\bfseries
+  POSTS AND TELECOMMUNICATIONS INSTITUTE OF TECHNOLOGY\par}
+\vspace{0.2cm}
+{\fontsize{12}{15}\selectfont\bfseries FACULTY OF INFORMATION TECHNOLOGY\par}
+\vspace{0.3cm}
+\textcolor{ptitblue}{\rule[0.5ex]{10cm}{0.4pt}}\par
+
+\vspace{1.0cm}
 \IfFileExists{logo_ptit.png}{
-  \includegraphics[width=0.42\textwidth]{logo_ptit.png}
+  \includegraphics[width=7cm,keepaspectratio]{logo_ptit.png}\par
 }{
-  \fbox{\parbox[c][4cm][c]{0.35\textwidth}{\centering\large Logo PTIT}}
+  \begin{tikzpicture}
+    \draw[ptitblue, thick] (0,0) rectangle (3,3);
+    \node at (1.75,1.75) {\bfseries\color{ptitblue} LOGO PTIT};
+  \end{tikzpicture}\par
 }
 
-\vspace{1.7cm}
- {\Huge\bfseries Software Requirements Specification and Use Case Document\par}
+\vspace{1.2cm}
+{\fontsize{18}{25}\selectfont\bfseries\color{ptitblue}
+  ĐẶC TẢ YÊU CẦU PHẦN MỀM VÀ CA SỬ DỤNG HỆ THỐNG QUẢN LÝ TÀI CHÍNH CÁ NHÂN\par}
 
-\vspace{1.4cm}
-{\Large\bfseries Nhóm 3\par}
+\vspace{1.0cm}
+{\large\bfseries Group 3\par}
+
+\vspace{0.6cm}
+{\fontsize{11}{14}\selectfont
+\begin{tabular}{llll}
+  \textbf{Members:} & Lê Anh Minh & B24DCCE180 & \\
+                    & Ứng Trọng Trình & B24DCCE271 & \\
+                    & Nguyễn Đình Tiến & B24DCCE264 & \\
+                    & Nguyễn Đinh Anh Quân & B24DCCE222 & \\
+\end{tabular}
+\par}
 
 \vspace{0.8cm}
-{\large
-\begin{tabular}{c}
-Lê Anh Minh -- B24DCCE180 \\
-Ứng Trọng Trình -- B24DCCE271 \\
-Nguyễn Đình Tiến -- B24DCCE264 \\
-Nguyễn Đinh Anh Quân -- B24DCCE222
-\end{tabular}
-\par}
+{\large\bfseries Instructor: MSc. Phạm Hoàng Việt\par}
 
 \vfill
-{\small
-\begin{tabular}{c}
-\textbf{Personal Finance Management System (PFMS)} \\
-\vspace{0.15em}
-\textit{ISO/IEC/IEEE 29148:2018 \textbullet{} IREB CPRE \textbullet{} Craig Larman Use Case Format} \\
-\textit{Martin Fowler Accounting Patterns}
-\end{tabular}
+{\small\itshape
+\begin{center}
+  ISO/IEC/IEEE 29148:2018 \textbullet{} IREB CPRE \textbullet{} Craig Larman Use Case Format\\
+  Martin Fowler Accounting Patterns
+\end{center}
 \par}
+\vspace{0.5cm}
+{\large\bfseries Hanoi, 2026\par}
 \end{titlepage}
 
 \subsection*{MỤC LỤC TỔNG QUAN}\label{mux1ee5c-lux1ee5c-tux1ed5ng-quan}
