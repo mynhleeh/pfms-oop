@@ -26,12 +26,11 @@
 - 1.5 Mối liên kết với Đặc tả Yêu cầu SRS
 
 ### Phần 2: Mô hình Miền Khái niệm
-- 2.1 Phương pháp luận Xác định Lớp Khái niệm (Conceptual Classes)
+- 2.1 Phương pháp luận Xác định Lớp Khái niệm
 - 2.2 Bảng Phân loại Khái niệm: Entity vs Value Object
-- 2.3 Biểu đồ Lớp Miền Khái niệm (Domain Model Diagram)
-- 2.4 Đặc tả Chi tiết các Lớp Thực thể (Domain Entities)
-- 2.5 Đặc tả Chi tiết các Đối tượng Giá trị (Value Objects)
-- 2.6 Các Mối Quan hệ Ngữ nghĩa và Bất biến Miền (BR-FIN-02, BR-FIN-03, BR-FIN-04)
+- 2.3 Đặc tả Chi tiết các Lớp Thực thể
+- 2.4 Đặc tả Chi tiết các Đối tượng Giá trị
+- 2.5 Các Mối Quan hệ Ngữ nghĩa và Bất biến Miền
 
 ### Phần 3: Sơ đồ Tuần tự Hệ thống
 - 3.1 Nguyên tắc Mô hình hóa SSD và Ranh giới Hộp đen (:System)
