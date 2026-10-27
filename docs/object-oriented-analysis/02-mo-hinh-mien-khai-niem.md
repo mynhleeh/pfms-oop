@@ -37,8 +37,8 @@ Hệ thống phân chia các khái niệm nghiệp vụ thành hai nhóm: 7 th�
 | `Money` | Số tiền thập phân, đơn vị tiền tệ | Lưu trữ số tiền chính xác, không dùng số thực để tránh sai lệch số thập phân (`BR-FIN-01`). Khi chia tiền, áp dụng quy tắc làm tròn nửa chẵn (làm tròn ngân hàng). |
 | `TransactionDate` | Ngày, tháng, năm | Ngày phát sinh giao dịch, phải đúng theo lịch thực tế. |
 | `TransactionType` | Giá trị cố định: Thu nhập hoặc Chi tiêu | Chỉ gồm hai giá trị cố định, quyết định việc cộng hay trừ tiền vào ví (`BR-FIN-04`). |
-| `SavingsRate` | Tỷ lệ phần trăm | Tỷ lệ phần trăm tiền tiết kiệm được, tính bằng dòng tiền thuần chia cho tổng thu nhập, lấy độ chính xác 4 chữ số thập phân (`BR-FIN-01`). |
 | `NetCashFlow` | Số tiền | Số tiền còn lại sau khi lấy tổng thu nhập trừ đi tổng chi tiêu trong một khoảng thời gian (`BR-FIN-01`). |
+| `SavingsRate` | Tỷ lệ phần trăm | Tỷ lệ phần trăm tiền tiết kiệm được, tính bằng dòng tiền thuần chia cho tổng thu nhập, lấy độ chính xác 4 chữ số thập phân (`BR-FIN-01`). |
 | `SpendingStructureShare` | Tỷ lệ phần trăm | Tỷ lệ phần trăm số tiền đã chi của một nhóm hoặc một danh mục so với tổng chi tiêu (`BR-FIN-01`). |
 
 ## 2.3 Đặc tả Chi tiết các Lớp Thực thể
@@ -230,68 +230,94 @@ Phần này thiết lập khung chỉ dẫn hoàn thiện cho các đối tượ
 - Quy tắc vận hành:
   - Căn cứ vào giá trị của `TransactionType`, hệ thống định tuyến chiều tác động dòng tiền lên số dư ví khả dụng và định hình cây phân cấp danh mục cấp 1 theo `FR-TXN-01`, `FR-TXN-02`, `BR-FIN-02`, `BR-FIN-04`, `FR-CAT-01`.
 
-### 2.4.4 Nhóm chỉ số Thống kê và Báo cáo
+### 2.4.4 Dòng tiền thuần - NetCashFlow
 
-Nhóm chỉ số Thống kê và Báo cáo gồm các đối tượng giá trị được sinh ra từ các phép toán tổng hợp đại số trên tập hợp dữ liệu giao dịch trong một kỳ quan sát xác định. Các đối tượng này mang tính bất biến tuyệt đối (`Immutable`), không lưu danh tính độc lập và tuân thủ chặt chẽ quy tắc độ chính xác số học tài chính `BR-FIN-01` cùng ràng buộc kỹ thuật `CON-02`, loại trừ hoàn toàn sai số làm tròn số thực nhị phân.
+`NetCashFlow` là đối tượng giá trị tiền tệ đo lường tổng hợp, phản ánh thặng dư hoặc thâm hụt tài chính ròng của người dùng trong một kỳ quan sát xác định. Đối tượng này mang tính bất biến tuyệt đối, không có danh tính độc lập và được tính toán đại số từ tập hợp các giao dịch trong kỳ theo `FR-REP-01`, `BR-FIN-01` và `BR-FIN-02`.
 
-#### 2.4.4.1 Dòng tiền thuần (NetCashFlow)
+**Cấu trúc thuộc tính**
 
-- **Bản chất**: Đối tượng giá trị tiền tệ đo lường tổng hợp (Monetary Value Object), phản ánh thặng dư hoặc thâm hụt tài chính ròng của người dùng trong một kỳ quan sát xác định.
-- **Cấu trúc thuộc tính**:
-  - `amount`: Giá trị số học thập phân có dấu đại số, biểu thị số tiền ròng (có thể mang giá trị âm, dương hoặc bằng 0).
-  - `currency`: Đơn vị tiền tệ chuẩn hóa, mặc định là Đồng Việt Nam (`VNĐ`).
-- **Nguồn tham chiếu nghiệp vụ**: `FR-REP-01` (Mục 943), `BR-FIN-01`, `BR-FIN-02`.
-- **Công thức xác định đại số**:
-  Xét kỳ thống kê quan sát $M$ (ví dụ: chuỗi 1 tháng hoặc chuỗi 12 tháng liên tục):
-  $$\text{NetCashFlow}(M) = \sum_{t \in M} \text{Income}(t) - \sum_{t \in M} \text{Expense}(t)$$
-  Trong đó:
-  - $\sum_{t \in M} \text{Income}(t)$: Tổng số tiền của các giao dịch thu nhập phát sinh trong kỳ $M$ theo `FR-TXN-01`.
-  - $\sum_{t \in M} \text{Expense}(t)$: Tổng số tiền của các giao dịch chi tiêu phát sinh trong kỳ $M$ theo `FR-TXN-02`, bao gồm cả các khoản chi phí giao dịch liên kết (`TransactionFee`) phát sinh trong kỳ.
-- **Ràng buộc số học và quy định làm tròn**:
-  - Dữ liệu bắt buộc biểu diễn bằng số thập phân chính xác, nghiêm cấm sử dụng số thực dấu chấm động nhị phân (`float`, `double`) theo `BR-FIN-01` và `CON-02`.
-  - Độ chính xác tính toán và lưu trữ duy trì ở mức 2 chữ số thập phân (`Scale = 2`). Trên giao diện người dùng, số tiền hiển thị theo quy cách số nguyên đồng cho VNĐ hoặc 2 chữ số thập phân trên báo cáo chi tiết (`AC-REP-01.2`).
+| Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
+| :--- | :--- | :--- |
+| `amount` | Giá trị số tiền ròng | Số thập phân chính xác có dấu đại số, có thể mang giá trị âm, dương hoặc bằng 0 theo `BR-FIN-01` và `CON-02`. Bất biến sau khi khởi tạo. |
+| `currency` | Đơn vị tiền tệ | Chuỗi ký tự định danh đơn vị tiền tệ chuẩn hóa, mặc định là `VNĐ`. |
+
+**Công thức xác định đại số**
+
+Xét kỳ thống kê quan sát $M$ (chuỗi 1 tháng hoặc chuỗi 12 tháng liên tục):
+
+$$\text{NetCashFlow}(M) = \sum_{t \in M} \text{Income}(t) - \sum_{t \in M} \text{Expense}(t)$$
+
+Trong đó:
+- $\sum_{t \in M} \text{Income}(t)$: Tổng số tiền của các giao dịch thu nhập phát sinh trong kỳ $M$ theo `FR-TXN-01`.
+- $\sum_{t \in M} \text{Expense}(t)$: Tổng số tiền của các giao dịch chi tiêu phát sinh trong kỳ $M$ theo `FR-TXN-02`, bao gồm cả các khoản chi phí giao dịch liên kết (`TransactionFee`) phát sinh trong kỳ.
+
+**Quy tắc bất biến và vận hành**
+
+- Quy tắc bất biến:
+  - Dữ liệu bắt buộc biểu diễn bằng số thập phân chính xác, nghiêm cấm sử dụng số thực dấu chấm động nhị phân (`float`, `double`) theo `BR-FIN-01` và ràng buộc kỹ thuật `CON-02`.
+  - Độ chính xác tính toán và lưu trữ duy trì ở mức 2 chữ số thập phân (`Scale = 2`).
   - Phân định ngữ nghĩa tài chính: $\text{NetCashFlow} > 0$ thể hiện thặng dư dòng tiền; $\text{NetCashFlow} < 0$ thể hiện thâm hụt dòng tiền (chi vượt thu); $\text{NetCashFlow} = 0$ thể hiện trạng thái cân bằng thu chi.
+- Quy tắc vận hành:
+  - Trên giao diện người dùng, số tiền hiển thị theo quy cách số nguyên đồng cho VNĐ hoặc 2 chữ số thập phân trên báo cáo chi tiết theo `AC-REP-01.2`.
 
-#### 2.4.4.2 Tỷ lệ tiết kiệm (SavingRate)
+### 2.4.5 Tỷ lệ tiết kiệm - SavingsRate
 
-- **Bản chất**: Đối tượng giá trị tỷ lệ phần trăm tài chính (Percentage / Ratio Value Object), đo lường mức độ tích lũy tài chính hình thành từ dòng tiền thuần so với tổng thu nhập tạo ra trong kỳ.
-- **Cấu trúc thuộc tính**:
-  - `rate`: Giá trị tỷ lệ phần trăm dạng số thập phân chính xác.
-  - `unit`: Đơn vị đo lường tỷ lệ phần trăm (`%`).
-- **Nguồn tham chiếu nghiệp vụ**: `FR-REP-01` (Mục 944), `BR-FIN-01`, `AC-REP-01.2`, `AC-REP-01.3`.
-- **Công thức xác định đại số**:
-  $$\text{SavingRate} = \begin{cases} \left(\dfrac{\text{NetCashFlow}}{\text{TotalIncome}}\right) \times 100\% & \text{khi } \text{TotalIncome} > 0 \\ 0.00\% & \text{khi } \text{TotalIncome} \le 0 \end{cases}$$
-- **Quy tắc xử lý biên và an toàn số học**:
-  - Khi $\text{TotalIncome} \le 0$ (kỳ phân tích hoàn toàn không có thu nhập hoặc thu nhập bằng 0.00 VNĐ nhưng phát sinh chi tiêu): Hệ thống mặc định gán tỷ lệ tiết kiệm bằng đúng $0.00\%$. Quy tắc này loại bỏ hoàn toàn rủi ro phát sinh lỗi chia cho 0 (`Divide by Zero / ERR-FIN-002`), đồng thời bảo đảm đúng bản chất tài chính: khi không có thu nhập thì không có căn cứ tính tích lũy từ thu nhập (`AC-REP-01.3`).
-  - Khi $\text{TotalIncome} > 0$ và $\text{NetCashFlow} < 0$ (chi vượt thu): Tỷ lệ tiết kiệm mang giá trị âm, phản ánh tỷ lệ thâm hụt tương ứng trên tổng thu nhập.
-- **Ràng buộc số học và quy định làm tròn**:
-  - Tính toán trung gian: Bắt buộc duy trì độ chính xác tối thiểu 4 chữ số thập phân (khuyến nghị 6 chữ số thập phân) theo quy tắc độ chính xác tài chính `BR-FIN-01`.
-  - Quy cách làm tròn: Bắt buộc áp dụng quy tắc làm tròn ngân hàng (`Banker's Rounding` - làm tròn về số chẵn gần nhất khi phần dư đúng bằng 0.5 đơn vị cuối).
-  - Kết quả hiển thị cuối cùng: Chuẩn hóa với đúng 2 chữ số thập phân kèm ký hiệu đơn vị (ví dụ: `40.00%` theo `AC-REP-01.2`).
+`SavingsRate` là đối tượng giá trị tỷ lệ phần trăm tài chính, đo lường mức độ tích lũy hình thành từ dòng tiền thuần so với tổng thu nhập tạo ra trong kỳ phân tích. Đối tượng này mang tính bất biến tuyệt đối, phụ thuộc trực tiếp vào kết quả của `NetCashFlow` và tuân thủ các quy tắc an toàn số học theo `FR-REP-01`, `BR-FIN-01`, `AC-REP-01.2` và `AC-REP-01.3`.
 
-#### 2.4.4.3 Tỷ trọng cơ cấu chi tiêu (SpendingStructureShare)
+**Cấu trúc thuộc tính**
 
-- **Bản chất**: Đối tượng giá trị tỷ trọng phân bổ (Proportion / Share Value Object), đo lường tỷ lệ đóng góp của từng nhóm nhu cầu (cấp 2) hoặc từng danh mục chi tiết (cấp 3) trên tổng quy mô dòng tiền chi tiêu (hoặc thu nhập) trong kỳ phân tích.
-- **Cấu trúc thuộc tính**:
-  - `share`: Giá trị tỷ trọng dạng số thập phân chính xác, nằm trong khoảng $[0.00, 100.00]$ đối với từng thành phần.
-  - `unit`: Đơn vị đo lường tỷ lệ phần trăm (`%`).
-  - `scope`: Cấp độ gom cụm phân tích (cấp 2 - Nhóm nhu cầu `NeedGroup`, hoặc cấp 3 - Danh mục chi tiết `Category`).
-- **Nguồn tham chiếu nghiệp vụ**: `FR-REP-02` (Mục 1002, 1004), `BR-FIN-01`, `BR-FIN-04`, `AC-REP-02.1`, `AC-REP-02.2`, `AC-REP-02.3`.
-- **Công thức xác định đại số**:
-  $$\text{SpendingStructureShare}_i = \begin{cases} \left(\dfrac{\text{ExpenseAmount}_i}{\text{TotalExpense}}\right) \times 100\% & \text{khi } \text{TotalExpense} > 0 \\ 0.00\% & \text{khi } \text{TotalExpense} = 0.00\text{ VNĐ} \end{cases}$$
-  Trong đó:
-  - $\text{ExpenseAmount}_i$: Tổng số tiền chi tiêu của Nhóm nhu cầu thứ $i$ (khi gom cụm cấp 2) hoặc Danh mục chi tiết thứ $i$ (khi gom cụm cấp 3) trong kỳ phân tích.
-  - $\text{TotalExpense}$: Tổng chi tiêu của toàn bộ các nhóm/danh mục trong kỳ phân tích (bao gồm cả các chi phí giao dịch liên kết).
-  *(Lưu ý: Công thức áp dụng tương tự khi phân tích cơ cấu thu nhập `INCOME` theo `FR-REP-02`).*
-- **Quy tắc xử lý biên và bảo toàn dữ liệu**:
-  - Khi $\text{TotalExpense} = 0.00\text{ VNĐ}$ (kỳ phân tích hoàn toàn không phát sinh chi tiêu): Hệ thống hiển thị tổng tiền 0.00 VNĐ cùng tỷ trọng mặc định $0.00\%$ cho danh sách rỗng, không làm phát sinh lỗi chia cho 0 (`ERR-FIN-002`, `AC-REP-02.2`).
-  - Xử lý mục đã xóa mềm (`isDeleted = true`): Nếu trong kỳ phân tích xuất hiện giao dịch thuộc nhóm hoặc danh mục đã bị xóa trong quá khứ, hệ thống vẫn hiển thị độc lập mục đó kèm nhãn "(đã xóa)" với đúng số tiền và tỷ trọng tương ứng (`AC-REP-02.3`). Không được gộp số liệu vào mục khác, bảo đảm tổng cơ cấu luôn khớp chính xác với tổng số tiền giao dịch thực tế.
-- **Ràng buộc số học và bất biến tổng thể**:
-  - Bước tính toán trung gian duy trì tối thiểu 4 chữ số thập phân theo `BR-FIN-01`.
-  - Áp dụng quy cách làm tròn ngân hàng (`Banker's Rounding`), hiển thị kết quả cuối cùng với đúng 2 chữ số thập phân (ví dụ: `40.00%` theo `AC-REP-02.1`).
-  - Bất biến tổng cơ cấu: Tổng tỷ trọng của toàn bộ các mục thành phần cấu thành trong cùng một cấp phân loại phải xấp xỉ bằng $100.00\%$:
+| Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
+| :--- | :--- | :--- |
+| `rate` | Giá trị tỷ lệ phần trăm | Số thập phân chính xác theo `BR-FIN-01`. Duy trì tối thiểu 4 chữ số thập phân trong tính toán trung gian và làm tròn ngân hàng về 2 chữ số thập phân khi hiển thị (`AC-REP-01.2`). |
+| `unit` | Đơn vị đo lường | Đơn vị tỷ lệ phần trăm, cố định là ký hiệu `%`. |
+
+**Công thức xác định đại số**
+
+$$\text{SavingsRate} = \begin{cases} \left(\dfrac{\text{NetCashFlow}}{\text{TotalIncome}}\right) \times 100\% & \text{khi } \text{TotalIncome} > 0 \\ 0.00\% & \text{khi } \text{TotalIncome} \le 0 \end{cases}$$
+
+**Quy tắc bất biến và vận hành**
+
+- Quy tắc bất biến:
+  - Xử lý biên an toàn: Khi $\text{TotalIncome} \le 0$ (kỳ phân tích không có thu nhập hoặc thu nhập bằng 0.00 VNĐ nhưng phát sinh chi tiêu), tỷ lệ tiết kiệm mặc định bằng đúng $0.00\%$. Quy tắc này loại bỏ hoàn toàn rủi ro chia cho 0 (`ERR-FIN-002`) và bảo đảm bản chất tài chính theo `AC-REP-01.3`.
+  - Phản ánh thâm hụt: Khi $\text{TotalIncome} > 0$ và $\text{NetCashFlow} < 0$ (chi vượt thu), tỷ lệ tiết kiệm mang giá trị âm, phản ánh tỷ lệ thâm hụt tương ứng trên tổng thu nhập.
+- Quy tắc vận hành:
+  - Bước tính toán trung gian bắt buộc duy trì độ chính xác tối thiểu 4 chữ số thập phân (khuyến nghị 6 chữ số thập phân) theo `BR-FIN-01`.
+  - Áp dụng quy tắc làm tròn ngân hàng (`Banker's Rounding` - làm tròn về số chẵn gần nhất khi phần dư đúng bằng 0.5 đơn vị cuối).
+  - Kết quả hiển thị cuối cùng chuẩn hóa đúng 2 chữ số thập phân kèm ký hiệu đơn vị (ví dụ: `40.00%` theo `AC-REP-01.2`).
+
+### 2.4.6 Tỷ trọng cơ cấu chi tiêu - SpendingStructureShare
+
+`SpendingStructureShare` là đối tượng giá trị tỷ trọng phân bổ, đo lường tỷ lệ đóng góp của từng nhóm nhu cầu (cấp 2) hoặc từng danh mục chi tiết (cấp 3) trên tổng quy mô dòng tiền trong kỳ phân tích. Đối tượng được áp dụng cho cả phân tích cơ cấu chi tiêu (`EXPENSE`) và cơ cấu thu nhập (`INCOME`) theo `FR-REP-02`, `BR-FIN-01`, `BR-FIN-04` và các tiêu chí chấp thuận `AC-REP-02.1` đến `AC-REP-02.3`.
+
+**Cấu trúc thuộc tính**
+
+| Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
+| :--- | :--- | :--- |
+| `share` | Giá trị tỷ trọng | Số thập phân chính xác nằm trong khoảng $[0.00, 100.00]$ đối với từng thành phần theo `BR-FIN-01`. |
+| `unit` | Đơn vị đo lường | Đơn vị tỷ lệ phần trăm, cố định là ký hiệu `%`. |
+| `scope` | Phạm vi gom cụm phân tích | Xác định cấp phân tích: Nhóm nhu cầu cấp 2 (`NeedGroup`) hoặc Danh mục chi tiết cấp 3 (`Category`) theo `FR-REP-02`. |
+
+**Công thức xác định đại số**
+
+$$\text{SpendingStructureShare}_i = \begin{cases} \left(\dfrac{\text{ExpenseAmount}_i}{\text{TotalExpense}}\right) \times 100\% & \text{khi } \text{TotalExpense} > 0 \\ 0.00\% & \text{khi } \text{TotalExpense} = 0.00\text{ VNĐ} \end{cases}$$
+
+Trong đó:
+- $\text{ExpenseAmount}_i$: Tổng số tiền chi tiêu của Nhóm nhu cầu thứ $i$ (khi gom cụm cấp 2) hoặc Danh mục chi tiết thứ $i$ (khi gom cụm cấp 3) trong kỳ phân tích.
+- $\text{TotalExpense}$: Tổng chi tiêu của toàn bộ các nhóm hoặc danh mục trong kỳ phân tích, bao gồm cả các chi phí giao dịch liên kết.
+
+*(Công thức áp dụng tương tự khi phân tích cơ cấu thu nhập `INCOME` theo `FR-REP-02`).*
+
+**Quy tắc bất biến và vận hành**
+
+- Quy tắc bất biến:
+  - Khi $\text{TotalExpense} = 0.00\text{ VNĐ}$ (kỳ phân tích không phát sinh chi tiêu), hệ thống hiển thị tổng tiền 0.00 VNĐ cùng tỷ trọng mặc định $0.00\%$ cho danh sách rỗng, không làm phát sinh lỗi chia cho 0 (`ERR-FIN-002`, `AC-REP-02.2`).
+  - Bảo toàn dữ liệu xóa mềm: Nếu trong kỳ phân tích xuất hiện giao dịch thuộc nhóm hoặc danh mục đã bị xóa trong quá khứ, hệ thống vẫn hiển thị độc lập mục đó kèm nhãn "(đã xóa)" với đúng số tiền và tỷ trọng tương ứng (`AC-REP-02.3`), không gộp vào mục khác.
+  - Bất biến tổng cơ cấu: Tổng tỷ trọng của toàn bộ các mục thành phần trong cùng một cấp phân loại phải xấp xỉ bằng $100.00\%$:
     $$\sum_{i} \text{SpendingStructureShare}_i \approx 100.00\%$$
     (Sai số cho phép tối đa trong khoảng $\pm 0.01\%$ do hiệu ứng phân rã làm tròn ngân hàng độc lập trên từng thành phần).
+- Quy tắc vận hành:
+  - Bước tính toán trung gian duy trì tối thiểu 4 chữ số thập phân theo `BR-FIN-01`.
+  - Áp dụng quy cách làm tròn ngân hàng (`Banker's Rounding`), hiển thị kết quả cuối cùng với đúng 2 chữ số thập phân (ví dụ: `40.00%` theo `AC-REP-02.1`).
 
 ## 2.5 Các Mối Quan hệ Ngữ nghĩa và Bất biến Miền
 
