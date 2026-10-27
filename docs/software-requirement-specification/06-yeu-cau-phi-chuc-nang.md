@@ -1,23 +1,23 @@
 ## 5. YÊU CẦU PHI CHỨC NĂNG
 
-6 yêu cầu phi chức năng (`NFR-01` đến `NFR-06`) của Hệ thống Quản lý Tài chính Cá nhân xác lập các tiêu chuẩn chất lượng sản phẩm phần mềm theo mô hình chất lượng quốc tế ISO/IEC 25010:2023 và tiêu chuẩn kỹ nghệ yêu cầu ISO/IEC/IEEE 29148:2018. Các yêu cầu này đóng vai trò ràng buộc vận hành và kiến trúc then chốt, bảo đảm hệ thống đạt độ chính xác tài chính tuyệt đối, hiệu quả vận hành tối ưu, độ tin cậy lưu trữ an toàn, tính khả dụng cao, khả năng tương thích môi trường và khả năng bảo trì theo nguyên lý hướng đối tượng phục vụ trực tiếp các tiêu chí nghiệm thu học thuật.
+6 yêu cầu phi chức năng (`NFR-01` đến `NFR-06`) của Hệ thống quản lý tài chính cá nhân xác lập các tiêu chuẩn chất lượng sản phẩm phần mềm theo mô hình chất lượng quốc tế ISO/IEC 25010:2023 và tiêu chuẩn kỹ nghệ yêu cầu ISO/IEC/IEEE 29148:2018. Các yêu cầu này đóng vai trò ràng buộc vận hành và kiến trúc then chốt, bảo đảm hệ thống đạt độ chính xác tài chính tuyệt đối, hiệu quả vận hành tối ưu, độ tin cậy lưu trữ an toàn, tính khả dụng cao, khả năng tương thích môi trường và khả năng bảo trì theo nguyên lý hướng đối tượng phục vụ trực tiếp các tiêu chí nghiệm thu học thuật.
 
 Mỗi yêu cầu phi chức năng được đặc tả nhất quán theo khuôn mẫu 4 khối thông tin chuẩn:
-1. Bảng phân loại đặc tính chất lượng: Xác định Đặc tính chất lượng và Đặc tính con tương ứng theo phân loại chuẩn quốc tế ISO/IEC 25010:2023.
+1. Bảng phân loại đặc tính chất lượng: Xác định đặc tính chất lượng và đặc tính con tương ứng theo phân loại chuẩn quốc tế ISO/IEC 25010:2023.
 2. Mô tả yêu cầu: Diễn giải chi tiết phạm vi chất lượng, căn cứ lý do kỹ thuật và các giải pháp kiến trúc tổng quát ở tầng bài toán, không rò rỉ mã nguồn cài đặt cụ thể.
 3. Bảng chỉ số đo và ngưỡng nghiệm thu: Xác lập các thuộc tính đo kiểm, chỉ số đo, công thức định lượng kèm dung sai kiểm thử và ngưỡng nghiệm thu nhị phân rõ ràng.
-4. Bảng phương pháp và công cụ kiểm chứng: Xác định phương thức nghiệm thu kỹ thuật dựa trên 4 phương pháp chuẩn theo ISO 29148 gồm Kiểm thử tự động (`T` - Test), Trình diễn thao tác (`D` - Demonstration), Soát xét kỹ thuật (`I` - Inspection), Phân tích số liệu (`A` - Analysis), kèm môi trường và công cụ thực hiện.
+4. Bảng phương pháp và công cụ kiểm chứng: Xác định phương thức nghiệm thu kỹ thuật dựa trên 4 phương pháp chuẩn theo ISO 29148 gồm kiểm thử tự động (`T` - Test), trình diễn thao tác (`D` - Demonstration), soát xét kỹ thuật (`I` - Inspection), phân tích số liệu (`A` - Analysis), kèm môi trường và công cụ thực hiện.
 
 Bảng tổng hợp 6 yêu cầu phi chức năng của hệ thống:
 
 | Mã yêu cầu | Tên yêu cầu | Đặc tính chất lượng ISO 25010 | Phương pháp chính | Chỉ số trọng tâm |
 | :---: | :--- | :--- | :---: | :--- |
 | `NFR-01` | Độ chính xác và toàn vẹn dữ liệu tài chính | Mức độ phù hợp chức năng / Tính chính xác chức năng | T, I | Sai số tích lũy tuyệt đối bằng 0.00 VNĐ; 0% trường dùng số thực nhị phân (float/double); 0% vi phạm quy tắc số dư luôn khớp. |
-| `NFR-02` | Hiệu năng và độ trễ phản hồi | Hiệu quả vận hành / Hành vi thời gian & Mức sử dụng tài nguyên | D, A | Phản hồi ngay với quy mô dữ liệu cá nhân thông thường; không rò rỉ bộ nhớ khi sử dụng liên tục. |
-| `NFR-03` | Độ tin cậy và lưu trữ an toàn | Độ tin cậy / Khả năng chịu lỗi & Khả năng phục hồi | T, I | Ghi tệp an toàn không làm hỏng dữ liệu cũ; tự động sao lưu trước tác vụ thay thế dữ liệu quy mô lớn; không mất dữ liệu khi ngắt nguồn. |
-| `NFR-04` | Khả năng bảo trì và kiến trúc hướng đối tượng | Khả năng bảo trì / Tính module hóa, Tính tái sử dụng, Tính phân tích được & Tính kiểm thử được | T, I | Thành phần độc lập về trách nhiệm, không phụ thuộc vòng, giao diện không truy cập trực tiếp dữ liệu. Trạng thái nội bộ được bảo vệ khỏi ghi đè trái phép. Mọi quy tắc nghiệp vụ có kiểm thử đơn vị tương ứng. |
-| `NFR-05` | Tính khả dụng và trải nghiệm người dùng | Khả năng tương tác / Tính dễ học, Tính dễ vận hành & Bảo vệ người dùng khỏi lỗi | D, I | Xác nhận thao tác rủi ro; 100% thông báo lỗi định hướng khắc phục. |
-| `NFR-06` | Tính tương thích và môi trường chạy | Tính linh hoạt / Tính thích ứng & Tính dễ cài đặt | T, I | Độc lập hệ điều hành trên JVM 17 LTS; mã hóa UTF-8 không BOM; không phụ thuộc thư viện nhị phân gốc phụ thuộc hệ điều hành. |
+| `NFR-02` | Hiệu năng và độ trễ phản hồi | Hiệu quả vận hành / hành vi thời gian & Mức sử dụng tài nguyên | D, A | Phản hồi ngay với quy mô dữ liệu cá nhân thông thường; không rò rỉ bộ nhớ khi sử dụng liên tục. |
+| `NFR-03` | Độ tin cậy và lưu trữ an toàn | Độ tin cậy / khả năng chịu lỗi & khả năng phục hồi | T, I | Ghi tệp an toàn không làm hỏng dữ liệu cũ; tự động sao lưu trước tác vụ thay thế dữ liệu quy mô lớn; không mất dữ liệu khi ngắt nguồn. |
+| `NFR-04` | Khả năng bảo trì và kiến trúc hướng đối tượng | Khả năng bảo trì / tính module hóa, tính tái sử dụng, tính phân tích được & tính kiểm thử được | T, I | Thành phần độc lập về trách nhiệm, không phụ thuộc vòng, giao diện không truy cập trực tiếp dữ liệu. Trạng thái nội bộ được bảo vệ khỏi ghi đè trái phép. Mọi quy tắc nghiệp vụ có kiểm thử đơn vị tương ứng. |
+| `NFR-05` | Tính khả dụng và trải nghiệm người dùng | Khả năng tương tác / tính dễ học, tính dễ vận hành & bảo vệ người dùng khỏi lỗi | D, I | Xác nhận thao tác rủi ro; 100% thông báo lỗi định hướng khắc phục. |
+| `NFR-06` | Tính tương thích và môi trường chạy | Tính linh hoạt / tính thích ứng & tính dễ cài đặt | T, I | Độc lập hệ điều hành trên JVM 17 LTS; mã hóa UTF-8 không BOM; không phụ thuộc thư viện nhị phân gốc phụ thuộc hệ điều hành. |
 
 ### 5.1 NFR-01: Độ chính xác và toàn vẹn dữ liệu tài chính
 
@@ -36,7 +36,7 @@ Mô tả yêu cầu:
    - Quy định này loại bỏ hoàn toàn sai số làm tròn số thực nhị phân trong các phép tính tài chính.
 2. Quy tắc độ chính xác thập phân và chế độ làm tròn:
    - Tạo giá trị số: Hệ thống phải tạo giá trị từ dữ liệu nhập dạng thập phân chính xác hoặc từ giá trị nguyên. Hệ thống không được tạo trực tiếp từ giá trị số thực nhị phân (float/double).
-   - Quy tắc số chữ số thập phân của giao dịch tiền tệ: Đối với các giao dịch tiền tệ nội tệ (VNĐ), giá trị hiển thị dùng 0 chữ số thập phân (số nguyên đồng) trên giao diện người dùng. Giá trị tính toán, xử lý nghiệp vụ và chuỗi kiểm thử tự động dùng 2 chữ số thập phân.
+   - Quy tắc số chữ số thập phân của giao dịch tiền tệ: Đối với các giao dịch tiền tệ nội tệ (VNĐ), giá trị hiển thị dùng 0 chữ số thập phân (Số nguyên đồng) trên giao diện người dùng. Giá trị tính toán, xử lý nghiệp vụ và chuỗi kiểm thử tự động dùng 2 chữ số thập phân.
    - Quy tắc số chữ số thập phân của tỷ lệ phần trăm: Hệ thống phải dùng tối thiểu 4 chữ số thập phân. Quy tắc này áp dụng cho các tỷ lệ phần trăm trung gian trong tính toán theo `BR-FIN-01`.
    - Chế độ làm tròn:
      - Khi thực hiện phép chia, tính tỷ lệ phần trăm, hệ thống phải chỉ định rõ ràng số chữ số thập phân và chế độ làm tròn ngân hàng.
@@ -50,18 +50,18 @@ Tại mọi thời điểm, số dư khả dụng của từng ví luôn thỏa 
 $$\text{Số dư ví } w \text{ tại } T = \left(\text{Thu} + \text{Chuyển vào} + \text{Điều chỉnh tăng}\right) - \left(\text{Chi} + \text{Chuyển ra} + \text{Điều chỉnh giảm}\right)$$
 
    Trong đó mỗi hạng tử là tổng các khoản của ví w đến thời điểm T. Điều chỉnh tăng là các khoản điều chỉnh số dư dương, điều chỉnh giảm là các khoản điều chỉnh số dư âm theo `FR-WAL-05`.
-5. Cân bằng nguồn - đích theo `BR-FIN-03` (trừ ví nguồn, cộng ví đích):
+5. Cân bằng nguồn - đích theo `BR-FIN-03` (Trừ ví nguồn, cộng ví đích):
 Hệ thống phải bảo đảm mọi thao tác điều chuyển tiền nội bộ giữa hai ví thỏa mãn phương trình cân bằng nguồn - đích. Phương trình này đòi hỏi số tiền trừ khỏi ví nguồn bằng số tiền cộng vào ví đích, chưa tính phí chuyển. Tổng lượng tiền mặt trong hệ thống được giữ nguyên sau giao dịch chuyển tiền, ngoại trừ chi phí chuyển tiền.
 
 Bảng chỉ số đo và ngưỡng nghiệm thu:
 
 | Thuộc tính đo kiểm | Chỉ số đo | Ngưỡng nghiệm thu |
 | --- | --- | --- |
-| Sai số tích lũy số học cho phép | Chênh lệch tuyệt đối giữa tổng tiền kỳ vọng và tổng tiền thực tế | 0.00 VNĐ (không có sai lệch) |
+| Sai số tích lũy số học cho phép | Chênh lệch tuyệt đối giữa tổng tiền kỳ vọng và tổng tiền thực tế | 0.00 VNĐ (Không có sai lệch) |
 | Tỷ lệ xuất hiện kiểu số thực nhị phân (float/double) trong mô hình nghiệp vụ | Số trường dùng kiểu số thực nhị phân chia cho tổng số trường số | 0.00% |
 | Tỷ lệ vi phạm quy tắc số dư luôn khớp `BR-FIN-02` | Số giao dịch vi phạm chia cho tổng số giao dịch | 0.00% trên toàn bộ tập dữ liệu kiểm thử |
-| Tỷ lệ sai lệch nguồn - đích khi chuyển tiền `BR-FIN-03` (không tính chi phí) | Chênh lệch tuyệt đối giữa tổng tiền trừ khỏi ví nguồn và tổng tiền cộng vào ví đích, chưa tính phí | 0.00 VNĐ |
-| Độ chính xác số chữ số thập phân của giao dịch tiền tệ VNĐ | Số chữ số thập phân tính toán và hiển thị | 0 chữ số thập phân (giao diện) / 2 chữ số thập phân (tính toán và kiểm thử) |
+| Tỷ lệ sai lệch nguồn - đích khi chuyển tiền `BR-FIN-03` (Không tính chi phí) | Chênh lệch tuyệt đối giữa tổng tiền trừ khỏi ví nguồn và tổng tiền cộng vào ví đích, chưa tính phí | 0.00 VNĐ |
+| Độ chính xác số chữ số thập phân của giao dịch tiền tệ VNĐ | Số chữ số thập phân tính toán và hiển thị | 0 chữ số thập phân (Giao diện người dùng) / 2 chữ số thập phân (Tính toán và kiểm thử) |
 | Độ chính xác số chữ số thập phân của tỷ lệ phần trăm | Số chữ số thập phân trong phép tính tỷ lệ phần trăm | Tính toán từ 4 chữ số thập phân trở lên |
 | Tỷ lệ chỉ định rõ ràng quy tắc làm tròn trong phép chia | Số phép chia số thập phân chính xác có kèm số chữ số thập phân và quy tắc làm tròn | 100.00% |
 
@@ -70,7 +70,7 @@ Bảng phương pháp và công cụ kiểm chứng:
 | Phương pháp | Loại hình | Quy trình |
 | --- | --- | --- |
 | Soát xét kỹ thuật | Đánh giá kiểm tra | Rà soát toàn bộ mã nguồn phần nghiệp vụ để phát hiện khai báo kiểu số thực nhị phân (float/double) hoặc tạo số thập phân chính xác trực tiếp từ số thực nhị phân. Kiểm tra các phép chia thiếu số chữ số thập phân và quy tắc làm tròn. |
-| Kiểm thử tự động | Kiểm thử tự động | Chạy bộ kiểm thử giá trị biên của phép tính (giao dịch có số tiền 18 chữ số phần nguyên theo `CON-02`, chia tỷ lệ phần trăm số dư ví lẻ). Kiểm thử độ bền chạy với chuỗi giao dịch liên tiếp theo kịch bản kiểm thử tải để đối chiếu số dư tính toán với số dư thực tế. Ngưỡng số lượng giao dịch cụ thể được bổ sung khi có benchmark chính thức. |
+| Kiểm thử tự động | Kiểm thử tự động | Chạy bộ kiểm thử giá trị biên của phép tính (Giao dịch có số tiền 18 chữ số phần nguyên theo `CON-02`, chia tỷ lệ phần trăm số dư ví lẻ). Kiểm thử độ bền chạy với chuỗi giao dịch liên tiếp theo kịch bản kiểm thử tải để đối chiếu số dư tính toán với số dư thực tế. Ngưỡng số lượng giao dịch cụ thể được bổ sung khi có benchmark chính thức. |
 
 ### 5.2 NFR-02: Hiệu năng và độ trễ phản hồi
 
@@ -84,7 +84,7 @@ Bảng phân loại đặc tính chất lượng:
 Mô tả yêu cầu:
 
 1. Độ trễ ghi nhận giao dịch:
-Thao tác ghi nhận một giao dịch (thu chi hoặc chuyển tiền) phải cập nhật bộ nhớ và đồng bộ số dư các thực thể liên quan ngay lập tức. Giao diện phải hiển thị phản hồi ngay, không tạo cảm giác trễ khi dùng với dữ liệu cá nhân thông thường.
+Thao tác ghi nhận một giao dịch (Thu chi hoặc chuyển tiền) phải cập nhật bộ nhớ và đồng bộ số dư các thực thể liên quan ngay lập tức. Giao diện phải hiển thị phản hồi ngay, không tạo cảm giác trễ khi dùng với dữ liệu cá nhân thông thường.
 2. Độ trễ truy vấn và lọc dữ liệu:
 Thao tác lọc danh sách giao dịch theo khoảng thời gian, theo danh mục hoặc ví phải phản hồi ngay với quy mô dữ liệu cá nhân thông thường. Thao tác tìm kiếm từ khóa và hiển thị kết quả phân trang cũng phải phản hồi ngay. Người dùng không phải chờ đợi đến mức nhận biết được.
 3. Độ trễ tổng hợp báo cáo:
@@ -129,13 +129,13 @@ Hệ thống ghi tệp dữ liệu theo cách ngăn tệp bị hỏng hoặc th�
    - Lưu bền xuống đĩa: Dữ liệu của lần ghi đã hoàn tất phải nằm trên đĩa lưu trữ, không chỉ trong vùng nhớ tạm, để không mất khi mất nguồn điện.
    - Bảo toàn bản cũ: Nếu không bảo đảm được việc thay thế trọn vẹn, hệ thống giữ lại bản sao của tệp gốc trước khi thay thế.
 2. Tự động sao lưu dữ liệu:
-Hệ thống tự động tạo bản sao lưu dữ liệu có gắn nhãn thời gian theo định dạng `backup_YYYYMMDD_HHMMSS.json` tại thư mục riêng `backups/` theo `CON-06`. Bản sao lưu này được tạo trước các tác vụ có nguy cơ thay thế dữ liệu quy mô lớn (phục hồi dữ liệu từ tệp nhập ngoài theo `UC-DAT-02`, đặt lại hệ thống).
+Hệ thống tự động tạo bản sao lưu dữ liệu có gắn nhãn thời gian theo định dạng `backup_YYYYMMDD_HHMMSS.json` tại thư mục riêng `backups/` theo `CON-06`. Bản sao lưu này được tạo trước các tác vụ có nguy cơ thay thế dữ liệu quy mô lớn (Phục hồi dữ liệu từ tệp nhập ngoài theo `UC-DAT-02`, Đặt lại hệ thống).
 3. Phục hồi toàn vẹn dữ liệu:
    - Khi đọc dữ liệu vào từ tệp lưu trữ hoặc bản sao lưu, hệ thống kiểm tra dữ liệu còn nguyên vẹn trước khi cập nhật vào bộ nhớ làm việc. Dữ liệu nguyên vẹn nghĩa là đúng lược đồ cấu trúc JSON, mã liên kết tới danh mục hợp lệ, quy tắc số dư luôn khớp.
    - Trường hợp tệp sai cấu trúc JSON, có mã liên kết tới danh mục không hợp lệ hoặc sai lệch quy tắc số dư luôn khớp, toàn bộ lần đọc dữ liệu bị hủy bỏ.
    - Hệ thống giữ nguyên trạng thái dữ liệu trước đó và hiển thị thông báo lỗi chi tiết.
 4. Kiểm soát và xử lý lỗi đọc ghi tệp:
-Mọi thao tác đọc ghi hệ thống tệp phải kiểm soát và xử lý 100.00% ngoại lệ đọc ghi dữ liệu. Trường hợp ổ đĩa đầy hoặc thư mục bị khóa quyền ghi, hệ thống giữ nguyên trạng tệp dữ liệu gốc và thông báo lỗi rõ ràng tới Người dùng.
+Mọi thao tác đọc ghi hệ thống tệp phải kiểm soát và xử lý 100.00% ngoại lệ đọc ghi dữ liệu. Trường hợp ổ đĩa đầy hoặc thư mục bị khóa quyền ghi, hệ thống giữ nguyên trạng tệp dữ liệu gốc và thông báo lỗi rõ ràng tới người dùng.
 
 Bảng chỉ số đo và ngưỡng nghiệm thu:
 
@@ -169,7 +169,7 @@ Mô tả yêu cầu:
 1. Phân định trách nhiệm theo thành phần độc lập:
 Hệ thống tổ chức thành các thành phần độc lập về trách nhiệm. Thành phần giao diện người dùng không truy cập trực tiếp dữ liệu lưu trữ mà làm việc qua thành phần xử lý nghiệp vụ.
    - Phụ thuộc một chiều: Thành phần bên ngoài phụ thuộc vào thành phần bên trong; không có phụ thuộc ngược chiều hoặc phụ thuộc vòng giữa các mô-đun.
-   - Đơn trách nhiệm mô-đun: Mỗi mô-đun chỉ đảm nhiệm một trách nhiệm duy nhất. Các thực thể nghiệp vụ (Người dùng, Ví, Giao dịch thu chi, Giao dịch chuyển tiền, Danh mục) chỉ quản lý trạng thái nghiệp vụ và các bất biến nghiệp vụ của riêng mình. Các thực thể này tách biệt hoàn toàn khỏi phần hiển thị giao diện và cách lưu trữ dữ liệu.
+   - Đơn trách nhiệm mô-đun: Mỗi mô-đun chỉ đảm nhiệm một trách nhiệm duy nhất. Các thực thể nghiệp vụ (Người dùng, ví, giao dịch thu chi, giao dịch chuyển tiền, danh mục) chỉ quản lý trạng thái nghiệp vụ và các bất biến nghiệp vụ của riêng mình. Các thực thể này tách biệt hoàn toàn khỏi phần hiển thị giao diện và cách lưu trữ dữ liệu.
 2. Bảo vệ trạng thái nội bộ khỏi thay đổi trái phép:
    - Dữ liệu trạng thái nội bộ của các thực thể chỉ được truy xuất qua giao diện đọc có kiểm soát hoặc thao tác nghiệp vụ chuyên biệt. Hệ thống không được cho phép đặt số dư ví bằng phép gán trực tiếp hoặc gán đè trực tiếp trạng thái giao dịch, ngoài quy trình ghi nhận dòng tiền.
    - Đối với dữ liệu dạng danh sách hoặc tập hợp, hệ thống bảo đảm giá trị trả về không thể bị sửa đổi từ bên ngoài phạm vi kiểm soát nghiệp vụ.
@@ -177,7 +177,7 @@ Hệ thống tổ chức thành các thành phần độc lập về trách nhi�
    - Xử lý đồng nhất các ví: Cấu trúc dữ liệu ví phải cho phép công cụ tổng hợp số dư ví và công cụ tính tỷ lệ từng ví xử lý đồng nhất. Cả hai công cụ này áp dụng logic tính toán chung trên mọi ví.
    - Cấu trúc danh mục cho phép mở rộng danh mục mới mà không cần chỉnh sửa logic tính toán số dư hiện có.
 4. Độ bao phủ kiểm thử tự động và kiểm soát độ phức tạp mã nguồn:
-   - Hệ thống phải có kiểm thử đơn vị tự động độc lập công nghệ cho toàn bộ quy tắc nghiệp vụ, thuật toán tính số dư và công thức tính tỷ lệ. Kiểm thử bao gồm các trường hợp biên của mọi giới hạn trong quy tắc (ví dụ số tiền âm, bằng 0, vượt hạn mức; tên rỗng, dài nhất, vượt độ dài tối đa).
+   - Hệ thống phải có kiểm thử đơn vị tự động độc lập công nghệ cho toàn bộ quy tắc nghiệp vụ, thuật toán tính số dư và công thức tính tỷ lệ. Kiểm thử bao gồm các trường hợp biên của mọi giới hạn trong quy tắc (Ví dụ số tiền âm, bằng 0, vượt hạn mức, tên rỗng, dài nhất, vượt độ dài tối đa).
    - Mỗi thao tác nghiệp vụ chỉ đảm nhiệm một luồng xử lý rõ ràng, dễ kiểm thử độc lập, tránh lồng ghép nhiều nhánh điều kiện trong cùng một thao tác.
 
 Bảng chỉ số đo và ngưỡng nghiệm thu:
@@ -212,10 +212,10 @@ Mô tả yêu cầu:
 1. Tinh giản thao tác nhập liệu:
    - Tự động điền giá trị mặc định: Biểu mẫu ghi nhận thu chi và chuyển tiền tự động điền ngày hiện tại của hệ thống. Ô chọn ví thanh toán tự động chọn ví được sử dụng gần nhất. Khi chưa có giao dịch nào, ô này chọn ví tiền mặt có sẵn.
    - Tự động định vị con trỏ nhập liệu: Khi mở hộp thoại ghi nhận giao dịch, con trỏ tự động tập trung vào ô nhập số tiền để sẵn sàng nhận số liệu.
-   - Lọc danh mục theo ngữ cảnh: Hệ thống tự động lọc danh mục thu chi theo phân loại ngữ cảnh để loại bỏ lỗi phân loại sai. Khi chọn giao dịch Thu nhập, chỉ hiển thị các danh mục thuộc loại Thu nhập. Khi chọn Chi tiêu, chỉ hiển thị các danh mục thuộc loại Chi tiêu. Danh mục hiển thị chỉ gồm danh mục đang dùng. Riêng danh mục của phí giao dịch luôn thuộc loại Chi tiêu, kể cả khi giao dịch gốc là Thu nhập.
-   - Định dạng số tiền theo thời gian thực: Khi Người dùng nhập các chữ số vào ô tiền tệ, hệ thống tự động định dạng phân tách hàng nghìn bằng dấu phẩy. Ví dụ: nhập "1500000" tự động hiển thị "1,500,000 VNĐ". Cách này hạn chế sai sót khi nhập liệu.
+   - Lọc danh mục theo ngữ cảnh: Hệ thống tự động lọc danh mục thu chi theo phân loại ngữ cảnh để loại bỏ lỗi phân loại sai. Khi chọn giao dịch thu nhập, chỉ hiển thị các danh mục thuộc loại thu nhập. Khi chọn giao dịch chi tiêu, chỉ hiển thị các danh mục thuộc loại chi tiêu. Danh mục hiển thị chỉ gồm danh mục đang dùng. Riêng danh mục của phí giao dịch luôn thuộc loại chi tiêu, kể cả khi giao dịch gốc là thu nhập.
+   - Định dạng số tiền theo thời gian thực: Khi Người dùng nhập các chữ số vào ô tiền tệ, hệ thống tự động định dạng phân tách hàng nghìn bằng dấu phẩy. Ví dụ: Nhập "1500000" tự động hiển thị "1,500,000 VNĐ". Cách này hạn chế sai sót khi nhập liệu.
 2. Bảo vệ người dùng khỏi lỗi và xác nhận thao tác rủi ro:
-   - Cảnh báo xác nhận trước thao tác rủi ro cao: Hệ thống phải hiển thị hộp thoại cảnh báo rủi ro khi xóa giao dịch hoặc lưu trữ ví còn số dư. Thao tác nhập tệp thay thế dữ liệu cũng yêu cầu xác nhận. Hộp thoại yêu cầu Người dùng xác nhận rõ ràng trước khi thực hiện.
+   - Cảnh báo xác nhận trước thao tác rủi ro cao: Hệ thống phải hiển thị hộp thoại cảnh báo rủi ro khi xóa giao dịch hoặc lưu trữ ví còn số dư. Thao tác nhập tệp thay thế dữ liệu cũng yêu cầu xác nhận. Hộp thoại yêu cầu người dùng xác nhận rõ ràng trước khi thực hiện.
    - Kiểm tra dữ liệu hợp lệ ngay khi nhập: Hệ thống kiểm tra định dạng số tiền và điều kiện cần có ngay khi nhập liệu, ngăn chặn việc gửi yêu cầu không hợp lệ.
 3. Thông báo lỗi định hướng khắc phục:
    - Toàn bộ thông báo lỗi kiểm tra dữ liệu đầu vào và vi phạm quy tắc nghiệp vụ bắt buộc được thể hiện bằng ngôn ngữ tiếng Việt tự nhiên, ngắn gọn. Thông báo chỉ rõ nguyên nhân gây lỗi và đưa ra hướng xử lý khắc phục cụ thể. Ví dụ: Khi số dư ví không đủ chi trả khoản chi, thông báo hiển thị: "Số dư ví MB Bank hiện tại là 150,000 VNĐ, không đủ để chi trả khoản chi 200,000 VNĐ. Vui lòng giảm số tiền chi tiêu hoặc chuyển tiền từ ví khác sang."
@@ -234,7 +234,7 @@ Bảng phương pháp và công cụ kiểm chứng:
 
 | Phương pháp | Loại hình | Quy trình |
 | --- | --- | --- |
-| Trình diễn thao tác | Trực quan thao tác | Thực hiện kiểm thử quan sát thao tác người dùng trên nhóm thử nghiệm với 3 kịch bản sử dụng cơ bản (tạo ví, ghi chi tiêu, chuyển tiền). Mục đích là đánh giá mức độ thuận tiện trong quá trình làm quen hệ thống. |
+| Trình diễn thao tác | Trực quan thao tác | Thực hiện kiểm thử quan sát thao tác người dùng trên nhóm thử nghiệm với 3 kịch bản sử dụng cơ bản (Tạo ví, ghi chi tiêu, chuyển tiền). Mục đích là đánh giá mức độ thuận tiện trong quá trình làm quen hệ thống. |
 | Soát xét kỹ thuật thông báo lỗi | Đánh giá kiểm tra | Rà soát toàn bộ bảng thông điệp lỗi trong mã nguồn để kiểm tra tính đầy đủ của ngôn ngữ tiếng Việt và hướng dẫn xử lý khắc phục. Rà soát mã nguồn bảo đảm không để lộ vết ngăn xếp lỗi hệ thống ra màn hình người dùng. |
 
 ### 5.6 NFR-06: Tính tương thích và môi trường chạy
@@ -251,9 +251,9 @@ Mô tả yêu cầu:
 1. Môi trường chạy tiêu chuẩn:
 Ứng dụng vận hành trên nền tảng máy ảo Java tương thích phiên bản 17 LTS trở lên (`CON-01`) để bảo đảm tính tương thích lâu dài và hỗ trợ xử lý thời gian theo lịch dương.
 2. Độc lập nền tảng hệ điều hành:
-Ứng dụng đóng gói độc lập và chạy đồng nhất trên mọi hệ điều hành máy tính cá nhân có JVM tương thích (Windows, macOS, Linux). Ứng dụng không cần thay đổi mã nguồn hoặc biên dịch lại theo từng hệ điều hành.
+Ứng dụng đóng gói độc lập và chạy đồng nhất trên mọi hệ điều hành máy tính cá nhân có JVM tương thích (Windows, MacOS, Linux). Ứng dụng không cần thay đổi mã nguồn hoặc biên dịch lại theo từng hệ điều hành.
 3. Thao tác đường dẫn hệ thống tệp:
-Không được viết cứng ký tự phân cách thư mục của từng hệ điều hành (như dấu `\` trên Windows hay `/` trên Linux). Mọi thao tác đường dẫn tệp phải dùng đối tượng đường dẫn trừu tượng độc lập hệ điều hành để chạy được trên nhiều nền tảng.
+Không được viết cứng ký tự phân cách thư mục của từng hệ điều hành (Như dấu `\` trên Windows hay `/` trên Linux). Mọi thao tác đường dẫn tệp phải dùng đối tượng đường dẫn trừu tượng độc lập hệ điều hành để chạy được trên nhiều nền tảng.
 4. Mã hóa ký tự UTF-8 không BOM:
 Mọi thao tác đọc, ghi tệp dữ liệu cục bộ, tệp xuất dữ liệu JSON và xuất báo cáo phải chỉ định rõ ràng bảng mã UTF-8 không BOM. Quy định này bảo đảm dữ liệu tiếng Việt có dấu lưu trữ và hiển thị chính xác. Điều này cũng tránh lỗi mã hóa ký tự bất kể bảng mã mặc định của hệ điều hành máy tính là gì.
 5. Không phụ thuộc thư viện nhị phân ngoại lai:
@@ -263,7 +263,7 @@ Bảng chỉ số đo và ngưỡng nghiệm thu:
 
 | Thuộc tính đo kiểm | Chỉ số đo | Ngưỡng nghiệm thu |
 | --- | --- | --- |
-| Tỷ lệ vượt qua bộ kiểm thử tự động trên các hệ điều hành mục tiêu (Windows, macOS, Linux) | Tỷ lệ ca kiểm thử đạt kết quả PASS trên từng nền tảng đã kiểm thử | 100.00% |
+| Tỷ lệ vượt qua bộ kiểm thử tự động trên các hệ điều hành mục tiêu (Windows, MacOS, Linux) | Tỷ lệ ca kiểm thử đạt kết quả PASS trên từng nền tảng đã kiểm thử | 100.00% |
 | Tỷ lệ thao tác đọc ghi tệp chỉ định rõ ràng bảng mã UTF-8 | Số thao tác đọc ghi tệp có chỉ định bảng mã UTF-8 chia cho tổng số thao tác đọc ghi tệp | 100.00% |
 | Tỷ lệ lỗi vỡ phông chữ tiếng Việt | Số trường hợp hiển thị sai ký tự có dấu phát hiện được | 0 lỗi phông chữ |
 | Số lượng thư viện nhị phân phụ thuộc nền tảng | Số thư viện nhị phân gốc phụ thuộc hệ điều hành sử dụng | 0 thư viện |

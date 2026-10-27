@@ -1,14 +1,14 @@
 ## 6. ĐẶC TẢ 20 CA SỬ DỤNG CHI TIẾT
 
-20 ca sử dụng của Hệ thống Quản lý Tài chính Cá nhân mô hình hóa toàn bộ chuỗi tương tác hoàn chỉnh giữa Người dùng và hệ thống để đạt được các mục tiêu nghiệp vụ cụ thể theo phương pháp Fully Dressed Use Case của Alistair Cockburn và chuẩn kỹ thuật IREB CPRE. Toàn bộ 20 ca sử dụng hiện thực hóa các yêu cầu chức năng tại Mục 4 (`FR-WAL-01` đến `FR-DAT-03`) và tuân thủ nghiêm ngặt các quy tắc nghiệp vụ tại Mục 3 (`BR-FIN-01` đến `BR-FIN-04` và `BR-NAM-01`). Hồ sơ ca sử dụng quán triệt 4 nguyên tắc kỹ thuật cốt lõi: hệ thống phục vụ một Người dùng duy nhất trên môi trường máy tính để bàn cục bộ; mỗi ca sử dụng bao đóng một mục tiêu nghiệp vụ độc lập, không gộp các thao tác thành cụm "Quản lý X" mơ hồ; các giao dịch tài chính nhiều bước được ghi nhận nguyên khối hoặc tự động hoàn nguyên khi có lỗi; phân định rạch ròi giữa biến thể thành công hợp lệ và tình huống vi phạm dữ liệu.
+20 ca sử dụng của Hệ thống quản lý tài chính cá nhân mô hình hóa toàn bộ chuỗi tương tác hoàn chỉnh giữa người dùng và hệ thống để đạt được các mục tiêu nghiệp vụ cụ thể theo phương pháp Fully Dressed Use Case của Alistair Cockburn và chuẩn kỹ thuật IREB CPRE. Toàn bộ 20 ca sử dụng hiện thực hóa các yêu cầu chức năng tại Mục 4 (`FR-WAL-01` đến `FR-DAT-03`) và tuân thủ nghiêm ngặt các quy tắc nghiệp vụ tại Mục 3 (`BR-FIN-01` đến `BR-FIN-04` và `BR-NAM-01`). Hồ sơ ca sử dụng quán triệt 4 nguyên tắc kỹ thuật cốt lõi: hệ thống phục vụ một người dùng duy nhất trên môi trường máy tính để bàn cục bộ; mỗi ca sử dụng bao đóng một mục tiêu nghiệp vụ độc lập, không gộp các thao tác thành cụm "Quản lý X" mơ hồ; các giao dịch tài chính nhiều bước được ghi nhận nguyên khối hoặc tự động hoàn nguyên khi có lỗi; phân định rạch ròi giữa biến thể thành công hợp lệ và tình huống vi phạm dữ liệu.
 
 Mỗi ca sử dụng được đặc tả nhất quán theo khuôn mẫu ca sử dụng mở rộng gồm 9 trường thông tin chuẩn:
-1. Mã và Tên ca sử dụng: Mã định danh phân cấp duy nhất `UC-<DOMAIN>-NN` và tên hành động theo cấu trúc chuẩn Động từ + Danh từ.
-2. Bảng thuộc tính ca sử dụng: Tác nhân chính, Phạm vi và Cấp độ mục tiêu người dùng, Các bên liên quan và mối quan tâm, Mô tả tóm tắt, Điều kiện kích hoạt.
+1. Mã và tên ca sử dụng: Mã định danh phân cấp duy nhất `UC-<DOMAIN>-<NN>` và tên hành động theo cấu trúc chuẩn động từ + danh từ.
+2. Bảng thuộc tính ca sử dụng: Tác nhân chính, phạm vi và cấp độ mục tiêu người dùng, các bên liên quan và mối quan tâm, mô tả tóm tắt, điều kiện kích hoạt.
 3. Tiền điều kiện: Trạng thái hệ thống và điều kiện dữ liệu bắt buộc phải thỏa mãn trước khi bắt đầu thực hiện ca sử dụng.
 4. Bảo đảm tối thiểu: Trạng thái hệ thống và tệp dữ liệu được hoàn nguyên nguyên vẹn khi giao dịch thất bại, bị hủy hoặc gặp lỗi dữ liệu, không để lại bản ghi rác.
 5. Hậu điều kiện thành công: Trạng thái dữ liệu lâu dài được ghi nhận sau khi luồng sự kiện chính hoàn tất, bảo toàn các bất biến tài chính tại Mục 3.
-6. Luồng sự kiện chính: Trình tự các bước tương tác tuần tự đánh số giữa Người dùng và Hệ thống từ khi bắt đầu đến khi đạt được mục tiêu.
+6. Luồng sự kiện chính: Trình tự các bước tương tác tuần tự đánh số giữa người dùng và hệ thống từ khi bắt đầu đến khi đạt được mục tiêu.
 7. Các luồng rẽ nhánh: Các biến thể thực hiện hợp lệ khác của ca sử dụng dẫn tới kết quả thành công hoặc kết thúc hợp lệ.
 8. Các luồng ngoại lệ: Các tình huống vi phạm dữ liệu, vượt ngưỡng số học hoặc điều kiện biên, chỉ rõ phản ứng hệ thống, thông báo lỗi `ERR-*` và điểm phục hồi.
 9. Quy tắc nghiệp vụ đặc thù: Danh sách liên kết trực tiếp tới các quy tắc nghiệp vụ `BR-*` tại Mục 3 và yêu cầu chức năng `FR-*` tại Mục 4 mà ca sử dụng trực tiếp áp dụng.
@@ -65,7 +65,7 @@ Bảng thuộc tính ca sử dụng:
 #### Tiền điều kiện
 
 1. Hệ thống PFMS đã khởi chạy và đọc tệp dữ liệu cục bộ vào bộ nhớ thành công.
-2. Người dùng đang ở màn hình Quản lý ví.
+2. Người dùng đang ở màn hình quản lý ví.
 3. Hệ thống đã đọc danh sách ví hiện có. Ở lần chạy đầu tiên, danh sách chỉ có ví tiền mặt có sẵn.
 
 #### Bảo đảm tối thiểu
