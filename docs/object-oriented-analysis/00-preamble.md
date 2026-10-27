@@ -58,7 +58,6 @@
 - 4.4 Các thao tác Chuyển tiền Nội bộ
 - 4.5 Các thao tác Danh mục Phân loại
 - 4.6 Thao tác Lưu trữ và Phục hồi Dữ liệu
-- 4.7 Bảng Tổng hợp Biến đổi Dữ liệu trên các Thực thể Miền
 
 ### Phần 5: Mô hình Trạng thái Thực thể
 - 5.1 Khái niệm và Vai trò của Biểu đồ Trạng thái trong OOA
