@@ -20,7 +20,7 @@
 - [01-gioi-thieu-va-ngu-canh-he-thong.md](01-gioi-thieu-va-ngu-canh-he-thong.md): Mục đích tài liệu OOA, ranh giới và ngữ cảnh hệ thống, bảng đối chiếu khái niệm miền
 - [02-mo-hinh-mien-khai-niem.md](02-mo-hinh-mien-khai-niem.md): Mô hình miền khái niệm, phân loại thực thể và đối tượng giá trị, các quy tắc nghiệp vụ
 - [03-so-do-tuan-tu-he-thong-ssd.md](03-so-do-tuan-tu-he-thong-ssd.md): Sơ đồ tuần tự hệ thống cho 20 ca sử dụng và bảng thao tác hệ thống
-- [04-hop-dong-thao-tac-operation-contracts.md](04-hop-dong-thao-tac-operation-contracts.md): Đặc tả hợp đồng thao tác hệ thống
+- [04-hop-dong-thao-tac-operation-contracts.md](04-hop-dong-thao-tac-operation-contracts.md): Đặc tả biến đổi dữ liệu của các thao tác hệ thống
 - [05-mo-hinh-trang-thai-thuc-the.md](05-mo-hinh-trang-thai-thuc-the.md): Biểu đồ máy trạng thái cho vòng đời thực thể
 - [06-phan-tich-robustness-va-crc.md](06-phan-tich-robustness-va-crc.md): Phân tích Robustness BCE và bộ thẻ CRC phân bổ trách nhiệm sơ bộ
 - [07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận truy vết hai chiều chức năng sang thực thể, thao tác và quy tắc nghiệp vụ
@@ -51,16 +51,14 @@
 - 3.7 Nhóm Chức năng Thống kê và Báo cáo (REP)
 - 3.8 Nhóm Chức năng Lưu trữ và Sao lưu Dữ liệu (DAT)
 
-### Phần 4: Hợp đồng Thao tác Hệ thống
-- 4.1 Phương pháp Luận và Cấu trúc Hợp đồng Chuẩn Craig Larman
-- 4.2 Hợp đồng Thao tác: createWallet
-- 4.3 Hợp đồng Thao tác: recordIncomeExpense
-- 4.4 Hợp đồng Thao tác: transferFunds
-- 4.5 Hợp đồng Thao tác: adjustBalance
-- 4.6 Hợp đồng Thao tác: deleteCategory
-- 4.7 Hợp đồng Thao tác: updateTransaction
-- 4.8 Hợp đồng Thao tác: deleteTransaction
-- 4.9 Bảng Tổng hợp Trách nhiệm Biến đổi Trạng thái
+### Phần 4: Đặc tả Biến đổi Dữ liệu Thao tác Hệ thống
+- 4.1 Cấu trúc Đặc tả Thao tác
+- 4.2 Các thao tác Quản lý Ví
+- 4.3 Các thao tác Ghi nhận Thu chi
+- 4.4 Các thao tác Chuyển tiền Nội bộ
+- 4.5 Các thao tác Danh mục Phân loại
+- 4.6 Thao tác Lưu trữ và Phục hồi Dữ liệu
+- 4.7 Bảng Tổng hợp Biến đổi Dữ liệu trên các Thực thể Miền
 
 ### Phần 5: Mô hình Trạng thái Thực thể
 - 5.1 Khái niệm và Vai trò của Biểu đồ Trạng thái trong OOA
