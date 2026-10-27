@@ -28,9 +28,6 @@ flowchart TD
 
     CoreTx --> BAL
     BAL --> REP
-
-    style BAL fill:#f9f0ea,stroke:#d97706,stroke-width:2px
-    style REP fill:#eff6ff,stroke:#2563eb,stroke-width:1px
 ```
 
 ### 2.2 Mục tiêu hệ thống

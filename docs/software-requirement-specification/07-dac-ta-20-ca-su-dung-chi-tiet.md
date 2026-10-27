@@ -25,31 +25,6 @@ Bảng chia 20 ca sử dụng theo 6 nhóm chức năng:
 | 6 | Lưu trữ và sao lưu dữ liệu | `DAT` | 3 | `UC-DAT-01` đến `UC-DAT-03` |
 | **Tổng** | **6 nhóm chức năng** |  | **20 UC** |  |
 
-Bảng tổng hợp phân bổ 20 ca sử dụng của hệ thống:
-
-| STT | Mã ca sử dụng | Tên ca sử dụng | Nhóm chức năng | Tác nhân chính | Yêu cầu chức năng ánh xạ |
-| :---: | :---: | :--- | :--- | :--- | :--- |
-| 1 | `UC-WAL-01` | Tạo ví mới | Ví | Người dùng | `FR-WAL-01`, `FR-WAL-02`, `FR-WAL-03`, `FR-WAL-04` |
-| 2 | `UC-WAL-02` | Theo dõi số dư tính lại từ lịch sử dòng tiền và cơ cấu ví | Ví | Người dùng | `FR-WAL-02`, `FR-WAL-04` |
-| 3 | `UC-WAL-03` | Cập nhật thông tin ví | Ví | Người dùng | `FR-WAL-01`, `FR-WAL-03` |
-| 4 | `UC-WAL-04` | Điều chỉnh số dư ví | Ví | Người dùng | `FR-WAL-05` |
-| 5 | `UC-TXN-01` | Ghi nhận giao dịch thu chi | Ghi nhận thu chi | Người dùng | `FR-TXN-01`, `FR-TXN-02` |
-| 6 | `UC-TXN-02` | Tra cứu và lọc lịch sử giao dịch thu chi | Ghi nhận thu chi | Người dùng | `FR-TXN-03` |
-| 7 | `UC-TXN-03` | Chỉnh sửa giao dịch thu chi | Ghi nhận thu chi | Người dùng | `FR-TXN-04` |
-| 8 | `UC-TXN-04` | Xóa giao dịch thu chi | Ghi nhận thu chi | Người dùng | `FR-TXN-05` |
-| 9 | `UC-TRF-01` | Chuyển tiền nội bộ giữa hai ví | Chuyển tiền nội bộ | Người dùng | `FR-TRF-01` |
-| 10 | `UC-TRF-02` | Tra cứu lịch sử chuyển tiền | Chuyển tiền nội bộ | Người dùng | `FR-TRF-02` |
-| 11 | `UC-TRF-03` | Xóa giao dịch chuyển tiền | Chuyển tiền nội bộ | Người dùng | `FR-TRF-02` |
-| 12 | `UC-CAT-01` | Bổ sung danh mục phân loại mới | Danh mục phân loại | Người dùng | `FR-CAT-01`, `FR-CAT-02` |
-| 13 | `UC-CAT-02` | Đổi tên danh mục | Danh mục phân loại | Người dùng | `FR-CAT-02`, `FR-CAT-03` |
-| 14 | `UC-CAT-03` | Khôi phục hoặc tạo lại mục đã xóa | Danh mục phân loại | Người dùng | `FR-CAT-02`, `FR-CAT-03` |
-| 15 | `UC-CAT-04` | Xóa danh mục hoặc nhóm | Danh mục phân loại | Người dùng | `FR-CAT-03` |
-| 16 | `UC-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | Thống kê và báo cáo | Người dùng | `FR-REP-01` |
-| 17 | `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | Thống kê và báo cáo | Người dùng | `FR-REP-02` |
-| 18 | `UC-DAT-01` | Xuất dữ liệu tài chính | Lưu trữ và sao lưu dữ liệu | Người dùng | `FR-DAT-01` |
-| 19 | `UC-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu | Lưu trữ và sao lưu dữ liệu | Người dùng | `FR-DAT-02` |
-| 20 | `UC-DAT-03` | Kiểm tra lại dữ liệu hệ thống | Lưu trữ và sao lưu dữ liệu | Người dùng | `FR-DAT-03` |
-
 ### 6.1 UC-WAL-01: Tạo ví mới
 
 Bảng thuộc tính ca sử dụng:
