@@ -17,25 +17,22 @@
 ## Danh mục Tài liệu Thành phần
 
 - [00-preamble.md](00-preamble.md): Thông tin định danh học phần, giảng viên hướng dẫn và nhóm tác giả
-- [01-muc-luc-tong-quan.md](01-muc-luc-tong-quan.md): Cấu trúc điều hướng tổng thể hồ sơ phân tích
-- [02-gioi-thieu-va-ngu-canh-he-thong.md](02-gioi-thieu-va-ngu-canh-he-thong.md): Mục đích tài liệu OOA, ranh giới hộp đen và tác nhân duy nhất
-- [03-mo-hinh-mien-khai-niem.md](03-mo-hinh-mien-khai-niem.md): Mô hình miền khái niệm, phân loại Entity vs Value Object và các quy tắc bất biến
-- [04-so-do-tuan-tu-he-thong-ssd.md](04-so-do-tuan-tu-he-thong-ssd.md): Sơ đồ tuần tự hệ thống cho 20 ca sử dụng và bảng System Operations
-- [05-hop-dong-thao-tac-operation-contracts.md](05-hop-dong-thao-tac-operation-contracts.md): Đặc tả hợp đồng thao tác hệ thống chuẩn Craig Larman
-- [06-mo-hinh-trang-thai-thuc-the.md](06-mo-hinh-trang-thai-thuc-the.md): Biểu đồ máy trạng thái UML cho vòng đời thực thể
-- [07-phan-tich-robustness-va-crc.md](07-phan-tich-robustness-va-crc.md): Phân tích Robustness BCE và bộ thẻ CRC phân bổ trách nhiệm sơ bộ
-- [08-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](08-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận truy vết hai chiều FR/UC sang Entity, Operation và Business Rule
-- [09-tong-ket-va-chuyen-giao-sang-ood.md](09-tong-ket-va-chuyen-giao-sang-ood.md): Tổng kết phân tích Milestone 2 và tiêu chí chuyển tiếp sang OOD
-- [10-tai-lieu-trich-dan.md](10-tai-lieu-trich-dan.md): Danh mục tài liệu tham khảo kỹ thuật chuẩn APA 7th edition
+- [01-gioi-thieu-va-ngu-canh-he-thong.md](01-gioi-thieu-va-ngu-canh-he-thong.md): Mục đích tài liệu OOA, ranh giới và ngữ cảnh hệ thống, bảng đối chiếu khái niệm miền
+- [02-mo-hinh-mien-khai-niem.md](02-mo-hinh-mien-khai-niem.md): Mô hình miền khái niệm, phân loại thực thể và đối tượng giá trị, các quy tắc nghiệp vụ
+- [03-so-do-tuan-tu-he-thong-ssd.md](03-so-do-tuan-tu-he-thong-ssd.md): Sơ đồ tuần tự hệ thống cho 20 ca sử dụng và bảng thao tác hệ thống
+- [04-hop-dong-thao-tac-operation-contracts.md](04-hop-dong-thao-tac-operation-contracts.md): Đặc tả hợp đồng thao tác hệ thống
+- [05-mo-hinh-trang-thai-thuc-the.md](05-mo-hinh-trang-thai-thuc-the.md): Biểu đồ máy trạng thái cho vòng đời thực thể
+- [06-phan-tich-robustness-va-crc.md](06-phan-tich-robustness-va-crc.md): Phân tích Robustness BCE và bộ thẻ CRC phân bổ trách nhiệm sơ bộ
+- [07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận truy vết hai chiều chức năng sang thực thể, thao tác và quy tắc nghiệp vụ
+- [08-tong-ket-va-chuyen-giao-sang-ood.md](08-tong-ket-va-chuyen-giao-sang-ood.md): Tổng kết phân tích Milestone 2 và tiêu chí chuyển tiếp sang OOD
+- [09-tai-lieu-trich-dan.md](09-tai-lieu-trich-dan.md): Danh mục tài liệu tham khảo kỹ thuật chuẩn APA
 
 ## Phân cấp Cấu trúc Chi tiết các Phần
 
 ### Phần 1: Giới thiệu và Ngữ cảnh Hệ thống
 - 1.1 Mục đích và Phạm vi Tài liệu OOA
-- 1.2 Ranh giới Hệ thống và Nguyên tắc Hộp đen (:System)
-- 1.3 Mô hình Ngữ cảnh Hệ thống
-- 1.4 Đặc tả Tác nhân Hệ thống (Người dùng theo AS-01)
-- 1.5 Mối liên kết với Đặc tả Yêu cầu SRS
+- 1.2 Ranh giới và Ngữ cảnh Hệ thống
+- 1.3 Bảng Đối chiếu Khái niệm Miền theo Nhóm Chức năng
 
 ### Phần 2: Mô hình Miền Khái niệm
 - 2.1 Phương pháp luận Xác định Lớp Khái niệm
@@ -45,14 +42,14 @@
 - 2.5 Các Mối Quan hệ Ngữ nghĩa và Bất biến Miền
 
 ### Phần 3: Sơ đồ Tuần tự Hệ thống
-- 3.1 Nguyên tắc Mô hình hóa SSD và Ranh giới Hộp đen (:System)
-- 3.2 Bảng Tổng hợp System Events và System Operations Toàn Hệ thống
-- 3.3 SSD Nhóm Chức năng Quản lý Ví (WAL)
-- 3.4 SSD Nhóm Chức năng Ghi nhận Thu chi (TXN)
-- 3.5 SSD Nhóm Chức năng Chuyển tiền Nội bộ (TRF)
-- 3.6 SSD Nhóm Chức năng Danh mục Phân loại (CAT)
-- 3.7 SSD Nhóm Chức năng Thống kê và Báo cáo (REP)
-- 3.8 SSD Nhóm Chức năng Lưu trữ và Sao lưu Dữ liệu (DAT)
+- 3.1 Nguyên tắc Mô hình hóa và Ranh giới Tương tác Hệ thống
+- 3.2 Tổng hợp Thao tác Hệ thống theo Nhóm Chức năng
+- 3.3 Nhóm Chức năng Quản lý Ví (WAL)
+- 3.4 Nhóm Chức năng Ghi nhận Thu chi (TXN)
+- 3.5 Nhóm Chức năng Chuyển tiền Nội bộ (TRF)
+- 3.6 Nhóm Chức năng Danh mục Phân loại (CAT)
+- 3.7 Nhóm Chức năng Thống kê và Báo cáo (REP)
+- 3.8 Nhóm Chức năng Lưu trữ và Sao lưu Dữ liệu (DAT)
 
 ### Phần 4: Hợp đồng Thao tác Hệ thống
 - 4.1 Phương pháp Luận và Cấu trúc Hợp đồng Chuẩn Craig Larman
