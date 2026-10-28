@@ -1,43 +1,68 @@
 # 5. Mô hình Trạng thái Thực thể
 
-<!-- PLACEHOLDER: Tổng quan về Mô hình Trạng thái Thực thể (Entity State Machine Diagrams) trong OOA | Nguồn tham chiếu: Craig Larman Chapter 29, Scott Ambler Chapter 6 | Tiêu chí hoàn thành: Giải thích vai trò của biểu đồ trạng thái UML trong việc mô hình hóa vòng đời của các thực thể có hành vi phụ thuộc vào trạng thái -->
+Tài liệu này mô tả vòng đời của các thực thể có hành vi thay đổi theo trạng thái dữ liệu trong hệ thống quản lý tài chính cá nhân.
 
-## 5.1 Khái niệm và Vai trò của Biểu đồ Trạng thái trong OOA
+Mô hình trạng thái xác định tập hợp các trạng thái hợp lệ của thực thể, sự kiện kích hoạt chuyển đổi, điều kiện kiểm tra dữ liệu và các tác vụ cập nhật số dư đi kèm. Những thực thể không thay đổi hành vi sau khi khởi tạo như nhóm nhu cầu hay bản ghi kiểm kê số dư không thuộc phạm vi mô tả của tài liệu này.
 
-<!-- PLACEHOLDER: Trình bày các thành phần chuẩn của biểu đồ trạng thái UML (Trạng thái ban đầu, Trạng thái kết thúc, Trạng thái chuyển tiếp, Sự kiện kích hoạt Event, Điều kiện bảo vệ Guard condition, Hành động Action) | Nguồn tham chiếu: Larman Chapter 29 | Tiêu chí hoàn thành: Định hướng mô hình hóa ở tầng khái niệm miền, không rò rỉ mã cài đặt hay State Pattern của OOD -->
+## 5.1 Quy chuẩn Mô hình Trạng thái
 
-## 5.2 Vòng đời Thực thể Danh mục (Category State Machine)
+Mỗi biểu đồ và bảng chuyển trạng thái trong tài liệu được chuẩn hóa theo các thành phần kỹ thuật sau:
 
-<!-- PLACEHOLDER: Giới thiệu vòng đời của thực thể Category và tầm quan trọng của cơ chế xóa mềm bảo toàn tính toàn vẹn dữ liệu | Nguồn tham chiếu: FR-CAT-03, BR-FIN-04, Checkpoint 3 | Tiêu chí hoàn thành: Nêu bật lý do tại sao không xóa vật lý danh mục đã có giao dịch -->
+| Thành phần | Ký hiệu quy ước | Nội dung kỹ thuật |
+| :--- | :--- | :--- |
+| **Trạng thái** | Khối trạng thái | Tình trạng tồn tại của thực thể, xác định các thao tác nghiệp vụ được chấp nhận hoặc bị từ chối xử lý tại thời điểm tiếp nhận. |
+| **Trạng thái ban đầu** | Điểm đen tròn `[*]` | Điểm bắt đầu vòng đời khi thực thể được khởi tạo thành công từ một thao tác hệ thống. |
+| **Sự kiện kích hoạt** | Tên thao tác hệ thống | Tác động từ người dùng hoặc hệ thống làm phát sinh yêu cầu chuyển đổi trạng thái của thực thể. |
+| **Điều kiện bảo vệ** | `[Điều kiện]` | Ràng buộc nghiệp vụ cần thỏa mãn trước khi đổi trạng thái. Nếu điều kiện vi phạm, hệ thống từ chối thao tác và giữ nguyên trạng thái cũ. |
+| **Hành động hệ thống** | `/Hành động` | Tác vụ xử lý dữ liệu được hệ thống thực thi ngay khi chuyển trạng thái, gồm cập nhật số dư hoặc điều chỉnh liên kết dữ liệu. |
+| **Trạng thái kết thúc** | Điểm tròn có vòng bao `[*]` | Điểm kết thúc vòng đời khi thực thể bị xóa hoàn toàn khỏi hệ thống lưu trữ. |
 
-### 5.2.1 Biểu đồ Trạng thái Danh mục
+Mỗi thực thể được mô tả qua biểu đồ trạng thái và bảng ràng buộc chuyển đổi gồm 3 cột: giai đoạn chuyển đổi, điều kiện kiểm tra và xử lý hệ thống.
 
-<!-- PLACEHOLDER: Biểu đồ trạng thái UML dạng Mermaid (stateDiagram-v2) thể hiện các trạng thái ACTIVE và SOFT_DELETED của Category | Nguồn tham chiếu: UC-CAT-01, UC-CAT-03, UC-CAT-04 | Tiêu chí hoàn thành: Cú pháp Mermaid hợp lệ, thể hiện nhánh hard delete khi chưa có giao dịch và soft delete khi đã có giao dịch -->
+## 5.2 Vòng đời Thực thể Ví
 
-### 5.2.2 Bảng Chuyển trạng thái và Sự kiện Kích hoạt
+(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ và mục đích quản lý vòng đời của thực thể trong hệ thống)
 
-<!-- PLACEHOLDER: Bảng chi tiết các bước chuyển trạng thái của Category gồm Trạng thái hiện tại, Sự kiện kích hoạt, Điều kiện bảo vệ (Guard), Trạng thái tiếp theo, Hành động hệ thống | Nguồn tham chiếu: SRS Mục 6.12 - 6.15 | Tiêu chí hoàn thành: Bảng chuẩn 5 cột bao phủ đầy đủ các kịch bản tạo mới, xóa mềm và khôi phục -->
+- Quy chiếu chéo: `UC-WAL-01`, `UC-WAL-03`, `FR-WAL-01`, `FR-WAL-03`, `BR-NAM-01`, `BR-FIN-02`, `ERR-NAM-001`, `ERR-NAM-002`
 
-## 5.3 Vòng đời Giao dịch Thu chi (IncomeExpenseTransaction State Machine)
+(Vẽ biểu đồ trạng thái mô tả các trạng thái hợp lệ và luồng chuyển đổi của thực thể)
 
-<!-- PLACEHOLDER: Giới thiệu vòng đời của thực thể IncomeExpenseTransaction từ khi ghi nhận đến khi hoàn nguyên số dư | Nguồn tham chiếu: SRS Mục 6.5 - 6.8, BR-FIN-02, Checkpoint 3 | Tiêu chí hoàn thành: Làm rõ cơ chế tự động hoàn nguyên số dư ví và phí khi sửa hoặc xóa -->
+| Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
+| :--- | :--- | :--- |
+| (Nêu giai đoạn hoặc bước chuyển của thực thể) | (Nêu các điều kiện hợp lệ cần kiểm tra trước khi chuyển trạng thái) | (Nêu trạng thái mới và các tác vụ cập nhật dữ liệu đi kèm) |
 
-### 5.3.1 Biểu đồ Trạng thái Giao dịch Thu chi
+## 5.3 Vòng đời Giao dịch Thu chi
 
-<!-- PLACEHOLDER: Biểu đồ trạng thái UML dạng Mermaid (stateDiagram-v2) thể hiện các trạng thái RECORDED, MODIFIED, DELETED của IncomeExpenseTransaction | Nguồn tham chiếu: UC-TXN-01, UC-TXN-03, UC-TXN-04 | Tiêu chí hoàn thành: Biểu đồ Mermaid chuẩn, thể hiện luồng hoàn nguyên tài chính an toàn -->
+(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ và mục đích quản lý vòng đời của thực thể trong hệ thống)
 
-### 5.3.2 Bảng Chuyển trạng thái và Xử lý Hoàn nguyên Số dư
+- Quy chiếu chéo: `UC-TXN-01`, `UC-TXN-03`, `UC-TXN-04`, `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
-<!-- PLACEHOLDER: Bảng chi tiết các bước chuyển trạng thái của IncomeExpenseTransaction kèm điều kiện kiểm tra số dư ví không âm trước khi cho phép chuyển trạng thái | Nguồn tham chiếu: BR-FIN-02, ERR-WAL-001 | Tiêu chí hoàn thành: Bảng chuẩn 5 cột, nêu rõ hành động đồng bộ hóa trên TransactionFee -->
+(Vẽ biểu đồ trạng thái mô tả các trạng thái hợp lệ và luồng chuyển đổi của thực thể)
 
-## 5.4 Vòng đời Giao dịch Chuyển tiền (TransferTransaction State Machine)
+| Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
+| :--- | :--- | :--- |
+| (Nêu giai đoạn hoặc bước chuyển của thực thể) | (Nêu các điều kiện hợp lệ cần kiểm tra trước khi chuyển trạng thái) | (Nêu trạng thái mới và các tác vụ cập nhật dữ liệu đi kèm) |
 
-<!-- PLACEHOLDER: Giới thiệu vòng đời của thực thể TransferTransaction theo nguyên tắc ghi nhận đồng thời | Nguồn tham chiếu: SRS Mục 6.9 - 6.11, BR-FIN-03, Checkpoint 3 | Tiêu chí hoàn thành: Khẳng định tính nguyên khối (atomic) của giao dịch chuyển tiền nội bộ -->
+## 5.4 Vòng đời Giao dịch Chuyển tiền
 
-### 5.4.1 Biểu đồ Trạng thái Chuyển tiền
+(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ và mục đích quản lý vòng đời của thực thể trong hệ thống)
 
-<!-- PLACEHOLDER: Biểu đồ trạng thái UML dạng Mermaid (stateDiagram-v2) thể hiện các trạng thái INITIALIZED, COMMITTED, REVERTED của TransferTransaction | Nguồn tham chiếu: UC-TRF-01, UC-TRF-03, BR-FIN-03 | Tiêu chí hoàn thành: Biểu đồ Mermaid chuẩn, thể hiện nhánh hủy bỏ khi số dư nguồn không đủ và nhánh hoàn nguyên an toàn -->
+- Quy chiếu chéo: `UC-TRF-01`, `UC-TRF-03`, `FR-TRF-01`, `FR-TRF-02`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
-### 5.4.2 Bảng Chuyển trạng thái và Ràng buộc Ghi nhận Đồng thời
+(Vẽ biểu đồ trạng thái mô tả các trạng thái hợp lệ và luồng chuyển đổi của thực thể)
 
-<!-- PLACEHOLDER: Bảng chi tiết các bước chuyển trạng thái của TransferTransaction gắn liền với bất biến BR-FIN-03 (trừ ví nguồn và cộng ví đích cùng được ghi nhận hoặc cùng không ghi nhận) | Nguồn tham chiếu: BR-FIN-03, BR-FIN-02 | Tiêu chí hoàn thành: Bảng chuẩn 5 cột, nêu rõ điều kiện bảo vệ khi xóa chuyển tiền (ví đích đủ số dư để hoàn trả) -->
+| Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
+| :--- | :--- | :--- |
+| (Nêu giai đoạn hoặc bước chuyển của thực thể) | (Nêu các điều kiện hợp lệ cần kiểm tra trước khi chuyển trạng thái) | (Nêu trạng thái mới và các tác vụ cập nhật dữ liệu đi kèm) |
+
+## 5.5 Vòng đời Thực thể Danh mục
+
+(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ và mục đích quản lý vòng đời của thực thể trong hệ thống)
+
+- Quy chiếu chéo: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`, `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`, `BR-FIN-04`, `BR-NAM-01`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-003`, `ERR-CAT-004`, `ERR-CAT-005`
+
+(Vẽ biểu đồ trạng thái mô tả các trạng thái hợp lệ và luồng chuyển đổi của thực thể)
+
+| Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
+| :--- | :--- | :--- |
+| (Nêu giai đoạn hoặc bước chuyển của thực thể) | (Nêu các điều kiện hợp lệ cần kiểm tra trước khi chuyển trạng thái) | (Nêu trạng thái mới và các tác vụ cập nhật dữ liệu đi kèm) |

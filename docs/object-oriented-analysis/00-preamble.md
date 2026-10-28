@@ -60,10 +60,11 @@
 - 4.6 Thao tác Lưu trữ và Phục hồi Dữ liệu
 
 ### Phần 5: Mô hình Trạng thái Thực thể
-- 5.1 Khái niệm và Vai trò của Biểu đồ Trạng thái trong OOA
-- 5.2 Vòng đời Thực thể Danh mục (Category State Machine)
-- 5.3 Vòng đời Giao dịch Thu chi (IncomeExpenseTransaction State Machine)
-- 5.4 Vòng đời Giao dịch Chuyển tiền (TransferTransaction State Machine)
+- 5.1 Quy chuẩn Mô hình Trạng thái
+- 5.2 Vòng đời Thực thể Ví
+- 5.3 Vòng đời Giao dịch Thu chi
+- 5.4 Vòng đời Giao dịch Chuyển tiền
+- 5.5 Vòng đời Thực thể Danh mục
 
 ### Phần 6: Phân tích Robustness và Thẻ CRC
 - 6.1 Phương pháp Phân tích Robustness (Boundary - Control - Entity)
