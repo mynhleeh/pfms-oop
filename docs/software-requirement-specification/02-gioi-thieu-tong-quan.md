@@ -2,11 +2,11 @@
 
 ### 1.1 Mục đích
 
-Tài liệu đặc tả yêu cầu phần mềm này xác định các yêu cầu cho Hệ thống quản lý tài chính cá nhân. Các yêu cầu gồm yêu cầu chức năng, yêu cầu phi chức năng, các quy tắc nghiệp vụ (`BR-FIN-01` đến `BR-FIN-04` và `BR-NAM-01`) và tiêu chí nghiệm thu kiểm chứng được. Tài liệu đặt ra căn cứ kỹ thuật cho hoạt động phân tích thiết kế hướng đối tượng. Căn cứ này áp dụng cả cho việc cài đặt mã nguồn trên nền tảng Java 17 LTS và triển khai bộ kiểm thử tự động độc lập công nghệ.
+Tài liệu đặc tả yêu cầu phần mềm này xác định các yêu cầu cho Hệ thống quản lý tài chính cá nhân. Các yêu cầu gồm yêu cầu chức năng, yêu cầu phi chức năng, 5 quy tắc nghiệp vụ cốt lõi: Quy tắc độ chính xác tài chính (`BR-FIN-01`), Quy tắc bảo toàn số dư ví (`BR-FIN-02`), Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`), Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`), cùng tiêu chí nghiệm thu kiểm chứng được. Tài liệu đặt ra căn cứ kỹ thuật cho hoạt động phân tích thiết kế hướng đối tượng. Căn cứ này áp dụng cả cho việc cài đặt mã nguồn trên nền tảng Java 17 LTS và triển khai bộ kiểm thử tự động độc lập công nghệ.
 
 ### 1.2 Phạm vi sản phẩm
 
-PFMS là ứng dụng máy tính để bàn chạy cục bộ trên máy ảo Java, phục vụ một người dùng duy nhất. Hệ thống đáp ứng nhu cầu quản lý tài chính cá nhân trên máy tính cá nhân. Hệ thống độc lập hoàn toàn với các hệ thống tài chính doanh nghiệp và dịch vụ ngân hàng trực tuyến.
+Hệ thống Quản lý Tài chính Cá nhân (PFMS) là ứng dụng máy tính để bàn chạy cục bộ trên máy ảo Java, phục vụ một người dùng duy nhất. Hệ thống đáp ứng nhu cầu quản lý tài chính cá nhân trên máy tính cá nhân. Hệ thống độc lập hoàn toàn với các hệ thống tài chính doanh nghiệp và dịch vụ ngân hàng trực tuyến.
 
 #### 1.2.1 Phạm vi chức năng trong hệ thống
 
@@ -33,8 +33,6 @@ Hệ thống loại trừ 3 hạng mục trong bảng dưới đây để giữ 
 
 ### 1.3 Đối tượng sử dụng và hướng dẫn đọc tài liệu
 
-Bốn nhóm đối tượng kỹ thuật dùng tài liệu này với mục đích và phạm vi đọc khác nhau:
-
 | Nhóm đối tượng | Mục đích sử dụng tài liệu | Phạm vi tài liệu trọng tâm |
 | --- | --- | --- |
 | Kỹ sư phân tích và thiết kế | Xác định ranh giới hệ thống, chuyển hóa yêu cầu nghiệp vụ thành kiến trúc và thiết kế phần mềm chi tiết | Mục 1, Mục 2, Mục 4, Mục 6, Mục 7 |
@@ -42,15 +40,7 @@ Bốn nhóm đối tượng kỹ thuật dùng tài liệu này với mục đí
 | Kỹ sư kiểm thử phần mềm | Xây dựng ca kiểm thử đơn vị và kiểm thử tích hợp dựa trên luồng sự kiện và điều kiện biên | Mục 3, Mục 6, Mục 8 |
 | Cán bộ thẩm định kỹ thuật | So khớp độ bao phủ của yêu cầu qua ma trận kiểm chứng và truy vết yêu cầu, kiểm tra mức độ đáp ứng yêu cầu phi chức năng ở Mục 5 | Toàn bộ tài liệu |
 
-Trình tự đọc tài liệu:
-
-1. Đọc Mục 1 và Mục 2 để nắm vững ranh giới hệ thống, 3 mục tiêu hệ thống (`G-01` đến `G-03`) cùng 6 giới hạn kỹ thuật (`CON-01` đến `CON-06`).
-2. Đọc Mục 3 để xác định 5 quy tắc nghiệp vụ (`BR-FIN-01` đến `BR-FIN-04` và `BR-NAM-01`), công thức làm tròn và các điều kiện luôn đúng của số dư.
-3. Đọc đối chiếu Mục 4 (Yêu cầu chức năng) với Mục 6 (Ca sử dụng chi tiết). Kiểm tra yêu cầu phi chức năng tại Mục 5. Tra cứu độ bao phủ kiểm chứng qua ma trận kiểm chứng và truy vết yêu cầu tại Mục 8.
-
 ### 1.4 Thuật ngữ, từ viết tắt và định nghĩa
-
-Các thuật ngữ dưới đây được dùng trong tài liệu này với nghĩa sau:
 
 | Thuật ngữ | Định nghĩa |
 | --- | --- |
@@ -59,30 +49,28 @@ Các thuật ngữ dưới đây được dùng trong tài liệu này với ngh
 | Tổng số dư | Tổng số dư khả dụng của các ví trong hệ thống. |
 | Giao dịch thu chi | Bản ghi biến động tài chính đơn lẻ làm tăng (`INCOME`) hoặc giảm (`EXPENSE`) số dư khả dụng của một ví xác định, có gắn nhãn phân loại danh mục. |
 | Ví nguồn, ví đích | Ví nguồn là ví bị trừ tiền, ví đích là ví được cộng tiền trong một lần chuyển tiền nội bộ. |
-| Chuyển tiền nội bộ | Nghiệp vụ chuyển tiền giữa hai ví nội bộ: ví nguồn bị trừ và ví đích được cộng, hai việc này cùng được ghi nhận hoặc cùng không được ghi nhận. Tổng số dư trong các ví của hệ thống không đổi, trừ phần chi phí chuyển tiền nếu có (Xem chi phí). |
-| Giao dịch chuyển tiền | Bản ghi của một lần chuyển tiền nội bộ, lưu ví nguồn, ví đích và số tiền chuyển. Bản ghi bị xóa hoàn toàn khi người dùng xóa giao dịch chuyển tiền. Chi phí chuyển tiền (Nếu có) được ghi riêng thành một phí giao dịch liên kết với giao dịch chuyển tiền đó (Xem phí giao dịch). Khác với giao dịch thu chi, giao dịch chuyển tiền không làm thay đổi tổng số dư trong các ví của hệ thống. |
+| Chuyển tiền nội bộ | Nghiệp vụ chuyển tiền giữa hai ví nội bộ theo cơ chế ghi nhận đồng thời (trừ ví nguồn, cộng ví đích), bảo toàn tổng số dư hệ thống trừ chi phí chuyển tiền (nếu có). |
+| Giao dịch chuyển tiền | Bản ghi dữ liệu của một lần chuyển tiền nội bộ, lưu thông tin ví nguồn, ví đích, số tiền chuyển và liên kết phí giao dịch (nếu có). |
 | Chi phí | Số tiền phí phát sinh khi ghi nhận một giao dịch thu chi hoặc một giao dịch chuyển tiền, có giá trị không âm. Chi phí là số tiền của phí, khác với chi tiêu (Giao dịch làm giảm số dư ví). |
-| Phí giao dịch | Giao dịch thu chi loại `EXPENSE` do hệ thống tự ghi cho chi phí. Phí liên kết với giao dịch thu chi hoặc giao dịch chuyển tiền phát sinh ra nó. Người dùng chọn một danh mục chi tiêu cho phí. Người dùng không sửa hay xóa phí trực tiếp. Phí được ghi nhận, sửa hoặc xóa cùng giao dịch phát sinh ra nó (`FR-TXN-04`, `FR-TXN-05`, `BR-FIN-02`, `BR-FIN-03`). |
+| Phí giao dịch | Giao dịch chi tiêu (`EXPENSE`) do hệ thống tự động ghi nhận cho chi phí phát sinh và liên kết với giao dịch gốc (thu chi hoặc chuyển tiền). Người dùng chọn danh mục cho phí; phí được cập nhật hoặc xóa đồng thời theo giao dịch gốc. |
 | Cấu trúc danh mục | Mô hình phân loại dạng cây 3 cấp gồm Loại thu chi -> Nhóm nhu cầu -> Danh mục chi tiết. |
 | Hoàn nguyên | Đưa số dư và dữ liệu về đúng trạng thái trước khi thao tác xảy ra; dùng khi xóa một giao dịch hoặc khi thao tác nhiều bước bị lỗi. |
-| Ghi nhận đồng thời | Cơ chế cập nhật cùng lúc hai biến động số dư khi chuyển tiền: trừ tiền ví nguồn và cộng tiền ví đích cùng được ghi nhận hoặc cùng không được ghi nhận (`BR-FIN-03`). |
+| Ghi nhận đồng thời | Cơ chế cập nhật cùng lúc hai biến động số dư khi chuyển tiền: trừ tiền ví nguồn và cộng tiền ví đích cùng được ghi nhận hoặc cùng không được ghi nhận. |
 | Khoản ghi | Một dòng ghi số tiền tăng hoặc giảm của một ví, như phần trừ tiền hoặc phần cộng tiền của một lần chuyển tiền, hoặc một lần điều chỉnh số dư ví. |
-| Điều chỉnh số dư | Thao tác đưa số dư khả dụng của một ví về đúng số tiền thực tế Người dùng đang có. Chênh lệch được ghi thành một bản ghi riêng, có thể truy vết (`FR-WAL-05`). |
+| Điều chỉnh số dư | Thao tác đưa số dư khả dụng của một ví về đúng số tiền thực tế Người dùng đang có. Chênh lệch được ghi thành một bản ghi riêng, có thể truy vết. |
 | Sổ giao dịch thu chi | Nơi lưu các giao dịch thu chi, kể cả phí giao dịch. |
 | Sổ giao dịch chuyển tiền | Nơi lưu các giao dịch chuyển tiền. |
-| Sổ điều chỉnh số dư | Nơi lưu các lần điều chỉnh số dư. Mỗi bản ghi độc lập và không được sửa (`BR-FIN-02`). |
-| Lịch sử dòng tiền | Toàn bộ biến động số dư của một ví: giao dịch thu chi (Kể cả phí giao dịch), giao dịch chuyển tiền và điều chỉnh số dư. Dùng để tính lại số dư (`BR-FIN-02`). |
+| Sổ điều chỉnh số dư | Nơi lưu các lần điều chỉnh số dư. Mỗi bản ghi độc lập và không được sửa. |
+| Lịch sử dòng tiền | Toàn bộ biến động số dư của một ví: giao dịch thu chi (Kể cả phí giao dịch), giao dịch chuyển tiền và điều chỉnh số dư. Dùng để tính lại số dư. |
 | Lịch sử giao dịch thu chi | Danh sách giao dịch thu chi do chức năng tra cứu và lọc trả về, kể cả phí giao dịch. Không gồm giao dịch chuyển tiền và điều chỉnh số dư. |
 | Dòng tiền thuần | Tổng số tiền thu trừ tổng số tiền chi trong cùng một khoảng thời gian. Khoản thu là giao dịch thu chi loại `INCOME`, khoản chi là loại `EXPENSE`. |
-| Tỷ lệ tiết kiệm | Dòng tiền thuần của một tháng chia tổng số tiền thu của tháng đó, nhân 100%. Bằng 0.00% khi tổng số tiền thu của tháng nhỏ hơn hoặc bằng 0 (`FR-REP-01`). |
-| Số thực nhị phân | Kiểu số thực (float, double) mà máy tính lưu bằng các chữ số 0 và 1 (Hệ nhị phân), có thể làm tròn sai khi tính tiền. Hệ thống không dùng kiểu này trong tính toán nghiệp vụ (`BR-FIN-01`). |
-| Số thập phân chính xác | Cách lưu số tiền và tỷ lệ phần trăm đúng từng chữ số thập phân, không dùng số thực nhị phân nên không bị sai số làm tròn của loại số đó (`BR-FIN-01`). Số tiền có tối thiểu 18 chữ số trước dấu thập phân và 2 chữ số sau dấu thập phân (`CON-02`). Tỷ lệ phần trăm trong các bước tính có tối thiểu 4 chữ số thập phân (`BR-FIN-01`). |
+| Tỷ lệ tiết kiệm | Dòng tiền thuần của một tháng chia tổng số tiền thu của tháng đó, nhân 100%. Bằng 0.00% khi tổng số tiền thu của tháng nhỏ hơn hoặc bằng 0. |
+| Số thực nhị phân | Kiểu số thực (float, double) mà máy tính lưu bằng các chữ số 0 và 1 (Hệ nhị phân), có thể làm tròn sai khi tính tiền. Hệ thống không dùng kiểu này trong tính toán nghiệp vụ. |
+| Số thập phân chính xác | Kiểu số học có phần thập phân cố định, bảo đảm độ chính xác tuyệt đối và loại bỏ hoàn toàn sai số làm tròn khi tính toán số tiền và tỷ lệ phần trăm. |
 | Làm tròn ngân hàng | Cách làm tròn về số chẵn gần nhất khi giá trị nằm đúng giữa hai mức. Ví dụ làm tròn đến số nguyên: 2.5 thành 2, 3.5 thành 4. |
 | Ghi tệp an toàn | Cách ghi dữ liệu xuống tệp sao cho tệp chính chỉ được thay bằng nội dung mới sau khi toàn bộ nội dung mới đã ghi xong. Nếu quá trình bị ngắt giữa chừng, tệp cũ vẫn giữ nguyên vẹn. |
 | Ngày tháng | Giá trị ngày viết theo định dạng YYYY-MM-DD (Năm, tháng, ngày, ngăn cách bằng dấu gạch nối), dùng cho mọi ngày được nhập và lưu trong tệp xuất hoặc tệp nhập. |
 | Người dùng | Người duy nhất sử dụng hệ thống và có toàn quyền với dữ liệu. Người dùng sử dụng toàn bộ 6 nhóm chức năng nghiệp vụ trên ứng dụng máy tính để bàn chạy trực tiếp trên máy của người dùng. |
-
-Tài liệu dùng 7 từ viết tắt sau:
 
 | Viết tắt | Tên đầy đủ | Ý nghĩa |
 | --- | --- | --- |
