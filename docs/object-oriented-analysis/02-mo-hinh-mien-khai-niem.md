@@ -256,42 +256,49 @@ Phần này đặc tả chi tiết các đối tượng giá trị được sử
 
 ### 2.4.1 Tiền tệ và Độ chính xác Số học - Money
 
-`Money` là đối tượng giá trị biểu diễn các đại lượng tiền tệ trong hệ thống, đảm bảo tính chính xác số học tuyệt đối và loại trừ hoàn toàn các sai số làm tròn số học nhị phân trong toàn bộ các phép tính toán tài chính. Đối tượng này mang tính bất biến (`Immutable`), không có định danh độc lập và được định danh hoàn toàn bởi giá trị số tiền cùng đơn vị tiền tệ kèm theo.
+`Money` là đối tượng giá trị đo lường tiền tệ bất biến (`Immutable`), loại trừ sai số làm tròn số thực nhị phân và bảo đảm độ chính xác số học tuyệt đối cho toàn bộ giao dịch, số dư ví và báo cáo theo `BR-FIN-01` và `CON-02`.
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| `amount` | Giá trị định lượng số tiền | Đại lượng số thập phân có độ chính xác cố định với 2 chữ số sau dấu phẩy; nghiêm cấm lưu trữ dưới dạng số thực dấu chấm động nhị phân. |
-| `currency` | Đơn vị tiền tệ | Đơn vị tiền tệ chuẩn hóa của hệ thống, mặc định và cố định là đồng Việt Nam (`VNĐ`). |
+| `amount` | Giá trị số tiền | Số thập phân chính xác với tối thiểu 18 chữ số phần nguyên và 2 chữ số phần thập phân theo `CON-02`. Nghiêm cấm dùng số thực dấu chấm động nhị phân (`float`, `double`); chỉ khởi tạo từ chuỗi thập phân hoặc số nguyên theo `BR-FIN-01` (sai định dạng báo `ERR-FIN-001`). |
+| `currency` | Đơn vị tiền tệ | Chuỗi ký tự chuẩn hóa, cố định là `VNĐ` trên toàn hệ thống. Mọi phép toán số học bắt buộc thực hiện giữa các đối tượng cùng đơn vị tiền tệ. |
 
 **Quy tắc bất biến và vận hành**
 
 - Quy tắc bất biến:
-  - Độ chính xác số học cố định: Toàn bộ dữ liệu tiền tệ bắt buộc phải được lưu trữ và tính toán dưới dạng số thập phân có độ chính xác cố định với đúng 2 chữ số thập phân, tuyệt đối không sử dụng kiểu dữ liệu số thực dấu chấm động nhị phân (`float`, `double`) nhằm ngăn chặn triệt để hiện tượng sai số làm tròn tích lũy.
-  - Gắn liền đơn vị tiền tệ: Mọi đại lượng tiền tệ đều gắn liền với đơn vị VNĐ, không thực hiện quy đổi tỷ giá ngoại tệ trong phạm vi nghiệp vụ hiện tại.
+  - Tính bất biến (`Immutability`): Trạng thái của `Money` không thay đổi sau khi khởi tạo; mọi phép toán số học (cộng, trừ, nhân, chia) bắt buộc trả về một thể hiện `Money` mới độc lập.
+  - Loại trừ sai số nhị phân: Mọi tính toán và lưu trữ duy trì quy mô cố định 2 chữ số thập phân (`Scale = 2`), loại bỏ hoàn toàn sai số làm tròn dấu chấm động (`BR-FIN-01`, `CON-02`).
+  - So sánh đại số: Hai đối tượng `Money` bằng nhau khi cùng đơn vị tiền tệ và cùng giá trị đại số thực, không phân biệt số chữ số 0 dư thừa ở phần thập phân (ví dụ: `100.00 VNĐ` = `100.0 VNĐ`).
+  - Ràng buộc không âm của số dư ví: Dù `Money` có thể mang giá trị âm trong biến trung gian hoặc khoản chênh lệch, giá trị `Money` gắn với số dư khả dụng của ví tại mọi thời điểm luôn bắt buộc $\ge 0.00$ VNĐ theo `BR-FIN-02` (`ERR-WAL-001`).
 - Quy tắc vận hành:
-  - Quy tắc làm tròn ngân hàng (`Banker's Rounding`): Đối với các phép tính chia tiền, tính tỷ trọng hoặc phân bổ trung gian, hệ thống áp dụng nguyên tắc làm tròn nửa chẵn (làm tròn về số chẵn gần nhất khi phần số lẻ đúng bằng 0.5 đơn vị cuối) nhằm triệt tiêu độ lệch thiên kiến thống kê.
-  - Quy cách hiển thị: Trên giao diện tổng quan, số tiền được hiển thị dưới dạng số nguyên có dấu phân cách hàng nghìn (ví dụ: `1,500,000 VNĐ`), và hiển thị đầy đủ hai chữ số thập phân trên các báo cáo phân tích chi tiết cũng như trong tệp dữ liệu sao lưu.
+  - Làm tròn ngân hàng (`Banker's Rounding`): Khi phát sinh phép chia không chia hết, hệ thống áp dụng làm tròn nửa chẵn (`BR-FIN-01`). Nghiêm cấm chia số học không xác định quy tắc làm tròn (`ERR-FIN-002`).
+  - Quy cách hiển thị: Hiển thị số nguyên đồng (0 chữ số thập phân) trên giao diện người dùng; duy trì đúng 2 chữ số thập phân trong tính toán nội bộ, tệp lưu trữ JSON (`CON-04`) và kiểm thử tự động (`BR-FIN-01`).
 
 ### 2.4.2 Ngày giao dịch và Mốc thời gian - TransactionDate
 
-`TransactionDate` là đối tượng giá trị xác định thời điểm phát sinh thực tế của các sự kiện tài chính (thu chi, chuyển tiền nội bộ, kiểm kê số dư) theo trình tự lịch pháp. Đối tượng này mang tính bất biến, đảm bảo mọi mốc thời gian đều chuẩn xác và làm căn cứ xác định thứ tự thời gian trong lịch sử giao dịch.
+`TransactionDate` là đối tượng giá trị mốc thời gian bất biến (`Immutable`), xác định ngày phát sinh thực tế của sự kiện tài chính để đối soát số dư lịch sử, lọc giao dịch và tổng hợp báo cáo chuỗi 12 tháng liên tục.
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| `date` | Mốc ngày phát sinh sự kiện tài chính | Chuỗi ký tự biểu diễn ngày tháng theo chuẩn ISO-8601 quốc tế (`YYYY-MM-DD`). |
+| `year` | Năm phát sinh giao dịch | Số nguyên dương 4 chữ số, hợp lệ theo lịch Gregory quốc tế. |
+| `month` | Tháng phát sinh giao dịch | Số nguyên từ 1 đến 12, đại diện cho 12 tháng trong năm. |
+| `day` | Ngày phát sinh giao dịch trong tháng | Số nguyên từ 1 đến 31, khớp chính xác số ngày thực tế của tháng và năm (xử lý đúng các tháng 30, 31 ngày và tháng 2 năm nhuận 29 ngày). |
+| `isoString` | Chuỗi ngày chuẩn hóa (dẫn xuất) | Chuỗi ISO 8601 (`YYYY-MM-DD`) sinh tự động từ bộ ba ngày-tháng-năm, phục vụ hiển thị, lưu trữ JSON (`CON-04`) và đối soát. |
 
 **Quy tắc bất biến và vận hành**
 
 - Quy tắc bất biến:
-  - Tính hợp lệ lịch pháp: Ngày tháng bắt buộc phải tồn tại thực tế trên lịch dương (bao gồm kiểm tra tính hợp lệ của năm nhuận và số ngày tối đa tương ứng của từng tháng).
-  - Giới hạn thời gian: Mốc ngày giao dịch không được vượt quá ngày hiện tại được ghi nhận từ đồng hồ hệ thống (không cho phép ghi nhận trước các giao dịch tương lai). Mốc năm giao dịch nằm trong khoảng cho phép từ năm 2000 đến hiện tại.
+  - Tính hợp lệ lịch pháp: Bắt buộc tuân thủ lịch Gregory quốc tế; từ chối mọi ngày không tồn tại trên thực tế.
+  - Giới hạn thời gian không vượt quá hiện tại: Ngày giao dịch không được sau ngày hiện tại do đồng hồ hệ thống (`DE-01`) cung cấp tại thời điểm ghi nhận (`FR-TXN-01`, `FR-TXN-02`, `FR-TRF-01`).
+  - Tính bất biến (`Immutability`): Không thay đổi trạng thái sau khi tạo; thay đổi ngày giao dịch tương đương với việc gán một thể hiện `TransactionDate` mới (`FR-TXN-04`).
 - Quy tắc vận hành:
-  - Thứ tự thời gian: Các giao dịch phát sinh được sắp xếp theo thứ tự ngày giảm dần khi hiển thị trên sổ giao dịch (mới nhất lên đầu). Trường hợp nhiều giao dịch có cùng ngày phát sinh, hệ thống sử dụng mốc thời gian tạo lập kỹ thuật (`createdAt`) làm tiêu chí sắp xếp phụ.
-  - Mặc định ngày ghi nhận: Khi người dùng mở biểu mẫu thêm mới giao dịch, hệ thống tự động điền sẵn ngày hiện tại để tối ưu thao tác.
+  - So sánh và sắp xếp thời gian: Hỗ trợ các quan hệ so sánh thứ tự (`trước`, `sau`, `trùng`). Phục vụ kiểm tra điều kiện lọc khoảng ngày ($startDate \le endDate$ theo `FR-TXN-03`) và sắp xếp danh sách giao dịch theo thứ tự ngày giảm dần.
+  - Gom cụm chu kỳ báo cáo: Định vị tháng phát sinh giao dịch (`YYYY-MM`) để trích xuất chuỗi 12 tháng liên tục kết thúc tại tháng được chọn, phục vụ phân tích dòng tiền thuần và tỷ lệ tiết kiệm theo `FR-REP-01` và `FR-REP-02`.
+  - Phân định thứ tự giao dịch cùng ngày: Khi nhiều giao dịch phát sinh trong cùng một `TransactionDate`, hệ thống dùng mốc thời gian tạo lập `createdAt` của thực thể để sắp xếp thứ tự hiển thị thứ cấp (`FR-TXN-03`).
 
 ### 2.4.3 Loại giao dịch - TransactionType
 
@@ -422,22 +429,19 @@ Phần này phân tích các mối quan hệ ngữ nghĩa cốt lõi chi phối 
 
 ### 2.5.1 Quan hệ Sở hữu Ví và Bảo toàn Số dư
 
-Quan hệ giữa Ví và các dòng tiền phản ánh sự gắn kết chặt chẽ giữa một nguồn tiền xác định với toàn bộ các sự kiện tài chính tác động trực tiếp đến nó. Mỗi biến động tăng hoặc giảm của ví đều bắt nguồn từ một giao dịch cụ thể được ghi nhận trong lịch sử, thiết lập nên nguyên tắc bảo toàn số dư cốt lõi của hệ thống.
+Quan hệ sở hữu ví xác lập mối liên kết một-nhiều (1:N) giữa một `Wallet` và toàn bộ các dòng tiền tác động đến nó, gồm giao dịch thu chi (`IncomeExpenseTransaction`), giao dịch chuyển tiền (`TransferTransaction`) và bản ghi kiểm kê (`BalanceAdjustmentRecord`). Mối quan hệ này chi phối trực tiếp chính sách bảo toàn tài sản, bảo đảm số dư ví luôn phản ánh chính xác lịch sử biến động tiền tệ mà không dùng phép gán tùy tiện theo `BR-FIN-02` và nhóm yêu cầu `FR-WAL`.
 
 **Quy tắc bất biến và vận hành**
 
-- Quy tắc bất biến:
-  - Bất biến số dư không âm: Số dư khả dụng của mỗi ví tại mọi thời điểm bắt buộc phải lớn hơn hoặc bằng 0.00 VNĐ ($WalletBalance_w(t) \ge 0.00$). Hệ thống nghiêm cấm mọi hành vi xuất quỹ dẫn đến thâm hụt số dư khả dụng.
-  - Không gán giá trị số dư trực tiếp: Số dư ví không phải là một thuộc tính được cập nhật bằng phép gán độc lập, mà là kết quả dẫn xuất tích lũy từ toàn bộ các luồng tiền đã phát sinh trong lịch sử.
-- Quy tắc vận hành:
-  - Công thức bảo toàn số dư thời gian thực: Số dư ví tại mốc thời gian $T$ được tính toán chính xác bằng tổng toàn bộ các dòng tiền đi vào trừ đi tổng các dòng tiền đi ra:
-
-$$
-WalletBalance_w(T) = \sum_{t \le T} \text{Inflow}_w(t) - \sum_{t \le T} \text{Outflow}_w(t)
-$$
-
-    Trong đó luồng tiền vào bao gồm các khoản thu nhập, nhận chuyển tiền từ ví khác và chênh lệch điều chỉnh dương. Luồng tiền ra bao gồm các khoản chi tiêu, chuyển tiền sang ví khác, chi phí giao dịch liên kết và chênh lệch điều chỉnh âm.
-  - Kiểm tra khả năng chi trả trước khi thực thi: Trước bất kỳ thao tác nào làm giảm số dư ví (ghi nhận chi tiêu, trích tiền chuyển đi, nộp phí giao dịch, điều chỉnh giảm kiểm kê, hoặc sửa và xóa giao dịch thu nhập trong quá khứ), hệ thống bắt buộc đối chiếu số dư hiện có. Nếu số dư khả dụng không đủ đáp ứng toàn bộ số tiền cần trích, hệ thống sẽ từ chối thực hiện và thông báo cảnh báo rõ ràng cho người dùng.
+- *Bất biến số dư khả dụng không âm*: Số dư khả dụng của mọi ví tại mọi thời điểm luôn thỏa mãn $WalletBalance_w(t) \ge 0.00$ VNĐ theo `BR-FIN-02`. Nghiêm cấm gán số dư trực tiếp; số dư chỉ hình thành từ các dòng tiền hợp lệ. Mọi hành động làm số dư âm đều bị từ chối (`ERR-WAL-001`).
+- *Công thức bảo toàn đại số theo thời gian thực*: Số dư khả dụng của ví $w$ tại thời điểm $T$ được tính toán nhất quán theo công thức đại số:
+  $$WalletBalance_w(T) = \sum_{t \le T} \text{Inflow}_w(t) - \sum_{t \le T} \text{Outflow}_w(t)$$
+  trong đó:
+  $$\text{Inflow}_w(t) = Income_w(t) + TransferIn_w(t) + \max(0, Adjustment_w(t))$$
+  $$\text{Outflow}_w(t) = Expense_w(t) + TransferOut_w(t) + \max(0, -Adjustment_w(t))$$
+- *Bất biến bản ghi kiểm kê số dư*: Khi kiểm kê thực tế (`FR-WAL-05`), hệ thống tạo một `BalanceAdjustmentRecord` độc lập và bất biến để lưu trữ số dư trước/sau, chênh lệch và lý do. Bản ghi này cấm sửa đổi sau khi lưu và chỉ hạch toán khoản chênh lệch vào công thức tính số dư của ví, tách biệt hoàn toàn với luồng thu chi hay chuyển tiền.
+- *Kiểm soát tiền điều kiện khi xuất quỹ*: Trước khi thực thi bất kỳ thao tác nào làm giảm số dư ví (ghi nhận chi tiêu `FR-TXN-02`, chuyển tiền đi `FR-TRF-01`, ghi nhận chi phí `FR-TXN-01`, điều chỉnh giảm số dư `FR-WAL-05`, sửa tăng chi tiêu/giảm thu nhập `FR-TXN-04`, xóa khoản thu `FR-TXN-05`), hệ thống bắt buộc kiểm tra khả năng chi trả. Nếu số dư khả dụng không đủ bù đắp số tiền cần trừ, hệ thống từ chối toàn bộ thao tác và giữ nguyên dữ liệu (`ERR-WAL-001`).
+- *Bảo toàn tổng số dư toàn hệ thống*: Tổng số dư trên toàn bộ các ví chỉ biến động khi có dòng tiền vào từ bên ngoài ($Income$), dòng tiền ra ($Expense$, bao gồm $Fee$), hoặc khoản chênh lệch kiểm kê ($Adjustment$). Thao tác chuyển tiền nội bộ thuần túy bảo toàn tuyệt đối tổng số dư hệ thống theo `BR-FIN-03`: $\sum WalletBalance_w(\text{sau}) = \sum WalletBalance_w(\text{trước})$.
 
 ### 2.5.2 Quan hệ Phân cấp Danh mục 3 Cấp
 
@@ -451,14 +455,15 @@ Quan hệ phân cấp danh mục là quan hệ hợp thành nghiêm ngặt giữ
 
 ### 2.5.3 Quan hệ Phụ thuộc Sinh tử giữa Giao dịch gốc và Phí
 
-Mối liên kết giữa giao dịch gốc và chi phí giao dịch là quan hệ hợp thành phụ thuộc bền chặt (`Composition`), trong đó khoản phí phụ trợ do bên thứ ba thu phát sinh đồng thời và phụ thuộc hoàn toàn vào sự tồn tại của giao dịch phát sinh dòng tiền chính (giao dịch thu chi hoặc giao dịch chuyển tiền nội bộ).
+Quan hệ giữa giao dịch gốc (`IncomeExpenseTransaction` hoặc `TransferTransaction`) và chi phí phát sinh (`TransactionFee`) là quan hệ phụ thuộc sinh tử nghiêm ngặt (Composition / Strong Lifecycle Dependency). Thực thể `TransactionFee` mang bản chất kinh tế của một khoản chi tiêu (`EXPENSE`), tách bạch chi phí vận hành do bên thứ ba thu khỏi giá trị dòng tiền cốt lõi theo `BR-FIN-02`, `BR-FIN-03`, `FR-TXN-01`, `FR-TXN-02` và `FR-TRF-01`.
 
 **Quy tắc bất biến và vận hành**
 
-- Quy tắc bất biến:
-  - Loại trừ tuyệt đối chi phí mồ côi: Một khoản phí giao dịch không bao giờ được phép sinh ra, tồn tại độc lập hoặc đứng ngoài vòng đời của một giao dịch gốc. Mọi bản ghi chi phí bắt buộc phải gắn liền với mã định danh của một giao dịch gốc hợp lệ.
-  - Ràng buộc phân loại và danh mục: Chi phí giao dịch luôn mang bản chất kinh tế là một khoản chi tiêu và bắt buộc phải được gắn với một danh mục phân loại chi tiết đang hoạt động thuộc nhánh Chi tiêu. Số tiền chi phí bắt buộc không âm và chỉ phát sinh bản ghi khi giá trị lớn hơn 0.00 VNĐ.
-  - Cấm thao tác trực tiếp: Người dùng không được phép thêm mới, chỉnh sửa hay xóa độc lập bản ghi phí; mọi thao tác với chi phí đều phải thông qua giao diện của giao dịch gốc.
-- Quy tắc vận hành:
-  - Thực thi nguyên tử: Việc ghi nhận giao dịch gốc và khoản phí đi kèm được thực hiện đồng thời. Nếu một trong hai bản ghi gặp lỗi về tính hợp lệ (ví dụ ví không đủ tiền trả phí hoặc danh mục phí không hợp lệ), toàn bộ thao tác sẽ bị hủy bỏ để đảm bảo dữ liệu không bị sai lệch.
-  - Đồng bộ vòng đời: Khi người dùng chỉnh sửa giá trị phí của giao dịch gốc, hệ thống tự động cập nhật lại bản ghi chi phí tương ứng (hoặc xóa bỏ bản ghi phí nếu người dùng đưa mức phí về 0). Khi giao dịch gốc bị xóa, bản ghi phí liên kết sẽ tự động bị xóa đồng thời, và toàn bộ số tiền phí đã trích sẽ được hoàn nguyên đầy đủ về ví thanh toán.
+- *Loại trừ tuyệt đối chi phí mồ côi (`No Orphan Fee`)*: `TransactionFee` bắt buộc gắn với một giao dịch gốc hợp lệ thông qua `parentTransactionId`. Hệ thống nghiêm cấm tạo, sửa hoặc duy trì một bản ghi phí độc lập ngoài vòng đời của giao dịch gốc (`BR-FIN-02`).
+- *Bất biến giá trị và danh mục phí*: Chi phí giao dịch bắt buộc không âm ($amount \ge 0.00$ VNĐ, vi phạm từ chối theo `ERR-FEE-001`). Khi $amount > 0.00$ VNĐ, bắt buộc liên kết với một `Category` cấp 3 đang hoạt động (`ACTIVE`) thuộc nhánh Chi tiêu (`EXPENSE`); từ chối nếu thiếu danh mục (`ERR-FEE-002`) hoặc danh mục sai loại/đã xóa (`ERR-FEE-003`). Không tạo thể hiện phí khi $amount = 0.00$ VNĐ.
+- *Hạch toán dòng tiền độc lập*: Bản ghi phí luôn được hạch toán vào sổ thu chi như một khoản chi tiêu độc lập trích từ ví chịu phí (ví gốc trong thu chi hoặc ví nguồn trong chuyển tiền). Số tiền phí được tính vào tổng chi tiêu toàn hệ thống trong các báo cáo tài chính định kỳ (`FR-REP-01`, `AC-TXN-03.3`).
+- *Vận hành đồng bộ vòng đời (`Atomic Lifecycle Coupling`)*:
+  - Khi tạo giao dịch gốc có phí ($amount > 0$): Hệ thống tạo đồng thời cả hai bản ghi trong cùng một khối xử lý nguyên khối (`AC-TXN-01.1`, `AC-TRF-01.1`).
+  - Khi chỉnh sửa giao dịch gốc (`FR-TXN-04`): Nếu chi phí mới bằng 0, xóa bản ghi phí liên kết; nếu thay đổi giá trị/danh mục, cập nhật bản ghi phí tương ứng; nếu ban đầu không có phí nay phát sinh phí mới thì tạo mới bản ghi phí.
+  - Khi xóa giao dịch gốc (`FR-TXN-05`, `FR-TRF-02`): Bản ghi phí liên kết tự động bị xóa vĩnh viễn khỏi sổ giao dịch thu chi, đồng thời số tiền phí được hoàn nguyên về số dư ví chịu phí (`AC-TXN-05.3`, `AC-TRF-02.1`).
+- *Kiểm soát điều kiện hoàn tác chuyển tiền*: Khi xóa giao dịch chuyển tiền có phí (`FR-TRF-02`), hệ thống kiểm tra ví đích phải đủ số dư để thu hồi ($WalletBalance_{w_{dst}} \ge amount$). Nếu đủ, hệ thống hoàn trả cả tiền chuyển và phí $(amount + feeAmount)$ về ví nguồn, trừ $amount$ ở ví đích và tiêu hủy bản ghi `TransactionFee` liên kết (`ERR-WAL-001`, `BR-FIN-03`).
