@@ -215,18 +215,31 @@ Nhóm Nhu cầu (`NeedGroup`) là đơn vị phân loại trung gian ở cấp 2
 
 ### 2.3.7 Thực thể Bản ghi Điều chỉnh Số dư - BalanceAdjustmentRecord
 
-(Mô tả khoảng 1 đến 2 câu về bản ghi kiểm kê thực tế để cân đối lại số dư ví với thực tế đời thực)
+Bản ghi Điều chỉnh Số dư (`BalanceAdjustmentRecord`) ghi nhận sự kiện kiểm kê thực tế nhằm cân đối số dư khả dụng của ví về đúng số tiền quan sát ngoài đời thực. Thực thể lưu trữ chênh lệch độc lập và bất biến để cập nhật số dư ví theo `BR-FIN-02` mà không phát sinh doanh thu hay chi phí trên sổ thu chi.
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| (Nêu thuộc tính cần có) | (Nêu ý nghĩa của thuộc tính) | (Giải thích tại sao cần thuộc tính này, căn cứ vào các quy tắc tài chính BR-FIN và nhóm yêu cầu kiểm kê ví FR-WAL tương ứng trong SRS) |
+| `recordId` | Mã định danh duy nhất của bản ghi điều chỉnh | Chuỗi ký tự định danh độc lập (ID), sinh tự động khi tạo lập thành công, bất biến và không tái sử dụng (`BR-FIN-02`, `FR-WAL-05`). |
+| `walletId` | Mã định danh ví được điều chỉnh | Tham chiếu thực thể `Wallet` đang hoạt động (`ACTIVE`). Từ chối điều chỉnh trên ví lưu trữ (`ARCHIVED`) theo `FR-WAL-05` (`AC-WAL-05.3`). |
+| `actualBalance` | Số dư thực tế quan sát được | Đối tượng giá trị tiền tệ (`Money`), bắt buộc $\ge 0.00$ VNĐ theo `BR-FIN-02`. Từ chối nếu âm theo `ERR-WAL-001` hoặc sai định dạng theo `ERR-FIN-001`. |
+| `previousBalance` | Số dư khả dụng của ví trước điều chỉnh | Đối tượng giá trị tiền tệ (`Money`), tính từ lịch sử dòng tiền theo `BR-FIN-02` ngay trước thời điểm kiểm kê (`FR-WAL-05`). |
+| `difference` | Giá trị chênh lệch điều chỉnh | Đối tượng giá trị tiền tệ (`Money`) có dấu đại số, tính bằng $actualBalance - previousBalance$ (`BR-FIN-01`). Bắt buộc khác 0.00 VNĐ; từ chối tạo bản ghi khi chênh lệch bằng 0 (`AC-WAL-05.3`). |
+| `reason` | Lý do điều chỉnh số dư | Chuỗi ký tự diễn giải lý do kiểm kê; tùy chọn, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu, cho phép để trống (`CON-05`, `FR-WAL-05`, `AC-WAL-05.4`). |
+| `adjustedAt` | Mốc thời gian ghi nhận điều chỉnh | Đối tượng giá trị ngày tháng (`TransactionDate`, định dạng `YYYY-MM-DD`), không vượt quá ngày hiện tại từ `DE-01`, mặc định lấy ngày hiện tại (`FR-WAL-05`). |
 
 **Quy tắc bất biến và vận hành**
 
-- (Nêu các quy tắc bất biến bắt buộc tuân thủ: ví dụ bản ghi mang tính bất biến tuyệt đối sau khi tạo không được sửa đổi, tách biệt hoàn toàn với luồng thu chi thông thường)
-- (Nêu các quy tắc vận hành của hệ thống: ví dụ công thức xác định giá trị chênh lệch giữa số dư thực tế và số dư sổ sách, cơ chế cộng hoặc trừ chênh lệch vào công thức số dư khả dụng)
+- Quy tắc bất biến:
+  - Tính bất biến tuyệt đối (`Immutability`): Bản ghi cấm sửa đổi hoặc xóa sau khi lưu trữ nhằm bảo toàn vết kiểm toán và lịch sử dòng tiền (`BR-FIN-02`, `FR-WAL-05`).
+  - Bắt buộc chênh lệch khác không: Hệ thống từ chối tạo bản ghi khi số dư thực tế bằng đúng số dư khả dụng hiện tại ($difference = 0.00$ VNĐ) để tránh tạo dữ liệu rỗng (`FR-WAL-05`, `AC-WAL-05.3`).
+  - Số dư thực tế không âm: $actualBalance \ge 0.00$ VNĐ theo `BR-FIN-02`; từ chối mọi giá trị âm theo `ERR-WAL-001`.
+  - Ràng buộc trạng thái ví: Chỉ cho phép điều chỉnh trên ví `ACTIVE`; từ chối trên ví `ARCHIVED` (`AC-WAL-05.3`).
+- Quy tắc vận hành:
+  - Cập nhật số dư ví tức thời: Khi ghi nhận bản ghi, hệ thống tính lại số dư ví theo `BR-FIN-02`; số dư khả dụng mới của ví bằng chính xác $actualBalance$.
+  - Tách bạch dòng tiền: Chênh lệch $Adjustment_w(t)$ hạch toán trực tiếp vào công thức số dư ví theo `BR-FIN-02` ($\max(0, Adjustment)$ cho Inflow, $\max(0, -Adjustment)$ cho Outflow); không tính vào báo cáo thu nhập, chi tiêu hay dòng tiền thuần (`FR-REP-01`).
+  - Bảo toàn biến động tổng tài sản: Tổng số dư toàn hệ thống biến động đúng bằng giá trị chênh lệch $difference$ (`FR-WAL-05`).
 
 ## 2.4 Đặc tả Chi tiết các Đối tượng Giá trị
 
