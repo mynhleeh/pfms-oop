@@ -2,7 +2,7 @@
 
 ### 1.1 Mục đích
 
-Tài liệu đặc tả yêu cầu phần mềm này xác định các yêu cầu cho Hệ thống quản lý tài chính cá nhân. Các yêu cầu gồm yêu cầu chức năng, yêu cầu phi chức năng, 5 quy tắc nghiệp vụ cốt lõi: Quy tắc độ chính xác tài chính (`BR-FIN-01`), Quy tắc bảo toàn số dư ví (`BR-FIN-02`), Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`), Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`), cùng tiêu chí nghiệm thu kiểm chứng được. Tài liệu đặt ra căn cứ kỹ thuật cho hoạt động phân tích thiết kế hướng đối tượng. Căn cứ này áp dụng cả cho việc cài đặt mã nguồn trên nền tảng Java 17 LTS và triển khai bộ kiểm thử tự động độc lập công nghệ.
+Tài liệu đặc tả yêu cầu phần mềm này xác định các yêu cầu cho Hệ thống quản lý tài chính cá nhân. Các yêu cầu gồm yêu cầu chức năng, yêu cầu phi chức năng, 5 quy tắc nghiệp vụ cốt lõi: Quy tắc độ chính xác tài chính, Quy tắc bảo toàn số dư ví, Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ, Quy tắc phân cấp danh mục thu chi 3 cấp, Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`), cùng tiêu chí nghiệm thu kiểm chứng được. Tài liệu đặt ra căn cứ kỹ thuật cho hoạt động phân tích thiết kế hướng đối tượng. Căn cứ này áp dụng cả cho việc cài đặt mã nguồn trên nền tảng Java 17 LTS và triển khai bộ kiểm thử tự động độc lập công nghệ.
 
 ### 1.2 Phạm vi sản phẩm
 
@@ -10,7 +10,7 @@ Hệ thống Quản lý Tài chính Cá nhân (PFMS) là ứng dụng máy tính
 
 #### 1.2.1 Phạm vi chức năng trong hệ thống
 
-Hệ thống gồm 6 nhóm chức năng nghiệp vụ, mô tả trong bảng dưới đây. Quy ước mã nhóm chức năng và cấu trúc mã nằm ở Mục 1.5.
+Hệ thống cung cấp các nhóm năng lực nghiệp vụ sau đây, với quy ước mã định danh được chuẩn hóa tại Mục 1.5.
 
 | STT | Nhóm | Mã nhóm | Mô tả nghiệp vụ |
 | :---: | :--- | :---: | :--- |
@@ -23,7 +23,7 @@ Hệ thống gồm 6 nhóm chức năng nghiệp vụ, mô tả trong bảng dư
 
 #### 1.2.2 Ranh giới ngoài hệ thống và căn cứ loại trừ
 
-Hệ thống loại trừ 3 hạng mục trong bảng dưới đây để giữ phạm vi nghiệp vụ trong giới hạn PFMS và để kiểm soát độ phức tạp kiến trúc.
+Các hạng mục kỹ thuật và nghiệp vụ được loại trừ khỏi ranh giới giải pháp của hệ thống.
 
 | STT | Hạng mục | Ranh giới phân định cụ thể | Căn cứ loại trừ |
 | :---: | :--- | :--- | :--- |
@@ -32,6 +32,8 @@ Hệ thống loại trừ 3 hạng mục trong bảng dưới đây để giữ 
 | 3 | Chuyển mạch thanh toán và tạo giao dịch tiền thực | Hệ thống không gửi lệnh chuyển tiền đến mạng lưới thanh toán liên ngân hàng. Dữ liệu dòng tiền chỉ phản ánh thông tin kế toán quản trị nội bộ sau khi giao dịch thực tế đã diễn ra ngoài đời thực. | Giới hạn hệ thống trong phạm vi sổ sách kế toán cá nhân, không xử lý thanh toán thật. |
 
 ### 1.3 Đối tượng sử dụng và hướng dẫn đọc tài liệu
+
+Tài liệu phục vụ nhóm vai trò kỹ thuật với mục tiêu sử dụng và lộ trình tiếp cận nội dung tương ứng.
 
 | Nhóm đối tượng | Mục đích sử dụng tài liệu | Phạm vi tài liệu trọng tâm |
 | --- | --- | --- |
@@ -121,7 +123,7 @@ Danh sách giá trị của biến `DOMAIN` là tập hợp cố định gồm 6
 
 ### 1.6 Quy ước mức độ bắt buộc của yêu cầu
 
-Tài liệu dùng 4 từ chỉ mức, viết thường, để xác định mức độ bắt buộc của giới hạn, quy tắc nghiệp vụ, yêu cầu chức năng và yêu cầu phi chức năng:
+Tài liệu dùng từ chỉ mức, viết thường, để xác định mức độ bắt buộc của giới hạn, quy tắc nghiệp vụ, yêu cầu chức năng và yêu cầu phi chức năng:
 
 | Từ chỉ mức | Mức độ bắt buộc | Ý nghĩa |
 | :--- | :--- | :--- |
