@@ -215,52 +215,83 @@ Nhóm Nhu cầu (`NeedGroup`) là đơn vị phân loại trung gian ở cấp 2
 
 ### 2.3.7 Thực thể Bản ghi Điều chỉnh Số dư - BalanceAdjustmentRecord
 
-(Mô tả khoảng 1 đến 2 câu về bản ghi kiểm kê thực tế để cân đối lại số dư ví với thực tế đời thực)
+Bản ghi Điều chỉnh Số dư (`BalanceAdjustmentRecord`) ghi nhận sự kiện kiểm kê thực tế nhằm cân đối và đồng bộ số dư khả dụng của ví trên hệ thống với lượng tiền thực tế quan sát được ngoài đời thực. Đây là cơ chế đối soát độc lập, không thông qua các luồng thu chi hay chuyển tiền thông thường, giúp khắc phục kịp thời các sai lệch phát sinh ngoài hệ thống mà vẫn bảo đảm tính minh bạch và khả năng truy vết tài chính toàn vẹn.
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| (Nêu thuộc tính cần có) | (Nêu ý nghĩa của thuộc tính) | (Giải thích tại sao cần thuộc tính này, căn cứ vào các quy tắc tài chính BR-FIN và nhóm yêu cầu kiểm kê ví FR-WAL tương ứng trong SRS) |
+| `adjustmentId` | Mã định danh duy nhất của bản ghi điều chỉnh | Chuỗi ký tự định danh độc lập, do hệ thống tự động sinh khi ghi nhận thành công, mang tính bất biến và không bao giờ tái sử dụng. |
+| `walletId` | Mã định danh ví được điều chỉnh | Tham chiếu đến thực thể `Wallet` đang ở trạng thái hoạt động; hệ thống từ chối điều chỉnh đối với các ví đã đưa vào lưu trữ. |
+| `balanceBefore` | Số dư khả dụng của ví trước khi điều chỉnh | Đối tượng giá trị tiền tệ (`Money`), ghi nhận lại chính xác số dư sổ sách của ví ngay trước thời điểm kiểm kê; luôn không âm. |
+| `balanceAfter` | Số dư thực tế quan sát được sau điều chỉnh | Đối tượng giá trị tiền tệ (`Money`), là số tiền thực tế người dùng nhập vào; bắt buộc phải lớn hơn hoặc bằng 0.00 VNĐ; hệ thống từ chối nếu số dư thực tế bị âm hoặc sai định dạng. |
+| `difference` | Giá trị chênh lệch điều chỉnh | Đối tượng giá trị tiền tệ có dấu đại số, tính bằng số dư thực tế trừ số dư sổ sách ($balanceAfter - balanceBefore$); bắt buộc phải khác 0.00 VNĐ để tránh tạo bản ghi rỗng. |
+| `adjustmentDate` | Ngày ghi nhận sự kiện điều chỉnh | Đối tượng giá trị ngày tháng (`TransactionDate`, định dạng `YYYY-MM-DD`), không được vượt quá ngày hiện tại; hệ thống mặc định điền ngày hiện tại khi tạo mới. |
+| `reason` | Lý do hoặc diễn giải việc kiểm kê điều chỉnh | Chuỗi ký tự mô tả nguyên nhân chênh lệch (ví dụ: làm rơi tiền lẻ, quên ghi nhận chi tiêu nhỏ); là trường tùy chọn với độ dài tối đa 255 ký tự sau khi cắt khoảng trắng thừa hai đầu. |
+| `createdAt` | Thời điểm ghi nhận bản ghi | Mốc thời gian tự động từ đồng hồ hệ thống, có tính bất biến, phục vụ đối soát và kiểm toán lịch sử biến động số dư. |
 
 **Quy tắc bất biến và vận hành**
 
-- (Nêu các quy tắc bất biến bắt buộc tuân thủ: ví dụ bản ghi mang tính bất biến tuyệt đối sau khi tạo không được sửa đổi, tách biệt hoàn toàn với luồng thu chi thông thường)
-- (Nêu các quy tắc vận hành của hệ thống: ví dụ công thức xác định giá trị chênh lệch giữa số dư thực tế và số dư sổ sách, cơ chế cộng hoặc trừ chênh lệch vào công thức số dư khả dụng)
+- Quy tắc bất biến:
+  - Tính bất biến tuyệt đối: Bản ghi điều chỉnh số dư sau khi tạo thành công sẽ không bao giờ được phép chỉnh sửa hay xóa bỏ, đảm bảo tính toàn vẹn và khả năng kiểm toán của sổ cái tài chính.
+  - Tách biệt luồng nghiệp vụ: Khoản điều chỉnh số dư hoàn toàn độc lập với các luồng thu nhập, chi tiêu hay chuyển tiền nội bộ; không gắn với danh mục phân loại và không được hạch toán vào báo cáo thu nhập hay chi tiêu định kỳ.
+  - Ràng buộc số dư thực tế không âm: Số dư sau điều chỉnh bắt buộc phải lớn hơn hoặc bằng 0.00 VNĐ; hệ thống từ chối mọi thao tác điều chỉnh dẫn đến số dư âm.
+  - Chênh lệch bắt buộc khác không: Giá trị chênh lệch giữa số dư thực tế và số dư sổ sách phải khác 0.00 VNĐ để tránh ghi nhận các bản ghi thừa không làm thay đổi số dư.
+- Quy tắc vận hành:
+  - Công thức tích hợp vào số dư khả dụng: Giá trị chênh lệch được tính trực tiếp vào luồng tiền vào (nếu chênh lệch dương) hoặc luồng tiền ra (nếu chênh lệch âm) trong công thức xác định số dư tức thời của ví:
+
+$$
+\text{Inflow}_w(t) \mathrel{+}= \max(0, \text{difference})
+$$
+
+$$
+\text{Outflow}_w(t) \mathrel{+}= \max(0, -\text{difference})
+$$
+
+  - Cập nhật số dư tức thời: Ngay khi bản ghi điều chỉnh được lưu thành công, số dư khả dụng mới của ví lập tức phản ánh đúng con số thực tế quan sát được và sẵn sàng cho các giao dịch tiếp theo.
 
 ## 2.4 Đặc tả Chi tiết các Đối tượng Giá trị
 
-Phần này thiết lập khung chỉ dẫn hoàn thiện cho các đối tượng giá trị trong hệ thống. Khác với thực thể, đối tượng giá trị không có định danh độc lập mà được định danh hoàn toàn bằng tập giá trị thuộc tính, mang tính bất biến và được dùng để bảo đảm độ chính xác số học trong toàn bộ các phép tính toán tài chính.
+Phần này đặc tả chi tiết các đối tượng giá trị được sử dụng trong toàn bộ hệ thống. Khác với thực thể, đối tượng giá trị không có định danh độc lập mà được định danh hoàn toàn bằng tập hợp các giá trị thuộc tính, mang tính bất biến tuyệt đối và đóng vai trò bảo đảm độ chính xác số học cùng tính nhất quán dữ liệu trong mọi phép tính tài chính.
 
 ### 2.4.1 Tiền tệ và Độ chính xác Số học - Money
 
-(Mô tả khoảng 1 đến 2 câu về đại lượng đo lường giá trị tiền tệ bảo đảm tính chính xác số học tuyệt đối)
+`Money` là đối tượng giá trị biểu diễn các đại lượng tiền tệ trong hệ thống, đảm bảo tính chính xác số học tuyệt đối và loại trừ hoàn toàn các sai số làm tròn số học nhị phân trong toàn bộ các phép tính toán tài chính. Đối tượng này mang tính bất biến (`Immutable`), không có định danh độc lập và được định danh hoàn toàn bởi giá trị số tiền cùng đơn vị tiền tệ kèm theo.
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| (Nêu thuộc tính cần có của tiền tệ) | (Nêu ý nghĩa của thuộc tính) | (Giải thích tại sao cần thuộc tính này, căn cứ vào quy tắc tài chính BR-FIN và ràng buộc thiết kế CON tương ứng trong SRS) |
+| `amount` | Giá trị định lượng số tiền | Đại lượng số thập phân có độ chính xác cố định với 2 chữ số sau dấu phẩy; nghiêm cấm lưu trữ dưới dạng số thực dấu chấm động nhị phân. |
+| `currency` | Đơn vị tiền tệ | Đơn vị tiền tệ chuẩn hóa của hệ thống, mặc định và cố định là đồng Việt Nam (`VNĐ`). |
 
 **Quy tắc bất biến và vận hành**
 
-- (Nêu các quy tắc bất biến bắt buộc tuân thủ: ví dụ không dùng số thực dấu chấm động theo BR-FIN-01 và CON-02, đại lượng tiền tệ luôn gắn liền với đơn vị tiền tệ VNĐ)
-- (Nêu các quy tắc vận hành của hệ thống: ví dụ quy tắc làm tròn ngân hàng Banker's Rounding khi phát sinh phép chia hoặc tính tỷ lệ)
+- Quy tắc bất biến:
+  - Độ chính xác số học cố định: Toàn bộ dữ liệu tiền tệ bắt buộc phải được lưu trữ và tính toán dưới dạng số thập phân có độ chính xác cố định với đúng 2 chữ số thập phân, tuyệt đối không sử dụng kiểu dữ liệu số thực dấu chấm động nhị phân (`float`, `double`) nhằm ngăn chặn triệt để hiện tượng sai số làm tròn tích lũy.
+  - Gắn liền đơn vị tiền tệ: Mọi đại lượng tiền tệ đều gắn liền với đơn vị VNĐ, không thực hiện quy đổi tỷ giá ngoại tệ trong phạm vi nghiệp vụ hiện tại.
+- Quy tắc vận hành:
+  - Quy tắc làm tròn ngân hàng (`Banker's Rounding`): Đối với các phép tính chia tiền, tính tỷ trọng hoặc phân bổ trung gian, hệ thống áp dụng nguyên tắc làm tròn nửa chẵn (làm tròn về số chẵn gần nhất khi phần số lẻ đúng bằng 0.5 đơn vị cuối) nhằm triệt tiêu độ lệch thiên kiến thống kê.
+  - Quy cách hiển thị: Trên giao diện tổng quan, số tiền được hiển thị dưới dạng số nguyên có dấu phân cách hàng nghìn (ví dụ: `1,500,000 VNĐ`), và hiển thị đầy đủ hai chữ số thập phân trên các báo cáo phân tích chi tiết cũng như trong tệp dữ liệu sao lưu.
 
 ### 2.4.2 Ngày giao dịch và Mốc thời gian - TransactionDate
 
-(Mô tả khoảng 1 đến 2 câu về mốc thời gian xác định thời điểm phát sinh sự kiện tài chính thực tế)
+`TransactionDate` là đối tượng giá trị xác định thời điểm phát sinh thực tế của các sự kiện tài chính (thu chi, chuyển tiền nội bộ, kiểm kê số dư) theo trình tự lịch pháp. Đối tượng này mang tính bất biến, đảm bảo mọi mốc thời gian đều chuẩn xác và làm căn cứ xác định thứ tự thời gian trong lịch sử giao dịch.
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| (Nêu thuộc tính cần có của ngày giao dịch) | (Nêu ý nghĩa của thuộc tính) | (Giải thích tại sao cần thuộc tính này, căn cứ vào nhóm yêu cầu ghi nhận thu chi FR-TXN và phụ thuộc môi trường DE tương ứng trong SRS) |
+| `date` | Mốc ngày phát sinh sự kiện tài chính | Chuỗi ký tự biểu diễn ngày tháng theo chuẩn ISO-8601 quốc tế (`YYYY-MM-DD`). |
 
 **Quy tắc bất biến và vận hành**
 
-- (Nêu các quy tắc bất biến bắt buộc tuân thủ: ví dụ tính hợp lệ về mặt lịch pháp quốc tế, mốc thời gian không được vượt quá thời điểm hiện tại hoặc nằm ngoài giới hạn cho phép)
-- (Nêu các quy tắc vận hành của hệ thống: ví dụ quy tắc so sánh thứ tự thời gian giữa các giao dịch để phục vụ tính toán số dư lịch sử)
+- Quy tắc bất biến:
+  - Tính hợp lệ lịch pháp: Ngày tháng bắt buộc phải tồn tại thực tế trên lịch dương (bao gồm kiểm tra tính hợp lệ của năm nhuận và số ngày tối đa tương ứng của từng tháng).
+  - Giới hạn thời gian: Mốc ngày giao dịch không được vượt quá ngày hiện tại được ghi nhận từ đồng hồ hệ thống (không cho phép ghi nhận trước các giao dịch tương lai). Mốc năm giao dịch nằm trong khoảng cho phép từ năm 2000 đến hiện tại.
+- Quy tắc vận hành:
+  - Thứ tự thời gian: Các giao dịch phát sinh được sắp xếp theo thứ tự ngày giảm dần khi hiển thị trên sổ giao dịch (mới nhất lên đầu). Trường hợp nhiều giao dịch có cùng ngày phát sinh, hệ thống sử dụng mốc thời gian tạo lập kỹ thuật (`createdAt`) làm tiêu chí sắp xếp phụ.
+  - Mặc định ngày ghi nhận: Khi người dùng mở biểu mẫu thêm mới giao dịch, hệ thống tự động điền sẵn ngày hiện tại để tối ưu thao tác.
 
 ### 2.4.3 Loại giao dịch - TransactionType
 
@@ -270,7 +301,7 @@ Phần này thiết lập khung chỉ dẫn hoàn thiện cho các đối tượ
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| `value` | Chiều tác động dòng tiền | Enum đóng, chỉ nhận `INCOME` (tăng số dư) hoặc `EXPENSE` (giảm số dư) theo `BR-FIN-04`. Bất biến sau khi gán. |
+| `value` | Chiều tác động dòng tiền | Enum đóng, chỉ nhận một trong hai giá trị: Thu nhập (`INCOME`, làm tăng số dư) hoặc Chi tiêu (`EXPENSE`, làm giảm số dư). Bất biến sau khi gán. |
 
 **Quy tắc bất biến và vận hành**
 
@@ -278,131 +309,156 @@ Phần này thiết lập khung chỉ dẫn hoàn thiện cho các đối tượ
   - Tập giá trị hữu hạn: Gồm đúng 2 giá trị đóng và khép kín:
     - `INCOME` (Thu nhập): Đại diện cho dòng tiền đi vào ví (`Inflow`), làm gia tăng tài sản khả dụng.
     - `EXPENSE` (Chi tiêu): Đại diện cho dòng tiền đi ra khỏi ví (`Outflow`), làm suy giảm tài sản khả dụng.
-  - Phân cấp danh mục cấp 1 cố định: Là gốc phân loại cấp 1 trong mô hình phân cấp 3 cấp theo `BR-FIN-04`. Hai nhánh `INCOME` và `EXPENSE` được hệ thống khởi tạo mặc định, mang tính bất biến vĩnh viễn, người dùng tuyệt đối không thể sửa tên, xóa bỏ hoặc tạo thêm nhánh mới (`FR-CAT-01`).
-  - Quyết định chiều biến động số dư ví: Trong công thức bảo toàn số dư ví theo thời gian thực (`BR-FIN-02`), giao dịch gắn với `INCOME` được cộng vào số dư ví tiếp nhận ($+Income_w(t)$ theo `FR-TXN-01`), trong khi giao dịch gắn với `EXPENSE` được trừ khỏi số dư ví chi trả ($-Expense_w(t)$ theo `FR-TXN-02`).
-  - Quy chuẩn chi phí giao dịch: Chi phí giao dịch (`TransactionFee`) luôn mang bản chất là một khoản chi tiêu độc lập thuộc loại `EXPENSE` và bắt buộc liên kết với một danh mục thuộc nhánh Chi tiêu đang hoạt động (`BR-FIN-02`, `ERR-FEE-003`).
-  - Ranh giới tính duy nhất của tên nhóm nhu cầu: Theo quy tắc đặt tên `BR-NAM-01`, tính duy nhất của tên Nhóm nhu cầu được giới hạn trong cùng một nhánh `TransactionType`. Hai nhóm nhu cầu thuộc hai nhánh khác nhau được phép trùng tên (ví dụ: nhóm "Khác" của nhánh Thu nhập và nhóm "Khác" của nhánh Chi tiêu).
-  - Tính bất biến liên kết: Hệ thống nghiêm cấm mọi thao tác chuyển đổi `TransactionType` của một Nhóm nhu cầu hoặc Danh mục khi đã phát sinh giao dịch liên kết nhằm loại trừ triệt để sai lệch số liệu lịch sử (`BR-FIN-04`, `ERR-CAT-001`).
+  - Phân cấp danh mục cấp 1 cố định: Là gốc phân loại cấp 1 trong mô hình phân cấp 3 cấp của hệ thống. Hai nhánh `INCOME` và `EXPENSE` được hệ thống khởi tạo mặc định ban đầu, mang tính bất biến vĩnh viễn; người dùng tuyệt đối không thể sửa tên, xóa bỏ hoặc tạo thêm nhánh mới.
+  - Quyết định chiều biến động số dư ví: Trong công thức bảo toàn số dư ví theo thời gian thực, giao dịch gắn với `INCOME` được cộng vào số dư ví tiếp nhận ($+Income_w(t)$), trong khi giao dịch gắn với `EXPENSE` được trừ khỏi số dư ví chi trả ($-Expense_w(t)$).
+  - Quy chuẩn chi phí giao dịch: Chi phí giao dịch (`TransactionFee`) luôn mang bản chất là một khoản chi tiêu độc lập thuộc loại `EXPENSE` và bắt buộc liên kết với một danh mục thuộc nhánh Chi tiêu đang hoạt động.
+  - Ranh giới tính duy nhất của tên nhóm nhu cầu: Tính duy nhất của tên Nhóm nhu cầu được giới hạn trong cùng một nhánh `TransactionType`. Hai nhóm nhu cầu thuộc hai nhánh khác nhau được phép trùng tên (ví dụ: nhóm "Khác" của nhánh Thu nhập và nhóm "Khác" của nhánh Chi tiêu).
+  - Tính bất biến liên kết: Hệ thống nghiêm cấm mọi thao tác chuyển đổi `TransactionType` của một Nhóm nhu cầu hoặc Danh mục khi đã phát sinh giao dịch liên kết nhằm loại trừ triệt để sai lệch số liệu lịch sử.
 - Quy tắc vận hành:
-  - Căn cứ vào giá trị của `TransactionType`, hệ thống định tuyến chiều tác động dòng tiền lên số dư ví khả dụng và định hình cây phân cấp danh mục cấp 1 theo `FR-TXN-01`, `FR-TXN-02`, `BR-FIN-02`, `BR-FIN-04`, `FR-CAT-01`.
+  - Căn cứ vào giá trị của `TransactionType`, hệ thống định tuyến chiều tác động dòng tiền lên số dư ví khả dụng và định hình cây phân cấp danh mục cấp 1 khi hiển thị biểu mẫu và báo cáo.
 
 ### 2.4.4 Dòng tiền thuần - NetCashFlow
 
-`NetCashFlow` là đối tượng giá trị tiền tệ đo lường tổng hợp, phản ánh thặng dư hoặc thâm hụt tài chính ròng của người dùng trong một kỳ quan sát xác định. Đối tượng này mang tính bất biến tuyệt đối, không có danh tính độc lập và được tính toán đại số từ tập hợp các giao dịch trong kỳ theo `FR-REP-01`, `BR-FIN-01` và `BR-FIN-02`.
+`NetCashFlow` là đối tượng giá trị tiền tệ đo lường tổng hợp, phản ánh thặng dư hoặc thâm hụt tài chính ròng của người dùng trong một kỳ quan sát xác định. Đối tượng này mang tính bất biến tuyệt đối, không có danh tính độc lập và được tính toán đại số từ tập hợp các giao dịch phát sinh trong kỳ.
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| `amount` | Giá trị số tiền ròng | Số thập phân chính xác có dấu đại số, có thể mang giá trị âm, dương hoặc bằng 0 theo `BR-FIN-01` và `CON-02`. Bất biến sau khi khởi tạo. |
+| `amount` | Giá trị số tiền ròng | Số thập phân chính xác có dấu đại số, có thể mang giá trị âm, dương hoặc bằng 0. Bất biến sau khi khởi tạo. |
 | `currency` | Đơn vị tiền tệ | Chuỗi ký tự định danh đơn vị tiền tệ chuẩn hóa, mặc định là `VNĐ`. |
 
 **Công thức xác định đại số**
 
 Xét kỳ thống kê quan sát $M$ (chuỗi 1 tháng hoặc chuỗi 12 tháng liên tục):
 
-$$\text{NetCashFlow}(M) = \sum_{t \in M} \text{Income}(t) - \sum_{t \in M} \text{Expense}(t)$$
+$$
+\text{NetCashFlow}(M) = \sum_{t \in M} \text{Income}(t) - \sum_{t \in M} \text{Expense}(t)
+$$
 
 Trong đó:
-- $\sum_{t \in M} \text{Income}(t)$: Tổng số tiền của các giao dịch thu nhập phát sinh trong kỳ $M$ theo `FR-TXN-01`.
-- $\sum_{t \in M} \text{Expense}(t)$: Tổng số tiền của các giao dịch chi tiêu phát sinh trong kỳ $M$ theo `FR-TXN-02`, bao gồm cả các khoản chi phí giao dịch liên kết (`TransactionFee`) phát sinh trong kỳ.
+- $\sum_{t \in M} \text{Income}(t)$: Tổng số tiền của các giao dịch thu nhập phát sinh trong kỳ $M$.
+- $\sum_{t \in M} \text{Expense}(t)$: Tổng số tiền của các giao dịch chi tiêu phát sinh trong kỳ $M$, bao gồm cả các khoản chi phí giao dịch liên kết (`TransactionFee`) phát sinh trong kỳ.
 
 **Quy tắc bất biến và vận hành**
 
 - Quy tắc bất biến:
-  - Dữ liệu bắt buộc biểu diễn bằng số thập phân chính xác, nghiêm cấm sử dụng số thực dấu chấm động nhị phân (`float`, `double`) theo `BR-FIN-01` và ràng buộc kỹ thuật `CON-02`.
-  - Độ chính xác tính toán và lưu trữ duy trì ở mức 2 chữ số thập phân (`Scale = 2`).
+  - Dữ liệu bắt buộc biểu diễn bằng số thập phân chính xác, nghiêm cấm sử dụng số thực dấu chấm động nhị phân (`float`, `double`).
+  - Độ chính xác tính toán và lưu trữ duy trì cố định ở mức 2 chữ số thập phân.
   - Phân định ngữ nghĩa tài chính: $\text{NetCashFlow} > 0$ thể hiện thặng dư dòng tiền; $\text{NetCashFlow} < 0$ thể hiện thâm hụt dòng tiền (chi vượt thu); $\text{NetCashFlow} = 0$ thể hiện trạng thái cân bằng thu chi.
 - Quy tắc vận hành:
-  - Trên giao diện người dùng, số tiền hiển thị theo quy cách số nguyên đồng cho VNĐ hoặc 2 chữ số thập phân trên báo cáo chi tiết theo `AC-REP-01.2`.
+  - Trên giao diện người dùng, số tiền hiển thị theo quy cách số nguyên đồng cho VNĐ hoặc 2 chữ số thập phân trên báo cáo phân tích chi tiết.
 
 ### 2.4.5 Tỷ lệ tiết kiệm - SavingsRate
 
-`SavingsRate` là đối tượng giá trị tỷ lệ phần trăm tài chính, đo lường mức độ tích lũy hình thành từ dòng tiền thuần so với tổng thu nhập tạo ra trong kỳ phân tích. Đối tượng này mang tính bất biến tuyệt đối, phụ thuộc trực tiếp vào kết quả của `NetCashFlow` và tuân thủ các quy tắc an toàn số học theo `FR-REP-01`, `BR-FIN-01`, `AC-REP-01.2` và `AC-REP-01.3`.
+`SavingsRate` là đối tượng giá trị tỷ lệ phần trăm tài chính, đo lường mức độ tích lũy hình thành từ dòng tiền thuần so với tổng thu nhập tạo ra trong kỳ phân tích. Đối tượng này mang tính bất biến tuyệt đối, phụ thuộc trực tiếp vào kết quả của `NetCashFlow` và tuân thủ các quy tắc an toàn số học khi tính toán.
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| `rate` | Giá trị tỷ lệ phần trăm | Số thập phân chính xác theo `BR-FIN-01`. Duy trì tối thiểu 4 chữ số thập phân trong tính toán trung gian và làm tròn ngân hàng về 2 chữ số thập phân khi hiển thị (`AC-REP-01.2`). |
+| `rate` | Giá trị tỷ lệ phần trăm | Số thập phân chính xác. Duy trì tối thiểu 4 chữ số thập phân trong tính toán trung gian và làm tròn ngân hàng về đúng 2 chữ số thập phân khi hiển thị. |
 | `unit` | Đơn vị đo lường | Đơn vị tỷ lệ phần trăm, cố định là ký hiệu `%`. |
 
 **Công thức xác định đại số**
 
-$$\text{SavingsRate} = \begin{cases} \left(\dfrac{\text{NetCashFlow}}{\text{TotalIncome}}\right) \times 100\% & \text{khi } \text{TotalIncome} > 0 \\ 0.00\% & \text{khi } \text{TotalIncome} \le 0 \end{cases}$$
+$$
+\text{SavingsRate} = \begin{cases} \left(\dfrac{\text{NetCashFlow}}{\text{TotalIncome}}\right) \times 100\% & \text{khi } \text{TotalIncome} > 0 \\ 0.00\% & \text{khi } \text{TotalIncome} \le 0 \end{cases}
+$$
 
 **Quy tắc bất biến và vận hành**
 
 - Quy tắc bất biến:
-  - Xử lý biên an toàn: Khi $\text{TotalIncome} \le 0$ (kỳ phân tích không có thu nhập hoặc thu nhập bằng 0.00 VNĐ nhưng phát sinh chi tiêu), tỷ lệ tiết kiệm mặc định bằng đúng $0.00\%$. Quy tắc này loại bỏ hoàn toàn rủi ro chia cho 0 (`ERR-FIN-002`) và bảo đảm bản chất tài chính theo `AC-REP-01.3`.
+  - Xử lý biên an toàn: Khi $\text{TotalIncome} \le 0$ (kỳ phân tích không có thu nhập hoặc thu nhập bằng 0.00 VNĐ nhưng phát sinh chi tiêu), tỷ lệ tiết kiệm mặc định bằng đúng $0.00\%$. Quy tắc này loại bỏ hoàn toàn rủi ro chia cho 0 và bảo đảm tính hợp lý của chỉ số tài chính.
   - Phản ánh thâm hụt: Khi $\text{TotalIncome} > 0$ và $\text{NetCashFlow} < 0$ (chi vượt thu), tỷ lệ tiết kiệm mang giá trị âm, phản ánh tỷ lệ thâm hụt tương ứng trên tổng thu nhập.
 - Quy tắc vận hành:
-  - Bước tính toán trung gian bắt buộc duy trì độ chính xác tối thiểu 4 chữ số thập phân (khuyến nghị 6 chữ số thập phân) theo `BR-FIN-01`.
+  - Bước tính toán trung gian bắt buộc duy trì độ chính xác tối thiểu 4 chữ số thập phân (khuyến nghị 6 chữ số thập phân).
   - Áp dụng quy tắc làm tròn ngân hàng (`Banker's Rounding` - làm tròn về số chẵn gần nhất khi phần dư đúng bằng 0.5 đơn vị cuối).
-  - Kết quả hiển thị cuối cùng chuẩn hóa đúng 2 chữ số thập phân kèm ký hiệu đơn vị (ví dụ: `40.00%` theo `AC-REP-01.2`).
+  - Kết quả hiển thị cuối cùng chuẩn hóa đúng 2 chữ số thập phân kèm ký hiệu đơn vị (ví dụ: `40.00%`).
 
 ### 2.4.6 Tỷ trọng cơ cấu chi tiêu - SpendingStructureShare
 
-`SpendingStructureShare` là đối tượng giá trị tỷ trọng phân bổ, đo lường tỷ lệ đóng góp của từng nhóm nhu cầu (cấp 2) hoặc từng danh mục chi tiết (cấp 3) trên tổng quy mô dòng tiền trong kỳ phân tích. Đối tượng được áp dụng cho cả phân tích cơ cấu chi tiêu (`EXPENSE`) và cơ cấu thu nhập (`INCOME`) theo `FR-REP-02`, `BR-FIN-01`, `BR-FIN-04` và các tiêu chí chấp thuận `AC-REP-02.1` đến `AC-REP-02.3`.
+`SpendingStructureShare` là đối tượng giá trị tỷ trọng phân bổ, đo lường tỷ lệ đóng góp của từng nhóm nhu cầu (cấp 2) hoặc từng danh mục chi tiết (cấp 3) trên tổng quy mô dòng tiền trong kỳ phân tích. Đối tượng được áp dụng cho cả phân tích cơ cấu chi tiêu (`EXPENSE`) và cơ cấu thu nhập (`INCOME`).
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| `share` | Giá trị tỷ trọng | Số thập phân chính xác nằm trong khoảng $[0.00, 100.00]$ đối với từng thành phần theo `BR-FIN-01`. |
+| `share` | Giá trị tỷ trọng | Số thập phân chính xác nằm trong khoảng $[0.00, 100.00]$ đối với từng thành phần. |
 | `unit` | Đơn vị đo lường | Đơn vị tỷ lệ phần trăm, cố định là ký hiệu `%`. |
-| `scope` | Phạm vi gom cụm phân tích | Xác định cấp phân tích: Nhóm nhu cầu cấp 2 (`NeedGroup`) hoặc Danh mục chi tiết cấp 3 (`Category`) theo `FR-REP-02`. |
+| `scope` | Phạm vi gom cụm phân tích | Xác định cấp độ phân tích: Nhóm nhu cầu cấp 2 (`NeedGroup`) hoặc Danh mục chi tiết cấp 3 (`Category`). |
 
 **Công thức xác định đại số**
 
-$$\text{SpendingStructureShare}_i = \begin{cases} \left(\dfrac{\text{ExpenseAmount}_i}{\text{TotalExpense}}\right) \times 100\% & \text{khi } \text{TotalExpense} > 0 \\ 0.00\% & \text{khi } \text{TotalExpense} = 0.00\text{ VNĐ} \end{cases}$$
+$$
+\text{SpendingStructureShare}_i = \begin{cases} \left(\dfrac{\text{ExpenseAmount}_i}{\text{TotalExpense}}\right) \times 100\% & \text{khi } \text{TotalExpense} > 0 \\ 0.00\% & \text{khi } \text{TotalExpense} = 0.00\text{ VNĐ} \end{cases}
+$$
 
 Trong đó:
 - $\text{ExpenseAmount}_i$: Tổng số tiền chi tiêu của Nhóm nhu cầu thứ $i$ (khi gom cụm cấp 2) hoặc Danh mục chi tiết thứ $i$ (khi gom cụm cấp 3) trong kỳ phân tích.
 - $\text{TotalExpense}$: Tổng chi tiêu của toàn bộ các nhóm hoặc danh mục trong kỳ phân tích, bao gồm cả các chi phí giao dịch liên kết.
 
-*(Công thức áp dụng tương tự khi phân tích cơ cấu thu nhập `INCOME` theo `FR-REP-02`).*
+*(Công thức áp dụng tương tự khi phân tích cơ cấu thu nhập `INCOME`).*
 
 **Quy tắc bất biến và vận hành**
 
 - Quy tắc bất biến:
-  - Khi $\text{TotalExpense} = 0.00\text{ VNĐ}$ (kỳ phân tích không phát sinh chi tiêu), hệ thống hiển thị tổng tiền 0.00 VNĐ cùng tỷ trọng mặc định $0.00\%$ cho danh sách rỗng, không làm phát sinh lỗi chia cho 0 (`ERR-FIN-002`, `AC-REP-02.2`).
-  - Bảo toàn dữ liệu xóa mềm: Nếu trong kỳ phân tích xuất hiện giao dịch thuộc nhóm hoặc danh mục đã bị xóa trong quá khứ, hệ thống vẫn hiển thị độc lập mục đó kèm nhãn "(đã xóa)" với đúng số tiền và tỷ trọng tương ứng (`AC-REP-02.3`), không gộp vào mục khác.
+  - Khi $\text{TotalExpense} = 0.00\text{ VNĐ}$ (kỳ phân tích không phát sinh chi tiêu), hệ thống hiển thị tổng tiền 0.00 VNĐ cùng tỷ trọng mặc định $0.00\%$ cho danh sách rỗng, không làm phát sinh lỗi chia cho 0.
+  - Bảo toàn dữ liệu xóa mềm: Nếu trong kỳ phân tích xuất hiện giao dịch thuộc nhóm hoặc danh mục đã bị xóa trong quá khứ, hệ thống vẫn hiển thị độc lập mục đó kèm nhãn "(đã xóa)" với đúng số tiền và tỷ trọng tương ứng, không gộp vào mục khác.
   - Bất biến tổng cơ cấu: Tổng tỷ trọng của toàn bộ các mục thành phần trong cùng một cấp phân loại phải xấp xỉ bằng $100.00\%$:
-    $$\sum_{i} \text{SpendingStructureShare}_i \approx 100.00\%$$
+
+$$
+\sum_{i} \text{SpendingStructureShare}_i \approx 100.00\%
+$$
+
     (Sai số cho phép tối đa trong khoảng $\pm 0.01\%$ do hiệu ứng phân rã làm tròn ngân hàng độc lập trên từng thành phần).
 - Quy tắc vận hành:
-  - Bước tính toán trung gian duy trì tối thiểu 4 chữ số thập phân theo `BR-FIN-01`.
-  - Áp dụng quy cách làm tròn ngân hàng (`Banker's Rounding`), hiển thị kết quả cuối cùng với đúng 2 chữ số thập phân (ví dụ: `40.00%` theo `AC-REP-02.1`).
+  - Bước tính toán trung gian duy trì tối thiểu 4 chữ số thập phân.
+  - Áp dụng quy cách làm tròn ngân hàng (`Banker's Rounding`), hiển thị kết quả cuối cùng với đúng 2 chữ số thập phân (ví dụ: `40.00%`).
 
 ## 2.5 Các Mối Quan hệ Ngữ nghĩa và Bất biến Miền
 
-Phần này thiết lập khung chỉ dẫn phân tích các chính sách tài chính cốt lõi chi phối sự tương tác giữa các thực thể trong mô hình miền. Mỗi mối quan hệ cần làm rõ bản chất liên kết, các bất biến số học hoặc cấu trúc bắt buộc tuân thủ, và kịch bản xử lý vi phạm của hệ thống.
+Phần này phân tích các mối quan hệ ngữ nghĩa cốt lõi chi phối sự tương tác giữa các thực thể trong mô hình miền. Mỗi mối quan hệ làm rõ bản chất liên kết giữa các khái niệm tài chính, các điều kiện bất biến bắt buộc tuân thủ, và cơ chế xử lý của hệ thống nhằm bảo đảm tính toàn vẹn dữ liệu.
 
 ### 2.5.1 Quan hệ Sở hữu Ví và Bảo toàn Số dư
 
-(Mô tả khoảng 1 đến 2 câu về mối liên kết giữa một Ví và toàn bộ các dòng tiền tác động đến số dư của ví đó)
+Quan hệ giữa Ví và các dòng tiền phản ánh sự gắn kết chặt chẽ giữa một nguồn tiền xác định với toàn bộ các sự kiện tài chính tác động trực tiếp đến nó. Mỗi biến động tăng hoặc giảm của ví đều bắt nguồn từ một giao dịch cụ thể được ghi nhận trong lịch sử, thiết lập nên nguyên tắc bảo toàn số dư cốt lõi của hệ thống.
 
 **Quy tắc bất biến và vận hành**
 
-- (Nêu các quy tắc bất biến bắt buộc tuân thủ: ví dụ điều kiện số dư khả dụng luôn không âm tại mọi thời điểm, căn cứ vào quy tắc bảo toàn số dư BR-FIN và nhóm yêu cầu ví FR-WAL)
-- (Nêu các quy tắc vận hành và công thức tính toán: ví dụ công thức đại số tính lại số dư khả dụng theo thời gian thực từ các dòng tiền vào và ra, kịch bản hệ thống từ chối khi chi tiêu vượt số dư hoặc khi sửa xóa giao dịch quá khứ)
+- Quy tắc bất biến:
+  - Bất biến số dư không âm: Số dư khả dụng của mỗi ví tại mọi thời điểm bắt buộc phải lớn hơn hoặc bằng 0.00 VNĐ ($WalletBalance_w(t) \ge 0.00$). Hệ thống nghiêm cấm mọi hành vi xuất quỹ dẫn đến thâm hụt số dư khả dụng.
+  - Không gán giá trị số dư trực tiếp: Số dư ví không phải là một thuộc tính được cập nhật bằng phép gán độc lập, mà là kết quả dẫn xuất tích lũy từ toàn bộ các luồng tiền đã phát sinh trong lịch sử.
+- Quy tắc vận hành:
+  - Công thức bảo toàn số dư thời gian thực: Số dư ví tại mốc thời gian $T$ được tính toán chính xác bằng tổng toàn bộ các dòng tiền đi vào trừ đi tổng các dòng tiền đi ra:
+
+$$
+WalletBalance_w(T) = \sum_{t \le T} \text{Inflow}_w(t) - \sum_{t \le T} \text{Outflow}_w(t)
+$$
+
+    Trong đó luồng tiền vào bao gồm các khoản thu nhập, nhận chuyển tiền từ ví khác và chênh lệch điều chỉnh dương. Luồng tiền ra bao gồm các khoản chi tiêu, chuyển tiền sang ví khác, chi phí giao dịch liên kết và chênh lệch điều chỉnh âm.
+  - Kiểm tra khả năng chi trả trước khi thực thi: Trước bất kỳ thao tác nào làm giảm số dư ví (ghi nhận chi tiêu, trích tiền chuyển đi, nộp phí giao dịch, điều chỉnh giảm kiểm kê, hoặc sửa và xóa giao dịch thu nhập trong quá khứ), hệ thống bắt buộc đối chiếu số dư hiện có. Nếu số dư khả dụng không đủ đáp ứng toàn bộ số tiền cần trích, hệ thống sẽ từ chối thực hiện và thông báo cảnh báo rõ ràng cho người dùng.
 
 ### 2.5.2 Quan hệ Phân cấp Danh mục 3 Cấp
 
-Quan hệ phân cấp danh mục là quan hệ hợp thành nghiêm ngặt giữa ba tầng khái niệm: `TransactionType` (Cấp 1, gốc cố định bất biến) $\rightarrow$ `NeedGroup` (Cấp 2, phân nhóm mục đích) $\rightarrow$ `Category` (Cấp 3, đơn vị gán nhãn giao dịch). Cây phân cấp này xác định ranh giới mà các thực thể `Category` và `NeedGroup` có thể tồn tại và vận hành, đồng thời chi phối toàn bộ tính hợp lệ của dữ liệu thu chi trong hệ thống (`BR-FIN-04`, `FR-CAT-01`–`FR-CAT-03`).
+Quan hệ phân cấp danh mục là quan hệ hợp thành nghiêm ngặt giữa ba tầng khái niệm: Loại thu chi `TransactionType` (Cấp 1, gốc cố định bất biến) $\rightarrow$ Nhóm nhu cầu `NeedGroup` (Cấp 2, phân nhóm mục đích) $\rightarrow$ Danh mục phân loại `Category` (Cấp 3, đơn vị gán nhãn giao dịch). Cây phân cấp này xác định ranh giới mà các thực thể `Category` và `NeedGroup` có thể tồn tại và vận hành, đồng thời chi phối toàn bộ tính hợp lệ của dữ liệu thu chi trong hệ thống.
 
 **Quy tắc bất biến và vận hành**
 
-- *Bất biến cấu trúc*: Cấp 3 (`Category`) là cấp duy nhất được phép liên kết trực tiếp với giao dịch thu chi; liên kết lên cấp 1 hoặc cấp 2 bị từ chối (`AC-CAT-01.2`). Mỗi `Category` và `NeedGroup` bắt buộc thuộc về đúng một nhánh `TransactionType` xác định và không được phép thay đổi nhánh đó sau khi khởi tạo (`ERR-CAT-001`). Hệ thống nghiêm cấm tồn tại danh mục mồ côi (`Orphan Category`) — mọi danh mục phải trực thuộc một nhóm cha hợp lệ đang tồn tại (`ERR-CAT-004`, `ERR-CAT-005`). Chi tiết ràng buộc thuộc tính từng thực thể xem tại mục **2.3.5** và **2.3.6**.
-- *Bất biến tổng thể cây phân cấp*: Mỗi nhánh `TransactionType` (`INCOME`, `EXPENSE`) luôn phải duy trì tối thiểu một `NeedGroup` ở trạng thái hoạt động; hành động xóa nhóm cuối cùng của một nhánh bị từ chối (`ERR-CAT-002`, `AC-CAT-03.3`). Tập giá trị hai nhánh này là bất biến vĩnh viễn — không thể sửa, xóa hay mở rộng (`FR-CAT-01`). Chi tiết bản chất enum `TransactionType` xem tại mục **2.4.3**.
-- *Vận hành xóa và khôi phục*: Thao tác xóa `NeedGroup` kéo theo xóa cascade toàn bộ `Category` con theo quy tắc xóa mềm hoặc xóa hẳn tùy lịch sử giao dịch (`BR-FIN-04`, `FR-CAT-03`). Thao tác chuyển nhóm cha của `Category` chỉ được phép khi nhóm đích đang hoạt động và thuộc **cùng** nhánh `TransactionType` (`ERR-CAT-001`, `ERR-CAT-003`). Dữ liệu giao dịch lịch sử liên kết với danh mục/nhóm đã xóa mềm được bảo toàn nguyên vẹn trên báo cáo kèm nhãn `(đã xóa)` (`AC-REP-02.3`).
+- *Bất biến cấu trúc*: Cấp 3 (`Category`) là cấp duy nhất được phép liên kết trực tiếp với giao dịch thu chi; mọi yêu cầu liên kết trực tiếp lên cấp 1 hoặc cấp 2 đều bị từ chối. Mỗi `Category` và `NeedGroup` bắt buộc thuộc về đúng một nhánh `TransactionType` xác định và không được phép thay đổi nhánh đó sau khi khởi tạo. Hệ thống nghiêm cấm tồn tại danh mục mồ côi (`Orphan Category`) — mọi danh mục phải trực thuộc một nhóm cha hợp lệ đang tồn tại.
+- *Bất biến tổng thể cây phân cấp*: Mỗi nhánh `TransactionType` (`INCOME`, `EXPENSE`) luôn phải duy trì tối thiểu một `NeedGroup` ở trạng thái hoạt động; hành động xóa nhóm cuối cùng của một nhánh đều bị từ chối. Tập giá trị hai nhánh này là bất biến vĩnh viễn, người dùng không thể chỉnh sửa, xóa bỏ hay mở rộng thêm nhánh mới.
+- *Vận hành xóa và khôi phục*: Thao tác xóa `NeedGroup` kéo theo việc xóa phân tầng toàn bộ các `Category` con trực thuộc theo quy tắc xóa mềm (nếu đã có giao dịch) hoặc xóa hoàn toàn (nếu chưa từng có giao dịch). Thao tác chuyển nhóm cha của `Category` chỉ được phép khi nhóm đích đang hoạt động và thuộc cùng nhánh Loại thu chi. Dữ liệu giao dịch lịch sử liên kết với danh mục hoặc nhóm đã xóa mềm được bảo toàn nguyên vẹn trên các báo cáo phân tích kèm nhãn "(đã xóa)".
 
 ### 2.5.3 Quan hệ Phụ thuộc Sinh tử giữa Giao dịch gốc và Phí
 
-(Mô tả khoảng 1 đến 2 câu về quan hệ phụ thuộc mạnh giữa một giao dịch gốc và chi phí phát sinh đi kèm)
+Mối liên kết giữa giao dịch gốc và chi phí giao dịch là quan hệ hợp thành phụ thuộc bền chặt (`Composition`), trong đó khoản phí phụ trợ do bên thứ ba thu phát sinh đồng thời và phụ thuộc hoàn toàn vào sự tồn tại của giao dịch phát sinh dòng tiền chính (giao dịch thu chi hoặc giao dịch chuyển tiền nội bộ).
 
 **Quy tắc bất biến và vận hành**
 
-- (Nêu các quy tắc bất biến bắt buộc tuân thủ: ví dụ chi phí không âm, chi phí không thể tồn tại độc lập ngoài giao dịch gốc, căn cứ vào các quy tắc tài chính BR-FIN)
-- (Nêu các quy tắc vận hành của hệ thống: ví dụ cơ chế ghi nhận đồng thời, bắt buộc chọn danh mục chi tiêu hợp lệ cho phí, và kịch bản xóa hoàn tác đồng bộ khi xóa giao dịch chuyển tiền)
+- Quy tắc bất biến:
+  - Loại trừ tuyệt đối chi phí mồ côi: Một khoản phí giao dịch không bao giờ được phép sinh ra, tồn tại độc lập hoặc đứng ngoài vòng đời của một giao dịch gốc. Mọi bản ghi chi phí bắt buộc phải gắn liền với mã định danh của một giao dịch gốc hợp lệ.
+  - Ràng buộc phân loại và danh mục: Chi phí giao dịch luôn mang bản chất kinh tế là một khoản chi tiêu và bắt buộc phải được gắn với một danh mục phân loại chi tiết đang hoạt động thuộc nhánh Chi tiêu. Số tiền chi phí bắt buộc không âm và chỉ phát sinh bản ghi khi giá trị lớn hơn 0.00 VNĐ.
+  - Cấm thao tác trực tiếp: Người dùng không được phép thêm mới, chỉnh sửa hay xóa độc lập bản ghi phí; mọi thao tác với chi phí đều phải thông qua giao diện của giao dịch gốc.
+- Quy tắc vận hành:
+  - Thực thi nguyên tử: Việc ghi nhận giao dịch gốc và khoản phí đi kèm được thực hiện đồng thời. Nếu một trong hai bản ghi gặp lỗi về tính hợp lệ (ví dụ ví không đủ tiền trả phí hoặc danh mục phí không hợp lệ), toàn bộ thao tác sẽ bị hủy bỏ để đảm bảo dữ liệu không bị sai lệch.
+  - Đồng bộ vòng đời: Khi người dùng chỉnh sửa giá trị phí của giao dịch gốc, hệ thống tự động cập nhật lại bản ghi chi phí tương ứng (hoặc xóa bỏ bản ghi phí nếu người dùng đưa mức phí về 0). Khi giao dịch gốc bị xóa, bản ghi phí liên kết sẽ tự động bị xóa đồng thời, và toàn bộ số tiền phí đã trích sẽ được hoàn nguyên đầy đủ về ví thanh toán.
