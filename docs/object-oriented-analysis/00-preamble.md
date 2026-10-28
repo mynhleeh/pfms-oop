@@ -22,7 +22,7 @@
 - [03-so-do-tuan-tu-he-thong-ssd.md](03-so-do-tuan-tu-he-thong-ssd.md): Sơ đồ tuần tự hệ thống cho 20 ca sử dụng và bảng thao tác hệ thống
 - [04-hop-dong-thao-tac-operation-contracts.md](04-hop-dong-thao-tac-operation-contracts.md): Đặc tả biến đổi dữ liệu của các thao tác hệ thống
 - [05-mo-hinh-trang-thai-thuc-the.md](05-mo-hinh-trang-thai-thuc-the.md): Biểu đồ máy trạng thái cho vòng đời thực thể
-- [06-phan-tich-robustness-va-crc.md](06-phan-tich-robustness-va-crc.md): Phân tích Robustness BCE và bộ thẻ CRC phân bổ trách nhiệm sơ bộ
+- [06-so-do-robustness-va-the-crc.md](06-so-do-robustness-va-the-crc.md): Sơ đồ Robustness và bộ thẻ CRC phân bổ trách nhiệm sơ bộ
 - [07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận truy vết hai chiều chức năng sang thực thể, thao tác và quy tắc nghiệp vụ
 - [08-tong-ket-va-chuyen-giao-sang-ood.md](08-tong-ket-va-chuyen-giao-sang-ood.md): Tổng kết phân tích Milestone 2 và tiêu chí chuyển tiếp sang OOD
 - [09-tai-lieu-trich-dan.md](09-tai-lieu-trich-dan.md): Danh mục tài liệu tham khảo kỹ thuật chuẩn APA
@@ -66,11 +66,9 @@
 - 5.4 Vòng đời Giao dịch Chuyển tiền
 - 5.5 Vòng đời Thực thể Danh mục
 
-### Phần 6: Phân tích Robustness và Thẻ CRC
-- 6.1 Phương pháp Phân tích Robustness (Boundary - Control - Entity)
-- 6.2 Biểu đồ Robustness cho các Ca Sử dụng Cốt lõi
-- 6.3 Phương pháp Thẻ CRC (Class - Responsibility - Collaborator)
-- 6.4 Bộ Thẻ CRC Phân bổ Trách nhiệm Sơ bộ
+### Phần 6: Sơ đồ Robustness và Thẻ CRC
+- 6.1 Sơ đồ Robustness
+- 6.2 Thẻ CRC
 
 ### Phần 7: Ma trận Truy vết Yêu cầu sang Thực thể và Thao tác
 - 7.1 Ma trận Truy vết FR / UC sang Domain Entities và Value Objects
