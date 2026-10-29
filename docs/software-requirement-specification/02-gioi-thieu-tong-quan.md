@@ -2,7 +2,7 @@
 
 ### 1.1 Mục đích
 
-Tài liệu đặc tả yêu cầu phần mềm này xác định các yêu cầu cho Hệ thống quản lý tài chính cá nhân. Các yêu cầu gồm yêu cầu chức năng, yêu cầu phi chức năng, 5 quy tắc nghiệp vụ cốt lõi: Quy tắc độ chính xác tài chính, Quy tắc bảo toàn số dư ví, Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ, Quy tắc phân cấp danh mục thu chi 3 cấp, Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`), cùng tiêu chí nghiệm thu kiểm chứng được. Tài liệu đặt ra căn cứ kỹ thuật cho hoạt động phân tích thiết kế hướng đối tượng. Căn cứ này áp dụng cả cho việc cài đặt mã nguồn trên nền tảng Java 17 LTS và triển khai bộ kiểm thử tự động độc lập công nghệ.
+Tài liệu Đặc tả Yêu cầu Phần mềm này xác định các yêu cầu cho Hệ thống Quản lý Tài chính Cá nhân. Các yêu cầu gồm yêu cầu chức năng, yêu cầu phi chức năng, các quy tắc nghiệp vụ và tiêu chí nghiệm thu kiểm chứng được. Tài liệu đặt ra căn cứ kỹ thuật cho hoạt động phân tích thiết kế hướng đối tượng. Căn cứ này áp dụng cả cho việc cài đặt mã nguồn trên nền tảng Java 17 LTS và triển khai bộ kiểm thử tự động độc lập công nghệ.
 
 ### 1.2 Phạm vi sản phẩm
 
@@ -97,9 +97,9 @@ Mã định danh gồm 12 dạng mã sau, dùng 10 tiền tố:
 | Tiền tố | Nghĩa của mã | Thực thể định danh | Ví dụ | Phạm vi áp dụng |
 | --- | --- | --- | --- | --- |
 | `G-NN` | Goal | Mục tiêu hệ thống | `G-01` | Bảng mục tiêu hệ thống tại Mục 2.2 |
-| `CON-NN` | Constraint | Giới hạn kỹ thuật bắt buộc | `CON-01` | Danh mục giới hạn tại Mục 2.4 |
-| `AS-NN` | Assumption | Giả định vận hành hệ thống | `AS-01` | Danh mục giả định tại Mục 2.4 |
-| `DE-NN` | Dependency | Sự phụ thuộc hệ thống | `DE-01` | Danh mục phụ thuộc tại Mục 2.4 |
+| `CON-NN` | Constraint | Giới hạn kỹ thuật bắt buộc | `CON-01` | Danh mục giới hạn tại Mục 2.3 |
+| `AS-NN` | Assumption | Giả định vận hành hệ thống | `AS-01` | Danh mục giả định tại Mục 2.3 |
+| `DE-NN` | Dependency | Sự phụ thuộc hệ thống | `DE-01` | Danh mục phụ thuộc tại Mục 2.3 |
 | `BR-FIN-NN` | Business Rule, Finance | Quy tắc nghiệp vụ tài chính | `BR-FIN-01` | Các quy tắc tài chính tại Mục 3 |
 | `BR-NAM-NN` | Business Rule, Name | Quy tắc nghiệp vụ về tên | `BR-NAM-01` | Quy tắc về tên của ví, nhóm nhu cầu và danh mục tại Mục 3.5 |
 | `ERR-NHÓM-NNN` | Error | Mã lỗi nghiệp vụ | `ERR-NAM-001` | Các bảng mã lỗi tại Mục 3 |

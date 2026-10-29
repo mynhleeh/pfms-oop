@@ -44,11 +44,9 @@ Các mục tiêu nghiệp vụ định lượng và tiêu chí kiểm chứng t�
 | `G-02` | Xác định tổng số dư và cơ cấu phân bổ ví | Tính tổng số dư của các ví và phần trăm số dư mỗi ví chiếm trong tổng, tại ngày Người dùng tra cứu. Số dư của từng ví được tính từ lịch sử dòng tiền của ví đó | Tổng số dư hiển thị bằng đúng tổng số dư của từng ví cộng lại, chênh lệch 0 VNĐ. Khi tổng số dư lớn hơn 0, 100.00% số ví hiển thị tỷ lệ đúng theo công thức của Thống kê cơ cấu số dư theo ví (`FR-WAL-04`). |
 | `G-03` | Bảo đảm độ chính xác số học tài chính | Loại bỏ hoàn toàn sai số làm tròn số thực nhị phân trong các phép tính số dư và tổng hợp báo cáo | Sai số làm tròn số học bằng 0.00 VNĐ theo Độ chính xác và toàn vẹn dữ liệu tài chính (`NFR-01`) trong các kịch bản tính toán số dư và tổng hợp báo cáo. Bảo đảm không xuất hiện sai số dấu chấm động nhị phân trên toàn bộ dữ liệu tài chính. |
 
-### 2.3 Đặc điểm Người dùng
+### 2.3 Đặc điểm người dùng, giới hạn kỹ thuật, giả định và sự phụ thuộc
 
 Hệ thống phục vụ một Người dùng duy nhất có toàn quyền quản trị dữ liệu cục bộ mà không phân quyền nhiều cấp. Người dùng chỉ cần kỹ năng máy tính cơ bản và hiểu biết tài chính thông dụng để ghi nhận giao dịch hàng ngày cùng theo dõi báo cáo định kỳ.
-
-### 2.4 Giới hạn kỹ thuật, giả định và sự phụ thuộc
 
 | Mã giới hạn | Nội dung |
 | --- | --- |
@@ -69,7 +67,7 @@ Hệ thống phục vụ một Người dùng duy nhất có toàn quyền quả
 | `DE-01` | Đồng hồ hệ thống | Cung cấp mốc thời gian thực tế từ hệ thống phần cứng và hệ điều hành. Mốc này dùng để ghi nhận thời điểm giao dịch và xác định chuỗi 12 tháng gần nhất trong báo cáo thống kê. |
 | `DE-02` | Hệ thống tệp tin cục bộ | Cung cấp quyền đọc, ghi tệp tin trên ổ đĩa để lưu trữ lâu dài, áp dụng cách ghi tệp an toàn và sao lưu dữ liệu. |
 
-### 2.5 Môi trường vận hành
+### 2.4 Môi trường vận hành
 
 | Yếu tố môi trường | Mức tối thiểu | Ghi chú tương thích |
 | --- | --- | --- |
@@ -78,7 +76,7 @@ Hệ thống phục vụ một Người dùng duy nhất có toàn quyền quả
 | Cấu hình phần cứng | Cấu hình máy tính cá nhân thông thường đủ chạy môi trường thực thi Java | Chưa xác lập ngưỡng phần cứng tối thiểu cụ thể; sẽ bổ sung sau khi có đo đạc thực tế |
 | Hiển thị | Kích thước màn hình đủ hiển thị bảng biểu số liệu và biểu đồ báo cáo | Chưa xác lập độ phân giải tối thiểu cụ thể; khuyến nghị 1280x720 pixel trở lên |
 
-### 2.6 Luận đề kỹ thuật và phân tích đánh đổi
+### 2.5 Luận đề kỹ thuật và phân tích đánh đổi
 
 #### Luận đề kỹ thuật
 
