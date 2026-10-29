@@ -20,11 +20,11 @@
 - [01-gioi-thieu-va-ngu-canh-he-thong.md](01-gioi-thieu-va-ngu-canh-he-thong.md): Mục đích tài liệu OOA, ranh giới và ngữ cảnh hệ thống, bảng đối chiếu khái niệm miền
 - [02-mo-hinh-mien-khai-niem.md](02-mo-hinh-mien-khai-niem.md): Mô hình miền khái niệm, phân loại thực thể và đối tượng giá trị, các quy tắc nghiệp vụ
 - [03-so-do-tuan-tu-he-thong-ssd.md](03-so-do-tuan-tu-he-thong-ssd.md): Sơ đồ tuần tự hệ thống cho 20 ca sử dụng và bảng thao tác hệ thống
-- [04-hop-dong-thao-tac-operation-contracts.md](04-hop-dong-thao-tac-operation-contracts.md): Đặc tả biến đổi dữ liệu của các thao tác hệ thống
+- [04-dac-ta-bien-doi-du-lieu-thao-tac-he-thong.md](04-dac-ta-bien-doi-du-lieu-thao-tac-he-thong.md): Đặc tả biến đổi dữ liệu của các thao tác hệ thống
 - [05-mo-hinh-trang-thai-thuc-the.md](05-mo-hinh-trang-thai-thuc-the.md): Biểu đồ máy trạng thái cho vòng đời thực thể
 - [06-so-do-robustness-va-the-crc.md](06-so-do-robustness-va-the-crc.md): Sơ đồ Robustness và bộ thẻ CRC phân bổ trách nhiệm sơ bộ
-- [07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận truy vết hai chiều chức năng sang thực thể, thao tác và quy tắc nghiệp vụ
-- [08-tong-ket-va-chuyen-giao-sang-ood.md](08-tong-ket-va-chuyen-giao-sang-ood.md): Tổng kết phân tích Milestone 2 và tiêu chí chuyển tiếp sang OOD
+- [07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận đối chiếu hai chiều giữa yêu cầu, thực thể miền và thao tác hệ thống
+- [08-tong-ket.md](08-tong-ket.md): Tổng kết hồ sơ phân tích hướng đối tượng
 - [09-tai-lieu-trich-dan.md](09-tai-lieu-trich-dan.md): Danh mục tài liệu tham khảo kỹ thuật chuẩn APA
 
 ## Phân cấp Cấu trúc Chi tiết các Phần
@@ -70,18 +70,14 @@
 - 6.1 Sơ đồ Robustness
 - 6.2 Thẻ CRC
 
-### Phần 7: Ma trận Truy vết Yêu cầu sang Thực thể và Thao tác
-- 7.1 Ma trận Truy vết FR / UC sang Domain Entities và Value Objects
-- 7.2 Ma trận Truy vết System Operations sang Domain Entities
-- 7.3 Ma trận Tuân thủ Quy tắc Nghiệp vụ (BR-FIN và BR-NAM Coverage)
-- 7.4 Xác nhận Khép kín Truy vết (Zero Orphan Entities / Requirements)
+### Phần 7: Ma trận Truy vết Yêu cầu vào Mô hình Phân tích
+- 7.1 Ma trận Đối chiếu Yêu cầu Chức năng với Thực thể và Đối tượng Giá trị
+- 7.2 Ma trận Tác động của Thao tác Hệ thống lên Thực thể Miền
+- 7.3 Bảng Kiểm soát Quy tắc Nghiệp vụ và Ràng buộc Kỹ thuật
+- 7.4 Báo cáo Kiểm toán Độ bao phủ và Tính Toàn vẹn Mô hình
 
-### Phần 8: Tổng kết Phân tích và Tiêu chí Chuyển giao sang OOD
-- 8.1 Tổng kết Kết quả Phân tích OOA (Milestone 2)
-- 8.2 Tiêu chí Nghiệm thu Hoàn thành Hồ sơ OOA
-- 8.3 Danh mục Đầu vào Bàn giao cho Thiết kế Hướng đối tượng (OOD)
-- 8.4 Hướng dẫn Chuyển dịch từ Khái niệm sang Mô hình Lớp Thiết kế
+### Phần 8: Tổng kết
+- Tổng kết kết quả phân tích và đóng khóa đường cơ sở nghiệp vụ
 
 ### Phần 9: Tài liệu Trích dẫn
-- 9.1 Giáo trình và Chuẩn mực Kỹ thuật Quốc tế
-- 9.2 Hồ sơ Kỹ thuật Dự án (Tier 1 và Tier 2)
+- Danh mục giáo trình và chuẩn mực kỹ thuật quốc tế
