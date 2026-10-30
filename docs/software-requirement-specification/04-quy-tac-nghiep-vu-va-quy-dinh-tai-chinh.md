@@ -11,13 +11,13 @@ Mỗi quy tắc nghiệp vụ được đặc tả nhất quán theo khuôn mẫ
 
 Bảng tổng hợp 5 quy tắc nghiệp vụ của hệ thống:
 
-| Tên quy tắc (mã) | Phân loại quy tắc | Thực thể áp dụng | Ý nghĩa nghiệp vụ |
-| :--- | :--- | :--- | :--- |
-| Quy tắc độ chính xác tài chính (`BR-FIN-01`) | Quy tắc tính toán số học | Toàn bộ thực thể tài chính | Số thập phân chính xác, làm tròn xác định. |
-| Quy tắc bảo toàn số dư ví (`BR-FIN-02`) | Ràng buộc toàn vẹn dữ liệu | Ví, giao dịch thu chi, giao dịch chuyển tiền, điều chỉnh số dư | Số dư ví tính lại từ lịch sử dòng tiền, luôn không âm. |
-| Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`) | Quy tắc giao dịch đồng thời | Giao dịch chuyển tiền, giao dịch thu chi, ví | Trừ ví nguồn và cộng ví đích cùng được ghi nhận hoặc cùng không được ghi nhận. |
-| Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) | Ràng buộc cấu trúc phân cấp | Danh mục, nhóm nhu cầu, loại thu chi | Cấu trúc 3 cấp (Loại thu chi -> Nhóm nhu cầu -> Danh mục chi tiết), mọi danh mục thuộc một nhóm cha hợp lệ. |
-| Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`) | Ràng buộc định danh dữ liệu | Ví, nhóm nhu cầu, danh mục | Tên đúng định dạng và không trùng trong phạm vi áp dụng. |
+| Mã quy tắc | Tên quy tắc | Phân loại quy tắc | Thực thể áp dụng | Ý nghĩa nghiệp vụ |
+| :--- | :--- | :--- | :--- | :--- |
+| `BR-FIN-01` | Quy tắc độ chính xác tài chính | Quy tắc tính toán số học | Toàn bộ thực thể tài chính | Số thập phân chính xác, làm tròn xác định. |
+| `BR-FIN-02` | Quy tắc bảo toàn số dư ví | Ràng buộc toàn vẹn dữ liệu | Ví, giao dịch thu chi, giao dịch chuyển tiền, điều chỉnh số dư | Số dư ví tính lại từ lịch sử dòng tiền, luôn không âm. |
+| `BR-FIN-03` | Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ | Quy tắc giao dịch đồng thời | Giao dịch chuyển tiền, giao dịch thu chi, ví | Trừ ví nguồn và cộng ví đích cùng được ghi nhận hoặc cùng không được ghi nhận. |
+| `BR-FIN-04` | Quy tắc phân cấp danh mục thu chi 3 cấp | Ràng buộc cấu trúc phân cấp | Danh mục, nhóm nhu cầu, loại thu chi | Cấu trúc 3 cấp (Loại thu chi -> Nhóm nhu cầu -> Danh mục chi tiết), mọi danh mục thuộc một nhóm cha hợp lệ. |
+| `BR-NAM-01` | Quy tắc tên của ví, nhóm nhu cầu và danh mục | Ràng buộc định danh dữ liệu | Ví, nhóm nhu cầu, danh mục | Tên đúng định dạng và không trùng trong phạm vi áp dụng. |
 
 ### 3.1 Quy tắc độ chính xác tài chính (`BR-FIN-01`)
 
@@ -166,13 +166,13 @@ Quy tắc áp dụng cho thực thể danh mục, nhóm nhu cầu, loại thu ch
 
 #### Lỗi vi phạm
 
-| Tên lỗi (mã lỗi) | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
-| :--- | :--- | :--- | :--- |
-| Lỗi đổi loại thu chi trái phép (`ERR-CAT-001`) | Chuyển danh mục sang nhóm thuộc loại thu chi khác, hoặc đổi loại thu chi của nhóm hoặc danh mục đã có giao dịch | Từ chối thay đổi thuộc tính | "Không được phép đổi loại thu chi hoặc chuyển danh mục sang nhóm thuộc loại thu chi khác." |
-| Lỗi xóa nhóm cuối cùng của loại thu chi (`ERR-CAT-002`) | Xóa nhóm đang dùng cuối cùng của một loại thu chi | Từ chối thao tác xóa | "Không thể xóa nhóm cuối cùng của loại thu chi này." |
-| Lỗi chuyển danh mục sang nhóm đã xóa (`ERR-CAT-003`) | Chuyển danh mục sang nhóm đã xóa | Từ chối thao tác chuyển | "Không thể chuyển danh mục sang nhóm đã xóa." |
-| Lỗi khôi phục danh mục khi nhóm cha đã xóa (`ERR-CAT-004`) | Khôi phục danh mục khi nhóm của nó còn ở trạng thái đã xóa | Từ chối thao tác khôi phục | "Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước." |
-| Lỗi tạo danh mục trong nhóm đã xóa (`ERR-CAT-005`) | Tạo danh mục vào nhóm đang ở trạng thái đã xóa | Từ chối thao tác tạo | "Không thể tạo danh mục trong nhóm đã xóa. Hãy chọn nhóm đang dùng hoặc khôi phục nhóm trước." |
+| Mã lỗi | Tên lỗi | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
+| :--- | :--- | :--- | :--- | :--- |
+| `ERR-CAT-001` | Lỗi đổi loại thu chi trái phép | Chuyển danh mục sang nhóm thuộc loại thu chi khác, hoặc đổi loại thu chi của nhóm hoặc danh mục đã có giao dịch | Từ chối thay đổi thuộc tính | "Không được phép đổi loại thu chi hoặc chuyển danh mục sang nhóm thuộc loại thu chi khác." |
+| `ERR-CAT-002` | Lỗi xóa nhóm cuối cùng của loại thu chi | Xóa nhóm đang dùng cuối cùng của một loại thu chi | Từ chối thao tác xóa | "Không thể xóa nhóm cuối cùng của loại thu chi này." |
+| `ERR-CAT-003` | Lỗi chuyển danh mục sang nhóm đã xóa | Chuyển danh mục sang nhóm đã xóa | Từ chối thao tác chuyển | "Không thể chuyển danh mục sang nhóm đã xóa." |
+| `ERR-CAT-004` | Lỗi khôi phục danh mục khi nhóm cha đã xóa | Khôi phục danh mục khi nhóm của nó còn ở trạng thái đã xóa | Từ chối thao tác khôi phục | "Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước." |
+| `ERR-CAT-005` | Lỗi tạo danh mục trong nhóm đã xóa | Tạo danh mục vào nhóm đang ở trạng thái đã xóa | Từ chối thao tác tạo | "Không thể tạo danh mục trong nhóm đã xóa. Hãy chọn nhóm đang dùng hoặc khôi phục nhóm trước." |
 
 ### 3.5 Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`)
 

@@ -1,6 +1,6 @@
 ## 6. ĐẶC TẢ 20 CA SỬ DỤNG CHI TIẾT
 
-20 ca sử dụng (UC) của Hệ thống quản lý tài chính cá nhân (PFMS) mô hình hóa các tương tác hoàn chỉnh giữa Người dùng và hệ thống theo phương pháp Fully Dressed Use Case của Alistair Cockburn và chuẩn IREB CPRE. Các UC hiện thực hóa các yêu cầu chức năng tại Mục 4 (`FR-WAL-01` đến `FR-DAT-03`) và tuân thủ các quy tắc nghiệp vụ tại Mục 3 (`BR-FIN-01` đến `BR-FIN-04`, `BR-NAM-01`). Hồ sơ UC theo 4 nguyên tắc:
+20 ca sử dụng (UC) của Hệ thống quản lý tài chính cá nhân (PFMS) mô hình hóa các tương tác hoàn chỉnh giữa Người dùng và hệ thống theo phương pháp Fully Dressed Use Case của Alistair Cockburn và chuẩn IREB CPRE. Các UC hiện thực hóa các yêu cầu chức năng tại Mục 4 (`FR-WAL-01` đến `FR-DAT-03`) và tuân thủ các quy tắc nghiệp vụ tại Mục 3 độ chính xác tài chính (`BR-FIN-01`), bảo toàn số dư ví (`BR-FIN-02`), ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và tên của ví, nhóm nhu cầu, danh mục (`BR-NAM-01`). Hồ sơ UC theo 4 nguyên tắc:
 
 - Hệ thống phục vụ một người dùng duy nhất trên máy tính để bàn cục bộ.
 - Mỗi UC chỉ có một mục tiêu nghiệp vụ độc lập, không gộp thành cụm "Quản lý X" mơ hồ.

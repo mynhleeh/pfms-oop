@@ -1,6 +1,6 @@
 ## 4. YÊU CẦU CHỨC NĂNG CHI TIẾT
 
-Hệ thống Quản lý Tài chính Cá nhân gồm 20 yêu cầu chức năng, hiện thực hóa 3 mục tiêu hệ thống (G-01, G-02, G-03) và tuân thủ các quy tắc nghiệp vụ: độ chính xác tài chính (`BR-FIN-01`), bảo toàn số dư ví (`BR-FIN-02`), ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và tên của ví, nhóm nhu cầu, danh mục (`BR-NAM-01`). Đặc tả theo ISO/IEC/IEEE 29148:2018 và phương pháp Karl Wiegers, chỉ mô tả bài toán nghiệp vụ (WHAT), tách biệt khỏi công nghệ lưu trữ và ngôn ngữ lập trình (HOW).
+Hệ thống Quản lý Tài chính Cá nhân gồm 20 yêu cầu chức năng, hiện thực hóa 3 mục tiêu hệ thống (G-01, G-02, G-03) và tuân thủ các quy tắc nghiệp vụ: độ chính xác tài chính (`BR-FIN-01`), bảo toàn số dư ví (`BR-FIN-02`), ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và tên của ví, nhóm nhu cầu, danh mục (`BR-NAM-01`). Mô tả bài toán nghiệp vụ (WHAT), tách biệt khỏi công nghệ lưu trữ và ngôn ngữ lập trình (HOW).
 
 Mỗi yêu cầu chức năng được đặc tả theo khuôn mẫu 6 khối:
 
@@ -16,9 +16,9 @@ Mỗi yêu cầu chức năng được đặc tả theo khuôn mẫu 6 khối:
 - Tên nhóm nhu cầu và danh mục trong tiêu chí nghiệm thu là dữ liệu giả lập, không phải quy định cứng; khi kiểm thử thay bằng nhóm và danh mục thực tế trong cấu hình triển khai.
 - Các FR gắn nhãn chỉ truy vấn, không làm thay đổi số dư ví hay bất kỳ bản ghi nào, nên không nhắc lại bất biến này ở từng FR.
 - Quy tắc nghiệp vụ được viện dẫn bằng mã; tên đầy đủ xem Mục 3. Mọi số tiền dùng số thập phân chính xác, làm tròn ngân hàng, hiển thị 2 chữ số thập phân (`BR-FIN-01`). Thao tác ghi nhiều bước là nguyên tử: cùng thành công hoặc cùng hủy.
-- **Quy tắc phí giao dịch (FEE)**, dùng chung cho `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TRF-01`:
+- **Quy tắc phí giao dịch (FEE)**, dùng chung cho (`FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TRF-01`):
   - Chi phí nhỏ hơn 0: từ chối, `ERR-FEE-001`. Chi phí mặc định 0.00 VNĐ.
-  - Chi phí lớn hơn 0 bắt buộc có danh mục phí: thiếu thì `ERR-FEE-002`; danh mục đã xóa hoặc không thuộc nhánh Chi tiêu (`EXPENSE`) thì `ERR-FEE-003`. Chi phí bằng 0 không cần danh mục phí.
+  - Chi phí lớn hơn 0 bắt buộc có danh mục phí: thiếu thì (`ERR-FEE-002`); danh mục đã xóa hoặc không thuộc nhánh Chi tiêu (`EXPENSE`) thì (`ERR-FEE-003`). Chi phí bằng 0 không cần danh mục phí.
   - Chi phí lớn hơn 0 sinh một bản ghi phí loại chi tiêu, số tiền bằng đúng chi phí, liên kết với giao dịch gốc (hoặc giao dịch chuyển tiền) và ghi đồng thời với giao dịch gốc.
 
 Bảng chia 20 yêu cầu chức năng theo 6 nhóm chức năng:
@@ -35,7 +35,7 @@ Bảng chia 20 yêu cầu chức năng theo 6 nhóm chức năng:
 
 ### 4.1 FR-WAL: Nhóm chức năng Ví
 
-Quản lý các ví (tài khoản và nguồn tiền dùng ngay) của Người dùng. Hệ thống có sẵn ví "Tiền mặt" và cho phép tạo thêm ví. Số dư ví luôn đúng theo `BR-FIN-02`.
+Quản lý các ví (tài khoản và nguồn tiền dùng ngay) của Người dùng. Hệ thống có sẵn ví "Tiền mặt" và cho phép tạo thêm ví. Số dư ví luôn đúng theo bảo toàn số dư ví (`BR-FIN-02`).
 
 #### 4.1.1 FR-WAL-01: Tạo ví mới
 
@@ -61,9 +61,9 @@ Dữ liệu đầu vào:
 
 Quy tắc xử lý:
 
-1. Tên rỗng sau khi cắt hoặc dài hơn 50 ký tự: từ chối, `ERR-NAM-001`.
-2. Tên trùng ví đang hoạt động hoặc ví đã lưu trữ: từ chối, `ERR-NAM-002`.
-3. Tạo ví ở trạng thái hoạt động (`ACTIVE`), số dư khởi điểm 0.00 VNĐ (`BR-FIN-02`); không nhận số dư ban đầu khi tạo ví. Khi khởi tạo hệ thống lần đầu, tạo sẵn đúng một ví "Tiền mặt" số dư 0.00 VNĐ.
+1. Tên rỗng sau khi cắt hoặc dài hơn 50 ký tự: từ chối, (`ERR-NAM-001`).
+2. Tên trùng ví đang hoạt động hoặc ví đã lưu trữ: từ chối, (`ERR-NAM-002`).
+3. Tạo ví ở trạng thái hoạt động (`ACTIVE`), số dư khởi điểm 0.00 VNĐ bảo toàn số dư ví(`BR-FIN-02`); không nhận số dư ban đầu khi tạo ví. Khi khởi tạo hệ thống lần đầu, tạo sẵn đúng một ví "Tiền mặt" số dư 0.00 VNĐ.
 4. Cấp mã định danh duy nhất, ghi thời điểm tạo và lưu vào tệp dữ liệu cục bộ.
 
 Dữ liệu đầu ra và bất biến hệ thống:
@@ -71,15 +71,15 @@ Dữ liệu đầu ra và bất biến hệ thống:
 | Thành phần | Nội dung |
 | :-- | :-- |
 | Bản ghi dữ liệu | Bản ghi ví mới gồm mã định danh, tên, trạng thái, thời điểm tạo và ghi chú. |
-| Bất biến hệ thống | Số dư ví mới bằng 0.00 VNĐ; tổng số dư toàn hệ thống không đổi (`BR-FIN-02`). |
+| Bất biến hệ thống | Số dư ví mới bằng 0.00 VNĐ; tổng số dư toàn hệ thống không đổi bảo toàn số dư ví(`BR-FIN-02`). |
 
 Tiêu chí nghiệm thu:
 
 | Mã tiêu chí | Điều kiện kích hoạt | Kết quả kỳ vọng |
 | :-- | :-- | :-- |
 | `AC-WAL-01.1` | Nhập tên "MB Bank" và ghi chú hợp lệ | Tạo ví `ACTIVE`, số dư 0.00 VNĐ. |
-| `AC-WAL-01.2` | Nhập tên chỉ gồm khoảng trắng hoặc dài hơn 50 ký tự | Từ chối, báo `ERR-NAM-001`. |
-| `AC-WAL-01.3` | Đã có ví "MB Bank"; tạo ví "mb bank" hoặc " MB Bank " | Từ chối, báo `ERR-NAM-002`. |
+| `AC-WAL-01.2` | Nhập tên chỉ gồm khoảng trắng hoặc dài hơn 50 ký tự | Từ chối, báo (`ERR-NAM-001`). |
+| `AC-WAL-01.3` | Đã có ví "MB Bank"; tạo ví "mb bank" hoặc " MB Bank " | Từ chối, báo (`ERR-NAM-002`). |
 
 #### 4.1.2 FR-WAL-02: Xem danh sách và chi tiết số dư tính lại từ lịch sử dòng tiền
 
@@ -89,7 +89,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | Mục tiêu xác định tổng số dư và cơ cấu phân bổ ví (`G-02`) |
 | Ca sử dụng liên quan | Xem danh sách ví (`UC-WAL-02`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-02` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`),bảo toàn số dư ví (`BR-FIN-02`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -177,7 +177,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | Mục tiêu xác định tổng số dư và cơ cấu phân bổ ví (`G-02`) |
 | Ca sử dụng liên quan | Xem danh sách ví (`UC-WAL-02`) |
-| Quy tắc áp dụng | `BR-FIN-01` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -220,7 +220,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | Mục tiêu xác định tổng số dư và cơ cấu phân bổ ví (`G-02`) |
 | Ca sử dụng liên quan | Điều chỉnh số dư ví (`UC-WAL-04`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-02` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`),bảo toàn số dư ví (`BR-FIN-02`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -250,7 +250,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 | Thành phần | Nội dung |
 | :-- | :-- |
 | Bản ghi dữ liệu | Bản ghi điều chỉnh trong sổ điều chỉnh số dư kèm số dư ví đã cập nhật. |
-| Bất biến hệ thống | Số dư ví sau điều chỉnh bằng đúng số dư quan sát; tổng số dư hệ thống biến động đúng bằng chênh lệch (`BR-FIN-02`). |
+| Bất biến hệ thống | Số dư ví sau điều chỉnh bằng đúng số dư quan sát; tổng số dư hệ thống biến động đúng bằng chênh lệchbảo toàn số dư ví (`BR-FIN-02`). |
 
 Tiêu chí nghiệm thu:
 
@@ -273,7 +273,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-01`, `G-03` |
 | Ca sử dụng liên quan | Ghi nhận giao dịch thu chi (`UC-TXN-01`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`), bảo toàn số dư ví(`BR-FIN-02`), phân cấp danh mục thu chi 3 cấp(`BR-FIN-04`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -325,7 +325,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-01`, `G-03` |
 | Ca sử dụng liên quan | Ghi nhận giao dịch thu chi (`UC-TXN-01`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`), bảo toàn số dư ví(`BR-FIN-02`), phân cấp danh mục thu chi 3 cấp(`BR-FIN-04`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -367,7 +367,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-01`, `G-03` |
 | Ca sử dụng liên quan | Tra cứu và lọc lịch sử giao dịch (`UC-TXN-02`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-04` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`), phân cấp danh mục thu chi 3 cấp(`BR-FIN-04`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -414,7 +414,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-01`, `G-02`, `G-03` |
 | Ca sử dụng liên quan | Chỉnh sửa giao dịch thu chi (`UC-TXN-03`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`), bảo toàn số dư ví(`BR-FIN-02`), phân cấp danh mục thu chi 3 cấp(`BR-FIN-04`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -466,7 +466,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-01`, `G-02`, `G-03` |
 | Ca sử dụng liên quan | Xóa giao dịch thu chi (`UC-TXN-04`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-02` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`), bảo toàn số dư ví(`BR-FIN-02`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -515,7 +515,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-02`, `G-03` |
 | Ca sử dụng liên quan | Chuyển tiền nội bộ (`UC-TRF-01`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`), bảo toàn số dư ví(`BR-FIN-02`), ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -566,7 +566,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-02`, `G-03` |
 | Ca sử dụng liên quan | Tra cứu lịch sử chuyển tiền (`UC-TRF-02`), Xóa giao dịch chuyển tiền (`UC-TRF-03`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03` |
+| Quy tắc áp dụng | Độ chính xác tài chính(`BR-FIN-01`), bảo toàn số dư ví(`BR-FIN-02`), ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -615,7 +615,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | Mục tiêu ghi nhận dòng tiền và cấu trúc danh mục phân cấp (`G-01`) |
 | Ca sử dụng liên quan | Khởi tạo cấu trúc danh mục (`UC-CAT-01`) |
-| Quy tắc áp dụng | `BR-FIN-04` |
+| Quy tắc áp dụng | Phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -755,7 +755,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-01`, `G-03` |
 | Ca sử dụng liên quan | Xem thống kê dòng tiền (`UC-REP-01`) |
-| Quy tắc áp dụng | `BR-FIN-01` |
+| Quy tắc áp dụng | Độ chính xác tài chính (`BR-FIN-01`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -802,7 +802,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | `G-01`, `G-03` |
 | Ca sử dụng liên quan | Xem phân tích cơ cấu thu chi (`UC-REP-02`) |
-| Quy tắc áp dụng | `BR-FIN-01`, `BR-FIN-04` |
+| Quy tắc áp dụng | Độ chính xác tài chính (`BR-FIN-01`), Phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
@@ -851,7 +851,7 @@ Bảng thuộc tính:
 | :-- | :-- |
 | Mục tiêu đáp ứng | Mục tiêu bảo đảm độ chính xác số học tài chính (`G-03`) |
 | Ca sử dụng liên quan | Xuất dữ liệu tài chính (`UC-DAT-01`) |
-| Quy tắc áp dụng | `BR-FIN-01` |
+| Quy tắc áp dụng | Độ chính xác tài chính (`BR-FIN-01`) |
 | Mức độ ưu tiên | Bắt buộc (`MUST`) |
 
 Điều kiện tiền đề:
