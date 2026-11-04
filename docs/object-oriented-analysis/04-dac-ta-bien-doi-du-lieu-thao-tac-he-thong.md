@@ -188,68 +188,86 @@ Người dùng muốn mở rộng cấu trúc phân loại chi tiêu bằng các
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về nhóm cha phải tồn tại và đang hoạt động, tên danh mục mới không được để trống và không trùng với các danh mục khác trong cùng nhóm cha sau khi chuẩn hóa)
+- Nhóm nhu cầu cha xác định bởi `parentCategoryId` bắt buộc phải tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`), không ở trạng thái đã xóa theo `BR-FIN-04` (vi phạm báo lỗi `ERR-CAT-005`).
+- Tên danh mục mới `categoryName` sau khi cắt tỉa khoảng trắng hai đầu (`trim`) phải có độ dài từ 1 đến 50 ký tự, không được để trống theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-001`).
+- Tên danh mục mới sau khi chuẩn hóa phải là duy nhất trong cùng nhóm cha, không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm cha đó theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-002`).
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: (Nêu thể hiện danh mục mới được tạo ra)
+- Tạo mới thể hiện: Một thể hiện thực thể `Category` mới được tạo ra trong hệ thống với mã định danh duy nhất (`categoryId`) được cấp phát tự động và mang tính bất biến.
 - Xóa thể hiện: Không có.
-- Biến đổi thuộc tính: (Nêu các thuộc tính ban đầu của danh mục: tên danh mục, trạng thái hoạt động mặc định ACTIVE)
-- Hình thành hoặc phá vỡ liên kết: (Nêu liên kết phân cấp giữa danh mục mới với nhóm cha tương ứng)
+- Biến đổi thuộc tính:
+  - Thuộc tính `name` được gán bằng giá trị `categoryName` đã cắt tỉa khoảng trắng hai đầu.
+  - Thuộc tính `status` được gán trạng thái hoạt động ban đầu là `ACTIVE` (`isDeleted = false`).
+  - Kế thừa thuộc tính loại thu chi (`transactionType`: `INCOME` hoặc `EXPENSE`) từ nhóm cha trực thuộc.
+- Hình thành hoặc phá vỡ liên kết:
+  - Thiết lập liên kết phân cấp ngữ nghĩa giữa thể hiện `Category` mới tạo với thể hiện nhóm nhu cầu cha `NeedGroup` tương ứng (`parentCategoryId`) theo cấu trúc phân cấp 3 cấp (`BR-FIN-04`).
+  - Phá vỡ liên kết: Không có.
 
 ### 4.5.2 Thao tác Đổi tên danh mục
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng thay đổi tên hiển thị của một danh mục phân loại đã có)
+Người dùng thay đổi tên hiển thị của một danh mục phân loại đã tồn tại trong hệ thống nhằm chuẩn hóa hoặc điều chỉnh cách gọi theo nhu cầu quản lý tài chính mà không làm thay đổi các giao dịch đã ghi nhận.
 
 - Thao tác hệ thống: `renameCategory(categoryId, newName)`
 - Quy chiếu chéo: `UC-CAT-02`, `FR-CAT-02`, `BR-NAM-01`, `ERR-CAT-001`, `ERR-NAM-001`, `ERR-NAM-002`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về danh mục phải tồn tại, tên mới không được để trống và không trùng với các danh mục khác trong cùng nhóm cha sau khi chuẩn hóa)
+- Danh mục phân loại xác định bởi `categoryId` bắt buộc phải tồn tại trong hệ thống và thuộc cấu trúc phân cấp danh mục đang quản lý (`BR-FIN-04`).
+- Tên mới `newName` sau khi cắt tỉa khoảng trắng hai đầu (`trim`) phải có độ dài từ 1 đến 50 ký tự, không được để trống theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-001`).
+- Tên mới sau khi chuẩn hóa không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động trong cùng nhóm cha theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-002`).
 
 **Hậu điều kiện**
 
 - Tạo mới thể hiện: Không có.
 - Xóa thể hiện: Không có.
-- Biến đổi thuộc tính: (Nêu thuộc tính tên của danh mục được cập nhật bằng giá trị tên mới đã chuẩn hóa)
-- Hình thành hoặc phá vỡ liên kết: Không có.
+- Biến đổi thuộc tính: Thuộc tính tên (`name`) của thể hiện `Category` được cập nhật bằng giá trị tên mới `newName` đã chuẩn hóa; mã định danh `categoryId` và trạng thái hoạt động được giữ nguyên vẹn.
+- Hình thành hoặc phá vỡ liên kết: Không có. (Toàn bộ liên kết phân cấp với nhóm cha và liên kết với các giao dịch lịch sử trong quá khứ được bảo toàn nguyên vẹn).
 
 ### 4.5.3 Thao tác Khôi phục danh mục đã xóa
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng phục hồi trạng thái hoạt động cho danh mục đã bị xóa mềm trước đó)
+Người dùng phục hồi trạng thái hoạt động cho một danh mục phân loại đã bị xóa mềm trước đó để tiếp tục sử dụng phân loại cho các giao dịch thu chi mới.
 
 - Thao tác hệ thống: `restoreCategory(categoryId)`
 - Quy chiếu chéo: `UC-CAT-03`, `FR-CAT-04`, `BR-FIN-04`, `ERR-CAT-001`, `ERR-CAT-002`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về danh mục đang ở trạng thái xóa mềm, nhóm cha tương ứng đang hoạt động và tên danh mục không bị trùng với các danh mục đang hoạt động)
+- Danh mục phân loại xác định bởi `categoryId` bắt buộc phải tồn tại trong hệ thống và hiện đang ở trạng thái đã xóa mềm (`DELETED` / `HIDDEN`, `isDeleted = true`).
+- Nhóm nhu cầu cha trực thuộc của danh mục bắt buộc phải đang ở trạng thái hoạt động (`ACTIVE`), không ở trạng thái đã xóa theo `BR-FIN-04` (vi phạm báo lỗi `ERR-CAT-004`).
+- Tên của danh mục cần khôi phục không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm cha sau khi chuẩn hóa theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-002`).
 
 **Hậu điều kiện**
 
 - Tạo mới thể hiện: Không có.
 - Xóa thể hiện: Không có.
-- Biến đổi thuộc tính: (Nêu thuộc tính trạng thái của danh mục được chuyển từ trạng thái ẩn sang ACTIVE)
-- Hình thành hoặc phá vỡ liên kết: Không có.
+- Biến đổi thuộc tính: Thuộc tính trạng thái của thể hiện `Category` được chuyển từ trạng thái đã xóa mềm (`DELETED` / `HIDDEN`, `isDeleted = true`) sang trạng thái hoạt động (`ACTIVE`, `isDeleted = false`), cho phép danh mục hiển thị trở lại trên các biểu mẫu ghi nhận giao dịch thu chi.
+- Hình thành hoặc phá vỡ liên kết: Không có. (Bảo toàn nguyên vẹn liên kết phân cấp với nhóm cha và toàn bộ liên kết lịch sử với các giao dịch cũ đã ghi nhận).
 
 ### 4.5.4 Thao tác Xóa danh mục phân loại
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng loại bỏ một danh mục phân loại theo cơ chế bảo toàn lịch sử giao dịch)
+Người dùng yêu cầu loại bỏ một danh mục phân loại không còn sử dụng, hệ thống tự động kiểm tra lịch sử phát sinh giao dịch để thực hiện xóa vĩnh viễn hoặc xóa mềm nhằm bảo toàn số liệu tài chính.
 
 - Thao tác hệ thống: `deleteCategory(categoryId)`
 - Quy chiếu chéo: `UC-CAT-04`, `FR-CAT-03`, `BR-FIN-04`, `ERR-CAT-001`, `ERR-CAT-003`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về danh mục phải tồn tại và đang hoạt động; không phải là danh mục duy nhất còn lại trong nhóm theo quy tắc tối thiểu một danh mục)
+- Danh mục phân loại xác định bởi `categoryId` bắt buộc phải tồn tại trong hệ thống và hiện đang ở trạng thái hoạt động (`ACTIVE`).
+- Danh mục không phải là danh mục hoạt động duy nhất còn lại trong nhóm theo quy tắc duy trì tối thiểu một danh mục cho mỗi nhóm nhu cầu theo `BR-FIN-04` (vi phạm báo lỗi `ERR-CAT-002`).
 
 **Hậu điều kiện**
 
 - Tạo mới thể hiện: Không có.
-- Xóa thể hiện: (Nêu phân nhánh: nếu danh mục chưa từng phát sinh giao dịch thì xóa vĩnh viễn thể hiện khỏi hệ thống; nếu đã phát sinh giao dịch thì không xóa thể hiện)
-- Biến đổi thuộc tính: (Nêu nếu danh mục đã có giao dịch thì thuộc tính trạng thái chuyển sang lưu trữ hoặc ẩn để bảo toàn dữ liệu lịch sử)
-- Hình thành hoặc phá vỡ liên kết: (Nêu nếu xóa vĩnh viễn thì gỡ bỏ liên kết với nhóm cha; nếu xóa mềm thì bảo toàn nguyên vẹn liên kết với các giao dịch lịch sử cũ)
+- Xóa thể hiện:
+  - Nếu danh mục chưa từng phát sinh bất kỳ giao dịch thu chi nào trong lịch sử: Thể hiện thực thể `Category` bị xóa hoàn toàn và vĩnh viễn khỏi hệ thống lưu trữ (xóa cứng).
+  - Nếu danh mục đã từng phát sinh ít nhất một giao dịch thu chi trong lịch sử: Không xóa thể hiện thực thể `Category` khỏi hệ thống lưu trữ nhằm bảo toàn dữ liệu lịch sử tài chính.
+- Biến đổi thuộc tính:
+  - Trường hợp danh mục đã có giao dịch lịch sử (xóa mềm): Thuộc tính trạng thái của thể hiện `Category` chuyển từ hoạt động (`ACTIVE`, `isDeleted = false`) sang đã xóa (`DELETED` / `HIDDEN`, `isDeleted = true`), ẩn khỏi danh sách chọn khi tạo giao dịch mới nhưng giữ nguyên trạng thái hiển thị kèm nhãn "(đã xóa)" trên các báo cáo thống kê lịch sử.
+  - Trường hợp danh mục chưa từng phát sinh giao dịch: Không có (thể hiện đã bị hủy bỏ hoàn toàn).
+- Hình thành hoặc phá vỡ liên kết:
+  - Trường hợp xóa vĩnh viễn: Phá vỡ hoàn toàn liên kết phân cấp giữa thể hiện `Category` với nhóm nhu cầu cha `NeedGroup`.
+  - Trường hợp xóa mềm: Không phá vỡ bất kỳ liên kết nào; toàn bộ liên kết phân cấp với nhóm cha cũng như liên kết ngữ nghĩa với các giao dịch lịch sử (`IncomeExpenseTransaction`, `TransactionFee`) được bảo toàn nguyên vẹn.
 
 ## 4.6 Thao tác Lưu trữ và Phục hồi Dữ liệu
 
@@ -257,36 +275,47 @@ Nhóm chức năng này đảm bảo an toàn và tính toàn vẹn cho dữ li�
 
 ### 4.6.1 Thao tác Phục hồi dữ liệu từ bản sao lưu
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng khôi phục toàn bộ trạng thái dữ liệu tài chính từ một tệp sao lưu an toàn)
+Người dùng khôi phục toàn bộ trạng thái dữ liệu tài chính của hệ thống từ một tệp sao lưu an toàn đã tạo trước đó, nạp lại toàn bộ dữ liệu vào bộ nhớ sau khi vượt qua quy trình kiểm tra toàn vẹn nghiêm ngặt.
 
 - Thao tác hệ thống: `restoreBackupData(backupFilePath)`
 - Quy chiếu chéo: `UC-DAT-02`, `FR-DAT-02`, `BR-FIN-02`, `BR-FIN-03`, `ERR-DAT-001`, `ERR-DAT-002`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về tệp sao lưu tại đường dẫn chỉ định phải tồn tại, đúng định dạng cấu trúc dữ liệu và vượt qua kiểm tra tính toàn vẹn)
+- Tệp sao lưu tại đường dẫn chỉ định `backupFilePath` bắt buộc phải tồn tại trên hệ thống tệp cục bộ, ứng dụng có quyền đọc (`READ permission`) và tệp đúng định dạng cấu trúc JSON UTF-8 theo `FR-DAT-02` (vi phạm báo lỗi `ERR-DAT-001`).
+- Dữ liệu trong tệp sao lưu phải vượt qua đầy đủ 4 bước kiểm tra tính toàn vẹn độc lập theo cơ chế All-or-Nothing theo `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04` (vi phạm báo lỗi `ERR-DAT-002`):
+  1. Cấu trúc cú pháp JSON hợp lệ, chứa đầy đủ các khóa thực thể cần thiết.
+  2. Cấu trúc danh mục phân cấp tuân thủ đúng chuẩn 3 cấp (`BR-FIN-04`), không có danh mục mồ côi.
+  3. Tính nhất quán của các liên kết chuyển tiền hai chiều và chi phí giao dịch đi kèm (`BR-FIN-03`).
+  4. Số dư của tất cả các ví sau khi tái tính toán từ dữ liệu trong tệp sao lưu không được âm ($\ge 0.00\text{ VND}$) theo quy tắc bảo toàn số dư ví (`BR-FIN-02`).
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: (Nêu toàn bộ các thể hiện thực thể được tái tạo đầy đủ từ dữ liệu lưu trữ trong tệp sao lưu)
-- Xóa thể hiện: (Nêu toàn bộ các thể hiện dữ liệu hiện tại trong bộ nhớ hệ thống bị hủy bỏ hoàn toàn trước khi nạp dữ liệu mới)
-- Biến đổi thuộc tính: (Nêu trạng thái của hệ thống được đồng bộ hóa hoàn toàn theo mốc thời gian lưu trữ trong tệp sao lưu)
-- Hình thành hoặc phá vỡ liên kết: (Nêu toàn bộ mạng lưới liên kết ngữ nghĩa giữa các đối tượng dữ liệu được tái lập chính xác theo tệp sao lưu)
+- Tạo mới thể hiện: Toàn bộ các thể hiện thực thể miền bao gồm ví (`Wallet`), danh mục phân loại (`TransactionType`, `NeedGroup`, `Category`), giao dịch thu chi (`IncomeExpenseTransaction`), giao dịch chuyển tiền (`TransferTransaction`), chi phí giao dịch (`TransactionFee`) và bản ghi kiểm kê đối soát (`BalanceAdjustmentRecord`) được tái tạo đầy đủ trong bộ nhớ hệ thống từ dữ liệu của tệp sao lưu.
+- Xóa thể hiện: Toàn bộ các thể hiện dữ liệu hiện tại trong bộ nhớ hệ thống bị hủy bỏ hoàn toàn trước khi tiếp nhận và nạp dữ liệu mới từ bản sao lưu.
+- Biến đổi thuộc tính:
+  - Toàn bộ các thuộc tính định danh, thông tin định lượng, thời gian và trạng thái của các thực thể được đồng bộ hóa chuẩn xác theo mốc thời gian lưu trữ trong tệp sao lưu.
+  - Thuộc tính số dư của từng ví (`Wallet.balance`) được tính toán và cập nhật lại một cách nhất quán từ số dư ban đầu kết hợp tổng hợp toàn bộ các giao dịch thu, chi, chuyển tiền, chi phí và các mốc kiểm kê đối soát có trong bản sao lưu theo quy tắc bảo toàn số dư (`BR-FIN-02`), bảo đảm số dư hệ thống sau phục hồi khớp đúng tuyệt đối với số liệu lịch sử.
+- Hình thành hoặc phá vỡ liên kết:
+  - Phá vỡ hoàn toàn toàn bộ mạng lưới liên kết giữa các đối tượng dữ liệu hiện tại cũ trước khi phục hồi.
+  - Tái lập chính xác toàn bộ mạng lưới liên kết ngữ nghĩa giữa các thể hiện thực thể mới được tạo ra theo đúng cấu trúc trong tệp sao lưu: liên kết giữa ví với các giao dịch và bản ghi kiểm kê; liên kết chuyển tiền giữa ví nguồn và ví đích; liên kết phân cấp 3 cấp giữa loại thu chi, nhóm nhu cầu và danh mục; liên kết giữa giao dịch với danh mục phân loại và chi phí giao dịch tương ứng.
 
 ### 4.7 Thống kê và Báo cáo
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng muốn xem báo cáo tài chính, thống kê chi tiêu, thu nhập …)
+Người dùng yêu cầu hệ thống trích xuất và hiển thị các báo cáo phân tích tài chính định kỳ, bao gồm dòng tiền thu chi theo chuỗi thời gian hoặc cơ cấu phân bổ chi tiêu theo nhóm danh mục nhằm theo dõi diễn biến tài chính.
 
 - Thao tác hệ thống: `generateReport(reportType, startDate, endDate, filters)`
 - Quy chiếu chéo: `UC-REP-01`, `FR-REP-01`, `BR-REP-01`, `ERR-REP-001`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về ngày tháng hợp lệ, loại báo cáo tồn tại, người dùng có quyền truy cập)
+- Loại báo cáo chỉ định (`reportType`) phải tồn tại và hợp lệ trong danh mục các loại báo cáo được hệ thống hỗ trợ (báo cáo dòng tiền 12 tháng hoặc báo cáo cơ cấu thu chi).
+- Khoảng thời gian thống kê (`startDate`, `endDate`) phải đúng định dạng ngày tháng hợp lệ và thỏa mãn điều kiện logic thời gian bắt đầu không vượt quá thời gian kết thúc (`startDate <= endDate`) theo `ERR-REP-001`.
+- Các tiêu chí lọc trong `filters` (nếu có, như ví hoặc nhóm danh mục) phải tham chiếu đến các thực thể hợp lệ đang tồn tại trong hệ thống.
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: Không có.
+- Tạo mới thể hiện: Không có. (Thao tác thuần truy vấn dữ liệu chỉ đọc, chỉ khởi tạo đối tượng cấu trúc dữ liệu báo cáo tạm thời trên bộ nhớ giao diện để hiển thị kết quả cho người dùng, không tạo mới bất kỳ thể hiện thực thể lưu trữ nào trong hệ thống).
 - Xóa thể hiện: Không có.
-- Biến đổi thuộc tính: (N/A – chỉ trả về dữ liệu báo cáo)
+- Biến đổi thuộc tính: Không có. (Thao tác chỉ đọc, tuyệt đối không làm thay đổi số dư ví, trạng thái hay bất kỳ giá trị thuộc tính nào của các thực thể trong hệ thống).
 - Hình thành hoặc phá vỡ liên kết: Không có.

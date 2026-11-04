@@ -62,12 +62,36 @@ Quản lý vòng đời của danh mục phân loại, bao gồm tạo mới, ch
 - Quy chiếu chéo: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`, `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`, `BR-FIN-04`, `BR-NAM-01`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-003`, `ERR-CAT-004`, `ERR-CAT-005`
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Active : createCategory
-    Active --> Hidden : hideCategory
-    Hidden --> Active : restoreCategory
-    Active --> Deleted : deleteCategory
-    Deleted --> [*] : permanentlyRemoved
+flowchart LR
+    User["Người dùng (Actor)"]
+
+    subgraph BoundaryLayer ["Giao diện (Boundary)"]
+        CatUI["CategoryUI"]
+    end
+
+    subgraph ControlLayer ["Điều khiển (Control)"]
+        CatCtrl["CategoryController"]
+    end
+
+    subgraph EntityLayer ["Thực thể (Entity)"]
+        NeedGrp["NeedGroup (Nhóm nhu cầu cha)"]
+        CatEnt["Category (Danh mục phân loại)"]
+        TxEnt["Transaction (Giao dịch thu chi liên quan)"]
+    end
+
+    User -->|"1. Thao tác vòng đời: tạo, đổi tên, ẩn/xóa, khôi phục"| CatUI
+    CatUI -->|"2. Điều phối thao tác vòng đời (create / rename / hide / restore / delete)"| CatCtrl
+    CatCtrl -->|"3. Kiểm tra điều kiện nhóm cha (ACTIVE) & quy tắc BR-NAM-01"| NeedGrp
+    NeedGrp -->|"4. Trả về trạng thái hoạt động nhóm cha & danh mục con"| CatCtrl
+    CatCtrl -->|"5. Kiểm tra phát sinh giao dịch lịch sử trước khi xóa"| TxEnt
+    TxEnt -->|"6. Trả về thông tin liên kết giao dịch (có / chưa có giao dịch)"| CatCtrl
+    CatCtrl -->|"7. Tạo mới (ACTIVE) / Đổi tên / Khôi phục trạng thái (ACTIVE)"| CatEnt
+    CatCtrl -->|"8. Chuyển trạng thái HIDDEN/DELETED (xóa mềm) hoặc xóa vĩnh viễn"| CatEnt
+    CatEnt -->|"9. Xác nhận hoàn tất biến đổi trạng thái thực thể"| CatCtrl
+    CatCtrl -->|"10. Đồng bộ cấu trúc danh mục & trả về kết quả xử lý"| CatUI
+    CatUI -->|"11. Cập nhật giao diện vòng đời danh mục & phản hồi thành công"| User
+
+    CatCtrl -.->|"Ngoại lệ: Vi phạm quy tắc (ERR-CAT-001..005, ERR-NAM-001..002)"| CatUI
 ```
 
 | Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
