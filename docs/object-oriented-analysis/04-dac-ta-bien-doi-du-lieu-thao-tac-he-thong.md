@@ -25,7 +25,7 @@ Nhóm chức năng này đảm nhiệm việc quản lý các nguồn tiền tro
 
 ### 4.2.1 Thao tác Tạo ví mới
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng tạo nguồn tiền mới trong hệ thống)
+Người dùng tạo một ví mới để quản lý một nguồn tiền riêng biệt, ví dụ tiền mặt hoặc tài khoản ngân hàng, nhằm phân loại và theo dõi giao dịch.
 
 - Thao tác hệ thống: `createWallet(walletName, note)`
 - Quy chiếu chéo: `UC-WAL-01`, `FR-WAL-01`, `BR-NAM-01`, `BR-FIN-02`, `ERR-NAM-001`, `ERR-NAM-002`
@@ -181,7 +181,7 @@ Nhóm chức năng này quản lý hệ thống phân loại thu chi của ngư�
 
 ### 4.5.1 Thao tác Thêm danh mục phân loại mới
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng bổ sung một danh mục chi tiết vào cấu trúc phân cấp thu chi)
+Người dùng muốn mở rộng cấu trúc phân loại chi tiêu bằng cách thêm một danh mục mới, giúp việc ghi nhận các giao dịch chi tiêu chi tiết hơn và dễ dàng theo dõi tài chính.
 
 - Thao tác hệ thống: `addCategory(categoryName, parentCategoryId)`
 - Quy chiếu chéo: `UC-CAT-01`, `FR-CAT-01`, `BR-NAM-01`, `BR-FIN-04`, `ERR-CAT-001`, `ERR-NAM-001`, `ERR-NAM-002`
@@ -272,3 +272,21 @@ Nhóm chức năng này đảm bảo an toàn và tính toàn vẹn cho dữ li�
 - Xóa thể hiện: (Nêu toàn bộ các thể hiện dữ liệu hiện tại trong bộ nhớ hệ thống bị hủy bỏ hoàn toàn trước khi nạp dữ liệu mới)
 - Biến đổi thuộc tính: (Nêu trạng thái của hệ thống được đồng bộ hóa hoàn toàn theo mốc thời gian lưu trữ trong tệp sao lưu)
 - Hình thành hoặc phá vỡ liên kết: (Nêu toàn bộ mạng lưới liên kết ngữ nghĩa giữa các đối tượng dữ liệu được tái lập chính xác theo tệp sao lưu)
+
+### 4.7 Thống kê và Báo cáo
+
+(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng muốn xem báo cáo tài chính, thống kê chi tiêu, thu nhập …)
+
+- Thao tác hệ thống: `generateReport(reportType, startDate, endDate, filters)`
+- Quy chiếu chéo: `UC-REP-01`, `FR-REP-01`, `BR-REP-01`, `ERR-REP-001`
+
+**Tiền điều kiện**
+
+- (Nêu các điều kiện bắt buộc về ngày tháng hợp lệ, loại báo cáo tồn tại, người dùng có quyền truy cập)
+
+**Hậu điều kiện**
+
+- Tạo mới thể hiện: Không có.
+- Xóa thể hiện: Không có.
+- Biến đổi thuộc tính: (N/A – chỉ trả về dữ liệu báo cáo)
+- Hình thành hoặc phá vỡ liên kết: Không có.
