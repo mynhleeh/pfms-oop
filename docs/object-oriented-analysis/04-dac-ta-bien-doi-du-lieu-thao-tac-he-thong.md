@@ -25,57 +25,62 @@ Nhóm chức năng này đảm nhiệm việc quản lý các nguồn tiền tro
 
 ### 4.2.1 Thao tác Tạo ví mới
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng tạo nguồn tiền mới trong hệ thống)
+Người dùng khởi tạo một nguồn tiền thanh toán mới để theo dõi số dư và hạch toán dòng tiền độc lập trong hệ thống. Hệ thống kiểm tra tính hợp lệ của tên ví (`BR-NAM-01`) và thiết lập ví mới ở trạng thái hoạt động với số dư ban đầu bằng 0.00 VNĐ (`BR-FIN-02`).
 
 - Thao tác hệ thống: `createWallet(walletName, note)`
-- Quy chiếu chéo: `UC-WAL-01`, `FR-WAL-01`, `BR-NAM-01`, `BR-FIN-02`, `ERR-NAM-001`, `ERR-NAM-002`
+- Quy chiếu chéo: `UC-WAL-01`, `FR-WAL-01`, `FR-WAL-04`, `BR-NAM-01`, `BR-FIN-02`, `ERR-NAM-001`, `ERR-NAM-002`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về tính hợp lệ của dữ liệu đầu vào và trạng thái tiên quyết của đối tượng trước khi hệ thống chấp nhận thực hiện)
+- Tham số `walletName` sau khi cắt khoảng trắng hai đầu (`trim`) có độ dài từ 1 đến 50 ký tự, không để rỗng và là duy nhất so với thuộc tính `name` của mọi thể hiện `Wallet` (`ACTIVE` hoặc `ARCHIVED`) không phân biệt hoa thường (`BR-NAM-01`); trường hợp vi phạm, báo lỗi tên sai định dạng (`ERR-NAM-001`), trùng tên ví (`ERR-NAM-002`).
+- Tham số `note` (nếu có) dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-01`).
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: (Nêu thể hiện thực thể nào được tạo ra; nếu không có ghi "Không có")
-- Xóa thể hiện: (Nêu thể hiện thực thể nào bị xóa bỏ hoặc kết thúc vòng đời; nếu không có ghi "Không có")
-- Biến đổi thuộc tính: (Nêu thuộc tính của thể hiện nào bị thay đổi giá trị; nếu không có ghi "Không có")
-- Hình thành hoặc phá vỡ liên kết: (Nêu mối quan hệ ngữ nghĩa giữa các thể hiện được thiết lập hoặc gỡ bỏ; nếu không có ghi "Không có")
+- Tạo mới thể hiện: Khởi tạo một thể hiện `Wallet` mới trong hệ thống (`FR-WAL-01`).
+- Xóa thể hiện: Không có.
+- Biến đổi thuộc tính: Thể hiện `Wallet` mới được cấp mã `walletId` duy nhất, gán `name = walletName`, `note = note`, trạng thái `status = ACTIVE`, mốc thời gian `createdAt` hiện tại và số dư khởi điểm `currentBalance = 0.00 VNĐ` (`BR-FIN-02`); tỷ lệ phân bổ số dư giữa các ví được tính lại (`FR-WAL-04`).
+- Hình thành hoặc phá vỡ liên kết: Không có.
 
 ### 4.2.2 Thao tác Cập nhật thông tin ví
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng chỉnh sửa tên hoặc ghi chú của ví đang tồn tại)
+Người dùng chỉnh sửa tên hiển thị hoặc ghi chú mô tả của một ví đang tồn tại để chuẩn hóa thông tin quản lý nguồn tiền. Hệ thống cập nhật thuộc tính định danh của ví mà không làm thay đổi số dư khả dụng hay lịch sử giao dịch (`BR-FIN-02`).
 
 - Thao tác hệ thống: `updateWallet(walletId, walletName, note)`
-- Quy chiếu chéo: `UC-WAL-03`, `FR-WAL-03`, `BR-NAM-01`, `ERR-WAL-002`, `ERR-NAM-001`, `ERR-NAM-002`
+- Quy chiếu chéo: `UC-WAL-03`, `FR-WAL-03`, `BR-NAM-01`, `BR-FIN-02`, `ERR-NAM-001`, `ERR-NAM-002`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về ví phải tồn tại, tên ví mới không được để trống và không trùng với tên các ví khác sau khi chuẩn hóa)
+- Thể hiện `Wallet` ứng với mã định danh `walletId` tồn tại trong hệ thống (`FR-WAL-03`).
+- Tham số `walletName` mới sau khi cắt khoảng trắng hai đầu (`trim`) có độ dài từ 1 đến 50 ký tự, không để rỗng và không trùng với thuộc tính `name` của bất kỳ thể hiện `Wallet` nào khác trong hệ thống, không phân biệt hoa thường (`BR-NAM-01`); trường hợp vi phạm, báo lỗi tên sai định dạng (`ERR-NAM-001`), trùng tên ví (`ERR-NAM-002`).
+- Tham số `note` mới (nếu có) dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-03`).
 
 **Hậu điều kiện**
 
 - Tạo mới thể hiện: Không có.
 - Xóa thể hiện: Không có.
-- Biến đổi thuộc tính: (Nêu các thuộc tính được cập nhật giá trị mới: tên ví, ghi chú)
+- Biến đổi thuộc tính: Trên thể hiện `Wallet` có mã `walletId`, cập nhật `name = walletName` và `note = note` mới (`FR-WAL-03`); giữ nguyên `walletId`, `status` và `currentBalance` (`BR-FIN-02`).
 - Hình thành hoặc phá vỡ liên kết: Không có.
 
 ### 4.2.3 Thao tác Điều chỉnh số dư ví thực tế
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng ghi nhận mốc chênh lệch kiểm kê số dư thực tế lệch khỏi số dư hệ thống)
+Người dùng ghi nhận mốc kiểm kê khi phát hiện số tiền thực tế bên ngoài chênh lệch với số dư đang tính trên phần mềm. Hệ thống sinh bản ghi đối soát cố định và đồng bộ số dư khả dụng của ví khớp với số dư thực tế (`BR-FIN-02`).
 
 - Thao tác hệ thống: `adjustBalance(walletId, actualBalance, reason)`
-- Quy chiếu chéo: `UC-WAL-04`, `FR-WAL-05`, `BR-FIN-02`, `ERR-WAL-001`, `ERR-WAL-002`
+- Quy chiếu chéo: `UC-WAL-04`, `FR-WAL-05`, `BR-FIN-01`, `BR-FIN-02`, `ERR-FIN-001`, `ERR-WAL-001`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về ví phải tồn tại, số dư thực tế kiểm kê không được âm, lý do kiểm kê hợp lệ)
+- Thể hiện `Wallet` ứng với mã `walletId` tồn tại trong hệ thống và có trạng thái `status = ACTIVE` (`FR-WAL-05`).
+- Tham số `actualBalance` là số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`), không âm (`actualBalance >= 0.00 VNĐ`) (`BR-FIN-02`) và khác với số dư hiện tại `currentBalance` của ví (`FR-WAL-05`); trường hợp vi phạm, báo lỗi sai định dạng số học (`ERR-FIN-001`), số dư thực tế âm (`ERR-WAL-001`).
+- Tham số `reason` (nếu có) dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-05`).
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: (Nêu bản ghi kiểm kê đối soát bất biến được tạo ra để lưu vết số dư cũ, số dư mới và mức chênh lệch)
+- Tạo mới thể hiện: Khởi tạo một thể hiện `BalanceAdjustmentRecord` mới theo yêu cầu điều chỉnh số dư (`FR-WAL-05`) và giữ cố định để lưu vết kiểm kê (`BR-FIN-02`).
 - Xóa thể hiện: Không có.
-- Biến đổi thuộc tính: (Nêu thuộc tính số dư của ví được cập nhật bằng số dư thực tế kiểm kê)
-- Hình thành hoặc phá vỡ liên kết: (Nêu liên kết giữa bản ghi kiểm kê đối soát với ví tương ứng)
+- Biến đổi thuộc tính: Thể hiện `BalanceAdjustmentRecord` mới ghi nhận mã định danh duy nhất, số dư trước điều chỉnh bằng `Wallet.currentBalance` cũ, số dư quan sát bằng `actualBalance`, giá trị chênh lệch bằng `actualBalance - Wallet.currentBalance` (`BR-FIN-01`), lý do `reason` và ngày ghi nhận hiện tại; trên thể hiện `Wallet`, thuộc tính `currentBalance` được tính lại khớp bằng `actualBalance` (`BR-FIN-02`).
+- Hình thành hoặc phá vỡ liên kết: Thiết lập liên kết tham chiếu cố định từ thể hiện `BalanceAdjustmentRecord` vừa tạo tới thể hiện `Wallet` thông qua `walletId` (`FR-WAL-05`).
 
 ## 4.3 Các thao tác Ghi nhận Thu chi
 
@@ -83,57 +88,66 @@ Nhóm chức năng này theo dõi dòng tiền hàng ngày của người dùng,
 
 ### 4.3.1 Thao tác Ghi nhận giao dịch thu chi
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng ghi nhận khoản thu nhập hoặc chi tiêu phát sinh hàng ngày kèm chi phí nếu có)
+Người dùng ghi nhận một khoản thu nhập hoặc chi tiêu phát sinh hàng ngày kèm chi phí giao dịch (nếu có) vào sổ theo dõi. Hệ thống hạch toán đồng thời bản ghi giao dịch gốc cùng bản ghi chi phí liên kết và cập nhật số dư ví tức thời (`BR-FIN-02`).
 
 - Thao tác hệ thống: `recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
-- Quy chiếu chéo: `UC-TXN-01`, `FR-TXN-01`, `FR-TXN-02`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-WAL-001`, `ERR-WAL-002`, `ERR-CAT-001`, `ERR-TXN-001`
+- Quy chiếu chéo: `UC-TXN-01`, `FR-TXN-01`, `FR-TXN-02`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-FIN-001`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về ví tồn tại và đang hoạt động, danh mục hợp lệ đúng loại thu/chi, số tiền giao dịch lớn hơn 0, số dư khả dụng đủ chi trả nếu là khoản chi hoặc có phí kèm theo)
+- Thể hiện `Wallet` ứng với `walletId` tồn tại và có trạng thái `status = ACTIVE` khi ghi nhận khoản thu (`FR-TXN-01`) hoặc khoản chi (`FR-TXN-02`).
+- Thể hiện `Category` ứng với `categoryId` tồn tại ở cấp 3, có trạng thái `status = ACTIVE` và thuộc nhánh Loại thu chi (`INCOME` hoặc `EXPENSE`) hợp lệ (`BR-FIN-04`).
+- Tham số `amount` là số thập phân chính xác lớn hơn 0.00 VNĐ (`BR-FIN-01`); trường hợp vi phạm, báo lỗi số tiền sai định dạng (`ERR-FIN-001`). Ngày `transactionDate` không vượt quá ngày hiện tại và `note` dài tối đa 255 ký tự đối với khoản thu (`FR-TXN-01`) hoặc khoản chi (`FR-TXN-02`).
+- Tham số `feeAmount` là số thập phân chính xác (`BR-FIN-01`) và không âm (`feeAmount >= 0.00 VNĐ`) (`BR-FIN-02`); nếu `feeAmount > 0.00 VNĐ`, bắt buộc cung cấp `feeCategoryId` trỏ tới một thể hiện `Category` cấp 3 có `status = ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`); trường hợp vi phạm, báo lỗi chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`).
+- Số dư khả dụng `Wallet.currentBalance` sau khi áp dụng `amount` và trừ đi `feeAmount` bắt buộc không âm (`>= 0.00 VNĐ`) (`BR-FIN-02`); trường hợp vi phạm, báo lỗi không đủ số dư ví (`ERR-WAL-001`).
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: (Nêu thể hiện giao dịch thu chi được tạo ra; nếu có phí phát sinh thì nêu thể hiện chi phí giao dịch đi kèm được tạo ra)
+- Tạo mới thể hiện: Khởi tạo một thể hiện `IncomeExpenseTransaction` mới cho khoản thu (`FR-TXN-01`) hoặc khoản chi (`FR-TXN-02`); nếu `feeAmount > 0.00 VNĐ`, khởi tạo đồng thời một thể hiện `TransactionFee` mới đi kèm (`BR-FIN-02`).
 - Xóa thể hiện: Không có.
-- Biến đổi thuộc tính: (Nêu thuộc tính số dư của ví được cập nhật: tăng nếu là thu nhập, giảm nếu là chi tiêu; giảm thêm khoản phí nếu có)
-- Hình thành hoặc phá vỡ liên kết: (Nêu liên kết giữa giao dịch với ví, với danh mục thu chi; và liên kết giữa giao dịch với chi phí kèm danh mục chi phí tương ứng)
+- Biến đổi thuộc tính: Thể hiện `IncomeExpenseTransaction` nhận mã `transactionId` duy nhất, `amount`, `transactionDate`, `note`, `createdAt` và `transactionType` kế thừa từ `Category`; thể hiện `TransactionFee` (nếu có) nhận mã `feeId` duy nhất, `amount = feeAmount` và `parentTransactionType = INCOME_EXPENSE`; trên thể hiện `Wallet`, thuộc tính `currentBalance` được tính toán chính xác (`BR-FIN-01`) để tăng thêm `amount - feeAmount` (nếu `INCOME`) hoặc giảm đi `amount + feeAmount` (nếu `EXPENSE`) (`BR-FIN-02`).
+- Hình thành hoặc phá vỡ liên kết: Thiết lập liên kết từ `IncomeExpenseTransaction` tới `Wallet` (`walletId`) và tới `Category` cấp 3 (`categoryId`) (`BR-FIN-04`); nếu `feeAmount > 0.00 VNĐ`, thiết lập liên kết phụ thuộc từ `TransactionFee` tới `IncomeExpenseTransaction` (`parentTransactionId = transactionId`), tới `Wallet` (`walletId`) và tới `Category` chi phí (`feeCategoryId`) (`BR-FIN-02`).
 
 ### 4.3.2 Thao tác Chỉnh sửa giao dịch thu chi
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng điều chỉnh thông tin của một giao dịch thu chi đã ghi nhận trước đó)
+Người dùng điều chỉnh các thuộc tính của một giao dịch thu chi đã ghi nhận trước đó trong sổ giao dịch. Hệ thống hoàn nguyên tác động tài chính cũ trên ví ban đầu, áp dụng thông số mới lên ví đích và đồng bộ bản ghi chi phí liên kết trong cùng một bước xử lý (`BR-FIN-02`).
 
 - Thao tác hệ thống: `updateTransaction(transactionId, walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
-- Quy chiếu chéo: `UC-TXN-03`, `FR-TXN-04`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-TXN-002`, `ERR-WAL-001`, `ERR-WAL-002`
+- Quy chiếu chéo: `UC-TXN-03`, `FR-TXN-04`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-FIN-001`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về giao dịch phải tồn tại, ví và danh mục hợp lệ; kiểm tra bảo toàn số dư không âm sau khi hoàn nguyên giao dịch cũ và áp dụng thông số mới)
+- Thể hiện `IncomeExpenseTransaction` ứng với `transactionId` tồn tại trong sổ giao dịch (`FR-TXN-04`) và không phải là bản ghi `TransactionFee` độc lập (`BR-FIN-02`).
+- Thể hiện `Wallet` mới ứng với `walletId` tồn tại và có trạng thái `status = ACTIVE` (`FR-TXN-04`).
+- Thể hiện `Category` mới ứng với `categoryId` có cùng `transactionType` (`INCOME` hoặc `EXPENSE`) với giao dịch gốc (`BR-FIN-04`); nếu chọn mới thì phải có `status = ACTIVE`, cho phép giữ nguyên danh mục cũ đã xóa mềm (`status = DELETED`) (`FR-TXN-04`).
+- Tham số `amount` mới là số thập phân chính xác lớn hơn 0.00 VNĐ (`BR-FIN-01`); `feeAmount` mới không âm (`BR-FIN-02`) và nếu `feeAmount > 0.00 VNĐ` thì phải có `feeCategoryId` hợp lệ thuộc nhánh `EXPENSE` (`BR-FIN-04`); trường hợp vi phạm, báo lỗi số tiền sai định dạng (`ERR-FIN-001`), chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`).
+- Số dư `currentBalance` của ví cũ sau hoàn nguyên và của ví mới sau khi áp dụng thông số mới đều không âm (`>= 0.00 VNĐ`) (`BR-FIN-02`); trường hợp vi phạm, báo lỗi làm âm số dư ví (`ERR-WAL-001`).
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: (Nêu thể hiện chi phí mới được tạo nếu trước đó chưa có phí nhưng lần sửa này phát sinh phí; nếu không ghi "Không có")
-- Xóa thể hiện: (Nêu thể hiện chi phí cũ bị xóa nếu lần sửa này loại bỏ chi phí; nếu không ghi "Không có")
-- Biến đổi thuộc tính: (Nêu các thuộc tính của giao dịch được cập nhật giá trị mới; số dư của ví liên quan được điều chỉnh lại tương ứng)
-- Hình thành hoặc phá vỡ liên kết: (Nêu các liên kết với ví, danh mục hoặc chi phí được thiết lập lại nếu người dùng thay đổi ví hoặc danh mục)
+- Tạo mới thể hiện: Khởi tạo một thể hiện `TransactionFee` mới đi kèm giao dịch (`BR-FIN-02`) nếu giao dịch trước khi sửa chưa có phí và lần sửa này đặt `feeAmount > 0.00 VNĐ` (`FR-TXN-04`); ngược lại không có.
+- Xóa thể hiện: Xóa vĩnh viễn thể hiện `TransactionFee` liên kết (`BR-FIN-02`) nếu giao dịch trước đó có phí nhưng lần sửa này đặt `feeAmount = 0.00 VNĐ` (`FR-TXN-04`); ngược lại không có.
+- Biến đổi thuộc tính: Trên `IncomeExpenseTransaction`, cập nhật `amount`, `transactionDate`, `note`, `walletId` và `categoryId` (giữ nguyên `transactionId` và `transactionType`); nếu phí cũ và mới đều lớn hơn 0.00 VNĐ, cập nhật `amount = feeAmount` và `categoryId = feeCategoryId` trên `TransactionFee`; tính toán chính xác (`BR-FIN-01`) để cập nhật lại `currentBalance` trên `Wallet` cũ và `Wallet` mới (`BR-FIN-02`).
+- Hình thành hoặc phá vỡ liên kết: Gỡ bỏ liên kết với `Wallet` hoặc `Category` cũ (nếu thay đổi) và thiết lập liên kết tới `Wallet` mới cùng `Category` cấp 3 mới (`BR-FIN-04`); đồng bộ liên kết giữa `IncomeExpenseTransaction`, `TransactionFee`, `Wallet` mới và `Category` chi phí (`feeCategoryId`) (`BR-FIN-02`).
 
 ### 4.3.3 Thao tác Xóa giao dịch thu chi
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng hủy bỏ hoàn toàn một giao dịch thu chi khỏi hệ thống)
+Người dùng loại bỏ một giao dịch thu chi đã ghi nhận khỏi sổ theo dõi để hủy tác động tài chính của giao dịch đó. Hệ thống kiểm tra an toàn số dư hoàn nguyên, xóa đồng thời giao dịch gốc cùng bản ghi phí đi kèm và khôi phục số dư ví (`BR-FIN-02`).
 
 - Thao tác hệ thống: `deleteTransaction(transactionId)`
-- Quy chiếu chéo: `UC-TXN-04`, `FR-TXN-05`, `BR-FIN-02`, `ERR-TXN-002`, `ERR-WAL-001`
+- Quy chiếu chéo: `UC-TXN-04`, `FR-TXN-05`, `BR-FIN-01`, `BR-FIN-02`, `ERR-WAL-001`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về giao dịch phải tồn tại; đối với giao dịch thu nhập, việc hoàn nguyên trừ tiền ví không được làm số dư ví bị âm)
+- Thể hiện `IncomeExpenseTransaction` ứng với `transactionId` tồn tại trong sổ giao dịch thu chi (`FR-TXN-05`) và không phải là bản ghi `TransactionFee` độc lập (`BR-FIN-02`).
+- Nếu giao dịch cần xóa có `transactionType = INCOME`, số dư `Wallet.currentBalance` hiện tại sau khi trừ đi `amount` và cộng hoàn lại `TransactionFee.amount` (nếu có) bắt buộc không âm (`>= 0.00 VNĐ`) (`BR-FIN-02`); trường hợp vi phạm, báo lỗi làm âm số dư ví (`ERR-WAL-001`).
 
 **Hậu điều kiện**
 
 - Tạo mới thể hiện: Không có.
-- Xóa thể hiện: (Nêu thể hiện giao dịch bị xóa khỏi hệ thống; thể hiện chi phí liên kết đi kèm bị xóa theo)
-- Biến đổi thuộc tính: (Nêu số dư ví được hoàn nguyên: giảm nếu xóa thu nhập, tăng nếu xóa chi tiêu; hoàn trả lại tiền phí nếu có)
-- Hình thành hoặc phá vỡ liên kết: (Nêu tất cả các liên kết giữa giao dịch này với ví, danh mục và chi phí bị hủy bỏ hoàn toàn)
+- Xóa thể hiện: Xóa vĩnh viễn thể hiện `IncomeExpenseTransaction` có mã `transactionId` khỏi sổ thu chi (`FR-TXN-05`) cùng thể hiện `TransactionFee` liên kết đi kèm nếu có (`BR-FIN-02`).
+- Biến đổi thuộc tính: Trên thể hiện `Wallet` liên kết, tính toán chính xác (`BR-FIN-01`) để hoàn nguyên thuộc tính `currentBalance`: giảm đi `amount - feeAmount` nếu xóa giao dịch `INCOME`, hoặc tăng thêm `amount + feeAmount` nếu xóa giao dịch `EXPENSE` (`BR-FIN-02`).
+- Hình thành hoặc phá vỡ liên kết: Gỡ bỏ hoàn toàn các liên kết tham chiếu từ `IncomeExpenseTransaction` tới `Wallet` và `Category` (`FR-TXN-05`), đồng thời hủy bỏ liên kết phụ thuộc giữa `TransactionFee` (nếu có) với `IncomeExpenseTransaction`, `Wallet` và `Category` chi phí (`BR-FIN-02`).
 
 ## 4.4 Các thao tác Chuyển tiền Nội bộ
 
@@ -141,39 +155,43 @@ Nhóm chức năng này xử lý việc điều chuyển giá trị giữa các 
 
 ### 4.4.1 Thao tác Chuyển tiền giữa hai ví
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng điều chuyển tiền giữa hai ví nội bộ theo cơ chế ghi nhận đồng thời kèm chi phí nếu có)
+Người dùng điều chuyển một khoản tiền giữa hai ví nội bộ kèm chi phí chuyển tiền (nếu có). Hệ thống thực thi cơ chế ghi nhận đồng thời để trừ tiền ví nguồn, cộng tiền ví đích và tách riêng khoản phí chuyển tiền thành bản ghi chi phí liên kết (`BR-FIN-03`).
 
 - Thao tác hệ thống: `transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)`
-- Quy chiếu chéo: `UC-TRF-01`, `FR-TRF-01`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `ERR-TRF-001`, `ERR-WAL-001`, `ERR-WAL-002`
+- Quy chiếu chéo: `UC-TRF-01`, `FR-TRF-01`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04`, `ERR-FIN-001`, `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về hai ví nguồn và đích phải tồn tại, đang hoạt động và phân biệt nhau; số tiền chuyển lớn hơn 0; số dư khả dụng của ví nguồn phải đủ chi trả tổng số tiền chuyển và tiền phí phát sinh)
+- Hai thể hiện `Wallet` ứng với `sourceWalletId` và `destinationWalletId` cùng tồn tại, đều có trạng thái `status = ACTIVE` và là hai thực thể phân biệt (`sourceWalletId != destinationWalletId`) (`BR-FIN-03`); trường hợp vi phạm, báo lỗi trùng ví chuyển và ví nhận (`ERR-TRF-001`).
+- Tham số `amount` là số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`) và lớn hơn 0.00 VNĐ (`BR-FIN-03`); trường hợp vi phạm, báo lỗi sai định dạng số học (`ERR-FIN-001`), số tiền chuyển nhỏ hơn hoặc bằng 0 (`ERR-TRF-002`). Ngày `transferDate` không vượt quá ngày hiện tại và `note` dài tối đa 255 ký tự (`FR-TRF-01`).
+- Tham số `feeAmount` là số thập phân chính xác (`BR-FIN-01`) và không âm (`feeAmount >= 0.00 VNĐ`) (`BR-FIN-03`); nếu `feeAmount > 0.00 VNĐ`, bắt buộc cung cấp `feeCategoryId` (`BR-FIN-02`) trỏ tới một thể hiện `Category` cấp 3 có `status = ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`); trường hợp vi phạm, báo lỗi chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`).
+- Số dư khả dụng hiện tại của ví nguồn (`sourceWallet.currentBalance`) lớn hơn hoặc bằng tổng `amount + feeAmount` khi chuyển đi (`BR-FIN-03`) để bảo toàn số dư không âm (`BR-FIN-02`); trường hợp vi phạm, báo lỗi ví nguồn không đủ số dư (`ERR-WAL-001`).
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: (Nêu thể hiện giao dịch chuyển tiền được tạo ra; nếu có phí phát sinh thì nêu thể hiện chi phí giao dịch đi kèm được tạo ra)
+- Tạo mới thể hiện: Khởi tạo một thể hiện `TransferTransaction` mới (`FR-TRF-01`); nếu `feeAmount > 0.00 VNĐ`, khởi tạo đồng thời một thể hiện `TransactionFee` mới thuộc loại `EXPENSE` (`BR-FIN-03`).
 - Xóa thể hiện: Không có.
-- Biến đổi thuộc tính: (Nêu thuộc tính số dư của ví nguồn bị trừ đi số tiền chuyển và tiền phí; thuộc tính số dư của ví đích được cộng thêm đúng số tiền chuyển theo nguyên tắc ghi nhận đồng thời)
-- Hình thành hoặc phá vỡ liên kết: (Nêu liên kết giữa giao dịch chuyển tiền với ví nguồn, ví đích; và liên kết với chi phí kèm danh mục chi phí tương ứng nếu có phí)
+- Biến đổi thuộc tính: Thể hiện `TransferTransaction` nhận mã `transferId` duy nhất, `amount`, `transactionDate = transferDate`, `note` và `createdAt`; thể hiện `TransactionFee` (nếu có) nhận mã `feeId` duy nhất, `amount = feeAmount` và `parentTransactionType = TRANSFER`; tính toán chính xác (`BR-FIN-01`) trong cùng một bước xử lý đồng thời (`BR-FIN-03`) để giảm `currentBalance` của `Wallet` nguồn đi `amount + feeAmount` và tăng `currentBalance` của `Wallet` đích thêm đúng `amount` (`BR-FIN-02`).
+- Hình thành hoặc phá vỡ liên kết: Thiết lập liên kết từ `TransferTransaction` tới `Wallet` nguồn (`sourceWalletId`) và `Wallet` đích (`destinationWalletId`) (`BR-FIN-03`); nếu `feeAmount > 0.00 VNĐ`, thiết lập liên kết phụ thuộc từ `TransactionFee` tới `TransferTransaction` (`parentTransactionId = transferId`), tới `Wallet` nguồn (`sourceWalletId`) và tới `Category` chi phí (`feeCategoryId`) (`BR-FIN-02`).
 
 ### 4.4.2 Thao tác Xóa giao dịch chuyển tiền
 
-(Mô tả khoảng 1 đến 2 câu về bối cảnh nghiệp vụ khi người dùng hủy bỏ giao dịch chuyển tiền và hoàn nguyên số dư cho cả hai ví)
+Người dùng hủy bỏ một giao dịch chuyển tiền nội bộ đã thực hiện để khôi phục số dư của cả hai ví về trạng thái trước khi chuyển. Hệ thống kiểm tra khả năng hoàn trả của ví đích, xóa đồng thời bản ghi chuyển tiền cùng phí liên kết và hoàn nguyên số dư hai ví (`BR-FIN-03`).
 
 - Thao tác hệ thống: `deleteTransfer(transferId)`
-- Quy chiếu chéo: `UC-TRF-03`, `FR-TRF-03`, `BR-FIN-02`, `BR-FIN-03`, `ERR-TRF-002`, `ERR-WAL-001`
+- Quy chiếu chéo: `UC-TRF-03`, `FR-TRF-02`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`
 
 **Tiền điều kiện**
 
-- (Nêu các điều kiện bắt buộc về giao dịch chuyển tiền phải tồn tại; việc hoàn nguyên trừ tiền ở ví đích không được làm số dư ví đích bị âm)
+- Thể hiện `TransferTransaction` ứng với mã `transferId` tồn tại trong sổ giao dịch chuyển tiền (`FR-TRF-02`).
+- Khi thu hồi đồng thời hai đầu ví (`BR-FIN-03`), số dư khả dụng hiện tại của `Wallet` đích (`destinationWallet.currentBalance`) phải lớn hơn hoặc bằng số tiền đã nhận (`TransferTransaction.amount`) để không làm âm số dư ví đích (`BR-FIN-02`); trường hợp vi phạm, báo lỗi ví đích không đủ số dư để hoàn trả (`ERR-WAL-001`).
 
 **Hậu điều kiện**
 
 - Tạo mới thể hiện: Không có.
-- Xóa thể hiện: (Nêu thể hiện giao dịch chuyển tiền bị xóa khỏi hệ thống; thể hiện chi phí liên kết đi kèm bị xóa theo)
-- Biến đổi thuộc tính: (Nêu số dư hai ví được hoàn nguyên đồng thời: ví nguồn được cộng lại tiền chuyển và tiền phí; ví đích bị trừ đi số tiền chuyển)
-- Hình thành hoặc phá vỡ liên kết: (Nêu tất cả các liên kết giữa giao dịch chuyển tiền với ví nguồn, ví đích và chi phí bị hủy bỏ hoàn toàn)
+- Xóa thể hiện: Xóa vĩnh viễn thể hiện `TransferTransaction` có mã `transferId` khỏi sổ chuyển tiền (`FR-TRF-02`) và xóa đồng thời thể hiện `TransactionFee` liên kết đi kèm nếu có (`BR-FIN-03`).
+- Biến đổi thuộc tính: Tính toán chính xác (`BR-FIN-01`) và hoàn nguyên đồng thời hai đầu ví (`BR-FIN-03`): cộng hoàn lại `amount + feeAmount` vào `currentBalance` của `Wallet` nguồn và trừ đi đúng `amount` khỏi `currentBalance` của `Wallet` đích (`BR-FIN-02`).
+- Hình thành hoặc phá vỡ liên kết: Gỡ bỏ hoàn toàn các liên kết tham chiếu từ `TransferTransaction` tới `Wallet` nguồn và `Wallet` đích (`FR-TRF-02`), đồng thời hủy bỏ các liên kết phụ thuộc giữa `TransactionFee` (nếu có) với `TransferTransaction` (`BR-FIN-03`), `Wallet` nguồn và `Category` chi phí (`BR-FIN-02`).
 
 ## 4.5 Các thao tác Danh mục Phân loại
 
