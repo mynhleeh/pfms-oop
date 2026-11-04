@@ -44,11 +44,9 @@
 
 <!-- PLACEHOLDER: Mô tả sơ đồ lớp thiết kế chi tiết cho toàn bộ tầng nghiệp vụ cốt lõi, phân loại Thực thể và Đối tượng Giá trị, đặc tả thuộc tính với kiểu dữ liệu Java chính xác và hợp đồng đóng gói | Căn cứ: Milestone 3 Rubric, Eric Evans DDD, ISO/IEC 19505 | Tiêu chí: Đầy đủ phạm vi truy cập, kiểu dữ liệu tiền tệ BigDecimal, tính bất biến của đối tượng giá trị -->
 
-- 2.1 Nguyên tắc Thiết kế Lớp Nghiệp vụ
-- 2.2 Sơ đồ Lớp Tổng quan
-- 2.3 Thiết kế các Lớp Thực thể
-- 2.4 Thiết kế các Đối tượng Giá trị
-- 2.5 Quan hệ Kế thừa và Tính Đa hình
+- 2.1 Sơ đồ Lớp Tổng quan
+- 2.2 Thiết kế các Lớp Thực thể
+- 2.3 Thiết kế các Đối tượng Giá trị
 
 ### Phần 3: Thiết kế Tầng Dịch vụ và Điều phối Nghiệp vụ
 
