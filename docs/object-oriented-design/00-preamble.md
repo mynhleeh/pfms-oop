@@ -19,7 +19,7 @@
 - [00-preamble.md](00-preamble.md): Thông tin định danh học phần, giảng viên hướng dẫn và nhóm tác giả
 - [01-kien-truc-he-thong-va-phan-tang.md](01-kien-truc-he-thong-va-phan-tang.md): Kiến trúc phân tầng, cấu trúc gói mã nguồn và quy tắc kiến trúc
 - [02-thiet-ke-cac-lop-thuc-the-va-doi-tuong-gia-tri.md](02-thiet-ke-cac-lop-thuc-the-va-doi-tuong-gia-tri.md): Sơ đồ lớp thiết kế cho các lớp thực thể và đối tượng giá trị bất biến
-- [03-thiet-ke-tang-dich-vu-va-dieu-phoi-nghiep-vu.md](03-thiet-ke-tang-dich-vu-va-dieu-phoi-nghiep-vu.md): Thiết kế tầng dịch vụ điều phối nghiệp vụ và hợp đồng phương thức
+- [03-thiet-ke-tang-dich-vu-va-dieu-phoi-nghiep-vu.md](03-thiet-ke-tang-dich-vu-va-dieu-phoi-nghiep-vu.md): Thiết kế tầng dịch vụ ứng dụng và điều phối nghiệp vụ
 - [04-thiet-ke-tang-luu-tru-va-truy-xuat-du-lieu.md](04-thiet-ke-tang-luu-tru-va-truy-xuat-du-lieu.md): Thiết kế tầng lưu trữ dữ liệu, giao diện kho lưu trữ và các bộ điều hợp
 - [05-so-do-tuong-tac-thiet-ke-sequence-diagram.md](05-so-do-tuong-tac-thiet-ke-sequence-diagram.md): Sơ đồ tuần tự thiết kế chi tiết cho các ca sử dụng của hệ thống
 - [06-ap-dung-nguyen-ly-solid-va-thiet-ke-mau-gof.md](06-ap-dung-nguyen-ly-solid-va-thiet-ke-mau-gof.md): Đánh giá tuân thủ nguyên lý thiết kế và chi tiết các mẫu thiết kế hướng đối tượng
@@ -48,15 +48,16 @@
 - 2.2 Thiết kế các Lớp Thực thể
 - 2.3 Thiết kế các Đối tượng Giá trị
 
-### Phần 3: Thiết kế Tầng Dịch vụ và Điều phối Nghiệp vụ
+### Phần 3: Thiết kế Tầng Dịch vụ Ứng dụng và Điều phối Nghiệp vụ
 
-<!-- PLACEHOLDER: Mô tả các dịch vụ điều phối ứng dụng và dịch vụ nghiệp vụ chuyên sâu, áp dụng nguyên lý GRASP Điều phối viên và Chuyên gia Thông tin, đặc tả chữ ký phương thức, điều kiện tiên quyết và điều kiện sau | Căn cứ: Craig Larman Chapters 16-17, Martin Fowler Service Layer | Tiêu chí: Dịch vụ đóng vai trò điều phối, không biến thành kịch bản giao dịch cồng kềnh -->
+<!-- PLACEHOLDER: Đặc tả 6 lớp dịch vụ ứng dụng tương ứng 6 phân hệ nghiệp vụ, áp dụng nguyên lý GRASP Điều phối viên và Chuyên gia Thông tin, lập trình hướng giao diện, bảng đặc tả phương thức và kiểm soát an toàn giao dịch | Căn cứ: Craig Larman Chapters 16-17, Martin Fowler Service Layer | Tiêu chí: Đầy đủ 6 dịch vụ bao phủ 20 ca sử dụng, không làm toán trong dịch vụ, ranh giới phân tầng chuẩn Clean Architecture -->
 
-- 3.1 Nguyên tắc Phân định Trách nhiệm Tầng Dịch vụ
-- 3.2 Hệ thống Giao diện và Hợp đồng Dịch vụ
-- 3.3 Thiết kế Nhóm Dịch vụ Thực thi Tài chính
-- 3.4 Thiết kế Nhóm Dịch vụ Kế hoạch và Phân tích
-- 3.5 Quản lý Giao dịch và An toàn Dữ liệu
+- 3.1 Dịch vụ Quản lý Ví
+- 3.2 Dịch vụ Ghi nhận Thu Chi
+- 3.3 Dịch vụ Chuyển tiền Nội bộ
+- 3.4 Dịch vụ Danh mục Phân loại
+- 3.5 Dịch vụ Báo cáo và Thống kê Tài chính
+- 3.6 Dịch vụ Quản trị và Sao lưu Dữ liệu
 
 ### Phần 4: Thiết kế Tầng Lưu trữ và Truy xuất Dữ liệu
 
