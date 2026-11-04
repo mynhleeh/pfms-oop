@@ -11,6 +11,7 @@ Mục này cung cấp góc nhìn toàn cảnh về cấu trúc tĩnh của Tần
 Đi kèm với sơ đồ lớp, bảng danh mục lớp và kiểu dữ liệu xác lập bản chỉ mục định danh hoàn chỉnh, tổng hợp đầy đủ trách nhiệm kỹ thuật của từng thành phần và bảo đảm tính truy vết hai chiều nhất quán giữa mô hình phân tích nghiệp vụ và cấu trúc mã nguồn phần mềm.
 
 ### 2.1.1 Sơ đồ Cấu trúc các Lớp Thực thể
+
 Sơ đồ dưới đây mô hình hóa cấu trúc tĩnh của 8 lớp thực thể cốt lõi thuộc Tầng Nghiệp vụ. Sơ đồ tập trung thể hiện bốn loại quan hệ cấu trúc hướng đối tượng then chốt gồm kế thừa, hợp thành, kết tập và liên kết, định hình xương sống dòng tiền và phân cấp danh mục của toàn bộ hệ thống:
 
 ```mermaid
@@ -58,6 +59,7 @@ Bản vẽ thiết lập bốn loại quan hệ cấu trúc hướng đối tư�
 Các đối tượng giá trị bất biến và kiểu liệt kê nghiệp vụ đóng vai trò là kiểu dữ liệu cấu thành trạng thái của các thực thể trên, được tra cứu tổng hợp tại bảng danh mục ở Mục 2.1.2 và đặc tả chi tiết tại Mục 2.3.
 
 ### 2.1.2 Danh mục Lớp và Kiểu Dữ liệu
+
 Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể, đối tượng giá trị và kiểu liệt kê trong Tầng Nghiệp vụ cốt lõi. Toàn bộ các thành phần này được định vị vật lý trong gói mã nguồn `com.pfms.domain.model` và được phân loại theo các nhóm nghiệp vụ tương ứng của hệ thống:
 
 | Tên lớp / Kiểu dữ liệu | Phân loại OOP | Trách nhiệm kỹ thuật chính |
@@ -101,7 +103,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp Ví trong việc quản lý nguồn tiền và kiểm soát số dư)
 
-- Quy chiếu: `UC-WAL-01`, `UC-WAL-03`, `UC-WAL-04`, `FR-WAL-01`, `FR-WAL-03`, `FR-WAL-05`, `BR-NAM-01`, `BR-FIN-01`, `BR-FIN-02`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-WAL-001`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-01`, `UC-WAL-02`, `UC-WAL-03`, `UC-WAL-04`
+- Yêu cầu chức năng: `FR-WAL-01`, `FR-WAL-02`, `FR-WAL-03`, `FR-WAL-04`, `FR-WAL-05`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-NAM-01`
+- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-WAL-001`, `ERR-FIN-001`
 
 **Cấu trúc thuộc tính**
 
@@ -125,7 +131,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp trừu tượng Transaction và lớp con IncomeExpenseTransaction trong việc quản lý và hạch toán các khoản thu chi phát sinh)
 
-- Quy chiếu: `UC-TXN-01`, `UC-TXN-03`, `UC-TXN-04`, `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-FIN-001`, `ERR-WAL-001`, `ERR-CAT-001`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TXN-01`, `UC-TXN-02`, `UC-TXN-03`, `UC-TXN-04`
+- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-03`, `FR-TXN-04`, `FR-TXN-05`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
+- Mã lỗi: `ERR-FIN-001`, `ERR-WAL-001`, `ERR-CAT-001`
 
 **Cấu trúc thuộc tính**
 
@@ -149,7 +159,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp TransferTransaction trong việc điều chuyển dòng tiền giữa hai ví và bảo toàn tổng tài sản)
 
-- Quy chiếu: `UC-TRF-01`, `UC-TRF-03`, `FR-TRF-01`, `FR-TRF-02`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`
+- Yêu cầu chức năng: `FR-TRF-01`, `FR-TRF-02`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`
+- Mã lỗi: `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`
 
 **Cấu trúc thuộc tính**
 
@@ -173,7 +187,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp TransactionFee trong việc ghi nhận phụ phí phát sinh và quan hệ sinh tử với giao dịch gốc)
 
-- Quy chiếu: `UC-TXN-01`, `UC-TXN-03`, `UC-TRF-01`, `FR-TXN-01`, `FR-TXN-04`, `FR-TRF-01`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-WAL-001`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TXN-01`, `UC-TXN-03`, `UC-TRF-01`, `UC-TRF-03`
+- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-04`, `FR-TRF-01`, `FR-TRF-02`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
+- Mã lỗi: `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`, `ERR-WAL-001`
 
 **Cấu trúc thuộc tính**
 
@@ -197,7 +215,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp Category trong việc phân loại dòng tiền cấp 3 và duy trì tính toàn vẹn cây danh mục)
 
-- Quy chiếu: `UC-CAT-01`, `UC-CAT-03`, `UC-CAT-04`, `FR-CAT-01`, `FR-CAT-03`, `BR-NAM-01`, `BR-FIN-04`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-003`, `ERR-CAT-004`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
+- Yêu cầu chức năng: `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`
+- Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-04`
+- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-003`, `ERR-CAT-004`
 
 **Cấu trúc thuộc tính**
 
@@ -221,7 +243,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp NeedGroup trong việc quản lý phân cấp nhóm nhu cầu cấp 2 và điều phối danh mục con)
 
-- Quy chiếu: `UC-CAT-01`, `UC-CAT-03`, `UC-CAT-04`, `FR-CAT-01`, `FR-CAT-03`, `BR-NAM-01`, `BR-FIN-04`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-002`, `ERR-CAT-005`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
+- Yêu cầu chức năng: `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`
+- Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-04`
+- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-002`, `ERR-CAT-005`
 
 **Cấu trúc thuộc tính**
 
@@ -245,7 +271,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp BalanceAdjustmentRecord trong việc lưu vết kiểm kê đối soát và điều chỉnh số dư thực tế)
 
-- Quy chiếu: `UC-WAL-04`, `FR-WAL-05`, `BR-FIN-01`, `BR-FIN-02`, `ERR-FIN-001`, `ERR-WAL-001`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-04`
+- Yêu cầu chức năng: `FR-WAL-05`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`
+- Mã lỗi: `ERR-FIN-001`, `ERR-WAL-001`
 
 **Cấu trúc thuộc tính**
 
@@ -278,7 +308,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp Money trong việc bọc số học BigDecimal, quy chuẩn làm tròn ngân hàng và loại trừ sai số dấu chấm động)
 
-- Quy chiếu: `BR-FIN-01`, `BR-FIN-02`, `FR-WAL-01`, `FR-TXN-01`, `FR-TRF-01`, `ERR-FIN-001`, `ERR-WAL-001`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-01`, `UC-TXN-01`, `UC-TRF-01`, `UC-WAL-04`
+- Yêu cầu chức năng: `FR-WAL-01`, `FR-TXN-01`, `FR-TRF-01`, `FR-WAL-05`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`
+- Mã lỗi: `ERR-FIN-001`, `ERR-WAL-001`
 
 **Cấu trúc thuộc tính**
 
@@ -302,7 +336,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp TransactionDate trong việc bọc LocalDate, kiểm soát lịch pháp và ràng buộc mốc thời gian không vượt quá hiện tại)
 
-- Quy chiếu: `UC-TXN-01`, `UC-TRF-01`, `UC-REP-01`, `FR-TXN-01`, `FR-TXN-03`, `FR-TRF-01`, `FR-REP-01`, `ERR-FIN-001`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TXN-01`, `UC-TRF-01`, `UC-REP-01`
+- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-03`, `FR-TRF-01`, `FR-REP-01`
+- Quy tắc nghiệp vụ: `BR-FIN-01`
+- Mã lỗi: `ERR-FIN-001`
 
 **Cấu trúc thuộc tính**
 
@@ -326,7 +364,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của enum TransactionType trong việc xác lập hai chiều thu chi cố định và ranh giới phân cấp danh mục cấp 1)
 
-- Quy chiếu: `UC-TXN-01`, `UC-CAT-01`, `UC-CAT-03`, `FR-TXN-01`, `FR-TXN-02`, `FR-CAT-01`, `BR-FIN-04`, `ERR-CAT-003`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TXN-01`, `UC-CAT-01`, `UC-CAT-03`
+- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-CAT-01`
+- Quy tắc nghiệp vụ: `BR-FIN-04`
+- Mã lỗi: `ERR-CAT-003`
 
 **Cấu trúc thuộc tính**
 
@@ -350,7 +392,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp NetCashFlow trong việc đại diện cho dòng tiền ròng có dấu và đo lường thặng dư tài chính theo chu kỳ)
 
-- Quy chiếu: `UC-REP-01`, `FR-REP-01`, `BR-FIN-01`, `ERR-FIN-001`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-REP-01`
+- Yêu cầu chức năng: `FR-REP-01`
+- Quy tắc nghiệp vụ: `BR-FIN-01`
+- Mã lỗi: `ERR-FIN-001`
 
 **Cấu trúc thuộc tính**
 
@@ -374,7 +420,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp SavingsRate trong việc đo lường tỷ lệ phần trăm tiền tích lũy và xử lý an toàn mẫu số bằng không)
 
-- Quy chiếu: `UC-REP-01`, `FR-REP-01`, `BR-FIN-01`, `ERR-FIN-002`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-REP-01`
+- Yêu cầu chức năng: `FR-REP-01`
+- Quy tắc nghiệp vụ: `BR-FIN-01`
+- Mã lỗi: `ERR-FIN-002`
 
 **Cấu trúc thuộc tính**
 
@@ -398,7 +448,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 (Mô tả khoảng 1 đến 2 câu về vai trò của lớp SpendingStructureShare trong việc đo lường tỷ trọng đóng góp của từng nhóm chi tiêu và giới hạn khoảng giá trị)
 
-- Quy chiếu: `UC-REP-02`, `FR-REP-02`, `BR-FIN-01`, `ERR-FIN-002`
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-REP-02`
+- Yêu cầu chức năng: `FR-REP-02`
+- Quy tắc nghiệp vụ: `BR-FIN-01`
+- Mã lỗi: `ERR-FIN-002`
 
 **Cấu trúc thuộc tính**
 
