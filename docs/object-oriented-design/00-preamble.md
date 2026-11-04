@@ -61,13 +61,11 @@
 
 ### Phần 4: Thiết kế Tầng Lưu trữ và Truy xuất Dữ liệu
 
-<!-- PLACEHOLDER: Mô tả thiết kế tầng lưu trữ sử dụng mẫu Kho lưu trữ, đặc tả giao diện lưu trữ tổng quát và các lớp điều hợp cụ thể (lưu trữ bộ nhớ cho kiểm thử và lưu trữ tệp cho vận hành) | Căn cứ: Martin Fowler PoEAA Chapter 10, Đề tài học thuật PTIT | Tiêu chí: Tách biệt hoàn toàn cơ chế đọc ghi tệp khỏi logic nghiệp vụ cốt lõi -->
+<!-- PLACEHOLDER: Mô tả thiết kế tầng lưu trữ sử dụng mẫu Kho lưu trữ, đặc tả giao diện lưu trữ cơ sở, các kho lưu trữ nghiệp vụ và hai cơ chế cài đặt bằng tệp tin và bộ nhớ tạm | Căn cứ: Martin Fowler PoEAA Chapter 10, Đề tài học thuật PTIT | Tiêu chí: Tách biệt hoàn toàn cơ chế đọc ghi tệp khỏi logic nghiệp vụ cốt lõi -->
 
-- 4.1 Nguyên tắc Thiết kế Mẫu Kho Lưu trữ
-- 4.2 Giao diện Lưu trữ Tổng quát
-- 4.3 Các Giao diện Lưu trữ Chuyên biệt theo Thực thể
-- 4.4 Thiết kế Bộ Điều hợp Lưu trữ Tệp
-- 4.5 Thiết kế Bộ Điều hợp Lưu trữ Bộ nhớ
+- 4.1 Giao diện Lưu trữ Cơ sở
+- 4.2 Giao diện Lưu trữ theo Thực thể
+- 4.3 Cài đặt Hạ tầng Lưu trữ
 
 ### Phần 5: Sơ đồ Tuần tự Thiết kế
 
@@ -77,7 +75,7 @@
 - 5.2 Sơ đồ Tuần tự Nhóm Quản lý Ví
 - 5.3 Sơ đồ Tuần tự Nhóm Ghi nhận Thu Chi
 - 5.4 Sơ đồ Tuần tự Nhóm Chuyển tiền Nội bộ
-- 5.5 Sơ đồ Tuần tự Nhóm Danh mục và Ngân sách
+- 5.5 Sơ đồ Tuần tự Nhóm Danh mục Phân loại
 - 5.6 Sơ đồ Tuần tự Nhóm Báo cáo và Quản trị Dữ liệu
 
 ### Phần 6: Áp dụng Nguyên lý SOLID và Mẫu Thiết kế
