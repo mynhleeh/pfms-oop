@@ -45,7 +45,7 @@ Người dùng gửi yêu cầu khởi tạo một nguồn tiền mới kèm tê
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `walletName` | Tên gọi của ví thanh toán mới cần khởi tạo | Chuỗi 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu (`trim`), không để rỗng (`BR-NAM-01`, `ERR-NAM-001`). Duy nhất trên toàn bộ ví trong hệ thống (gồm cả ví đang hoạt động và ví lưu trữ), không phân biệt hoa thường (`BR-NAM-01`, `ERR-NAM-002`). |
+| `walletName` | Tên gọi của ví thanh toán mới cần khởi tạo | Chuỗi 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu (`trim`), không để rỗng và duy nhất trên toàn bộ ví trong hệ thống (gồm cả ví đang hoạt động và ví lưu trữ), không phân biệt hoa thường (`BR-NAM-01`); trường hợp vi phạm, báo lỗi tên sai định dạng (`ERR-NAM-001`), trùng tên ví (`ERR-NAM-002`). |
 | `note` | Ghi chú mô tả mục đích sử dụng hoặc thông tin tài khoản của ví | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-01`). |
 
 **Sơ đồ tuần tự hệ thống**
@@ -57,21 +57,21 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: createWallet(walletName, note)
-    alt Tên ví sai định dạng (rỗng hoặc vượt quá 50 ký tự sau khi trim)
-        System-->>User: Từ chối thao tác: Tên phải có từ 1 đến 50 ký tự (ERR-NAM-001)
-    else Tên ví trùng với ví đang hoạt động hoặc ví đã lưu trữ
-        System-->>User: Từ chối thao tác: Tên ví này đã tồn tại trong hệ thống (ERR-NAM-002)
-    else Ghi chú mô tả vượt quá 255 ký tự
-        System-->>User: Từ chối thao tác: Ghi chú không được vượt quá 255 ký tự
+    alt Tên ví sai định dạng
+        System-->>User: Từ chối thao tác: Tên ví không hợp lệ
+    else Tên ví đã tồn tại trong hệ thống
+        System-->>User: Từ chối thao tác: Tên ví bị trùng lặp
+    else Ghi chú vượt quá độ dài cho phép
+        System-->>User: Từ chối thao tác: Ghi chú vượt quá giới hạn ký tự
     else Dữ liệu hợp lệ
-        Note over System: Khởi tạo thực thể Wallet mới, sinh mã walletId duy nhất<br/>Gán trạng thái ACTIVE và số dư khởi điểm 0.00 VNĐ (BR-FIN-02)<br/>Tính lại tổng số dư và tỷ lệ cơ cấu phân bổ các ví (FR-WAL-04)
-        System-->>User: Phản hồi thành công (Thông tin ví mới, làm mới danh sách và cơ cấu ví)
+        Note over System: Khởi tạo ví mới ở trạng thái hoạt động với số dư bằng 0<br/>Cập nhật tổng số dư và cơ cấu phân bổ các ví
+        System-->>User: Phản hồi thành công (Thông tin ví mới và danh sách ví cập nhật)
     end
 ```
 
 ### 3.3.2 Xem tổng hợp số dư và cơ cấu ví
 
-Người dùng truy vấn danh sách ví hiện có để xem số dư khả dụng tức thời và tỷ trọng phân bổ tài sản toàn hệ thống. Hệ thống tính lại số dư từng ví từ lịch sử dòng tiền (`BR-FIN-02`) và tổng hợp tỷ lệ phần trăm tương ứng (`BR-FIN-01`, `FR-WAL-04`).
+Người dùng truy vấn danh sách ví hiện có để xem số dư khả dụng tức thời và tỷ trọng phân bổ tài sản toàn hệ thống. Hệ thống tính lại số dư từng ví từ lịch sử dòng tiền (`BR-FIN-02`), tổng hợp cơ cấu phân bổ giữa các ví (`FR-WAL-04`) và làm tròn tỷ lệ phần trăm tương ứng (`BR-FIN-01`).
 
 - Thao tác hệ thống: `getWalletsSummary()`
 - Kết quả phản hồi: Hệ thống trả về danh sách ví kèm số dư tính lại từ lịch sử dòng tiền (`BR-FIN-02`), tổng số dư hệ thống và tỷ lệ phân bổ từng ví làm tròn ngân hàng 2 chữ số thập phân (`BR-FIN-01`); nếu tổng số dư bằng 0.00 VNĐ, hệ thống gán tỷ lệ 0.00% cho mọi ví để tránh lỗi chia cho 0 (`ERR-FIN-002`). Thao tác chỉ đọc dữ liệu, không làm thay đổi trạng thái hệ thống.
@@ -89,13 +89,13 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: getWalletsSummary()
-    Note over System: Quét lịch sử dòng tiền, tính lại số dư từng ví (BR-FIN-02):<br/>WalletBalance = Income + TransferIn - Expense - TransferOut + Adjustment<br/>Cộng tổng số dư các ví ACTIVE và ví ARCHIVED có số dư > 0.00 VNĐ
-    alt Tổng số dư toàn hệ thống bằng 0.00 VNĐ
-        Note over System: Bỏ qua phép chia cho 0 để tránh lỗi số học (ERR-FIN-002)<br/>Gán tỷ lệ cơ cấu mặc định 0.00% cho toàn bộ các ví
-        System-->>User: Phản hồi danh sách số dư ví (Tỷ lệ phân bổ 0.00% kèm thông báo tổng số dư bằng 0)
-    else Tổng số dư toàn hệ thống lớn hơn 0.00 VNĐ
-        Note over System: Tính tỷ lệ từng ví = (WalletBalance / TotalWalletBalance) * 100%<br/>Lấy tối thiểu 4 chữ số thập phân trung gian, làm tròn ngân hàng 2 chữ số (BR-FIN-01)<br/>Sắp xếp danh sách ví theo tỷ lệ phân bổ giảm dần
-        System-->>User: Phản hồi danh sách số dư ví, tổng số dư hệ thống và bảng cơ cấu phân bổ
+    Note over System: Tính lại số dư từng ví từ lịch sử dòng tiền<br/>Tổng hợp tổng số dư toàn hệ thống
+    alt Tổng số dư toàn hệ thống bằng 0
+        Note over System: Gán tỷ lệ phân bổ mặc định 0% cho các ví
+        System-->>User: Phản hồi danh sách số dư ví và thông báo tổng số dư bằng 0
+    else Tổng số dư toàn hệ thống lớn hơn 0
+        Note over System: Tính tỷ lệ phân bổ của từng ví và sắp xếp giảm dần
+        System-->>User: Phản hồi danh sách số dư ví, tổng số dư và cơ cấu phân bổ
     end
 ```
 
@@ -111,7 +111,7 @@ Người dùng gửi yêu cầu chỉnh sửa tên hiển thị hoặc ghi chú 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
 | `walletId` | Mã định danh của ví cần cập nhật thông tin | Chuỗi định danh bắt buộc tồn tại trong danh sách ví của hệ thống (`FR-WAL-03`). |
-| `walletName` | Tên gọi mới cần áp dụng cho ví | Chuỗi 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu (`trim`), không để rỗng (`BR-NAM-01`, `ERR-NAM-001`). Duy nhất so với các ví khác trong hệ thống, không phân biệt hoa thường (`BR-NAM-01`, `ERR-NAM-002`). |
+| `walletName` | Tên gọi mới cần áp dụng cho ví | Chuỗi 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu (`trim`), không để rỗng và duy nhất so với các ví khác trong hệ thống, không phân biệt hoa thường (`BR-NAM-01`); trường hợp vi phạm, báo lỗi tên sai định dạng (`ERR-NAM-001`), trùng tên ví (`ERR-NAM-002`). |
 | `note` | Ghi chú mô tả mới của ví | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-03`). |
 
 **Sơ đồ tuần tự hệ thống**
@@ -123,16 +123,16 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: updateWallet(walletId, walletName, note)
-    alt Không tìm thấy mã ví trong hệ thống
-        System-->>User: Từ chối thao tác: Ví yêu cầu cập nhật không tồn tại
-    else Tên ví mới sai định dạng (rỗng hoặc vượt quá 50 ký tự)
-        System-->>User: Từ chối thao tác: Tên phải có từ 1 đến 50 ký tự (ERR-NAM-001)
-    else Tên ví mới trùng với một ví khác trong hệ thống
-        System-->>User: Từ chối thao tác: Tên ví này đã tồn tại trong hệ thống (ERR-NAM-002)
-    else Ghi chú mới vượt quá 255 ký tự
-        System-->>User: Từ chối thao tác: Ghi chú không được vượt quá 255 ký tự
+    alt Không tìm thấy ví trong hệ thống
+        System-->>User: Từ chối thao tác: Ví không tồn tại
+    else Tên ví mới sai định dạng
+        System-->>User: Từ chối thao tác: Tên ví không hợp lệ
+    else Tên ví mới trùng với ví khác
+        System-->>User: Từ chối thao tác: Tên ví đã tồn tại
+    else Ghi chú mới vượt quá độ dài cho phép
+        System-->>User: Từ chối thao tác: Ghi chú vượt quá giới hạn ký tự
     else Dữ liệu hợp lệ
-        Note over System: Cập nhật thuộc tính name và note của thực thể Wallet<br/>Bảo toàn nguyên vẹn walletId, số dư hiện tại và lịch sử dòng tiền (BR-FIN-02)
+        Note over System: Cập nhật tên và ghi chú của ví<br/>Giữ nguyên mã định danh, số dư và lịch sử giao dịch
         System-->>User: Phản hồi thành công (Thông tin ví sau khi cập nhật)
     end
 ```
@@ -149,7 +149,7 @@ Người dùng đối chiếu tiền thực tế với số dư phần mềm và
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
 | `walletId` | Mã định danh của ví cần điều chỉnh số dư thực tế | Chuỗi định danh tồn tại trong hệ thống, ví đang ở trạng thái hoạt động (`ACTIVE`) (`FR-WAL-05`). |
-| `actualBalance` | Số dư thực tế quan sát được khi kiểm kê ví | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`, `ERR-FIN-001`), không âm (`BR-FIN-02`, `ERR-WAL-001`) và khác số dư hiện tại của ví (`FR-WAL-05`). |
+| `actualBalance` | Số dư thực tế quan sát được khi kiểm kê ví | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`), không âm (`BR-FIN-02`) và khác số dư hiện tại của ví (`FR-WAL-05`); trường hợp vi phạm, báo lỗi sai định dạng số học (`ERR-FIN-001`), số dư thực tế âm (`ERR-WAL-001`). |
 | `reason` | Lý do giải trình nguyên nhân chênh lệch số dư | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-05`). |
 
 **Sơ đồ tuần tự hệ thống**
@@ -161,19 +161,17 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: adjustBalance(walletId, actualBalance, reason)
-    alt Ví không tồn tại hoặc đang ở trạng thái lưu trữ (ARCHIVED)
-        System-->>User: Từ chối thao tác: Ví không tồn tại hoặc không ở trạng thái hoạt động
-    else Số dư thực tế sai định dạng số học
-        System-->>User: Từ chối thao tác: Dữ liệu số tiền không đúng định dạng hợp lệ (ERR-FIN-001)
-    else Số dư thực tế nhỏ hơn 0.00 VNĐ
-        System-->>User: Từ chối thao tác: Số dư thực tế không được nhỏ hơn 0 (ERR-WAL-001)
-    else Lý do điều chỉnh vượt quá 255 ký tự
-        System-->>User: Từ chối thao tác: Lý do điều chỉnh không được vượt quá 255 ký tự
-    else Chênh lệch điều chỉnh bằng 0.00 VNĐ (actualBalance == currentBalance)
-        System-->>User: Từ chối thao tác: Số dư nhập vào trùng với số dư hiện tại của hệ thống
+    alt Ví không tồn tại hoặc không ở trạng thái hoạt động
+        System-->>User: Từ chối thao tác: Ví không khả dụng để điều chỉnh
+    else Số dư thực tế sai định dạng hoặc bị âm
+        System-->>User: Từ chối thao tác: Số dư thực tế không hợp lệ
+    else Lý do điều chỉnh vượt quá độ dài cho phép
+        System-->>User: Từ chối thao tác: Lý do vượt quá giới hạn ký tự
+    else Số dư thực tế trùng với số dư hiện tại
+        System-->>User: Từ chối thao tác: Không phát sinh chênh lệch số dư
     else Dữ liệu hợp lệ
-        Note over System: Tính chênh lệch Adjustment = actualBalance - currentBalance (BR-FIN-01)<br/>Tạo bản ghi BalanceAdjustmentRecord cố định (lưu số dư trước, sau, chênh lệch, lý do)<br/>Tính lại số dư khả dụng của ví khớp đúng với actualBalance (BR-FIN-02)
-        System-->>User: Phản hồi thành công (Bản ghi điều chỉnh số dư mới và số dư ví sau điều chỉnh)
+        Note over System: Tính mức chênh lệch và tạo bản ghi điều chỉnh số dư<br/>Cập nhật số dư khả dụng của ví theo số dư thực tế
+        System-->>User: Phản hồi thành công (Bản ghi điều chỉnh và số dư ví mới)
     end
 ```
 
@@ -193,19 +191,19 @@ Nhóm chức năng Ghi nhận Thu chi xử lý các giao dịch dòng tiền hà
 Người dùng gửi thông tin khoản thu nhập hoặc chi tiêu kèm ví thanh toán, danh mục và chi phí phát sinh (nếu có). Hệ thống kiểm tra danh mục cấp 3 (`BR-FIN-04`) và số dư ví (`BR-FIN-02`), sau đó ghi nhận đồng thời giao dịch gốc cùng bản ghi phí liên kết.
 
 - Thao tác hệ thống: `recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
-- Kết quả phản hồi: Hệ thống tạo bản ghi giao dịch (`IncomeExpenseTransaction`) với mã duy nhất, tạo bản ghi phí (`TransactionFee`) liên kết nếu `feeAmount > 0.00 VNĐ`, cập nhật số dư ví (`BR-FIN-02`) và trả về thông tin giao dịch vừa lưu; trường hợp vi phạm, hệ thống hủy thao tác và báo lỗi số tiền sai định dạng hoặc $\le 0$ (`ERR-FIN-001`), ví không hoạt động, danh mục sai phân cấp (`BR-FIN-04`), chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`), hoặc không đủ số dư ví (`ERR-WAL-001`).
+- Kết quả phản hồi: Hệ thống tạo bản ghi giao dịch (`IncomeExpenseTransaction`) với mã duy nhất, tạo bản ghi phí (`TransactionFee`) liên kết nếu `feeAmount > 0.00 VNĐ`, cập nhật số dư ví (`BR-FIN-02`) và trả về thông tin giao dịch vừa lưu; trường hợp vi phạm, hệ thống hủy thao tác và báo lỗi số tiền sai định dạng hoặc $\le 0$ (`ERR-FIN-001`), chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`), không đủ số dư ví (`ERR-WAL-001`), hoặc từ chối khi ví không hoạt động hay danh mục sai phân cấp (`BR-FIN-04`).
 
 **Danh sách tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `walletId` | Mã định danh của ví tiếp nhận khoản thu hoặc chi trả khoản chi | Mã ví tồn tại và đang hoạt động (`ACTIVE`) (`FR-TXN-01`, `FR-TXN-02`). Số dư ví sau khi áp dụng giao dịch và chi phí phải không âm (`BR-FIN-02`, `ERR-WAL-001`). |
+| `walletId` | Mã định danh của ví tiếp nhận khoản thu hoặc chi trả khoản chi | Mã ví tồn tại và đang hoạt động (`ACTIVE`) khi ghi nhận thu nhập (`FR-TXN-01`) hoặc chi tiêu (`FR-TXN-02`). Số dư ví sau khi áp dụng giao dịch và chi phí phải không âm (`BR-FIN-02`); trường hợp vi phạm, báo lỗi không đủ số dư ví (`ERR-WAL-001`). |
 | `categoryId` | Mã định danh danh mục chi tiết cấp 3 dùng để phân loại giao dịch | Mã danh mục cấp 3 đang hoạt động (`ACTIVE`), thuộc nhánh Thu nhập (`INCOME`) hoặc Chi tiêu (`EXPENSE`) (`BR-FIN-04`). |
-| `amount` | Số tiền gốc của giao dịch thu nhập hoặc chi tiêu | Số thập phân chính xác lớn hơn 0.00 VNĐ với 2 chữ số thập phân (`BR-FIN-01`, `ERR-FIN-001`). |
-| `transactionDate` | Ngày phát sinh giao dịch thực tế | Ngày tháng định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-01`, `FR-TXN-02`). |
-| `note` | Ghi chú diễn giải nội dung khoản thu chi | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-TXN-01`, `FR-TXN-02`). |
-| `feeAmount` | Số tiền chi phí phụ phát sinh đi kèm giao dịch | Số thập phân chính xác không âm ($\ge 0.00$ VNĐ), mặc định 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). |
-| `feeCategoryId` | Mã định danh danh mục chi tiêu dùng để hạch toán chi phí giao dịch | Tùy chọn khi `feeAmount = 0.00 VNĐ`; bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`). Phải là danh mục cấp 3 đang hoạt động (`ACTIVE`) thuộc nhánh Chi tiêu (`EXPENSE`) (`BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-003`). |
+| `amount` | Số tiền gốc của giao dịch thu nhập hoặc chi tiêu | Số thập phân chính xác lớn hơn 0.00 VNĐ với 2 chữ số thập phân (`BR-FIN-01`); trường hợp vi phạm, báo lỗi số tiền sai định dạng (`ERR-FIN-001`). |
+| `transactionDate` | Ngày phát sinh giao dịch thực tế | Ngày tháng định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại đối với khoản thu (`FR-TXN-01`) và khoản chi (`FR-TXN-02`). |
+| `note` | Ghi chú diễn giải nội dung khoản thu chi | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu đối với khoản thu (`FR-TXN-01`) và khoản chi (`FR-TXN-02`). |
+| `feeAmount` | Số tiền chi phí phụ phát sinh đi kèm giao dịch | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`), không âm ($\ge 0.00$ VNĐ) và mặc định 0.00 VNĐ (`BR-FIN-02`); trường hợp vi phạm, báo lỗi chi phí âm (`ERR-FEE-001`). |
+| `feeCategoryId` | Mã định danh danh mục chi tiêu dùng để hạch toán chi phí giao dịch | Tùy chọn khi `feeAmount = 0.00 VNĐ`; bắt buộc chọn khi `feeAmount > 0.00 VNĐ` (`BR-FIN-02`). Phải là danh mục cấp 3 đang hoạt động (`ACTIVE`) thuộc nhánh Chi tiêu (`EXPENSE`) (`BR-FIN-04`); trường hợp vi phạm, báo lỗi thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -216,19 +214,17 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)
-    alt Số tiền giao dịch sai định dạng số học hoặc <= 0.00 VNĐ
-        System-->>User: Từ chối thao tác: Số tiền không đúng định dạng hoặc không lớn hơn 0 (ERR-FIN-001)
-    else Ví không tồn tại hoặc đang ở trạng thái lưu trữ (ARCHIVED)
-        System-->>User: Từ chối thao tác: Ví thanh toán không tồn tại hoặc không hoạt động
-    else Danh mục chính không tồn tại, đã xóa (DELETED) hoặc không thuộc cấp 3
-        System-->>User: Từ chối thao tác: Danh mục phân loại không hợp lệ (BR-FIN-04)
-    else Chi phí âm (ERR-FEE-001), thiếu danh mục phí (ERR-FEE-002) hoặc danh mục phí sai loại/đã xóa (ERR-FEE-003)
-        System-->>User: Từ chối thao tác: Thông tin chi phí hoặc danh mục phí không hợp lệ
-    else Số dư ví sau giao dịch và chi phí bị âm (< 0.00 VNĐ)
-        System-->>User: Từ chối thao tác: Số dư ví không đủ để thực hiện giao dịch (ERR-WAL-001)
-    else Dữ liệu hợp lệ và đủ số dư thanh toán
-        Note over System: Khởi tạo bản ghi IncomeExpenseTransaction với mã định danh duy nhất<br/>Nếu feeAmount > 0.00 VNĐ: Tạo đồng thời bản ghi TransactionFee (loại EXPENSE) liên kết<br/>Cập nhật số dư ví (cộng nếu INCOME, trừ nếu EXPENSE, trừ thêm feeAmount) (BR-FIN-02)<br/>Cập nhật các chỉ số tổng hợp dòng tiền trong kỳ
-        System-->>User: Phản hồi thành công (Thông tin giao dịch mới, phí liên kết và số dư ví sau cập nhật)
+    alt Số tiền giao dịch không hợp lệ
+        System-->>User: Từ chối thao tác: Số tiền sai định dạng hoặc không lớn hơn 0
+    else Ví thanh toán hoặc danh mục phân loại không hợp lệ
+        System-->>User: Từ chối thao tác: Ví hoặc danh mục không khả dụng
+    else Thông tin chi phí hoặc danh mục phí không hợp lệ
+        System-->>User: Từ chối thao tác: Chi phí hoặc danh mục phí sai quy định
+    else Số dư ví không đủ thực hiện giao dịch
+        System-->>User: Từ chối thao tác: Số dư ví không đủ thanh toán
+    else Dữ liệu hợp lệ và đủ số dư
+        Note over System: Lưu bản ghi giao dịch thu chi và bản ghi phí liên kết (nếu có)<br/>Cập nhật số dư khả dụng của ví và thống kê dòng tiền
+        System-->>User: Phản hồi thành công (Thông tin giao dịch mới và số dư ví cập nhật)
     end
 ```
 
@@ -246,7 +242,7 @@ Người dùng gửi tiêu chí lọc theo khoảng thời gian, ví thanh toán
 | `startDate` | Ngày bắt đầu của khoảng thời gian tra cứu lịch sử thu chi | Ngày bắt đầu định dạng `YYYY-MM-DD`, nhỏ hơn hoặc bằng `endDate` (`FR-TXN-03`). |
 | `endDate` | Ngày kết thúc của khoảng thời gian tra cứu lịch sử thu chi | Ngày kết thúc định dạng `YYYY-MM-DD`, lớn hơn hoặc bằng `startDate` (`FR-TXN-03`). |
 | `walletId` | Mã định danh ví thanh toán cần lọc giao dịch | Tham số tùy chọn; truyền mã ví hợp lệ để lọc riêng một ví hoặc để trống để lấy toàn bộ ví (`FR-TXN-03`). |
-| `categoryId` | Mã định danh nhóm nhu cầu hoặc danh mục chi tiết cần lọc | Tham số tùy chọn; nhận mã nhóm nhu cầu hoặc danh mục chi tiết, bao gồm cả mục đã xóa mềm (`DELETED`) (`BR-FIN-04`, `FR-TXN-03`). |
+| `categoryId` | Mã định danh nhóm nhu cầu hoặc danh mục chi tiết cần lọc | Tham số tùy chọn theo tiêu chí lọc (`FR-TXN-03`); nhận mã nhóm nhu cầu hoặc danh mục chi tiết, bao gồm cả mục đã xóa mềm (`DELETED`) (`BR-FIN-04`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -257,14 +253,14 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: filterTransactions(startDate, endDate, walletId, categoryId)
-    alt Khoảng thời gian không hợp lệ (startDate > endDate)
-        System-->>User: Từ chối truy vấn: Ngày bắt đầu phải trước hoặc bằng ngày kết thúc
+    alt Khoảng thời gian tra cứu không hợp lệ
+        System-->>User: Từ chối truy vấn: Khoảng thời gian không hợp lệ
     else Tiêu chí lọc hợp lệ
-        Note over System: Lọc sổ giao dịch thu chi theo điều kiện kết hợp VÀ (AND)<br/>Bao gồm cả các bản ghi TransactionFee loại EXPENSE và danh mục đã xóa mềm<br/>Sắp xếp bản ghi theo ngày giao dịch giảm dần<br/>Tính Tổng thu nhập, Tổng chi tiêu và Dòng tiền thuần = Tổng thu - Tổng chi (BR-FIN-01)
-        alt Không có bản ghi nào thỏa mãn bộ lọc
-            System-->>User: Phản hồi danh sách rỗng (Tổng thu = 0.00, Tổng chi = 0.00, Dòng tiền thuần = 0.00)
-        else Có bản ghi thỏa mãn bộ lọc
-            System-->>User: Phản hồi danh sách giao dịch phân trang kèm khối tổng hợp Thu - Chi - Dòng tiền thuần
+        Note over System: Lọc các giao dịch thu chi và phí giao dịch theo bộ tiêu chí<br/>Sắp xếp theo ngày giảm dần và tổng hợp thu, chi, dòng tiền thuần
+        alt Không có bản ghi thỏa mãn
+            System-->>User: Phản hồi danh sách rỗng và các chỉ số tổng hợp bằng 0
+        else Có bản ghi thỏa mãn
+            System-->>User: Phản hồi danh sách giao dịch và kết quả tổng hợp dòng tiền
         end
     end
 ```
@@ -274,20 +270,20 @@ sequenceDiagram
 Người dùng gửi yêu cầu hiệu chỉnh thông tin một giao dịch thu chi đã lưu. Hệ thống hoàn nguyên tác động tài chính cũ trên ví ban đầu và áp dụng thông số mới lên ví đích trong cùng một bước xử lý, đảm bảo số dư các ví không âm (`BR-FIN-02`).
 
 - Thao tác hệ thống: `updateTransaction(transactionId, walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
-- Kết quả phản hồi: Hệ thống hoàn nguyên số dư ví cũ, cập nhật số dư ví mới (`BR-FIN-02`), ghi đè bản ghi giao dịch gốc, đồng thời tạo mới, cập nhật hoặc xóa bản ghi phí (`TransactionFee`) liên kết và trả về giao dịch sau chỉnh sửa; trường hợp vi phạm, hệ thống giữ nguyên dữ liệu cũ và báo lỗi không tìm thấy giao dịch, sửa trực tiếp bản ghi phí độc lập, đổi loại thu chi (`BR-FIN-04`), sai định dạng số tiền (`ERR-FIN-001`), sai quy định phí (`ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`) hoặc làm âm số dư ví (`ERR-WAL-001`).
+- Kết quả phản hồi: Hệ thống hoàn nguyên số dư ví cũ, cập nhật số dư ví mới (`BR-FIN-02`), ghi đè bản ghi giao dịch gốc, đồng thời tạo mới, cập nhật hoặc xóa bản ghi phí (`TransactionFee`) liên kết và trả về giao dịch sau chỉnh sửa; trường hợp vi phạm, hệ thống giữ nguyên dữ liệu cũ và báo lỗi sai định dạng số tiền (`ERR-FIN-001`), chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`), làm âm số dư ví (`ERR-WAL-001`), hoặc từ chối khi không tìm thấy giao dịch, sửa trực tiếp bản ghi phí độc lập hay đổi loại thu chi (`BR-FIN-04`).
 
 **Danh sách tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transactionId` | Mã định danh của giao dịch thu chi gốc cần chỉnh sửa | Mã giao dịch gốc tồn tại trong sổ thu chi, không phải bản ghi phí giao dịch độc lập (`BR-FIN-02`, `FR-TXN-04`). |
-| `walletId` | Mã định danh của ví thanh toán áp dụng sau khi chỉnh sửa | Mã ví tồn tại và đang hoạt động (`ACTIVE`). Số dư ví cũ sau hoàn nguyên và số dư ví mới sau cập nhật đều phải không âm (`BR-FIN-02`, `ERR-WAL-001`). |
+| `transactionId` | Mã định danh của giao dịch thu chi gốc cần chỉnh sửa | Mã giao dịch gốc tồn tại trong sổ thu chi (`FR-TXN-04`), không phải bản ghi phí giao dịch độc lập (`BR-FIN-02`). |
+| `walletId` | Mã định danh của ví thanh toán áp dụng sau khi chỉnh sửa | Mã ví tồn tại và đang hoạt động (`ACTIVE`). Số dư ví cũ sau hoàn nguyên và số dư ví mới sau cập nhật đều phải không âm (`BR-FIN-02`); trường hợp vi phạm, báo lỗi làm âm số dư ví (`ERR-WAL-001`). |
 | `categoryId` | Mã định danh danh mục chi tiết cấp 3 sau khi chỉnh sửa | Mã danh mục cấp 3 cùng nhánh Loại thu chi (`INCOME` hoặc `EXPENSE`) với giao dịch gốc (`BR-FIN-04`). Danh mục chọn mới phải đang hoạt động (`ACTIVE`), cho phép giữ nguyên danh mục cũ đã xóa mềm (`FR-TXN-04`). |
-| `amount` | Số tiền giao dịch mới sau khi hiệu chỉnh | Số thập phân chính xác lớn hơn 0.00 VNĐ với 2 chữ số thập phân (`BR-FIN-01`, `ERR-FIN-001`). |
+| `amount` | Số tiền giao dịch mới sau khi hiệu chỉnh | Số thập phân chính xác lớn hơn 0.00 VNĐ với 2 chữ số thập phân (`BR-FIN-01`); trường hợp vi phạm, báo lỗi số tiền sai định dạng (`ERR-FIN-001`). |
 | `transactionDate` | Ngày phát sinh giao dịch mới | Ngày tháng định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-04`). |
 | `note` | Ghi chú diễn giải mới của giao dịch | Chuỗi ký tự tùy chọn, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-TXN-04`). |
-| `feeAmount` | Số tiền chi phí giao dịch mới | Số thập phân chính xác không âm ($\ge 0.00$ VNĐ) (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). |
-| `feeCategoryId` | Mã định danh danh mục chi tiêu cho khoản phí mới | Bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`). Phải thuộc nhánh Chi tiêu (`EXPENSE`) và đang hoạt động (`ACTIVE`) nếu chọn mới, hoặc giữ nguyên danh mục phí cũ đã xóa mềm (`BR-FIN-02`, `FR-TXN-04`, `ERR-FEE-003`). |
+| `feeAmount` | Số tiền chi phí giao dịch mới | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`) và không âm ($\ge 0.00$ VNĐ) (`BR-FIN-02`); trường hợp vi phạm, báo lỗi chi phí âm (`ERR-FEE-001`). |
+| `feeCategoryId` | Mã định danh danh mục chi tiêu cho khoản phí mới | Bắt buộc chọn khi `feeAmount > 0.00 VNĐ` (`BR-FIN-02`). Phải thuộc nhánh Chi tiêu (`EXPENSE`) và đang hoạt động (`ACTIVE`) nếu chọn mới, hoặc giữ nguyên danh mục phí cũ đã xóa mềm (`FR-TXN-04`); trường hợp vi phạm, báo lỗi thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -298,21 +294,15 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: updateTransaction(transactionId, walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)
-    alt Giao dịch không tồn tại hoặc mã truyền vào là bản ghi phí giao dịch độc lập
-        System-->>User: Từ chối thao tác: Không tìm thấy giao dịch hoặc không được sửa trực tiếp phí giao dịch
-    else Số tiền mới sai định dạng (ERR-FIN-001), <= 0.00 VNĐ hoặc ví mới không ở trạng thái ACTIVE
-        System-->>User: Từ chối thao tác: Số tiền mới hoặc trạng thái ví thanh toán không hợp lệ
-    else Danh mục mới khác nhánh Loại thu chi gốc hoặc đã bị xóa khi chọn mới
-        System-->>User: Từ chối thao tác: Danh mục mới không tương thích với loại giao dịch gốc (BR-FIN-04)
-    else Chi phí mới âm (ERR-FEE-001), thiếu danh mục phí (ERR-FEE-002) hoặc danh mục phí sai loại (ERR-FEE-003)
-        System-->>User: Từ chối thao tác: Thông tin chi phí hoặc danh mục phí không hợp lệ
-    else Hoàn nguyên giao dịch cũ làm âm số dư ví cũ (< 0.00 VNĐ)
-        System-->>User: Từ chối thao tác: Hoàn nguyên khoản thu cũ làm âm số dư ví cũ (ERR-WAL-001)
-    else Áp dụng thông số mới làm âm số dư ví mới (< 0.00 VNĐ)
-        System-->>User: Từ chối thao tác: Số dư khả dụng của ví mới không đủ chi trả (ERR-WAL-001)
-    else Thỏa mãn toàn bộ điều kiện kiểm tra
-        Note over System: Thực thi đồng thời (All-or-Nothing):<br/>1. Hoàn nguyên số dư trên ví cũ (trừ thu nhập cũ hoặc cộng hoàn chi tiêu và phí cũ)<br/>2. Áp dụng số tiền mới và chi phí mới vào số dư ví mới (BR-FIN-02)<br/>3. Cập nhật bản ghi IncomeExpenseTransaction<br/>4. Tạo mới, cập nhật hoặc xóa bản ghi TransactionFee liên kết
-        System-->>User: Phản hồi thành công (Bản ghi giao dịch sau cập nhật và số dư mới của các ví liên quan)
+    alt Giao dịch không tồn tại hoặc là bản ghi phí độc lập
+        System-->>User: Từ chối thao tác: Giao dịch không hợp lệ để chỉnh sửa
+    else Thông tin số tiền, ví, danh mục hoặc chi phí mới không hợp lệ
+        System-->>User: Từ chối thao tác: Dữ liệu cập nhật vi phạm ràng buộc
+    else Hoàn nguyên giao dịch cũ hoặc áp dụng giao dịch mới làm âm số dư ví
+        System-->>User: Từ chối thao tác: Số dư ví không đủ để thực hiện thay đổi
+    else Dữ liệu hợp lệ và đảm bảo số dư
+        Note over System: Hoàn nguyên tác động cũ và cập nhật số dư ví mới<br/>Cập nhật bản ghi giao dịch gốc và điều chỉnh bản ghi phí liên kết
+        System-->>User: Phản hồi thành công (Thông tin giao dịch sau chỉnh sửa và số dư ví mới)
     end
 ```
 
@@ -321,13 +311,13 @@ sequenceDiagram
 Người dùng yêu cầu xóa một giao dịch thu chi khỏi sổ theo dõi. Hệ thống kiểm tra số dư hoàn nguyên (`BR-FIN-02`), xóa đồng thời giao dịch gốc cùng bản ghi phí liên kết (nếu có) và khôi phục số dư ví.
 
 - Thao tác hệ thống: `deleteTransaction(transactionId)`
-- Kết quả phản hồi: Hệ thống xóa vĩnh viễn bản ghi giao dịch gốc và bản ghi phí (`TransactionFee`) liên kết, hoàn nguyên số dư ví (`BR-FIN-02`) và phản hồi thông báo xóa thành công; trường hợp không tìm thấy giao dịch, xóa trực tiếp bản ghi phí độc lập hoặc việc trừ lại khoản thu nhập làm âm số dư ví (`ERR-WAL-001`), hệ thống từ chối thao tác.
+- Kết quả phản hồi: Hệ thống xóa vĩnh viễn bản ghi giao dịch gốc và bản ghi phí (`TransactionFee`) liên kết, hoàn nguyên số dư ví (`BR-FIN-02`) và phản hồi thông báo xóa thành công; trường hợp vi phạm, hệ thống từ chối thao tác và báo lỗi làm âm số dư ví khi trừ lại khoản thu nhập (`ERR-WAL-001`), hoặc từ chối khi không tìm thấy giao dịch hay xóa trực tiếp bản ghi phí độc lập (`BR-FIN-02`).
 
 **Danh sách tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transactionId` | Mã định danh của giao dịch thu chi cần xóa khỏi hệ thống | Mã giao dịch tồn tại trong sổ thu chi, không phải bản ghi phí độc lập (`BR-FIN-02`, `FR-TXN-05`). Nếu xóa giao dịch thu nhập (`INCOME`), số dư ví sau khi trừ khoản thu và cộng lại phí liên kết phải không âm (`BR-FIN-02`, `ERR-WAL-001`). |
+| `transactionId` | Mã định danh của giao dịch thu chi cần xóa khỏi hệ thống | Mã giao dịch gốc tồn tại trong sổ thu chi (`FR-TXN-05`), không phải bản ghi phí độc lập và khi xóa giao dịch thu nhập (`INCOME`), số dư ví sau khi trừ khoản thu và cộng lại phí liên kết phải không âm (`BR-FIN-02`); trường hợp vi phạm, báo lỗi làm âm số dư ví (`ERR-WAL-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -338,15 +328,13 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: deleteTransaction(transactionId)
-    alt Không tìm thấy mã giao dịch trong sổ thu chi
-        System-->>User: Từ chối thao tác: Không tìm thấy giao dịch yêu cầu xóa
-    else Mã truyền vào là bản ghi phí giao dịch độc lập (TransactionFee)
-        System-->>User: Từ chối thao tác: Phí giao dịch không được xóa trực tiếp, phải xóa từ giao dịch gốc
-    else Giao dịch là Thu nhập (INCOME) và số dư ví hiện tại không đủ để trừ hoàn nguyên
-        System-->>User: Từ chối thao tác: Xóa khoản thu nhập này sẽ làm âm số dư ví (ERR-WAL-001)
-    else Đủ điều kiện an toàn số dư
-        Note over System: Thực thi đồng thời (All-or-Nothing):<br/>1. Xóa bản ghi IncomeExpenseTransaction khỏi sổ giao dịch thu chi<br/>2. Xóa bản ghi TransactionFee liên kết (nếu có)<br/>3. Tính lại số dư khả dụng của ví (BR-FIN-02) và cập nhật thống kê tháng
-        System-->>User: Phản hồi thành công (Đã xóa giao dịch và hoàn nguyên số dư ví)
+    alt Giao dịch không tồn tại hoặc là bản ghi phí độc lập
+        System-->>User: Từ chối thao tác: Giao dịch không hợp lệ để xóa
+    else Hoàn nguyên khoản thu làm âm số dư ví
+        System-->>User: Từ chối thao tác: Số dư ví không đủ để thu hồi khoản thu
+    else Đủ điều kiện xóa
+        Note over System: Xóa bản ghi giao dịch gốc và bản ghi phí liên kết (nếu có)<br/>Hoàn nguyên số dư khả dụng của ví và cập nhật thống kê
+        System-->>User: Phản hồi thành công (Đã xóa giao dịch và khôi phục số dư ví)
     end
 ```
 
@@ -362,22 +350,22 @@ Nhóm chức năng Chuyển tiền Nội bộ quản lý các giao dịch điề
 
 ### 3.5.1 Chuyển tiền giữa hai ví
 
-Người dùng yêu cầu điều chuyển tiền từ ví nguồn sang ví đích kèm chi phí chuyển tiền (nếu có). Hệ thống kiểm tra hai ví phân biệt và số dư ví nguồn (`BR-FIN-02`, `BR-FIN-03`), sau đó trừ tiền ví nguồn, cộng tiền ví đích đồng thời và tạo bản ghi phí liên kết.
+Người dùng yêu cầu điều chuyển tiền từ ví nguồn sang ví đích kèm chi phí chuyển tiền (nếu có). Hệ thống kiểm tra hai ví phân biệt (`BR-FIN-03`) và số dư khả dụng của ví nguồn (`BR-FIN-02`), sau đó trừ tiền ví nguồn, cộng tiền ví đích đồng thời và tạo bản ghi phí liên kết.
 
 - Thao tác hệ thống: `transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)`
-- Kết quả phản hồi: Hệ thống tạo bản ghi chuyển tiền (`TransferTransaction`) với mã duy nhất, trừ đồng thời số tiền chuyển và phí khỏi ví nguồn, cộng số tiền chuyển vào ví đích (`BR-FIN-03`), tạo bản ghi phí (`TransactionFee`) loại `EXPENSE` nếu `feeAmount > 0.00 VNĐ` và trả về số dư mới của hai ví; trường hợp vi phạm, hệ thống hủy giao dịch và báo lỗi trùng ví (`ERR-TRF-001`), số tiền chuyển $\le 0$ (`ERR-TRF-002`), sai định dạng số (`ERR-FIN-001`), sai quy định phí (`ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`) hoặc ví nguồn không đủ số dư (`ERR-WAL-001`).
+- Kết quả phản hồi: Hệ thống tạo bản ghi chuyển tiền (`TransferTransaction`) với mã duy nhất, trừ đồng thời số tiền chuyển và phí khỏi ví nguồn, cộng số tiền chuyển vào ví đích (`BR-FIN-03`), tạo bản ghi phí (`TransactionFee`) loại `EXPENSE` nếu `feeAmount > 0.00 VNĐ` và trả về số dư mới của hai ví; trường hợp vi phạm, hệ thống hủy giao dịch và báo lỗi trùng ví chuyển và ví nhận (`ERR-TRF-001`), số tiền chuyển $\le 0$ (`ERR-TRF-002`), sai định dạng số học (`ERR-FIN-001`), chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`), hoặc ví nguồn không đủ số dư (`ERR-WAL-001`).
 
 **Danh sách tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `sourceWalletId` | Mã định danh của ví nguồn trích tiền chuyển đi | Mã ví nguồn tồn tại và đang hoạt động (`ACTIVE`), có số dư khả dụng lớn hơn hoặc bằng `amount + feeAmount` (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). |
-| `destinationWalletId` | Mã định danh của ví đích tiếp nhận khoản tiền chuyển đến | Mã ví đích tồn tại, đang hoạt động (`ACTIVE`) và khác `sourceWalletId` (`BR-FIN-03`, `ERR-TRF-001`). |
-| `amount` | Số tiền điều chuyển giữa hai ví nội bộ | Số thập phân chính xác lớn hơn 0.00 VNĐ với 2 chữ số thập phân (`BR-FIN-01`, `BR-FIN-03`, `ERR-FIN-001`, `ERR-TRF-002`). |
+| `sourceWalletId` | Mã định danh của ví nguồn trích tiền chuyển đi | Mã ví nguồn tồn tại và đang hoạt động (`ACTIVE`) (`BR-FIN-03`), có số dư khả dụng lớn hơn hoặc bằng `amount + feeAmount` (`BR-FIN-02`); trường hợp vi phạm, báo lỗi ví nguồn không đủ số dư (`ERR-WAL-001`). |
+| `destinationWalletId` | Mã định danh của ví đích tiếp nhận khoản tiền chuyển đến | Mã ví đích tồn tại, đang hoạt động (`ACTIVE`) và khác `sourceWalletId` (`BR-FIN-03`); trường hợp vi phạm, báo lỗi trùng ví chuyển và ví nhận (`ERR-TRF-001`). |
+| `amount` | Số tiền điều chuyển giữa hai ví nội bộ | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`) và lớn hơn 0.00 VNĐ (`BR-FIN-03`); trường hợp vi phạm, báo lỗi sai định dạng số học (`ERR-FIN-001`), số tiền chuyển nhỏ hơn hoặc bằng 0 (`ERR-TRF-002`). |
 | `transferDate` | Ngày thực hiện giao dịch chuyển tiền | Ngày tháng định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TRF-01`). |
 | `note` | Ghi chú diễn giải mục đích điều chuyển tiền | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-TRF-01`). |
-| `feeAmount` | Số tiền chi phí chuyển tiền phát sinh do bên thứ ba thu | Số thập phân chính xác không âm ($\ge 0.00$ VNĐ), mặc định 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-03`, `ERR-FEE-001`). |
-| `feeCategoryId` | Mã định danh danh mục chi tiêu dùng để hạch toán phí chuyển tiền | Tùy chọn khi `feeAmount = 0.00 VNĐ`; bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`). Phải là danh mục cấp 3 đang hoạt động (`ACTIVE`) thuộc nhánh Chi tiêu (`EXPENSE`) (`BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-003`). |
+| `feeAmount` | Số tiền chi phí chuyển tiền phát sinh do bên thứ ba thu | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`), không âm ($\ge 0.00$ VNĐ) và mặc định 0.00 VNĐ (`BR-FIN-03`); trường hợp vi phạm, báo lỗi chi phí âm (`ERR-FEE-001`). |
+| `feeCategoryId` | Mã định danh danh mục chi tiêu dùng để hạch toán phí chuyển tiền | Tùy chọn khi `feeAmount = 0.00 VNĐ`; bắt buộc chọn khi `feeAmount > 0.00 VNĐ` (`BR-FIN-02`). Phải là danh mục cấp 3 đang hoạt động (`ACTIVE`) thuộc nhánh Chi tiêu (`EXPENSE`) (`BR-FIN-04`); trường hợp vi phạm, báo lỗi thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -388,19 +376,15 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)
-    alt Ví nguồn hoặc ví đích không tồn tại hoặc đang ở trạng thái lưu trữ (ARCHIVED)
-        System-->>User: Từ chối thao tác: Ví nguồn và ví đích phải tồn tại và đang hoạt động
-    else Ví nguồn trùng với ví đích (sourceWalletId == destinationWalletId)
-        System-->>User: Từ chối thao tác: Ví chuyển và ví nhận phải khác nhau (ERR-TRF-001)
-    else Dữ liệu số tiền sai định dạng (ERR-FIN-001) hoặc số tiền chuyển <= 0.00 VNĐ (ERR-TRF-002)
-        System-->>User: Từ chối thao tác: Số tiền chuyển phải là số dương hợp lệ lớn hơn 0
-    else Phí chuyển tiền âm (ERR-FEE-001), thiếu danh mục phí (ERR-FEE-002) hoặc danh mục phí sai loại (ERR-FEE-003)
-        System-->>User: Từ chối thao tác: Thông tin phí chuyển tiền hoặc danh mục phí không hợp lệ
-    else Số dư khả dụng của ví nguồn nhỏ hơn (amount + feeAmount)
-        System-->>User: Từ chối thao tác: Số dư ví nguồn không đủ để thực hiện chuyển tiền (ERR-WAL-001)
+    alt Ví nguồn hoặc ví đích không hoạt động hoặc trùng nhau
+        System-->>User: Từ chối thao tác: Ví chuyển và ví nhận không hợp lệ
+    else Số tiền chuyển hoặc thông tin chi phí không hợp lệ
+        System-->>User: Từ chối thao tác: Dữ liệu số tiền hoặc phí chuyển tiền sai quy định
+    else Ví nguồn không đủ số dư thanh toán
+        System-->>User: Từ chối thao tác: Số dư ví nguồn không đủ thực hiện chuyển tiền
     else Đủ điều kiện thực hiện chuyển tiền
-        Note over System: Ghi nhận đồng thời hai đầu ví (BR-FIN-03, All-or-Nothing):<br/>1. Tạo bản ghi TransferTransaction mới với mã transferId duy nhất<br/>2. Nếu feeAmount > 0.00 VNĐ: Tạo bản ghi TransactionFee (loại EXPENSE) gắn với ví nguồn<br/>3. Trừ (amount + feeAmount) khỏi số dư ví nguồn và cộng amount vào số dư ví đích
-        System-->>User: Phản hồi thành công (Thông tin chuyển tiền, phí đã trừ và số dư mới của hai ví)
+        Note over System: Tạo bản ghi chuyển tiền và bản ghi phí liên kết (nếu có)<br/>Trừ số dư ví nguồn và cộng số dư ví đích đồng thời
+        System-->>User: Phản hồi thành công (Thông tin chuyển tiền và số dư mới của hai ví)
     end
 ```
 
@@ -429,14 +413,14 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: filterTransfers(startDate, endDate, sourceWalletId, destinationWalletId)
-    alt Khoảng thời gian không hợp lệ (startDate > endDate)
-        System-->>User: Từ chối truy vấn: Ngày bắt đầu phải trước hoặc bằng ngày kết thúc
+    alt Khoảng thời gian tra cứu không hợp lệ
+        System-->>User: Từ chối truy vấn: Khoảng thời gian không hợp lệ
     else Tiêu chí lọc hợp lệ
-        Note over System: Truy vấn sổ giao dịch chuyển tiền theo các tiêu chí lọc kết hợp<br/>Đối chiếu chi phí chuyển tiền liên kết (TransactionFee) của từng giao dịch<br/>Sắp xếp kết quả theo ngày thực hiện giảm dần và tính tổng chi phí phát sinh
-        alt Sổ chuyển tiền rỗng hoặc không có bản ghi thỏa mãn
-            System-->>User: Phản hồi danh sách rỗng kèm thông báo chưa có giao dịch chuyển tiền phù hợp
-        else Có bản ghi chuyển tiền thỏa mãn
-            System-->>User: Phản hồi danh sách lịch sử chuyển tiền nội bộ và tổng chi phí phát sinh
+        Note over System: Lọc lịch sử chuyển tiền và chi phí liên kết theo bộ tiêu chí<br/>Sắp xếp theo ngày giảm dần và tổng hợp chi phí phát sinh
+        alt Không có bản ghi thỏa mãn
+            System-->>User: Phản hồi danh sách rỗng
+        else Có bản ghi thỏa mãn
+            System-->>User: Phản hồi danh sách lịch sử chuyển tiền và tổng chi phí
         end
     end
 ```
@@ -446,13 +430,13 @@ sequenceDiagram
 Người dùng yêu cầu xóa một giao dịch chuyển tiền nội bộ để khôi phục số dư hai ví về trạng thái trước khi chuyển. Hệ thống kiểm tra số dư khả dụng của ví đích (`BR-FIN-02`), xóa đồng thời bản ghi chuyển tiền cùng phí liên kết và hoàn nguyên số dư hai ví (`BR-FIN-03`).
 
 - Thao tác hệ thống: `deleteTransfer(transferId)`
-- Kết quả phản hồi: Hệ thống xóa vĩnh viễn bản ghi chuyển tiền (`TransferTransaction`) và bản ghi phí (`TransactionFee`) liên kết, hoàn nguyên đồng thời số dư hai ví (`BR-FIN-02`, `BR-FIN-03`) và phản hồi thông báo xóa thành công; trường hợp không tìm thấy giao dịch hoặc số dư hiện tại của ví đích nhỏ hơn số tiền cần thu hồi (`ERR-WAL-001`), hệ thống từ chối xóa và giữ nguyên dữ liệu hai ví.
+- Kết quả phản hồi: Hệ thống xóa vĩnh viễn bản ghi chuyển tiền (`TransferTransaction`) và bản ghi phí (`TransactionFee`) liên kết, hoàn nguyên đồng thời hai đầu ví (`BR-FIN-03`), tính lại số dư khả dụng (`BR-FIN-02`) và phản hồi thông báo xóa thành công; trường hợp vi phạm, hệ thống giữ nguyên dữ liệu hai ví và báo lỗi ví đích không đủ số dư để hoàn trả (`ERR-WAL-001`) hoặc từ chối khi không tìm thấy giao dịch.
 
 **Danh sách tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transferId` | Mã định danh của giao dịch chuyển tiền nội bộ cần xóa | Mã giao dịch chuyển tiền tồn tại trong hệ thống (`FR-TRF-02`). Số dư khả dụng hiện tại của ví đích phải lớn hơn hoặc bằng số tiền đã nhận (`amount`) để không làm âm ví đích khi thu hồi (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). |
+| `transferId` | Mã định danh của giao dịch chuyển tiền nội bộ cần xóa | Mã giao dịch chuyển tiền tồn tại trong hệ thống (`FR-TRF-02`). Khi hoàn nguyên đồng thời hai đầu ví (`BR-FIN-03`), số dư khả dụng hiện tại của ví đích phải lớn hơn hoặc bằng số tiền đã nhận (`amount`) để không làm âm ví đích (`BR-FIN-02`); trường hợp vi phạm, báo lỗi ví đích không đủ số dư để hoàn trả (`ERR-WAL-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -463,13 +447,13 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: deleteTransfer(transferId)
-    alt Không tìm thấy mã giao dịch chuyển tiền trong hệ thống
-        System-->>User: Từ chối thao tác: Không tìm thấy giao dịch chuyển tiền yêu cầu xóa
-    else Số dư khả dụng hiện tại của ví đích nhỏ hơn số tiền chuyển cần thu hồi
-        System-->>User: Từ chối thao tác: Số dư ví đích không đủ để hoàn trả khoản tiền chuyển (ERR-WAL-001)
-    else Ví đích đủ số dư để hoàn nguyên
-        Note over System: Thực thi hoàn nguyên đồng thời hai đầu ví (BR-FIN-03, All-or-Nothing):<br/>1. Xóa bản ghi TransferTransaction khỏi sổ chuyển tiền nội bộ<br/>2. Xóa bản ghi TransactionFee liên kết (nếu có) khỏi sổ giao dịch thu chi<br/>3. Tính lại số dư (BR-FIN-02): Cộng hoàn (amount + feeAmount) về ví nguồn, trừ amount khỏi ví đích
-        System-->>User: Phản hồi thành công (Đã xóa giao dịch chuyển tiền và khôi phục số dư hai ví)
+    alt Không tìm thấy giao dịch chuyển tiền
+        System-->>User: Từ chối thao tác: Giao dịch chuyển tiền không tồn tại
+    else Ví đích không đủ số dư để thu hồi tiền chuyển
+        System-->>User: Từ chối thao tác: Số dư ví đích không đủ để hoàn nguyên
+    else Ví đích đủ số dư hoàn nguyên
+        Note over System: Xóa bản ghi chuyển tiền và bản ghi phí liên kết (nếu có)<br/>Hoàn nguyên đồng thời số dư của ví nguồn và ví đích
+        System-->>User: Phản hồi thành công (Đã xóa chuyển tiền và khôi phục số dư hai ví)
     end
 ```
 
