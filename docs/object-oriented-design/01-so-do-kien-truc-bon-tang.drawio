@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net" modified="2026-10-29T13:15:00.000Z" agent="PFMS Architecture Specialist" version="24.0.0">
+  <diagram id="PFMS-Minimal-Architecture" name="PFMS Kiến Trúc Phân Tầng">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="10" value="SƠ ĐỒ KIẾN TRÚC PHÂN TẦNG — PFMS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=center;verticalAlign=middle;fontFamily=Segoe UI, Arial, sans-serif;fontStyle=1;fontSize=15;fontColor=#1A202C;" vertex="1" parent="1">
+          <mxGeometry x="75" y="12" width="700" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="100" value="TẦNG 1: TRÌNH DIỄN — com.pfms.cli" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F0F5FA;strokeColor=#2B6CB0;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=12;fontStyle=1;fontColor=#1A4971;" vertex="1" parent="1">
+          <mxGeometry x="75" y="50" width="700" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="101" value="&lt;b&gt;Điều Phối Giao Diện &amp;amp; Menu&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Tiếp nhận lệnh từ bàn phím&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="92" y="80" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="102" value="&lt;b&gt;Hiển Thị Dòng Lệnh &amp;amp; Bảng Biểu&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Kết xuất dữ liệu console&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="103" value="&lt;b&gt;Đối Tượng Truyền Dữ Liệu DTO&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Đóng gói tham số nhập xuất&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="548" y="80" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="200" value="TẦNG 2: DỊCH VỤ — com.pfms.service" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F0F9F4;strokeColor=#287D4A;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=12;fontStyle=1;fontColor=#1A5331;" vertex="1" parent="1">
+          <mxGeometry x="75" y="175" width="700" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="201" value="&lt;b&gt;Giao Diện Dịch Vụ&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Hợp đồng phương thức ca sử dụng&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#287D4A;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="92" y="205" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="202" value="&lt;b&gt;Dịch Vụ Điều Phối Ca Sử Dụng&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Quản lý giao dịch Ví, Thu Chi, Ngân Sách&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#287D4A;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="320" y="205" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="203" value="&lt;b&gt;Điều Phối Sự Kiện Miền&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Phát và lắng nghe cảnh báo&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#287D4A;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="548" y="205" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="300" value="TẦNG 3: NGHIỆP VỤ — com.pfms.domain" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FEF9EC;strokeColor=#B7791F;strokeWidth=2.2;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=12;fontStyle=1;fontColor=#744210;" vertex="1" parent="1">
+          <mxGeometry x="75" y="300" width="700" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="301" value="&lt;b&gt;Thực Thể Nghiệp Vụ&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#B7791F;font-size:9px;&quot;&gt;Ví, Giao Dịch, Ngân Sách, Danh Mục&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B7791F;strokeWidth=1.2;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="92" y="332" width="210" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="302" value="&lt;b&gt;Đối Tượng Giá Trị Bất Biến&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#B7791F;font-size:9px;&quot;&gt;Tiền Tệ, Khoảng Thời Gian&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B7791F;strokeWidth=1.2;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="320" y="332" width="210" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="303" value="&lt;b&gt;Giao Diện Kho Lưu Trữ&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#B7791F;font-size:9px;&quot;&gt;Hợp đồng truy xuất dữ liệu trừu tượng&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B7791F;strokeWidth=1.2;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="548" y="332" width="210" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="400" value="TẦNG 4: HẠ TẦNG — com.pfms.infrastructure" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FDF2F2;strokeColor=#C53030;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=12;fontStyle=1;fontColor=#822727;" vertex="1" parent="1">
+          <mxGeometry x="75" y="430" width="700" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="401" value="&lt;b&gt;Bộ Điều Hợp Lưu Trữ Tệp CSV&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#C53030;font-size:9px;&quot;&gt;Đọc ghi dữ liệu tệp cục bộ&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C53030;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="92" y="460" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="402" value="&lt;b&gt;Bộ Điều Hợp Bộ Nhớ Kiểm Thử&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#C53030;font-size:9px;&quot;&gt;Lưu trữ RAM phục vụ kiểm thử đơn vị&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C53030;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="320" y="460" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="403" value="&lt;b&gt;Cơ Chế Ghi Tệp An Toàn&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#C53030;font-size:9px;&quot;&gt;Ghi file tạm nguyên tử chống lỗi&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C53030;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">
+          <mxGeometry x="548" y="460" width="210" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="501" value="Gọi thực thi ca sử dụng (Truyền DTO)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1A73E8;strokeWidth=2.2;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=10;fontColor=#1A4971;fontStyle=1;" edge="1" parent="1" source="100" target="200">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="502" value="Ủy quyền thi hành quy tắc nghiệp vụ &amp;amp; Thao tác qua giao diện" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#287D4A;strokeWidth=2.2;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=10;fontColor=#1A5331;fontStyle=1;" edge="1" parent="1" source="200" target="300">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="601" value="Hiện thực hóa giao diện kho lưu trữ (Nghịch đảo phụ thuộc — DIP)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C53030;strokeWidth=2.5;dashed=1;endArrow=block;endFill=0;fontFamily=Segoe UI;fontSize=10;fontColor=#822727;fontStyle=1;" edge="1" parent="1" source="400" target="300">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="700" value="&lt;b&gt;QUY ƯỚC MŨI TÊN:&lt;/b&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;color:#1A73E8;&quot;&gt;───► &lt;b&gt;Mũi tên liền (Từ trên xuống):&lt;/b&gt; Luồng gọi thực thi hàm theo thời gian chạy&lt;/span&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;bull;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;color:#C53030;&quot;&gt;-- - ▷ &lt;b&gt;Mũi tên đứt tam giác rỗng (Từ dưới lên):&lt;/b&gt; Hiện thực hóa giao diện kho lưu trữ (Tầng Hạ tầng cài đặt giao diện của Tầng Nghiệp vụ)&lt;/span&gt;" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=9;fontColor=#4A5568;" vertex="1" parent="1">
+          <mxGeometry x="75" y="545" width="700" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
