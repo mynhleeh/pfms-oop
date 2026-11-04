@@ -61,10 +61,14 @@ Bảng dưới đây liệt kê những giới hạn kỹ thuật mà hệ thố
 | `CON-05` | Dữ liệu đầu vào phải tuân theo các giới hạn sau: tên ví, tên nhóm và tên danh mục dài từ 1 đến 50 ký tự. Mô tả ví, ghi chú giao dịch và lý do điều chỉnh số dư dài tối đa 255 ký tự (cho phép để trống). Số bản ghi mỗi trang nằm trong khoảng từ 10 đến 100 và mặc định là 50. |
 | `CON-06` | Bản sao lưu tự động phải được đặt tên theo định dạng `backup_YYYYMMDD_HHMMSS.json` và lưu trong thư mục riêng `backups/`. |
 
+Thiết kế hệ thống dựa trên các giả định sau đây về phạm vi người dùng, phiên làm việc và nguồn gốc của tệp sao lưu:
+
 | Mã giả định | Nội dung |
 | :---: | :--- |
 | `AS-01` | Hệ thống giả định chỉ có một Người dùng và một phiên làm việc đơn tiến trình duy nhất. Phiên này truy cập vào tệp dữ liệu tại một thời điểm trên ứng dụng máy tính để bàn cục bộ. |
 | `AS-02` | Hệ thống giả định tệp sao lưu do chính hệ thống tạo ra và không bị chỉnh sửa bên ngoài hệ thống. Vì vậy khi nhập tệp, Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`) không được kiểm tra lại. Tệp hỏng hoặc sai loại vẫn bị từ chối theo quy trình kiểm tra của Phục hồi dữ liệu hệ thống từ bản sao lưu (`FR-DAT-02`). |
+
+Hệ thống cần các thành phần bên ngoài sau đây của máy tính để vận hành đúng, cụ thể là nguồn thời gian và khả năng đọc, ghi tệp tin cục bộ:
 
 | Mã phụ thuộc | Thành phần | Vai trò |
 | --- | --- | --- |

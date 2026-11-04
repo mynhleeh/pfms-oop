@@ -1,6 +1,6 @@
 ## 3. QUY TẮC NGHIỆP VỤ VÀ QUY ĐỊNH TÀI CHÍNH
 
-Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán (Problem Domain Policies) và bảo vệ tính toàn vẹn của 3 mục tiêu hệ thống tại Mục 2.2: Ghi nhận dòng tiền và cấu trúc danh mục phân cấp (`G-01`), Xác định tổng số dư và cơ cấu phân bổ ví (`G-02`), Bảo đảm độ chính xác số học tài chính (`G-03`). Toàn bộ yêu cầu chức năng tại Mục 4 và ca sử dụng tại Mục 6 phải tuân thủ các quy tắc này.
+Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán (Problem Domain Policies) và bảo vệ tính toàn vẹn của mục tiêu hệ thống: Ghi nhận dòng tiền và cấu trúc danh mục phân cấp (`G-01`), Xác định tổng số dư và cơ cấu phân bổ ví (`G-02`), Bảo đảm độ chính xác số học tài chính (`G-03`). 
 
 Mỗi quy tắc nghiệp vụ được đặc tả nhất quán theo khuôn mẫu:
 1. Tên và mã quy tắc: cú pháp `<Tên quy tắc> (BR-<DOMAIN>-NN)`, phân loại theo miền nghiệp vụ tài chính (`BR-FIN`) hoặc miền định danh (`BR-NAM`).
@@ -37,10 +37,10 @@ Quy tắc áp dụng cho mọi thực thể dữ liệu, phép tính toán số 
 
 #### Lỗi vi phạm
 
-| Tên lỗi (mã lỗi) | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
-| :--- | :--- | :--- | :--- |
-| Lỗi định dạng số học (`ERR-FIN-001`) | Dữ liệu đầu vào sai định dạng số học hoặc chứa ký tự không hợp lệ | Từ chối xử lý dữ liệu đầu vào | "Dữ liệu số tiền không đúng định dạng số học hợp lệ." |
-| Lỗi phép chia thiếu quy tắc làm tròn (`ERR-FIN-002`) | Phép toán chia không xác định quy tắc làm tròn gây số thập phân vô hạn | Hủy giao dịch hiện tại và ghi nhật ký cảnh báo | "Lỗi số học: Phép toán chia không xác định quy tắc làm tròn." |
+| Mã lỗi | Tên lỗi | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
+| :--- | :--- | :--- | :--- | :--- |
+| `ERR-FIN-001` | Lỗi định dạng số học | Dữ liệu đầu vào sai định dạng số học hoặc chứa ký tự không hợp lệ | Từ chối xử lý dữ liệu đầu vào | "Dữ liệu số tiền không đúng định dạng số học hợp lệ." |
+| `ERR-FIN-002` | Lỗi phép chia thiếu quy tắc làm tròn | Phép toán chia không xác định quy tắc làm tròn gây số thập phân vô hạn | Hủy giao dịch hiện tại và ghi nhật ký cảnh báo | "Lỗi số học: Phép toán chia không xác định quy tắc làm tròn." |
 
 ### 3.2 Quy tắc bảo toàn số dư ví (`BR-FIN-02`)
 
@@ -48,31 +48,31 @@ Quy tắc áp dụng cho thực thể ví và toàn bộ các dòng tiền đế
 
 #### Nội dung quy tắc
 
-1. Công thức số dư tính lại từ lịch sử dòng tiền: xét ví $w$ tại thời điểm quan sát $T$. Số dư khả dụng $WalletBalance_w(T)$ được xác định duy nhất bằng tổng các dòng tiền vào trừ tổng các dòng tiền ra có đến thời điểm $T$. Ví mới tạo có số dư 0.00 VNĐ, nên số dư hiện có của ví chỉ hình thành qua giao dịch thu chi, chuyển tiền nội bộ hoặc khoản điều chỉnh số dư:
+1. Công thức số dư tính lại từ lịch sử dòng tiền: xét ví $w$ tại thời điểm quan sát $T$. Số dư khả dụng $\text{WalletBalance}_w(T)$ được xác định duy nhất bằng tổng các dòng tiền vào trừ tổng các dòng tiền ra có đến thời điểm $T$. Ví mới tạo có số dư 0.00 VNĐ, nên số dư hiện có của ví chỉ hình thành qua giao dịch thu chi, chuyển tiền nội bộ hoặc khoản điều chỉnh số dư:
 
 $$
-WalletBalance_w(T) = \sum_{t \le T} \text{Inflow}_w(t) - \sum_{t \le T} \text{Outflow}_w(t)
+\text{WalletBalance}_w(T) = \sum_{t \le T} \text{Inflow}_w(t) - \sum_{t \le T} \text{Outflow}_w(t)
 $$
 
 Trong đó:
 
 $$
-\text{Inflow}_w(t) = Income_w(t) + TransferIn_w(t) + \max(0, Adjustment_w(t))
+\text{Inflow}_w(t) = \text{Income}_w(t) + \text{TransferIn}_w(t) + \max\bigl(0, \text{Adjustment}_w(t)\bigr)
 $$
 
 $$
-\text{Outflow}_w(t) = Expense_w(t) + TransferOut_w(t) + \max(0, -Adjustment_w(t))
+\text{Outflow}_w(t) = \text{Expense}_w(t) + \text{TransferOut}_w(t) + \max\bigl(0, -\text{Adjustment}_w(t)\bigr)
 $$
 
 Mỗi số hạng trong công thức được xác định như sau:
 
 | Số hạng | Loại dòng tiền | Dấu | Ý nghĩa |
 | --- | --- | --- | --- |
-| $Income_w(t)$ | Thu nhập | + | Khoản thu nhập được ghi trực tiếp vào ví $w$ bằng giao dịch thu nhập theo Tạo mới giao dịch thu nhập (`FR-TXN-01`) |
-| $Expense_w(t)$ | Chi tiêu | − | Khoản chi tiêu chi trả trực tiếp từ ví $w$, kể cả phí giao dịch theo Tạo mới giao dịch chi tiêu (`FR-TXN-02`) |
-| $TransferIn_w(t)$ | Nhận chuyển tiền | + | Khoản tiền nhận được do chuyển từ ví khác vào ví $w$ theo Chuyển tiền giữa hai ví nội bộ, kèm chi phí tùy chọn (`FR-TRF-01`) |
-| $TransferOut_w(t)$ | Chuyển tiền đi | − | Khoản tiền chuyển từ ví $w$ sang ví khác theo Chuyển tiền giữa hai ví nội bộ, kèm chi phí tùy chọn (`FR-TRF-01`) |
-| $Adjustment_w(t)$ | Khoản điều chỉnh số dư | +/− | Chênh lệch từ khoản điều chỉnh số dư theo Điều chỉnh số dư ví (`FR-WAL-05`), không thuộc luồng thu, chi hoặc chuyển tiền nào |
+| $\text{Income}_w(t)$ | Thu nhập | + | Khoản thu nhập được ghi trực tiếp vào ví $w$ bằng giao dịch thu nhập theo Tạo mới giao dịch thu nhập (`FR-TXN-01`) |
+| $\text{Expense}_w(t)$ | Chi tiêu | − | Khoản chi tiêu chi trả trực tiếp từ ví $w$, kể cả phí giao dịch theo Tạo mới giao dịch chi tiêu (`FR-TXN-02`) |
+| $\text{TransferIn}_w(t)$ | Nhận chuyển tiền | + | Khoản tiền nhận được do chuyển từ ví khác vào ví $w$ theo Chuyển tiền giữa hai ví nội bộ, kèm chi phí tùy chọn (`FR-TRF-01`) |
+| $\text{TransferOut}_w(t)$ | Chuyển tiền đi | − | Khoản tiền chuyển từ ví $w$ sang ví khác theo Chuyển tiền giữa hai ví nội bộ, kèm chi phí tùy chọn (`FR-TRF-01`) |
+| $\text{Adjustment}_w(t)$ | Khoản điều chỉnh số dư | +/− | Chênh lệch từ khoản điều chỉnh số dư theo Điều chỉnh số dư ví (`FR-WAL-05`), không thuộc luồng thu, chi hoặc chuyển tiền nào |
 
 2. Điều kiện về số dư khả dụng:
    - Đối với mọi ví: số dư khả dụng tại thời điểm hiện tại luôn không âm (lớn hơn hoặc bằng 0.00 VNĐ).
@@ -92,13 +92,12 @@ Mỗi số hạng trong công thức được xác định như sau:
 | Kiểm tra tiền điều kiện | Trước khi thực hiện thao tác làm giảm số dư ví (chi tiêu, chuyển đi, điều chỉnh giảm, ghi chi phí, xóa hoặc sửa giao dịch dẫn tới giảm số dư ví), hệ thống phải kiểm tra số dư khả dụng. Thao tác bị từ chối theo Lỗi số dư ví không đủ (`ERR-WAL-001`) nếu số dư không đủ. |
 
 #### Lỗi vi phạm
-
-| Tên lỗi (mã lỗi) | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
-| :--- | :--- | :--- | :--- |
-| Lỗi số dư ví không đủ (`ERR-WAL-001`) | Giao dịch làm số dư ví âm hoặc không đủ thanh toán số tiền và chi phí | Từ chối thực hiện giao dịch, giữ nguyên trạng thái số dư | "Giao dịch bị từ chối: Số dư ví không đủ để thực hiện thao tác." |
-| Lỗi chi phí không hợp lệ (`ERR-FEE-001`) | Chi phí giao dịch nhỏ hơn 0 | Từ chối giao dịch | "Chi phí không hợp lệ." |
-| Lỗi thiếu danh mục phí giao dịch (`ERR-FEE-002`) | Chi phí lớn hơn 0 nhưng chưa chọn danh mục cho phí giao dịch | Từ chối tiếp nhận giao dịch | "Vui lòng chọn danh mục cho phí giao dịch." |
-| Lỗi danh mục phí không hợp lệ (`ERR-FEE-003`) | Danh mục phí đã bị xóa hoặc không thuộc loại thu chi chi tiêu (`EXPENSE`) | Từ chối thực hiện giao dịch | "Danh mục phí không hợp lệ hoặc không tương thích với loại chi tiêu." |
+| Mã lỗi | Tên lỗi | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
+| :--- | :--- | :--- | :--- | :--- |
+| `ERR-WAL-001` | Lỗi số dư ví không đủ | Giao dịch làm số dư ví âm hoặc không đủ thanh toán số tiền và chi phí | Từ chối thực hiện giao dịch, giữ nguyên trạng thái số dư | "Giao dịch bị từ chối: Số dư ví không đủ để thực hiện thao tác." |
+| `ERR-FEE-001` | Lỗi chi phí không hợp lệ | Chi phí giao dịch nhỏ hơn 0 | Từ chối giao dịch | "Chi phí không hợp lệ." |
+| `ERR-FEE-002` | Lỗi thiếu danh mục phí giao dịch | Chi phí lớn hơn 0 nhưng chưa chọn danh mục cho phí giao dịch | Từ chối tiếp nhận giao dịch | "Vui lòng chọn danh mục cho phí giao dịch." |
+| `ERR-FEE-003` | Lỗi danh mục phí không hợp lệ | Danh mục phí đã bị xóa hoặc không thuộc loại thu chi chi tiêu (`EXPENSE`) | Từ chối thực hiện giao dịch | "Danh mục phí không hợp lệ hoặc không tương thích với loại chi tiêu." |
 
 ### 3.3 Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`)
 
@@ -107,18 +106,36 @@ Quy tắc áp dụng cho thực thể giao dịch chuyển tiền, cặp thực 
 #### Nội dung quy tắc
 
 1. Cặp khoản ghi: với một giao dịch chuyển tiền từ ví nguồn tới ví đích với số tiền chuyển lớn hơn 0:
-   - Ví nguồn giảm số tiền chuyển: số dư ví nguồn sau chuyển tiền bằng số dư trước chuyển trừ số tiền chuyển ($WalletBalance_{w_{src}}(\text{sau}) = WalletBalance_{w_{src}}(\text{trước}) - A$).
-   - Ví đích tăng số tiền chuyển: số dư ví đích sau chuyển tiền bằng số dư trước chuyển cộng số tiền chuyển ($WalletBalance_{w_{dst}}(\text{sau}) = WalletBalance_{w_{dst}}(\text{trước}) + A$).
+   - Ví nguồn giảm số tiền chuyển: số dư ví nguồn sau chuyển tiền bằng số dư trước chuyển trừ số tiền chuyển:
+
+     $$
+     \text{WalletBalance}_{w_{\text{src}}}(\text{sau}) = \text{WalletBalance}_{w_{\text{src}}}(\text{trước}) - A
+     $$
+
+   - Ví đích tăng số tiền chuyển: số dư ví đích sau chuyển tiền bằng số dư trước chuyển cộng số tiền chuyển:
+
+     $$
+     \text{WalletBalance}_{w_{\text{dst}}}(\text{sau}) = \text{WalletBalance}_{w_{\text{dst}}}(\text{trước}) + A
+     $$
+
 2. Giữ nguyên tổng số dư trong các ví: trước khi tính chi phí, tổng số dư trên toàn bộ các ví trước và sau chuyển tiền luôn không đổi:
+
    $$
-   \sum_{w \in Wallets} WalletBalance_w(\text{sau}) = \sum_{w \in Wallets} WalletBalance_w(\text{trước})
+   \sum_{w \in \text{Wallets}} \text{WalletBalance}_w(\text{sau}) = \sum_{w \in \text{Wallets}} \text{WalletBalance}_w(\text{trước})
    $$
+
 3. Ghi nhận phí giao dịch độc lập: khi có phí chuyển tiền (chi phí lớn hơn hoặc bằng 0) do bên thứ ba thu:
    - Số tiền trừ ví nguồn bằng số tiền chuyển cộng chi phí.
    - Số tiền cộng ví đích bằng số tiền chuyển.
    - Chi phí chuyển tiền được ghi nhận thành một phí giao dịch độc lập (loại `EXPENSE`) từ ví nguồn:
-     $$WalletBalance_{w_{src}}(\text{sau}) = WalletBalance_{w_{src}}(\text{trước}) - (A + Fee)$$
-     $$\sum_{w \in Wallets} WalletBalance_w(\text{sau}) = \sum_{w \in Wallets} WalletBalance_w(\text{trước}) - Fee$$
+
+     $$
+     \text{WalletBalance}_{w_{\text{src}}}(\text{sau}) = \text{WalletBalance}_{w_{\text{src}}}(\text{trước}) - (A + \text{Fee})
+     $$
+
+     $$
+     \sum_{w \in \text{Wallets}} \text{WalletBalance}_w(\text{sau}) = \sum_{w \in \text{Wallets}} \text{WalletBalance}_w(\text{trước}) - \text{Fee}
+     $$
 
 #### Quy định xử lý
 
@@ -131,11 +148,10 @@ Quy tắc áp dụng cho thực thể giao dịch chuyển tiền, cặp thực 
 | Quy tắc xóa chuyển tiền | Khi xóa chuyển tiền, hệ thống xóa bản ghi chuyển tiền khỏi sổ giao dịch chuyển tiền, xóa phí giao dịch liên kết (nếu có) khỏi sổ giao dịch thu chi, hoàn số tiền chuyển cộng chi phí về ví nguồn và trừ số tiền chuyển khỏi ví đích. Cả hai ví được tính lại số dư theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`) từ các giao dịch đang tồn tại. Hệ thống từ chối xóa theo Lỗi số dư ví không đủ (`ERR-WAL-001`) nếu số dư ví đích nhỏ hơn số tiền chuyển. |
 
 #### Lỗi vi phạm
-
-| Tên lỗi (mã lỗi) | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
-| :--- | :--- | :--- | :--- |
-| Lỗi ví nguồn trùng ví đích (`ERR-TRF-001`) | Ví nguồn trùng với ví đích | Từ chối thực hiện giao dịch | "Giao dịch không hợp lệ: Ví chuyển và ví nhận phải khác nhau." |
-| Lỗi số tiền chuyển không hợp lệ (`ERR-TRF-002`) | Số tiền chuyển nhỏ hơn hoặc bằng 0 | Từ chối thực hiện giao dịch | "Số tiền chuyển phải là một số dương lớn hơn 0." |
+| Mã lỗi | Tên lỗi | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
+| :--- | :--- | :--- | :--- | :--- |
+| `ERR-TRF-001` | Lỗi ví nguồn trùng ví đích | Ví nguồn trùng với ví đích | Từ chối thực hiện giao dịch | "Giao dịch không hợp lệ: Ví chuyển và ví nhận phải khác nhau." |
+| `ERR-TRF-002` | Lỗi số tiền chuyển không hợp lệ | Số tiền chuyển nhỏ hơn hoặc bằng 0 | Từ chối thực hiện giao dịch | "Số tiền chuyển phải là một số dư­ơng lớn hơn 0." |
 
 ### 3.4 Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`)
 
@@ -207,11 +223,10 @@ Bảng phạm vi duy nhất của tên:
 | Dữ liệu khi bị từ chối | Hệ thống không tạo, không đổi tên, không chuyển nhóm và không khôi phục. Dữ liệu giữ nguyên. |
 
 #### Lỗi vi phạm
-
-| Tên lỗi (mã lỗi) | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
-| :--- | :--- | :--- | :--- |
-| Lỗi định dạng tên (`ERR-NAM-001`) | Tên rỗng sau khi cắt khoảng trắng ở hai đầu, hoặc dài hơn 50 ký tự | Từ chối thao tác | "Tên phải có từ 1 đến 50 ký tự, không tính khoảng trắng ở hai đầu." |
-| Lỗi trùng tên (`ERR-NAM-002`) | Tên trùng một mục khác trong cùng phạm vi duy nhất | Từ chối thao tác | Theo bảng thông điệp ngay dưới đây |
+| Mã lỗi | Tên lỗi | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
+| :--- | :--- | :--- | :--- | :--- |
+| `ERR-NAM-001` | Lỗi định dạng tên | Tên rỗng sau khi cắt khoảng trắng ở hai đầu, hoặc dài hơn 50 ký tự | Từ chối thao tác | "Tên phải có từ 1 đến 50 ký tự, không tính khoảng trắng ở hai đầu." |
+| `ERR-NAM-002` | Lỗi trùng tên | Tên trùng một mục khác trong cùng phạm vi duy nhất | Từ chối thao tác | Theo bảng thông điệp ngay dưới đây |
 
 Thông điệp của Lỗi trùng tên (`ERR-NAM-002`) theo đối tượng và thao tác:
 

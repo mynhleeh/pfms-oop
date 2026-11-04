@@ -1,13 +1,13 @@
 ## 4. YÊU CẦU CHỨC NĂNG CHI TIẾT
 
-Hệ thống Quản lý Tài chính Cá nhân gồm 20 yêu cầu chức năng, hiện thực hóa 3 mục tiêu hệ thống (G-01, G-02, G-03) và tuân thủ các quy tắc nghiệp vụ: độ chính xác tài chính (`BR-FIN-01`), bảo toàn số dư ví (`BR-FIN-02`), ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và tên của ví, nhóm nhu cầu, danh mục (`BR-NAM-01`). Mô tả bài toán nghiệp vụ (WHAT), tách biệt khỏi công nghệ lưu trữ và ngôn ngữ lập trình (HOW).
+Hệ thống Quản lý Tài chính Cá nhân gồm các yêu cầu chức năng, hiện thực hóa mục tiêu hệ thống (G-01, G-02, G-03) và tuân thủ các quy tắc nghiệp vụ: độ chính xác tài chính (`BR-FIN-01`), bảo toàn số dư ví (`BR-FIN-02`), ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và tên của ví, nhóm nhu cầu, danh mục (`BR-NAM-01`).
 
-Mỗi yêu cầu chức năng được đặc tả theo khuôn mẫu 6 khối:
+Mỗi yêu cầu chức năng được đặc tả theo khuôn mẫu:
 
-1. Bảng thuộc tính yêu cầu: mục tiêu hệ thống phục vụ, ca sử dụng tương ứng tại Mục 6 theo cú pháp `UC-<DOMAIN>-NN`, quy tắc nghiệp vụ chi phối tại Mục 3 và mức độ ưu tiên theo RFC 2119 (quy ước tại Mục 1.6: `MUST`, `SHOULD`, `MAY`).
+1. Bảng thuộc tính yêu cầu: mục tiêu hệ thống phục vụ, ca sử dụng tương ứng theo cú pháp `UC-<DOMAIN>-NN`, quy tắc nghiệp vụ chi phối (`MUST`, `SHOULD`, `MAY`).
 2. Điều kiện tiền đề: trạng thái hệ thống và dữ liệu cần có trước khi kích hoạt.
 3. Dữ liệu đầu vào: tham số, kiểu dữ liệu, ràng buộc giá trị và tính bắt buộc.
-4. Quy tắc xử lý: các bước xử lý tuần tự, kiểm tra hợp lệ và mã lỗi tương ứng tại Mục 3 (`ERR-*`).
+4. Quy tắc xử lý: các bước xử lý tuần tự, kiểm tra hợp lệ và mã lỗi tương ứng (`ERR-*`).
 5. Dữ liệu đầu ra và bất biến: kết quả ghi nhận, thông điệp phản hồi và bất biến tài chính sau xử lý.
 6. Tiêu chí nghiệm thu: kịch bản Given-When-Then kèm mã `AC-FR-xxx-yy`.
 
@@ -15,13 +15,13 @@ Mỗi yêu cầu chức năng được đặc tả theo khuôn mẫu 6 khối:
 
 - Tên nhóm nhu cầu và danh mục trong tiêu chí nghiệm thu là dữ liệu giả lập, không phải quy định cứng; khi kiểm thử thay bằng nhóm và danh mục thực tế trong cấu hình triển khai.
 - Các FR gắn nhãn chỉ truy vấn, không làm thay đổi số dư ví hay bất kỳ bản ghi nào, nên không nhắc lại bất biến này ở từng FR.
-- Quy tắc nghiệp vụ được viện dẫn bằng mã; tên đầy đủ xem Mục 3. Mọi số tiền dùng số thập phân chính xác, làm tròn ngân hàng, hiển thị 2 chữ số thập phân (`BR-FIN-01`). Thao tác ghi nhiều bước là nguyên tử: cùng thành công hoặc cùng hủy.
+- Quy tắc nghiệp vụ được viện dẫn bằng mã, tên đầy đủ. Mọi số tiền dùng số thập phân chính xác, làm tròn ngân hàng, hiển thị 2 chữ số thập phân (`BR-FIN-01`). Thao tác ghi nhiều bước là nguyên tử: cùng thành công hoặc cùng hủy.
 - **Quy tắc phí giao dịch (FEE)**, dùng chung cho (`FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TRF-01`):
   - Chi phí nhỏ hơn 0: từ chối, `ERR-FEE-001`. Chi phí mặc định 0.00 VNĐ.
   - Chi phí lớn hơn 0 bắt buộc có danh mục phí: thiếu thì (`ERR-FEE-002`); danh mục đã xóa hoặc không thuộc nhánh Chi tiêu (`EXPENSE`) thì (`ERR-FEE-003`). Chi phí bằng 0 không cần danh mục phí.
   - Chi phí lớn hơn 0 sinh một bản ghi phí loại chi tiêu, số tiền bằng đúng chi phí, liên kết với giao dịch gốc (hoặc giao dịch chuyển tiền) và ghi đồng thời với giao dịch gốc.
 
-Bảng chia 20 yêu cầu chức năng theo 6 nhóm chức năng:
+Bảng chia các yêu cầu chức năng theo 6 nhóm chức năng:
 
 | STT | Nhóm chức năng | Mã nhóm | Số lượng FR |
 | :-: | :-- | :-: | :-: |
@@ -39,7 +39,7 @@ Quản lý các ví (tài khoản và nguồn tiền dùng ngay) của Người 
 
 #### 4.1.1 FR-WAL-01: Tạo ví mới
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Tạo mới ví (FR-WAL-01), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -83,7 +83,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.1.2 FR-WAL-02: Xem danh sách và chi tiết số dư tính lại từ lịch sử dòng tiền
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Xem danh sách ví (FR-WAL-02), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -125,7 +125,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.1.3 FR-WAL-03: Cập nhật thông tin ví
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Cập nhật thông tin ví (FR-WAL-03), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên.
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -171,7 +171,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.1.4 FR-WAL-04: Thống kê cơ cấu số dư theo ví
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Thống kê cơ cấu số dư theo ví (FR-WAL-04), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -214,7 +214,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.1.5 FR-WAL-05: Điều chỉnh số dư ví
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Điều chỉnh số dư ví (FR-WAL-05), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -263,11 +263,11 @@ Tiêu chí nghiệm thu:
 
 ### 4.2 FR-TXN: Nhóm chức năng Ghi nhận thu chi
 
-Quản lý sổ giao dịch thu chi hằng ngày, gắn biến động số dư với danh mục 3 cấp. Mọi giao dịch chỉ liên kết với danh mục chi tiết cấp 3 đang dùng (`BR-FIN-04`). Quy tắc phí xem mục FEE ở phần Quy ước chung.
+Quản lý sổ giao dịch thu chi hằng ngày, gắn biến động số dư với danh mục 3 cấp. Mọi giao dịch chỉ liên kết với danh mục chi tiết cấp 3 đang dùng (`BR-FIN-04`). Quy tắc phí giao dịch FEE
 
 #### 4.2.1 FR-TXN-01: Tạo mới giao dịch thu nhập
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Tạo mới giao dịch thu nhập (FR-TXN-01), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -288,8 +288,8 @@ Dữ liệu đầu vào:
 | Số tiền thu nhập | Số tiền (`VNĐ`) | Lớn hơn 0, 2 chữ số thập phân (`BR-FIN-01`) | Bắt buộc |
 | Mã định danh ví | Chuỗi ký tự | Ví `ACTIVE` | Bắt buộc |
 | Mã định danh danh mục | Chuỗi ký tự | Danh mục chi tiết đang dùng, thuộc nhánh `INCOME` (`BR-FIN-04`) | Bắt buộc |
-| Chi phí giao dịch | Số tiền (`VNĐ`) | Không âm, mặc định 0.00 VNĐ (xem FEE) | Tùy chọn |
-| Mã định danh danh mục phí | Chuỗi ký tự | Danh mục `EXPENSE` đang dùng (xem FEE) | Bắt buộc khi chi phí lớn hơn 0 |
+| Chi phí giao dịch | Số tiền (`VNĐ`) | Không âm, mặc định 0.00 VNĐ | Tùy chọn |
+| Mã định danh danh mục phí | Chuỗi ký tự | Danh mục `EXPENSE` đang dùng | Bắt buộc khi chi phí lớn hơn 0 |
 | Ghi chú mô tả | Chuỗi ký tự | Tối đa 255 ký tự | Tùy chọn |
 
 Quy tắc xử lý:
@@ -297,9 +297,9 @@ Quy tắc xử lý:
 1. Số tiền sai định dạng hoặc chứa ký tự không hợp lệ: `ERR-FIN-001`; số tiền nhỏ hơn hoặc bằng 0: từ chối.
 2. Ví không tồn tại hoặc `ARCHIVED`: từ chối, báo lỗi ví không hoạt động.
 3. Danh mục không thuộc `INCOME`, đã xóa, hoặc không phải danh mục chi tiết đang dùng: từ chối.
-4. Kiểm tra phí theo FEE (`ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`).
+4. Kiểm tra phí theo quy tắc phí giao dịch (FEE) (`ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`).
 5. Khi chi phí lớn hơn 0: số dư ví trước giao dịch cộng thu nhập trừ chi phí phải lớn hơn hoặc bằng 0 (`BR-FIN-02`); nếu không, từ chối toàn bộ, `ERR-WAL-001`.
-6. Tạo bản ghi thu nhập (mã duy nhất, tự liên kết nhóm danh mục từ danh mục chi tiết); tạo bản ghi phí liên kết theo FEE nếu có.
+6. Tạo bản ghi thu nhập (mã duy nhất, tự liên kết nhóm danh mục từ danh mục chi tiết); tạo bản ghi phí liên kết theo quy tắc phí giao dịch (FEE).
 7. Cập nhật số dư ví: cộng thu nhập, trừ chi phí (`BR-FIN-02`).
 
 Dữ liệu đầu ra và bất biến hệ thống:
@@ -319,7 +319,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.2.2 FR-TXN-02: Tạo mới giao dịch chi tiêu
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Tạo mới giao dịch chi tiêu (FR-TXN-02), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -339,9 +339,9 @@ Quy tắc xử lý:
 1. Số tiền sai định dạng: `ERR-FIN-001`; số tiền nhỏ hơn hoặc bằng 0: từ chối.
 2. Ví không tồn tại hoặc `ARCHIVED`: từ chối, báo lỗi ví không hoạt động.
 3. Danh mục không thuộc `EXPENSE`, đã xóa, hoặc không phải danh mục chi tiết đang dùng: từ chối.
-4. Kiểm tra phí theo FEE.
+4. Kiểm tra phí theo quy tắc phí giao dịch (FEE).
 5. Số dư khả dụng của ví phải lớn hơn hoặc bằng tổng số tiền chi và chi phí (`BR-FIN-02`); nếu không, từ chối toàn bộ, `ERR-WAL-001`.
-6. Tạo bản ghi chi tiêu (mã duy nhất, loại `EXPENSE`, tự liên kết nhóm danh mục); tạo bản ghi phí liên kết theo FEE nếu có.
+6. Tạo bản ghi chi tiêu (mã duy nhất, loại `EXPENSE`, tự liên kết nhóm danh mục); tạo bản ghi phí liên kết theo quy tắc phí giao dịch (FEE).
 7. Trừ tổng số tiền chi và chi phí khỏi số dư ví (`BR-FIN-02`).
 
 Dữ liệu đầu ra và bất biến hệ thống:
@@ -361,7 +361,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.2.3 FR-TXN-03: Tra cứu và lọc lịch sử giao dịch thu chi
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Tra cứu và lọc lịch sử giao dịch thu chi (FR-TXN-03), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -408,7 +408,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.2.4 FR-TXN-04: Chỉnh sửa giao dịch thu chi
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Chỉnh sửa giao dịch thu chi (FR-TXN-04), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -440,7 +440,7 @@ Quy tắc xử lý:
 2. Loại giao dịch (`INCOME` hoặc `EXPENSE`) không đổi. Danh mục mới phải cùng loại (`BR-FIN-04`); giữ danh mục cũ được phép dù đã xóa, đổi sang danh mục khác thì danh mục mới phải đang hoạt động.
 3. Hoàn nguyên ví cũ (`BR-FIN-02`): giao dịch `INCOME` thì trừ thu nhập cũ và hoàn chi phí cũ vào ví cũ (số dư âm thì từ chối, `ERR-WAL-001`); giao dịch `EXPENSE` thì hoàn số tiền chi cũ và chi phí cũ.
 4. Áp dụng lên ví mới trên số dư sau hoàn nguyên, kể cả khi ví mới trùng ví cũ: `INCOME` thì cộng số tiền mới, trừ chi phí mới, số dư sau không âm; `EXPENSE` thì số dư phải đủ trừ số tiền mới và chi phí mới. Không đủ: `ERR-WAL-001`.
-5. Xử lý phí liên kết theo FEE: chi phí mới bằng 0 thì xóa bản ghi phí hiện có; lớn hơn 0 và chưa có phí thì tạo mới; cả hai lớn hơn 0 thì cập nhật số tiền và danh mục phí.
+5. Xử lý phí liên kết theo quy tắc phí giao dịch (FEE): chi phí mới bằng 0 thì xóa bản ghi phí hiện có; lớn hơn 0 và chưa có phí thì tạo mới; cả hai lớn hơn 0 thì cập nhật số tiền và danh mục phí.
 6. Cập nhật giao dịch, phí liên kết và số dư ví là một thao tác nguyên tử; lỗi ở bất kỳ bước nào thì hủy toàn bộ.
 
 Dữ liệu đầu ra và bất biến hệ thống:
@@ -460,7 +460,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.2.5 FR-TXN-05: Xóa giao dịch thu chi
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Xóa giao dịch thu chi (FR-TXN-05), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -509,7 +509,7 @@ Chuyển tiền giữa các ví của cùng Người dùng theo cơ chế ghi nh
 
 #### 4.3.1 FR-TRF-01: Chuyển tiền giữa hai ví nội bộ, kèm chi phí tùy chọn
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Chuyển tiền giữa hai ví nội bộ, kèm chi phí tùy chọn (FR-TRF-01), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -530,15 +530,15 @@ Dữ liệu đầu vào:
 | Mã định danh ví đích | Chuỗi ký tự | Ví `ACTIVE`, khác ví nguồn (`BR-FIN-03`) | Bắt buộc |
 | Số tiền chuyển | Số tiền (`VNĐ`) | Lớn hơn 0, 2 chữ số thập phân | Bắt buộc |
 | Ngày giao dịch | Ngày tháng (`YYYY-MM-DD`) | Không vượt quá ngày hiện tại; mặc định ngày hiện tại | Bắt buộc |
-| Chi phí giao dịch | Số tiền (`VNĐ`) | Không âm, mặc định 0.00 VNĐ (xem FEE) | Tùy chọn |
-| Mã định danh danh mục phí | Chuỗi ký tự | Danh mục `EXPENSE` đang dùng (xem FEE) | Bắt buộc khi chi phí lớn hơn 0 |
+| Chi phí giao dịch | Số tiền (`VNĐ`) | Không âm, mặc định 0.00 VNĐ | Tùy chọn |
+| Mã định danh danh mục phí | Chuỗi ký tự | Danh mục `EXPENSE` đang dùng quy tắc phí giao dịch (FEE) | Bắt buộc khi chi phí lớn hơn 0 |
 | Ghi chú mô tả | Chuỗi ký tự | Tối đa 255 ký tự | Tùy chọn |
 
 Quy tắc xử lý:
 
 1. Sai định dạng số: `ERR-FIN-001`. Số tiền chuyển nhỏ hơn hoặc bằng 0: `ERR-TRF-002`. Chi phí âm: `ERR-FEE-001`.
 2. Một trong hai ví không `ACTIVE`: từ chối. Ví đích trùng ví nguồn: `ERR-TRF-001`.
-3. Kiểm tra danh mục phí theo FEE (`ERR-FEE-002`, `ERR-FEE-003`).
+3. Kiểm tra danh mục phí theo quy tắc phí giao dịch (FEE) (`ERR-FEE-002`, `ERR-FEE-003`).
 4. Số dư khả dụng ví nguồn phải lớn hơn hoặc bằng tổng số tiền chuyển và chi phí (`BR-FIN-02`, `BR-FIN-03`); nếu không, từ chối toàn bộ, `ERR-WAL-001`.
 5. Trừ tổng số tiền chuyển và chi phí khỏi ví nguồn, cộng số tiền chuyển vào ví đích; hai biến động này cùng có hiệu lực hoặc cùng bị hủy (`BR-FIN-03`).
 6. Tạo bản ghi chuyển tiền (mã duy nhất) trong sổ chuyển tiền nội bộ. Nếu có chi phí, tạo bản ghi phí loại chi tiêu trong sổ thu chi, liên kết với mã chuyển tiền. Chi phí tính vào tổng chi tiêu; khoản chuyển thuần túy không làm đổi tổng thu hay tổng chi.
@@ -560,7 +560,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.3.2 FR-TRF-02: Tra cứu và xóa giao dịch chuyển tiền nội bộ
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Tra cứu và xóa giao dịch chuyển tiền nội bộ (FR-TRF-02), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -609,7 +609,7 @@ Quản lý cấu trúc danh mục 3 cấp (`BR-FIN-04`): Loại thu chi cố đ�
 
 #### 4.4.1 FR-CAT-01: Tạo cấu trúc danh mục 3 cấp
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Tạo cấu trúc danh mục 3 cấp (FR-CAT-01), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -652,7 +652,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.4.2 FR-CAT-02: Tùy biến danh mục người dùng
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Tùy biến danh mục người dùng (FR-CAT-02), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -698,7 +698,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.4.3 FR-CAT-03: Kiểm soát toàn vẹn khi cập nhật và xóa danh mục
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Kiểm soát toàn vẹn khi cập nhật và xóa danh mục (FR-CAT-03), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -749,7 +749,7 @@ Tổng hợp tự động dữ liệu giao dịch và số dư ví thành chuỗ
 
 #### 4.5.1 FR-REP-01: Thống kê dòng tiền 12 tháng gần nhất
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Thống kê dòng tiền 12 tháng gần nhất (FR-REP-01), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -796,7 +796,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.5.2 FR-REP-02: Phân tích cơ cấu thu chi theo nhóm và danh mục
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Phân tích cơ cấu thu chi theo nhóm và danh mục (FR-REP-02), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -845,7 +845,7 @@ Bảo đảm tệp dữ liệu hoạt động độc lập, không mất mát; p
 
 #### 4.6.1 FR-DAT-01: Xuất dữ liệu tài chính
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Xuất dữ liệu tài chính (FR-DAT-01), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -891,7 +891,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.6.2 FR-DAT-02: Phục hồi dữ liệu hệ thống từ bản sao lưu
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Phục hồi dữ liệu hệ thống từ bản sao lưu (FR-DAT-02), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |
@@ -938,7 +938,7 @@ Tiêu chí nghiệm thu:
 
 #### 4.6.3 FR-DAT-03: Kiểm tra lại dữ liệu hệ thống
 
-Bảng thuộc tính:
+Bảng thuộc tính của yêu cầu chức năng Kiểm tra lại dữ liệu hệ thống (FR-DAT-03), gồm mục tiêu đáp ứng, ca sử dụng liên quan, quy tắc áp dụng và mức độ ưu tiên
 
 | Thuộc tính | Giá trị |
 | :-- | :-- |

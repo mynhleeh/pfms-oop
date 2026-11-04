@@ -28,7 +28,7 @@ Các hạng mục kỹ thuật và nghiệp vụ được loại trừ khỏi ra
 | STT | Hạng mục | Ranh giới phân định cụ thể | Căn cứ loại trừ |
 | :---: | :--- | :--- | :--- |
 | 1 | Tích hợp Open Banking và cổng thanh toán trực tuyến | Hệ thống không tích hợp Open Banking API hoặc Webhook tự động cào dữ liệu giao dịch; Người dùng trực tiếp nhập các giao dịch đã xảy ra. | Ứng dụng vận hành ngoại tuyến và độc lập trên máy trạm cục bộ. Ứng dụng không lưu thông tin xác thực của bên thứ ba (Tài khoản, khóa truy cập) hay phụ thuộc vào hạ tầng mạng ngoài. |
-| 2 | Quản trị đa tài khoản và kiểm soát truy cập phân quyền | Hệ thống chỉ phục vụ một Người dùng duy nhất; loại trừ việc đăng ký nhiều tài khoản trực tuyến qua mạng hoặc phân cấp quyền hạn quản trị. | Ứng dụng máy tính để bàn đơn tiến trình phục vụ một Người dùng duy nhất (Giả định `AS-01`), nên không cần phân quyền nhiều cấp và không phát sinh xung đột ghi đồng thời. |
+| 2 | Quản trị đa tài khoản và kiểm soát truy cập phân quyền | Hệ thống chỉ phục vụ một Người dùng duy nhất; loại trừ việc đăng ký nhiều tài khoản trực tuyến qua mạng hoặc phân cấp quyền hạn quản trị. | Ứng dụng máy tính để bàn đơn tiến trình phục vụ một người dùng duy nhất hệ thống đơn người dùng, đơn nhiệm(`AS-01`), nên không cần phân quyền nhiều cấp và không phát sinh xung đột ghi đồng thời. |
 | 3 | Chuyển mạch thanh toán và tạo giao dịch tiền thực | Hệ thống không gửi lệnh chuyển tiền đến mạng lưới thanh toán liên ngân hàng. Dữ liệu dòng tiền chỉ phản ánh thông tin kế toán quản trị nội bộ sau khi giao dịch thực tế đã diễn ra ngoài đời thực. | Giới hạn hệ thống trong phạm vi sổ sách kế toán cá nhân, không xử lý thanh toán thật. |
 
 ### 1.3 Đối tượng sử dụng và hướng dẫn đọc tài liệu

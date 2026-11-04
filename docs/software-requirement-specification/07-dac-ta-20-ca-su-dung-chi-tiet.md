@@ -1,15 +1,15 @@
 ## 6. ĐẶC TẢ 20 CA SỬ DỤNG CHI TIẾT
 
-20 ca sử dụng (UC) của Hệ thống quản lý tài chính cá nhân (PFMS) mô hình hóa các tương tác hoàn chỉnh giữa Người dùng và hệ thống theo phương pháp Fully Dressed Use Case của Alistair Cockburn và chuẩn IREB CPRE. Các UC hiện thực hóa các yêu cầu chức năng tại Mục 4 (`FR-WAL-01` đến `FR-DAT-03`) và tuân thủ các quy tắc nghiệp vụ tại Mục 3 độ chính xác tài chính (`BR-FIN-01`), bảo toàn số dư ví (`BR-FIN-02`), ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và tên của ví, nhóm nhu cầu, danh mục (`BR-NAM-01`). Hồ sơ UC theo 4 nguyên tắc:
+20 ca sử dụng của Hệ thống Quản lý Tài chính Cá nhân (PFMS) mô hình hóa các tương tác giữa Người dùng và hệ thống, đáp ứng các yêu cầu chức năng và quy tắc nghiệp vụ tài chính theo 4 nguyên tắc thiết kế then chốt:
 
 - Hệ thống phục vụ một người dùng duy nhất trên máy tính để bàn cục bộ.
-- Mỗi UC chỉ có một mục tiêu nghiệp vụ độc lập, không gộp thành cụm "Quản lý X" mơ hồ.
-- Giao dịch tài chính nhiều bước được ghi nhận nguyên khối hoặc tự động hoàn nguyên khi có lỗi.
+- Mỗi ca sử dụng chỉ có một mục tiêu nghiệp vụ độc lập, không gộp thành cụm "Quản lý X" mơ hồ.
+- Giao dịch tài chính nhiều bước được ghi nhận nguyên khối hoặc tự động hoàn nguyên khi có lỗi phát sinh.
 - Phân biệt rõ biến thể thành công hợp lệ (luồng rẽ nhánh) với tình huống vi phạm dữ liệu (luồng ngoại lệ).
 
-**Quy ước chung:** mọi UC có tác nhân chính là Người dùng, phạm vi là hệ thống PFMS, cấp độ là mục tiêu người dùng; các thông tin này không lặp lại ở từng UC. Thông báo lỗi chỉ ghi nội dung đầy đủ ở lần xuất hiện đầu tiên; các lần sau tra theo mã `ERR-*` tại Mục 3.
+Quy ước chung: mọi ca sử dụng đều có tác nhân chính là Người dùng, phạm vi là hệ thống PFMS, cấp độ là mục tiêu người dùng; các thuộc tính này không lặp lại ở từng ca sử dụng. Thông báo lỗi được đặc tả chi tiết ở lần xuất hiện đầu tiên; các lần tiếp theo được dẫn chiếu theo mã lỗi chuẩn (`ERR-*`) tại Mục 3.
 
-Mỗi UC gồm 9 trường:
+Mỗi ca sử dụng được đặc tả cấu trúc gồm 9 thành phần chuẩn hóa:
 
 1. Mã và tên UC: `UC-<DOMAIN>-<NN>` và tên dạng động từ + danh từ.
 2. Bảng thuộc tính: các bên liên quan và mối quan tâm, mô tả tóm tắt, điều kiện kích hoạt.
@@ -21,22 +21,22 @@ Mỗi UC gồm 9 trường:
 8. Các luồng ngoại lệ: vi phạm dữ liệu hoặc điều kiện biên, nêu phản ứng hệ thống, mã `ERR-*` và điểm phục hồi.
 9. Quy tắc nghiệp vụ đặc thù: liên kết tới `BR-*` và `FR-*` mà UC áp dụng.
 
-Bảng chia 20 UC theo 6 nhóm chức năng:
+Bảng phân bổ số lượng 20 ca sử dụng theo 6 nhóm chức năng nghiệp vụ của hệ thống:
 
 | STT | Nhóm chức năng | Mã nhóm | Số lượng UC |
-| :-: | :-- | :-: | :-: |
+| :---: | :--- | :---: | :---: |
 | 1 | Ví | `WAL` | 4 |
 | 2 | Ghi nhận thu chi | `TXN` | 4 |
 | 3 | Chuyển tiền nội bộ | `TRF` | 3 |
 | 4 | Danh mục phân loại | `CAT` | 4 |
 | 5 | Thống kê và báo cáo | `REP` | 2 |
 | 6 | Lưu trữ và sao lưu dữ liệu | `DAT` | 3 |
-| | **Tổng** | | **20** |
+|  | **Tổng** |  | **20** |
 
-Bảng tổng hợp phân bổ 20 UC:
+Bảng danh mục 20 ca sử dụng chi tiết cùng nhóm chức năng và yêu cầu chức năng (FR) ánh xạ tương ứng:
 
 | STT | Mã UC | Tên ca sử dụng | Nhóm chức năng | FR ánh xạ |
-| :-: | :-: | :-- | :-- | :-- |
+| :---: | :---: | :--- | :--- | :--- |
 | 1 | `UC-WAL-01` | Tạo ví mới | Ví | `FR-WAL-01`, `FR-WAL-02`, `FR-WAL-03`, `FR-WAL-04` |
 | 2 | `UC-WAL-02` | Theo dõi số dư tính lại từ lịch sử dòng tiền và cơ cấu ví | Ví | `FR-WAL-02`, `FR-WAL-04` |
 | 3 | `UC-WAL-03` | Cập nhật thông tin ví | Ví | `FR-WAL-01`, `FR-WAL-03` |
@@ -60,11 +60,11 @@ Bảng tổng hợp phân bổ 20 UC:
 
 ### 6.1 UC-WAL-01: Tạo ví mới
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả mục tiêu, các bên liên quan và điều kiện kích hoạt của ca sử dụng Tạo ví mới (`UC-WAL-01`):
 
 | Trường | Nội dung |
 | --- | --- |
-| Các bên liên quan và mối quan tâm | Người dùng: cần tạo tài khoản chứa tiền để ghi chép dòng tiền. Hệ thống: ví mới có số dư 0.00, tên hợp lệ và duy nhất (`BR-NAM-01`), số dư luôn đúng (`BR-FIN-02`). |
+| Các bên liên quan và mối quan tâm | Người dùng: cần tạo tài khoản chứa tiền để ghi chép dòng tiền. Hệ thống: ví mới có số dư 0.00, tên hợp lệ và duy nhất theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`), số dư luôn đúng theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`). |
 | Mô tả tóm tắt | Tạo ví mới với tên và ghi chú. Số dư ban đầu là 0.00 VNĐ; số tiền đang có được ghi nhận sau bằng khoản điều chỉnh số dư (`UC-WAL-04`). Hệ thống tính lại tổng số dư và tỷ lệ cơ cấu giữa các ví. |
 | Điều kiện kích hoạt | Người dùng chọn chức năng thêm ví mới trên giao diện quản lý ví. |
 
@@ -75,7 +75,7 @@ Bảng thuộc tính ca sử dụng:
 
 #### Bảo đảm tối thiểu
 
-Nếu gặp lỗi kiểm tra dữ liệu hoặc lỗi ghi tệp, tệp dữ liệu và danh sách ví không thay đổi, không có ví rác nào được lưu.
+Nếu gặp lỗi kiểm tra dữ liệu hoặc lỗi ghi tệp, cơ sở dữ liệu và danh sách ví không thay đổi, không có ví rác nào được lưu.
 
 #### Hậu điều kiện thành công
 
@@ -88,9 +88,9 @@ Nếu gặp lỗi kiểm tra dữ liệu hoặc lỗi ghi tệp, tệp dữ li�
 2. Hệ thống hiển thị biểu mẫu gồm Tên ví, Ghi chú mô tả.
 3. Người dùng nhập tên ví và ghi chú (nếu có).
 4. Người dùng gửi yêu cầu lưu.
-5. Hệ thống kiểm tra tên theo `BR-NAM-01`: sai định dạng bị từ chối (`ERR-NAM-001`); trùng bị từ chối (`ERR-NAM-002`).
+5. Hệ thống kiểm tra tên theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`): sai định dạng bị từ chối (`ERR-NAM-001`); trùng bị từ chối (`ERR-NAM-002`).
 6. Hệ thống tạo ví mới với mã duy nhất, trạng thái `ACTIVE`, số dư 0.00 VNĐ.
-7. Hệ thống tính lại tổng số dư các ví (`FR-WAL-02`, `BR-FIN-02`) và tỷ lệ cơ cấu từng ví (`FR-WAL-04`).
+7. Hệ thống tính lại tổng số dư các ví (`FR-WAL-02`, Quy tắc bảo toàn số dư ví `BR-FIN-02`) và tỷ lệ cơ cấu từng ví (`FR-WAL-04`).
 8. Hệ thống lưu tệp dữ liệu, thông báo thành công và làm mới danh sách ví cùng bảng cơ cấu.
 
 #### Các luồng rẽ nhánh
@@ -113,12 +113,12 @@ Không có.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-02`: số dư ví tại mỗi thời điểm bằng tổng dòng tiền vào trừ tổng dòng tiền ra đến thời điểm đó; ví mới bắt đầu từ 0.00 VNĐ.
+1. Quy tắc bảo toàn số dư ví (`BR-FIN-02`): số dư ví tại mỗi thời điểm bằng tổng dòng tiền vào trừ tổng dòng tiền ra đến thời điểm đó; ví mới bắt đầu từ 0.00 VNĐ.
 2. Yêu cầu chức năng liên quan: `FR-WAL-01`, `FR-WAL-02`, `FR-WAL-03`, `FR-WAL-04`.
 
 ### 6.2 UC-WAL-02: Theo dõi số dư tính lại từ lịch sử dòng tiền và cơ cấu ví
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả mục tiêu nghiệp vụ và điều kiện kích hoạt của ca sử dụng Theo dõi số dư tính lại từ lịch sử dòng tiền và cơ cấu ví (`UC-WAL-02`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -137,13 +137,13 @@ Hệ thống chỉ đọc, không thay đổi bất kỳ dữ liệu nào trong 
 
 #### Hậu điều kiện thành công
 
-1. Số dư từng ví được tính đúng theo `BR-FIN-02` tại thời điểm truy vấn.
+1. Số dư từng ví được tính đúng theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`) tại thời điểm truy vấn.
 2. Tỷ lệ cơ cấu hiển thị đúng theo `FR-WAL-04`.
 
 #### Luồng sự kiện chính
 
 1. Người dùng mở danh sách ví và chọn bộ lọc trạng thái (`ACTIVE` mặc định, `ARCHIVED` hoặc `ALL`).
-2. Hệ thống quét dòng tiền của từng ví thỏa điều kiện lọc và tính lại số dư theo `BR-FIN-02`:
+2. Hệ thống quét dòng tiền của từng ví thỏa điều kiện lọc và tính lại số dư theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`):
    $$WalletBalance_w = \sum Income_w + \sum TransferIn_w - \sum Expense_w - \sum TransferOut_w + \sum Adjustment_w$$
 3. Hệ thống tính tổng số dư hệ thống (`FR-WAL-02`, quy tắc 3) bằng số thập phân chính xác, gồm các ví `ACTIVE` và các ví `ARCHIVED` có số dư lớn hơn 0.00 VNĐ, không phụ thuộc bộ lọc hiển thị.
 4. Hệ thống hiển thị bảng gồm Mã ví, Tên ví, Trạng thái, Số dư tính lại; chân bảng có tổng số dư toàn hệ thống.
@@ -169,13 +169,13 @@ Hệ thống chỉ đọc, không thay đổi bất kỳ dữ liệu nào trong 
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-02`: số dư hiển thị là số dư tính lại từ lịch sử dòng tiền, không cho phép gán trực tiếp.
-2. `BR-FIN-01`: mọi phép cộng dồn và chia tỷ lệ dùng số thập phân chính xác.
+1. Quy tắc bảo toàn số dư ví (`BR-FIN-02`): số dư hiển thị là số dư tính lại từ lịch sử dòng tiền, không cho phép gán trực tiếp.
+2. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi phép cộng dồn và chia tỷ lệ dùng số thập phân chính xác.
 3. Yêu cầu chức năng liên quan: `FR-WAL-02`, `FR-WAL-04`.
 
 ### 6.3 UC-WAL-03: Cập nhật thông tin ví
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả phạm vi cập nhật thông tin và điều kiện kích hoạt của ca sử dụng Cập nhật thông tin ví (`UC-WAL-03`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -204,7 +204,7 @@ Nếu thao tác bị hủy hoặc lỗi, thuộc tính ví giữ nguyên. Số d
 2. Hệ thống hiển thị biểu mẫu gồm Tên ví, Ghi chú mô tả, Trạng thái (`ACTIVE` hoặc `ARCHIVED`); trường Số dư chỉ đọc.
 3. Người dùng sửa tên hoặc ghi chú.
 4. Người dùng xác nhận lưu.
-5. Hệ thống kiểm tra tên theo `BR-NAM-01` (so với các ví khác): sai định dạng `ERR-NAM-001`, trùng `ERR-NAM-002`.
+5. Hệ thống kiểm tra tên theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`) (so với các ví khác): sai định dạng `ERR-NAM-001`, trùng `ERR-NAM-002`.
 6. Hệ thống cập nhật các trường vào đối tượng ví trong tệp dữ liệu.
 7. Hệ thống thông báo thành công và làm mới giao diện.
 
@@ -213,7 +213,7 @@ Nếu thao tác bị hủy hoặc lỗi, thuộc tính ví giữ nguyên. Số d
 ##### Luồng rẽ nhánh 3a: Chuyển ví sang lưu trữ (`ARCHIVED`)
 
 1. Tại bước 3, Người dùng đổi trạng thái từ `ACTIVE` sang `ARCHIVED`.
-2. Nếu số dư ví khác 0 (`BR-FIN-02`), hệ thống hiển thị cảnh báo: "Ví này hiện vẫn còn số dư khả dụng là [Số dư] VNĐ. Số dư này vẫn được tính vào tổng số dư trong các ví nhưng ví sẽ bị ẩn khỏi danh sách chọn khi tạo giao dịch mới. Bạn có chắc chắn muốn lưu trữ ví này không?"
+2. Nếu số dư ví khác 0 (theo Quy tắc bảo toàn số dư ví `BR-FIN-02`), hệ thống hiển thị cảnh báo: "Ví này hiện vẫn còn số dư khả dụng là [Số dư] VNĐ. Số dư này vẫn được tính vào tổng số dư trong các ví nhưng ví sẽ bị ẩn khỏi danh sách chọn khi tạo giao dịch mới. Bạn có chắc chắn muốn lưu trữ ví này không?"
 3. Người dùng xác nhận.
 4. Hệ thống cập nhật `ARCHIVED`, ẩn ví khỏi các danh sách chọn ví khi tạo giao dịch mới, giữ ví trong báo cáo lịch sử.
 5. Tiếp tục tại bước 7 của luồng chính.
@@ -264,12 +264,12 @@ Nếu thao tác bị hủy hoặc lỗi, thuộc tính ví giữ nguyên. Số d
 #### Quy tắc nghiệp vụ đặc thù
 
 1. Không xóa vật lý ví đã có bản ghi trong sổ thu chi, sổ chuyển tiền hoặc sổ điều chỉnh số dư; muốn ngừng dùng thì chuyển sang `ARCHIVED`. Ví chưa từng phát sinh giao dịch được xóa vĩnh viễn.
-2. `BR-FIN-02`: số dư ví chỉ thay đổi gián tiếp qua các nghiệp vụ có dòng tiền hợp lệ.
+2. Quy tắc bảo toàn số dư ví (`BR-FIN-02`): số dư ví chỉ thay đổi gián tiếp qua các nghiệp vụ có dòng tiền hợp lệ.
 3. Yêu cầu chức năng liên quan: `FR-WAL-01`, `FR-WAL-03`.
 
 ### 6.4 UC-WAL-04: Điều chỉnh số dư ví
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả mục tiêu đối soát chênh lệch và điều kiện kích hoạt của ca sử dụng Điều chỉnh số dư ví (`UC-WAL-04`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -290,12 +290,12 @@ Nếu Người dùng hủy hoặc ghi lỗi, số dư tính lại giữ nguyên,
 
 1. Khoản điều chỉnh mới được lưu và không sửa được về sau, gồm: mã khoản điều chỉnh, mã ví, ngày ghi nhận, số dư trước, số dư quan sát, chênh lệch, lý do (nếu có).
 2. Số dư tính lại của ví bằng đúng số dư quan sát.
-3. `BR-FIN-02` được thỏa mãn nhờ số hạng điều chỉnh trong công thức số dư.
+3. Quy tắc bảo toàn số dư ví (`BR-FIN-02`) được thỏa mãn nhờ số hạng điều chỉnh trong công thức số dư.
 
 #### Luồng sự kiện chính
 
 1. Người dùng chọn một ví đang hoạt động và nhấn "Điều chỉnh số dư".
-2. Hệ thống tính số dư hiện tại (`BR-FIN-02`) và hiển thị biểu mẫu gồm Số dư hiện tại (chỉ đọc), Số dư thực tế quan sát, Lý do điều chỉnh (tùy chọn).
+2. Hệ thống tính số dư hiện tại theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`) và hiển thị biểu mẫu gồm Số dư hiện tại (chỉ đọc), Số dư thực tế quan sát, Lý do điều chỉnh (tùy chọn).
 3. Người dùng nhập số dư thực tế và lý do (tùy chọn, tối đa 255 ký tự).
 4. Người dùng yêu cầu xem trước kết quả.
 5. Hệ thống tính chênh lệch:
@@ -331,13 +331,13 @@ Không có.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Khoản điều chỉnh là một số hạng độc lập trong công thức `BR-FIN-02`, không sửa hay xóa giao dịch dòng tiền trong quá khứ.
+1. Khoản điều chỉnh là một số hạng độc lập trong công thức Quy tắc bảo toàn số dư ví (`BR-FIN-02`), không sửa hay xóa giao dịch dòng tiền trong quá khứ.
 2. Bản ghi điều chỉnh không được sửa hoặc xóa sau khi ghi nhận, để bảo đảm dấu vết kiểm tra.
 3. Yêu cầu chức năng liên quan: `FR-WAL-05`.
 
 ### 6.5 UC-TXN-01: Ghi nhận giao dịch thu chi
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả mục tiêu ghi nhận thu chi và điều kiện kích hoạt của ca sử dụng Ghi nhận giao dịch thu chi (`UC-TXN-01`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -358,7 +358,7 @@ Nếu giao dịch bị hủy hoặc lỗi, số dư ví không đổi và không
 #### Hậu điều kiện thành công
 
 1. Bản ghi giao dịch được lưu với mã duy nhất; nếu chi phí lớn hơn 0, phí giao dịch liên kết được lưu cùng lúc.
-2. Số dư ví được cập nhật ngay theo `BR-FIN-02` (`EXPENSE`: trừ tiền; `INCOME`: cộng tiền; trừ thêm chi phí nếu có) và không âm.
+2. Số dư ví được cập nhật ngay theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`) (`EXPENSE`: trừ tiền; `INCOME`: cộng tiền; trừ thêm chi phí nếu có) và không âm.
 3. Chỉ số tổng hợp dòng tiền tháng và báo cáo cơ cấu thu chi được cập nhật.
 
 #### Luồng sự kiện chính
@@ -366,16 +366,16 @@ Nếu giao dịch bị hủy hoặc lỗi, số dư ví không đổi và không
 1. Người dùng chọn "Thêm giao dịch mới".
 2. Hệ thống hiển thị biểu mẫu gồm Ngày giao dịch (mặc định ngày hiện tại), Loại giao dịch (`INCOME` hoặc `EXPENSE`), Ví thanh toán, Danh mục chi tiết, Số tiền, Chi phí (tùy chọn), Danh mục phí (khi có chi phí), Ghi chú mô tả.
 3. Người dùng chọn Loại giao dịch là `EXPENSE`.
-4. Hệ thống tải các nhóm nhu cầu và danh mục chi tiết đang dùng thuộc loại `EXPENSE` (`BR-FIN-04`).
+4. Hệ thống tải các nhóm nhu cầu và danh mục chi tiết đang dùng thuộc loại `EXPENSE` theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`).
 5. Người dùng chọn ngày, ví `ACTIVE`, danh mục chi tiết, nhập số tiền (lớn hơn 0), chi phí (không âm, mặc định 0.00), danh mục phí khi chi phí lớn hơn 0 và ghi chú.
 6. Người dùng xác nhận lưu.
 7. Hệ thống kiểm tra:
-   - Số tiền lớn hơn 0, chuẩn hóa thành số thập phân chính xác 2 chữ số (`BR-FIN-01`).
-   - Danh mục đang dùng và thuộc loại `EXPENSE` (`BR-FIN-04`).
+   - Số tiền lớn hơn 0, chuẩn hóa thành số thập phân chính xác 2 chữ số theo Quy tắc độ chính xác tài chính (`BR-FIN-01`).
+   - Danh mục đang dùng và thuộc loại `EXPENSE` theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`).
    - Chi phí không âm; khi chi phí lớn hơn 0 phải có danh mục phí là danh mục `EXPENSE` đang dùng.
-   - Số dư khả dụng sau khi trừ số tiền và chi phí không âm (`BR-FIN-02`).
+   - Số dư khả dụng sau khi trừ số tiền và chi phí không âm theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`).
 8. Hệ thống tạo bản ghi giao dịch với mã duy nhất; nếu chi phí lớn hơn 0, tạo thêm phí giao dịch liên kết.
-9. Hệ thống trừ số tiền và chi phí (nếu có) khỏi số dư ví (`BR-FIN-02`).
+9. Hệ thống trừ số tiền và chi phí (nếu có) khỏi số dư ví theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`).
 10. Hệ thống cập nhật các chỉ số tổng hợp của tháng quan sát.
 11. Hệ thống lưu tệp dữ liệu, thông báo thành công và làm mới lịch sử giao dịch.
 
@@ -385,7 +385,7 @@ Nếu giao dịch bị hủy hoặc lỗi, số dư ví không đổi và không
 
 1. Tại bước 3, Người dùng chọn Loại giao dịch là `INCOME`.
 2. Hệ thống tải các nhóm và danh mục đang dùng thuộc loại `INCOME`; khi có chi phí, tải thêm danh mục `EXPENSE` đang dùng để chọn danh mục phí.
-3. Người dùng chọn ví nhận tiền, danh mục thu nhập, nhập số tiền (lớn hơn 0), chi phí (tùy chọn), danh mục phí (khi chi phí lớn hơn 0) và ghi chú.
+3. Người dùng chọn ví nhận tiền, danh mục thu nhập tương ứng, nhập số tiền (lớn hơn 0), chi phí (tùy chọn), danh mục phí (khi chi phí lớn hơn 0) và ghi chú.
 4. Tại bước 7, hệ thống kiểm tra danh mục thuộc `INCOME`, số tiền lớn hơn 0 và số dư ví sau khi cộng số tiền, trừ chi phí không âm. Nếu không thỏa, chuyển sang luồng ngoại lệ 7b.
 5. Tại bước 9, hệ thống cộng số tiền vào ví nhận và trừ chi phí (nếu có).
 6. Tiếp tục tại bước 10 của luồng chính.
@@ -438,15 +438,15 @@ Nếu giao dịch bị hủy hoặc lỗi, số dư ví không đổi và không
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-02`: giao dịch phản ánh vào số dư ví cùng lúc với việc ghi giao dịch và phí liên kết; nếu một trong hai thất bại thì cả hai đều không có hiệu lực.
-2. `BR-FIN-04`: mọi giao dịch phân loại theo cấu trúc 3 cấp, Loại thu chi luôn nhất quán.
-3. `BR-FIN-01`: mọi phép toán dùng số thập phân chính xác 2 chữ số, không làm tròn nhị phân.
+1. Quy tắc bảo toàn số dư ví (`BR-FIN-02`): giao dịch phản ánh vào số dư ví cùng lúc với việc ghi giao dịch và phí liên kết; nếu một trong hai thất bại thì cả hai đều không có hiệu lực.
+2. Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`): mọi giao dịch phân loại theo cấu trúc 3 cấp, Loại thu chi luôn nhất quán.
+3. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi phép toán dùng số thập phân chính xác 2 chữ số, không làm tròn nhị phân.
 4. Phí giao dịch là giao dịch thu chi loại `EXPENSE` liên kết với giao dịch phát sinh ra nó; hai bản ghi cùng có hiệu lực hoặc cùng không.
 5. Yêu cầu chức năng liên quan: `FR-TXN-01`, `FR-TXN-02`.
 
 ### 6.6 UC-TXN-02: Tra cứu và lọc lịch sử giao dịch thu chi
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả phạm vi tra cứu, lọc giao dịch và điều kiện kích hoạt của ca sử dụng Tra cứu và lọc lịch sử giao dịch thu chi (`UC-TXN-02`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -466,7 +466,7 @@ Truy vấn chỉ đọc, không thay đổi giao dịch hay số dư ví.
 #### Hậu điều kiện thành công
 
 1. Danh sách giao dịch khớp đúng tập kết quả lọc (các tiêu chí kết hợp đồng thời).
-2. Tổng thu nhập, tổng chi tiêu, dòng tiền thuần phản ánh đúng tập kết quả (`BR-FIN-01`).
+2. Tổng thu nhập, tổng chi tiêu, dòng tiền thuần phản ánh đúng tập kết quả theo Quy tắc độ chính xác tài chính (`BR-FIN-01`).
 
 #### Luồng sự kiện chính
 
@@ -478,7 +478,7 @@ Truy vấn chỉ đọc, không thay đổi giao dịch hay số dư ví.
    - Từ khóa tìm trong ghi chú.
 2. Người dùng nhấn "Áp dụng bộ lọc".
 3. Hệ thống áp dụng đồng thời mọi tiêu chí, sắp xếp theo ngày giao dịch giảm dần và phân trang (mặc định 50 bản ghi mỗi trang).
-4. Hệ thống tính trên toàn bộ tập kết quả (2 chữ số thập phân, `BR-FIN-01`): tổng thu nhập; tổng chi tiêu; dòng tiền thuần bằng tổng thu trừ tổng chi.
+4. Hệ thống tính trên toàn bộ tập kết quả (2 chữ số thập phân theo Quy tắc độ chính xác tài chính `BR-FIN-01`): tổng thu nhập; tổng chi tiêu; dòng tiền thuần bằng tổng thu trừ tổng chi.
 5. Hệ thống hiển thị bảng giao dịch, thông tin phân trang và khối tổng hợp. Danh mục đã xóa có nhãn "(đã xóa)"; phí giao dịch hiển thị thành dòng riêng với nhãn "phí của giao dịch [mã giao dịch phát sinh]".
 
 #### Các luồng rẽ nhánh
@@ -500,17 +500,17 @@ Không có.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-01`: mọi phép tổng hợp dùng số thập phân chính xác.
+1. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi phép tổng hợp dùng số thập phân chính xác.
 2. Phí giao dịch là giao dịch `EXPENSE` nên được lọc, tính vào tổng chi và phân trang như mọi giao dịch thu chi.
 3. Yêu cầu chức năng liên quan: `FR-TXN-03`.
 
 ### 6.7 UC-TXN-03: Chỉnh sửa giao dịch thu chi
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả cơ chế hoàn tác và cập nhật thông tin của ca sử dụng Chỉnh sửa giao dịch thu chi (`UC-TXN-03`):
 
 | Trường | Nội dung |
 | --- | --- |
-| Các bên liên quan và mối quan tâm | Người dùng: cần sửa số tiền, chi phí, ví, danh mục, ghi chú mà không làm sai số dư. Hệ thống: chỉ ghi nhận khi cả hoàn nguyên giao dịch cũ và áp dụng dữ liệu mới đều thành công, giữ `BR-FIN-02` luôn đúng. |
+| Các bên liên quan và mối quan tâm | Người dùng: cần sửa số tiền, chi phí, ví, danh mục, ghi chú mà không làm sai số dư. Hệ thống: chỉ ghi nhận khi cả hoàn nguyên giao dịch cũ và áp dụng dữ liệu mới đều thành công, giữ Quy tắc bảo toàn số dư ví (`BR-FIN-02`) luôn đúng. |
 | Mô tả tóm tắt | Sửa một giao dịch thu chi hiện có: hoàn nguyên số dư ví cũ và áp dụng cho ví mới trong cùng một lần xử lý, kèm cập nhật phí giao dịch liên kết (nếu có); ngăn ví bị âm. |
 | Điều kiện kích hoạt | Người dùng chọn chỉnh sửa tại một dòng giao dịch. |
 
@@ -526,16 +526,16 @@ Nếu thất bại ở bất kỳ bước kiểm tra nào, giao dịch cũ và s
 #### Hậu điều kiện thành công
 
 1. Giao dịch và phí liên kết (nếu có) được cập nhật.
-2. Số dư ví cũ và ví mới đồng bộ đúng theo `BR-FIN-02` và không âm.
+2. Số dư ví cũ và ví mới đồng bộ đúng theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`) và không âm.
 
 #### Luồng sự kiện chính
 
 1. Người dùng chọn chỉnh sửa một giao dịch từ lịch sử.
 2. Hệ thống tải dữ liệu hiện tại lên biểu mẫu (Ngày giao dịch, Loại giao dịch, Ví, Danh mục chi tiết, Số tiền, Chi phí, Danh mục phí, Ghi chú).
 3. Người dùng sửa các trường cần thiết và nhấn "Lưu thay đổi".
-4. Hệ thống kiểm tra: số tiền mới lớn hơn 0, chi phí mới không âm, danh mục tương thích loại giao dịch (`BR-FIN-04`). Nếu đổi danh mục thì danh mục mới phải đang dùng; được giữ danh mục cũ kể cả khi đã xóa. Nếu chi phí mới lớn hơn 0 thì cần danh mục phí `EXPENSE` đang dùng; được giữ danh mục phí cũ kể cả khi đã xóa.
-5. Hệ thống tính thử hoàn nguyên ví cũ (`BR-FIN-02`): giao dịch cũ `INCOME` thì trừ số tiền cũ, cộng lại chi phí cũ và kiểm tra số dư không âm; giao dịch cũ `EXPENSE` thì hoàn lại số tiền cũ và chi phí cũ.
-6. Hệ thống tính thử áp dụng vào ví mới (`BR-FIN-02`), trên số dư sau khi hoàn nguyên ví cũ: `EXPENSE` thì số dư phải đủ trừ số tiền mới và chi phí mới; `INCOME` thì số dư sau khi cộng số tiền mới, trừ chi phí mới không âm.
+4. Hệ thống kiểm tra: số tiền mới lớn hơn 0, chi phí mới không âm, danh mục tương thích loại giao dịch theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`). Nếu đổi danh mục thì danh mục mới phải đang dùng; được giữ danh mục cũ kể cả khi đã xóa. Nếu chi phí mới lớn hơn 0 thì cần danh mục phí `EXPENSE` đang dùng; được giữ danh mục phí cũ kể cả khi đã xóa.
+5. Hệ thống tính thử hoàn nguyên ví cũ theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`): giao dịch cũ `INCOME` thì trừ số tiền cũ, cộng lại chi phí cũ và kiểm tra số dư không âm; giao dịch cũ `EXPENSE` thì hoàn lại số tiền cũ và chi phí cũ.
+6. Hệ thống tính thử áp dụng vào ví mới theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`), trên số dư sau khi hoàn nguyên ví cũ: `EXPENSE` thì số dư phải đủ trừ số tiền mới và chi phí mới; `INCOME` thì số dư sau khi cộng số tiền mới, trừ chi phí mới không âm.
 7. Hệ thống thực hiện, chỉ ghi nhận khi tất cả thành công: hoàn nguyên số dư ví cũ; cập nhật số dư ví mới; ghi đè thông tin vào giao dịch; xử lý phí liên kết (xóa nếu chi phí mới bằng 0 và đang có phí; tạo mới nếu chi phí mới lớn hơn 0 và chưa có phí; cập nhật nếu cả hai lớn hơn 0).
 8. Hệ thống lưu tệp dữ liệu, thông báo thành công và làm mới lịch sử.
 
@@ -608,13 +608,13 @@ Không có.
 #### Quy tắc nghiệp vụ đặc thù
 
 1. Hoàn nguyên ví cũ, ghi nhận ví mới và cập nhật phí liên kết phải hoàn tất cùng lúc; nếu lỗi lưu trữ, toàn bộ trạng thái tự khôi phục về trước khi sửa.
-2. `BR-FIN-02`: số dư ví không được âm tại bất kỳ thời điểm nào của quá trình chuyển đổi.
+2. Quy tắc bảo toàn số dư ví (`BR-FIN-02`): số dư ví không được âm tại bất kỳ thời điểm nào của quá trình chuyển đổi.
 3. Phí giao dịch chỉ được sửa cùng giao dịch phát sinh ra nó, không sửa trực tiếp.
 4. Yêu cầu chức năng liên quan: `FR-TXN-04`.
 
 ### 6.8 UC-TXN-04: Xóa giao dịch thu chi
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả quy trình hoàn nguyên dòng tiền và điều kiện kích hoạt của ca sử dụng Xóa giao dịch thu chi (`UC-TXN-04`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -634,7 +634,7 @@ Nếu bị từ chối do vi phạm điều kiện số dư hoặc Người dùn
 #### Hậu điều kiện thành công
 
 1. Giao dịch và phí liên kết (nếu có) bị xóa khỏi sổ giao dịch thu chi.
-2. Số dư ví được hoàn nguyên đúng (`BR-FIN-02`): xóa chi tiêu thì cộng hoàn trả số tiền và chi phí; xóa thu nhập thì trừ số tiền và cộng hoàn trả chi phí.
+2. Số dư ví được hoàn nguyên đúng theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`): xóa chi tiêu thì cộng hoàn trả số tiền và chi phí; xóa thu nhập thì trừ số tiền và cộng hoàn trả chi phí.
 3. Báo cáo thống kê tháng và số dư ví được cập nhật ngay.
 
 #### Luồng sự kiện chính
@@ -642,7 +642,7 @@ Nếu bị từ chối do vi phạm điều kiện số dư hoặc Người dùn
 1. Người dùng chọn xóa một giao dịch từ lịch sử.
 2. Hệ thống hiển thị hộp thoại xác nhận gồm Ngày giao dịch, Danh mục, Số tiền, Chi phí (nếu có), Ví và tác động hoàn nguyên số dư dự kiến.
 3. Người dùng nhấn "Xác nhận xóa".
-4. Hệ thống kiểm tra điều kiện số dư (`BR-FIN-02`): giao dịch `EXPENSE` thì ví được cộng hoàn trả nên không có nguy cơ âm; giao dịch `INCOME` thì số dư khả dụng hiện tại sau khi trừ số tiền và cộng lại chi phí phải không âm.
+4. Hệ thống kiểm tra điều kiện số dư theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`): giao dịch `EXPENSE` thì ví được cộng hoàn trả nên không có nguy cơ âm; giao dịch `INCOME` thì số dư khả dụng hiện tại sau khi trừ số tiền và cộng lại chi phí phải không âm.
 5. Hệ thống thực hiện, chỉ ghi nhận khi tất cả thành công: hoàn nguyên số dư ví; xóa giao dịch và phí liên kết (nếu có) khỏi sổ.
 6. Hệ thống cập nhật các chỉ số tổng hợp của tháng quan sát.
 7. Hệ thống lưu tệp dữ liệu, thông báo thành công và làm mới lịch sử.
@@ -680,17 +680,17 @@ Không có.
 #### Quy tắc nghiệp vụ đặc thù
 
 1. Xóa bản ghi (kể cả phí liên kết) và hoàn nguyên số dư diễn ra đồng thời; nếu lỗi lưu trữ, hệ thống tự khôi phục về trước khi xóa.
-2. `BR-FIN-02`: không cho xóa khoản thu nếu làm số dư khả dụng của ví âm.
+2. Quy tắc bảo toàn số dư ví (`BR-FIN-02`): không cho xóa khoản thu nếu làm số dư khả dụng của ví âm.
 3. Phí giao dịch bị xóa cùng giao dịch phát sinh ra nó, không xóa trực tiếp.
 4. Yêu cầu chức năng liên quan: `FR-TXN-05`.
 
 ### 6.9 UC-TRF-01: Chuyển tiền nội bộ giữa hai ví
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả cơ chế ghi nhận đồng thời hai ví và điều kiện kích hoạt của ca sử dụng Chuyển tiền nội bộ giữa hai ví (`UC-TRF-01`):
 
 | Trường | Nội dung |
 | --- | --- |
-| Các bên liên quan và mối quan tâm | Người dùng: cần chuyển tiền giữa các tài khoản nội bộ (tiền mặt, ví điện tử) và ghi đúng phí. Hệ thống: ghi nhận đồng thời (trừ ví nguồn, cộng ví đích); tổng số dư không đổi nếu không có phí, hoặc giảm đúng bằng phí (`BR-FIN-03`). |
+| Các bên liên quan và mối quan tâm | Người dùng: cần chuyển tiền giữa các tài khoản nội bộ (tiền mặt, ví điện tử) và ghi đúng phí. Hệ thống: ghi nhận đồng thời (trừ ví nguồn, cộng ví đích); tổng số dư không đổi nếu không có phí, hoặc giảm đúng bằng phí theo Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`). |
 | Mô tả tóm tắt | Điều chuyển tiền giữa hai ví nội bộ theo cơ chế ghi nhận đồng thời. Chi phí chuyển tiền (nếu có) được tách thành một phí giao dịch độc lập liên kết với giao dịch chuyển tiền. |
 | Điều kiện kích hoạt | Người dùng chọn chức năng chuyển tiền nội bộ. |
 
@@ -709,7 +709,7 @@ Nếu lỗi ở bất kỳ bước nào (ví dụ đã trừ ví nguồn nhưng 
 1. Giao dịch chuyển tiền được lưu với mã duy nhất.
 2. Ví nguồn giảm đúng tổng số tiền chuyển và phí; ví đích tăng đúng số tiền chuyển, cùng lúc.
 3. Nếu phí lớn hơn 0, một phí giao dịch độc lập được ghi vào sổ thu chi, liên kết với mã giao dịch chuyển tiền.
-4. Tổng số dư các ví giảm đúng bằng phí; không có phí thì tổng giữ nguyên (`BR-FIN-03`).
+4. Tổng số dư các ví giảm đúng bằng phí; không có phí thì tổng giữ nguyên theo Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`).
 
 #### Luồng sự kiện chính
 
@@ -722,10 +722,10 @@ Nếu lỗi ở bất kỳ bước nào (ví dụ đã trừ ví nguồn nhưng 
 7. Người dùng nhập ghi chú (nếu có) và nhấn "Thực hiện chuyển tiền".
 8. Hệ thống kiểm tra:
    - Ví nguồn khác ví đích.
-   - Số tiền chuyển lớn hơn 0 và phí không âm, chuẩn hóa số thập phân chính xác 2 chữ số (`BR-FIN-01`).
-   - Số dư ví nguồn không nhỏ hơn tổng số tiền chuyển và phí (`BR-FIN-02`).
+   - Số tiền chuyển lớn hơn 0 và phí không âm, chuẩn hóa số thập phân chính xác 2 chữ số theo Quy tắc độ chính xác tài chính (`BR-FIN-01`).
+   - Số dư ví nguồn không nhỏ hơn tổng số tiền chuyển và phí theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`).
    - Nếu phí lớn hơn 0: đã chọn danh mục phí, đang dùng và thuộc `EXPENSE`.
-9. Hệ thống ghi nhận đồng thời theo `BR-FIN-03`: trừ số tiền chuyển khỏi ví nguồn; cộng số tiền chuyển vào ví đích; lưu giao dịch chuyển tiền với mã duy nhất.
+9. Hệ thống ghi nhận đồng thời theo Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`): trừ số tiền chuyển khỏi ví nguồn; cộng số tiền chuyển vào ví đích; lưu giao dịch chuyển tiền với mã duy nhất.
 10. Nếu phí lớn hơn 0, hệ thống sinh một phí giao dịch loại `EXPENSE` trong sổ thu chi, số tiền bằng phí, mang danh mục phí đã chọn và mã liên kết tới giao dịch chuyển tiền; khoản phí được trừ tiếp khỏi ví nguồn.
 11. Hệ thống lưu tệp dữ liệu và thông báo thành công, kèm số tiền chuyển, phí đã trừ, số dư mới của ví nguồn và ví đích.
 
@@ -778,14 +778,14 @@ Nếu lỗi ở bất kỳ bước nào (ví dụ đã trừ ví nguồn nhưng 
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-03`: tổng số dư toàn bộ các ví luôn giữ nguyên đối với giao dịch chuyển tiền thuần túy.
+1. Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`): tổng số dư toàn bộ các ví luôn giữ nguyên đối với giao dịch chuyển tiền thuần túy.
 2. Chi phí phải được ghi thành phí giao dịch `EXPENSE` riêng, không khấu trừ gộp làm sai số tiền ví đích thực nhận.
-3. `BR-FIN-01`: mọi bước trừ cộng số dư dùng số thập phân chính xác.
+3. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi bước trừ cộng số dư dùng số thập phân chính xác.
 4. Yêu cầu chức năng liên quan: `FR-TRF-01`.
 
 ### 6.10 UC-TRF-02: Tra cứu lịch sử chuyển tiền
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả phạm vi theo dõi lịch sử chuyển khoản của ca sử dụng Tra cứu lịch sử chuyển tiền (`UC-TRF-02`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -825,16 +825,16 @@ Không có.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Số tiền chuyển và chi phí hiển thị phải khớp chính xác với các khoản đã ghi ở ví nguồn và ví đích (`BR-FIN-02`, `BR-FIN-03`).
+1. Số tiền chuyển và chi phí hiển thị phải khớp chính xác với các khoản đã ghi ở ví nguồn và ví đích (theo Quy tắc bảo toàn số dư ví `BR-FIN-02` và Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ `BR-FIN-03`).
 2. Yêu cầu chức năng liên quan: `FR-TRF-02`.
 
 ### 6.11 UC-TRF-03: Xóa giao dịch chuyển tiền
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả quy trình hoàn nguyên kép giữa hai ví của ca sử dụng Xóa giao dịch chuyển tiền (`UC-TRF-03`):
 
 | Trường | Nội dung |
 | --- | --- |
-| Các bên liên quan và mối quan tâm | Người dùng: cần xóa giao dịch chuyển tiền nhầm và đưa số dư hai ví về như cũ. Hệ thống: hoàn nguyên đồng thời, chỉ cho xóa khi ví đích còn đủ số dư hoàn trả, giữ `BR-FIN-02` và `BR-FIN-03` luôn đúng. |
+| Các bên liên quan và mối quan tâm | Người dùng: cần xóa giao dịch chuyển tiền nhầm và đưa số dư hai ví về như cũ. Hệ thống: hoàn nguyên đồng thời, chỉ cho xóa khi ví đích còn đủ số dư hoàn trả, giữ Quy tắc bảo toàn số dư ví (`BR-FIN-02`) và Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`) luôn đúng. |
 | Mô tả tóm tắt | Xóa một giao dịch chuyển tiền đã thực hiện, tự động hoàn nguyên số dư ví nguồn và ví đích; bản ghi chuyển tiền và phí liên kết (nếu có) bị xóa khỏi sổ. |
 | Điều kiện kích hoạt | Người dùng chọn xóa tại một dòng trong bảng lịch sử chuyển tiền. |
 
@@ -887,16 +887,16 @@ Không có.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-03`: hoàn nguyên phải khôi phục chính xác cả ví nguồn và ví đích; một ví thất bại thì cả hai không thay đổi.
+1. Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`): hoàn nguyên phải khôi phục chính xác cả ví nguồn và ví đích; một ví thất bại thì cả hai không thay đổi.
 2. Yêu cầu chức năng liên quan: `FR-TRF-02`.
 
 ### 6.12 UC-CAT-01: Bổ sung danh mục phân loại mới
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả cấu trúc phân cấp danh mục 3 cấp của ca sử dụng Bổ sung danh mục phân loại mới (`UC-CAT-01`):
 
 | Trường | Nội dung |
 | --- | --- |
-| Các bên liên quan và mối quan tâm | Người dùng: cần mở rộng cấu trúc danh mục để theo dõi chi tiết các khoản chi hoặc nguồn thu đặc thù. Hệ thống: giữ cấu trúc 3 cấp (`BR-FIN-04`), danh mục luôn có nhóm cha, tên hợp lệ và duy nhất (`BR-NAM-01`). |
+| Các bên liên quan và mối quan tâm | Người dùng: cần mở rộng cấu trúc danh mục để theo dõi chi tiết các khoản chi hoặc nguồn thu đặc thù. Hệ thống: giữ cấu trúc 3 cấp theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`), danh mục luôn có nhóm cha, tên hợp lệ và duy nhất theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`). |
 | Mô tả tóm tắt | Thêm một danh mục chi tiết (cấp 3) vào một nhóm nhu cầu đang dùng (cấp 2), hoặc thêm một nhóm nhu cầu mới vào một Loại thu chi (cấp 1). Mục mới ở trạng thái đang dùng và danh sách chọn của biểu mẫu giao dịch được cập nhật. |
 | Điều kiện kích hoạt | Người dùng chọn thêm danh mục trên màn hình quản lý danh mục thu chi. |
 
@@ -912,7 +912,7 @@ Nếu lỗi kiểm tra hoặc lỗi ghi tệp, cấu trúc danh mục giữ nguy
 #### Hậu điều kiện thành công
 
 1. Danh mục mới thuộc đúng nhóm cha, kế thừa Loại thu chi của nhóm cha, lưu ở trạng thái đang dùng.
-2. Cấu trúc 3 cấp được giữ: mọi danh mục thuộc một nhóm cha (`BR-FIN-04`), tên không trùng trong cùng nhóm cha (`BR-NAM-01`).
+2. Cấu trúc 3 cấp được giữ: mọi danh mục thuộc một nhóm cha theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`), tên không trùng trong cùng nhóm cha theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`).
 
 #### Luồng sự kiện chính
 
@@ -921,7 +921,7 @@ Nếu lỗi kiểm tra hoặc lỗi ghi tệp, cấu trúc danh mục giữ nguy
 3. Người dùng chọn một nhóm nhu cầu (ví dụ nhóm thuộc `EXPENSE`) và nhấn "Thêm danh mục con".
 4. Hệ thống hiển thị biểu mẫu gồm Nhóm cha (chỉ đọc), Tên danh mục, Biểu tượng và màu sắc (tùy chọn).
 5. Người dùng nhập tên, chọn biểu tượng và nhấn "Lưu danh mục".
-6. Hệ thống kiểm tra: tên theo `BR-NAM-01` (sai định dạng `ERR-NAM-001`; trùng danh mục đang dùng trong cùng nhóm cha `ERR-NAM-002`); nhóm cha tồn tại và đang dùng.
+6. Hệ thống kiểm tra: tên theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`) (sai định dạng `ERR-NAM-001`; trùng danh mục đang dùng trong cùng nhóm cha `ERR-NAM-002`); nhóm cha tồn tại và đang dùng.
 7. Hệ thống tạo bản ghi danh mục với mã duy nhất, liên kết nhóm cha, trạng thái đang dùng.
 8. Hệ thống làm mới cấu trúc danh mục, tự mở nhánh nhóm cha để làm nổi bật danh mục mới.
 9. Hệ thống cập nhật danh sách chọn tại các biểu mẫu giao dịch.
@@ -932,7 +932,7 @@ Nếu lỗi kiểm tra hoặc lỗi ghi tệp, cấu trúc danh mục giữ nguy
 
 1. Tại bước 3, Người dùng chọn một Loại thu chi và nhấn "Thêm nhóm".
 2. Hệ thống hiển thị biểu mẫu gồm Loại thu chi (chỉ đọc), Tên nhóm, Biểu tượng và màu sắc (tùy chọn).
-3. Người dùng nhập tên nhóm và nhấn "Lưu nhóm". Hệ thống kiểm tra tên theo `BR-NAM-01`: sai định dạng `ERR-NAM-001`; trùng nhóm đang dùng trong cùng Loại thu chi `ERR-NAM-002`.
+3. Người dùng nhập tên nhóm và nhấn "Lưu nhóm". Hệ thống kiểm tra tên theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`): sai định dạng `ERR-NAM-001`; trùng nhóm đang dùng trong cùng Loại thu chi `ERR-NAM-002`.
 4. Hệ thống tạo nhóm với mã duy nhất, trạng thái đang dùng. Tiếp tục tại bước 8 của luồng chính.
 
 #### Các luồng ngoại lệ
@@ -969,16 +969,16 @@ Nếu lỗi kiểm tra hoặc lỗi ghi tệp, cấu trúc danh mục giữ nguy
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-04`: mỗi Loại thu chi có ít nhất 1 nhóm đang dùng, mọi danh mục thuộc đúng một nhóm cha; cấm nút thiếu nhóm cha hoặc gán sai cấp.
+1. Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`): mỗi Loại thu chi có ít nhất 1 nhóm đang dùng, mọi danh mục thuộc đúng một nhóm cha; cấm nút thiếu nhóm cha hoặc gán sai cấp.
 2. Yêu cầu chức năng liên quan: `FR-CAT-01`, `FR-CAT-02`.
 
 ### 6.13 UC-CAT-02: Đổi tên danh mục
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả phạm vi đổi tên và chuyển nhóm của ca sử dụng Đổi tên danh mục (`UC-CAT-02`):
 
 | Trường | Nội dung |
 | --- | --- |
-| Các bên liên quan và mối quan tâm | Người dùng: cần chỉnh tên danh mục cho rõ hơn. Hệ thống: giữ nguyên liên kết với giao dịch quá khứ, giao dịch lịch sử hiển thị tên mới mà không đổi số tiền; tên mới hợp lệ và duy nhất (`BR-NAM-01`). |
+| Các bên liên quan và mối quan tâm | Người dùng: cần chỉnh tên danh mục cho rõ hơn. Hệ thống: giữ nguyên liên kết với giao dịch quá khứ, giao dịch lịch sử hiển thị tên mới mà không đổi số tiền; tên mới hợp lệ và duy nhất theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`). |
 | Mô tả tóm tắt | Đổi tên hiển thị của một danh mục chi tiết hoặc một nhóm nhu cầu đang dùng; giao dịch quá khứ không mất liên kết. UC này cũng cho chuyển một danh mục sang nhóm khác cùng Loại thu chi. |
 | Điều kiện kích hoạt | Người dùng chọn đổi tên danh mục hoặc nhóm trên cấu trúc danh mục. |
 
@@ -1001,7 +1001,7 @@ Nếu lỗi kiểm tra hoặc Người dùng hủy, tên và liên kết lịch 
 1. Người dùng chọn một danh mục hoặc nhóm và nhấn "Đổi tên".
 2. Hệ thống hiển thị hộp thoại chỉnh tên, điền sẵn tên hiện tại.
 3. Người dùng nhập tên mới và nhấn "Lưu thay đổi".
-4. Hệ thống kiểm tra theo `BR-NAM-01`: sai định dạng `ERR-NAM-001`; trùng mục đang dùng cùng cấp (danh mục trong cùng nhóm cha, nhóm trong cùng Loại thu chi) `ERR-NAM-002`.
+4. Hệ thống kiểm tra theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`): sai định dạng `ERR-NAM-001`; trùng mục đang dùng cùng cấp (danh mục trong cùng nhóm cha, nhóm trong cùng Loại thu chi) `ERR-NAM-002`.
 5. Hệ thống cập nhật tên trong tệp dữ liệu. Giao dịch lịch sử phản ánh tên mới qua mã liên kết; với nhóm, các danh mục con giữ nguyên mã và liên kết giao dịch.
 6. Hệ thống thông báo thành công (đổi tên hoặc chuyển nhóm) và làm mới cấu trúc danh mục.
 
@@ -1011,8 +1011,8 @@ Nếu lỗi kiểm tra hoặc Người dùng hủy, tên và liên kết lịch 
 
 1. Tại bước 1, Người dùng chọn một danh mục chi tiết và nhấn "Chuyển nhóm".
 2. Hệ thống hiển thị các nhóm đang dùng cùng Loại thu chi với danh mục, đánh dấu nhóm hiện tại.
-3. Người dùng chọn nhóm đích. Hệ thống kiểm tra nhóm đích đang dùng, cùng Loại thu chi, và tên danh mục không trùng danh mục đang dùng trong nhóm đích (`BR-NAM-01`).
-4. Hệ thống hiển thị hộp xác nhận nêu số giao dịch của danh mục, nhóm cũ, nhóm mới, và cảnh báo báo cáo theo nhóm của các kỳ đã qua sẽ tính số tiền này vào nhóm mới (tổng thu và tổng chi không đổi).
+3. Người dùng chọn nhóm đích. Hệ thống kiểm tra nhóm đích đang dùng, cùng Loại thu chi, và tên danh mục không trùng danh mục đang dùng trong nhóm đích theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`).
+4. Hệ thống hiển thị hộp xác nhận nêu số giao dịch của danh mục, nhóm cũ, nhóm mới, và cảnh báo rằng báo cáo theo nhóm của các kỳ đã qua sẽ tính số tiền này vào nhóm mới (tổng thu và tổng chi không đổi).
 5. Người dùng nhấn "Xác nhận chuyển". Hệ thống cập nhật nhóm cha của danh mục, giữ nguyên mã và mọi giao dịch liên kết.
 6. Tiếp tục tại bước 6 của luồng chính.
 
@@ -1057,17 +1057,17 @@ Nếu lỗi kiểm tra hoặc Người dùng hủy, tên và liên kết lịch 
 #### Quy tắc nghiệp vụ đặc thù
 
 1. Đổi tên không được phá liên kết với giao dịch lịch sử.
-2. `BR-FIN-04`: cấm chuyển danh mục sang Loại thu chi khác và cấm đổi Loại của nhóm hoặc danh mục đã có giao dịch, để tránh sai lệch báo cáo dòng tiền quá khứ.
+2. Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`): cấm chuyển danh mục sang Loại thu chi khác và cấm đổi Loại của nhóm hoặc danh mục đã có giao dịch, để tránh sai lệch báo cáo dòng tiền quá khứ.
 3. Báo cáo luôn gom theo nhóm hiện tại của danh mục, không lưu nhóm tại thời điểm ghi giao dịch. Nhóm nhu cầu không chuyển được vì cha của nhóm là Loại thu chi và Loại thu chi không đổi.
 4. Yêu cầu chức năng liên quan: `FR-CAT-02`, `FR-CAT-03`.
 
 ### 6.14 UC-CAT-03: Khôi phục hoặc tạo lại mục đã xóa
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả quy trình khôi phục mục đã ẩn của ca sử dụng Khôi phục hoặc tạo lại mục đã xóa (`UC-CAT-03`):
 
 | Trường | Nội dung |
 | --- | --- |
-| Các bên liên quan và mối quan tâm | Người dùng: cần lấy lại nhóm hoặc danh mục xóa nhầm hoặc cần dùng lại, và chọn nối lại lịch sử cũ hay bắt đầu mới. Hệ thống: khôi phục không làm mất hay đổi dữ liệu lịch sử, không để hai mục đang dùng trùng tên trong cùng phạm vi (`BR-NAM-01`). |
+| Các bên liên quan và mối quan tâm | Người dùng: cần lấy lại nhóm hoặc danh mục xóa nhầm hoặc cần dùng lại, và chọn nối lại lịch sử cũ hay bắt đầu mới. Hệ thống: khôi phục không làm mất hay đổi dữ liệu lịch sử, không để hai mục đang dùng trùng tên trong cùng phạm vi theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`). |
 | Mô tả tóm tắt | Từ màn hình "Danh mục đã xóa", Người dùng chọn một nhóm hoặc danh mục đã xóa rồi chọn Khôi phục (giữ mã cũ, nối lại giao dịch cũ) hoặc Tạo mới (mã mới, không nối giao dịch cũ). |
 | Điều kiện kích hoạt | Người dùng mở màn hình "Danh mục đã xóa", hoặc chọn Khôi phục tại hộp hỏi khi tên mới trùng một mục đã xóa (`UC-CAT-01`). |
 
@@ -1091,7 +1091,7 @@ Nếu bị từ chối hoặc lỗi ghi, mục đã xóa giữ nguyên trạng t
 1. Người dùng mở "Danh mục đã xóa".
 2. Hệ thống liệt kê các nhóm và danh mục đã xóa kèm tên, nơi chứa cũ và số giao dịch còn gắn.
 3. Người dùng chọn một mục và nhấn "Khôi phục".
-4. Hệ thống kiểm tra theo `BR-NAM-01`: không có mục đang dùng nào trùng tên trong cùng phạm vi (danh mục trong cùng nhóm, nhóm trong cùng Loại thu chi); với danh mục, nhóm cha phải đang dùng.
+4. Hệ thống kiểm tra theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`): không có mục đang dùng nào trùng tên trong cùng phạm vi (danh mục trong cùng nhóm, nhóm trong cùng Loại thu chi); với danh mục, nhóm cha phải đang dùng.
 5. Hệ thống chuyển mục sang đang dùng với mã cũ, nối lại giao dịch cũ và đưa mục trở lại danh sách chọn.
 6. Hệ thống làm mới cấu trúc danh mục và thông báo khôi phục thành công.
 
@@ -1106,7 +1106,7 @@ Nếu bị từ chối hoặc lỗi ghi, mục đã xóa giữ nguyên trạng t
 ##### Luồng rẽ nhánh 3a: Tạo mới thay vì khôi phục
 
 1. Tại bước 3, Người dùng nhấn "Tạo mới".
-2. Hệ thống yêu cầu nhập tên (điền sẵn tên cũ) và nơi chứa, kiểm tra tên theo `BR-NAM-01` (đúng định dạng, không trùng mục đang dùng trong cùng phạm vi). Bước này không hỏi lại Khôi phục hoặc Tạo mới.
+2. Hệ thống yêu cầu nhập tên (điền sẵn tên cũ) và nơi chứa, kiểm tra tên theo Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`) (đúng định dạng, không trùng mục đang dùng trong cùng phạm vi). Bước này không hỏi lại Khôi phục hoặc Tạo mới.
 3. Hệ thống tạo mục mới với mã mới, đang dùng; mục cũ giữ trạng thái đã xóa.
 4. Tiếp tục tại bước 6 của luồng chính.
 
@@ -1138,13 +1138,13 @@ Nếu bị từ chối hoặc lỗi ghi, mục đã xóa giữ nguyên trạng t
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-04`: khôi phục giữ nguyên mã cũ nên không tạo dữ liệu mồ côi; mã định danh không bao giờ dùng lại cho mục khác.
+1. Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`): khôi phục giữ nguyên mã cũ nên không tạo dữ liệu mồ côi; mã định danh không bao giờ dùng lại cho mục khác.
 2. Khôi phục nhóm chỉ khôi phục riêng nhóm; các danh mục con được khôi phục riêng từng cái.
 3. Yêu cầu chức năng liên quan: `FR-CAT-02`, `FR-CAT-03`.
 
 ### 6.15 UC-CAT-04: Xóa danh mục hoặc nhóm
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả cơ chế xóa cứng hoặc ẩn mềm của ca sử dụng Xóa danh mục hoặc nhóm (`UC-CAT-04`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -1195,18 +1195,18 @@ Không có.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-04`: mục đã có giao dịch không bao giờ bị xóa vật lý, để không giao dịch nào mất danh mục.
+1. Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`): mục đã có giao dịch không bao giờ bị xóa vật lý, để không giao dịch nào mất danh mục.
 2. Người dùng chỉ thấy một thao tác "Xóa"; xóa hẳn hay ẩn do hệ thống quyết định theo số giao dịch.
 3. Yêu cầu chức năng liên quan: `FR-CAT-03`.
 
 ### 6.16 UC-REP-01: Thống kê dòng tiền 12 tháng gần nhất
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả chu kỳ tổng hợp dòng tiền 12 tháng của ca sử dụng Thống kê dòng tiền 12 tháng gần nhất (`UC-REP-01`):
 
 | Trường | Nội dung |
 | --- | --- |
 | Các bên liên quan và mối quan tâm | Người dùng: đánh giá tình hình tài chính định kỳ qua chuỗi dòng tiền 12 tháng và tỷ lệ tiết kiệm. |
-| Mô tả tóm tắt | Tổng hợp chuỗi dòng tiền 12 tháng gần nhất từ mốc tháng chỉ định thành bảng thống kê theo `FR-REP-01`: thu nhập, chi tiêu, dòng tiền thuần, tỷ lệ tiết kiệm theo `BR-FIN-01`. |
+| Mô tả tóm tắt | Tổng hợp chuỗi dòng tiền 12 tháng gần nhất từ mốc tháng chỉ định thành bảng thống kê theo `FR-REP-01`: thu nhập, chi tiêu, dòng tiền thuần, tỷ lệ tiết kiệm theo Quy tắc độ chính xác tài chính (`BR-FIN-01`). |
 | Điều kiện kích hoạt | Người dùng cần đánh giá dòng tiền định kỳ trong 12 tháng gần nhất. |
 
 #### Tiền điều kiện
@@ -1225,7 +1225,7 @@ Hệ thống chỉ đọc, không thay đổi giao dịch hay số dư ví.
 
 #### Luồng sự kiện chính
 
-1. Người dùng chọn "Thống kê dòng tiền 12 tháng gần nhất", tùy chọn chọn tháng và năm kết thúc (mặc định tháng và năm hiện tại).
+1. Người dùng chọn "Thống kê dòng tiền 12 tháng gần nhất", có thể tùy chọn mốc tháng và năm kết thúc (mặc định tháng và năm hiện tại).
 2. Hệ thống xác định mốc tháng kết thúc (mặc định lấy từ đồng hồ hệ thống).
 3. Hệ thống tạo danh sách 12 tháng liên tục từ 11 tháng trước mốc đến chính mốc, sắp xếp thời gian tăng dần (tháng kết thúc ở dòng cuối).
 4. Với mỗi tháng, hệ thống lọc giao dịch có ngày trong tháng và tính tổng thu nhập, tổng chi tiêu (trên các giao dịch đang tồn tại).
@@ -1258,12 +1258,12 @@ Không có.
 #### Quy tắc nghiệp vụ đặc thù
 
 1. `FR-REP-01`: bảng luôn gồm đúng 12 tháng liên tục lùi từ tháng kết thúc (mặc định tháng hiện tại).
-2. `BR-FIN-01`: mọi chỉ số tính bằng số thập phân chính xác, làm tròn ngân hàng 2 chữ số, không có sai số dấu phẩy động.
+2. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi chỉ số tính bằng số thập phân chính xác, làm tròn ngân hàng 2 chữ số, không có sai số dấu phẩy động.
 3. Yêu cầu chức năng liên quan: `FR-REP-01`.
 
 ### 6.17 UC-REP-02: Phân tích cơ cấu thu chi theo nhóm và danh mục
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả cơ cấu tỷ lệ chi tiêu theo nhóm và danh mục của ca sử dụng Phân tích cơ cấu thu chi theo nhóm và danh mục (`UC-REP-02`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -1310,13 +1310,13 @@ Không có.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-01`: mọi phép tổng hợp và tỷ lệ dùng số thập phân chính xác, làm tròn ngân hàng; tiền làm tròn 2 chữ số; tỷ lệ phần trăm giữ tối thiểu 4 chữ số thập phân ở bước trung gian và hiển thị 2 chữ số (`FR-REP-02`).
+1. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi phép tổng hợp và tỷ lệ dùng số thập phân chính xác, làm tròn ngân hàng; tiền làm tròn 2 chữ số; tỷ lệ phần trăm giữ tối thiểu 4 chữ số thập phân ở bước trung gian và hiển thị 2 chữ số (`FR-REP-02`).
 2. Nhóm và danh mục đã xóa giữ tên gốc kèm nhãn "(đã xóa)", không gộp vào dòng "Khác". Dòng số 0 chỉ hiện cho các kỳ quá khứ từ kỳ chứa ngày mục được tạo; kỳ trước ngày tạo và kỳ tương lai ẩn dòng.
 3. Yêu cầu chức năng liên quan: `FR-REP-02`.
 
 ### 6.18 UC-DAT-01: Xuất dữ liệu tài chính
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả cấu trúc định dạng dữ liệu xuất tệp của ca sử dụng Xuất dữ liệu tài chính (`UC-DAT-01`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -1370,17 +1370,17 @@ Tệp sao lưu được tạo với mã hóa UTF-8; các trường số học l�
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `BR-FIN-01`, `FR-DAT-01`: không làm tròn hay dùng ký hiệu khoa học đối với trường số học tài chính khi xuất.
+1. Quy tắc độ chính xác tài chính (`BR-FIN-01`), `FR-DAT-01`: không làm tròn hay dùng ký hiệu khoa học đối với trường số học tài chính khi xuất.
 2. Yêu cầu chức năng liên quan: `FR-DAT-01`.
 
 ### 6.19 UC-DAT-02: Phục hồi dữ liệu hệ thống từ bản sao lưu
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả quy trình xác thực dữ liệu và tự động sao lưu của ca sử dụng Phục hồi dữ liệu hệ thống từ bản sao lưu (`UC-DAT-02`):
 
 | Trường | Nội dung |
 | --- | --- |
 | Các bên liên quan và mối quan tâm | Người dùng: phục hồi dữ liệu tài chính từ tệp sao lưu đã xuất mà không vi phạm các quy tắc tài chính hiện hành. |
-| Mô tả tóm tắt | Phục hồi dữ liệu từ tệp sao lưu qua quy trình kiểm tra 4 bước (cú pháp; danh mục theo `BR-FIN-04`; ví và liên kết chuyển tiền; số dư không âm theo `BR-FIN-02`), có hoàn nguyên tự động theo `FR-DAT-02`. |
+| Mô tả tóm tắt | Phục hồi dữ liệu từ tệp sao lưu qua quy trình kiểm tra 4 bước (cú pháp; danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`); ví và liên kết chuyển tiền; số dư không âm theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`)), có hoàn nguyên tự động theo `FR-DAT-02`. |
 | Điều kiện kích hoạt | Người dùng cần phục hồi dữ liệu từ một tệp sao lưu có sẵn. |
 
 #### Tiền điều kiện
@@ -1394,7 +1394,7 @@ Nếu tệp không hợp lệ hoặc quá trình nhập bị hủy, dữ liệu 
 
 #### Hậu điều kiện thành công
 
-1. Dữ liệu hiện tại được thay thế hoàn toàn bằng dữ liệu từ tệp sao lưu; `BR-FIN-02` và `BR-FIN-04` luôn đúng.
+1. Dữ liệu hiện tại được thay thế hoàn toàn bằng dữ liệu từ tệp sao lưu; Quy tắc bảo toàn số dư ví (`BR-FIN-02`) và Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) luôn đúng.
 2. Nếu tệp chứa dữ liệu lỗi, toàn bộ thao tác bị hủy và hoàn nguyên, dữ liệu hiện tại không đổi.
 
 #### Luồng sự kiện chính
@@ -1406,9 +1406,9 @@ Nếu tệp không hợp lệ hoặc quá trình nhập bị hủy, dữ liệu 
 5. Người dùng xác nhận tiếp tục.
 6. Hệ thống phân tích cú pháp JSON và kiểm tra 4 bước (`FR-DAT-02`):
    - Bước 1 (định dạng): cấu trúc tệp, định dạng ngày `YYYY-MM-DD`, chuỗi số học.
-   - Bước 2 (`BR-FIN-04`): mọi mã danh mục dùng trong giao dịch trỏ tới danh mục hợp lệ (đang dùng hoặc đã xóa) có Loại thu chi tương thích.
+   - Bước 2 (Quy tắc phân cấp danh mục thu chi 3 cấp `BR-FIN-04`): mọi mã danh mục dùng trong giao dịch trỏ tới danh mục hợp lệ (đang dùng hoặc đã xóa) có Loại thu chi tương thích.
    - Bước 3 (ví và liên kết chuyển tiền): mọi giao dịch thu chi và chuyển tiền trỏ tới ví có trong danh sách; mỗi phí giao dịch phát sinh từ chuyển tiền trỏ tới một giao dịch chuyển tiền tồn tại.
-   - Bước 4 (`BR-FIN-02`): tính lại số dư từng ví từ lịch sử dòng tiền trong tệp, không ví nào âm.
+   - Bước 4 (Quy tắc bảo toàn số dư ví `BR-FIN-02`): tính lại số dư từng ví từ lịch sử dòng tiền trong tệp, không ví nào âm.
 7. Nếu cả 4 bước đều đạt, hệ thống bắt đầu ghi tệp, xóa dữ liệu cũ, nạp toàn bộ bản ghi từ tệp sao lưu, hoàn tất ghi, rồi tính lại toàn bộ số dư và bảng thống kê 12 tháng gần nhất.
 8. Hệ thống hiển thị báo cáo nhập thành công gồm tổng số bản ghi và số lượng từng loại thực thể đã phục hồi.
 
@@ -1433,22 +1433,22 @@ Không có.
 
 1. Tại bước 6, hệ thống phát hiện ít nhất một vi phạm, ví dụ giao dịch chi trỏ tới ví không tồn tại, phí giao dịch trỏ tới chuyển tiền không tồn tại, hoặc lịch sử dòng tiền làm ví tiền mặt âm.
 2. Hệ thống hủy toàn bộ quá trình nhập, không ghi bản ghi nào vào tệp dữ liệu.
-3. Hệ thống hiển thị bảng lỗi chi tiết (số dòng lỗi, loại vi phạm: liên kết dữ liệu hoặc quy tắc số dư `BR-FIN-02`) để Người dùng sửa tệp trước khi thử lại.
+3. Hệ thống hiển thị bảng lỗi chi tiết (số dòng lỗi, loại vi phạm: liên kết dữ liệu hoặc Quy tắc bảo toàn số dư ví (`BR-FIN-02`)) để Người dùng sửa tệp trước khi thử lại.
 
 #### Quy tắc nghiệp vụ đặc thù
 
 1. Nguyên tắc tất cả hoặc không: nếu có bất kỳ lỗi nào, toàn bộ quá trình hoàn nguyên về trạng thái trước đó.
-2. `FR-DAT-02`: không ghi dữ liệu nếu chưa qua 4 bước kiểm tra (cấu trúc; danh mục `BR-FIN-04`; ví và liên kết chuyển tiền; số dư không âm `BR-FIN-02`).
+2. `FR-DAT-02`: không ghi dữ liệu nếu chưa qua 4 bước kiểm tra (cấu trúc; danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp `BR-FIN-04`; ví và liên kết chuyển tiền; số dư không âm theo Quy tắc bảo toàn số dư ví `BR-FIN-02`).
 3. Yêu cầu chức năng liên quan: `FR-DAT-02`.
 
 ### 6.20 UC-DAT-03: Kiểm tra lại dữ liệu hệ thống
 
-Bảng thuộc tính ca sử dụng:
+Bảng thuộc tính đặc tả thuật toán rà soát bất biến toàn vẹn của ca sử dụng Kiểm tra lại dữ liệu hệ thống (`UC-DAT-03`):
 
 | Trường | Nội dung |
 | --- | --- |
 | Các bên liên quan và mối quan tâm | Người dùng: kiểm tra, đối soát độc lập 4 điều kiện toàn vẹn để phát hiện sớm sai lệch. |
-| Mô tả tóm tắt | Chạy công cụ kiểm tra lại độc lập theo `FR-DAT-03` cho 4 điều kiện: số dư ví (`BR-FIN-02`), cân bằng nguồn - đích khi chuyển tiền (`BR-FIN-03`), liên kết danh mục (`BR-FIN-04`) và toàn vẹn liên kết phí chuyển tiền. |
+| Mô tả tóm tắt | Chạy công cụ kiểm tra lại độc lập theo `FR-DAT-03` cho 4 điều kiện: số dư ví theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`), cân bằng nguồn - đích khi chuyển tiền theo Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và toàn vẹn liên kết phí chuyển tiền. |
 | Điều kiện kích hoạt | Người dùng cần kiểm tra định kỳ hoặc khi nghi ngờ có sai lệch. |
 
 #### Tiền điều kiện
@@ -1468,9 +1468,9 @@ Báo cáo kiểm tra phản ánh trung thực trạng thái của 4 điều ki�
 
 1. Người dùng chọn "Kiểm tra lại dữ liệu hệ thống".
 2. Hệ thống quét toàn bộ tệp dữ liệu và kiểm tra lần lượt 4 điều kiện (`FR-DAT-03`):
-   - Bước 1 (`BR-FIN-02`): tính độc lập số dư từng ví từ lịch sử dòng tiền, so với số dư ghi nhận, sai số bằng 0.00 VNĐ.
-   - Bước 2 (`BR-FIN-03`): với mọi giao dịch chuyển tiền, số tiền trừ ở ví nguồn bằng đúng số tiền cộng ở ví đích (không tính chi phí).
-   - Bước 3 (`BR-FIN-04`): mọi giao dịch thu chi gắn với danh mục có trong dữ liệu (mục đã xóa vẫn hợp lệ) và đúng Loại thu chi.
+   - Bước 1 (Quy tắc bảo toàn số dư ví `BR-FIN-02`): tính độc lập số dư từng ví từ lịch sử dòng tiền, so với số dư ghi nhận, sai số bằng 0.00 VNĐ.
+   - Bước 2 (Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ `BR-FIN-03`): với mọi giao dịch chuyển tiền, số tiền trừ ở ví nguồn bằng đúng số tiền cộng ở ví đích (không tính chi phí).
+   - Bước 3 (Quy tắc phân cấp danh mục thu chi 3 cấp `BR-FIN-04`): mọi giao dịch thu chi gắn với danh mục có trong dữ liệu (mục đã xóa vẫn hợp lệ) và đúng Loại thu chi.
    - Bước 4: mọi phí giao dịch phát sinh từ chuyển tiền trỏ tới một giao dịch chuyển tiền tồn tại.
 3. Hệ thống tổng hợp Báo cáo kiểm tra lại dữ liệu, phân mức độ nghiêm trọng: `INFO`, `WARNING`, `ERROR`.
 4. Nếu tất cả đạt, hệ thống hiển thị trạng thái hợp lệ: "Dữ liệu hệ thống đạt 100% yêu cầu về liên kết dữ liệu và số dư khớp nhau."
@@ -1486,5 +1486,5 @@ Không có luồng ngoại lệ nghiệp vụ bổ sung ngoài việc phân lo�
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục (`BR-FIN-04`) và liên kết phí chuyển tiền.
+1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và liên kết phí chuyển tiền.
 2. Yêu cầu chức năng liên quan: `FR-DAT-03`.
