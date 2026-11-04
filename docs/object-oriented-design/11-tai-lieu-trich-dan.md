@@ -1,0 +1,4 @@
+# 11. Tài liệu Trích dẫn
+
+<!-- PLACEHOLDER: Danh mục toàn bộ các tài liệu tham khảo kỹ thuật, sách chuyên khảo phần mềm và tiêu chuẩn quốc tế được trích dẫn từ thư mục reference/ (bao gồm Craig Larman, Martin Fowler, Eric Evans, Erich Gamma và nhóm tác giả GoF, Scott Ambler, Robert C. Martin, Joshua Bloch, ISO/IEC 19505, ISO/IEC 25010, ISO/IEC/IEEE 29148, ISO 8601-1, RFC 4180, RFC 8259, RFC 3629); toàn bộ danh mục được định dạng theo chuẩn APA 7th edition và sắp xếp theo thứ tự chữ cái A-Z của tên tác giả hoặc cơ quan ban hành; không phân chia thành các tiểu mục con và không bao gồm tài liệu môn học hay văn bản đề bài | Căn cứ: Thư mục reference/, Quy tắc trích dẫn Rule 07 | Tiêu chí hoàn thành: Ghi đầy đủ tác giả hoặc cơ quan ban hành, năm xuất bản, tên tài liệu in nghiêng, số hiệu tiêu chuẩn, nhà xuất bản hoặc tổ chức công bố và liên kết tra cứu ổn định; khớp chính xác 100% với các tài liệu được viện dẫn trong toàn bộ hồ sơ thiết kế -->
+
