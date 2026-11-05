@@ -7,7 +7,7 @@
 - Giao dịch tài chính nhiều bước được ghi nhận nguyên khối hoặc tự động hoàn nguyên khi có lỗi phát sinh.
 - Phân biệt rõ biến thể thành công hợp lệ (luồng rẽ nhánh) với tình huống vi phạm dữ liệu (luồng ngoại lệ).
 
-Quy ước chung: mọi ca sử dụng đều có tác nhân chính là Người dùng, phạm vi là hệ thống PFMS, cấp độ là mục tiêu người dùng; các thuộc tính này không lặp lại ở từng ca sử dụng. Thông báo lỗi được đặc tả chi tiết ở lần xuất hiện đầu tiên; các lần tiếp theo được dẫn chiếu theo mã lỗi chuẩn (`ERR-*`) tại Mục 3.
+Quy ước chung: mọi ca sử dụng đều có tác nhân chính là Người dùng, phạm vi là hệ thống PFMS, cấp độ là mục tiêu người dùng; các thuộc tính này không lặp lại ở từng ca sử dụng. Thông báo lỗi được đặc tả chi tiết ở lần xuất hiện đầu tiên; các lần tiếp theo được dẫn chiếu theo mã lỗi chuẩn (`ERR-*`).
 
 Mỗi ca sử dụng được đặc tả cấu trúc gồm 9 thành phần chuẩn hóa:
 
@@ -15,7 +15,7 @@ Mỗi ca sử dụng được đặc tả cấu trúc gồm 9 thành phần chu�
 2. Bảng thuộc tính: các bên liên quan và mối quan tâm, mô tả tóm tắt, điều kiện kích hoạt.
 3. Tiền điều kiện: trạng thái hệ thống và dữ liệu cần có trước khi bắt đầu.
 4. Bảo đảm tối thiểu: trạng thái được giữ nguyên khi UC thất bại hoặc bị hủy, không để lại bản ghi rác.
-5. Hậu điều kiện thành công: trạng thái dữ liệu sau khi hoàn tất, bảo toàn các bất biến tại Mục 3.
+5. Hậu điều kiện thành công: trạng thái dữ liệu sau khi hoàn tất, bảo toàn các bất biến tài chính.
 6. Luồng sự kiện chính: các bước đánh số từ lúc bắt đầu đến khi đạt mục tiêu.
 7. Các luồng rẽ nhánh: biến thể hợp lệ dẫn tới thành công hoặc kết thúc hợp lệ.
 8. Các luồng ngoại lệ: vi phạm dữ liệu hoặc điều kiện biên, nêu phản ứng hệ thống, mã `ERR-*` và điểm phục hồi.
@@ -1335,7 +1335,7 @@ Xuất dữ liệu không làm đổi dữ liệu hiện có. Nếu lỗi ghi đ
 
 #### Hậu điều kiện thành công
 
-Tệp sao lưu được tạo với mã hóa UTF-8; các trường số học là chuỗi số giữ nguyên chữ số thập phân (không làm tròn, không dùng ký hiệu khoa học) theo `CON-02`; tên tệp tự động theo `pfms_export_{scope}_{yyyyMMdd_HHmmss}.json` (`FR-DAT-01`).
+Tệp sao lưu được tạo với mã hóa UTF-8; các trường số học là chuỗi số giữ nguyên chữ số thập phân (không làm tròn, không dùng ký hiệu khoa học); tên tệp tự động theo `pfms_export_{scope}_{yyyyMMdd_HHmmss}.json` (`FR-DAT-01`).
 
 #### Luồng sự kiện chính
 

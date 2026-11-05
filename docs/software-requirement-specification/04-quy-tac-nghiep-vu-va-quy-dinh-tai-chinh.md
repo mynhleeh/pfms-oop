@@ -1,6 +1,6 @@
 ## 3. QUY TẮC NGHIỆP VỤ VÀ QUY ĐỊNH TÀI CHÍNH
 
-Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán (Problem Domain Policies) và bảo vệ tính toàn vẹn của mục tiêu hệ thống: Ghi nhận dòng tiền và cấu trúc danh mục phân cấp (`G-01`), Xác định tổng số dư và cơ cấu phân bổ ví (`G-02`), Bảo đảm độ chính xác số học tài chính (`G-03`). 
+Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán (Problem Domain Policies) và bảo vệ tính toàn vẹn của mục tiêu hệ thống: 
 
 Mỗi quy tắc nghiệp vụ được đặc tả nhất quán theo khuôn mẫu:
 1. Tên và mã quy tắc: cú pháp `<Tên quy tắc> (BR-<DOMAIN>-NN)`, phân loại theo miền nghiệp vụ tài chính (`BR-FIN`) hoặc miền định danh (`BR-NAM`).
@@ -21,7 +21,7 @@ Bảng tổng hợp 5 quy tắc nghiệp vụ của hệ thống:
 
 ### 3.1 Quy tắc độ chính xác tài chính (`BR-FIN-01`)
 
-Quy tắc áp dụng cho mọi thực thể dữ liệu, phép tính toán số học và việc lưu trữ (ví, giao dịch thu chi, giao dịch chuyển tiền, danh mục, điều chỉnh số dư). Mọi giá trị số tiền và tỷ lệ phần trăm bắt buộc dùng số thập phân chính xác, với số chữ số thập phân cố định theo Giới hạn kiểu số có độ chính xác cố định (`CON-02`). Hệ thống không được sử dụng số thực nhị phân trong tính toán nghiệp vụ nhằm loại bỏ sai số làm tròn, bảo đảm độ chính xác của mọi phép toán tiền tệ và tỷ lệ.
+Quy tắc áp dụng cho mọi thực thể dữ liệu, phép tính toán số học và việc lưu trữ trong hệ thống. Mọi giá trị số tiền và tỷ lệ phần trăm bắt buộc dùng số thập phân chính xác với số chữ số thập phân cố định. Hệ thống không sử dụng số thực nhị phân trong tính toán nghiệp vụ nhằm loại bỏ sai số làm tròn, bảo đảm độ chính xác của mọi phép toán tiền tệ và tỷ lệ.
 
 #### Quy định xử lý
 

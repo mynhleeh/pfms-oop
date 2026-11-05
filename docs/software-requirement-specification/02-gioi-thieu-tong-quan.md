@@ -44,6 +44,8 @@ Tài liệu phục vụ nhóm vai trò kỹ thuật với mục tiêu sử dụn
 
 ### 1.4 Thuật ngữ, từ viết tắt và định nghĩa
 
+Danh mục các thuật ngữ chuyên môn và định nghĩa nghiệp vụ được sử dụng thống nhất trong toàn bộ tài liệu đặc tả:
+
 | Thuật ngữ | Định nghĩa |
 | --- | --- |
 | Ví | Tài khoản lưu giữ số dư tiền khả dụng thực tế của người dùng. Hệ thống có sẵn một ví tiền mặt. Người dùng có thể tạo thêm các ví khác. |
@@ -73,6 +75,8 @@ Tài liệu phục vụ nhóm vai trò kỹ thuật với mục tiêu sử dụn
 | Ghi tệp an toàn | Cách ghi dữ liệu xuống tệp sao cho tệp chính chỉ được thay bằng nội dung mới sau khi toàn bộ nội dung mới đã ghi xong. Nếu quá trình bị ngắt giữa chừng, tệp cũ vẫn giữ nguyên vẹn. |
 | Ngày tháng | Giá trị ngày viết theo định dạng YYYY-MM-DD (Năm, tháng, ngày, ngăn cách bằng dấu gạch nối), dùng cho mọi ngày được nhập và lưu trong tệp xuất hoặc tệp nhập. |
 | Người dùng | Người duy nhất sử dụng hệ thống và có toàn quyền với dữ liệu. Người dùng sử dụng toàn bộ 6 nhóm chức năng nghiệp vụ trên ứng dụng máy tính để bàn chạy trực tiếp trên máy của người dùng. |
+
+Danh mục các từ viết tắt kỹ thuật và nghiệp vụ xuất hiện trong tài liệu kèm tên đầy đủ và ý nghĩa sử dụng:
 
 | Viết tắt | Tên đầy đủ | Ý nghĩa |
 | --- | --- | --- |

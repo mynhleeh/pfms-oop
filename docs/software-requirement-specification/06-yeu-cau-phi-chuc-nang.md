@@ -1,17 +1,17 @@
 ## 5. YÊU CẦU PHI CHỨC NĂNG
 
-Các yêu cầu phi chức năng của Hệ thống Quản lý Tài chính Cá nhân (PFMS) được xây dựng dựa trên tiêu chuẩn chất lượng sản phẩm phần mềm ISO/IEC 25010:2011 và chuẩn kỹ nghệ yêu cầu ISO/IEC/IEEE 29148:2018. Các yêu cầu này đóng vai trò là ràng buộc vận hành và kiến trúc then chốt, bảo đảm hệ thống đạt độ chính xác tài chính tuyệt đối, vận hành ổn định, lưu trữ an toàn, thuận tiện khi sử dụng, tương thích môi trường và dễ bảo trì theo nguyên lý thiết kế hướng đối tượng.
+Các yêu cầu phi chức năng của Hệ thống Quản lý Tài chính Cá nhân (PFMS) được xây dựng dựa trên các nhóm đặc tính chất lượng phần mềm phổ biến. Các yêu cầu này đóng vai trò là ràng buộc vận hành và kiến trúc then chốt, bảo đảm hệ thống đạt độ chính xác tài chính tuyệt đối, vận hành ổn định, lưu trữ an toàn, thuận tiện khi sử dụng, tương thích với môi trường triển khai và dễ bảo trì, mở rộng theo nguyên lý thiết kế hướng đối tượng.
 
 Mỗi yêu cầu phi chức năng được đặc tả nhất quán theo khuôn mẫu:
 
-1. Đặc tính chất lượng: phân loại theo mô hình chất lượng phần mềm ISO/IEC 25010:2011.
-2. Mô tả yêu cầu: xác định phạm vi ràng buộc vận hành và giải pháp kiến trúc mức bài toán.
-3. Chỉ số đo và ngưỡng nghiệm thu: định lượng các tiêu chí đo kiểm và ngưỡng chấp thuận.
-4. Phương pháp kiểm chứng: cơ chế xác minh gồm kiểm thử tự động (`T`), trình diễn thao tác (`D`), soát xét kỹ thuật (`I`) và phân tích số liệu (`A`).
+- Đặc tính chất lượng: xác định yêu cầu thuộc nhóm đặc tính chất lượng phần mềm nào, như độ chính xác, độ tin cậy, bảo mật, khả năng sử dụng, tính tương thích hoặc khả năng bảo trì.
+- Mô tả yêu cầu: xác định phạm vi ràng buộc vận hành và giải pháp kiến trúc ở mức bài toán, làm rõ hệ thống phải đạt được điều gì mà chưa đi vào chi tiết cài đặt.
+- Chỉ số đo và ngưỡng nghiệm thu: định lượng các tiêu chí đo kiểm và ngưỡng chấp thuận để có thể đánh giá yêu cầu đã được đáp ứng hay chưa.
+- Phương pháp kiểm chứng: cơ chế xác minh yêu cầu, gồm kiểm thử tự động (`T`), trình diễn thao tác (`D`), soát xét kỹ thuật (`I`) và phân tích số liệu (`A`).
 
-Bảng tổng hợp danh mục 6 yêu cầu phi chức năng của hệ thống theo các đặc tính chất lượng của tiêu chuẩn ISO/IEC 25010:2011, phương pháp kiểm chứng tương ứng và chỉ số trọng tâm:
+Bảng tổng hợp danh mục các yêu cầu phi chức năng của hệ thống theo từng đặc tính chất lượng, kèm phương pháp kiểm chứng tương ứng và chỉ số trọng tâm:
 
-| Mã yêu cầu | Tên yêu cầu | Đặc tính chất lượng ISO 25010 | Phương pháp chính | Chỉ số trọng tâm |
+| Mã yêu cầu | Tên yêu cầu | Đặc tính chất lượng | Phương pháp chính | Chỉ số trọng tâm |
 | :---: | :--- | :--- | :---: | :--- |
 | `NFR-01` | Độ chính xác và toàn vẹn dữ liệu tài chính | Mức độ phù hợp chức năng / Tính chính xác chức năng | T, I | Sai số tích lũy 0.00 VNĐ; 0% trường dùng số thực nhị phân (`float`/`double`); 0% vi phạm quy tắc bảo toàn số dư. |
 | `NFR-02` | Hiệu năng và độ trễ phản hồi | Hiệu quả vận hành / Hành vi thời gian, Mức sử dụng tài nguyên | D, A | Phản hồi dưới 1.0 giây với thao tác thông thường; không rò rỉ bộ nhớ khi sử dụng liên tục. |
@@ -27,20 +27,20 @@ Bảng tổng hợp danh mục 6 yêu cầu phi chức năng của hệ thống 
 Mô tả yêu cầu:
 
 1. Kiểu dữ liệu số học:
-   - Dùng kiểu số thập phân chính xác cố định cho mọi trường số, biến trung gian, phép tính tiền tệ, số dư ví và tổng số dư, với tối thiểu 18 chữ số phần nguyên và 2 chữ số thập phân (`CON-02`).
+   - Dùng kiểu số thập phân chính xác cố định cho mọi trường số, biến trung gian, phép tính tiền tệ, số dư ví và tổng số dư, với tối thiểu 18 chữ số phần nguyên và 2 chữ số thập phân.
    - Cấm sử dụng kiểu số thực nhị phân (`float`, `double`) trong cấu trúc dữ liệu nghiệp vụ, thuật toán tính toán và lưu trữ. Giá trị số chỉ được khởi tạo từ dữ liệu nhập dạng thập phân chính xác hoặc từ số nguyên, tuyệt đối không chuyển đổi trung gian qua `float` hoặc `double`.
 2. Độ chính xác thập phân và làm tròn:
    - Tiền VNĐ hiển thị 0 chữ số thập phân (số nguyên đồng) trên giao diện người dùng; tính toán, xử lý nghiệp vụ và kiểm thử dùng 2 chữ số thập phân.
-   - Tỷ lệ phần trăm trung gian dùng tối thiểu 4 chữ số thập phân (`BR-FIN-01`).
+   - Tỷ lệ phần trăm trung gian dùng tối thiểu 4 chữ số thập phân theo quy tắc Độ chính xác tài chính (`BR-FIN-01`).
    - Mọi phép chia phải chỉ định rõ số chữ số thập phân và chế độ làm tròn ngân hàng (làm tròn đến số chẵn gần nhất khi giá trị nằm giữa hai mức).
    - So sánh số theo giá trị thực, bỏ qua khác biệt do cách hiển thị số chữ số thập phân.
 3. Sai số tích lũy: sai số của mọi chuỗi phép tính, trong từng giao dịch và trên toàn bộ dữ liệu tổng hợp, bảo đảm bằng 0.00 VNĐ.
-4. Bảo toàn số dư (`BR-FIN-02`): tại mọi thời điểm, số dư khả dụng của ví $w$ tại thời điểm quan sát $T$ thỏa mãn công thức:
+4. Bảo toàn số dư theo quy tắc Bảo toàn số dư ví (`BR-FIN-02`): tại mọi thời điểm, số dư khả dụng của ví $w$ tại thời điểm quan sát $T$ thỏa mãn công thức:
 
    $$\text{Số dư ví } w \text{ tại } T = (\text{Thu} + \text{Chuyển vào} + \text{Điều chỉnh tăng}) - (\text{Chi} + \text{Chuyển ra} + \text{Điều chỉnh giảm})$$
 
-   Mỗi hạng tử là tổng các khoản của ví $w$ đến thời điểm $T$. Điều chỉnh tăng và điều chỉnh giảm lần lượt là các khoản điều chỉnh số dư dương và âm theo `FR-WAL-05`.
-5. Cân bằng nguồn - đích (`BR-FIN-03`): mọi lần chuyển tiền nội bộ phải có số tiền trừ ở ví nguồn bằng số tiền cộng ở ví đích (chưa tính phí). Tổng tiền trong hệ thống giữ nguyên, trừ chi phí chuyển tiền phát sinh nếu có.
+   Mỗi hạng tử là tổng các khoản của ví $w$ đến thời điểm $T$. Điều chỉnh tăng và điều chỉnh giảm lần lượt là các khoản điều chỉnh số dư dương và âm theo yêu cầu Điều chỉnh số dư ví (`FR-WAL-05`).
+5. Cân bằng nguồn - đích theo quy tắc Ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`): mọi lần chuyển tiền nội bộ phải có số tiền trừ ở ví nguồn bằng số tiền cộng ở ví đích (chưa tính phí). Tổng tiền trong hệ thống giữ nguyên, trừ chi phí chuyển tiền phát sinh nếu có.
 
 Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với độ chính xác và tính toàn vẹn dữ liệu tài chính:
 
@@ -48,8 +48,8 @@ Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với độ
 | --- | --- | --- |
 | Sai số tích lũy số học | Chênh lệch tuyệt đối giữa tổng tiền kỳ vọng và thực tế | 0.00 VNĐ |
 | Kiểu số thực nhị phân trong mô hình nghiệp vụ | Số trường dùng `float`/`double` chia tổng số trường số | 0.00% |
-| Vi phạm quy tắc bảo toàn số dư (`BR-FIN-02`) | Số giao dịch vi phạm chia tổng số giao dịch | 0.00% trên toàn bộ tập kiểm thử |
-| Sai lệch nguồn - đích khi chuyển tiền (`BR-FIN-03`, chưa tính phí) | Chênh lệch tuyệt đối giữa tiền trừ ví nguồn và tiền cộng ví đích | 0.00 VNĐ |
+| Vi phạm quy tắc Bảo toàn số dư ví (`BR-FIN-02`) | Số giao dịch vi phạm chia tổng số giao dịch | 0.00% trên toàn bộ tập kiểm thử |
+| Sai lệch nguồn - đích khi chuyển tiền theo quy tắc Ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`), chưa tính phí | Chênh lệch tuyệt đối giữa tiền trừ ví nguồn và tiền cộng ví đích | 0.00 VNĐ |
 | Số chữ số thập phân của tiền VNĐ | Số chữ số thập phân khi hiển thị, khi tính toán và kiểm thử | 0 (giao diện) / 2 (tính toán, kiểm thử) |
 | Số chữ số thập phân của tỷ lệ phần trăm | Số chữ số thập phân trong phép tính tỷ lệ | Từ 4 trở lên |
 | Phép chia có chỉ định số chữ số thập phân và làm tròn | Số phép chia thập phân chính xác đạt yêu cầu chia tổng số phép chia | 100.00% |
@@ -59,7 +59,7 @@ Bảng quy định phương pháp và quy trình kiểm chứng kỹ thuật cho
 | Phương pháp | Loại hình | Quy trình |
 | --- | --- | --- |
 | Soát xét kỹ thuật (`I`) | Đánh giá kiểm tra | Rà soát mã nguồn phần nghiệp vụ để phát hiện khai báo `float`/`double`, việc tạo số thập phân trực tiếp từ số thực nhị phân và các phép chia thiếu số chữ số thập phân hoặc quy tắc làm tròn. |
-| Kiểm thử tự động (`T`) | Kiểm thử tự động | Chạy kiểm thử giá trị biên (số tiền 18 chữ số phần nguyên theo `CON-02`, chia tỷ lệ phần trăm cho số dư ví lẻ) và kiểm thử độ bền với chuỗi giao dịch liên tiếp để đối chiếu số dư tính toán với số dư thực tế. |
+| Kiểm thử tự động (`T`) | Kiểm thử tự động | Chạy kiểm thử giá trị biên (số tiền 18 chữ số phần nguyên, chia tỷ lệ phần trăm cho số dư ví lẻ) và kiểm thử độ bền với chuỗi giao dịch liên tiếp để đối chiếu số dư tính toán với số dư thực tế. |
 
 ### 5.2 NFR-02: Hiệu năng và độ trễ phản hồi
 
@@ -98,7 +98,7 @@ Mô tả yêu cầu:
    - Không ghi dở: dữ liệu mới chỉ thay thế tệp chính thức khi toàn bộ nội dung đã ghi thành công và trọn vẹn xuống tệp tạm.
    - Lưu bền xuống đĩa: dữ liệu của lần ghi hoàn tất phải được đẩy trực tiếp xuống đĩa vật lý, không tồn đọng trong vùng đệm bộ nhớ.
    - Bảo toàn bản cũ: tự động giữ lại bản sao tệp dữ liệu gốc trước khi tiến hành thay thế nếu phát hiện rủi ro gián đoạn.
-2. Tự động sao lưu: tạo bản sao lưu có gắn nhãn thời gian theo mẫu `backup_YYYYMMDD_HHMMSS.json` trong thư mục `backups/` (`CON-06`), trước khi thực hiện các tác vụ thay thế dữ liệu quy mô lớn (phục hồi dữ liệu từ tệp nhập ngoài theo `UC-DAT-02`, đặt lại hệ thống).
+2. Tự động sao lưu: tạo bản sao lưu có gắn nhãn thời gian theo mẫu `backup_YYYYMMDD_HHMMSS.json` trong thư mục `backups/`, trước khi thực hiện các tác vụ thay thế dữ liệu quy mô lớn (phục hồi dữ liệu từ tệp nhập ngoài theo ca sử dụng Phục hồi dữ liệu từ bản sao lưu (`UC-DAT-02`), đặt lại hệ thống).
 3. Kiểm tra toàn vẹn khi đọc: khi đọc từ tệp lưu trữ hoặc bản sao lưu, kiểm tra cấu trúc dữ liệu trước khi nạp vào bộ nhớ (đúng lược đồ JSON, mã liên kết danh mục hợp lệ, thỏa mãn quy tắc bảo toàn số dư). Nếu phát hiện sai lệch, hủy toàn bộ thao tác đọc, giữ nguyên trạng thái dữ liệu trước đó và hiển thị thông báo lỗi chi tiết.
 4. Xử lý lỗi đọc ghi: kiểm soát và xử lý toàn bộ ngoại lệ vào/ra tệp tin. Khi ổ đĩa đầy hoặc thư mục bị khóa quyền ghi, giữ nguyên tệp dữ liệu gốc và hiển thị thông báo lỗi rõ ràng.
 
@@ -195,7 +195,7 @@ Bảng quy định phương pháp và quy trình kiểm chứng tính khả dụ
 
 Mô tả yêu cầu:
 
-1. Môi trường thực thi: tương thích máy ảo Java (JVM) phiên bản 17 LTS trở lên (`CON-01`).
+1. Môi trường thực thi: tương thích máy ảo Java (JVM) phiên bản 17 LTS trở lên.
 2. Độc lập hệ điều hành: ứng dụng được đóng gói độc lập, vận hành đồng nhất trên các hệ điều hành máy tính cá nhân phổ biến có cài đặt JVM tương thích (Windows, macOS, Linux) mà không cần chỉnh sửa mã nguồn hay biên dịch lại.
 3. Quản lý đường dẫn tệp tin: không viết cứng ký tự phân cách thư mục (`\` hoặc `/`); toàn bộ thao tác xử lý đường dẫn phải thông qua đối tượng đường dẫn trừu tượng độc lập nền tảng của hệ thống vào/ra tệp tin.
 4. Chuẩn mã hóa UTF-8 không BOM: toàn bộ thao tác đọc, ghi tệp dữ liệu cục bộ, tệp xuất JSON và báo cáo định dạng văn bản bắt buộc chỉ định rõ UTF-8 không BOM, bảo đảm dữ liệu tiếng Việt hiển thị chính xác trên mọi hệ điều hành.
