@@ -1,42 +1,338 @@
-# 06. Áp dụng Nguyên lý SOLID và Mẫu Thiết kế
+# 06. Áp dụng Nguyên lý SOLID và Mẫu Thiết kế Hướng đối tượng
 
-## 6.1 Đánh giá Tuân thủ Năm Nguyên lý Thiết kế Cơ bản
+Tài liệu này xác lập hồ sơ đánh giá chất lượng kiến trúc và đặc tả các mẫu thiết kế hướng đối tượng cho Hệ thống Quản lý Tài chính Cá nhân PFMS. Văn bản định hình cầu nối kỹ thuật giữa mô hình cấu trúc tĩnh và luồng tương tác động đã xác lập ở các phần trước với giai đoạn triển khai mã nguồn, bảo đảm toàn bộ hệ thống tuân thủ nghiêm ngặt các tiêu chuẩn thiết kế phần mềm sạch.
 
-### 6.1.1 Bảng Đối chiếu Hiện thực Hóa Từng Nguyên lý
-<!-- PLACEHOLDER: Bảng đối chiếu 5 nguyên lý thiết kế SOLID (Đơn trách nhiệm, Đóng mở, Thay thế Liskov, Phân tách giao diện, Nghịch đảo phụ thuộc); mỗi nguyên lý gồm các cột: Tên nguyên lý, Mục tiêu thiết kế, Cặp lớp hoặc giao diện điển hình chứng minh việc tuân thủ trong hệ thống PFMS, và Lợi ích thu được trong việc bảo trì mã nguồn | Căn cứ: Robert C. Martin Clean Architecture, Rubric học thuật PTIT | Tiêu chí hoàn thành: 100% cả 5 nguyên lý đều có dẫn chứng cặp lớp/giao diện cụ thể có thật trong hệ thống, không đưa ra lý thuyết suông -->
+Nội dung tài liệu tập trung giải quyết ba mục tiêu kỹ thuật trọng tâm: rà soát và đối chiếu định lượng mức độ tuân thủ năm nguyên lý thiết kế SOLID trên các cặp lớp và giao diện thực tế trong hệ thống, xác lập điểm cân bằng kỹ thuật để phòng tránh việc thiết kế quá mức cho một ứng dụng dòng lệnh; thiết lập cơ sở lựa chọn và đặc tả chi tiết bốn mẫu thiết kế hướng đối tượng nhằm triệt tiêu các khối lệnh rẽ nhánh thủ công và phân tách các tác vụ phụ trợ khỏi luồng nghiệp vụ chính; và xác lập khung tương tác chuẩn mực bảo đảm mã nguồn Java đạt độ ghép nối lỏng, tính gắn kết cao cùng khả năng kiểm thử độc lập toàn diện bằng JUnit 5.
 
-### 6.1.2 Phân tích Đánh đổi Kỹ thuật khi Áp dụng
-<!-- PLACEHOLDER: Trình bày phân tích đánh đổi kỹ thuật thực tế: việc tuân thủ nghiêm ngặt SOLID giúp mã nguồn có độ ghép nối lỏng lẻo và dễ kiểm thử độc lập, nhưng làm gia tăng số lượng lớp và giao diện trong dự án; quy định giới hạn áp dụng hợp lý nhằm tránh việc thiết kế quá mức (over-engineering) cho một đồ án ứng dụng dòng lệnh | Căn cứ: Martin Fowler Refactoring, Joshua Bloch Effective Java | Tiêu chí hoàn thành: Chỉ ra được điểm cân bằng thực tế giữa tính linh hoạt của thiết kế và sự đơn giản cần thiết của mã nguồn -->
+## 6.1 Đánh giá Tuân thủ Năm Nguyên lý SOLID
 
-## 6.2 Mẫu Nhà máy Khởi tạo Đối tượng
+Mục này đánh giá mức độ tuân thủ năm nguyên lý SOLID trong kiến trúc của Hệ thống Quản lý Tài chính Cá nhân PFMS. Mọi minh chứng kỹ thuật đều được đối chiếu trực tiếp từ các lớp thực thể, dịch vụ và kho lưu trữ thực tế của hệ thống, không dùng các ví dụ trừu tượng ngoài phạm vi dự án.
 
-### 6.2.1 Động lực Áp dụng và Cấu trúc Lớp Nhà máy
-<!-- PLACEHOLDER: Phân tích động lực áp dụng mẫu Nhà máy (Factory Method): giải quyết bài toán khởi tạo các loại giao dịch khác nhau (Giao dịch thu nhập, Giao dịch chi tiêu, Giao dịch chuyển tiền) từ dữ liệu nhập thô của người dùng mà không để tầng giao diện phụ thuộc trực tiếp vào các lớp con cụ thể; sơ đồ lớp thiết kế chi tiết thể hiện lớp Nhà máy Giao dịch và các phương thức khởi tạo tương ứng | Căn cứ: Erich Gamma GoF Creational Patterns, Craig Larman Creator Pattern | Tiêu chí hoàn thành: Tách biệt hoàn toàn việc tạo đối tượng giao dịch phức tạp khỏi tầng điều phối dịch vụ -->
+**Đối chiếu cài đặt năm nguyên lý trong hệ thống:**
 
-### 6.2.2 Quy trình Xử lý Khởi tạo Giao dịch Đa dạng
-<!-- PLACEHOLDER: Đặc tả quy trình nhận diện tham số và khởi tạo: lớp Nhà máy tiếp nhận đối tượng truyền dữ liệu (DTO) từ tầng giao diện -> kiểm tra loại giao dịch hợp lệ -> gọi hàm khởi tạo lớp con phù hợp -> nạp thông tin ví và danh mục -> trả về đối tượng Giao dịch trừu tượng; cơ chế ném ngoại lệ khi loại giao dịch không hợp lệ | Căn cứ: Joshua Bloch Effective Java (Static factory methods) | Tiêu chí hoàn thành: Đảm bảo nguyên lý Đóng/Mở - khi bổ sung loại giao dịch mới trong tương lai chỉ cần mở rộng lớp con và cập nhật nhà máy mà không sửa đổi tầng giao diện -->
+Hệ thống tuân thủ trọn vẹn năm nguyên lý thiết kế thông qua việc phân tách cấu trúc bốn tầng hướng tâm và thiết lập các hợp đồng giao diện nghiêm ngặt:
 
-## 6.3 Mẫu Chiến lược Thuật toán Linh hoạt
+| Nguyên lý thiết kế | Quy tắc cốt lõi | Minh chứng cài đặt trong hệ thống PFMS |
+| :--- | :--- | :--- |
+| **Đơn trách nhiệm**<br/>(Single Responsibility Principle - SRP) | Mỗi lớp chỉ đảm nhiệm một lý do duy nhất để thay đổi; tách biệt giữa quy tắc nghiệp vụ, điều phối ca sử dụng và lưu trữ tệp. | Bộ ba lớp: thực thể `Wallet` (gói `domain.model`), dịch vụ `WalletServiceImpl` (gói `service.impl`) và kho lưu trữ `WalletRepository` (gói `domain.repository`). Mỗi lớp có một lý do duy nhất để thay đổi: `Wallet` chỉ sửa khi quy tắc tính số dư thay đổi; `WalletServiceImpl` chỉ sửa khi luồng phối hợp ca sử dụng đổi khác; `WalletRepository` chỉ sửa khi cấu trúc đọc ghi tệp thay đổi. Thay đổi ở lớp này không làm ảnh hưởng sang lớp khác. |
+| **Đóng mở**<br/>(Open/Closed Principle - OCP) | Thực thể phần mềm mở rộng cho việc phát triển thêm hành vi mới nhưng đóng kín trước việc sửa đổi mã nguồn sẵn có. | Lớp cơ sở trừu tượng `Transaction` và hai lớp con kế thừa `IncomeExpenseTransaction`, `TransferTransaction` (gói `domain.model`). Khi hệ thống cần bổ sung một loại giao dịch mới trong tương lai, lập trình viên chỉ cần tạo thêm lớp con kế thừa từ `Transaction` mà không phải sửa đổi mã nguồn lớp cha, đồng thời không phải viết thêm các lệnh rẽ nhánh `switch-case` trong các lớp dịch vụ. |
+| **Thay thế Liskov**<br/>(Liskov Substitution Principle - LSP) | Các đối tượng của lớp con có thể thay thế hoàn toàn cho đối tượng của lớp cha mà không làm thay đổi tính đúng đắn của chương trình. | Lớp cha `Transaction` và hai lớp con cụ thể. Các phương thức trong `TransactionRepository` (như `save(Transaction)`) và phương thức tính toán trong `ReportServiceImpl` đều nhận tham số kiểu lớp cha `Transaction`. Mọi thể hiện của `IncomeExpenseTransaction` hay `TransferTransaction` đều có thể truyền vào thay thế hoàn hảo mà không làm sai lệch kết quả, không cần ép kiểu thủ công (`cast`) và không ném ngoại lệ ngoài hợp đồng của lớp cha. |
+| **Phân tách Giao diện**<br/>(Interface Segregation Principle - ISP) | Không ép buộc các thành phần phụ thuộc vào các giao diện chứa phương thức mà chúng không có nhu cầu sử dụng. | Thay vì tạo một giao diện khổng lồ cho toàn bộ hệ thống, hệ thống chia nhỏ thành 6 giao diện dịch vụ độc lập: `WalletService`, `TransactionService`, `TransferService`, `CategoryService`, `ReportService`, `DataManagementService`. Mỗi bộ điều khiển giao diện dòng lệnh (Controller) chỉ phụ thuộc vào đúng giao diện dịch vụ mà nó cần dùng. Ví dụ: `WalletController` chỉ gọi `WalletService`, hoàn toàn không bị ảnh hưởng hay phải biên dịch lại khi `ReportService` thay đổi. |
+| **Nghịch đảo Phụ thuộc**<br/>(Dependency Inversion Principle - DIP) | Mô đun cấp cao không phụ thuộc mô đun cấp thấp; cả hai phụ thuộc vào sự trừu tượng hóa; trừu tượng hóa không phụ thuộc chi tiết cài đặt. | Tầng Dịch vụ (`WalletServiceImpl`) không phụ thuộc trực tiếp vào lớp lưu tệp cụ thể (`JsonFileWalletRepository`), mà phụ thuộc vào giao diện trừu tượng `WalletRepository` nằm trong Tầng Nghiệp vụ. Lớp cài đặt cụ thể được tiêm từ bên ngoài vào qua hàm khởi tạo (Constructor Injection). Nhờ đó, hệ thống có thể dễ dàng tráo đổi sang kho lưu trữ trên bộ nhớ tạm (`MemoryWalletRepository`) để chạy kiểm thử đơn vị tự động tốc độ cao mà không phải sửa một dòng mã nghiệp vụ nào. |
 
-### 6.3.1 Động lực Áp dụng và Giao diện Chiến lược
-<!-- PLACEHOLDER: Phân tích động lực áp dụng mẫu Chiến lược (Strategy Pattern): đóng gói các thuật toán có khả năng thay đổi và tráo đổi lẫn nhau trong lúc ứng dụng đang chạy; đặc tả hai giao diện chiến lược trọng tâm: Giao diện Chiến lược Tính Lãi (cho phép tráo đổi giữa tính lãi đơn, tính lãi kép, tính lãi bậc thang) và Giao diện Chiến lược Xuất Báo cáo (cho phép tráo đổi giữa hiển thị bảng văn bản trên màn hình dòng lệnh và xuất tệp phẳng) | Căn cứ: Erich Gamma GoF Behavioral Patterns, Rubric học thuật PTIT | Tiêu chí hoàn thành: Giao diện chiến lược được định nghĩa độc lập, nhận tham số tính toán và trả về kết quả chuẩn mà không bị phụ thuộc vào trạng thái nội bộ của lớp gọi -->
+**Phân tích đánh đổi kỹ thuật và giới hạn áp dụng:**
 
-### 6.3.2 Hiện thực Các Chiến lược Cụ thể
-<!-- PLACEHOLDER: Đặc tả chi tiết các lớp cài đặt chiến lược cụ thể: Lớp Tính Lãi Đơn, Lớp Tính Lãi Kép Theo Chu Kỳ; Lớp Xuất Báo Cáo Dòng Lệnh, Lớp Xuất Báo Cáo Tệp Dữ Liệu; sơ đồ lớp thể hiện mối quan hệ giữa lớp Ngữ cảnh (Context như Sổ Tiết kiệm hoặc Dịch vụ Báo cáo) và các lớp Chiến lược | Căn cứ: Chuẩn tính toán tài chính, Martin Fowler Strategy Pattern | Tiêu chí hoàn thành: Chứng minh việc chuyển đổi linh hoạt giữa các thuật toán thông qua cấu hình hoặc lựa chọn của người dùng tại thời điểm chạy chương trình -->
+Việc tuân thủ nghiêm ngặt năm nguyên lý thiết kế giúp mã nguồn có độ ghép nối lỏng và dễ kiểm thử độc lập, nhưng đòi hỏi sự cân nhắc kỹ lưỡng về chi phí đánh đổi trong bối cảnh một ứng dụng dòng lệnh Java chạy cục bộ:
 
-## 6.4 Mẫu Trạng thái Vòng đời Nghiệp vụ
+**Chi phí kỹ thuật phát sinh:**
+- Gia tăng số lượng tệp mã nguồn: Việc phân tách giao diện và lớp cài đặt làm tăng số lượng tệp cần quản lý trong dự án (mỗi giao diện đều đi kèm ít nhất một lớp cài đặt tương ứng).
+- Chi phí chuyển đổi dữ liệu giữa các tầng: Dữ liệu từ người dùng phải chuyển đổi qua lại nhiều lần từ DTO sang Thực thể nghiệp vụ, rồi từ Thực thể sang bản ghi tệp JSON làm tăng số lượng dòng mã trung gian.
+- Đòi hỏi thời gian làm quen kiến trúc: Thành viên phát triển cần nắm vững mô hình phân tầng và cách tương tác qua giao diện thay vì lối viết mã kịch bản thủ tục đơn giản.
 
-### 6.4.1 Động lực Áp dụng và Máy Trạng thái Hướng đối tượng
-<!-- PLACEHOLDER: Phân tích động lực áp dụng mẫu Trạng thái (State Pattern): quản lý hành vi của thực thể Hợp đồng Vay Nợ và Sổ Tiết kiệm thay đổi tùy theo trạng thái vòng đời hiện tại của nó; thay thế toàn bộ các khối lệnh điều kiện phức tạp (if-else hoặc switch-case theo mã trạng thái) bằng cấu trúc đa hình hướng đối tượng | Căn cứ: Erich Gamma GoF State Pattern, Mô hình máy trạng thái OOA | Tiêu chí hoàn thành: Mỗi trạng thái vòng đời được đóng gói thành một lớp riêng biệt, kế thừa từ một giao diện trạng thái chung -->
+**Điểm cân bằng thực tế trong PFMS nhằm tránh thiết kế quá mức:**
+- Tiêm phụ thuộc thủ công qua hàm khởi tạo: Hệ thống sử dụng cơ chế Dependency Injection thuần Java tại điểm khởi động chương trình (`Main`), không đưa các khung công nghệ nặng như Spring Framework hay Google Guice vào ứng dụng dòng lệnh.
+- Tái sử dụng giao diện kho lưu trữ cơ sở: Áp dụng `GenericRepository<E, ID>` với 5 phương thức CRUD chuẩn để loại bỏ trùng lặp mã nguồn, chỉ khai báo thêm các phương thức truy vấn thực sự cần thiết theo ca sử dụng.
+- Đóng gói phạm vi lớp cài đặt nội bộ: Khai báo các lớp cài đặt dịch vụ ở phạm vi `package-private`, chỉ công khai giao diện trừu tượng ra ngoài gói nhằm bảo vệ tính toàn vẹn và giữ cho không gian tên của hệ thống luôn tinh gọn.
 
-### 6.4.2 Chuyển đổi Trạng thái Sổ Tiết kiệm và Hợp đồng Vay Nợ
-<!-- PLACEHOLDER: Sơ đồ lớp và bảng chuyển đổi trạng thái chi tiết: các trạng thái của Sổ Tiết kiệm (Đang tích lũy, Đã đến hạn tất toán, Đã tất toán trước hạn); các trạng thái của Hợp đồng Vay Nợ (Đang có hiệu lực, Quá hạn trả nợ, Đã hoàn tất thanh toán); đặc tả hành vi của các phương thức như rút tiền, thanh toán đợt nợ tại từng trạng thái cụ thể | Căn cứ: Quy tắc nghiệp vụ hợp đồng tài chính, ISO/IEC 19505 State Machine Diagram | Tiêu chí hoàn thành: Khóa chặt các thao tác không hợp lệ tại từng trạng thái (ví dụ: không cho phép thanh toán khoản nợ đã hoàn tất) bằng ngoại lệ nghiệp vụ có kiểm soát -->
+## 6.2 Áp dụng các Mẫu Thiết kế trong Hệ thống
 
-## 6.5 Mẫu Quan sát Đồng bộ Dữ liệu
+Mục này đặc tả việc áp dụng các mẫu thiết kế hướng đối tượng vào cấu trúc phần mềm của Hệ thống Quản lý Tài chính Cá nhân PFMS. Hệ thống chọn lọc bốn giải pháp cấu trúc và hành vi cốt lõi nhằm chuẩn hóa quá trình tạo đối tượng, đóng gói thuật toán kết xuất dữ liệu, kiểm soát vòng đời thực thể và phân tách sự kiện kiểm toán; loại trừ việc áp dụng hình thức các mẫu thiết kế gây phức tạp hóa không cần thiết cho ứng dụng dòng lệnh.
 
-### 6.5.1 Động lực Áp dụng và Cơ chế Đăng ký Lắng nghe
-<!-- PLACEHOLDER: Phân tích động lực áp dụng mẫu Quan sát (Observer Pattern / Publish-Subscribe): thiết lập mối liên kết lỏng lẻo giữa đối tượng phát ra sự kiện (Subject) và các đối tượng có nhu cầu lắng nghe sự kiện (Observer); đặc tả giao diện Đối tượng Lắng nghe Sự kiện Giao dịch và cơ chế đăng ký, hủy đăng ký lắng nghe trong Dịch vụ Giao dịch | Căn cứ: Erich Gamma GoF Observer Pattern, Kiến trúc hướng sự kiện lỏng lẻo | Tiêu chí hoàn thành: Đối tượng phát sự kiện hoàn toàn không biết chi tiết cụ thể của đối tượng lắng nghe, chỉ gửi thông điệp thông qua giao diện chung -->
+Bốn mẫu thiết kế gồm Factory Method, Strategy, State và Observer được đặc tả chi tiết dưới đây theo cấu trúc đồng nhất: động lực áp dụng và bài toán thực tế, cấu trúc lớp và phân định vai trò, quy trình thực thi và lợi ích kỹ thuật thu được khi bảo trì hệ thống.
 
-### 6.5.2 Đồng bộ Số dư Ví và Kích hoạt Cảnh báo Ngân sách
-<!-- PLACEHOLDER: Đặc tả hai lớp lắng nghe cụ thể: Lớp Lắng nghe Cập nhật Số dư Ví (tự động kích hoạt việc ghi nhận số dư tức thời khi giao dịch được xác nhận) và Lớp Lắng nghe Cảnh báo Hạn mức Ngân sách (tự động so sánh số tiền lũy kế với hạn mức ngân sách và phát tín hiệu cảnh báo ra màn hình dòng lệnh nếu chi tiêu vượt quá 80% hoặc 100%); sơ đồ tuần tự mô tả luồng phát sự kiện và xử lý bất đồng bộ hoặc tuần tự | Căn cứ: Ca sử dụng ghi nhận giao dịch và cảnh báo ngân sách | Tiêu chí hoàn thành: Loại bỏ hoàn toàn việc gọi trực tiếp cứng giữa Dịch vụ Giao dịch và Dịch vụ Ngân sách, giữ tính gắn kết cao và ghép nối lỏng lẻo -->
+### 6.2.1 Mẫu Factory Method Khởi tạo Giao dịch
 
+**Bài toán thực tế và Động lực áp dụng:**
+
+Trong hệ thống PFMS, các thực thể đơn lẻ như `Wallet` hay `Category` có cấu trúc khởi tạo đơn giản nên được tạo trực tiếp qua hàm khởi tạo (Constructor). Mẫu Factory Method được áp dụng chuyên biệt cho cây phân cấp `Transaction` nhằm giải quyết bài toán khởi tạo đa hình phức tạp:
+
+- Phân tách cấu trúc đa hình: Hệ thống quản lý hai loại biến động tài chính có thuộc tính khác biệt gồm giao dịch thu chi tại một ví (`IncomeExpenseTransaction`) và giao dịch chuyển tiền giữa hai ví (`TransferTransaction`).
+- Quản lý ràng buộc hợp thành sinh tử: Cả hai loại giao dịch đều có thể phát sinh chi phí giao dịch (`TransactionFee`). Bản ghi phí này phải được khởi tạo đồng thời và gắn liền với vòng đời của giao dịch gốc.
+- Tránh ô nhiễm tầng dịch vụ: Nếu không có Factory, `TransactionServiceImpl` và `TransferServiceImpl` sẽ phải trực tiếp gọi lệnh `new` cho từng lớp con và tự xử lý logic tạo phí, khiến tầng dịch vụ bị ghép nối chặt với chi tiết cài đặt của tầng miền.
+
+Lớp `TransactionFactory` được định vị tại Tầng Nghiệp vụ (`com.pfms.domain.model`) để đóng gói toàn bộ quy trình tiếp nhận tham số, khởi tạo đúng lớp con cụ thể kèm chi phí đi kèm, và trả về kiểu tham chiếu trừu tượng `Transaction`.
+
+**Cấu trúc lớp và Sơ đồ thiết kế:**
+
+Sơ đồ lớp dưới đây mô tả cấu trúc lớp `TransactionFactory` cùng mối quan hệ giữa Tầng Dịch vụ và các lớp thực thể giao dịch:
+
+```mermaid
+classDiagram
+    direction TB
+
+    class TransactionServiceImpl {
+        +recordIncomeExpense(TransactionRequestDTO)
+    }
+
+    class TransferServiceImpl {
+        +transferFunds(TransferRequestDTO)
+    }
+
+    class TransactionFactory {
+        +createIncomeExpense(...) IncomeExpenseTransaction$
+        +createTransfer(...) TransferTransaction$
+        +createFee(...) TransactionFee$
+    }
+
+    class Transaction {
+        <<abstract>>
+        +getAmount() Money*
+        +getFee() Optional~TransactionFee~
+    }
+
+    class IncomeExpenseTransaction {
+        +getCategory() Category
+    }
+
+    class TransferTransaction {
+        +getSourceWallet() Wallet
+        +getDestinationWallet() Wallet
+    }
+
+    class TransactionFee {
+        +getFeeAmount() Money
+    }
+
+    TransactionServiceImpl ..> TransactionFactory : triệu gọi
+    TransferServiceImpl ..> TransactionFactory : triệu gọi
+
+    TransactionFactory ..> IncomeExpenseTransaction : tạo mới
+    TransactionFactory ..> TransferTransaction : tạo mới
+    TransactionFactory ..> TransactionFee : tạo mới
+
+    Transaction <|-- IncomeExpenseTransaction : kế thừa
+    Transaction <|-- TransferTransaction : kế thừa
+    IncomeExpenseTransaction "1" *-- "0..1" TransactionFee : hợp thành
+    TransferTransaction "1" *-- "0..1" TransactionFee : hợp thành
+```
+
+**Cơ chế khởi tạo và Giá trị kỹ thuật:**
+
+Lớp `TransactionFactory` cung cấp các phương thức tĩnh nhằm chuẩn hóa quy trình sinh đối tượng và mang lại các giá trị kỹ thuật thực tế:
+
+- Tự động đóng gói chi phí hợp thành: Khi tham số phí hợp lệ (`feeAmount > 0`), Factory tự động khởi tạo thể hiện `TransactionFee` liên kết và nạp vào thực thể giao dịch tương ứng; ngược lại, trường phí nhận giá trị rỗng. Toàn bộ logic ràng buộc này nằm trọn trong Factory, loại trừ nguy cơ phát sinh bản ghi phí mồ côi.
+- Tách biệt trách nhiệm điều phối: Tầng Dịch vụ chỉ tập trung điều phối luồng nghiệp vụ ca sử dụng, hoàn toàn giải phóng khỏi chi tiết khởi tạo và ràng buộc cấu trúc của các lớp thực thể con.
+- Khả năng mở rộng không xâm lấn: Khi hệ thống cần mở rộng loại giao dịch mới trong tương lai (như giao dịch định kỳ tự động), lập trình viên chỉ cần tạo lớp kế thừa mới từ `Transaction` và bổ sung phương thức tạo trên `TransactionFactory` mà không phải chỉnh sửa bất kỳ dòng mã nào trong Tầng Dịch vụ.
+- Bảo đảm tính toàn vẹn dữ liệu: Mọi kiểm tra bất biến về số tiền dương, ngày phát sinh hợp lệ và danh mục phí đều được đóng gói tập trung tại Factory, bảo đảm mọi thực thể `Transaction` ra đời luôn ở trạng thái hoàn chỉnh và hợp lệ.
+
+### 6.2.2 Mẫu Strategy Định dạng Báo cáo Tài chính
+
+**Bài toán thực tế và Động lực áp dụng:**
+
+Phân hệ Báo cáo (`REP`) chịu trách nhiệm tổng hợp dữ liệu thu chi theo kỳ quan sát (`UC-REP-01`) và phân tích cơ cấu chi tiêu theo nhóm danh mục (`UC-REP-02`). Dữ liệu tài chính sau khi được tính toán cần được kết xuất ra bên ngoài theo hai nhu cầu hoàn toàn khác biệt của người dùng:
+- Hiển thị trực quan trên giao diện dòng lệnh: Dữ liệu được định dạng thành bảng văn bản ASCII có khung viền, căn lề chuẩn và hiển thị dấu phân cách hàng nghìn.
+- Kết xuất tệp phẳng bền vững: Dữ liệu được chuyển đổi thành cấu trúc JSON lưu xuống đĩa cục bộ phục vụ việc lưu trữ lâu dài hoặc tái sử dụng cho các công cụ phân tích khác.
+
+Nếu `ReportServiceImpl` tự đảm nhiệm toàn bộ việc vẽ bảng và xuất tệp:
+- Tầng Dịch vụ bị phình to do trộn lẫn giữa logic tính toán số học tài chính với logic xử lý chuỗi ký tự và định dạng tệp tin.
+- Mỗi khi cần thay đổi bố cục bảng hiển thị hoặc bổ sung thêm định dạng xuất mới (như định dạng CSV cho bảng tính), lập trình viên buộc phải sửa đổi trực tiếp mã nguồn của `ReportServiceImpl`.
+
+Giải pháp là áp dụng mẫu Strategy bằng cách trừu tượng hóa hành vi kết xuất thành giao diện `ReportExportStrategy`. Các thuật toán định dạng được đóng gói thành các lớp chiến lược độc lập, cho phép `ReportServiceImpl` ủy quyền việc kết xuất và tráo đổi định dạng linh hoạt tại thời điểm chạy.
+
+**Cấu trúc lớp và Sơ đồ thiết kế:**
+
+Sơ đồ lớp dưới đây mô tả cấu trúc mẫu Strategy trong phân hệ Báo cáo:
+
+```mermaid
+classDiagram
+    direction TB
+
+    class ReportServiceImpl {
+        -TransactionRepository transactionRepo
+        -CategoryRepository categoryRepo
+        +generateFinancialReport(LocalDate, LocalDate, ReportExportStrategy) String
+    }
+
+    class ReportExportStrategy {
+        <<interface>>
+        +export(FinancialReportDTO) String*
+    }
+
+    class ConsoleTableReportStrategy {
+        +export(FinancialReportDTO) String
+    }
+
+    class JsonReportStrategy {
+        +export(FinancialReportDTO) String
+    }
+
+    class FinancialReportDTO {
+        -LocalDate startDate
+        -LocalDate endDate
+        -Money totalIncome
+        -Money totalExpense
+        -Money netCashFlow
+        -BigDecimal savingsRate
+    }
+
+    ReportServiceImpl ..> ReportExportStrategy : ủy quyền kết xuất
+    ReportExportStrategy <|.. ConsoleTableReportStrategy : cài đặt
+    ReportExportStrategy <|.. JsonReportStrategy : cài đặt
+    ReportExportStrategy ..> FinancialReportDTO : nhận dữ liệu
+```
+
+**Cơ chế chuyển đổi và Giá trị kỹ thuật:**
+
+Mẫu Strategy mang lại cơ chế vận hành linh hoạt và các giá trị kỹ thuật thực tế cho hệ thống:
+
+- Tráo đổi định dạng tại thời điểm chạy: Khi người dùng lựa chọn xem trên màn hình dòng lệnh hoặc xuất tệp trên Menu chức năng, Tầng Trình diễn (`cli.controller`) sẽ truyền lớp chiến lược tương ứng (`ConsoleTableReportStrategy` hoặc `JsonReportStrategy`) vào phương thức của `ReportServiceImpl`. Dịch vụ thực hiện tính toán số liệu và chuyển giao đối tượng `FinancialReportDTO` cho chiến lược được chọn tự kết xuất kết quả.
+- Tách biệt tính toán và định dạng trình bày: `ReportServiceImpl` chỉ tập trung thực hiện các phép tính số học tài chính chính xác (`NetCashFlow`, `SavingsRate`). Toàn bộ việc xử lý căn lề chuỗi, vẽ khung viền hay tuần tự hóa JSON được chuyển giao trọn vẹn cho các lớp chiến lược.
+- Khả năng mở rộng không xâm lấn: Khi hệ thống cần bổ sung định dạng xuất mới trong tương lai (như `CsvReportStrategy` để mở trên Excel), lập trình viên chỉ cần tạo thêm một lớp mới cài đặt giao diện `ReportExportStrategy` mà không phải chỉnh sửa bất kỳ dòng mã nào trong `ReportServiceImpl`.
+- Năng lực kiểm thử độc lập: Thuật toán tính toán số liệu của dịch vụ có thể được kiểm thử độc lập bằng cách truyền vào một chiến lược giả lập (Mock Strategy), đồng thời quy tắc vẽ bảng hiển thị cũng được kiểm thử riêng biệt mà không phụ thuộc vào kho lưu trữ dữ liệu.
+
+### 6.2.3 Mẫu State Quản lý Vòng đời Ví Tiền
+
+**Bài toán thực tế và Động lực áp dụng:**
+
+Trong phân hệ Quản lý Ví (`WAL`), thực thể Ví tiền (`Wallet`) trải qua một vòng đời biến đổi trạng thái chặt chẽ gồm ba trạng thái: Đang hoạt động (`ACTIVE`), Đã lưu trữ (`ARCHIVED`) và Đã xóa (`DELETED`). Hành vi tài chính của ví thay đổi căn bản tùy theo trạng thái hiện tại:
+- Trạng thái `ACTIVE`: Tiếp nhận bình thường mọi biến động dòng tiền gồm nạp tiền, chi tiêu, chuyển tiền đi và nhận tiền chuyển đến.
+- Trạng thái `ARCHIVED`: Ví được tạm ngừng sử dụng, số dư vẫn được tính vào tổng tài sản của người dùng nhưng từ chối tuyệt đối mọi giao dịch thu chi hoặc điều chuyển tiền mới (`FR-WAL-03`). Ví chỉ cho phép thao tác kích hoạt lại (`activate`).
+- Trạng thái `DELETED`: Ví đã bị xóa khỏi hệ thống, từ chối mọi thao tác nghiệp vụ và chuyển đổi.
+
+Nếu quản lý trạng thái bằng biến cờ liệt kê (`enum`) thông thường:
+- Các phương thức biến động số dư (`credit`, `debit`) và phương thức chuyển trạng thái của `Wallet` sẽ ngập tràn các khối lệnh kiểm tra điều kiện lặp lại: `if (this.status == ARCHIVED) throw ...; else if (this.status == DELETED) throw ...`.
+- Logic kiểm soát vòng đời bị phân mảnh rải rác trong nhiều hàm; khi hệ thống bổ sung trạng thái mới (như tạm khóa để kiểm kê), lập trình viên buộc phải rà soát và sửa đổi toàn bộ các câu lệnh rẽ nhánh trong thực thể.
+
+Giải pháp là áp dụng mẫu State: đóng gói các quy tắc hành vi của từng trạng thái vòng đời vào các lớp trạng thái độc lập kế thừa từ giao diện chung `WalletState`. Thực thể `Wallet` giữ vai trò là Ngữ cảnh (Context), ủy quyền toàn bộ các hành vi tài chính cho đối tượng trạng thái hiện tại xử lý thông qua tính đa hình.
+
+**Cấu trúc lớp và Sơ đồ thiết kế:**
+
+Sơ đồ lớp dưới đây mô tả cấu trúc mẫu State áp dụng cho thực thể Ví tiền:
+
+```mermaid
+classDiagram
+    direction TB
+
+    class Wallet {
+        -UUID id
+        -String name
+        -Money currentBalance
+        -WalletState state
+        +credit(Money)
+        +debit(Money)
+        +archive()
+        +activate()
+        +delete()
+        ~setState(WalletState)
+    }
+
+    class WalletState {
+        <<interface>>
+        +credit(Wallet, Money)*
+        +debit(Wallet, Money)*
+        +archive(Wallet)*
+        +activate(Wallet)*
+        +delete(Wallet)*
+    }
+
+    class ActiveWalletState {
+        +credit(Wallet, Money)
+        +debit(Wallet, Money)
+        +archive(Wallet)
+        +activate(Wallet)
+        +delete(Wallet)
+    }
+
+    class ArchivedWalletState {
+        +credit(Wallet, Money)
+        +debit(Wallet, Money)
+        +archive(Wallet)
+        +activate(Wallet)
+        +delete(Wallet)
+    }
+
+    class DeletedWalletState {
+        +credit(Wallet, Money)
+        +debit(Wallet, Money)
+        +archive(Wallet)
+        +activate(Wallet)
+        +delete(Wallet)
+    }
+
+    Wallet *-- WalletState : duy trì trạng thái hiện tại
+    WalletState <|.. ActiveWalletState : cài đặt
+    WalletState <|.. ArchivedWalletState : cài đặt
+    WalletState <|.. DeletedWalletState : cài đặt
+```
+
+**Cơ chế chuyển đổi và Giá trị kỹ thuật:**
+
+Mẫu State thiết lập cơ chế kiểm soát vòng đời chặt chẽ và an toàn cho nguồn tiền:
+
+- Khóa thao tác không hợp lệ qua tính đa hình: Thay vì phải viết các câu lệnh điều kiện rẽ nhánh thủ công, mỗi lớp trạng thái tự kiểm soát các hành vi hợp lệ và từ chối các hành vi trái phép. Ví dụ: `ArchivedWalletState` tự động ném ngoại lệ nghiệp vụ khi phương thức `credit()` hoặc `debit()` được triệu gọi, bảo đảm ví đã lưu trữ không bao giờ bị phát sinh giao dịch mới ngoài ý muốn.
+- Cô lập logic chuyển đổi trạng thái: Toàn bộ điều kiện tiên quyết để chuyển từ trạng thái này sang trạng thái khác (như từ `ACTIVE` sang `ARCHIVED` hoặc chuyển ngược lại về `ACTIVE`) được gói gọn bên trong các lớp trạng thái cụ thể thông qua lời gọi `wallet.setState(...)`. Trạng thái nội tại của ví luôn được bảo vệ toàn vẹn.
+- Khả năng mở rộng trạng thái mới: Khi hệ thống cần bổ sung trạng thái vòng đời mới trong tương lai, lập trình viên chỉ cần tạo thêm một lớp mới cài đặt giao diện `WalletState` và định nghĩa các bước chuyển tương ứng mà không làm xáo trộn mã nguồn của các trạng thái đã chạy ổn định.
+
+### 6.2.4 Mẫu Observer Xử lý Sự kiện Giao dịch
+
+**Bài toán thực tế và Động lực áp dụng:**
+
+Trong hệ thống PFMS, mỗi khi một giao dịch tài chính (thu chi hoặc điều chuyển tiền) được ghi nhận thành công, hệ thống cần lập tức kích hoạt hai tác vụ phụ trợ độc lập:
+- Cập nhật số dư tức thời của ví: Phản ánh biến động tiền tệ lên trường `currentBalance` của các ví liên quan (cộng tiền vào ví thu, trừ tiền khỏi ví chi hoặc chuyển khoản đồng thời giữa hai ví theo quy tắc `BR-FIN-02`).
+- Ghi nhận vết kiểm toán tài chính: Ghi lại thông tin giao dịch gồm mốc thời gian, loại giao dịch, số tiền biến động và mã định danh vào tệp `audit.log` phục vụ việc đối soát và khôi phục dữ liệu ở phân hệ `DAT`.
+
+Nếu `TransactionServiceImpl` và `TransferServiceImpl` trực tiếp gọi tuần tự các dịch vụ phụ trợ:
+- Tầng Dịch vụ bị ghép nối chặt với các hệ thống ghi log kiểm toán và dịch vụ cập nhật ví, dẫn đến hiện tượng dịch vụ bị phình to và ôm đồm quá nhiều trách nhiệm ngoài luồng nghiệp vụ chính.
+- Khi hệ thống cần bổ sung thêm một hành động mới sau giao dịch trong tương lai (như kiểm tra đối soát số dư tức thời hoặc hiển thị thông báo ra màn hình), lập trình viên buộc phải can thiệp và sửa đổi trực tiếp mã nguồn của dịch vụ giao dịch.
+
+Giải pháp là áp dụng mẫu Observer theo cơ chế hướng sự kiện nội bộ: dịch vụ giao dịch đóng vai trò là nguồn phát sự kiện; khi giao dịch được xác nhận thành công, dịch vụ chỉ phát ra sự kiện `TransactionCreatedEvent`. Các bộ lắng nghe đăng ký nhận sự kiện sẽ tự động đón bắt và thực thi tác vụ riêng biệt.
+
+**Cấu trúc lớp và Sơ đồ thiết kế:**
+
+Sơ đồ lớp dưới đây mô tả cấu trúc mẫu Observer trong luồng xử lý sự kiện giao dịch:
+
+```mermaid
+classDiagram
+    direction TB
+
+    class TransactionServiceImpl {
+        -TransactionEventPublisher eventPublisher
+        +recordIncomeExpense(TransactionRequestDTO)
+        +transferFunds(TransferRequestDTO)
+    }
+
+    class TransactionEventPublisher {
+        -List~TransactionEventListener~ listeners
+        +registerListener(TransactionEventListener)
+        +removeListener(TransactionEventListener)
+        +publishEvent(TransactionCreatedEvent)
+    }
+
+    class TransactionEventListener {
+        <<interface>>
+        +onTransactionCreated(TransactionCreatedEvent)*
+    }
+
+    class WalletBalanceUpdateListener {
+        -WalletRepository walletRepo
+        +onTransactionCreated(TransactionCreatedEvent)
+    }
+
+    class AuditLogEventListener {
+        -AuditLogger auditLogger
+        +onTransactionCreated(TransactionCreatedEvent)
+    }
+
+    class TransactionCreatedEvent {
+        -UUID transactionId
+        -Money amount
+        -LocalDateTime timestamp
+        +getTransactionId() UUID
+        +getAmount() Money
+    }
+
+    TransactionServiceImpl ..> TransactionEventPublisher : phát sự kiện
+    TransactionEventPublisher o-- "*" TransactionEventListener : quản lý danh sách lắng nghe
+    TransactionEventListener <|.. WalletBalanceUpdateListener : cài đặt
+    TransactionEventListener <|.. AuditLogEventListener : cài đặt
+    TransactionEventListener ..> TransactionCreatedEvent : tiếp nhận sự kiện
+```
+
+**Cơ chế phát sự kiện và Giá trị kỹ thuật:**
+
+Mẫu Observer thiết lập cơ chế liên kết lỏng lẻo và mang lại các giá trị kiến trúc thực tế:
+
+- Liên kết lỏng lẻo giữa nguồn phát và bên tiếp nhận: `TransactionServiceImpl` hoàn toàn không phụ thuộc vào chi tiết cài đặt của các bộ lắng nghe. Dịch vụ chỉ phát đi thông điệp `TransactionCreatedEvent` thông qua bộ điều phối `TransactionEventPublisher`, loại bỏ hoàn toàn các lời gọi hàm trực tiếp sang lớp kiểm toán.
+- Phân tách luồng nghiệp vụ chính khỏi tác vụ phụ trợ: Tầng Dịch vụ chỉ tập trung vào việc xác thực và hạch toán dòng tiền của ca sử dụng. Toàn bộ logic ghi vết nhật ký tệp và tính toán số dư được chuyển giao sang các listener độc lập, giúp mã nguồn tầng dịch vụ luôn ngắn gọn và sáng rõ.
+- Khả năng mở rộng không giới hạn: Khi hệ thống cần bổ sung tác vụ mới sau giao dịch (như tự động kiểm tra toàn vẹn tài chính sau mỗi lần chuyển khoản), lập trình viên chỉ cần tạo thêm lớp mới cài đặt giao diện `TransactionEventListener` và đăng ký vào bộ phát sự kiện mà không phải sửa đổi bất kỳ dòng mã nào trong `TransactionServiceImpl`.
+- Độc lập kiểm thử: Năng lực kiểm thử đơn vị của `TransactionServiceImpl` được tối ưu hóa tối đa; kiểm thử viên có thể kiểm tra tính đúng đắn của quy trình giao dịch mà không cần khởi tạo hệ thống tệp ghi nhật ký kiểm toán thực tế.

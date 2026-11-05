@@ -78,15 +78,12 @@
 - 5.5 Sơ đồ Tuần tự Nhóm Danh mục Phân loại
 - 5.6 Sơ đồ Tuần tự Nhóm Báo cáo và Quản trị Dữ liệu
 
-### Phần 6: Áp dụng Nguyên lý SOLID và Mẫu Thiết kế
+### Phần 6: Áp dụng Nguyên lý SOLID và Mẫu Thiết kế Hướng đối tượng
 
-<!-- PLACEHOLDER: Đánh giá chi tiết việc tuân thủ 5 nguyên lý thiết kế cơ bản và đặc tả chi tiết 4 mẫu thiết kế hướng đối tượng gồm Nhà máy, Chiến lược, Trạng thái và Quan sát | Căn cứ: Milestone 5 Rubric, Robert C. Martin Clean Architecture, Erich Gamma GoF | Tiêu chí: Mỗi mẫu thiết kế phải có sơ đồ lớp, vai trò từng thành phần và phân tích lợi ích kỹ thuật -->
+<!-- PLACEHOLDER: Đánh giá chi tiết việc tuân thủ 5 nguyên lý SOLID và đặc tả chi tiết 4 mẫu thiết kế hướng đối tượng gồm Factory Method, Strategy, State và Observer | Căn cứ: Milestone 5 Rubric, Robert C. Martin Clean Architecture, Erich Gamma GoF | Tiêu chí: Mỗi mẫu thiết kế phải có sơ đồ lớp, vai trò từng thành phần và phân tích lợi ích kỹ thuật -->
 
-- 6.1 Đánh giá Tuân thủ Năm Nguyên lý Thiết kế Cơ bản
-- 6.2 Mẫu Nhà máy Khởi tạo Đối tượng
-- 6.3 Mẫu Chiến lược Thuật toán Linh hoạt
-- 6.4 Mẫu Trạng thái Vòng đời Nghiệp vụ
-- 6.5 Mẫu Quan sát Đồng bộ Dữ liệu
+- 6.1 Đánh giá Tuân thủ Năm Nguyên lý SOLID
+- 6.2 Áp dụng các Mẫu Thiết kế trong Hệ thống
 
 ### Phần 7: Thiết kế Giao diện Dòng lệnh
 
