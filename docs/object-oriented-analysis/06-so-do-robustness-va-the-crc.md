@@ -142,8 +142,6 @@ ctrl ..> view : ! ERR-CAT-005 / ERR-NAM-001 / ERR-NAM-002
 | 8 | `CategoryController` cập nhật cây danh mục 3 cấp và trả kết quả về `CategoryUI`. |
 | 9 | `CategoryUI` hiển thị danh mục mới trên cây phân cấp và báo thành công cho người dùng. |
 
-> **Ngoại lệ:** `ERR-CAT-005` — Nhóm cha không tồn tại hoặc không hoạt động (bước 3). `ERR-NAM-001` — Tên danh mục sai định dạng (bước 5). `ERR-NAM-002` — Tên danh mục trùng trong cùng nhóm cha (bước 5). `CategoryController` báo lỗi về `CategoryUI`; không có thực thể nào được tạo.
-
 ### 6.1.5 Thống kê và Báo cáo
 
 Cho phép người dùng yêu cầu hệ thống trích xuất và tổng hợp chuỗi số liệu dòng tiền 12 tháng liên tục lùi từ mốc thời gian chỉ định (hoặc thời điểm hiện tại), tính toán thu nhập, chi tiêu, dòng tiền thuần và tỷ lệ tiết kiệm từng tháng theo chuẩn làm tròn ngân hàng, đồng thời xác định 3 giá trị bình quân tháng trong chế độ thuần đọc mà không làm biến đổi bất kỳ trạng thái dữ liệu nào.
@@ -202,8 +200,6 @@ ctrl ..> view : ! ERR-FIN-002
 | 8 | `ReportController` tính 3 mức bình quân tháng (chia đều cho 12) và đóng gói toàn bộ dữ liệu báo cáo. |
 | 9 | `ReportController` trả về mô hình dữ liệu báo cáo 12 tháng hoàn chỉnh cho `ReportUI`. |
 | 10 | `ReportUI` hiển thị bảng số liệu 12 tháng, dòng bình quân và biểu đồ kết hợp cột–đường. |
-
-> **Ngoại lệ `! ERR-FIN-002`:** Khi mốc thời gian không hợp lệ (bước 3) hoặc khi thu nhập bằng 0 gây lỗi chia cho không trong tính `SavingsRate` (bước 7), `ReportController` trả cảnh báo về `ReportUI` để hiển thị; dữ liệu giao dịch gốc không bị ảnh hưởng.
 
 ### 6.1.6 Lưu trữ và Sao lưu
 
@@ -265,8 +261,6 @@ ctrl ..> view : ! ERR-DAT-001
 | 9 | `BackupController` kiểm tra độ nguyên vẹn tệp đã ghi và đóng gói kết quả kiểm toán. |
 | 10 | `BackupController` trả về cho `BackupUI` đường dẫn tệp, dung lượng và số lượng bản ghi đã xuất. |
 | 11 | `BackupUI` hiển thị thông báo xuất dữ liệu thành công kèm đường dẫn tệp, dung lượng và số bản ghi. |
-
-> **Ngoại lệ `! ERR-DAT-001`:** Có thể xảy ra tại bước 3 (kiểm tra quyền/dung lượng) hoặc bước 8 (ghi tệp). `BackupController` báo lỗi quyền truy cập đĩa hoặc ổ đĩa đầy về `BackupUI` để hiển thị cảnh báo; toàn bộ dữ liệu gốc trong `FinancialDataStore` không bị ảnh hưởng.
 
 
 ## 6.2 Thẻ CRC
