@@ -61,49 +61,13 @@ Quản lý vòng đời của danh mục phân loại, bao gồm tạo mới, ch
 
 - Quy chiếu chéo: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`, `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`, `BR-FIN-04`, `BR-NAM-01`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-003`, `ERR-CAT-004`, `ERR-CAT-005`
 
-```plantuml
-@startuml
-skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 11
-skinparam shadowing false
-skinparam roundCorner 8
-
-skinparam ArrowFontSize 10
-
-skinparam ActivityStartColor #38BDF8
-skinparam ActivityEndColor #F43F5E
-skinparam ActivityBorderColor #F43F5E
-
-skinparam state {
-    BackgroundColor #232731
-    BorderColor #4B5563
-    FontColor #F3F4F6
-    FontStyle bold
-}
-
-skinparam nodesep 30
-skinparam ranksep 36
-
-scale 1.3
-
-state ACTIVE #0F382C;line:10B981;text:E6FFFA
-state HIDDEN #382D10;line:F59E0B;text:FEF3C7
-state DELETED #3F1D24;line:F43F5E;text:FFE4E6
-
-[*] -right-> ACTIVE 
-
-HIDDEN -up-> HIDDEN : renameCategory()
-ACTIVE -up-> HIDDEN : hideCategory()
-HIDDEN -down-> ACTIVE : restoreCategory()
-
-ACTIVE -down-> DELETED : deleteCategory()
-DELETED -up-> ACTIVE : restoreCategory()
-
-DELETED -right-> [*] : permanentlyRemoved()
-ACTIVE -right-> [*] : deleteCategory()
-
-ACTIVE --> ACTIVE : renameCategory()
-@enduml
+```mermaid
+stateDiagram-v2
+    [*] --> Active : createCategory
+    Active --> Hidden : hideCategory
+    Hidden --> Active : restoreCategory
+    Active --> Deleted : deleteCategory
+    Deleted --> [*] : permanentlyRemoved
 ```
 
 | Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |

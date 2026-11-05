@@ -188,9 +188,12 @@ Người dùng muốn mở rộng cấu trúc phân loại chi tiêu bằng các
 
 **Tiền điều kiện**
 
-- Nhóm nhu cầu cha xác định bởi `parentCategoryId` bắt buộc phải tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`), không được ở trạng thái đã xóa (theo `BR-FIN-04`, lỗi `ERR-CAT-005`).
-- Tên danh mục mới (`categoryName`) không được để trống, sau khi loại bỏ khoảng trắng ở hai đầu (`trim`) phải có độ dài từ 1 đến 50 ký tự (theo `BR-NAM-01`, lỗi `ERR-NAM-001`).
-- Tên danh mục mới sau khi loại bỏ khoảng trắng ở hai đầu và không phân biệt chữ hoa, chữ thường phải là duy nhất trong cùng nhóm cha, không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm nhu cầu cha đó (theo `BR-NAM-01`, lỗi `ERR-NAM-002`).
+- Nhóm nhu cầu cha xác định bởi `parentCategoryId` bắt buộc phải tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`), không được ở trạng thái đã xóa (theo `BR-FIN-04`).
+- Trường hợp phát sinh (`ERR-CAT-005`): Người dùng tạo danh mục vào nhóm nhu cầu đang ở trạng thái đã xóa hoặc nhóm cha không tồn tại trong hệ thống.
+- Tên danh mục mới (`categoryName`) không được để trống, sau khi loại bỏ khoảng trắng ở hai đầu (`trim`) phải có độ dài từ 1 đến 50 ký tự (theo `BR-NAM-01`).
+- Trường hợp phát sinh (`ERR-NAM-001`): Tên danh mục mới để trống, chỉ chứa khoảng trắng hoặc có độ dài vượt quá 50 ký tự sau khi cắt tỉa khoảng trắng ở hai đầu.
+- Tên danh mục mới sau khi loại bỏ khoảng trắng ở hai đầu và không phân biệt chữ hoa, chữ thường phải là duy nhất trong cùng nhóm cha, không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm nhu cầu cha đó (theo `BR-NAM-01`).
+- Trường hợp phát sinh (`ERR-NAM-002`): Tên danh mục mới trùng với tên của một danh mục khác đang hoạt động trong cùng nhóm nhu cầu cha.
 
 **Hậu điều kiện**
 
@@ -214,8 +217,10 @@ Người dùng thay đổi tên hiển thị của một danh mục phân loại
 **Tiền điều kiện**
 
 - Danh mục phân loại xác định bởi `categoryId` bắt buộc phải tồn tại trong hệ thống và thuộc cấu trúc phân cấp danh mục đang quản lý (theo `BR-FIN-04`).
-- Tên mới (`newName`) không được để trống, sau khi loại bỏ khoảng trắng ở hai đầu (`trim`) phải có độ dài từ 1 đến 50 ký tự (theo `BR-NAM-01`, lỗi `ERR-NAM-001`).
-- Tên mới sau khi loại bỏ khoảng trắng ở hai đầu và không phân biệt chữ hoa, chữ thường không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động trong cùng nhóm nhu cầu cha; mục đang đổi tên không bị so sánh với chính nó (theo `BR-NAM-01`, lỗi `ERR-NAM-002`).
+- Tên mới (`newName`) không được để trống, sau khi loại bỏ khoảng trắng ở hai đầu (`trim`) phải có độ dài từ 1 đến 50 ký tự (theo `BR-NAM-01`).
+- Trường hợp phát sinh (`ERR-NAM-001`): Tên mới của danh mục để trống, chỉ chứa khoảng trắng hoặc có độ dài vượt quá 50 ký tự sau khi cắt tỉa khoảng trắng ở hai đầu.
+- Tên mới sau khi loại bỏ khoảng trắng ở hai đầu và không phân biệt chữ hoa, chữ thường không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động trong cùng nhóm nhu cầu cha; mục đang đổi tên không bị so sánh với chính nó (theo `BR-NAM-01`).
+- Trường hợp phát sinh (`ERR-NAM-002`): Tên mới của danh mục trùng với tên của một danh mục khác đang hoạt động trong cùng nhóm nhu cầu cha.
 
 **Hậu điều kiện**
 
@@ -234,8 +239,10 @@ Người dùng phục hồi trạng thái hoạt động cho một danh mục ph
 **Tiền điều kiện**
 
 - Danh mục phân loại xác định bởi `categoryId` bắt buộc phải tồn tại trong hệ thống và hiện đang ở trạng thái đã xóa mềm (`DELETED` / `HIDDEN`, `isDeleted = true`).
-- Nhóm nhu cầu cha trực thuộc của danh mục bắt buộc phải đang ở trạng thái hoạt động (`ACTIVE`), không được ở trạng thái đã xóa (theo `BR-FIN-04`, lỗi `ERR-CAT-004`).
-- Tên của danh mục cần khôi phục sau khi loại bỏ khoảng trắng ở hai đầu và không phân biệt chữ hoa, chữ thường không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm nhu cầu cha (theo `BR-NAM-01`, lỗi `ERR-NAM-002`).
+- Nhóm nhu cầu cha trực thuộc của danh mục bắt buộc phải đang ở trạng thái hoạt động (`ACTIVE`), không được ở trạng thái đã xóa (theo `BR-FIN-04`).
+- Trường hợp phát sinh (`ERR-CAT-004`): Người dùng khôi phục danh mục khi nhóm nhu cầu cha trực thuộc của nó vẫn đang ở trạng thái đã xóa.
+- Tên của danh mục cần khôi phục sau khi loại bỏ khoảng trắng ở hai đầu và không phân biệt chữ hoa, chữ thường không được trùng với tên của bất kỳ danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm nhu cầu cha (theo `BR-NAM-01`).
+- Trường hợp phát sinh (`ERR-NAM-002`): Tên của danh mục cần khôi phục trùng với tên của một danh mục khác đang hoạt động trong cùng nhóm nhu cầu cha.
 
 **Hậu điều kiện**
 
@@ -254,7 +261,8 @@ Người dùng yêu cầu loại bỏ một danh mục phân loại không còn 
 **Tiền điều kiện**
 
 - Danh mục phân loại xác định bởi `categoryId` bắt buộc phải tồn tại trong hệ thống và hiện đang ở trạng thái hoạt động (`ACTIVE`).
-- Danh mục cần xóa không phải là danh mục hoạt động duy nhất còn lại trong nhóm nhu cầu cha, đảm bảo duy trì tối thiểu một danh mục hoạt động cho mỗi nhóm (theo `BR-FIN-04`, lỗi `ERR-CAT-002`).
+- Danh mục cần xóa không phải là danh mục hoạt động duy nhất còn lại trong nhóm nhu cầu cha, đảm bảo duy trì tối thiểu một danh mục hoạt động cho mỗi nhóm (theo `BR-FIN-04`).
+- Trường hợp phát sinh (`ERR-CAT-002`): Danh mục cần xóa là danh mục hoạt động duy nhất còn lại trong nhóm nhu cầu cha, vi phạm yêu cầu duy trì tối thiểu một danh mục hoạt động cho mỗi nhóm.
 
 **Hậu điều kiện**
 
@@ -282,12 +290,14 @@ Người dùng khôi phục toàn bộ trạng thái dữ liệu tài chính c�
 
 **Tiền điều kiện**
 
-- Tệp sao lưu tại đường dẫn chỉ định (`backupFilePath`) bắt buộc phải tồn tại trên hệ thống tệp cục bộ, ứng dụng có quyền đọc (`READ permission`) và nội dung tệp phải đúng định dạng cấu trúc JSON với bộ mã ký tự UTF-8 (theo `FR-DAT-02`, lỗi `ERR-DAT-001`).
-- Dữ liệu trong tệp sao lưu phải vượt qua đầy đủ 4 bước kiểm tra tính toàn vẹn độc lập theo cơ chế tất cả hoặc không (`All-or-Nothing`), nếu phát hiện bất kỳ sai lệch nào hệ thống sẽ từ chối toàn bộ quá trình phục hồi (theo `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04`, lỗi `ERR-DAT-002`):
+- Tệp sao lưu tại đường dẫn chỉ định (`backupFilePath`) bắt buộc phải tồn tại trên hệ thống tệp cục bộ, ứng dụng có quyền đọc (`READ permission`) và nội dung tệp phải đúng định dạng cấu trúc JSON với bộ mã ký tự UTF-8 (theo `FR-DAT-02`).
+- Trường hợp phát sinh (`ERR-DAT-001`): Tệp sao lưu không tồn tại tại đường dẫn chỉ định, ứng dụng không có quyền đọc tệp hoặc nội dung tệp bị lỗi cấu trúc cú pháp JSON hay sai định dạng mã hóa ký tự UTF-8.
+- Dữ liệu trong tệp sao lưu phải vượt qua đầy đủ 4 bước kiểm tra tính toàn vẹn độc lập theo cơ chế tất cả hoặc không (`All-or-Nothing`), nếu phát hiện bất kỳ sai lệch nào hệ thống sẽ từ chối toàn bộ quá trình phục hồi (theo `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04`):
   - Cấu trúc cú pháp JSON hợp lệ, chứa đầy đủ các khóa thực thể dữ liệu bắt buộc của hệ thống.
   - Cấu trúc phân cấp danh mục thu chi phải tuân thủ đúng mô hình 3 cấp (Loại thu chi -> Nhóm nhu cầu -> Danh mục chi tiết), mỗi danh mục phải trực thuộc một nhóm nhu cầu cha hợp lệ và không có danh mục mồ côi (theo `BR-FIN-04`).
   - Các liên kết giao dịch chuyển tiền hai chiều giữa ví nguồn và ví đích cùng chi phí giao dịch đi kèm phải bảo đảm tính nhất quán và toàn vẹn theo nguyên tắc ghi nhận đồng thời (theo `BR-FIN-03`).
   - Số dư của tất cả các ví sau khi tái tính toán từ toàn bộ lịch sử giao dịch trong tệp sao lưu không được âm, luôn lớn hơn hoặc bằng $0.00\text{ VND}$ (theo quy tắc bảo toàn số dư ví `BR-FIN-02`).
+- Trường hợp phát sinh (`ERR-DAT-002`): Dữ liệu trong tệp sao lưu vi phạm ít nhất một trong 4 bước kiểm tra tính toàn vẹn độc lập (cấu trúc JSON thiếu khóa thực thể bắt buộc, vi phạm phân cấp danh mục 3 cấp hoặc có danh mục mồ côi, sai lệch liên kết chuyển tiền hai chiều hoặc chi phí mồ côi, hoặc số dư ví bị âm khi tái tính toán từ lịch sử giao dịch).
 
 **Hậu điều kiện**
 
@@ -310,7 +320,8 @@ Người dùng yêu cầu hệ thống trích xuất và hiển thị các báo 
 **Tiền điều kiện**
 
 - Loại báo cáo chỉ định (`reportType`) phải tồn tại và hợp lệ trong danh mục các loại báo cáo được hệ thống hỗ trợ (báo cáo dòng tiền 12 tháng hoặc báo cáo cơ cấu thu chi).
-- Khoảng thời gian thống kê (`startDate`, `endDate`) phải đúng định dạng ngày tháng hợp lệ và thỏa mãn điều kiện logic thời gian bắt đầu không vượt quá thời gian kết thúc (`startDate <= endDate`) (lỗi `ERR-REP-001`).
+- Khoảng thời gian thống kê (`startDate`, `endDate`) phải đúng định dạng ngày tháng hợp lệ và thỏa mãn điều kiện logic thời gian bắt đầu không vượt quá thời gian kết thúc (`startDate <= endDate`).
+- Trường hợp phát sinh (`ERR-REP-001`): Khoảng thời gian thống kê không đúng định dạng ngày tháng hợp lệ hoặc ngày bắt đầu được chọn lớn hơn ngày kết thúc (`startDate > endDate`).
 - Các tiêu chí lọc trong `filters` (nếu có, như ví hoặc nhóm danh mục) phải tham chiếu đến các thực thể hợp lệ đang tồn tại trong hệ thống.
 
 **Hậu điều kiện**
