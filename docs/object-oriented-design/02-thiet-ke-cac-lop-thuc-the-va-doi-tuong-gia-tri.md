@@ -362,7 +362,7 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 ### 2.3.1 Tiền tệ
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp Money trong việc bọc số học BigDecimal, quy chuẩn làm tròn ngân hàng và loại trừ sai số dấu chấm động)
+Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất biến với 2 chữ số thập phân và làm tròn nửa chẵn `RoundingMode.HALF_EVEN`, loại bỏ sai số dấu chấm động (`BR-FIN-01`). Đối tượng thực hiện các phép toán số học và kiểm tra biên giá trị cho số dư ví (`FR-WAL-01`), giao dịch thu chi (`FR-TXN-01`), chuyển tiền (`FR-TRF-01`) cùng kiểm kê đối soát (`FR-WAL-05`).
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`, `UC-TXN-01`, `UC-TRF-01`, `UC-WAL-04`
@@ -374,19 +374,30 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `ZERO` | `Money` | `public static final` | Hằng số tiền tệ mang giá trị `0.00 VNĐ` (`BR-FIN-01`), làm mốc số dư ban đầu của ví mới (`FR-WAL-01`) và mốc so sánh dấu đại số (`BR-FIN-02`). |
+| `amount` | `BigDecimal` | `private final` | Số thập phân chuẩn hóa cố định 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN`, cấm khởi tạo từ `float` hoặc `double` (`BR-FIN-01`); báo lỗi nếu truyền giá trị rỗng hoặc sai định dạng số học (`ERR-FIN-001`). |
+| `currency` | `String` | `private final` | Mã đơn vị tiền tệ bất biến, cố định là `"VNĐ"` trên toàn hệ thống để đồng nhất các phép tính tài chính (`BR-FIN-01`). |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc tính toán số học, so sánh hoặc định dạng kết xuất) |
+| `of` | `String rawAmount` | `Money` | `ValidationException` | Phân tích chuỗi thập phân, chuẩn hóa 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN` và gán đơn vị `"VNĐ"` (`BR-FIN-01`); từ chối nếu chuỗi rỗng hoặc sai định dạng số học (`ERR-FIN-001`). |
+| `of` | `BigDecimal value` | `Money` | `ValidationException` | Kiểm tra `value` khác `null`, chuẩn hóa `setScale(2, RoundingMode.HALF_EVEN)` và trả về thể hiện `Money` mới (`BR-FIN-01`); báo lỗi nếu tham số đầu vào bị rỗng (`ERR-FIN-001`). |
+| `add` | `Money other` | `Money` | `ValidationException` | Cộng `this.amount` với `other.amount` và trả về thể hiện `Money` mới (`BR-FIN-01`), dùng khi ghi nhận khoản thu (`FR-TXN-01`) hoặc nhận chuyển tiền (`FR-TRF-01`); báo lỗi nếu tham số rỗng (`ERR-FIN-001`). |
+| `subtract` | `Money other` | `Money` | `ValidationException` | Trừ `other.amount` khỏi `this.amount` và trả về thể hiện `Money` mới (`BR-FIN-01`), dùng khi trừ số dư ví (`BR-FIN-02`) hoặc tính chênh lệch kiểm kê (`FR-WAL-05`); báo lỗi nếu tham số rỗng (`ERR-FIN-001`). |
+| `abs` | `Không` | `Money` | `Không` | Trả về thể hiện `Money` mới mang giá trị tuyệt đối không âm (`BR-FIN-01`), dùng để tách dòng tiền vào hoặc ra từ khoản chênh lệch kiểm kê (`BR-FIN-02`). |
+| `requireNonNegative` | `Không` | `Money` | `BusinessRuleException` | Kiểm tra `amount` từ `0.00 VNĐ` trở lên để giữ số dư ví và số dư kiểm kê không âm (`BR-FIN-02`); từ chối nếu giá trị nhỏ hơn không (`ERR-WAL-001`). |
+| `isPositive` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` lớn hơn `0.00` (`BR-FIN-01`), dùng để kiểm tra số tiền giao dịch thu chi (`FR-TXN-01`) và chuyển tiền (`FR-TRF-01`) phải dương. |
+| `isNegative` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` nhỏ hơn `0.00` (`BR-FIN-01`), dùng để phát hiện và chặn thao tác làm âm số dư ví (`BR-FIN-02`). |
+| `compareTo` | `Money other` | `int` | `ValidationException` | So sánh thứ tự đại số qua `this.amount.compareTo(other.amount)` (`BR-FIN-01`), trả về số âm, `0` hoặc số dương; báo lỗi nếu đối tượng đem so sánh bị rỗng (`ERR-FIN-001`). |
+| `formatDisplay` | `Không` | `String` | `Không` | Định dạng số tiền thành chuỗi số nguyên đồng (0 chữ số thập phân) có dấu phân cách hàng nghìn kèm đơn vị `"VNĐ"` để hiển thị trên dòng lệnh (`BR-FIN-01`). |
 
 **Tính bất biến và cơ chế so sánh**
 
-- (Nêu kỷ luật bất biến, từ khóa final, loại trừ setter và cơ chế luôn trả về thể hiện mới)
-- (Nêu cơ chế so sánh bằng nhau qua equals và hashCode dựa trên giá trị thuộc tính)
-- (Nêu việc cài đặt giao diện Comparable để so sánh thứ tự tự nhiên phục vụ sắp xếp)
+- Lớp `Money` khai báo `public final`, khóa toàn bộ thuộc tính bằng `private final` và bỏ mọi phương thức sửa đổi trạng thái. Các phép toán `add`, `subtract` và `abs` luôn tạo và trả về một thể hiện `Money` mới độc lập để giữ nguyên giá trị gốc (`BR-FIN-01`).
+- Phương thức `equals` và `hashCode` so sánh trực tiếp trên cặp thuộc tính `amount` (đã chuẩn hóa `scale = 2` khi khởi tạo) và `currency`. Nhờ vậy, hai đối tượng `Money` có cùng giá trị đại số thực luôn bằng nhau và sinh cùng mã băm (`BR-FIN-01`).
+- Lớp cài đặt giao diện `Comparable<Money>` và hiện thực hóa `compareTo` bằng phép so sánh đại số của `BigDecimal`. Cơ chế này giúp các thực thể miền kiểm tra điều kiện đủ số dư ví (`BR-FIN-02`), chặn thao tác làm âm ví (`ERR-WAL-001`) và sắp xếp danh sách theo quy mô tiền tệ.
 
 ### 2.3.2 Ngày Giao dịch
 
