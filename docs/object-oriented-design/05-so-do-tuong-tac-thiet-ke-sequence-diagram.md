@@ -1,47 +1,427 @@
 # 05. Sơ đồ Tuần tự Thiết kế
 
+Tài liệu này đặc tả luồng tương tác động giữa các đối tượng trong hệ thống nhằm hiện thực hóa các ca sử dụng trên môi trường dòng lệnh Java. Các kịch bản tương tác phân rã luồng xử lý từ sự kiện đầu vào của người dùng qua các tầng kiến trúc: tiếp nhận lệnh tại tầng trình diễn, điều phối nghiệp vụ tại tầng dịch vụ, thực thi quy tắc nghiệp vụ tại tầng miền và ghi nhận dữ liệu bền vững tại tầng hạ tầng.
+
+Các sơ đồ tuần tự xác định trình tự gọi phương thức đồng bộ, quy chuẩn truyền nhận đối tượng truyền dữ liệu và cơ chế biến đổi trạng thái nội tại của thực thể. Mọi thông điệp trao đổi trên sơ đồ đều khớp với cấu trúc lớp tĩnh đã thiết kế, đồng thời mô hình hóa đầy đủ các nhánh ngoại lệ nghiệp vụ phát sinh trong quá trình vận hành để duy trì tính nhất quán của dữ liệu tài chính.
+
 ## 5.1 Nguyên tắc Thiết kế Sơ đồ Tuần tự Chi tiết
 
-### 5.1.1 Chuyển đổi từ Sơ đồ Tuần tự Hệ thống sang Sơ đồ Tuần tự Chi tiết
-<!-- PLACEHOLDER: Trình bày phương pháp luận mở rộng từ Sơ đồ Tuần tự Hệ thống trong phân tích (hộp đen, nơi hệ thống chỉ là một đối tượng duy nhất) sang Sơ đồ Tuần tự Thiết kế (hộp trắng, phân rã luồng tương tác giữa các đối tượng cụ thể trong 4 tầng kiến trúc); quy định thứ tự các cột đối tượng tham gia tương tác: từ trái qua phải bắt đầu từ Người dùng -> Giao diện Dòng lệnh -> Bộ Điều phối Dịch vụ -> Thực thể Nghiệp vụ -> Kho Lưu trữ Dữ liệu | Căn cứ: Craig Larman Chapter 15, ISO/IEC 19505-1 | Tiêu chí hoàn thành: 100% các thông điệp gửi đi trên sơ đồ tuần tự đều phải là tên phương thức có thật và khớp chữ ký với Sơ đồ Lớp Thiết kế -->
+Mục này xác lập các nguyên tắc thiết kế và quy chuẩn mô hình hóa tương tác động cho toàn bộ hệ thống. Các quy định tại đây thiết lập khung kỹ thuật thống nhất, bảo đảm tính nhất quán trong cách biểu diễn luồng dữ liệu và lời gọi phương thức xuyên suốt các ca sử dụng.
 
-### 5.1.2 Quy chuẩn Ký hiệu và Khung Điều khiển Tương tác
-<!-- PLACEHOLDER: Đặc tả các quy chuẩn ký hiệu trực quan của UML Sequence Diagram theo chuẩn Mermaid: đường thẳng đứng biểu diễn vòng đời đối tượng (lifeline), thanh kích hoạt thời gian thực thi (activation bar), mũi tên nét liền cho lời gọi hàm đồng bộ, mũi tên nét đứt cho kết quả trả về; quy định bắt buộc sử dụng các khung điều khiển tiêu chuẩn: alt (rẽ nhánh điều kiện thành công / thất bại), loop (vòng lặp duyệt danh sách), opt (hành động tùy chọn như gửi cảnh báo vượt hạn mức), ref (tham chiếu đến sơ đồ con) | Căn cứ: ISO/IEC 19505-1 chuẩn UML 2.5 | Tiêu chí hoàn thành: Thể hiện tường minh luồng rẽ nhánh xử lý ngoại lệ trong từng kịch bản, không vẽ sơ đồ theo kiểu chỉ có đường chạy thành công duy nhất (happy path) -->
+Trong giai đoạn phân tích, sơ đồ tuần tự hệ thống mô tả phần mềm dưới dạng hộp đen: toàn bộ hệ thống được xem như một đối tượng duy nhất, chỉ thể hiện sự kiện người dùng gửi vào và phản hồi nhận lại mà không bộc lộ cấu trúc bên trong. Khi chuyển sang giai đoạn thiết kế, sơ đồ tuần tự chi tiết mở rộng hộp đen thành chuỗi tương tác cụ thể giữa các đối tượng phân bổ trên bốn tầng kiến trúc: tầng trình diễn tiếp nhận dữ liệu và điều hướng hiển thị, tầng dịch vụ điều phối luồng nghiệp vụ và quản lý giao dịch, tầng miền thực thi các quy tắc nghiệp vụ và biến đổi trạng thái, tầng hạ tầng đảm nhận việc lưu trữ dữ liệu bền vững.
+
+Bảng so sánh đặc điểm giữa sơ đồ tuần tự hệ thống và sơ đồ tuần tự thiết kế:
+
+| Tiêu chí | Sơ đồ tuần tự hệ thống | Sơ đồ tuần tự thiết kế |
+| :--- | :--- | :--- |
+| **Góc nhìn tương tác** | Hộp đen: Xem xét hệ thống là một thành phần nguyên khối duy nhất. | Hộp trắng: Phân rã luồng thực thi chi tiết qua các đối tượng thuộc bốn tầng kiến trúc. |
+| **Mục đích sử dụng** | Xác định ranh giới chức năng và nắm bắt sự kiện đầu vào của người dùng. | Định hình cấu trúc gọi hàm, phân bổ trách nhiệm và hướng dẫn cài đặt mã nguồn. |
+| **Thành phần tham gia** | Người dùng và đối tượng hệ thống trừu tượng. | Người dùng, lớp điều phối giao diện, dịch vụ ứng dụng, thực thể miền và kho lưu trữ. |
+| **Bản chất thông điệp** | Thao tác hệ thống trừu tượng mô tả nghiệp vụ cần thực hiện. | Lời gọi phương thức đồng bộ khớp chính xác chữ ký hàm của các lớp mã nguồn. |
+| **Xử lý ngoại lệ** | Mô tả thông báo từ chối tổng quát ở mức giao diện người dùng. | Ném ngoại lệ nghiệp vụ cụ thể kèm mã lỗi định danh và điều hướng luồng xử lý lỗi. |
+| **Bảo toàn trạng thái** | Ghi nhận điều kiện tiên quyết và kết quả thay đổi sau thao tác. | Kiểm soát biến đổi trạng thái nội tại của thực thể và duy trì tính toàn vẹn dữ liệu. |
+
+Các cột đối tượng tham gia tương tác trên sơ đồ được sắp xếp theo thứ tự cố định từ trái qua phải, phản ánh chiều phụ thuộc và luồng điều khiển của kiến trúc:
+
+1. Tác nhân ngoài: Người dùng thực hiện thao tác trên bàn phím.
+2. Tầng Trình diễn: Lớp giao diện dòng lệnh đọc dữ liệu nhập, kiểm tra định dạng và đóng gói đối tượng truyền dữ liệu.
+3. Tầng Dịch vụ: Lớp dịch vụ ứng dụng tiếp nhận yêu cầu, nạp dữ liệu và điều phối quy trình xử lý ca sử dụng.
+4. Tầng Nghiệp vụ: Các thực thể và đối tượng giá trị thực hiện tính toán, kiểm tra ràng buộc và cập nhật trạng thái.
+5. Tầng Hạ tầng: Kho lưu trữ dữ liệu thực hiện các thao tác truy xuất hoặc lưu trữ bền vững.
+
+Sơ đồ dưới đây minh họa luồng tương tác tổng quát qua bốn tầng kiến trúc:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant Service as Tầng Dịch vụ
+    participant Domain as Tầng Nghiệp vụ
+    participant Repo as Tầng Hạ tầng
+
+    User->>+CLI: 1. Nhập lệnh thao tác nghiệp vụ
+    CLI->>+Service: 2. executeUseCase(requestDto)
+    Service->>+Repo: 3. findById(id)
+    Repo-->>-Service: 4. Optional<Entity>
+    Service->>+Domain: 5. businessOperation(parameters)
+    Domain-->>-Service: 6. result
+    Service->>+Repo: 7. save(entity)
+    Repo-->>-Service: 8. entity
+    Service-->>-CLI: 9. responseDto
+    CLI-->>-User: 10. Kết xuất bảng kết quả hiển thị
+```
+
+Mọi thông điệp trao đổi trên sơ đồ tuần tự bắt buộc phải khớp chính xác với chữ ký phương thức đã công bố trong các giao diện dịch vụ, thực thể miền và kho lưu trữ dữ liệu.
+
+Bên cạnh luồng thực thi chuẩn, mọi sơ đồ tuần tự trong tài liệu bắt buộc phải mô hình hóa tường minh các nhánh ngoại lệ nghiệp vụ thông qua khung rẽ nhánh điều kiện `alt`. Thiết kế phải bao phủ đầy đủ các điểm kiểm tra ràng buộc tài chính kèm mã lỗi định danh tương ứng, loại bỏ các sơ đồ chỉ biểu diễn kịch bản thành công đơn lẻ. Đối với các giao dịch tác động đồng thời lên nhiều nguồn tiền như chuyển tiền nội bộ, luồng tương tác được bao bọc trong khung thực thi cô lập `critical` nhằm bảo đảm nguyên tắc toàn vẹn: toàn bộ thao tác cập nhật số dư các ví phải cùng thành công hoặc hoàn tác về trạng thái ban đầu nếu phát sinh sự cố.
 
 ## 5.2 Sơ đồ Tuần tự Nhóm Quản lý Ví
 
-### 5.2.1 Sơ đồ Tạo Mới Ví và Thiết lập Số dư Ban đầu
-<!-- PLACEHOLDER: Sơ đồ tuần tự chi tiết mô tả luồng tương tác khi người dùng tạo một ví mới (chọn loại ví tiền mặt, ngân hàng, ví điện tử); thể hiện tương tác: Giao diện dòng lệnh nhận lệnh -> Dịch vụ Ví xác thực tên ví không trùng lặp -> tạo đối tượng Ví con tương ứng -> gọi Kho lưu trữ Ví lưu xuống tệp -> phản hồi thông báo thành công; khung alt thể hiện trường hợp tên ví bị trùng lặp | Căn cứ: Ca sử dụng UC-WAL-01, Rubric học thuật PTIT | Tiêu chí hoàn thành: Sơ đồ Mermaid hợp lệ, thể hiện rõ việc đóng gói số dư ban đầu trong đối tượng Tiền tệ -->
+Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ quản lý nguồn tiền trong hệ thống. Chuỗi tương tác mô tả quy trình điều phối vòng đời của ví thanh toán: khởi tạo nguồn tiền, cập nhật thông tin nhận diện, chuyển đổi trạng thái lưu trữ và ghi nhận chênh lệch kiểm kê thực tế.
 
-### 5.2.2 Sơ đồ Điều chỉnh và Khóa Ví
-<!-- PLACEHOLDER: Sơ đồ tuần tự mô tả luồng cập nhật thông tin ví và vô hiệu hóa ví: Dịch vụ Ví nạp ví từ kho lưu trữ -> kiểm tra điều kiện (ví dụ: không cho phép khóa nếu đang còn số dư lớn hơn 0) -> cập nhật trạng thái ví -> lưu lại kho lưu trữ; khung alt thể hiện trường hợp ví không tồn tại hoặc vi phạm điều kiện khóa ví | Căn cứ: Ca sử dụng UC-WAL-03 và UC-WAL-04 | Tiêu chí hoàn thành: Thể hiện đúng việc ném ngoại lệ nghiệp vụ khi số dư ví không thỏa mãn điều kiện vô hiệu hóa -->
+Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với thực thể ví và kho lưu trữ dữ liệu, bảo đảm thực thi quy tắc kiểm tra tính duy nhất của tên ví, kiểm soát điều kiện số dư không âm và lưu vết kiểm toán đối soát khi phát sinh chênh lệch kiểm kê.
+
+### 5.2.1 Sơ đồ Tạo Mới Ví
+
+(Mô tả khoảng 1 đến 2 câu về luồng điều phối khởi tạo ví mới, kiểm tra tính duy nhất của tên ví tại tầng dịch vụ, khởi tạo thực thể ví với số dư ban đầu bằng không và lưu trữ bản ghi vào kho dữ liệu)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-01`
+- Thao tác hệ thống: `createWallet(walletName, note)`
+- Yêu cầu chức năng: `FR-WAL-01`, `FR-WAL-02`
+- Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-02`
+- Mã lỗi xử lý: `ERR-NAM-001`, `ERR-NAM-002`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> WalletServiceImpl -> Wallet -> WalletRepository; kích hoạt đầy đủ thanh thực thi; sử dụng khung alt phân tách các nhánh ném ngoại lệ ValidationException với mã ERR-NAM-001 khi tên ví không hợp lệ, DuplicateEntityException với mã ERR-NAM-002 khi tên ví trùng lặp, và luồng thành công khởi tạo thực thể Wallet ở trạng thái ACTIVE với số dư ban đầu bằng không, lưu qua WalletRepository và phản hồi WalletResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: ví mới luôn được khởi tạo với số dư bằng không thông qua đối tượng tiền tệ bất biến, loại trừ việc gán số dư tùy tiện khi chưa kiểm kê)
+
+### 5.2.2 Sơ đồ Xem Tổng hợp Số dư và Cơ cấu Ví
+
+(Mô tả khoảng 1 đến 2 câu về luồng truy vấn danh sách ví, tính lại số dư khả dụng tức thời và xác định tỷ trọng phân bổ tài sản toàn hệ thống ở chế độ chỉ đọc)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-02`
+- Thao tác hệ thống: `getWalletsSummary()`
+- Yêu cầu chức năng: `FR-WAL-04`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`
+- Mã lỗi xử lý: `ERR-FIN-002`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> WalletServiceImpl -> WalletRepository -> Money; không có tham số đầu vào; WalletServiceImpl gọi WalletRepository.findAll nạp danh sách ví, tính tổng số dư toàn hệ thống; sử dụng khung alt xử lý trường hợp tổng tài sản bằng không thì gán tỷ trọng 0.00% cho mọi ví tránh lỗi chia cho không ERR-FIN-002, trường hợp tổng tài sản dương thì tính tỷ trọng phân bổ từng ví làm tròn ngân hàng hai chữ số thập phân, đóng gói kết quả và phản hồi WalletsSummaryDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể ví nào trong hệ thống)
+
+### 5.2.3 Sơ đồ Cập nhật Thông tin Ví
+
+(Mô tả khoảng 1 đến 2 câu về luồng cập nhật tên gọi và ghi chú mô tả của ví hiện có, bảo đảm kiểm soát tính duy nhất của tên mới mà không làm xáo trộn số dư tài chính)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-03`
+- Thao tác hệ thống: `updateWallet(walletId, walletName, note)`
+- Yêu cầu chức năng: `FR-WAL-03`
+- Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-02`
+- Mã lỗi xử lý: `ERR-WAL-001`, `ERR-NAM-001`, `ERR-NAM-002`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> WalletServiceImpl -> Wallet -> WalletRepository; tiếp nhận UpdateWalletRequestDto; WalletServiceImpl gọi WalletRepository.findById, sử dụng khung alt ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy ví; kiểm tra định dạng tên ném ValidationException với mã ERR-NAM-001; nếu đổi tên mới thì gọi WalletRepository.existsByName ném DuplicateEntityException với mã ERR-NAM-002 khi bị trùng; nạp thực thể Wallet, cập nhật tên và ghi chú qua phương thức nội tại, gọi WalletRepository.save lưu thay đổi và phản hồi WalletResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc cập nhật thông tin định danh giữ nguyên mã định danh và số dư hiện hành, không làm đứt gãy lịch sử liên kết giao dịch)
+
+### 5.2.4 Sơ đồ Điều chỉnh Số dư Ví Thực tế
+
+(Mô tả khoảng 1 đến 2 câu về luồng điều chỉnh số dư ví khớp với kết quả kiểm kê thực tế, ghi nhận chênh lệch kiểm kê và lưu vết kiểm toán cố định)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-04`
+- Thao tác hệ thống: `adjustBalance(walletId, actualBalance, reason)`
+- Yêu cầu chức năng: `FR-WAL-05`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`
+- Mã lỗi xử lý: `ERR-WAL-001`, `ERR-FIN-001`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> WalletServiceImpl -> Wallet -> WalletRepository -> BalanceAdjustmentRepository; tiếp nhận AdjustBalanceRequestDto; WalletServiceImpl kiểm tra số dư thực tế không âm ném ValidationException với mã ERR-FIN-001 nếu vi phạm; gọi WalletRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu ví không tồn tại hoặc không ở trạng thái ACTIVE; từ chối nếu số dư thực tế trùng số dư hiện tại; ủy quyền Wallet tính chênh lệch và cập nhật số dư, khởi tạo bản ghi BalanceAdjustmentRecord bất biến, lưu đồng thời qua WalletRepository và BalanceAdjustmentRepository, phản hồi BalanceAdjustmentResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: mọi chênh lệch kiểm kê bắt buộc tạo bản ghi điều chỉnh bất biến để lưu vết kiểm toán, số dư khả dụng mới luôn duy trì không âm)
 
 ## 5.3 Sơ đồ Tuần tự Nhóm Ghi nhận Thu Chi
 
-### 5.3.1 Sơ đồ Ghi nhận Giao dịch Chi tiêu
-<!-- PLACEHOLDER: Sơ đồ tuần tự chi tiết mô tả luồng ghi nhận một khoản chi tiêu: Giao diện nhập thông tin chi tiêu -> Dịch vụ Giao dịch nạp Ví từ Kho lưu trữ Ví -> nạp Danh mục từ Kho lưu trữ Danh mục -> khởi tạo đối tượng Giao dịch Chi tiêu -> gọi phương thức trừ tiền của Ví -> gọi Kho lưu trữ Giao dịch lưu giao dịch mới -> gọi Kho lưu trữ Ví cập nhật số dư -> gọi Dịch vụ Ngân sách kiểm tra ngưỡng tiêu hao; khung alt kiểm tra số dư ví không đủ chi; khung opt kích hoạt cảnh báo ngân sách | Căn cứ: Ca sử dụng UC-TXN-02, Craig Larman Information Expert | Tiêu chí hoàn thành: Thể hiện đầy đủ luồng tác động liên hoàn giữa Ví, Giao dịch và Ngân sách; kiểm tra đầy đủ các nhánh lỗi -->
+Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ ghi nhận biến động dòng tiền thu chi hàng ngày trong hệ thống. Chuỗi tương tác mô tả quy trình tiếp nhận sự kiện tài chính, phân loại theo danh mục chi tiết, kiểm soát chi phí giao dịch liên kết và điều phối cập nhật số dư ví tức thời.
 
-### 5.3.2 Sơ đồ Ghi nhận Giao dịch Thu nhập và Hoàn tác
-<!-- PLACEHOLDER: Sơ đồ tuần tự mô tả luồng ghi nhận khoản thu nhập (cộng tiền vào ví) và luồng hoàn tác/xóa một giao dịch đã ghi nhận: Dịch vụ Giao dịch nạp giao dịch cũ -> nạp ví liên kết -> gọi phương thức hoàn tác của giao dịch để phục hồi số dư ví -> xóa giao dịch khỏi kho lưu trữ -> lưu lại trạng thái ví đã phục hồi | Căn cứ: Ca sử dụng UC-TXN-01 và UC-TXN-04 | Tiêu chí hoàn thành: Thể hiện tính đối xứng chính xác giữa thao tác ghi nhận và thao tác hoàn tác giao dịch tài chính -->
+Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với các thực thể giao dịch, thực thể ví và các kho lưu trữ tương ứng, bảo đảm thực thi quy tắc kiểm tra số dư khả dụng không âm, kiểm soát tính hợp lệ của cây danh mục phân loại và thực hiện cơ chế hoàn nguyên hai pha khi chỉnh sửa hoặc xóa giao dịch.
+
+### 5.3.1 Sơ đồ Ghi nhận Giao dịch Thu Chi
+
+(Mô tả khoảng 1 đến 2 câu về luồng điều phối ghi nhận giao dịch thu nhập hoặc chi tiêu kèm chi phí phát sinh, xác thực danh mục hợp lệ và cập nhật số dư ví)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TXN-01`
+- Thao tác hệ thống: `recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
+- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-FIN-001`, `ERR-WAL-001`, `ERR-CAT-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransactionServiceImpl -> WalletRepository -> CategoryRepository -> Wallet -> IncomeExpenseTransaction -> TransactionRepository; tiếp nhận RecordTransactionRequestDto; TransactionServiceImpl kiểm tra số tiền hợp lệ ném ValidationException với mã ERR-FIN-001; nạp ví từ WalletRepository ném EntityNotFoundException với mã ERR-WAL-001 nếu ví không tồn tại hoặc không ở trạng thái ACTIVE; nạp danh mục từ CategoryRepository ném ValidationException với mã ERR-CAT-001 nếu danh mục sai cấp hoặc đã xóa; kiểm tra chi phí phát sinh nếu có ném ERR-FEE-001 đến ERR-FEE-003; kiểm tra số dư ví khả dụng ném BusinessRuleException với mã ERR-WAL-001 nếu chi tiêu vượt quá số dư; khởi tạo thực thể IncomeExpenseTransaction kèm TransactionFee nếu có, ủy quyền Wallet cập nhật số dư, lưu đồng thời qua TransactionRepository và WalletRepository, phản hồi TransactionResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: mọi giao dịch chi tiêu và chi phí liên kết bắt buộc kiểm soát số dư khả dụng không âm trước khi ghi nhận lưu trữ)
+
+### 5.3.2 Sơ đồ Tra cứu và Lọc Lịch sử Giao dịch
+
+(Mô tả khoảng 1 đến 2 câu về luồng truy vấn danh sách lịch sử giao dịch thu chi theo các tiêu chí thời gian, nguồn tiền và danh mục phân loại ở chế độ chỉ đọc)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TXN-02`
+- Thao tác hệ thống: `filterTransactions(filterCriteria)`
+- Yêu cầu chức năng: `FR-TXN-03`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-FIN-001`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransactionServiceImpl -> TransactionRepository; tiếp nhận FilterTransactionsRequestDto; TransactionServiceImpl kiểm tra tính hợp lệ của khoảng thời gian lọc ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu sau ngày kết thúc; chuyển đổi tiêu chí lọc và gọi TransactionRepository.findByCriteria nạp danh sách giao dịch thỏa mãn; sắp xếp kết quả theo thứ tự ngày phát sinh giảm dần, đóng gói và phản hồi TransactionListResponseDto về tầng trình diễn)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi dữ liệu hay trạng thái của các thực thể giao dịch)
+
+### 5.3.3 Sơ đồ Chỉnh sửa Giao dịch Thu Chi
+
+(Mô tả khoảng 1 đến 2 câu về luồng điều chỉnh thông tin giao dịch đã ghi nhận, áp dụng cơ chế hoàn nguyên hai pha để kiểm soát số dư ví an toàn)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TXN-03`
+- Thao tác hệ thống: `updateTransaction(transactionId, newAmount, newDate, newCategoryId, newNote, newFeeAmount, newFeeCategoryId)`
+- Yêu cầu chức năng: `FR-TXN-04`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-FIN-001`, `ERR-WAL-001`, `ERR-CAT-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransactionServiceImpl -> TransactionRepository -> WalletRepository -> CategoryRepository -> Wallet -> IncomeExpenseTransaction; tiếp nhận UpdateTransactionRequestDto; TransactionServiceImpl nạp giao dịch cũ từ TransactionRepository ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy; nạp ví liên kết; thực hiện hoàn nguyên số tiền và phí cũ về ví; kiểm tra điều kiện áp dụng số tiền và danh mục mới, ném ngoại lệ tương ứng nếu vi phạm hoặc không đủ số dư ví sau khi sửa với mã ERR-WAL-001; cập nhật thuộc tính giao dịch, hạch toán số dư ví mới, lưu đồng thời qua TransactionRepository và WalletRepository, phản hồi TransactionResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: cơ chế hoàn nguyên hai pha bảo đảm giao dịch chỉ được cập nhật khi số dư ví sau điều chỉnh thỏa mãn ràng buộc không âm)
+
+### 5.3.4 Sơ đồ Xóa Giao dịch Thu Chi
+
+(Mô tả khoảng 1 đến 2 câu về luồng loại bỏ giao dịch khỏi hệ thống, phục hồi trạng thái số dư ví gốc và giải phóng các chi phí phụ thuộc liên kết)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TXN-04`
+- Thao tác hệ thống: `deleteTransaction(transactionId)`
+- Yêu cầu chức năng: `FR-TXN-05`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`
+- Mã lỗi xử lý: `ERR-WAL-001`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransactionServiceImpl -> TransactionRepository -> WalletRepository -> Wallet; tiếp nhận transactionId; TransactionServiceImpl gọi TransactionRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy; nạp ví liên kết; kiểm tra ràng buộc hoàn tác nếu là giao dịch thu nhập thì trừ tiền ví, ném BusinessRuleException với mã ERR-WAL-001 nếu số dư ví hiện tại không đủ để hoàn tác; ủy quyền Wallet phục hồi số dư, gọi TransactionRepository.deleteById xóa bản ghi giao dịch và chi phí liên kết, gọi WalletRepository.save lưu số dư ví đã phục hồi, phản hồi thông báo xóa thành công)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc xóa giao dịch loại bỏ hoàn toàn các bản ghi chi phí phụ thuộc nhằm chống phát sinh dữ liệu mồ côi và bảo toàn số dư không âm)
 
 ## 5.4 Sơ đồ Tuần tự Nhóm Chuyển tiền Nội bộ
 
+Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ điều chuyển tiền giữa các ví trong hệ thống. Chuỗi tương tác mô tả quy trình tiếp nhận sự kiện chuyển tiền, kiểm tra tính phân biệt giữa ví nguồn và ví đích, hạch toán chi phí phát sinh liên kết và điều phối cập nhật đồng thời số dư của cả hai ví.
+
+Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với các thực thể giao dịch chuyển tiền, thực thể ví và các kho lưu trữ tương ứng, bảo đảm thực thi quy tắc bảo toàn tổng tài sản trừ chi phí phát sinh, kiểm soát số dư ví nguồn và ví đích luôn không âm và thực hiện cơ chế hoàn nguyên hai pha khi xóa giao dịch chuyển tiền.
+
 ### 5.4.1 Sơ đồ Chuyển tiền giữa Hai Ví
-<!-- PLACEHOLDER: Sơ đồ tuần tự chi tiết mô tả luồng chuyển tiền giữa hai ví của cùng một người dùng: Dịch vụ Chuyển tiền nạp ví nguồn và ví đích -> kiểm tra ví nguồn khác ví đích -> kiểm tra số dư ví nguồn có đủ tiền chuyển và phí -> trừ tiền ví nguồn -> cộng tiền ví đích -> tạo bản ghi Giao dịch Chuyển tiền liên kết hai ví -> lưu đồng thời hai ví và giao dịch vào các kho lưu trữ tương ứng; khung alt thể hiện nhánh lỗi nếu hai ví trùng nhau hoặc ví nguồn thiếu tiền | Căn cứ: Ca sử dụng UC-TRF-01, Quy tắc giao dịch chuyển tiền | Tiêu chí hoàn thành: Thể hiện rõ việc đảm bảo tính toàn vẹn: nếu việc cộng tiền ví đích hoặc lưu bản ghi gặp sự cố thì hệ thống phải phục hồi lại số dư ban đầu của ví nguồn -->
 
-## 5.5 Sơ đồ Tuần tự Nhóm Danh mục và Ngân sách
+(Mô tả khoảng 1 đến 2 câu về luồng điều phối chuyển tiền từ ví nguồn sang ví đích, kiểm tra điều kiện hai ví phân biệt, kiểm tra số dư khả dụng ví nguồn đủ chi trả khoản chuyển cùng chi phí, trừ tiền ví nguồn, cộng tiền ví đích và lưu vết giao dịch)
 
-### 5.5.1 Sơ đồ Quản lý Danh mục Thu Chi
-<!-- PLACEHOLDER: Sơ đồ tuần tự mô tả luồng thêm danh mục mới và luồng xóa danh mục: Dịch vụ Danh mục kiểm tra tên danh mục duy nhất trong cùng nhóm -> kiểm tra danh mục cha hợp lệ -> lưu danh mục mới; đối với thao tác xóa: kiểm tra danh mục có chứa giao dịch liên kết hay không, khung alt xử lý việc chuyển giao dịch sang danh mục mặc định khác trước khi xóa | Căn cứ: Ca sử dụng UC-CAT-01 và UC-CAT-03 | Tiêu chí hoàn thành: Bảo đảm không để lại giao dịch mồ côi không có danh mục quản lý -->
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TRF-01`
+- Thao tác hệ thống: `transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)`
+- Yêu cầu chức năng: `FR-TRF-01`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FIN-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
-### 5.5.2 Sơ đồ Thiết lập và Kiểm soát Hạn mức Ngân sách
-<!-- PLACEHOLDER: Sơ đồ tuần tự mô tả luồng tạo lập ngân sách cho một danh mục trong tháng và luồng tự động kiểm tra tỷ lệ tiêu hao: Dịch vụ Ngân sách truy vấn tổng các giao dịch chi tiêu của danh mục trong chu kỳ -> tính toán tỷ lệ phần trăm đã tiêu -> so sánh với hạn mức; khung opt phát thông báo cảnh báo khi chi tiêu vượt quá 80% hoặc vượt quá 100% hạn mức | Căn cứ: Ca sử dụng UC-BUD-01 và UC-BUD-03 | Tiêu chí hoàn thành: Minh họa rõ cơ chế kiểm tra cảnh báo tự động không làm gián đoạn luồng ghi nhận giao dịch -->
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransferServiceImpl -> WalletRepository -> TransferRepository -> TransactionFeeRepository -> Wallet; tiếp nhận TransferRequestDto; TransferServiceImpl kiểm tra hai ví phân biệt ném BusinessRuleException với mã ERR-TRF-001 nếu trùng; kiểm tra số tiền dương ném ValidationException với mã ERR-TRF-002 nếu nhỏ hơn hoặc bằng không; gọi WalletRepository.findById nạp ví nguồn và ví đích, ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy ví hoặc ví không ở trạng thái ACTIVE; kiểm tra chi phí giao dịch ném ValidationException với mã ERR-FEE-001 nếu âm hoặc ERR-FEE-002 nếu thiếu danh mục chi phí khi feeAmount lớn hơn không; kiểm tra số dư ví nguồn ném BusinessRuleException với mã ERR-WAL-001 nếu không đủ thanh toán tổng số tiền chuyển và phí; thực thi chuyển tiền nguyên tử bằng cách trừ tiền ví nguồn, cộng tiền ví đích; khởi tạo TransferTransaction và TransactionFee liên kết nếu có; gọi WalletRepository.save lưu cập nhật hai ví, TransferRepository.save lưu giao dịch chuyển tiền và TransactionFeeRepository.save lưu chi phí; phản hồi TransferResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: giao dịch chuyển tiền được thực hiện theo cơ chế nguyên tử bảo đảm tổng tài sản toàn hệ thống được bảo toàn ngoại trừ phần chi phí phát sinh thực tế và số dư ví nguồn luôn duy trì không âm)
+
+### 5.4.2 Sơ đồ Tra cứu Lịch sử Chuyển tiền
+
+(Mô tả khoảng 1 đến 2 câu về luồng truy vấn và lọc danh sách giao dịch chuyển tiền theo khoảng thời gian và ví liên quan ở chế độ chỉ đọc)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TRF-02`
+- Thao tác hệ thống: `filterTransfers(startDate, endDate, sourceWalletId, destinationWalletId)`
+- Yêu cầu chức năng: `FR-TRF-02`
+- Quy tắc nghiệp vụ: `BR-FIN-01`
+- Mã lỗi xử lý: `ERR-FIN-001`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransferServiceImpl -> TransferRepository -> WalletRepository; tiếp nhận TransferFilterCriteriaDto; TransferServiceImpl kiểm tra tính hợp lệ của khoảng thời gian, sử dụng khung alt ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu lớn hơn ngày kết thúc; gọi TransferRepository.findByCriteria truy vấn danh sách giao dịch thỏa mãn điều kiện lọc kèm chi phí liên kết; sắp xếp kết quả theo ngày giao dịch giảm dần; nạp tên các ví liên quan qua WalletRepository nếu cần hiển thị trực quan; tính tổng tiền chuyển và tổng phí phát sinh; đóng gói và phản hồi TransferHistoryResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm thay đổi trạng thái của các thực thể giao dịch hay số dư của bất kỳ ví nào trong hệ thống)
+
+### 5.4.3 Sơ đồ Xóa và Hoàn tác Giao dịch Chuyển tiền
+
+(Mô tả khoảng 1 đến 2 câu về luồng hủy giao dịch chuyển tiền, hoàn nguyên đồng thời số dư của hai ví liên quan và xóa bản ghi chi phí phát sinh)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-TRF-03`
+- Thao tác hệ thống: `deleteTransfer(transferId)`
+- Yêu cầu chức năng: `FR-TRF-02`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`
+- Mã lỗi xử lý: `ERR-WAL-001`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransferServiceImpl -> TransferRepository -> WalletRepository -> TransactionFeeRepository -> Wallet; tiếp nhận transferId; TransferServiceImpl gọi TransferRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy giao dịch; nạp ví nguồn và ví đích qua WalletRepository; kiểm tra ràng buộc hoàn tác: số dư khả dụng hiện tại của ví đích phải lớn hơn hoặc bằng số tiền chuyển, ném BusinessRuleException với mã ERR-WAL-001 nếu ví đích không đủ số dư để hoàn trả tránh làm âm ví; thực hiện hoàn nguyên hai pha: cộng hoàn trả số tiền chuyển cùng phí vào ví nguồn, trừ số tiền chuyển khỏi ví đích; gọi TransferRepository.deleteById xóa bản ghi chuyển tiền và xóa bản ghi TransactionFee liên kết nếu có; gọi WalletRepository.save lưu cập nhật trạng thái hai ví; phản hồi thông báo xóa thành công)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: cơ chế hoàn nguyên hai pha bảo đảm thu hồi đồng thời số dư cả hai ví và xóa sạch các bản ghi chi phí phụ thuộc, ngăn chặn tuyệt đối tình trạng âm số dư ví đích)
+
+## 5.5 Sơ đồ Tuần tự Nhóm Danh mục Phân loại
+
+Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ quản lý hệ thống danh mục phân loại thu chi trong hệ thống. Chuỗi tương tác mô tả quy trình tiếp nhận thao tác bổ sung danh mục mới, đổi tên hiển thị, khôi phục danh mục đã ẩn và thực hiện cơ chế xóa mềm nhằm bảo đảm tính liên tục của dữ liệu tài chính.
+
+Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với thực thể danh mục, kho lưu trữ danh mục và kho lưu trữ giao dịch, bảo đảm tuân thủ nghiêm ngặt quy tắc cấu trúc phân cấp ba tầng, kiểm soát tính duy nhất của tên gọi trong cùng phạm vi cha và bảo toàn toàn vẹn tham chiếu cho các giao dịch lịch sử đã ghi nhận.
+
+### 5.5.1 Sơ đồ Thêm mới Danh mục Chi tiết
+
+(Mô tả khoảng 1 đến 2 câu về luồng điều phối bổ sung danh mục chi tiết cấp ba vào nhóm nhu cầu cha đang hoạt động, kiểm tra tính hợp lệ của định danh và lưu trữ thực thể vào kho dữ liệu)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-CAT-01`
+- Thao tác hệ thống: `addCategory(categoryName, parentCategoryId)`
+- Yêu cầu chức năng: `FR-CAT-01`, `FR-CAT-02`
+- Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-005`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> CategoryServiceImpl -> CategoryRepository -> Category; tiếp nhận CreateCategoryRequestDto; CategoryServiceImpl kiểm tra tính hợp lệ của tên danh mục ném ValidationException với mã ERR-NAM-001 nếu rỗng; kiểm tra nhóm cha parentCategoryId qua CategoryRepository.findById, ném EntityNotFoundException với mã ERR-CAT-001 nếu không tìm thấy hoặc BusinessRuleException với mã ERR-CAT-005 nếu nhóm cha đang ở trạng thái DELETED; kiểm tra trùng tên trong cùng nhóm cha qua CategoryRepository.existsByNameAndParentId ném DuplicateEntityException với mã ERR-NAM-002 nếu đã tồn tại; khởi tạo thực thể Category ở trạng thái ACTIVE kế thừa loại giao dịch từ nhóm cha; gọi CategoryRepository.save lưu bản ghi mới và phản hồi CategoryResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: danh mục mới luôn được gắn kết vào một nhóm cha hợp lệ đang hoạt động và kế thừa loại giao dịch cố định, bảo đảm tính toàn vẹn của cấu trúc phân cấp ba tầng)
+
+### 5.5.2 Sơ đồ Đổi tên Danh mục
+
+(Mô tả khoảng 1 đến 2 câu về luồng điều phối cập nhật tên hiển thị của danh mục hiện có, kiểm tra tính duy nhất trong nhóm cha và bảo toàn nguyên vẹn mã định danh cùng lịch sử giao dịch)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-CAT-02`
+- Thao tác hệ thống: `renameCategory(categoryId, newName)`
+- Yêu cầu chức năng: `FR-CAT-02`, `FR-CAT-03`
+- Quy tắc nghiệp vụ: `BR-NAM-01`
+- Mã lỗi xử lý: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> CategoryServiceImpl -> CategoryRepository -> Category; tiếp nhận RenameCategoryRequestDto; CategoryServiceImpl kiểm tra định dạng tên mới ném ValidationException với mã ERR-NAM-001 nếu rỗng hoặc chỉ chứa khoảng trắng; gọi CategoryRepository.findById ném EntityNotFoundException với mã ERR-CAT-001 nếu danh mục không tồn tại; kiểm tra trùng lặp tên mới với các danh mục khác trong cùng nhóm cha qua CategoryRepository.existsByNameAndParentIdAndIdNot ném DuplicateEntityException với mã ERR-NAM-002 nếu bị trùng; nạp thực thể Category, cập nhật thuộc tính tên, gọi CategoryRepository.save lưu cập nhật và phản hồi CategoryResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc đổi tên bảo toàn tuyệt đối mã định danh và loại thu chi của danh mục, không làm đứt gãy hoặc sai lệch dữ liệu lịch sử của các giao dịch đã ghi nhận trong quá khứ)
+
+### 5.5.3 Sơ đồ Khôi phục Danh mục Đã xóa
+
+(Mô tả khoảng 1 đến 2 câu về luồng điều phối phục hồi danh mục đã xóa mềm về trạng thái hoạt động, kiểm tra tính khả dụng của nhóm cha và kiểm soát xung đột tên gọi)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-CAT-03`
+- Thao tác hệ thống: `restoreCategory(categoryId)`
+- Yêu cầu chức năng: `FR-CAT-02`, `FR-CAT-03`
+- Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-CAT-001`, `ERR-CAT-004`, `ERR-NAM-002`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> CategoryServiceImpl -> CategoryRepository -> Category; tiếp nhận categoryId; CategoryServiceImpl gọi CategoryRepository.findById ném EntityNotFoundException với mã ERR-CAT-001 nếu không tìm thấy danh mục hoặc danh mục đang ở trạng thái ACTIVE không cần khôi phục; nạp nhóm cha của danh mục, kiểm tra nếu nhóm cha đang ở trạng thái DELETED thì ném BusinessRuleException với mã ERR-CAT-004 từ chối khôi phục; kiểm tra tên danh mục khôi phục có bị trùng với danh mục đang hoạt động trong cùng nhóm hay không qua CategoryRepository.existsByNameAndParentId, ném DuplicateEntityException với mã ERR-NAM-002 nếu trùng; ủy quyền Category chuyển trạng thái từ DELETED sang ACTIVE, gọi CategoryRepository.save lưu thay đổi và phản hồi CategoryResponseDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác khôi phục chỉ được phép khi nhóm cha đang hoạt động và không xảy ra xung đột định danh, đưa danh mục trở lại danh sách lựa chọn mà không làm xáo trộn số liệu báo cáo lịch sử)
+
+### 5.5.4 Sơ đồ Xóa mềm Danh mục
+
+(Mô tả khoảng 1 đến 2 câu về luồng điều phối xóa danh mục, tự động phân nhánh giữa xóa cứng đối với danh mục chưa có giao dịch và xóa mềm đối với danh mục đã có dữ liệu lịch sử)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-CAT-04`
+- Thao tác hệ thống: `deleteCategory(categoryId)`
+- Yêu cầu chức năng: `FR-CAT-03`
+- Quy tắc nghiệp vụ: `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-003`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> CategoryServiceImpl -> CategoryRepository -> TransactionRepository -> Category; tiếp nhận categoryId; CategoryServiceImpl gọi CategoryRepository.findById ném EntityNotFoundException với mã ERR-CAT-001 nếu không tìm thấy; kiểm tra nếu mục cần xóa là nhóm nhu cầu cuối cùng còn hoạt động của một loại thu chi thì ném BusinessRuleException với mã ERR-CAT-002 từ chối xóa; gọi TransactionRepository.existsByCategoryId kiểm tra lịch sử phát sinh giao dịch; sử dụng khung alt: nếu chưa từng phát sinh giao dịch thì gọi CategoryRepository.deleteById thực hiện xóa cứng loại bỏ vĩnh viễn khỏi kho dữ liệu; nếu đã có giao dịch lịch sử thì ủy quyền Category chuyển trạng thái sang DELETED, gọi CategoryRepository.save lưu cập nhật và ẩn danh mục khỏi các luồng nhập liệu mới; phản hồi thông báo xóa thành công)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: cơ chế xóa mềm bảo toàn tuyệt đối tính toàn vẹn tham chiếu lịch sử của mọi giao dịch liên kết và duy trì tối thiểu một nhóm nhu cầu hoạt động cho mỗi loại thu chi theo quy định tài chính)
 
 ## 5.6 Sơ đồ Tuần tự Nhóm Báo cáo và Quản trị Dữ liệu
 
-### 5.6.1 Sơ đồ Tổng hợp Báo cáo Thu Chi Định kỳ
-<!-- PLACEHOLDER: Sơ đồ tuần tự mô tả luồng tạo báo cáo tài chính: Giao diện yêu cầu báo cáo kèm khoảng thời gian lọc -> Dịch vụ Báo cáo truy vấn toàn bộ giao dịch thỏa mãn điều kiện thời gian từ Kho lưu trữ Giao dịch -> nhóm giao dịch theo từng danh mục -> tính tổng thu, tổng chi và số dư ròng -> đóng gói toàn bộ kết quả tính toán vào đối tượng truyền dữ liệu DTO Báo cáo -> chuyển sang Giao diện Dòng lệnh để vẽ bảng hiển thị | Căn cứ: Ca sử dụng UC-REP-01 và UC-REP-02 | Tiêu chí hoàn thành: Chứng minh việc truy vấn báo cáo là thao tác chỉ đọc (read-only), không làm biến đổi trạng thái của bất kỳ thực thể nào trong hệ thống -->
+Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ kết xuất báo cáo phân tích tài chính và quản trị dữ liệu an toàn của hệ thống. Chuỗi tương tác mô tả quy trình tổng hợp dòng tiền đa chiều, đo lường cơ cấu chi tiêu, trích xuất tệp sao lưu định dạng chuẩn, phục hồi dữ liệu có kiểm định bốn bước và đối soát độc lập các điều kiện cân bằng tài chính.
 
-### 5.6.2 Sơ đồ Sao lưu và Phục hồi Dữ liệu Hệ thống
-<!-- PLACEHOLDER: Sơ đồ tuần tự mô tả luồng sao lưu toàn bộ dữ liệu ra tệp lưu trữ dự phòng và luồng phục hồi dữ liệu từ bản sao lưu: Dịch vụ Dữ liệu khóa tạm thời các thao tác ghi -> nạp toàn bộ dữ liệu từ các kho lưu trữ -> đóng gói thành tệp nén hoặc tệp sao lưu có gắn nhãn thời gian -> lưu vào thư mục dự phòng; luồng phục hồi kiểm tra tính toàn vẹn của tệp sao lưu trước khi ghi đè lại hệ thống | Căn cứ: Ca sử dụng UC-DAT-01 và UC-DAT-02 | Tiêu chí hoàn thành: Quy trình kiểm tra tính hợp lệ của dữ liệu trước khi phục hồi, bảo đảm không nhập dữ liệu hỏng làm lỗi hệ thống -->
+Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối báo cáo và quản trị dữ liệu với toàn bộ các kho lưu trữ thực thể trong hệ thống, bảo đảm nguyên tắc vận hành chỉ đọc đối với các luồng thống kê đối soát, kiểm soát tính toàn vẹn của tệp JSON sao lưu và duy trì tính nhất quán tuyệt đối của sổ cái tài chính.
 
+### 5.6.1 Sơ đồ Lập Báo cáo Dòng tiền Định kỳ
+
+(Mô tả khoảng 1 đến 2 câu về luồng truy vấn và tổng hợp dòng tiền định kỳ 12 tháng liên tục, tính toán dòng tiền ròng cùng tỷ lệ tiết kiệm ở chế độ chỉ đọc)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-REP-01`
+- Thao tác hệ thống: `generateCashFlowReport(year)`
+- Yêu cầu chức năng: `FR-REP-01`
+- Quy tắc nghiệp vụ: `BR-FIN-01`
+- Mã lỗi xử lý: `ERR-FIN-002`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> ReportServiceImpl -> TransactionRepository -> Money; tiếp nhận year; ReportServiceImpl gọi TransactionRepository.findByYear truy vấn danh sách giao dịch; nhóm các giao dịch theo từng tháng trong năm; tính tổng thu nhập, tổng chi tiêu và dòng tiền ròng từng tháng; sử dụng khung alt xử lý trường hợp tổng thu bằng không thì gán tỷ lệ tiết kiệm mặc định 0.00% tránh lỗi chia cho không ERR-FIN-002, trường hợp tổng thu dương thì tính tỷ lệ tiết kiệm làm tròn ngân hàng hai chữ số thập phân; đóng gói kết quả và phản hồi CashFlowReportDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể hay số dư tài chính nào trong hệ thống)
+
+### 5.6.2 Sơ đồ Lập Báo cáo Cơ cấu Chi tiêu
+
+(Mô tả khoảng 1 đến 2 câu về luồng trích xuất và phân tích cơ cấu chi tiêu theo nhóm nhu cầu và danh mục chi tiết trong khoảng thời gian xác định ở chế độ chỉ đọc)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-REP-02`
+- Thao tác hệ thống: `generateSpendingStructureReport(startDate, endDate, transactionType)`
+- Yêu cầu chức năng: `FR-REP-02`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-FIN-001`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> ReportServiceImpl -> TransactionRepository -> CategoryRepository -> Money; tiếp nhận SpendingReportCriteriaDto; ReportServiceImpl kiểm tra khoảng thời gian ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu lớn hơn ngày kết thúc; gọi TransactionRepository.findByDateRangeAndType truy vấn giao dịch; nạp thông tin phân cấp danh mục qua CategoryRepository kể cả các mục đã xóa mềm có giao dịch trong kỳ; gom cụm số liệu theo nhóm nhu cầu và danh mục; tính tỷ trọng phần trăm từng mục làm tròn ngân hàng hai chữ số thập phân; đóng gói và phản hồi SpendingStructureReportDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác trích xuất và tính toán tỷ trọng phân bổ chi tiêu ở chế độ chỉ đọc, bảo toàn tính toàn vẹn của dữ liệu danh mục và số liệu lịch sử)
+
+### 5.6.3 Sơ đồ Xuất Dữ liệu Sao lưu Hệ thống
+
+(Mô tả khoảng 1 đến 2 câu về luồng trích xuất toàn bộ dữ liệu tài chính trong hệ thống và đóng gói thành tệp sao lưu JSON chuẩn hóa theo cấu trúc đã định)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-DAT-01`
+- Thao tác hệ thống: `exportBackupData(destinationPath)`
+- Yêu cầu chức năng: `FR-DAT-01`
+- Quy tắc nghiệp vụ: `BR-FIN-01`
+- Mã lỗi xử lý: `StorageException`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> DataManagementServiceImpl -> WalletRepository -> TransactionRepository -> TransferRepository -> CategoryRepository -> NeedGroupRepository -> BalanceAdjustmentRepository -> JsonStorageAdapter; tiếp nhận destinationPath; DataManagementServiceImpl lần lượt gọi findAll trên toàn bộ các kho lưu trữ dữ liệu để nạp toàn bộ thực thể hệ thống; tổng hợp dữ liệu vào đối tượng BackupPayloadDto; gọi JsonStorageAdapter.writeBackupFile chuyển đổi sang chuỗi JSON và ghi xuống tệp đĩa; sử dụng khung alt bắt ngoại lệ I/O ném StorageException nếu gặp sự cố quyền ghi hoặc bộ nhớ; phản hồi thông báo xuất sao lưu thành công kèm đường dẫn tệp)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc xuất dữ liệu sao lưu là thao tác chỉ đọc dữ liệu nghiệp vụ, tạo bản chụp trạng thái nhất quán và giữ nguyên độ chính xác số học của mọi giá trị tiền tệ)
+
+### 5.6.4 Sơ đồ Phục hồi Dữ liệu Hệ thống
+
+(Mô tả khoảng 1 đến 2 câu về luồng nạp dữ liệu từ tệp sao lưu JSON, thực thi quy trình kiểm định bốn bước nghiêm ngặt và đồng bộ hóa toàn bộ kho lưu trữ dữ liệu)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-DAT-02`
+- Thao tác hệ thống: `restoreBackupData(backupFilePath)`
+- Yêu cầu chức năng: `FR-DAT-02`
+- Quy tắc nghiệp vụ: `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-DAT-001`, `ERR-DAT-002`, `StorageException`
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> DataManagementServiceImpl -> JsonStorageAdapter -> WalletRepository -> TransactionRepository -> TransferRepository -> CategoryRepository -> NeedGroupRepository -> BalanceAdjustmentRepository; tiếp nhận backupFilePath; DataManagementServiceImpl gọi JsonStorageAdapter.readBackupFile ném StorageException nếu tệp không tồn tại hoặc lỗi đọc; thực hiện quy trình kiểm định bốn bước nghiêm ngặt: kiểm tra cấu trúc cú pháp JSON (bước 1) ném DataIntegrityException với mã ERR-DAT-001 nếu sai schema; kiểm tra phân cấp danh mục ba cấp (bước 2) ném DataIntegrityException với mã ERR-DAT-001 nếu vi phạm BR-FIN-04; kiểm tra liên kết chuyển tiền và phí mồ côi (bước 3) ném DataIntegrityException với mã ERR-DAT-002 nếu vi phạm BR-FIN-03; tính toán số dư ví không âm (bước 4) ném BusinessRuleException với mã ERR-DAT-002 nếu vi phạm BR-FIN-02; nếu vượt qua cả bốn bước thì ghi đè toàn bộ dữ liệu vào các kho lưu trữ tương ứng; phản hồi thông báo phục hồi thành công)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: hệ thống bảo lưu nguyên vẹn dữ liệu hiện tại nếu phát hiện bất kỳ sai phạm nào trong bốn bước kiểm định và chỉ ghi đè khi toàn bộ tệp sao lưu hợp lệ 100%)
+
+### 5.6.5 Sơ đồ Đối soát Toàn vẹn Dữ liệu Tài chính
+
+(Mô tả khoảng 1 đến 2 câu về luồng quét kiểm tra độc lập bốn điều kiện cân bằng tài chính của toàn bộ hệ thống và xuất báo cáo đối soát chi tiết ở chế độ chỉ đọc)
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-DAT-03`
+- Thao tác hệ thống: `reconcileSystemData()`
+- Yêu cầu chức năng: `FR-DAT-03`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04`
+- Mã lỗi xử lý: Không ném ngoại lệ chặn, phân loại kết quả kiểm tra theo các mức INFO, WARNING, ERROR
+
+**Sơ đồ tuần tự tương tác:**
+
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> DataManagementServiceImpl -> WalletRepository -> TransactionRepository -> TransferRepository -> CategoryRepository -> TransactionFeeRepository; không có tham số đầu vào; DataManagementServiceImpl nạp dữ liệu từ các kho lưu trữ; lần lượt quét kiểm tra bốn điều kiện cân đối độc lập: tính lại số dư ví từ lịch sử dòng tiền và so khớp số dư hiện hành (điều kiện 1 theo BR-FIN-02), kiểm tra cân bằng tổng tiền chuyển và chi phí giữa hai đầu ví nguồn và đích (điều kiện 2 theo BR-FIN-03), kiểm tra liên kết danh mục và tính toàn vẹn loại thu chi (điều kiện 3 theo BR-FIN-04), kiểm tra chi phí phát sinh mồ côi không có giao dịch cha (điều kiện 4); tổng hợp sai lệch và phân loại mức độ nghiêm trọng; đóng gói và phản hồi ReconciliationReportDto)
+
+(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác đối soát vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi bất kỳ bản ghi tài chính nào và cung cấp báo cáo minh bạch về mức độ nhất quán của sổ cái)
