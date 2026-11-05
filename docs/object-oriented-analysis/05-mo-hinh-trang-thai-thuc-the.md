@@ -59,46 +59,59 @@ Mỗi thực thể được mô tả qua biểu đồ trạng thái và bảng r
 
 Quản lý vòng đời của danh mục phân loại, bao gồm tạo mới, chỉnh sửa, ẩn/khôi phục và xóa, đảm bảo tính nhất quán của cấu trúc phân cấp và bảo toàn lịch sử giao dịch.
 
-- Quy chiếu chéo: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`, `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`, `BR-FIN-04`, `BR-NAM-01`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-003`, `ERR-CAT-004`, `ERR-CAT-005`
+- Quy chiếu chéo: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`, `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`, `BR-FIN-04`, `BR-NAM-01`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-003`, `ERR-CAT-004`, `ERR-CAT-005`
 
-```mermaid
-flowchart LR
-    User["Người dùng (Actor)"]
+```plantuml
+@startuml
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam shadowing false
+skinparam roundCorner 8
 
-    subgraph BoundaryLayer ["Giao diện (Boundary)"]
-        CatUI["CategoryUI"]
-    end
+skinparam ArrowFontSize 10
 
-    subgraph ControlLayer ["Điều khiển (Control)"]
-        CatCtrl["CategoryController"]
-    end
+skinparam ActivityStartColor #38BDF8
+skinparam ActivityEndColor #F43F5E
+skinparam ActivityBorderColor #F43F5E
 
-    subgraph EntityLayer ["Thực thể (Entity)"]
-        NeedGrp["NeedGroup (Nhóm nhu cầu cha)"]
-        CatEnt["Category (Danh mục phân loại)"]
-        TxEnt["Transaction (Giao dịch thu chi liên quan)"]
-    end
+skinparam state {
+    BackgroundColor #232731
+    BorderColor #4B5563
+    FontColor #F3F4F6
+    FontStyle bold
+}
 
-    User -->|"1. Thao tác vòng đời: tạo, đổi tên, ẩn/xóa, khôi phục"| CatUI
-    CatUI -->|"2. Điều phối thao tác vòng đời (create / rename / hide / restore / delete)"| CatCtrl
-    CatCtrl -->|"3. Kiểm tra điều kiện nhóm cha (ACTIVE) & quy tắc BR-NAM-01"| NeedGrp
-    NeedGrp -->|"4. Trả về trạng thái hoạt động nhóm cha & danh mục con"| CatCtrl
-    CatCtrl -->|"5. Kiểm tra phát sinh giao dịch lịch sử trước khi xóa"| TxEnt
-    TxEnt -->|"6. Trả về thông tin liên kết giao dịch (có / chưa có giao dịch)"| CatCtrl
-    CatCtrl -->|"7. Tạo mới (ACTIVE) / Đổi tên / Khôi phục trạng thái (ACTIVE)"| CatEnt
-    CatCtrl -->|"8. Chuyển trạng thái HIDDEN/DELETED (xóa mềm) hoặc xóa vĩnh viễn"| CatEnt
-    CatEnt -->|"9. Xác nhận hoàn tất biến đổi trạng thái thực thể"| CatCtrl
-    CatCtrl -->|"10. Đồng bộ cấu trúc danh mục & trả về kết quả xử lý"| CatUI
-    CatUI -->|"11. Cập nhật giao diện vòng đời danh mục & phản hồi thành công"| User
+skinparam nodesep 30
+skinparam ranksep 36
 
-    CatCtrl -.->|"Ngoại lệ: Vi phạm quy tắc (ERR-CAT-001..005, ERR-NAM-001..002)"| CatUI
+scale 1.3
+
+state ACTIVE #0F382C;line:10B981;text:E6FFFA
+state HIDDEN #382D10;line:F59E0B;text:FEF3C7
+state DELETED #3F1D24;line:F43F5E;text:FFE4E6
+
+[*] -right-> ACTIVE 
+
+HIDDEN -up-> HIDDEN : renameCategory()
+ACTIVE -up-> HIDDEN : hideCategory()
+HIDDEN -down-> ACTIVE : restoreCategory()
+
+ACTIVE -down-> DELETED : deleteCategory()
+DELETED -up-> ACTIVE : restoreCategory()
+
+DELETED -right-> [*] : permanentlyRemoved()
+ACTIVE -right-> [*] : deleteCategory()
+
+ACTIVE --> ACTIVE : renameCategory()
+@enduml
 ```
 
 | Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
 | :--- | :--- | :--- |
-| **Tạo danh mục mới** (`createCategory`) | - ParentCategoryId tồn tại và ở trạng thái ACTIVE.<br>- categoryName không rỗng, chuẩn hoá không trùng với danh mục cùng cha.<br>- Người dùng có quyền thực hiện thao tác. | - Tạo thực thể Category mới ở trạng thái ACTIVE.<br>- Thiết lập liên kết phân cấp tới nhóm cha.<br>- Ghi log tạo danh mục. |
-| **Đổi tên danh mục** (`renameCategory`) | - categoryId tồn tại, trạng thái ACTIVE hoặc HIDDEN.<br>- newName không rỗng, chuẩn hoá không trùng với danh mục cùng cha.<br>- Nếu danh mục đang được giao dịch, đổi tên vẫn được chấp nhận. | - Cập nhật thuộc tính name của Category.<br>- Ghi log thay đổi tên. |
-| **Ẩn (xóa mềm) danh mục** (`hideCategory`) | - categoryId tồn tại và ở trạng thái ACTIVE.<br>- Danh mục không phải là danh mục duy nhất còn lại trong nhóm cha. | - Đổi trạng thái thành HIDDEN.<br>- Giữ liên kết với các giao dịch lịch sử.<br>- Ghi log ẩn danh mục. |
-| **Khôi phục danh mục** (`restoreCategory`) | - categoryId tồn tại và ở trạng thái HIDDEN.<br>- ParentCategoryId vẫn ACTIVE.<br>- Không có danh mục ACTIVE cùng tên trong cùng nhóm cha. | - Đổi trạng thái thành ACTIVE.<br>- Ghi log khôi phục. |
-| **Xóa vĩnh viễn danh mục** (`permanentlyRemoved`) | - categoryId ở trạng thái DELETED và không có giao dịch liên quan.<br>- Người dùng xác nhận xóa vĩnh viễn. | - Xóa thực thể Category khỏi hệ thống.<br>- Gỡ bỏ liên kết với nhóm cha và các tham chiếu.<br>- Ghi log xóa vĩnh viễn. |
+| **Khởi tạo danh mục**: Từ `[*]` sang `ACTIVE` (`createCategory`) | - Nhóm nhu cầu cha (`parentCategoryId`) bắt buộc tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`), không ở trạng thái đã xóa (`BR-FIN-04`).<br>- Nhóm nhu cầu cha (`parentCategoryId`) bắt buộc tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`), không ở trạng thái đã xóa (`ERR-CAT-005`).<br>- Tên danh mục (`categoryName`) không được để trống, sau khi cắt tỉa khoảng trắng ở hai đầu có độ dài từ 1 đến 50 ký tự (`BR-NAM-01`).<br>- Tên danh mục (`categoryName`) không được để trống, sau khi cắt tỉa khoảng trắng ở hai đầu có độ dài từ 1 đến 50 ký tự (`ERR-NAM-001`).<br>- Tên danh mục mới sau khi chuẩn hóa là duy nhất, không trùng với danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm nhu cầu cha (`BR-NAM-01`).<br>- Tên danh mục mới sau khi chuẩn hóa là duy nhất, không trùng với danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm nhu cầu cha (`ERR-NAM-002`). | - Cấp mã `categoryId` duy nhất và khởi tạo thực thể `Category` mới ở trạng thái `ACTIVE` (`isDeleted = false`).<br>- Kế thừa loại thu chi (`transactionType`) từ nhóm cha và thiết lập liên kết phân cấp 3 cấp tới `NeedGroup` (`BR-FIN-04`, `FR-CAT-01`).<br>- Đồng bộ cấu trúc danh mục trên giao diện và ghi log tạo danh mục. |
+| **Đổi tên danh mục**: Giữ nguyên `ACTIVE` → `ACTIVE` hoặc `HIDDEN` → `HIDDEN` (`renameCategory`) | - Thể hiện `Category` xác định bởi `categoryId` bắt buộc tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`) hoặc ẩn (`HIDDEN`); hệ thống từ chối nếu danh mục không tồn tại hoặc đã bị xóa vĩnh viễn (`BR-FIN-04`).<br>- Thể hiện `Category` xác định bởi `categoryId` bắt buộc tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`) hoặc ẩn (`HIDDEN`); hệ thống từ chối nếu danh mục không tồn tại hoặc đã bị xóa vĩnh viễn (`ERR-CAT-001`).<br>- Tên mới `newName` không được để trống, sau khi cắt tỉa khoảng trắng ở hai đầu có độ dài từ 1 đến 50 ký tự (`BR-NAM-01`).<br>- Tên mới `newName` không được để trống, sau khi cắt tỉa khoảng trắng ở hai đầu có độ dài từ 1 đến 50 ký tự (`ERR-NAM-001`).<br>- Tên mới sau khi chuẩn hóa không trùng với bất kỳ danh mục nào khác đang hoạt động trong cùng nhóm nhu cầu cha (`BR-NAM-01`).<br>- Tên mới sau khi chuẩn hóa không trùng với bất kỳ danh mục nào khác đang hoạt động trong cùng nhóm nhu cầu cha (`ERR-NAM-002`).<br>- Hệ thống chấp nhận đổi tên bình thường kể cả khi danh mục đã phát sinh giao dịch lịch sử; mã định danh và toàn bộ liên kết với giao dịch cũ được giữ nguyên (`FR-CAT-02`). | - Cập nhật thuộc tính `name` của thể hiện `Category` bằng giá trị `newName` đã chuẩn hóa.<br>- Giữ nguyên mã `categoryId`, trạng thái hoạt động và bảo toàn nguyên vẹn liên kết với toàn bộ giao dịch lịch sử trong quá khứ (`FR-CAT-02`, `BR-FIN-04`).<br>- Cập nhật giao diện và ghi log thay đổi tên danh mục. |
+| **Ẩn (xóa mềm) danh mục**: Từ `ACTIVE` sang `HIDDEN` (`hideCategory`) | - Thể hiện `Category` xác định bởi `categoryId` bắt buộc tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`); hệ thống từ chối nếu danh mục không tồn tại hoặc không đang ở trạng thái hoạt động (`ERR-CAT-001`).<br>- Danh mục không phải là danh mục hoạt động duy nhất còn lại trong nhóm nhu cầu cha, đảm bảo duy trì tối thiểu một danh mục hoạt động cho mỗi nhóm nhu cầu (`BR-FIN-04`).<br>- Danh mục không phải là danh mục hoạt động duy nhất còn lại trong nhóm nhu cầu cha, đảm bảo duy trì tối thiểu một danh mục hoạt động cho mỗi nhóm nhu cầu (`ERR-CAT-002`). | - Chuyển thuộc tính trạng thái của thực thể sang `HIDDEN`.<br>- Ẩn danh mục khỏi danh sách lựa chọn khi tạo giao dịch mới.<br>- Bảo toàn nguyên vẹn liên kết phân cấp với nhóm cha và các giao dịch lịch sử liên quan (`FR-CAT-03`, `BR-FIN-04`).<br>- Cập nhật giao diện và ghi log ẩn danh mục. |
+| **Khôi phục danh mục**: Từ `HIDDEN` hoặc `DELETED` sang `ACTIVE` (`restoreCategory`) | - Thể hiện `Category` xác định bởi `categoryId` bắt buộc tồn tại trong hệ thống và đang ở trạng thái ẩn (`HIDDEN`) hoặc đã xóa mềm (`DELETED`); hệ thống từ chối nếu không tìm thấy danh mục (`ERR-CAT-001`).<br>- Nhóm nhu cầu cha trực thuộc (`parentCategoryId`) bắt buộc đang ở trạng thái hoạt động (`ACTIVE`), không ở trạng thái đã xóa; hệ thống yêu cầu khôi phục nhóm cha trước khi khôi phục danh mục (`BR-FIN-04`).<br>- Nhóm nhu cầu cha trực thuộc (`parentCategoryId`) bắt buộc đang ở trạng thái hoạt động (`ACTIVE`), không ở trạng thái đã xóa; hệ thống yêu cầu khôi phục nhóm cha trước khi khôi phục danh mục (`ERR-CAT-004`).<br>- Tên danh mục sau khi chuẩn hóa không trùng với bất kỳ danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm nhu cầu cha (`BR-NAM-01`).<br>- Tên danh mục sau khi chuẩn hóa không trùng với bất kỳ danh mục nào khác đang hoạt động (`ACTIVE`) trong cùng nhóm nhu cầu cha (`ERR-NAM-002`). | - Chuyển thuộc tính trạng thái sang `ACTIVE` (`isDeleted = false`).<br>- Cho phép danh mục hiển thị trở lại trên các biểu mẫu ghi nhận giao dịch thu chi mới.<br>- Giữ nguyên mã `categoryId` và nối lại toàn bộ liên kết dữ liệu lịch sử (`FR-CAT-03`, `BR-FIN-04`).<br>- Cập nhật giao diện và ghi log khôi phục danh mục. |
+| **Xóa danh mục**: Từ `ACTIVE` sang `DELETED` (`deleteCategory`) | - Thể hiện `Category` xác định bởi `categoryId` bắt buộc tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`); hệ thống từ chối nếu không tìm thấy danh mục (`ERR-CAT-001`).<br>- Danh mục đã từng phát sinh ít nhất một giao dịch thu chi trong lịch sử hệ thống, do đó hệ thống áp dụng xóa mềm thay vì xóa vĩnh viễn để bảo toàn lịch sử (`BR-FIN-04`).<br>- Danh mục đã từng phát sinh ít nhất một giao dịch thu chi trong lịch sử hệ thống, do đó hệ thống áp dụng xóa mềm thay vì xóa vĩnh viễn để bảo toàn lịch sử (`ERR-CAT-003`).<br>- Danh mục không phải là danh mục hoạt động duy nhất còn lại trong nhóm nhu cầu cha, đảm bảo duy trì tối thiểu một danh mục hoạt động cho mỗi nhóm nhu cầu (`BR-FIN-04`).<br>- Danh mục không phải là danh mục hoạt động duy nhất còn lại trong nhóm nhu cầu cha, đảm bảo duy trì tối thiểu một danh mục hoạt động cho mỗi nhóm nhu cầu (`ERR-CAT-002`). | - Chuyển thuộc tính trạng thái sang `DELETED` (`isDeleted = true`, xóa mềm) nhằm bảo toàn dữ liệu tài chính lịch sử.<br>- Ẩn khỏi danh sách lựa chọn khi ghi nhận giao dịch mới; hiển thị kèm nhãn "(đã xóa)" trên các báo cáo thống kê lịch sử (`FR-CAT-03`, `BR-FIN-04`).<br>- Bảo toàn nguyên vẹn liên kết phân cấp và liên kết ngữ nghĩa với các giao dịch lịch sử (`IncomeExpenseTransaction`, `TransactionFee`).<br>- Cập nhật giao diện và ghi log xóa danh mục. |
+| **Xóa vĩnh viễn danh mục**: Từ `DELETED` hoặc `ACTIVE` sang `[*]` (`permanentlyRemoved` / `deleteCategory`) | - Thể hiện `Category` xác định bởi `categoryId` đang ở trạng thái đã xóa mềm (`DELETED`) hoặc đang hoạt động (`ACTIVE`).<br>- Danh mục chưa từng phát sinh bất kỳ giao dịch thu chi nào trong lịch sử hệ thống; nếu đã có giao dịch, hệ thống áp dụng xóa mềm thay vì xóa vĩnh viễn (`FR-CAT-03`).<br>- Danh mục chưa từng phát sinh bất kỳ giao dịch thu chi nào trong lịch sử hệ thống; nếu đã có giao dịch, hệ thống áp dụng xóa mềm thay vì xóa vĩnh viễn (`BR-FIN-04`).<br>- Người dùng xác nhận thao tác xóa vĩnh viễn. | - Xóa hoàn toàn thể hiện `Category` khỏi hệ thống lưu trữ (xóa cứng vĩnh viễn).<br>- Phá vỡ hoàn toàn liên kết phân cấp giữa `Category` với nhóm cha `NeedGroup` và giải phóng thuộc tính `name` khỏi phạm vi kiểm tra trùng tên (`BR-NAM-01`, `FR-CAT-03`).<br>- Đồng bộ cây danh mục và ghi log xóa vĩnh viễn thực thể. |
 

@@ -93,41 +93,55 @@ Cho phép người dùng tạo một danh mục phân loại mới dưới một
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
 | Giao diện | CategoryUI | Thu thập thông tin danh mục từ biểu mẫu (tên danh mục, nhóm cha, biểu tượng, màu sắc) và hiển thị kết quả phản hồi hoặc thông báo lỗi cho người dùng. |
-| Điều khiển | CategoryController | Điều phối luồng xử lý tạo danh mục;<br/>Kiểm tra tiền điều kiện nhóm cha tồn tại và đang hoạt động (`ERR-CAT-005`);<br/>Kiểm tra định dạng tên danh mục (`ERR-NAM-001`) và tính duy nhất trong cùng nhóm cha (`ERR-NAM-002`, `BR-NAM-01`);<br/>Khởi tạo thực thể `Category` mới ở trạng thái `ACTIVE` và thiết lập liên kết phân cấp 3 cấp (`BR-FIN-04`). |
+| Điều khiển | CategoryController | Điều phối luồng xử lý tạo danh mục;<br/>Kiểm tra tiền điều kiện nhóm cha tồn tại và đang hoạt động (`ERR-CAT-005`);<br/>Kiểm tra định dạng tên danh mục (`ERR-NAM-001`);<br/>Kiểm tra tính duy nhất của tên trong cùng nhóm cha (`BR-NAM-01`);<br/>Báo lỗi nếu trùng tên trong cùng nhóm cha (`ERR-NAM-002`);<br/>Khởi tạo thực thể `Category` mới ở trạng thái `ACTIVE` và thiết lập liên kết phân cấp 3 cấp (`BR-FIN-04`). |
 | Thực thể | NeedGroup | Lưu giữ thông tin nhóm nhu cầu cha cấp 2; cung cấp trạng thái hoạt động và danh sách danh mục con phục vụ kiểm tra ràng buộc toàn vẹn. |
 | Thực thể | Category | Lưu giữ thông tin danh mục cấp 3 mới tạo (mã định danh, tên gọi, biểu tượng, màu sắc, trạng thái `ACTIVE`), liên kết với nhóm cha và kế thừa thuộc tính loại thu chi. |
 
 **Sơ đồ Robustness**
 
-```mermaid
-flowchart LR
-    User["Người dùng (Actor)"]
+```plantuml
+@startuml
+left to right direction
+skinparam defaultFontSize 11
+skinparam nodesep 20
+skinparam ranksep 30
+skinparam shadowing false
 
-    subgraph BoundaryLayer ["Giao diện (Boundary)"]
-        CatUI["CategoryUI"]
-    end
+actor "Người dùng" as user
+boundary "CategoryUI" as view
+control "CategoryController" as ctrl
+entity "NeedGroup\n(Nhóm nhu cầu cha)" as needGrp
+entity "Category\n(Danh mục mới)" as catEnt
 
-    subgraph ControlLayer ["Điều khiển (Control)"]
-        CatCtrl["CategoryController"]
-    end
+user --> view : 1
+view --> ctrl : 2
+ctrl --> needGrp : 3
+needGrp --> ctrl : 4
+ctrl --> ctrl : 5
+ctrl --> catEnt : 6
+catEnt --> ctrl : 7
+ctrl --> view : 8
+view --> user : 9
 
-    subgraph EntityLayer ["Thực thể (Entity)"]
-        NeedGrp["NeedGroup (Nhóm nhu cầu cha)"]
-        CatEnt["Category (Danh mục chi tiết mới)"]
-    end
-
-    User -->|"1. Chọn nhóm cha & nhập thông tin danh mục"| CatUI
-    CatUI -->|"2. createCategory(parentId, categoryName, icon, color)"| CatCtrl
-    CatCtrl -->|"3. Kiểm tra nhóm cha tồn tại & đang hoạt động"| NeedGrp
-    NeedGrp -->|"4. Trả về trạng thái nhóm cha & danh sách danh mục con"| CatCtrl
-    CatCtrl -->|"5. Kiểm tra định dạng BR-NAM-01 & tính duy nhất tên"| CatCtrl
-    CatCtrl -->|"6. Khởi tạo Category mới (ACTIVE, kế thừa transactionType)"| CatEnt
-    CatEnt -->|"7. Xác nhận tạo mới thành công"| CatCtrl
-    CatCtrl -->|"8. Cập nhật cây danh mục 3 cấp & trả về kết quả"| CatUI
-    CatUI -->|"9. Hiển thị danh mục mới trên cây phân cấp & báo thành công"| User
-
-    CatCtrl -.->|"Ngoại lệ: Báo lỗi vi phạm ERR-NAM-001 / ERR-NAM-002 / ERR-CAT-005"| CatUI
+ctrl ..> view : ! ERR-CAT-005 / ERR-NAM-001 / ERR-NAM-002
+@enduml
 ```
+
+**Chú thích luồng**
+
+| Số | Mô tả |
+| :---: | :--- |
+| 1 | Người dùng chọn nhóm nhu cầu cha và nhập thông tin danh mục mới (tên, biểu tượng, màu sắc). |
+| 2 | `CategoryUI` gửi lệnh `createCategory(parentId, categoryName, icon, color)` tới `CategoryController`. |
+| 3 | `CategoryController` truy vấn `NeedGroup` để kiểm tra nhóm cha tồn tại và đang hoạt động (`ERR-CAT-005`). |
+| 4 | `NeedGroup` trả về trạng thái hoạt động và danh sách danh mục con hiện có. |
+| 5 | `CategoryController` kiểm tra định dạng tên danh mục (`ERR-NAM-001`) và tính duy nhất trong cùng nhóm cha (`BR-NAM-01`, `ERR-NAM-002`). |
+| 6 | `CategoryController` khởi tạo thực thể `Category` mới ở trạng thái `ACTIVE`, thiết lập liên kết phân cấp 3 cấp (`BR-FIN-04`). |
+| 7 | `Category` xác nhận tạo mới thành công, trả kết quả về `CategoryController`. |
+| 8 | `CategoryController` cập nhật cây danh mục 3 cấp và trả kết quả về `CategoryUI`. |
+| 9 | `CategoryUI` hiển thị danh mục mới trên cây phân cấp và báo thành công cho người dùng. |
+
+> **Ngoại lệ:** `ERR-CAT-005` — Nhóm cha không tồn tại hoặc không hoạt động (bước 3). `ERR-NAM-001` — Tên danh mục sai định dạng (bước 5). `ERR-NAM-002` — Tên danh mục trùng trong cùng nhóm cha (bước 5). `CategoryController` báo lỗi về `CategoryUI`; không có thực thể nào được tạo.
 
 ### 6.1.5 Thống kê và Báo cáo
 
@@ -142,40 +156,54 @@ Cho phép người dùng yêu cầu hệ thống trích xuất và tổng hợp 
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
 | Giao diện | ReportUI | Tiếp nhận tham số mốc thời gian kết thúc (`endMonth`, `endYear`) từ người dùng;<br/>Gửi yêu cầu tạo báo cáo tới bộ điều khiển;<br/>Hiển thị bảng số liệu 12 tháng liên tục gồm Thu nhập, Chi tiêu, Dòng tiền thuần và Tỷ lệ tiết kiệm;<br/>Hiển thị dòng tổng kết 3 mức bình quân tháng kèm ghi chú giải thích;<br/>Biểu diễn trực quan bằng biểu đồ kết hợp cột và đường;<br/>Hiển thị thông báo lỗi hoặc cảnh báo khi tham số đầu vào không hợp lệ. Hoạt động thuần túy ở chế độ chỉ đọc. |
-| Điều khiển | ReportController | Tiếp nhận yêu cầu trích xuất báo cáo từ `ReportUI`;<br/>Kiểm tra tính hợp lệ của mốc thời gian kết thúc;<br/>Sinh chuỗi 12 mốc tháng liên tục lùi từ mốc chỉ định;<br/>Truy vấn dữ liệu từ thực thể `IncomeExpenseTransaction`;<br/>Thực hiện phân loại, tổng hợp doanh số thu chi từng tháng;<br/>Tính toán dòng tiền thuần (`NetCashFlow`);<br/>Tính tỷ lệ tiết kiệm (`SavingsRate`) tuân thủ quy tắc làm tròn ngân hàng (`BR-FIN-01`) và xử lý biên tránh lỗi chia cho không (`ERR-FIN-002`);<br/>Tính 3 mức bình quân tháng chia đều cho 12;<br/>Đóng gói toàn bộ dữ liệu kết quả chuyển giao cho `ReportUI`. |
+| Điều khiển | ReportController | Tiếp nhận yêu cầu trích xuất báo cáo từ `ReportUI`;<br/>Kiểm tra tính hợp lệ của mốc thời gian kết thúc;<br/>Sinh chuỗi 12 mốc tháng liên tục lùi từ mốc chỉ định;<br/>Truy vấn dữ liệu từ thực thể `IncomeExpenseTransaction`;<br/>Thực hiện phân loại, tổng hợp doanh số thu chi từng tháng;<br/>Tính toán dòng tiền thuần (`NetCashFlow`);<br/>Tính tỷ lệ tiết kiệm (`SavingsRate`) tuân thủ quy tắc làm tròn ngân hàng (`BR-FIN-01`);<br/>Xử lý trường hợp biên tránh lỗi chia cho không (`ERR-FIN-002`);<br/>Tính 3 mức bình quân tháng chia đều cho 12;<br/>Đóng gói toàn bộ dữ liệu kết quả chuyển giao cho `ReportUI`. |
 | Thực thể | IncomeExpenseTransaction | Lưu giữ thông tin lịch sử giao dịch thu chi (`transactionId`, `amount`, `transactionDate`, `transactionType`, `categoryId`, `walletId`);<br/>Cung cấp tập dữ liệu giao dịch phục vụ lọc theo mốc thời gian tháng;<br/>Bảo toàn nguyên vẹn trạng thái và số dư dữ liệu trong suốt quá trình xử lý báo cáo (nguyên tắc bất biến chỉ đọc). |
 
 **Sơ đồ Robustness**
 
-```mermaid
-flowchart LR
-    User["Người dùng (Actor)"]
+```plantuml
+@startuml
+left to right direction
+skinparam defaultFontSize 11
+skinparam nodesep 20
+skinparam ranksep 30
+skinparam shadowing false
+scale 1.3
 
-    subgraph BoundaryLayer ["Giao diện (Boundary)"]
-        RepUI["ReportUI"]
-    end
+actor "Người dùng" as user
+boundary "ReportUI" as view
+control "ReportController" as ctrl
+entity "IncomeExpenseTransaction\n(Giao dịch thu chi)" as txEnt
 
-    subgraph ControlLayer ["Điều khiển (Control)"]
-        RepCtrl["ReportController"]
-    end
+user --> view : 1
+view --> ctrl : 2
+ctrl --> ctrl : 3
+ctrl --> txEnt : 4
+txEnt --> ctrl : 5
+ctrl --> ctrl : 6, 7, 8
+ctrl --> view : 9
+view --> user : 10
 
-    subgraph EntityLayer ["Thực thể (Entity)"]
-        TxEnt["IncomeExpenseTransaction (Giao dịch thu chi)"]
-    end
-
-    User -->|"1. Chọn mốc thời gian kết thúc (endMonth, endYear)"| RepUI
-    RepUI -->|"2. generateMonthlyCashFlowReport(endMonth, endYear)"| RepCtrl
-    RepCtrl -->|"3. Kiểm tra tính hợp lệ của mốc thời gian"| RepCtrl
-    RepCtrl -->|"4. Truy vấn tập hợp giao dịch trong chuỗi 12 tháng"| TxEnt
-    TxEnt -->|"5. Cung cấp dữ liệu lịch sử giao dịch (chế độ chỉ đọc)"| RepCtrl
-    RepCtrl -->|"6. Lọc và tổng hợp Thu nhập, Chi tiêu từng tháng"| RepCtrl
-    RepCtrl -->|"7. Tính NetCashFlow & SavingsRate theo BR-FIN-01, xử lý biên ERR-FIN-002"| RepCtrl
-    RepCtrl -->|"8. Tính 3 mức bình quân tháng (chia cho 12) & đóng gói báo cáo"| RepCtrl
-    RepCtrl -->|"9. Trả về mô hình dữ liệu báo cáo 12 tháng hoàn chỉnh"| RepUI
-    RepUI -->|"10. Hiển thị bảng số liệu 12 tháng, dòng bình quân & biểu đồ"| User
-
-    RepCtrl -.->|"Ngoại lệ: Mốc thời gian sai định dạng / cảnh báo biên ERR-FIN-002"| RepUI
+ctrl ..> view : ! ERR-FIN-002
+@enduml
 ```
+
+**Chú thích luồng**
+
+| Số | Mô tả |
+| :---: | :--- |
+| 1 | Người dùng chọn mốc thời gian kết thúc (`endMonth`, `endYear`) để lấy báo cáo 12 tháng gần nhất. |
+| 2 | `ReportUI` gửi lệnh `generateMonthlyCashFlowReport(endMonth, endYear)` tới `ReportController`. |
+| 3 | `ReportController` kiểm tra tính hợp lệ của mốc thời gian kết thúc và sinh chuỗi 12 mốc tháng liên tục lùi. |
+| 4 | `ReportController` truy vấn `IncomeExpenseTransaction` để lấy tập hợp giao dịch trong chuỗi 12 tháng. |
+| 5 | `IncomeExpenseTransaction` cung cấp dữ liệu lịch sử giao dịch ở chế độ chỉ đọc; trạng thái dữ liệu gốc không thay đổi. |
+| 6 | `ReportController` lọc, phân loại và tổng hợp thu nhập, chi tiêu từng tháng. |
+| 7 | `ReportController` tính `NetCashFlow` và `SavingsRate` theo quy tắc làm tròn ngân hàng (`BR-FIN-01`); xử lý biên tránh lỗi chia cho không (`ERR-FIN-002`). |
+| 8 | `ReportController` tính 3 mức bình quân tháng (chia đều cho 12) và đóng gói toàn bộ dữ liệu báo cáo. |
+| 9 | `ReportController` trả về mô hình dữ liệu báo cáo 12 tháng hoàn chỉnh cho `ReportUI`. |
+| 10 | `ReportUI` hiển thị bảng số liệu 12 tháng, dòng bình quân và biểu đồ kết hợp cột–đường. |
+
+> **Ngoại lệ `! ERR-FIN-002`:** Khi mốc thời gian không hợp lệ (bước 3) hoặc khi thu nhập bằng 0 gây lỗi chia cho không trong tính `SavingsRate` (bước 7), `ReportController` trả cảnh báo về `ReportUI` để hiển thị; dữ liệu giao dịch gốc không bị ảnh hưởng.
 
 ### 6.1.6 Lưu trữ và Sao lưu
 
@@ -195,36 +223,50 @@ Cho phép người dùng kết xuất toàn bộ dữ liệu tài chính (ví, d
 
 **Sơ đồ Robustness**
 
-```mermaid
-flowchart LR
-    User["Người dùng (Actor)"]
+```plantuml
+@startuml
+left to right direction
+skinparam defaultFontSize 11
+skinparam nodesep 30
+skinparam ranksep 40
+skinparam shadowing false
+scale 1.3
 
-    subgraph BoundaryLayer ["Giao diện (Boundary)"]
-        BakUI["BackupUI"]
-    end
+actor "Người dùng" as user
+boundary "BackupUI" as view
+control "BackupController" as ctrl
+entity "FinancialDataStore\n(Toàn bộ thực thể tài chính)" as dataEnt
 
-    subgraph ControlLayer ["Điều khiển (Control)"]
-        BakCtrl["BackupController"]
-    end
+user --> view : 1
+view --> ctrl : 2
+ctrl --> ctrl : 3
+ctrl --> dataEnt : 4
+dataEnt --> ctrl : 5
+ctrl --> ctrl : 6, 7, 8, 9
+ctrl --> view : 10
+view --> user : 11
 
-    subgraph EntityLayer ["Thực thể (Entity)"]
-        DataEnt["FinancialDataStore (Toàn bộ thực thể tài chính)"]
-    end
-
-    User -->|"1. Chọn phạm vi (FULL/TXN), định dạng & thư mục đích"| BakUI
-    BakUI -->|"2. exportFinancialData(scope, format, targetDirectory)"| BakCtrl
-    BakCtrl -->|"3. Kiểm tra quyền ghi đĩa & dung lượng thư mục đích"| BakCtrl
-    BakCtrl -->|"4. Truy vấn trích xuất dữ liệu nghiệp vụ theo phạm vi"| DataEnt
-    DataEnt -->|"5. Cung cấp tập dữ liệu thực thể (chế độ chỉ đọc)"| BakCtrl
-    BakCtrl -->|"6. Chuẩn hóa số học chuỗi chính xác & định dạng JSON"| BakCtrl
-    BakCtrl -->|"7. Sinh tên tệp chuẩn pfms_export_{scope}_{timestamp}.json"| BakCtrl
-    BakCtrl -->|"8. Ghi tệp JSON UTF-8 không BOM xuống đĩa cứng cục bộ"| BakCtrl
-    BakCtrl -->|"9. Kiểm tra độ nguyên vẹn tệp & đóng gói kết quả"| BakCtrl
-    BakCtrl -->|"10. Trả về đường dẫn, dung lượng & số lượng bản ghi"| BakUI
-    BakUI -->|"11. Hiển thị thông báo xuất dữ liệu thành công"| User
-
-    BakCtrl -.->|"Ngoại lệ: Lỗi quyền truy cập đĩa / ổ đĩa đầy (ERR-DAT-001)"| BakUI
+ctrl ..> view : ! ERR-DAT-001
+@enduml
 ```
+
+**Chú thích luồng**
+
+| Số | Mô tả |
+| :---: | :--- |
+| 1 | Người dùng chọn phạm vi xuất (`FULL` hoặc `TRANSACTIONS`), định dạng (`JSON`) và thư mục đích lưu tệp. |
+| 2 | `BackupUI` gửi lệnh `exportFinancialData(scope, format, targetDirectory)` tới `BackupController`. |
+| 3 | `BackupController` kiểm tra quyền ghi vào thư mục đích và dung lượng lưu trữ còn lại. |
+| 4 | `BackupController` truy vấn `FinancialDataStore` để trích xuất dữ liệu nghiệp vụ theo phạm vi đã chọn ở chế độ chỉ đọc. |
+| 5 | `FinancialDataStore` trả về tập hợp dữ liệu thực thể tài chính (`Wallet`, `Category`, `NeedGroup`, `Transaction`, `Transfer`, `BalanceAdjustment`) ở chế độ chỉ đọc; trạng thái dữ liệu gốc không bị thay đổi. |
+| 6 | `BackupController` chuẩn hóa giá trị số học sang chuỗi chính xác (không làm tròn số mũ theo `CON-02`, `FR-DAT-01`) và định dạng toàn bộ cấu trúc sang JSON. |
+| 7 | `BackupController` sinh tên tệp tự động theo mẫu `pfms_export_{scope}_{timestamp}.json`. |
+| 8 | `BackupController` ghi tệp JSON xuống đĩa cứng cục bộ với mã hóa UTF-8 không BOM. |
+| 9 | `BackupController` kiểm tra độ nguyên vẹn tệp đã ghi và đóng gói kết quả kiểm toán. |
+| 10 | `BackupController` trả về cho `BackupUI` đường dẫn tệp, dung lượng và số lượng bản ghi đã xuất. |
+| 11 | `BackupUI` hiển thị thông báo xuất dữ liệu thành công kèm đường dẫn tệp, dung lượng và số bản ghi. |
+
+> **Ngoại lệ `! ERR-DAT-001`:** Có thể xảy ra tại bước 3 (kiểm tra quyền/dung lượng) hoặc bước 8 (ghi tệp). `BackupController` báo lỗi quyền truy cập đĩa hoặc ổ đĩa đầy về `BackupUI` để hiển thị cảnh báo; toàn bộ dữ liệu gốc trong `FinancialDataStore` không bị ảnh hưởng.
 
 
 ## 6.2 Thẻ CRC
@@ -329,7 +371,7 @@ Lớp Thực thể đại diện cho đơn vị phân loại chi tiết ở cấ
 | Nhóm trách nhiệm | Nội dung trách nhiệm cụ thể | Cộng tác viên |
 | :--- | :--- | :--- |
 | Thông tin | - Lưu giữ mã định danh duy nhất của danh mục (`categoryId`).<br/>- Lưu giữ tên gọi danh mục chi tiết (`name`), ràng buộc từ 1 đến 50 ký tự (`BR-NAM-01`).<br/>- Lưu giữ liên kết tham chiếu tới nhóm nhu cầu cha cấp 2 (`needGroupId`).<br/>- Lưu giữ trạng thái hoạt động của danh mục (`status`: `ACTIVE` hoặc `DELETED`).<br/>- Lưu giữ biểu tượng nhận diện (`icon`) và mã màu hiển thị trực quan (`color`).<br/>- Kế thừa và xác định loại thu chi (`transactionType`: `INCOME` hoặc `EXPENSE`) thông qua nhóm nhu cầu cha (`BR-FIN-04`). | `CategoryGroup` |
-| Hành vi | - Kiểm tra định dạng tên danh mục không được để trống và có từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng ở hai đầu (`BR-NAM-01`, `ERR-NAM-001`).<br/>- Cung cấp tên danh mục và nhóm cha để kiểm tra tính duy nhất trong phạm vi nhóm cha (`BR-NAM-01`, `ERR-NAM-002`).<br/>- Cập nhật tên hiển thị mới khi người dùng đổi tên mà không làm ảnh hưởng đến các giao dịch lịch sử (`UC-CAT-02`).<br/>- Cập nhật nhóm nhu cầu cha mới khi chuyển nhóm (yêu cầu nhóm đích cùng loại thu chi và đang hoạt động, `BR-FIN-04`, `ERR-CAT-001`).<br/>- Cập nhật trạng thái xóa mềm (`DELETED`) nếu danh mục đã từng có giao dịch lịch sử, hoặc cho phép xóa vĩnh viễn nếu chưa phát sinh giao dịch (`UC-CAT-04`, `BR-FIN-04`).<br/>- Khôi phục trạng thái hoạt động (`ACTIVE`) khi nhóm cha đang hoạt động và không trùng tên (`UC-CAT-03`, `ERR-CAT-004`).<br/>- Cung cấp thông tin phân loại cho các giao dịch thu chi và hỗ trợ kết xuất báo cáo cơ cấu chi tiêu (`UC-REP-02`). | `CategoryGroup`, `Transaction`, `TransactionFee`, `CategoryController` |
+| Hành vi | - Kiểm tra định dạng tên danh mục không được để trống và có từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng ở hai đầu (`BR-NAM-01`).<br/>- Báo lỗi nếu tên danh mục để trống hoặc sai định dạng độ dài (`ERR-NAM-001`).<br/>- Cung cấp tên danh mục và nhóm cha để kiểm tra tính duy nhất trong phạm vi nhóm cha (`BR-NAM-01`).<br/>- Báo lỗi nếu trùng tên danh mục trong cùng nhóm cha (`ERR-NAM-002`).<br/>- Cập nhật tên hiển thị mới khi người dùng đổi tên mà không làm ảnh hưởng đến các giao dịch lịch sử (`UC-CAT-02`).<br/>- Cập nhật nhóm nhu cầu cha mới khi chuyển nhóm theo cấu trúc phân cấp (yêu cầu nhóm đích cùng loại thu chi và đang hoạt động, `BR-FIN-04`).<br/>- Báo lỗi nếu nhóm đích không tồn tại hoặc không hợp lệ khi chuyển nhóm (`ERR-CAT-001`).<br/>- Cập nhật trạng thái xóa mềm (`DELETED`) nếu danh mục đã từng có giao dịch lịch sử, hoặc cho phép xóa vĩnh viễn nếu chưa phát sinh giao dịch (`UC-CAT-04`, `BR-FIN-04`).<br/>- Khôi phục trạng thái hoạt động (`ACTIVE`) khi nhóm cha đang hoạt động và không trùng tên (`UC-CAT-03`, `ERR-CAT-004`).<br/>- Cung cấp thông tin phân loại cho các giao dịch thu chi và hỗ trợ kết xuất báo cáo cơ cấu chi tiêu (`UC-REP-02`). | `CategoryGroup`, `Transaction`, `TransactionFee`, `CategoryController` |
 
 ### 6.2.7 Lớp Nhóm Nhu cầu
 
@@ -344,7 +386,7 @@ Lớp Thực thể đại diện cho đơn vị phân loại trung gian ở cấ
 | Nhóm trách nhiệm | Nội dung trách nhiệm cụ thể | Cộng tác viên |
 | :--- | :--- | :--- |
 | Thông tin | - Lưu giữ mã định danh duy nhất của nhóm nhu cầu (`needGroupId` / `groupId`).<br/>- Lưu giữ tên gọi của nhóm nhu cầu (`name`), ràng buộc từ 1 đến 50 ký tự (`BR-NAM-01`).<br/>- Lưu giữ loại thu chi gốc cấp 1 mà nhóm trực thuộc (`transactionType`: `INCOME` hoặc `EXPENSE`), có tính bất biến vĩnh viễn sau khởi tạo (`BR-FIN-04`).<br/>- Lưu giữ trạng thái hoạt động của nhóm (`status`: `ACTIVE` hoặc `DELETED`).<br/>- Lưu giữ tập hợp liên kết tới các danh mục con chi tiết (cấp 3) trực thuộc nhóm.<br/>- Lưu giữ biểu tượng nhận diện (`icon`) và mã màu hiển thị (`color`) phục vụ vẽ biểu đồ cơ cấu tài chính. | `Category` |
-| Hành vi | - Kiểm tra định dạng tên nhóm không được để trống và có từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng ở hai đầu (`BR-NAM-01`, `ERR-NAM-001`).<br/>- Cung cấp tên và loại thu chi để kiểm tra tính duy nhất trong cùng nhánh loại thu chi (`BR-NAM-01`, `ERR-NAM-002`).<br/>- Cập nhật tên nhóm mới khi có yêu cầu đổi tên (`UC-CAT-02`).<br/>- Quản lý tập hợp danh mục con: tiếp nhận thêm danh mục mới (`UC-CAT-01`), cho phép chuyển danh mục ra khỏi hoặc nhập vào nhóm (`UC-CAT-02`).<br/>- Thực thi cơ chế xóa phân tầng: khi nhóm bị xóa, kích hoạt xử lý xóa đồng bộ các danh mục con; chuyển sang xóa mềm nếu nhóm hoặc danh mục con đã có giao dịch, xóa vĩnh viễn nếu chưa có giao dịch (`UC-CAT-04`).<br/>- Kiểm soát quy tắc bất biến duy trì tối thiểu 1 nhóm nhu cầu hoạt động cho mỗi nhánh loại thu chi; từ chối xóa nếu là nhóm hoạt động cuối cùng (`BR-FIN-04`).<br/>- Khôi phục trạng thái hoạt động độc lập (`ACTIVE`) cho nhóm đã xóa mà không tự động khôi phục các danh mục con (`UC-CAT-03`).<br/>- Cung cấp dữ liệu gom cụm và danh sách danh mục con phục vụ phân tích cơ cấu thu chi 2 tầng phân cấp (`UC-REP-02`). | `Category`, `CategoryController`, `ReportController` |
+| Hành vi | - Kiểm tra định dạng tên nhóm không được để trống và có từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng ở hai đầu (`BR-NAM-01`).<br/>- Báo lỗi nếu tên nhóm để trống hoặc sai định dạng độ dài (`ERR-NAM-001`).<br/>- Cung cấp tên và loại thu chi để kiểm tra tính duy nhất trong cùng nhánh loại thu chi (`BR-NAM-01`).<br/>- Báo lỗi nếu trùng tên trong cùng nhánh loại thu chi (`ERR-NAM-002`).<br/>- Cập nhật tên nhóm mới khi có yêu cầu đổi tên (`UC-CAT-02`).<br/>- Quản lý tập hợp danh mục con: tiếp nhận thêm danh mục mới (`UC-CAT-01`), cho phép chuyển danh mục ra khỏi hoặc nhập vào nhóm (`UC-CAT-02`).<br/>- Thực thi cơ chế xóa phân tầng: khi nhóm bị xóa, kích hoạt xử lý xóa đồng bộ các danh mục con; chuyển sang xóa mềm nếu nhóm hoặc danh mục con đã có giao dịch, xóa vĩnh viễn nếu chưa có giao dịch (`UC-CAT-04`).<br/>- Kiểm soát quy tắc bất biến duy trì tối thiểu 1 nhóm nhu cầu hoạt động cho mỗi nhánh loại thu chi; từ chối xóa nếu là nhóm hoạt động cuối cùng (`BR-FIN-04`).<br/>- Khôi phục trạng thái hoạt động độc lập (`ACTIVE`) cho nhóm đã xóa mà không tự động khôi phục các danh mục con (`UC-CAT-03`).<br/>- Cung cấp dữ liệu gom cụm và danh sách danh mục con phục vụ phân tích cơ cấu thu chi 2 tầng phân cấp (`UC-REP-02`). | `Category`, `CategoryController`, `ReportController` |
 
 ### 6.2.8 Lớp Điều phối Dòng tiền
 
