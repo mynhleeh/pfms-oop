@@ -1,0 +1,73 @@
+<mxfile host="65bd71144e">
+    <diagram id="PFMS-CLI-Architecture" name="PFMS Kiến Trúc Tầng Trình Diễn">
+        <mxGraphModel dx="669" dy="615" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="880" pageHeight="620" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=center;verticalAlign=middle;fontFamily=Segoe UI, Arial, sans-serif;fontStyle=1;fontSize=13;fontColor=#1A202C;" value="SƠ ĐỒ KIẾN TRÚC PHÂN TẦNG VÀ LUỒNG DỮ LIỆU TẦNG TRÌNH DIỄN" vertex="1">
+                    <mxGeometry height="24" width="800" x="40" y="14" as="geometry"/>
+                </mxCell>
+                <mxCell id="100" parent="1" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#F0F5FA;strokeColor=#2B6CB0;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=11;fontStyle=1;fontColor=#1A4971;" value="TẦNG 1: TRÌNH DIỄN — com.pfms.cli" vertex="1">
+                    <mxGeometry height="325" width="800" x="40" y="46" as="geometry"/>
+                </mxCell>
+                <mxCell id="pkg_view" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#2B6CB0;" value="GÓI KHUNG NHÌN — com.pfms.cli.view" vertex="1">
+                    <mxGeometry height="154" width="320" x="55" y="76" as="geometry"/>
+                </mxCell>
+                <mxCell id="111" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;ConsoleView &amp;amp; InputValidator&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Đọc phím, kiểm tra cú pháp và hiển thị menu&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="48" width="290" x="70" y="105" as="geometry"/>
+                </mxCell>
+                <mxCell id="112" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;TableRenderer&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Kẻ khung bảng ASCII, căn lề cột hiển thị&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="48" width="290" x="70" y="165" as="geometry"/>
+                </mxCell>
+                <mxCell id="pkg_ctrl" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#2B6CB0;" value="GÓI ĐIỀU PHỐI — com.pfms.cli.controller" vertex="1">
+                    <mxGeometry height="154" width="320" x="505" y="76" as="geometry"/>
+                </mxCell>
+                <mxCell id="121" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;MainController&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Vòng lặp sự kiện (MainLoop), bắt ngoại lệ an toàn&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="48" width="290" x="520" y="105" as="geometry"/>
+                </mxCell>
+                <mxCell id="122" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;6 Sub-Controllers Phân Hệ&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Ví, Giao Dịch, Chuyển Tiền, Danh Mục, Báo Cáo, Sao Lưu&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="48" width="290" x="520" y="165" as="geometry"/>
+                </mxCell>
+                <mxCell id="pkg_dto" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FEF9EC;strokeColor=#B7791F;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#744210;" value="GÓI TRUYỀN DỮ LIỆU — com.pfms.cli.dto" vertex="1">
+                    <mxGeometry height="95" width="770" x="55" y="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="131" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B7791F;strokeWidth=1.2;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;ResponseDTO (Dữ liệu trả về)&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#744210;font-size:9px;&quot;&gt;Kết quả từ Tầng Dịch vụ gửi cho View hiển thị&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="50" width="320" x="70" y="290" as="geometry"/>
+                </mxCell>
+                <mxCell id="132" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B7791F;strokeWidth=1.2;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;RequestDTO (Tham số đầu vào)&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#744210;font-size:9px;&quot;&gt;Tham số nhập từ Controller gửi xuống Giao diện Dịch vụ&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="50" width="320" x="490" y="290" as="geometry"/>
+                </mxCell>
+                <mxCell id="pkg_service" parent="1" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#F0F9F4;strokeColor=#287D4A;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=11;fontStyle=1;fontColor=#1A5331;" value="TẦNG 2: DỊCH VỤ — com.pfms.service" vertex="1">
+                    <mxGeometry height="130" width="800" x="40" y="405" as="geometry"/>
+                </mxCell>
+                <mxCell id="202" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#287D4A;strokeWidth=1.2;dashed=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;Service Implementations&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Lớp cài đặt gọi Tầng Nghiệp vụ và Kho lưu trữ&lt;br/&gt;(Nghiệp vụ tài chính được đóng gói bên trong)&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="70" width="335" x="60" y="445" as="geometry"/>
+                </mxCell>
+                <mxCell id="201" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#287D4A;strokeWidth=1.4;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;Service Interfaces&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#1A5331;font-size:9px;&quot;&gt;Giao diện dịch vụ ứng dụng&lt;br/&gt;(WalletService, TransactionService, ReportService...)&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="70" width="335" x="485" y="445" as="geometry"/>
+                </mxCell>
+                <mxCell id="300" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=9;fontColor=#4A5568;" value="&lt;b&gt;QUY ƯỚC LUỒNG:&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;color:#1A73E8;&quot;&gt;[1, 2] Trao đổi View ◄► Controller&lt;/span&gt;&amp;nbsp;&amp;nbsp;&amp;bull;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;color:#B7791F;&quot;&gt;[3, 4] Controller gửi RequestDTO xuống Service&lt;/span&gt;&amp;nbsp;&amp;nbsp;&amp;bull;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;color:#287D4A;&quot;&gt;[5, 6] Service trả ResponseDTO về cho View kết xuất&lt;/span&gt;&amp;nbsp;&amp;nbsp;&amp;bull;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;color:#C53030;&quot;&gt;(CLI không gọi Domain hay Repository)&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="34" width="800" x="40" y="555" as="geometry"/>
+                </mxCell>
+                <mxCell id="501" edge="1" parent="1" source="pkg_view" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2B6CB0;strokeWidth=1.8;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=9;fontColor=#1A4971;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" target="pkg_ctrl" value="[1] Dữ liệu nhập">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="502" edge="1" parent="1" source="pkg_ctrl" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#718096;strokeWidth=1.4;dashed=1;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=9;fontColor=#4A5568;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;" target="pkg_view" value="[2] Lệnh in menu">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="503" edge="1" parent="1" source="pkg_ctrl" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#B7791F;strokeWidth=1.8;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=9;fontColor=#744210;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.79;entryY=0;entryDx=0;entryDy=0;" target="pkg_dto" value="[3] Đóng gói tham số">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="504" edge="1" parent="1" source="pkg_dto" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#287D4A;strokeWidth=1.8;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=9;fontColor=#1A5331;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=0.79;exitY=1;exitDx=0;exitDy=0;entryX=0.78;entryY=0;entryDx=0;entryDy=0;" target="pkg_service" value="[4] Gửi RequestDTO">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="505" edge="1" parent="1" source="pkg_service" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#287D4A;strokeWidth=1.8;dashed=1;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=9;fontColor=#1A5331;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=0.22;exitY=0;exitDx=0;exitDy=0;entryX=0.21;entryY=1;entryDx=0;entryDy=0;" target="pkg_dto" value="[5] Trả ResponseDTO">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="506" edge="1" parent="1" source="pkg_dto" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1A73E8;strokeWidth=1.8;dashed=1;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=9;fontColor=#1A4971;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=0.21;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="pkg_view" value="[6] Dữ liệu hiển thị">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
