@@ -7,7 +7,7 @@
         <mxCell id="10" value="SƠ ĐỒ KIẾN TRÚC PHÂN TẦNG — PFMS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=center;verticalAlign=middle;fontFamily=Segoe UI, Arial, sans-serif;fontStyle=1;fontSize=15;fontColor=#1A202C;" vertex="1" parent="1">
           <mxGeometry x="75" y="12" width="700" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="100" value="TẦNG 1: TRÌNH DIỄN — com.pfms.cli" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F0F5FA;strokeColor=#2B6CB0;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=12;fontStyle=1;fontColor=#1A4971;" vertex="1" parent="1">
+        <mxCell id="100" value="TẦNG 1: TRÌNH DIỄN — com.pfms.presentation" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F0F5FA;strokeColor=#2B6CB0;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=12;fontStyle=1;fontColor=#1A4971;" vertex="1" parent="1">
           <mxGeometry x="75" y="50" width="700" height="95" as="geometry" />
         </mxCell>
         <mxCell id="101" value="&lt;b&gt;Điều Phối Giao Diện &amp;amp; Menu&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Tiếp nhận lệnh từ bàn phím&lt;/span&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" vertex="1" parent="1">

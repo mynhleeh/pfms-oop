@@ -48,7 +48,7 @@ skinparam roundcorner 6
 skinparam defaultFontName Arial
 skinparam defaultFontSize 12
 
-package "Tầng 1: Trình diễn (Presentation Layer)\ncom.pfms.cli" as L1 #F0F7FF {
+package "Tầng 1: Trình diễn (Presentation Layer)\ncom.pfms.presentation" as L1 #F0F7FF {
     [Bộ Điều hướng Menu & CLI View] as CLI
     [Đối tượng Truyền Dữ liệu DTO] as DTO
     CLI -down-> DTO
@@ -105,7 +105,7 @@ Cấu trúc gói định hình không gian tên vật lý trong mã nguồn Java
 
 ```text
 com.pfms
-├── cli                     # Tầng Trình diễn: Giao diện dòng lệnh
+├── presentation            # Tầng Trình diễn: Giao diện dòng lệnh
 │   ├── controller          # Điều phối luồng màn hình và tiếp nhận lệnh
 │   ├── view                # Định dạng bảng biểu và kết xuất hiển thị
 │   └── dto                 # Đối tượng truyền dữ liệu giữa giao diện và dịch vụ
@@ -126,10 +126,10 @@ Bảng ma trận xác lập các gói được phép tham chiếu và phạm vi 
 
 | Gói nguồn | Gói đích được phép import | Phạm vi truy cập | Thành phần được phép sử dụng |
 | :--- | :--- | :--- | :--- |
-| `cli` | `service`, `cli.dto` | `public` | Chỉ gọi các phương thức công khai trên giao diện dịch vụ; không import trực tiếp gói `domain` hoặc `infrastructure`. |
-| `service` | `domain`, `cli.dto` | `public` | Thao tác trên thực thể, đối tượng giá trị và gọi các giao diện thuộc `domain.repository`; không import gói `cli` hoặc `infrastructure`. |
+| `presentation` | `service`, `presentation.dto` | `public` | Chỉ gọi các phương thức công khai trên giao diện dịch vụ; không import trực tiếp gói `domain` hoặc `infrastructure`. |
+| `service` | `domain`, `presentation.dto` | `public` | Thao tác trên thực thể, đối tượng giá trị và gọi các giao diện thuộc `domain.repository`; không import gói `presentation` hoặc `infrastructure`. |
 | `domain` | Thư viện Java chuẩn | `public` | Độc lập tuyệt đối; chỉ sử dụng `java.time`, `java.math`, `java.util`; không import bất kỳ gói nào khác trong hệ thống. |
-| `infrastructure` | `domain` | `public` | Hiện thực hóa các giao diện từ gói `domain.repository`; không import ngược lên gói `service` hoặc `cli`. |
+| `infrastructure` | `domain` | `public` | Hiện thực hóa các giao diện từ gói `domain.repository`; không import ngược lên gói `service` hoặc `presentation`. |
 
 **Quy tắc kiểm soát phạm vi lớp nội bộ:**
 
@@ -160,7 +160,7 @@ skinparam participant {
 }
 
 actor "Người dùng\n(Bàn phím & Màn hình)" as USR #E2E8F0
-participant "Tầng Trình diễn\ncom.pfms.cli" as CLI #F0F5FA
+participant "Tầng Trình diễn\ncom.pfms.presentation" as CLI #F0F5FA
 participant "Tầng Dịch vụ\ncom.pfms.service" as SVC #F0F9F4
 participant "Tầng Nghiệp vụ\ncom.pfms.domain" as DOM #FEF9EC
 participant "Tầng Hạ tầng\ncom.pfms.infrastructure" as INF #FDF2F2

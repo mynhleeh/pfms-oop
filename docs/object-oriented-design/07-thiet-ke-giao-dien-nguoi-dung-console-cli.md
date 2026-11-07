@@ -10,23 +10,23 @@ Mục này trình bày cấu trúc các gói nội bộ của Tầng Trình di�
 
 Tầng Trình diễn tuân thủ nguyên lý phân tách giao diện: các thành phần giao diện chỉ tương tác với người dùng qua bàn phím và màn hình console, không chứa quy tắc tính toán số dư hay lưu trữ dữ liệu.
 
-Mã nguồn tầng trình diễn nằm trong không gian tên `com.pfms.cli`, gồm ba gói:
+Mã nguồn tầng trình diễn nằm trong không gian tên `com.pfms.presentation`, gồm ba gói:
 
-- Gói Khung nhìn (`com.pfms.cli.view`): Đọc lệnh từ bàn phím, kiểm tra cú pháp chuỗi nhập liệu, in menu và kết xuất bảng dữ liệu ASCII ra màn hình.
-- Gói Điều phối (`com.pfms.cli.controller`): Xử lý lựa chọn từ menu, điều hướng màn hình, đóng gói tham số vào DTO và gọi phương thức tương ứng trên Tầng Dịch vụ qua giao diện trừu tượng.
-- Gói Truyền Dữ liệu (`com.pfms.cli.dto`): Chứa các đối tượng dữ liệu thô bất biến (`RequestDTO` và `ResponseDTO`) dùng để trao đổi dữ liệu hai chiều giữa Tầng Trình diễn và Tầng Dịch vụ.
+- Gói Khung nhìn (`com.pfms.presentation.view`): Đọc lệnh từ bàn phím, kiểm tra cú pháp chuỗi nhập liệu, in menu và kết xuất bảng dữ liệu ASCII ra màn hình.
+- Gói Điều phối (`com.pfms.presentation.controller`): Xử lý lựa chọn từ menu, điều hướng màn hình, đóng gói tham số vào DTO và gọi phương thức tương ứng trên Tầng Dịch vụ qua giao diện trừu tượng.
+- Gói Truyền Dữ liệu (`com.pfms.presentation.dto`): Chứa các đối tượng dữ liệu thô bất biến (`RequestDTO` và `ResponseDTO`) dùng để trao đổi dữ liệu hai chiều giữa Tầng Trình diễn và Tầng Dịch vụ.
 
 Bảng phân định trách nhiệm nội bộ Tầng Trình diễn:
 
 | Thành phần | Trách nhiệm cho phép | Ranh giới cấm đoán |
 | :--- | :--- | :--- |
-| **Gói Khung nhìn**<br/>(`cli.view`) | Đọc ký tự từ bàn phím, kiểm tra cú pháp chuỗi thô, in menu chức năng, căn lề bảng biểu văn bản, hiển thị thông báo kết quả hoặc lỗi. | Không tính toán số dư, không kiểm tra quy tắc nghiệp vụ tài chính, không tự điều hướng màn hình, không gọi trực tiếp Tầng Dịch vụ, Tầng Miền hay Kho lưu trữ. |
-| **Gói Điều phối**<br/>(`cli.controller`) | Nhận lựa chọn menu, điều hướng màn hình, đóng gói tham số vào DTO yêu cầu, gọi Giao diện Tầng Dịch vụ, nhận DTO phản hồi và chuyển cho View hiển thị. | Không tính toán tài chính, không sửa đổi số liệu nghiệp vụ, không in trực tiếp ra console, không phụ thuộc vào lớp cài đặt cụ thể của dịch vụ hay kho lưu trữ. |
-| **Gói Truyền Dữ liệu**<br/>(`cli.dto`) | Đóng gói tham số nhập thành `RequestDTO`, nhận kết quả ca sử dụng thành `ResponseDTO`, bảo đảm tính bất biến của dữ liệu trung chuyển giữa CLI và Service. | Không chứa logic tính toán tài chính hoặc quy tắc nghiệp vụ, không tham chiếu thực thể miền (`Domain Entity`), không sửa đổi dữ liệu sau khi khởi tạo. |
+| **Gói Khung nhìn**<br/>(`presentation.view`) | Đọc ký tự từ bàn phím, kiểm tra cú pháp chuỗi thô, in menu chức năng, căn lề bảng biểu văn bản, hiển thị thông báo kết quả hoặc lỗi. | Không tính toán số dư, không kiểm tra quy tắc nghiệp vụ tài chính, không tự điều hướng màn hình, không gọi trực tiếp Tầng Dịch vụ, Tầng Miền hay Kho lưu trữ. |
+| **Gói Điều phối**<br/>(`presentation.controller`) | Nhận lựa chọn menu, điều hướng màn hình, đóng gói tham số vào DTO yêu cầu, gọi Giao diện Tầng Dịch vụ, nhận DTO phản hồi và chuyển cho View hiển thị. | Không tính toán tài chính, không sửa đổi số liệu nghiệp vụ, không in trực tiếp ra console, không phụ thuộc vào lớp cài đặt cụ thể của dịch vụ hay kho lưu trữ. |
+| **Gói Truyền Dữ liệu**<br/>(`presentation.dto`) | Đóng gói tham số nhập thành `RequestDTO`, nhận kết quả ca sử dụng thành `ResponseDTO`, bảo đảm tính bất biến của dữ liệu trung chuyển giữa CLI và Service. | Không chứa logic tính toán tài chính hoặc quy tắc nghiệp vụ, không tham chiếu thực thể miền (`Domain Entity`), không sửa đổi dữ liệu sau khi khởi tạo. |
 
 > [!NOTE]
 > **Tệp sơ đồ nguồn đính kèm:** [`07-so-do-kien-truc-tang-trinh-dien.drawio`](07-so-do-kien-truc-tang-trinh-dien.drawio)
-> Sơ đồ kiến trúc mô hình hóa tương tác giữa các gói nội bộ của Tầng Trình diễn (`cli.view`, `cli.controller`, `cli.dto`) và điểm kết nối với Tầng Dịch vụ qua giao diện trừu tượng (`Service Interfaces`).
+> Sơ đồ kiến trúc mô hình hóa tương tác giữa các gói nội bộ của Tầng Trình diễn (`presentation.view`, `presentation.controller`, `presentation.dto`) và điểm kết nối với Tầng Dịch vụ qua giao diện trừu tượng (`Service Interfaces`).
 
 Lợi ích kỹ thuật của việc phân tách:
 1. Độc lập công nghệ: Khi thay đổi giao diện từ dòng lệnh sang giao diện đồ họa hoặc Web API, Tầng Dịch vụ và Tầng Nghiệp vụ phía sau được giữ nguyên.
@@ -172,7 +172,7 @@ Mục này đặc tả lớp tiện ích kiểm tra tính hợp lệ của dữ 
 
 ### 7.3.1 Xác thực Cú pháp Chuỗi Ký tự và Số học
 
-Toàn bộ dữ liệu nhập từ thiết bị nhập chuẩn thông qua `Scanner` ban đầu đều ở dạng chuỗi ký tự thô. Để ngăn chặn việc lan truyền dữ liệu rác xuống Tầng Dịch vụ và phòng ngừa các ngoại lệ chuyển đổi kiểu dữ liệu, hệ thống thiết kế lớp tiện ích dùng chung `InputValidator` đặt trong gói `com.pfms.cli.view`.
+Toàn bộ dữ liệu nhập từ thiết bị nhập chuẩn thông qua `Scanner` ban đầu đều ở dạng chuỗi ký tự thô. Để ngăn chặn việc lan truyền dữ liệu rác xuống Tầng Dịch vụ và phòng ngừa các ngoại lệ chuyển đổi kiểu dữ liệu, hệ thống thiết kế lớp tiện ích dùng chung `InputValidator` đặt trong gói `com.pfms.presentation.view`.
 
 Lớp `InputValidator` chịu trách nhiệm làm sạch và kiểm tra cú pháp trước khi dữ liệu được chuyển đổi sang các kiểu dữ liệu nghiệp vụ:
 - Chuẩn hóa chuỗi văn bản: Tự động loại bỏ khoảng trắng thừa ở hai đầu chuỗi (`trim`) và rút gọn các khoảng trắng liên tiếp bên trong chuỗi.
@@ -226,7 +226,7 @@ Nguyên tắc đóng gói và thiết kế bất biến:
 
 ### 7.4.2 Danh mục các Lớp Truyền Dữ liệu Chi tiết
 
-Toàn bộ các lớp DTO trong hệ thống được định vị trong gói `com.pfms.cli.dto` và phân định rạch ròi thành hai nhóm chính:
+Toàn bộ các lớp DTO trong hệ thống được định vị trong gói `com.pfms.presentation.dto` và phân định rạch ròi thành hai nhóm chính:
 - Nhóm DTO Yêu cầu (`Request DTO`): Đóng gói dữ liệu đầu vào người dùng đã được `InputValidator` kiểm tra tính hợp lệ trước khi gửi xuống Giao diện Tầng Dịch vụ.
 - Nhóm DTO Phản hồi (`Response DTO`): Đóng gói dữ liệu kết quả nghiệp vụ từ Tầng Dịch vụ trả về để Tầng Trình diễn kết xuất ra màn hình console.
 

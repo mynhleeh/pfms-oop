@@ -9,7 +9,7 @@ Bản vẽ thiết kế tập trung giải quyết ba mục tiêu kỹ thuật t
 Mục này xác lập cấu trúc phân tách giữa giao diện công khai và lớp cài đặt nội bộ của tầng dịch vụ, đồng thời cung cấp bảng danh mục đối chiếu các dịch vụ điều phối trong toàn bộ hệ thống.
 
 Cấu trúc mã nguồn của tầng dịch vụ được phân định rạch ròi thành hai không gian tên:
-- **Giao diện công khai (`com.pfms.service`):** Định nghĩa toàn bộ các hợp đồng phương thức mà Tầng Trình diễn (`com.pfms.cli`) được phép triệu gọi. Tầng Trình diễn chỉ phụ thuộc duy nhất vào các giao diện này, hoàn toàn không được phép tiếp xúc với lớp cài đặt cụ thể hay các thực thể nghiệp vụ.
+- **Giao diện công khai (`com.pfms.service`):** Định nghĩa toàn bộ các hợp đồng phương thức mà Tầng Trình diễn (`com.pfms.presentation`) được phép triệu gọi. Tầng Trình diễn chỉ phụ thuộc duy nhất vào các giao diện này, hoàn toàn không được phép tiếp xúc với lớp cài đặt cụ thể hay các thực thể nghiệp vụ.
 - **Lớp cài đặt nội bộ (`com.pfms.service.impl`):** Hiện thực hóa các giao diện dịch vụ với phạm vi truy cập nội bộ gói (`package-private`), giấu kín toàn bộ logic điều phối. Lớp cài đặt tiếp nhận đối tượng truyền dữ liệu (DTO), tiêm các giao diện kho lưu trữ (`com.pfms.domain.repository`) qua hàm khởi tạo để truy xuất dữ liệu, và ủy quyền các phép tính toán số học cho các thực thể thuộc Tầng Nghiệp vụ.
 
 **Bảng tổng hợp danh mục dịch vụ ứng dụng:**

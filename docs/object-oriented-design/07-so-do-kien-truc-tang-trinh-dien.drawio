@@ -7,10 +7,10 @@
                 <mxCell id="10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=center;verticalAlign=middle;fontFamily=Segoe UI, Arial, sans-serif;fontStyle=1;fontSize=13;fontColor=#1A202C;" value="SƠ ĐỒ KIẾN TRÚC PHÂN TẦNG VÀ LUỒNG DỮ LIỆU TẦNG TRÌNH DIỄN" vertex="1">
                     <mxGeometry height="24" width="800" x="40" y="14" as="geometry"/>
                 </mxCell>
-                <mxCell id="100" parent="1" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#F0F5FA;strokeColor=#2B6CB0;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=11;fontStyle=1;fontColor=#1A4971;" value="TẦNG 1: TRÌNH DIỄN — com.pfms.cli" vertex="1">
+                <mxCell id="100" parent="1" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#F0F5FA;strokeColor=#2B6CB0;strokeWidth=1.8;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fontFamily=Segoe UI;fontSize=11;fontStyle=1;fontColor=#1A4971;" value="TẦNG 1: TRÌNH DIỄN — com.pfms.presentation" vertex="1">
                     <mxGeometry height="325" width="800" x="40" y="46" as="geometry"/>
                 </mxCell>
-                <mxCell id="pkg_view" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#2B6CB0;" value="GÓI KHUNG NHÌN — com.pfms.cli.view" vertex="1">
+                <mxCell id="pkg_view" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#2B6CB0;" value="GÓI KHUNG NHÌN — com.pfms.presentation.view" vertex="1">
                     <mxGeometry height="154" width="320" x="55" y="76" as="geometry"/>
                 </mxCell>
                 <mxCell id="111" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;ConsoleView &amp;amp; InputValidator&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Đọc phím, kiểm tra cú pháp và hiển thị menu&lt;/span&gt;" vertex="1">
@@ -19,7 +19,7 @@
                 <mxCell id="112" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;TableRenderer&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Kẻ khung bảng ASCII, căn lề cột hiển thị&lt;/span&gt;" vertex="1">
                     <mxGeometry height="48" width="290" x="70" y="165" as="geometry"/>
                 </mxCell>
-                <mxCell id="pkg_ctrl" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#2B6CB0;" value="GÓI ĐIỀU PHỐI — com.pfms.cli.controller" vertex="1">
+                <mxCell id="pkg_ctrl" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2B6CB0;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#2B6CB0;" value="GÓI ĐIỀU PHỐI — com.pfms.presentation.controller" vertex="1">
                     <mxGeometry height="154" width="320" x="505" y="76" as="geometry"/>
                 </mxCell>
                 <mxCell id="121" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;MainController&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Vòng lặp sự kiện (MainLoop), bắt ngoại lệ an toàn&lt;/span&gt;" vertex="1">
@@ -28,7 +28,7 @@
                 <mxCell id="122" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E0;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;6 Sub-Controllers Phân Hệ&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#718096;font-size:9px;&quot;&gt;Ví, Giao Dịch, Chuyển Tiền, Danh Mục, Báo Cáo, Sao Lưu&lt;/span&gt;" vertex="1">
                     <mxGeometry height="48" width="290" x="520" y="165" as="geometry"/>
                 </mxCell>
-                <mxCell id="pkg_dto" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FEF9EC;strokeColor=#B7791F;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#744210;" value="GÓI TRUYỀN DỮ LIỆU — com.pfms.cli.dto" vertex="1">
+                <mxCell id="pkg_dto" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FEF9EC;strokeColor=#B7791F;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontFamily=Segoe UI;fontSize=10;fontStyle=1;fontColor=#744210;" value="GÓI TRUYỀN DỮ LIỆU — com.pfms.presentation.dto" vertex="1">
                     <mxGeometry height="95" width="770" x="55" y="260" as="geometry"/>
                 </mxCell>
                 <mxCell id="131" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B7791F;strokeWidth=1.2;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=10;fontColor=#2D3748;" value="&lt;b&gt;ResponseDTO (Dữ liệu trả về)&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;color:#744210;font-size:9px;&quot;&gt;Kết quả từ Tầng Dịch vụ gửi cho View hiển thị&lt;/span&gt;" vertex="1">

@@ -31,7 +31,7 @@ Bảng phân định trách nhiệm bắt và ném ngoại lệ giữa bốn t�
 
 | Tầng kiến trúc | Trách nhiệm ném ngoại lệ | Trách nhiệm bắt và chuyển đổi ngoại lệ |
 | :--- | :--- | :--- |
-| **Tầng Trình diễn**<br/>(`com.pfms.cli`) | Ném ngoại lệ định dạng đầu vào khi chuỗi nhập liệu sai cú pháp. | Điểm chốt chặn cuối cùng: Bắt toàn bộ ngoại lệ tại vòng lặp menu chính, hiển thị thông báo thân thiện và an toàn đưa người dùng quay lại menu. |
+| **Tầng Trình diễn**<br/>(`com.pfms.presentation`) | Ném ngoại lệ định dạng đầu vào khi chuỗi nhập liệu sai cú pháp. | Điểm chốt chặn cuối cùng: Bắt toàn bộ ngoại lệ tại vòng lặp menu chính, hiển thị thông báo thân thiện và an toàn đưa người dùng quay lại menu. |
 | **Tầng Dịch vụ**<br/>(`com.pfms.service`) | Ném Ngoại lệ Nghiệp vụ kèm mã lỗi khi điều kiện ca sử dụng không thỏa mãn. | Không nuốt lỗi; cho phép ngoại lệ từ Tầng Miền và Tầng Hạ tầng lan truyền tự nhiên lên Tầng Trình diễn. |
 | **Tầng Nghiệp vụ cốt lõi**<br/>(`com.pfms.domain`) | Ném Ngoại lệ Nghiệp vụ ngay tại thực thể khi vi phạm ràng buộc số dư hoặc ngân sách. | Không bắt giữ lỗi; tuyệt đối không tiếp xúc với các thư viện I/O hoặc Console. |
 | **Tầng Hạ tầng lưu trữ**<br/>(`com.pfms.infrastructure`) | Ném ngoại lệ hạ tầng (`StorageException`). | Bắt giữ toàn bộ `IOException`, chuyển đổi và đóng gói nguyên nhân gốc vào `StorageException` trước khi ném ra ngoài. |
