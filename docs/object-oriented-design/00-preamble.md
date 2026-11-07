@@ -26,7 +26,7 @@
 - [07-thiet-ke-giao-dien-nguoi-dung-console-cli.md](07-thiet-ke-giao-dien-nguoi-dung-console-cli.md): Thiết kế giao diện dòng lệnh, điều hướng menu, xác thực đầu vào và đối tượng truyền dữ liệu
 - [08-thiet-ke-xu-ly-ngoai-le-va-nhat-ky.md](08-thiet-ke-xu-ly-ngoai-le-va-nhat-ky.md): Cây phân cấp ngoại lệ hệ thống và từ điển mã lỗi nghiệp vụ chuẩn hóa
 - [09-ma-tran-truy-vet-thiet-ke-sang-phan-tich-va-srs.md](09-ma-tran-truy-vet-thiet-ke-sang-phan-tich-va-srs.md): Ma trận truy vết hai chiều giữa yêu cầu, phân tích và bản vẽ thiết kế
-- [10-tong-ket-va-lo-trinh-cai-dat.md](10-tong-ket-va-lo-trinh-cai-dat.md): Tổng hợp chỉ số thiết kế hệ thống và lộ trình cài đặt mã nguồn
+- [10-tong-ket-va-lo-trinh-cai-dat.md](10-tong-ket-va-lo-trinh-cai-dat.md): Tổng kết kết quả thiết kế và lộ trình cài đặt mã nguồn
 - [11-tai-lieu-trich-dan.md](11-tai-lieu-trich-dan.md): Danh mục tài liệu tham khảo kỹ thuật và chuẩn mực quốc tế chuẩn APA
 
 ## Phân cấp Cấu trúc Chi tiết các Phần
@@ -107,18 +107,15 @@
 <!-- PLACEHOLDER: Bảng ma trận đối chiếu giữa yêu cầu chức năng, thao tác hệ thống và các lớp phương thức thiết kế | Căn cứ: Chuẩn kỹ thuật ISO/IEC 29148 | Tiêu chí: Đảm bảo độ bao phủ 100% không sót nghiệp vụ và không sinh lớp mồ côi -->
 
 - 9.1 Ánh xạ Yêu cầu Chức năng sang Lớp Thiết kế
-- 9.2 Ánh xạ Thao tác Hệ thống sang Phương thức Dịch vụ
-- 9.3 Đánh giá Độ Bao phủ và Tính Nhất quán Thiết kế
+- 9.2 Đánh giá Độ Bao phủ và Tính Nhất quán Thiết kế
 
-### Phần 10: Tổng kết và Lộ trình Cài đặt
+### Phần 10: Tổng kết
 
-<!-- PLACEHOLDER: Tổng hợp định lượng chỉ số thiết kế hệ thống, đối chiếu tiêu chí đề bài, đóng khóa thiết kế và lập lộ trình cài đặt mã nguồn Java | Căn cứ: Milestone 4 Rubric, Tiêu chuẩn quản lý cấu hình | Tiêu chí: Thứ tự cài đặt lớp logic rõ ràng, kế hoạch kiểm thử tự động khả thi -->
+<!-- PLACEHOLDER: Tổng kết toàn diện hồ sơ thiết kế hướng đối tượng, đánh giá độ bao phủ kiến trúc và xác lập lộ trình cài đặt mã nguồn Java theo nguyên tắc từ dưới lên cùng kế hoạch kiểm thử đơn vị tự động | Căn cứ: Milestone 4 Rubric | Tiêu chí: Tóm tắt rõ ràng kết quả thiết kế và lộ trình triển khai mã nguồn -->
 
-- 10.1 Tổng hợp Chỉ số Thiết kế Hệ thống
-- 10.2 Đóng Khóa Hồ sơ Thiết kế
-- 10.3 Lộ trình Cài đặt Mã nguồn
+- 10. Tổng kết
 
-### Phần 11: Tài liệu Trích dẫn
+### Phần 11: Tài liệu Tham khảo
 
 <!-- PLACEHOLDER: Danh mục toàn bộ các tài liệu tham khảo kỹ thuật, sách chuyên khảo phần mềm và tiêu chuẩn quốc tế từ thư mục reference/ được trích dẫn theo chuẩn APA 7th edition, sắp xếp theo thứ tự chữ cái A-Z | Căn cứ: Thư mục reference/, Quy tắc trích dẫn Rule 07 | Tiêu chí: 100% tài liệu được viện dẫn trong hồ sơ đều có mặt đầy đủ trong danh mục -->
 
