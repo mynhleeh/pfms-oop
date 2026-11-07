@@ -23,7 +23,7 @@
 - [04-dac-ta-bien-doi-du-lieu-thao-tac-he-thong.md](04-dac-ta-bien-doi-du-lieu-thao-tac-he-thong.md): Đặc tả biến đổi dữ liệu của các thao tác hệ thống
 - [05-mo-hinh-trang-thai-thuc-the.md](05-mo-hinh-trang-thai-thuc-the.md): Biểu đồ máy trạng thái cho vòng đời thực thể
 - [06-so-do-robustness-va-the-crc.md](06-so-do-robustness-va-the-crc.md): Sơ đồ Robustness và bộ thẻ CRC phân bổ trách nhiệm sơ bộ
-- [07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận đối chiếu hai chiều giữa yêu cầu, thực thể miền và thao tác hệ thống
+- [07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận truy vết hai chiều giữa yêu cầu và mô hình phân tích
 - [08-tong-ket.md](08-tong-ket.md): Tổng kết hồ sơ phân tích hướng đối tượng
 - [09-tai-lieu-trich-dan.md](09-tai-lieu-trich-dan.md): Danh mục tài liệu tham khảo kỹ thuật chuẩn APA
 
@@ -70,11 +70,9 @@
 - 6.1 Sơ đồ Robustness
 - 6.2 Thẻ CRC
 
-### Phần 7: Ma trận Truy vết Yêu cầu vào Mô hình Phân tích
-- 7.1 Ma trận Đối chiếu Yêu cầu Chức năng với Thực thể và Đối tượng Giá trị
-- 7.2 Ma trận Tác động của Thao tác Hệ thống lên Thực thể Miền
-- 7.3 Bảng Kiểm soát Quy tắc Nghiệp vụ và Ràng buộc Kỹ thuật
-- 7.4 Báo cáo Kiểm toán Độ bao phủ và Tính Toàn vẹn Mô hình
+### Phần 7: Ma trận Truy vết
+- 7.1 Truy vết Yêu cầu Chức năng
+- 7.2 Kiểm soát Quy tắc Nghiệp vụ
 
 ### Phần 8: Tổng kết
 - Tổng kết kết quả phân tích và đóng khóa đường cơ sở nghiệp vụ
