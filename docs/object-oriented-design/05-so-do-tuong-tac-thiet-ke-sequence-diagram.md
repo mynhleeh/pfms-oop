@@ -269,7 +269,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 ### 5.5.1 Sơ đồ Thêm mới Danh mục Chi tiết
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều phối bổ sung danh mục chi tiết cấp ba vào nhóm nhu cầu cha đang hoạt động, kiểm tra tính hợp lệ của định danh và lưu trữ thực thể vào kho dữ liệu)
+Luồng tương tác mô tả quá trình tiếp nhận yêu cầu bổ sung danh mục chi tiết cấp ba vào một nhóm nhu cầu cha đang hoạt động, thực hiện kiểm tra tính hợp lệ của định danh và tính khả dụng của nhóm cha trước khi khởi tạo thực thể. Dịch vụ ứng dụng kiểm soát tính duy nhất của tên trong phạm vi nhóm cha và lưu trữ thực thể danh mục mới vào kho dữ liệu.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-CAT-01`
@@ -280,13 +280,52 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> CategoryServiceImpl -> CategoryRepository -> Category; tiếp nhận CreateCategoryRequestDto; CategoryServiceImpl kiểm tra tính hợp lệ của tên danh mục ném ValidationException với mã ERR-NAM-001 nếu rỗng; kiểm tra nhóm cha parentCategoryId qua CategoryRepository.findById, ném EntityNotFoundException với mã ERR-CAT-001 nếu không tìm thấy hoặc BusinessRuleException với mã ERR-CAT-005 nếu nhóm cha đang ở trạng thái DELETED; kiểm tra trùng tên trong cùng nhóm cha qua CategoryRepository.existsByNameAndParentId ném DuplicateEntityException với mã ERR-NAM-002 nếu đã tồn tại; khởi tạo thực thể Category ở trạng thái ACTIVE kế thừa loại giao dịch từ nhóm cha; gọi CategoryRepository.save lưu bản ghi mới và phản hồi CategoryResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant CategoryService as CategoryServiceImpl
+    participant CategoryRepo as CategoryRepository
+    participant Category as Category
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: danh mục mới luôn được gắn kết vào một nhóm cha hợp lệ đang hoạt động và kế thừa loại giao dịch cố định, bảo đảm tính toàn vẹn của cấu trúc phân cấp ba tầng)
+    User->>+CLI: 1. Nhập thông tin danh mục mới (categoryName, parentCategoryId)
+    CLI->>+CategoryService: 2. createCategory(CreateCategoryRequestDto)
+    alt Tên danh mục rỗng hoặc vượt quá 50 ký tự
+        CategoryService-->>CLI: 3. ném ValidationException
+        CLI-->>User: 4. Hiển thị thông báo tên danh mục không hợp lệ
+    else Tên danh mục hợp lệ
+        CategoryService->>+CategoryRepo: 5. findById(parentCategoryId)
+        CategoryRepo-->>-CategoryService: 6. Optional<Category> parentOpt
+        alt Nhóm cha không tồn tại trong hệ thống
+            CategoryService-->>CLI: 7. ném EntityNotFoundException
+            CLI-->>User: 8. Hiển thị thông báo nhóm cha không tồn tại
+        else Nhóm cha đang ở trạng thái DELETED
+            CategoryService-->>CLI: 9. ném BusinessRuleException
+            CLI-->>User: 10. Hiển thị thông báo nhóm cha đã bị xóa
+        else Nhóm cha hợp lệ và đang hoạt động (ACTIVE)
+            CategoryService->>+CategoryRepo: 11. existsByNameAndNeedGroupId(categoryName, parentCategoryId)
+            CategoryRepo-->>-CategoryService: 12. boolean isDuplicate
+            alt Tên danh mục đã tồn tại trong cùng nhóm cha
+                CategoryService-->>CLI: 13. ném DuplicateEntityException
+                CLI-->>User: 14. Hiển thị thông báo tên danh mục bị trùng lặp
+            else Tên danh mục chưa tồn tại (Hợp lệ)
+                CategoryService->>+Category: 15. new Category(newId, categoryName, parentCategoryId, transactionType, icon, color)
+                Category-->>-CategoryService: 16. newCategory
+                CategoryService->>+CategoryRepo: 17. save(newCategory)
+                CategoryRepo-->>-CategoryService: 18. savedCategory
+                CategoryService-->>-CLI: 19. CategoryResponseDto
+                CLI-->>-User: 20. Kết xuất thông tin danh mục mới khởi tạo
+            end
+        end
+    end
+```
+
+Danh mục mới luôn được gắn kết vào một nhóm cha hợp lệ đang hoạt động và kế thừa loại giao dịch cố định, bảo đảm tính toàn vẹn của cấu trúc phân cấp ba tầng.
 
 ### 5.5.2 Sơ đồ Đổi tên Danh mục
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều phối cập nhật tên hiển thị của danh mục hiện có, kiểm tra tính duy nhất trong nhóm cha và bảo toàn nguyên vẹn mã định danh cùng lịch sử giao dịch)
+Luồng tương tác mô tả quy trình tiếp nhận yêu cầu cập nhật tên hiển thị của danh mục hiện có, kiểm tra định dạng tên mới và kiểm soát tính duy nhất trong phạm vi nhóm cha trực thuộc. Dịch vụ ứng dụng nạp thực thể danh mục, cập nhật tên mới và lưu trữ vào kho dữ liệu mà không làm biến động mã định danh hay lịch sử giao dịch liên kết.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-CAT-02`
@@ -297,13 +336,49 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> CategoryServiceImpl -> CategoryRepository -> Category; tiếp nhận RenameCategoryRequestDto; CategoryServiceImpl kiểm tra định dạng tên mới ném ValidationException với mã ERR-NAM-001 nếu rỗng hoặc chỉ chứa khoảng trắng; gọi CategoryRepository.findById ném EntityNotFoundException với mã ERR-CAT-001 nếu danh mục không tồn tại; kiểm tra trùng lặp tên mới với các danh mục khác trong cùng nhóm cha qua CategoryRepository.existsByNameAndParentIdAndIdNot ném DuplicateEntityException với mã ERR-NAM-002 nếu bị trùng; nạp thực thể Category, cập nhật thuộc tính tên, gọi CategoryRepository.save lưu cập nhật và phản hồi CategoryResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant CategoryService as CategoryServiceImpl
+    participant CategoryRepo as CategoryRepository
+    participant Category as Category
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc đổi tên bảo toàn tuyệt đối mã định danh và loại thu chi của danh mục, không làm đứt gãy hoặc sai lệch dữ liệu lịch sử của các giao dịch đã ghi nhận trong quá khứ)
+    User->>+CLI: 1. Nhập yêu cầu đổi tên (categoryId, newName)
+    CLI->>+CategoryService: 2. renameCategory(RenameCategoryRequestDto)
+    alt Tên mới rỗng hoặc vượt quá 50 ký tự
+        CategoryService-->>CLI: 3. ném ValidationException
+        CLI-->>User: 4. Hiển thị thông báo tên mới không hợp lệ
+    else Định dạng tên mới hợp lệ
+        CategoryService->>+CategoryRepo: 5. findById(categoryId)
+        CategoryRepo-->>-CategoryService: 6. Optional<Category> categoryOpt
+        alt Danh mục không tồn tại trong hệ thống
+            CategoryService-->>CLI: 7. ném EntityNotFoundException
+            CLI-->>User: 8. Hiển thị thông báo danh mục không tồn tại
+        else Danh mục tồn tại
+            CategoryService->>+CategoryRepo: 9. existsByNameAndNeedGroupIdAndIdNot(newName, category.getNeedGroupId(), categoryId)
+            CategoryRepo-->>-CategoryService: 10. boolean isDuplicate
+            alt Tên mới trùng với danh mục khác trong cùng nhóm cha
+                CategoryService-->>CLI: 11. ném DuplicateEntityException
+                CLI-->>User: 12. Hiển thị thông báo tên mới bị trùng lặp
+            else Tên mới duy nhất (Hợp lệ)
+                CategoryService->>+Category: 13. rename(newName)
+                Category-->>-CategoryService: 14. void
+                CategoryService->>+CategoryRepo: 15. save(category)
+                CategoryRepo-->>-CategoryService: 16. updatedCategory
+                CategoryService-->>-CLI: 17. CategoryResponseDto
+                CLI-->>-User: 18. Kết xuất thông tin danh mục sau khi đổi tên
+            end
+        end
+    end
+```
+
+Việc đổi tên bảo toàn tuyệt đối mã định danh và loại thu chi của danh mục, không làm đứt gãy hoặc sai lệch dữ liệu lịch sử của các giao dịch đã ghi nhận trong quá khứ theo quy tắc đặt tên bất biến của định danh.
 
 ### 5.5.3 Sơ đồ Khôi phục Danh mục Đã xóa
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều phối phục hồi danh mục đã xóa mềm về trạng thái hoạt động, kiểm tra tính khả dụng của nhóm cha và kiểm soát xung đột tên gọi)
+Luồng tương tác mô tả quy trình phục hồi danh mục đã xóa mềm trở lại trạng thái hoạt động, đồng thời xác thực trạng thái hoạt động của nhóm cha và kiểm soát xung đột tên gọi trong nhóm. Dịch vụ ứng dụng cập nhật trạng thái của thực thể sang hoạt động và lưu vào kho dữ liệu, đưa danh mục tái xuất hiện trên các biểu mẫu giao dịch.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-CAT-03`
@@ -314,13 +389,51 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> CategoryServiceImpl -> CategoryRepository -> Category; tiếp nhận categoryId; CategoryServiceImpl gọi CategoryRepository.findById ném EntityNotFoundException với mã ERR-CAT-001 nếu không tìm thấy danh mục hoặc danh mục đang ở trạng thái ACTIVE không cần khôi phục; nạp nhóm cha của danh mục, kiểm tra nếu nhóm cha đang ở trạng thái DELETED thì ném BusinessRuleException với mã ERR-CAT-004 từ chối khôi phục; kiểm tra tên danh mục khôi phục có bị trùng với danh mục đang hoạt động trong cùng nhóm hay không qua CategoryRepository.existsByNameAndParentId, ném DuplicateEntityException với mã ERR-NAM-002 nếu trùng; ủy quyền Category chuyển trạng thái từ DELETED sang ACTIVE, gọi CategoryRepository.save lưu thay đổi và phản hồi CategoryResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant CategoryService as CategoryServiceImpl
+    participant CategoryRepo as CategoryRepository
+    participant Category as Category
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác khôi phục chỉ được phép khi nhóm cha đang hoạt động và không xảy ra xung đột định danh, đưa danh mục trở lại danh sách lựa chọn mà không làm xáo trộn số liệu báo cáo lịch sử)
+    User->>+CLI: 1. Chọn yêu cầu khôi phục danh mục (categoryId)
+    CLI->>+CategoryService: 2. restoreCategory(categoryId)
+    CategoryService->>+CategoryRepo: 3. findById(categoryId)
+    CategoryRepo-->>-CategoryService: 4. Optional<Category> categoryOpt
+    alt Danh mục không tồn tại hoặc đang ở trạng thái ACTIVE
+        CategoryService-->>CLI: 5. ném EntityNotFoundException
+        CLI-->>User: 6. Hiển thị thông báo danh mục không hợp lệ để khôi phục
+    else Danh mục tồn tại và đang ở trạng thái DELETED
+        CategoryService->>+CategoryRepo: 7. findById(category.getNeedGroupId())
+        CategoryRepo-->>-CategoryService: 8. Optional<Category> parentOpt
+        alt Nhóm cha đang ở trạng thái DELETED
+            CategoryService-->>CLI: 9. ném BusinessRuleException
+            CLI-->>User: 10. Hiển thị thông báo từ chối do nhóm cha đang bị xóa
+        else Nhóm cha đang hoạt động (ACTIVE)
+            CategoryService->>+CategoryRepo: 11. existsByNameAndNeedGroupId(category.getName(), category.getNeedGroupId())
+            CategoryRepo-->>-CategoryService: 12. boolean isDuplicate
+            alt Tên danh mục trùng với danh mục đang hoạt động trong nhóm
+                CategoryService-->>CLI: 13. ném DuplicateEntityException
+                CLI-->>User: 14. Hiển thị thông báo xung đột tên danh mục đang hoạt động
+            else Không bị trùng tên (Đủ điều kiện khôi phục)
+                CategoryService->>+Category: 15. restore(parentGroupStatus)
+                Category-->>-CategoryService: 16. void (chuyển trạng thái sang ACTIVE)
+                CategoryService->>+CategoryRepo: 17. save(category)
+                CategoryRepo-->>-CategoryService: 18. restoredCategory
+                CategoryService-->>-CLI: 19. CategoryResponseDto
+                CLI-->>-User: 20. Kết xuất thông báo khôi phục danh mục thành công
+            end
+        end
+    end
+```
 
-### 5.5.4 Sơ đồ Xóa mềm Danh mục
+Thao tác khôi phục chỉ được phép khi nhóm cha đang hoạt động và không xảy ra xung đột định danh, đưa danh mục trở lại danh sách lựa chọn mà không làm xáo trộn số liệu báo cáo lịch sử.
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều phối xóa danh mục, tự động phân nhánh giữa xóa cứng đối với danh mục chưa có giao dịch và xóa mềm đối với danh mục đã có dữ liệu lịch sử)
+### 5.5.4 Sơ đồ Xóa Danh mục (Xóa cứng và Xóa mềm)
+
+Luồng tương tác mô tả quy trình tiếp nhận yêu cầu loại bỏ danh mục phân loại, kiểm tra ràng buộc duy trì tối thiểu nhóm nhu cầu hoạt động và kiểm tra lịch sử giao dịch tham chiếu. Dịch vụ ứng dụng tự động phân nhánh thực hiện xóa cứng nếu danh mục chưa từng phát sinh giao dịch hoặc xóa mềm chuyển trạng thái để bảo toàn tính toàn vẹn dòng tiền.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-CAT-04`
@@ -331,9 +444,50 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> CategoryServiceImpl -> CategoryRepository -> TransactionRepository -> Category; tiếp nhận categoryId; CategoryServiceImpl gọi CategoryRepository.findById ném EntityNotFoundException với mã ERR-CAT-001 nếu không tìm thấy; kiểm tra nếu mục cần xóa là nhóm nhu cầu cuối cùng còn hoạt động của một loại thu chi thì ném BusinessRuleException với mã ERR-CAT-002 từ chối xóa; gọi TransactionRepository.existsByCategoryId kiểm tra lịch sử phát sinh giao dịch; sử dụng khung alt: nếu chưa từng phát sinh giao dịch thì gọi CategoryRepository.deleteById thực hiện xóa cứng loại bỏ vĩnh viễn khỏi kho dữ liệu; nếu đã có giao dịch lịch sử thì ủy quyền Category chuyển trạng thái sang DELETED, gọi CategoryRepository.save lưu cập nhật và ẩn danh mục khỏi các luồng nhập liệu mới; phản hồi thông báo xóa thành công)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant CategoryService as CategoryServiceImpl
+    participant CategoryRepo as CategoryRepository
+    participant TxnRepo as TransactionRepository
+    participant Category as Category
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: cơ chế xóa mềm bảo toàn tuyệt đối tính toàn vẹn tham chiếu lịch sử của mọi giao dịch liên kết và duy trì tối thiểu một nhóm nhu cầu hoạt động cho mỗi loại thu chi theo quy định tài chính)
+    User->>+CLI: 1. Yêu cầu xóa danh mục (categoryId)
+    CLI->>+CategoryService: 2. deleteCategory(categoryId)
+    CategoryService->>+CategoryRepo: 3. findById(categoryId)
+    CategoryRepo-->>-CategoryService: 4. Optional<Category> categoryOpt
+    alt Danh mục không tồn tại trong hệ thống
+        CategoryService-->>CLI: 5. ném EntityNotFoundException
+        CLI-->>User: 6. Hiển thị thông báo không tìm thấy danh mục
+    else Danh mục tồn tại
+        CategoryService->>+CategoryRepo: 7. countActiveByNeedGroupId(category.getNeedGroupId())
+        CategoryRepo-->>-CategoryService: 8. long activeCount
+        alt Danh mục là mục hoạt động duy nhất còn lại của nhóm cha
+            CategoryService-->>CLI: 9. ném BusinessRuleException
+            CLI-->>User: 10. Hiển thị thông báo không thể xóa mục hoạt động cuối cùng
+        else Nhóm cha còn các danh mục hoạt động khác
+            CategoryService->>+TxnRepo: 11. existsByCategoryId(categoryId)
+            TxnRepo-->>-CategoryService: 12. boolean hasTransactions
+            alt Chưa từng phát sinh giao dịch (Xóa cứng)
+                CategoryService->>+CategoryRepo: 13. deleteById(categoryId)
+                CategoryRepo-->>-CategoryService: 14. void
+                CategoryService-->>CLI: 15. phản hồi xóa cứng thành công
+                CLI-->>User: 16. Hiển thị thông báo đã xóa hoàn toàn danh mục khỏi hệ thống
+            else Đã từng phát sinh giao dịch lịch sử (Xóa mềm)
+                CategoryService->>+Category: 17. markDeleted()
+                Category-->>-CategoryService: 18. void (chuyển trạng thái sang DELETED)
+                CategoryService->>+CategoryRepo: 19. save(category)
+                CategoryRepo-->>-CategoryService: 20. updatedCategory
+                CategoryService-->>-CLI: 21. phản hồi xóa mềm thành công
+                CLI-->>-User: 22. Hiển thị thông báo đã chuyển danh mục sang trạng thái đã xóa
+            end
+        end
+    end
+```
+
+Cơ chế xóa mềm bảo toàn tuyệt đối tính toàn vẹn tham chiếu lịch sử của mọi giao dịch liên kết và duy trì tối thiểu một nhóm nhu cầu hoạt động cho mỗi loại thu chi theo quy định tài chính.
 
 ## 5.6 Sơ đồ Tuần tự Nhóm Báo cáo và Quản trị Dữ liệu
 
@@ -343,7 +497,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 ### 5.6.1 Sơ đồ Lập Báo cáo Dòng tiền Định kỳ
 
-(Mô tả khoảng 1 đến 2 câu về luồng truy vấn và tổng hợp dòng tiền định kỳ 12 tháng liên tục, tính toán dòng tiền ròng cùng tỷ lệ tiết kiệm ở chế độ chỉ đọc)
+Luồng tương tác mô tả quy trình truy vấn và tổng hợp dòng tiền định kỳ trong chuỗi 12 tháng liên tục lùi tính từ mốc tháng/năm kết thúc ở chế độ chỉ đọc, tính toán dòng tiền ròng và tỷ lệ tiết kiệm từng tháng. Dịch vụ ứng dụng nạp các giao dịch từ kho lưu trữ theo khoảng ngày, tính toán các chỉ số tài chính, áp dụng tỷ lệ tiết kiệm mặc định khi tổng thu bằng không để tránh lỗi số học và đóng gói kết quả báo cáo.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-01`
@@ -354,13 +508,39 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> ReportServiceImpl -> TransactionRepository -> Money; tiếp nhận year; ReportServiceImpl gọi TransactionRepository.findByYear truy vấn danh sách giao dịch; nhóm các giao dịch theo từng tháng trong năm; tính tổng thu nhập, tổng chi tiêu và dòng tiền ròng từng tháng; sử dụng khung alt xử lý trường hợp tổng thu bằng không thì gán tỷ lệ tiết kiệm mặc định 0.00% tránh lỗi chia cho không ERR-FIN-002, trường hợp tổng thu dương thì tính tỷ lệ tiết kiệm làm tròn ngân hàng hai chữ số thập phân; đóng gói kết quả và phản hồi CashFlowReportDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant ReportService as ReportServiceImpl
+    participant TxnRepo as TransactionRepository
+    participant Money as Money
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể hay số dư tài chính nào trong hệ thống)
+    User->>+CLI: 1. Yêu cầu lập báo cáo dòng tiền (endMonth, endYear)
+    CLI->>+ReportService: 2. generateCashFlowReport(endMonth, endYear)
+    ReportService->>+TxnRepo: 3. findByDateRange(startDate, endDate)
+    TxnRepo-->>-ReportService: 4. List<Transaction> transactions
+    loop Xử lý tổng hợp 12 tháng liên tục
+        ReportService->>+Money: 5. calculateNetCashFlow(monthIncome, monthExpense)
+        Money-->>-ReportService: 6. NetCashFlow netFlow
+        alt Tổng thu nhập của tháng bằng 0 (totalIncome == 0)
+            ReportService->>ReportService: 7. gán SavingsRate mặc định 0.00% (tránh lỗi chia cho không)
+        else Tổng thu nhập của tháng lớn hơn 0 (totalIncome > 0)
+            ReportService->>+Money: 8. calculateSavingsRate(netFlow, monthIncome)
+            Money-->>-ReportService: 9. SavingsRate savingsRate (làm tròn ngân hàng 2 chữ số)
+        end
+    end
+    ReportService->>ReportService: 10. tính bình quân tháng và đóng gói CashFlowReportDto
+    ReportService-->>-CLI: 11. CashFlowReportDto
+    CLI-->>-User: 12. Kết xuất bảng báo cáo dòng tiền 12 tháng kèm biểu đồ
+```
+
+Thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể hay số dư tài chính nào trong hệ thống.
 
 ### 5.6.2 Sơ đồ Lập Báo cáo Cơ cấu Chi tiêu
 
-(Mô tả khoảng 1 đến 2 câu về luồng trích xuất và phân tích cơ cấu chi tiêu theo nhóm nhu cầu và danh mục chi tiết trong khoảng thời gian xác định ở chế độ chỉ đọc)
+Luồng tương tác mô tả quy trình trích xuất và phân tích cơ cấu chi tiêu theo nhóm nhu cầu và danh mục chi tiết trong khoảng thời gian xác định ở chế độ chỉ đọc. Dịch vụ ứng dụng kiểm tra tính hợp lệ của mốc thời gian, truy vấn giao dịch và thông tin phân cấp danh mục, gom cụm số liệu và tính toán tỷ trọng phân bổ chính xác.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-02`
@@ -371,13 +551,42 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> ReportServiceImpl -> TransactionRepository -> CategoryRepository -> Money; tiếp nhận SpendingReportCriteriaDto; ReportServiceImpl kiểm tra khoảng thời gian ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu lớn hơn ngày kết thúc; gọi TransactionRepository.findByDateRangeAndType truy vấn giao dịch; nạp thông tin phân cấp danh mục qua CategoryRepository kể cả các mục đã xóa mềm có giao dịch trong kỳ; gom cụm số liệu theo nhóm nhu cầu và danh mục; tính tỷ trọng phần trăm từng mục làm tròn ngân hàng hai chữ số thập phân; đóng gói và phản hồi SpendingStructureReportDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant ReportService as ReportServiceImpl
+    participant TxnRepo as TransactionRepository
+    participant CategoryRepo as CategoryRepository
+    participant Money as Money
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác trích xuất và tính toán tỷ trọng phân bổ chi tiêu ở chế độ chỉ đọc, bảo toàn tính toàn vẹn của dữ liệu danh mục và số liệu lịch sử)
+    User->>+CLI: 1. Nhập tiêu chí báo cáo (startDate, endDate, transactionType)
+    CLI->>+ReportService: 2. generateSpendingStructureReport(SpendingReportCriteriaDto)
+    alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
+        ReportService-->>CLI: 3. ném ValidationException
+        CLI-->>User: 4. Hiển thị thông báo khoảng thời gian không hợp lệ
+    else Khoảng thời gian hợp lệ
+        ReportService->>+TxnRepo: 5. findByDateRangeAndType(startDate, endDate, transactionType)
+        TxnRepo-->>-ReportService: 6. List<Transaction> transactions
+        ReportService->>+CategoryRepo: 7. findAll()
+        CategoryRepo-->>-ReportService: 8. List<Category> allCategories (bao gồm mục đã xóa mềm)
+        ReportService->>ReportService: 9. gom cụm số liệu theo NeedGroup và Category
+        loop Tính toán tỷ trọng từng nhóm và danh mục
+            ReportService->>+Money: 10. calculatePercentageShare(itemAmount, totalAmount)
+            Money-->>-ReportService: 11. SpendingStructureShare (làm tròn ngân hàng 2 chữ số)
+        end
+        ReportService->>ReportService: 12. đóng gói SpendingStructureReportDto
+        ReportService-->>-CLI: 13. SpendingStructureReportDto
+        CLI-->>-User: 14. Kết xuất báo cáo cơ cấu chi tiêu theo phân cấp hai tầng
+    end
+```
+
+Thao tác trích xuất và tính toán tỷ trọng phân bổ chi tiêu ở chế độ chỉ đọc, bảo toàn tính toàn vẹn của dữ liệu danh mục và số liệu lịch sử.
 
 ### 5.6.3 Sơ đồ Xuất Dữ liệu Sao lưu Hệ thống
 
-(Mô tả khoảng 1 đến 2 câu về luồng trích xuất toàn bộ dữ liệu tài chính trong hệ thống và đóng gói thành tệp sao lưu JSON chuẩn hóa theo cấu trúc đã định)
+Luồng tương tác mô tả quy trình trích xuất toàn bộ dữ liệu tài chính trong hệ thống và đóng gói thành tệp sao lưu JSON chuẩn hóa theo cấu trúc đã định. Dịch vụ ứng dụng nạp toàn bộ thực thể từ tất cả các kho lưu trữ dữ liệu, tổng hợp vào đối tượng dữ liệu sao lưu và ủy quyền cho bộ điều hợp tệp ghi an toàn xuống đĩa cục bộ.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-DAT-01`
@@ -388,13 +597,52 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> DataManagementServiceImpl -> WalletRepository -> TransactionRepository -> TransferRepository -> CategoryRepository -> NeedGroupRepository -> BalanceAdjustmentRepository -> JsonStorageAdapter; tiếp nhận destinationPath; DataManagementServiceImpl lần lượt gọi findAll trên toàn bộ các kho lưu trữ dữ liệu để nạp toàn bộ thực thể hệ thống; tổng hợp dữ liệu vào đối tượng BackupPayloadDto; gọi JsonStorageAdapter.writeBackupFile chuyển đổi sang chuỗi JSON và ghi xuống tệp đĩa; sử dụng khung alt bắt ngoại lệ I/O ném StorageException nếu gặp sự cố quyền ghi hoặc bộ nhớ; phản hồi thông báo xuất sao lưu thành công kèm đường dẫn tệp)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant DataService as DataManagementServiceImpl
+    participant WalletRepo as WalletRepository
+    participant TxnRepo as TransactionRepository
+    participant TransferRepo as TransferRepository
+    participant CategoryRepo as CategoryRepository
+    participant NeedGroupRepo as NeedGroupRepository
+    participant AdjRepo as BalanceAdjustmentRepository
+    participant StorageAdapter as JsonStorageAdapter
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc xuất dữ liệu sao lưu là thao tác chỉ đọc dữ liệu nghiệp vụ, tạo bản chụp trạng thái nhất quán và giữ nguyên độ chính xác số học của mọi giá trị tiền tệ)
+    User->>+CLI: 1. Nhập lệnh xuất sao lưu (destinationPath)
+    CLI->>+DataService: 2. exportBackupData(destinationPath)
+    DataService->>+WalletRepo: 3. findAll()
+    WalletRepo-->>-DataService: 4. List<Wallet>
+    DataService->>+TxnRepo: 5. findAll()
+    TxnRepo-->>-DataService: 6. List<IncomeExpenseTransaction>
+    DataService->>+TransferRepo: 7. findAll()
+    TransferRepo-->>-DataService: 8. List<TransferTransaction>
+    DataService->>+CategoryRepo: 9. findAll()
+    CategoryRepo-->>-DataService: 10. List<Category>
+    DataService->>+NeedGroupRepo: 11. findAll()
+    NeedGroupRepo-->>-DataService: 12. List<NeedGroup>
+    DataService->>+AdjRepo: 13. findAll()
+    AdjRepo-->>-DataService: 14. List<BalanceAdjustmentRecord>
+    DataService->>DataService: 15. tổng hợp dữ liệu vào BackupPayloadDto
+    DataService->>+StorageAdapter: 16. writeBackupFile(destinationPath, backupPayloadDto)
+    alt Sự cố I/O, lỗi quyền ghi hoặc không đủ dung lượng đĩa
+        StorageAdapter-->>DataService: 17. ném StorageException
+        DataService-->>CLI: 18. ném StorageException
+        CLI-->>User: 19. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
+    else Ghi tệp sao lưu an toàn thành công
+        StorageAdapter-->>-DataService: 20. BackupFileMetadata
+        DataService-->>-CLI: 21. phản hồi xuất sao lưu thành công kèm đường dẫn tệp
+        CLI-->>-User: 22. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
+    end
+```
+
+Việc xuất dữ liệu sao lưu là thao tác chỉ đọc dữ liệu nghiệp vụ, tạo bản chụp trạng thái nhất quán và giữ nguyên độ chính xác số học của mọi giá trị tiền tệ.
 
 ### 5.6.4 Sơ đồ Phục hồi Dữ liệu Hệ thống
 
-(Mô tả khoảng 1 đến 2 câu về luồng nạp dữ liệu từ tệp sao lưu JSON, thực thi quy trình kiểm định bốn bước nghiêm ngặt và đồng bộ hóa toàn bộ kho lưu trữ dữ liệu)
+Luồng tương tác mô tả quy trình nạp dữ liệu từ tệp sao lưu JSON, thực thi tuần tự quy trình kiểm định bốn bước nghiêm ngặt theo nguyên tắc tất cả hoặc không trước khi ghi đè dữ liệu vào các kho lưu trữ. Toàn bộ dữ liệu hiện tại được bảo lưu nguyên vẹn nếu phát hiện bất kỳ sai phạm nào trong các bước kiểm định.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-DAT-02`
@@ -405,13 +653,75 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> DataManagementServiceImpl -> JsonStorageAdapter -> WalletRepository -> TransactionRepository -> TransferRepository -> CategoryRepository -> NeedGroupRepository -> BalanceAdjustmentRepository; tiếp nhận backupFilePath; DataManagementServiceImpl gọi JsonStorageAdapter.readBackupFile ném StorageException nếu tệp không tồn tại hoặc lỗi đọc; thực hiện quy trình kiểm định bốn bước nghiêm ngặt: kiểm tra cấu trúc cú pháp JSON (bước 1) ném DataIntegrityException với mã ERR-DAT-001 nếu sai schema; kiểm tra phân cấp danh mục ba cấp (bước 2) ném DataIntegrityException với mã ERR-DAT-001 nếu vi phạm BR-FIN-04; kiểm tra liên kết chuyển tiền và phí mồ côi (bước 3) ném DataIntegrityException với mã ERR-DAT-002 nếu vi phạm BR-FIN-03; tính toán số dư ví không âm (bước 4) ném BusinessRuleException với mã ERR-DAT-002 nếu vi phạm BR-FIN-02; nếu vượt qua cả bốn bước thì ghi đè toàn bộ dữ liệu vào các kho lưu trữ tương ứng; phản hồi thông báo phục hồi thành công)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant DataService as DataManagementServiceImpl
+    participant StorageAdapter as JsonStorageAdapter
+    participant WalletRepo as WalletRepository
+    participant TxnRepo as TransactionRepository
+    participant TransferRepo as TransferRepository
+    participant CategoryRepo as CategoryRepository
+    participant NeedGroupRepo as NeedGroupRepository
+    participant AdjRepo as BalanceAdjustmentRepository
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: hệ thống bảo lưu nguyên vẹn dữ liệu hiện tại nếu phát hiện bất kỳ sai phạm nào trong bốn bước kiểm định và chỉ ghi đè khi toàn bộ tệp sao lưu hợp lệ 100%)
+    User->>+CLI: 1. Nhập đường dẫn tệp sao lưu (backupFilePath)
+    CLI->>+DataService: 2. restoreBackupData(backupFilePath)
+    DataService->>+StorageAdapter: 3. readBackupFile(backupFilePath)
+    alt Tệp không tồn tại hoặc lỗi đọc I/O
+        StorageAdapter-->>DataService: 4. ném StorageException
+        DataService-->>CLI: 5. ném StorageException
+        CLI-->>User: 6. Hiển thị thông báo không thể đọc tệp sao lưu
+    else Đọc tệp thành công
+        StorageAdapter-->>-DataService: 7. BackupPayloadDto
+        Note over DataService: Bước 1: Kiểm tra cấu trúc cú pháp JSON và schema bắt buộc
+        alt Sai cú pháp JSON hoặc thiếu các khóa thực thể bắt buộc
+            DataService-->>CLI: 8. ném DataCorruptionException
+            CLI-->>User: 9. Từ chối: Sai cấu trúc schema tệp sao lưu
+        else Cấu trúc JSON hợp lệ
+            Note over DataService: Bước 2: Kiểm tra cấu trúc phân cấp danh mục 3 cấp
+            alt Vi phạm phân cấp 3 cấp hoặc phát hiện danh mục mồ côi
+                DataService-->>CLI: 10. ném DataCorruptionException
+                CLI-->>User: 11. Từ chối: Vi phạm cấu trúc phân cấp danh mục
+            else Phân cấp danh mục hợp lệ
+                Note over DataService: Bước 3: Kiểm tra liên kết chuyển tiền hai chiều và phí
+                alt Sai lệch cặp giao dịch chuyển tiền hoặc phí mồ côi
+                    DataService-->>CLI: 12. ném DataCorruptionException
+                    CLI-->>User: 13. Từ chối: Vi phạm liên kết chuyển tiền hoặc phí mồ côi
+                else Liên kết giao dịch hợp lệ
+                    Note over DataService: Bước 4: Tái tính toán số dư ví từ lịch sử
+                    alt Phát hiện số dư ví bị âm tại bất kỳ thời điểm nào
+                        DataService-->>CLI: 14. ném DataCorruptionException
+                        CLI-->>User: 15. Từ chối: Vi phạm quy tắc số dư ví không được âm
+                    else Vượt qua toàn bộ 4 bước kiểm định (All-or-Nothing)
+                        DataService->>+WalletRepo: 16. deleteAll(), saveAll(wallets)
+                        WalletRepo-->>-DataService: 17. void
+                        DataService->>+NeedGroupRepo: 18. deleteAll(), saveAll(needGroups)
+                        NeedGroupRepo-->>-DataService: 19. void
+                        DataService->>+CategoryRepo: 20. deleteAll(), saveAll(categories)
+                        CategoryRepo-->>-DataService: 21. void
+                        DataService->>+TxnRepo: 22. deleteAll(), saveAll(transactions)
+                        TxnRepo-->>-DataService: 23. void
+                        DataService->>+TransferRepo: 24. deleteAll(), saveAll(transfers)
+                        TransferRepo-->>-DataService: 25. void
+                        DataService->>+AdjRepo: 26. deleteAll(), saveAll(adjustments)
+                        AdjRepo-->>-DataService: 27. void
+                        DataService-->>-CLI: 28. phản hồi phục hồi thành công
+                        CLI-->>-User: 29. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
+                    end
+                end
+            end
+        end
+    end
+```
+
+Hệ thống bảo lưu nguyên vẹn dữ liệu hiện tại nếu phát hiện bất kỳ sai phạm nào trong bốn bước kiểm định và chỉ ghi đè khi toàn bộ tệp sao lưu hợp lệ 100%.
 
 ### 5.6.5 Sơ đồ Đối soát Toàn vẹn Dữ liệu Tài chính
 
-(Mô tả khoảng 1 đến 2 câu về luồng quét kiểm tra độc lập bốn điều kiện cân bằng tài chính của toàn bộ hệ thống và xuất báo cáo đối soát chi tiết ở chế độ chỉ đọc)
+Luồng tương tác mô tả quy trình quét kiểm tra độc lập bốn điều kiện cân bằng tài chính của toàn bộ hệ thống và xuất báo cáo đối soát chi tiết ở chế độ chỉ đọc. Dịch vụ ứng dụng nạp dữ liệu từ các kho lưu trữ, đánh giá tính nhất quán của số dư ví, cân bằng chuyển tiền, phân cấp danh mục và kiểm tra tính toàn vẹn của các khoản chi phí gắn liền với giao dịch chứa phí (theo quan hệ hợp thành mà không cần kho lưu trữ phí riêng biệt), phân loại cảnh báo theo các cấp độ mà không làm biến đổi dữ liệu.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-DAT-03`
@@ -422,6 +732,39 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> DataManagementServiceImpl -> WalletRepository -> TransactionRepository -> TransferRepository -> CategoryRepository -> TransactionFeeRepository; không có tham số đầu vào; DataManagementServiceImpl nạp dữ liệu từ các kho lưu trữ; lần lượt quét kiểm tra bốn điều kiện cân đối độc lập: tính lại số dư ví từ lịch sử dòng tiền và so khớp số dư hiện hành (điều kiện 1 theo BR-FIN-02), kiểm tra cân bằng tổng tiền chuyển và chi phí giữa hai đầu ví nguồn và đích (điều kiện 2 theo BR-FIN-03), kiểm tra liên kết danh mục và tính toàn vẹn loại thu chi (điều kiện 3 theo BR-FIN-04), kiểm tra chi phí phát sinh mồ côi không có giao dịch cha (điều kiện 4); tổng hợp sai lệch và phân loại mức độ nghiêm trọng; đóng gói và phản hồi ReconciliationReportDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant CLI as Tầng Trình diễn
+    participant DataService as DataManagementServiceImpl
+    participant WalletRepo as WalletRepository
+    participant TxnRepo as TransactionRepository
+    participant TransferRepo as TransferRepository
+    participant CategoryRepo as CategoryRepository
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác đối soát vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi bất kỳ bản ghi tài chính nào và cung cấp báo cáo minh bạch về mức độ nhất quán của sổ cái)
+    User->>+CLI: 1. Yêu cầu đối soát dữ liệu hệ thống
+    CLI->>+DataService: 2. reconcileSystemData()
+    DataService->>+WalletRepo: 3. findAll()
+    WalletRepo-->>-DataService: 4. List<Wallet>
+    DataService->>+TxnRepo: 5. findAll()
+    TxnRepo-->>-DataService: 6. List<IncomeExpenseTransaction>
+    DataService->>+TransferRepo: 7. findAll()
+    TransferRepo-->>-DataService: 8. List<TransferTransaction>
+    DataService->>+CategoryRepo: 9. findAll()
+    CategoryRepo-->>-DataService: 10. List<Category>
+    Note over DataService: Điều kiện 1: Tái tính số dư ví từ lịch sử dòng tiền và so khớp số dư hiện hành
+    Note over DataService: Điều kiện 2: Kiểm tra cân bằng nguồn - đích và chi phí chuyển tiền
+    Note over DataService: Điều kiện 3: Kiểm tra liên kết phân cấp danh mục 3 cấp và loại thu chi
+    Note over DataService: Điều kiện 4: Kiểm tra chi phí phát sinh (TransactionFee) gắn kèm các giao dịch thu chi và chuyển tiền, bảo đảm không có phí mồ côi
+    DataService->>DataService: 11. tổng hợp sai lệch và phân loại mức độ nghiêm trọng (INFO, WARNING, ERROR)
+    alt Tất cả 4 điều kiện đều thỏa mãn 100%
+        DataService->>DataService: 12. đánh dấu trạng thái dữ liệu nhất quán hoàn hảo (INFO)
+    else Phát hiện sai lệch dữ liệu
+        DataService->>DataService: 13. đóng gói danh sách chi tiết bất thường kèm khuyến nghị (WARNING/ERROR)
+    end
+    DataService-->>-CLI: 14. ReconciliationReportDto
+    CLI-->>-User: 15. Kết xuất Báo cáo đối soát toàn vẹn dữ liệu tài chính chi tiết
+```
+
+Thao tác đối soát vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi bất kỳ bản ghi tài chính nào và cung cấp báo cáo minh bạch về mức độ nhất quán của sổ cái.

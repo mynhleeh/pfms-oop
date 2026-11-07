@@ -213,7 +213,7 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 ### 2.2.5 Lớp Danh mục Chi tiết
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp Category trong việc phân loại dòng tiền cấp 3 và duy trì tính toàn vẹn cây danh mục)
+Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 3 trong cấu trúc cây danh mục của hệ thống, đóng vai trò gán nhãn mục đích tài chính cho các giao dịch thu chi và chi phí giao dịch. Lớp này chịu trách nhiệm duy trì tính toàn vẹn tham chiếu phân cấp với nhóm nhu cầu cha và thực thi cơ chế xóa mềm nhằm bảo toàn lịch sử sổ sách tài chính.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
@@ -225,23 +225,43 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `categoryId` | `UUID` | `private final` | Mã định danh duy nhất của danh mục, sinh tự động khi khởi tạo, bất biến và không bao giờ tái sử dụng (theo quy tắc cấu trúc danh mục ba cấp và yêu cầu tùy biến danh mục). |
+| `name` | `String` | `private` | Tên gọi danh mục từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng hai đầu (`trim`), không được để trống theo quy tắc đặt tên; duy nhất trong cùng nhóm nhu cầu cha đang hoạt động theo cơ chế so sánh không phân biệt hoa thường và kiểm tra trùng lặp. |
+| `needGroupId` | `UUID` | `private` | Mã định danh tham chiếu đến nhóm nhu cầu cha cấp 2 trực thuộc; bắt buộc trỏ tới một `NeedGroup` đang hoạt động (`ACTIVE`), loại trừ hoàn toàn danh mục mồ côi hoặc thuộc nhóm đã xóa theo quy tắc cấu trúc danh mục ba cấp. |
+| `transactionType` | `TransactionType` | `private final` | Nhánh loại thu chi (`INCOME` hoặc `EXPENSE`) kế thừa từ nhóm nhu cầu cha; mang tính bất biến tuyệt đối sau khởi tạo nhằm bảo vệ tính toàn vẹn dữ liệu lịch sử theo quy tắc cấu trúc danh mục ba cấp, ngăn chặn đổi loại thu chi. |
+| `status` | `CategoryStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
+| `icon` | `String` | `private` | Ký hiệu hoặc mã biểu tượng đồ họa đại diện trên giao diện người dùng; tùy chọn, độ dài tối đa 50 ký tự phục vụ tùy biến hiển thị. |
+| `color` | `String` | `private` | Chuỗi mã màu định dạng Hex (ví dụ `#4CAF50`) phục vụ hiển thị trực quan; tùy chọn, độ dài tối đa 10 ký tự. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc kiểm tra và logic xử lý trạng thái) |
+| `Category` *(Constructor)* | `UUID categoryId, String name, UUID needGroupId, TransactionType transactionType, String icon, String color` | Không có | `BusinessException` | Khởi tạo thực thể danh mục mới ở trạng thái `ACTIVE`; kiểm tra định dạng tên theo quy tắc đặt tên, bắt buộc có mã nhóm cha và loại thu chi kế thừa theo cấu trúc danh mục ba cấp. |
+| `getCategoryId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của danh mục chi tiết. |
+| `getName` | Không có | `String` | Không có | Trả về tên hiển thị hiện tại của danh mục. |
+| `getNeedGroupId` | Không có | `UUID` | Không có | Trả về mã định danh nhóm nhu cầu cha cấp 2 mà danh mục trực thuộc. |
+| `getTransactionType` | Không có | `TransactionType` | Không có | Trả về loại thu chi (`INCOME` hoặc `EXPENSE`) của danh mục. |
+| `getStatus` | Không có | `CategoryStatus` | Không có | Trả về trạng thái hoạt động vòng đời hiện tại của danh mục. |
+| `getIcon` | Không có | `String` | Không có | Trả về mã biểu tượng đồ họa đại diện của danh mục. |
+| `getColor` | Không có | `String` | Không có | Trả về chuỗi mã màu hiển thị trực quan của danh mục. |
+| `isActive` | Không có | `boolean` | Không có | Kiểm tra danh mục có đang ở trạng thái hoạt động (`ACTIVE`) hay không. |
+| `isDeleted` | Không có | `boolean` | Không có | Kiểm tra danh mục có đang ở trạng thái đã xóa mềm (`DELETED`) hay không. |
+| `rename` | `String newName` | `void` | `BusinessException` | Cập nhật tên danh mục sau khi chuẩn hóa cắt tỉa khoảng trắng (1-50 ký tự), ném ngoại lệ nếu tên để trống; giữ nguyên mã định danh và toàn bộ liên kết lịch sử theo quy tắc đặt tên và bảo toàn dữ liệu lịch sử. |
+| `changeNeedGroup` | `UUID newNeedGroupId, TransactionType targetGroupType` | `void` | `BusinessException` | Chuyển danh mục sang nhóm nhu cầu cha mới; ném ngoại lệ nếu nhóm đích khác loại thu chi hoặc nhóm đích đã bị xóa theo quy tắc cấu trúc danh mục ba cấp. |
+| `updateAppearance` | `String newIcon, String newColor` | `void` | Không có | Cập nhật biểu tượng nhận diện và mã màu hiển thị của danh mục theo tùy biến người dùng. |
+| `markDeleted` | Không có | `void` | Không có | Chuyển trạng thái sang `DELETED` (xóa mềm), ẩn danh mục khỏi danh sách lựa chọn cho giao dịch mới nhưng bảo toàn liên kết với các giao dịch lịch sử và báo cáo theo quy tắc xóa mềm bảo toàn lịch sử và cấu trúc danh mục ba cấp. |
+| `restore` | `CategoryStatus parentGroupStatus` | `void` | `BusinessException` | Khôi phục danh mục về trạng thái `ACTIVE`; ném ngoại lệ từ chối nếu nhóm nhu cầu cha vẫn đang ở trạng thái đã xóa theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi khôi phục. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- (Nêu ràng buộc bắt buộc phải liên kết với một nhóm nhu cầu cha hợp lệ, cùng loại thu chi)
-- (Nêu quy tắc đặt tên không trùng lặp trong phạm vi cùng nhóm nhu cầu cha)
-- (Nêu cơ chế xóa mềm để bảo toàn lịch sử giao dịch và điều kiện khôi phục trạng thái)
+- Ràng buộc liên kết phân cấp cha con: Danh mục chi tiết cấp 3 bắt buộc phải luôn trực thuộc một nhóm nhu cầu cha cấp 2 (`NeedGroup`) hợp lệ đang hoạt động; hệ thống nghiêm cấm tồn tại danh mục mồ côi hoặc tạo danh mục trong nhóm đã xóa theo quy tắc cấu trúc danh mục ba cấp. Thuộc tính `transactionType` được kế thừa trực tiếp từ nhóm cha và mang tính bất biến tuyệt đối; khi chuyển nhóm cha (`changeNeedGroup`), nhóm đích bắt buộc phải đang hoạt động và có cùng loại thu chi, từ chối mọi hành vi chuyển nhóm chéo loại hoặc chuyển vào nhóm đã xóa.
+- Quy tắc kiểm soát định danh và tính duy nhất: Thuộc tính `name` được bảo vệ đóng gói chặt chẽ qua phương thức `rename()`, bắt buộc chuẩn hóa cắt tỉa khoảng trắng ở hai đầu (`trim`) với độ dài từ 1 đến 50 ký tự, không được để trống hoặc vượt quá độ dài quy định. Tên danh mục là duy nhất trong phạm vi cùng nhóm nhu cầu cha đang hoạt động, so sánh không phân biệt chữ hoa chữ thường theo quy tắc đặt tên và kiểm tra trùng lặp. Hai danh mục thuộc hai nhóm cha khác nhau được phép trùng tên.
+- Cơ chế xóa mềm bảo toàn lịch sử và điều kiện khôi phục: Khi thực hiện xóa danh mục đã phát sinh giao dịch lịch sử, thực thể chuyển sang trạng thái xóa mềm (`DELETED`) thông qua `markDeleted()`. Danh mục bị ẩn khỏi danh sách lựa chọn khi tạo giao dịch mới, nhưng liên kết tham chiếu trong sổ giao dịch và báo cáo tài chính được giữ nguyên vẹn kèm nhãn "(đã xóa)" theo quy tắc xóa mềm bảo toàn dữ liệu lịch sử. Thao tác khôi phục (`restore()`) chỉ được kích hoạt khi nhóm cha trực thuộc đang ở trạng thái `ACTIVE` (không bị xóa) và tên danh mục không bị trùng lặp với một danh mục đang dùng khác trong cùng nhóm cha.
 
 ### 2.2.6 Lớp Nhóm Nhu cầu
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp NeedGroup trong việc quản lý phân cấp nhóm nhu cầu cấp 2 và điều phối danh mục con)
+Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp 2 trong cấu trúc phân cấp danh mục của hệ thống, quản lý việc gom cụm các danh mục chi tiết cấp 3 có cùng tính chất tài chính. Lớp này đóng vai trò điều phối tập hợp danh mục con, làm căn cứ tổng hợp cơ cấu chi tiêu trên báo cáo và bảo toàn ranh giới phân loại theo nhánh thu chi gốc.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
@@ -253,19 +273,40 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `needGroupId` | `UUID` | `private final` | Mã định danh duy nhất của nhóm nhu cầu, sinh tự động khi khởi tạo, bất biến và không bao giờ tái sử dụng (theo quy tắc cấu trúc danh mục ba cấp và yêu cầu tùy biến danh mục). |
+| `name` | `String` | `private` | Tên gọi nhóm nhu cầu từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng (`trim`), không được để trống; duy nhất trong cùng nhánh `TransactionType` đang hoạt động theo cơ chế so sánh không phân biệt hoa thường theo quy tắc đặt tên và kiểm tra trùng lặp. Không được dùng làm điều kiện cứng trong logic xử lý theo quy tắc cấu trúc danh mục. |
+| `transactionType` | `TransactionType` | `private final` | Nhánh loại thu chi gốc cấp 1 (`INCOME` hoặc `EXPENSE`); bất biến tuyệt đối sau khi khởi tạo, nghiêm cấm đổi loại thu chi theo quy tắc cấu trúc danh mục ba cấp. |
+| `status` | `GroupStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
+| `icon` | `String` | `private` | Ký hiệu hoặc biểu tượng đồ họa đại diện của nhóm trên giao diện; tùy chọn, độ dài tối đa 50 ký tự. |
+| `color` | `String` | `private` | Chuỗi mã màu định dạng Hex (tối đa 10 ký tự) dùng để phân biệt các nhóm trên biểu đồ tròn cơ cấu thu chi phục vụ hiển thị và phân tích cơ cấu chi tiêu. |
+| `categories` | `List<Category>` | `private final` | Tập hợp các danh mục chi tiết cấp 3 trực thuộc trong quan hệ kết tập (`aggregation`); khởi tạo danh sách rỗng, bảo vệ đóng gói không mở setter tự do theo quy tắc cấu trúc danh mục ba cấp. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc kiểm tra và logic xử lý trạng thái) |
+| `NeedGroup` *(Constructor)* | `UUID needGroupId, String name, TransactionType transactionType, String icon, String color` | Không có | `BusinessException` | Khởi tạo nhóm nhu cầu mới ở trạng thái `ACTIVE` với danh sách danh mục con rỗng; kiểm tra định dạng tên theo quy tắc đặt tên và tính hợp lệ theo cấu trúc danh mục ba cấp. |
+| `getNeedGroupId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của nhóm nhu cầu. |
+| `getName` | Không có | `String` | Không có | Trả về tên hiển thị hiện tại của nhóm nhu cầu. |
+| `getTransactionType` | Không có | `TransactionType` | Không có | Trả về loại thu chi cố định (`INCOME` hoặc `EXPENSE`) của nhóm. |
+| `getStatus` | Không có | `GroupStatus` | Không có | Trả về trạng thái hoạt động vòng đời của nhóm nhu cầu. |
+| `getIcon` | Không có | `String` | Không có | Trả về mã biểu tượng đồ họa đại diện của nhóm nhu cầu. |
+| `getColor` | Không có | `String` | Không có | Trả về chuỗi mã màu hiển thị của nhóm nhu cầu. |
+| `getCategories` | Không có | `List<Category>` | Không có | Trả về danh sách danh mục con dưới dạng chỉ đọc (`Collections.unmodifiableList`) nhằm bảo vệ tính toàn vẹn tập hợp. |
+| `isActive` | Không có | `boolean` | Không có | Kiểm tra nhóm nhu cầu có đang ở trạng thái hoạt động (`ACTIVE`) hay không. |
+| `isDeleted` | Không có | `boolean` | Không có | Kiểm tra nhóm nhu cầu có đang ở trạng thái đã xóa mềm (`DELETED`) hay không. |
+| `rename` | `String newName` | `void` | `BusinessException` | Cập nhật tên nhóm mới sau khi cắt tỉa khoảng trắng (1-50 ký tự), ném ngoại lệ nếu tên để trống; giữ nguyên mã và loại thu chi theo quy tắc đặt tên và bảo toàn dữ liệu. |
+| `updateAppearance` | `String newIcon, String newColor` | `void` | Không có | Cập nhật biểu tượng nhận diện và mã màu hiển thị của nhóm nhu cầu phục vụ trực quan hóa báo cáo. |
+| `addCategory` | `Category category` | `void` | `BusinessException` | Tiếp nhận thêm danh mục con vào nhóm; ném ngoại lệ nếu nhóm đang bị xóa hoặc danh mục không cùng loại thu chi theo quy tắc cấu trúc danh mục ba cấp. |
+| `removeCategory` | `Category category` | `void` | Không có | Loại bỏ một danh mục con khỏi danh sách trực thuộc của nhóm khi danh mục bị xóa cứng hoặc chuyển nhóm theo quy tắc cấu trúc danh mục ba cấp. |
+| `markDeleted` | `int activeGroupCountInType` | `void` | `BusinessException` | Chuyển trạng thái sang `DELETED` và kích hoạt xóa lan truyền cho các danh mục con; ném ngoại lệ nếu là nhóm hoạt động duy nhất còn lại của loại thu chi (`activeGroupCountInType <= 1`) theo quy tắc duy trì tối thiểu một nhóm hoạt động. |
+| `restore` | Không có | `void` | Không có | Khôi phục trạng thái nhóm từ `DELETED` về `ACTIVE` một cách độc lập; không tự động khôi phục các danh mục con bên trong theo quy tắc phân cấp danh mục và ca sử dụng khôi phục độc lập. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- (Nêu tính bất biến của loại thu chi gắn liền với nhóm nhu cầu sau khi khởi tạo)
-- (Nêu quy tắc bảo vệ nhóm nhu cầu duy nhất còn lại của một loại thu chi không bị xóa)
-- (Nêu cơ chế quản lý danh sách danh mục con và hiệu ứng xóa lan truyền)
+- Tính bất biến của loại thu chi: Thuộc tính `transactionType` được khai báo `final`, thiết lập duy nhất một lần tại hàm khởi tạo và không có phương thức sửa đổi. Quy tắc này ngăn chặn triệt để hành vi thay đổi loại thu chi của nhóm giữa `INCOME` và `EXPENSE`, bảo đảm tính nhất quán cấu trúc cây phân cấp và không làm sai lệch số liệu thống kê lịch sử theo quy tắc cấu trúc danh mục ba cấp, ngăn chặn đổi loại thu chi gây sai lệch dữ liệu.
+- Bảo vệ nhóm nhu cầu duy nhất còn lại: Mỗi nhánh Loại thu chi (`INCOME`, `EXPENSE`) bắt buộc phải duy trì tối thiểu một nhóm nhu cầu ở trạng thái hoạt động (`ACTIVE`). Phương thức `markDeleted()` kiểm tra số lượng nhóm đang hoạt động trong cùng loại; nếu là nhóm hoạt động cuối cùng, hệ thống từ chối xóa và ném ngoại lệ theo quy tắc duy trì tối thiểu một nhóm hoạt động cho mỗi nhánh thu chi.
+- Quản lý danh mục con và hiệu ứng xóa lan truyền: Tập hợp `categories` được đóng gói an toàn, chỉ truy xuất qua bản sao hoặc danh sách không thể sửa đổi (`unmodifiableList`). Khi xóa nhóm nhu cầu (`markDeleted`), hệ thống áp dụng cơ chế xóa lan truyền (`cascade`): toàn bộ danh mục con đã có giao dịch được chuyển sang xóa mềm (`DELETED`), còn các danh mục con chưa phát sinh giao dịch được loại bỏ vĩnh viễn khỏi hệ thống theo quy tắc phân cấp danh mục. Khi nhóm được khôi phục (`restore()`), nhóm chuyển về `ACTIVE` nhưng các danh mục con vẫn giữ trạng thái đã xóa để người dùng khôi phục riêng lẻ từng mục theo nhu cầu theo quy tắc cấu trúc danh mục và quy trình khôi phục độc lập.
 
 ### 2.2.7 Lớp Bản ghi Điều chỉnh Số dư
 
