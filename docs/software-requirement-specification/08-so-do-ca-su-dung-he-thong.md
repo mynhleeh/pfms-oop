@@ -1,6 +1,6 @@
 ## 7. Sơ đồ ca sử dụng hệ thống
 
-Sơ đồ ca sử dụng thể hiện phạm vi chức năng, tác nhân và mối liên hệ của 20 ca sử dụng trong Hệ thống Quản lý Tài chính Cá nhân (PFMS), theo chuẩn UML 2.5. Hệ thống được tổ chức phân tầng thành hai cấp độ:
+Sơ đồ ca sử dụng thể hiện phạm vi chức năng, tác nhân và mối liên hệ của 20 ca sử dụng trong Hệ thống Quản lý Tài chính Cá nhân (PFMS). Hệ thống được tổ chức phân tầng thành hai cấp độ:
 
 - Tầng 1 (vĩ mô): một sơ đồ tổng quan thể hiện ranh giới hệ thống và hai gói nghiệp vụ lớn.
 - Tầng 2 (vi mô): sáu sơ đồ chi tiết bao phủ đủ 20 ca sử dụng, mỗi sơ đồ duy trì dưới 9 phần tử để tối ưu khả năng quan sát.
@@ -9,11 +9,11 @@ Ba nguyên tắc thiết kế áp dụng khi xây dựng sơ đồ ca sử dụn
 
 1. Đặt tên theo dạng động từ + danh từ: mỗi ca sử dụng thể hiện một mục tiêu hoàn chỉnh của Người dùng, không dùng các nút gộp chung mơ hồ.
 2. Sử dụng quan hệ đúng ngữ nghĩa: không lạm dụng quan hệ phụ thuộc tuần tự, không biểu diễn các kịch bản rẽ nhánh loại trừ bằng quan hệ mở rộng.
-3. Tính nhất quán và khớp nối hai chiều: 20 ca sử dụng trên 7 sơ đồ ánh xạ một-một với hồ sơ đặc tả chi tiết tại Mục 6 và ma trận truy vết tại Mục 8.
+3. Tính nhất quán và khớp nối hai chiều: 20 ca sử dụng trên 7 sơ đồ ánh xạ một-một với hồ sơ đặc tả chi tiết và ma trận truy vết.
 
 Trong cả 7 sơ đồ, toàn bộ ca sử dụng đều do tác nhân Người dùng trực tiếp kích hoạt.
 
-Bảng tổng hợp danh mục 7 sơ đồ ca sử dụng của hệ thống phân bổ theo hai tầng kiến trúc, phạm vi nghiệp vụ và số lượng ca sử dụng tương ứng:
+Bảng tổng hợp danh mục sơ đồ ca sử dụng của hệ thống phân bổ theo hai tầng kiến trúc, phạm vi nghiệp vụ và số lượng ca sử dụng tương ứng:
 
 | Tầng | Mục | Tên sơ đồ | Phạm vi | Số UC | Dải mã |
 | :---: | :---: | :--- | :--- | :---: | :--- |
@@ -73,7 +73,7 @@ Bảng phân loại chi tiết 20 ca sử dụng theo mục tiêu tương tác c
 
 #### 7.2.1 Nhóm chức năng Dòng tiền và Tiền trong ví
 
-Nhóm chức năng này gồm 15 ca sử dụng, được phân rã thành bốn sơ đồ chi tiết: ví, ghi nhận thu chi, chuyển tiền nội bộ (cơ chế ghi nhận đồng thời: trừ ví nguồn, cộng ví đích) và danh mục phân loại.
+Nhóm chức năng này gồm các ca sử dụng, được phân rã thành bốn sơ đồ chi tiết: ví, ghi nhận thu chi, chuyển tiền nội bộ (cơ chế ghi nhận đồng thời: trừ ví nguồn, cộng ví đích) và danh mục phân loại.
 
 ##### 7.2.1a Nhóm Ví (WAL)
 

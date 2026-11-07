@@ -10,7 +10,7 @@ Hệ thống Quản lý Tài chính Cá nhân (PFMS) là ứng dụng máy tính
 
 #### 1.2.1 Phạm vi chức năng trong hệ thống
 
-Hệ thống cung cấp các nhóm năng lực nghiệp vụ sau đây, với quy ước mã định danh được chuẩn hóa tại Mục 1.5.
+Hệ thống cung cấp các nhóm năng lực nghiệp vụ sau đây, với quy ước mã định danh được chuẩn hóa.
 
 | STT | Nhóm | Mã nhóm | Mô tả nghiệp vụ |
 | :---: | :--- | :---: | :--- |
@@ -113,7 +113,7 @@ Mã định danh gồm 12 dạng mã sau, dùng 10 tiền tố:
 | `NFR-NN` | Non-Functional Requirement | Yêu cầu phi chức năng | `NFR-01` | Danh mục 6 yêu cầu phi chức năng tại Mục 5 |
 | `AC-DOMAIN-NN.x` | Acceptance Criteria | Tiêu chí nghiệm thu | `AC-WAL-01.1` | Tiêu chí nghiệm thu của từng FR tại Mục 4 |
 
-Danh sách giá trị của biến `DOMAIN` là tập hợp cố định gồm 6 nhóm chức năng nghiệp vụ, tương ứng trực tiếp với cấu trúc phân rã chức năng:
+Danh sách giá trị của biến `DOMAIN` là tập hợp cố định gồm các nhóm chức năng nghiệp vụ, tương ứng trực tiếp với cấu trúc phân rã chức năng:
 
 | STT | Nhóm | Mã `DOMAIN` | Nghĩa của mã | Đối tượng quản lý | Số lượng FR | Số lượng UC |
 | :---: | :--- | :---: | :--- | :--- | :---: | :---: |

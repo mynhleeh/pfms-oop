@@ -21,28 +21,28 @@ Bốn ma trận dưới đây thiết lập chuỗi truy vết hai chiều lấy
 
 Bảng ma trận truy vết đối chiếu giữa 20 yêu cầu chức năng và 3 mục tiêu hệ thống, trong đó ký hiệu `X` thể hiện yêu cầu chức năng trực tiếp hiện thực hóa mục tiêu tương ứng:
 
-| Yêu cầu chức năng | `G-01` (Ghi nhận dòng tiền, danh mục) | `G-02` (Tổng số dư, cơ cấu ví) | `G-03` (Chính xác số học) |
-| --- | :---: | :---: | :---: |
-| `FR-WAL-01` (Tạo ví mới) | X | X |  |
-| `FR-WAL-02` (Xem danh sách và chi tiết số dư tính lại từ lịch sử dòng tiền) |  | X |  |
-| `FR-WAL-03` (Cập nhật thông tin ví) |  | X |  |
-| `FR-WAL-04` (Thống kê cơ cấu số dư theo ví) |  | X |  |
-| `FR-WAL-05` (Điều chỉnh số dư ví) |  | X |  |
-| `FR-TXN-01` (Tạo giao dịch thu nhập) | X |  | X |
-| `FR-TXN-02` (Tạo giao dịch chi tiêu) | X |  | X |
-| `FR-TXN-03` (Tra cứu và lọc lịch sử giao dịch thu chi) | X |  |  |
-| `FR-TXN-04` (Chỉnh sửa giao dịch thu chi) | X |  | X |
-| `FR-TXN-05` (Xóa giao dịch thu chi) | X |  | X |
-| `FR-TRF-01` (Chuyển tiền giữa hai ví nội bộ, kèm chi phí tùy chọn) | X |  | X |
-| `FR-TRF-02` (Tra cứu và xóa giao dịch chuyển tiền nội bộ) | X |  | X |
-| `FR-CAT-01` (Tạo cấu trúc danh mục 3 cấp) | X |  |  |
-| `FR-CAT-02` (Tùy biến danh mục người dùng) | X |  |  |
-| `FR-CAT-03` (Kiểm soát toàn vẹn khi cập nhật và xóa danh mục) | X |  |  |
-| `FR-REP-01` (Thống kê dòng tiền 12 tháng gần nhất) | X |  | X |
-| `FR-REP-02` (Phân tích cơ cấu thu chi theo nhóm và danh mục) | X |  |  |
-| `FR-DAT-01` (Xuất dữ liệu tài chính) |  | X | X |
-| `FR-DAT-02` (Phục hồi dữ liệu hệ thống từ bản sao lưu) |  | X | X |
-| `FR-DAT-03` (Kiểm tra lại dữ liệu hệ thống) |  |  | X |
+| Mã | Tên chức năng | `G-01` (Ghi nhận dòng tiền, danh mục) | `G-02` (Tổng số dư, cơ cấu ví) | `G-03` (Chính xác số học) |
+| --- | --- | :---: | :---: | :---: |
+| `FR-WAL-01` | Tạo ví mới | X | X |  |
+| `FR-WAL-02` | Xem danh sách và chi tiết số dư tính lại từ lịch sử dòng tiền |  | X |  |
+| `FR-WAL-03` | Cập nhật thông tin ví |  | X |  |
+| `FR-WAL-04` | Thống kê cơ cấu số dư theo ví |  | X |  |
+| `FR-WAL-05` | Điều chỉnh số dư ví |  | X |  |
+| `FR-TXN-01` | Tạo giao dịch thu nhập | X |  | X |
+| `FR-TXN-02` | Tạo giao dịch chi tiêu | X |  | X |
+| `FR-TXN-03` | Tra cứu và lọc lịch sử giao dịch thu chi | X |  |  |
+| `FR-TXN-04` | Chỉnh sửa giao dịch thu chi | X |  | X |
+| `FR-TXN-05` | Xóa giao dịch thu chi | X |  | X |
+| `FR-TRF-01` | Chuyển tiền giữa hai ví nội bộ, kèm chi phí tùy chọn | X |  | X |
+| `FR-TRF-02` | Tra cứu và xóa giao dịch chuyển tiền nội bộ | X |  | X |
+| `FR-CAT-01` | Tạo cấu trúc danh mục 3 cấp | X |  |  |
+| `FR-CAT-02` | Tùy biến danh mục người dùng | X |  |  |
+| `FR-CAT-03` | Kiểm soát toàn vẹn khi cập nhật và xóa danh mục | X |  |  |
+| `FR-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | X |  | X |
+| `FR-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | X |  |  |
+| `FR-DAT-01` | Xuất dữ liệu tài chính |  | X | X |
+| `FR-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu |  | X | X |
+| `FR-DAT-03` | Kiểm tra lại dữ liệu hệ thống |  |  | X |
 
 #### 8.1.2 Ma trận ca sử dụng theo yêu cầu chức năng
 

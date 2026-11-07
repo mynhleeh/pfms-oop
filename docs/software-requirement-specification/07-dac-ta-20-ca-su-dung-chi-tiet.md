@@ -1199,7 +1199,7 @@ Không có.
 2. Người dùng chỉ thấy một thao tác "Xóa"; xóa hẳn hay ẩn do hệ thống quyết định theo số giao dịch.
 3. Yêu cầu chức năng liên quan: `FR-CAT-03`.
 
-### 6.16 UC-REP-01: Thống kê dòng tiền 12 tháng gần nhất
+###  UC-REP-01: Thống kê dòng tiền 12 tháng gần nhất
 
 Bảng thuộc tính đặc tả chu kỳ tổng hợp dòng tiền 12 tháng của ca sử dụng Thống kê dòng tiền 12 tháng gần nhất (`UC-REP-01`):
 
@@ -1486,5 +1486,5 @@ Không có luồng ngoại lệ nghiệp vụ bổ sung ngoài việc phân lo�
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và liên kết phí chuyển tiền.
+1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp  (`BR-FIN-04`) và liên kết phí chuyển tiền.
 2. Yêu cầu chức năng liên quan: `FR-DAT-03`.

@@ -1,6 +1,6 @@
 ## 3. QUY TẮC NGHIỆP VỤ VÀ QUY ĐỊNH TÀI CHÍNH
 
-Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán (Problem Domain Policies) và bảo vệ tính toàn vẹn của mục tiêu hệ thống: 
+Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán và bảo vệ tính toàn vẹn của mục tiêu hệ thống: 
 
 Mỗi quy tắc nghiệp vụ được đặc tả nhất quán theo khuôn mẫu:
 1. Tên và mã quy tắc: cú pháp `<Tên quy tắc> (BR-<DOMAIN>-NN)`, phân loại theo miền nghiệp vụ tài chính (`BR-FIN`) hoặc miền định danh (`BR-NAM`).
