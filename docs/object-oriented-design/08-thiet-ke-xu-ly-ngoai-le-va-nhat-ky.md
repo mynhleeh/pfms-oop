@@ -1,34 +1,160 @@
-# 08. Thiết kế Xử lý Ngoại lệ và Ghi Nhật ký
+# 08. Thiết kế Xử lý Ngoại lệ
+
+Tài liệu này xác lập thiết kế kiểm soát ngoại lệ và bảng từ điển mã lỗi chuẩn hóa cho Hệ thống Quản lý Tài chính Cá nhân PFMS trên nền tảng Java Console. Nội dung tập trung vào quy tắc phân tách ngoại lệ kỹ thuật với ngoại lệ nghiệp vụ, cơ chế bọc lỗi xuyên tầng kiến trúc và bảo vệ giao diện dòng lệnh trước các sự cố dữ liệu.
+
+Thiết kế tập trung giải quyết các trọng tâm kỹ thuật: cô lập ngoại lệ kỹ thuật không để rò rỉ lên tầng trình diễn, gán mã định danh duy nhất cho từng vi phạm nghiệp vụ và bảo đảm tính toàn vẹn trạng thái ứng dụng trước các tình huống bất thường.
 
 ## 8.1 Chiến lược Quản lý Ngoại lệ Toàn hệ thống
 
+Mục này xác lập nguyên tắc quản lý sai số và kiểm soát ngoại lệ xuyên suốt bốn tầng kiến trúc của hệ thống PFMS. Nội dung định hình cơ chế phân loại lỗi, căn cứ lựa chọn kiểu ngoại lệ trong Java và quy tắc bọc lỗi bảo đảm tính toàn vẹn của dữ liệu tài chính.
+
 ### 8.1.1 Phân loại Ngoại lệ Kỹ thuật và Ngoại lệ Nghiệp vụ
-<!-- PLACEHOLDER: Quy định tiêu chí phân tách rõ ràng giữa hai nhóm ngoại lệ chính: Ngoại lệ Kỹ thuật (lỗi đọc ghi tệp đĩa cứng, lỗi hỏng định dạng tệp, lỗi bộ nhớ) và Ngoại lệ Nghiệp vụ (vi phạm điều kiện số dư ví không đủ chi, vi phạm hạn mức ngân sách, danh mục trùng tên); phân tích lý do kế thừa RuntimeException trong Java để tránh việc khai báo throws cồng kềnh xuyên suốt các tầng kiến trúc | Căn cứ: Joshua Bloch Effective Java (Item về Exception), Clean Architecture Exception Handling | Tiêu chí hoàn thành: Quy chuẩn rõ ràng lớp nào được phép ném ngoại lệ và lớp nào chịu trách nhiệm bắt giữ ngoại lệ -->
+
+Hệ thống phân tách toàn bộ các tình huống bất thường thành hai nhóm ngoại lệ:
+
+| Tiêu chí | Ngoại lệ Nghiệp vụ (Business Exception) | Ngoại lệ Kỹ thuật (Technical Exception) |
+| :--- | :--- | :--- |
+| **Bản chất lỗi** | Vi phạm quy tắc tài chính do thao tác người dùng (ví dụ: không đủ số dư, vượt hạn mức). | Sự cố hệ thống, đọc ghi tệp đĩa cứng hoặc hỏng dữ liệu lưu trữ. |
+| **Nơi phát sinh** | Tầng Nghiệp vụ cốt lõi (`domain`) và Tầng Dịch vụ (`service`). | Tầng Hạ tầng lưu trữ (`infrastructure`). |
+| **Xử lý hiển thị** | Trích xuất thông điệp tiếng Việt thân thiện ra màn hình dòng lệnh. | Thông báo lỗi hệ thống và an toàn đưa người dùng quay lại menu chính. |
+
+Toàn bộ các lớp ngoại lệ của hệ thống đều kế thừa từ `java.lang.RuntimeException` (Unchecked Exception) nhằm:
+- Loại bỏ từ khóa `throws` cồng kềnh trên chữ ký phương thức, tránh rò rỉ chi tiết cài đặt giữa các tầng.
+- Đảm bảo tính đóng gói của Clean Architecture: Tầng Trình diễn và Tầng Dịch vụ giao tiếp qua Interface mà không bị ràng buộc bởi ngoại lệ kiểm tra (Checked Exception).
+- Phù hợp với cơ chế tương tác Console: khi có lỗi, giao dịch bị hủy và điều hướng người dùng quay lại vòng lặp menu chính một cách an toàn.
 
 ### 8.1.2 Nguyên tắc Bắt và Chuyển đổi Ngoại lệ Xuyên tầng
-<!-- PLACEHOLDER: Đặc tả quy trình biến đổi ngoại lệ qua từng ranh giới kiến trúc: Tầng Lưu trữ bắt IOException kỹ thuật và đóng gói thành Ngoại lệ Lưu trữ; Tầng Dịch vụ ném Ngoại lệ Nghiệp vụ có gắn mã lỗi định danh; Tầng Giao diện bắt toàn bộ ngoại lệ tại vòng lặp sự kiện chính để hiển thị thông báo tiếng Việt thân thiện, không để lộ vết ngăn xếp kỹ thuật (stack trace) ra màn hình người dùng | Căn cứ: Craig Larman Chapter 16, Java Exception Chaining Pattern | Tiêu chí hoàn thành: Sơ đồ luồng lan truyền ngoại lệ minh họa việc đóng gói nguyên nhân gốc (cause exception) mà không làm mất thông tin lỗi phục vụ sửa lỗi -->
+
+Hệ thống áp dụng kỹ thuật bọc ngoại lệ (*Exception Chaining*) để bảo vệ ranh giới phân tầng. Khi phát sinh lỗi kỹ thuật ở tầng dưới, tầng đó không để rò rỉ chi tiết công nghệ (như `java.io.IOException`) lên các tầng trên mà phải đóng gói vào một ngoại lệ có ngữ nghĩa phù hợp, lưu giữ tham chiếu nguyên nhân gốc qua hàm khởi tạo `super(message, cause)`.
+
+Bảng phân định trách nhiệm bắt và ném ngoại lệ giữa bốn tầng kiến trúc:
+
+| Tầng kiến trúc | Trách nhiệm ném ngoại lệ | Trách nhiệm bắt và chuyển đổi ngoại lệ |
+| :--- | :--- | :--- |
+| **Tầng Trình diễn**<br/>(`com.pfms.cli`) | Ném ngoại lệ định dạng đầu vào khi chuỗi nhập liệu sai cú pháp. | Điểm chốt chặn cuối cùng: Bắt toàn bộ ngoại lệ tại vòng lặp menu chính, hiển thị thông báo thân thiện và an toàn đưa người dùng quay lại menu. |
+| **Tầng Dịch vụ**<br/>(`com.pfms.service`) | Ném Ngoại lệ Nghiệp vụ kèm mã lỗi khi điều kiện ca sử dụng không thỏa mãn. | Không nuốt lỗi; cho phép ngoại lệ từ Tầng Miền và Tầng Hạ tầng lan truyền tự nhiên lên Tầng Trình diễn. |
+| **Tầng Nghiệp vụ cốt lõi**<br/>(`com.pfms.domain`) | Ném Ngoại lệ Nghiệp vụ ngay tại thực thể khi vi phạm ràng buộc số dư hoặc ngân sách. | Không bắt giữ lỗi; tuyệt đối không tiếp xúc với các thư viện I/O hoặc Console. |
+| **Tầng Hạ tầng lưu trữ**<br/>(`com.pfms.infrastructure`) | Ném ngoại lệ hạ tầng (`StorageException`). | Bắt giữ toàn bộ `IOException`, chuyển đổi và đóng gói nguyên nhân gốc vào `StorageException` trước khi ném ra ngoài. |
 
 ## 8.2 Cây Phân cấp Lớp Ngoại lệ Hệ thống
 
+Mục này thiết lập cấu trúc phân cấp các lớp ngoại lệ theo nguyên lý kế thừa và đa hình trong lập trình hướng đối tượng, cung cấp khung bẫy lỗi có cấu trúc và khả năng mở rộng cho toàn bộ ứng dụng.
+
 ### 8.2.1 Sơ đồ Phân cấp Lớp Ngoại lệ Hướng đối tượng
-<!-- PLACEHOLDER: Sơ đồ lớp Mermaid thể hiện cây phân cấp ngoại lệ bắt đầu từ lớp cơ sở trừu tượng của hệ thống kế thừa từ RuntimeException: chia thành hai nhánh lớn gồm Nhánh Ngoại lệ Nghiệp vụ và Nhánh Ngoại lệ Kỹ thuật; mỗi lớp ngoại lệ đều có thuộc tính lưu mã định danh lỗi và thời điểm phát sinh lỗi | Căn cứ: ISO/IEC 19505-1, Java Core Exception Hierarchy | Tiêu chí hoàn thành: Cây phân cấp rõ ràng, tuân thủ nguyên lý kế thừa và đa hình, không tạo các lớp ngoại lệ thừa thãi trùng lặp trách nhiệm -->
+
+Cây phân cấp ngoại lệ của hệ thống bắt đầu từ lớp trừu tượng gốc `PfmsException`, kế thừa trực tiếp từ `java.lang.RuntimeException`. Cấu trúc được phân nhánh thành hai họ ngoại lệ độc lập gồm ngoại lệ nghiệp vụ và ngoại lệ kỹ thuật:
+
+```mermaid
+classDiagram
+  class RuntimeException {
+    <<Java Platform>>
+  }
+
+  class PfmsException {
+    <<abstract>>
+    -ErrorCode errorCode
+    -Instant timestamp
+    +getErrorCode() ErrorCode
+    +getTimestamp() Instant
+  }
+
+  class BusinessException {
+    <<abstract>>
+  }
+
+  class TechnicalException {
+    <<abstract>>
+  }
+
+  class InsufficientBalanceException
+  class EntityNotFoundException
+  class DuplicateEntityException
+  class BudgetLimitExceededException
+
+  class StorageException
+  class DataCorruptionException
+
+  RuntimeException <|-- PfmsException
+  PfmsException <|-- BusinessException
+  PfmsException <|-- TechnicalException
+
+  BusinessException <|-- InsufficientBalanceException
+  BusinessException <|-- EntityNotFoundException
+  BusinessException <|-- DuplicateEntityException
+  BusinessException <|-- BudgetLimitExceededException
+
+  TechnicalException <|-- StorageException
+  TechnicalException <|-- DataCorruptionException
+```
+
+Đặc điểm kiến trúc của cây phân cấp:
+- Lớp cơ sở `PfmsException` đóng gói thuộc tính `errorCode` (mã định danh nghiệp vụ) và `timestamp` (thời điểm phát sinh lỗi UTC), bảo đảm mọi ngoại lệ khi được ném ra đều mang đầy đủ ngữ cảnh phục vụ việc hiển thị và kiểm toán.
+- Nhánh `BusinessException` chỉ phục vụ các vi phạm ràng buộc dữ liệu do người dùng thao tác, không mang theo tham chiếu `Throwable cause` kỹ thuật.
+- Nhánh `TechnicalException` luôn bắt buộc tiếp nhận tham chiếu `Throwable cause` qua hàm khởi tạo để bảo lưu trọn vẹn vết ngăn xếp gốc của hệ thống máy ảo Java.
 
 ### 8.2.2 Danh mục các Lớp Ngoại lệ Nghiệp vụ Chi tiết
-<!-- PLACEHOLDER: Bảng đặc tả chi tiết từng lớp ngoại lệ nghiệp vụ cụ thể: Ngoại lệ Không Tìm Thấy Thực Thể, Ngoại lệ Không Đủ Số Dư, Ngoại lệ Trùng Lặp Tên Dữ Liệu, Ngoại lệ Vượt Quá Hạn Mức Ngân Sách, Ngoại lệ Hợp Đồng Quá Hạn; mô tả tên lớp, lớp cha trực tiếp, danh sách tham số hàm khởi tạo, và mục đích kích hoạt | Căn cứ: Yêu cầu chức năng 20 ca sử dụng PFMS | Tiêu chí hoàn thành: Bao phủ 100% các tình huống vi phạm quy tắc nghiệp vụ đã được định nghĩa trong phân tích OOA -->
+
+Bảng dưới đây đặc tả chi tiết toàn bộ các lớp ngoại lệ cụ thể trong hệ thống PFMS, làm căn cứ cài đặt mã nguồn Java cho gói `com.pfms.domain.exception`:
+
+| Tên lớp ngoại lệ | Lớp cha trực tiếp | Tham số hàm khởi tạo | Điều kiện kích hoạt nghiệp vụ |
+| :--- | :--- | :--- | :--- |
+| **`InsufficientBalanceException`** | `BusinessException` | `ErrorCode code, String walletId, Money balance, Money amount` | Ném ra khi người dùng thực hiện rút tiền hoặc chuyển khoản với số tiền lớn hơn số dư khả dụng hiện có của ví nguồn. |
+| **`EntityNotFoundException`** | `BusinessException` | `ErrorCode code, String entityType, String identifier` | Ném ra khi tra cứu một thực thể (Ví, Danh mục, Giao dịch, Ngân sách) theo mã định danh hoặc tên nhưng không tồn tại trong hệ thống. |
+| **`DuplicateEntityException`** | `BusinessException` | `ErrorCode code, String entityType, String name` | Ném ra khi tạo mới hoặc cập nhật Ví, Danh mục có tên bị trùng lặp với một bản ghi đang hoạt động khác. |
+| **`BudgetLimitExceededException`** | `BusinessException` | `ErrorCode code, String budgetId, Money limit, Money currentSpent` | Ném ra khi ghi nhận một khoản chi tiêu làm tổng số tiền chi vượt quá hạn mức ngân sách đã thiết lập trong kỳ. |
+| **`StorageException`** | `TechnicalException` | `ErrorCode code, String message, Throwable cause` | Ném ra tại Tầng Hạ tầng khi xảy ra lỗi I/O đọc ghi tệp cục bộ (`.csv` hoặc `.dat`), bọc trọn vẹn ngoại lệ gốc `java.io.IOException`. |
+| **`DataCorruptionException`** | `TechnicalException` | `ErrorCode code, String fileName, int line, Throwable cause` | Ném ra khi tệp lưu trữ bị hỏng cấu trúc dòng, thiếu trường dữ liệu hoặc sai lệch định dạng không thể phân tích cú pháp. |
 
 ## 8.3 Bảng Mã Lỗi Nghiệp vụ Chuẩn hóa
 
+Mục này xác lập hệ thống mã định danh lỗi chuẩn hóa cho PFMS, bảo đảm tính duy nhất toàn cục, hỗ trợ việc đối chiếu hai chiều giữa tài liệu yêu cầu, giao diện người dùng và mã nguồn Java.
+
 ### 8.3.1 Cấu trúc Định danh Mã Lỗi Hệ thống
-<!-- PLACEHOLDER: Quy định cấu trúc tiền tố mã lỗi chuẩn gồm 3 thành phần: nhóm nghiệp vụ (VAL - xác thực dữ liệu, WAL - ví, TXN - giao dịch, BUD - ngân sách, SYS - hệ thống lưu trữ), mã số thứ tự (001 đến 999), và mức độ nghiêm trọng (INFO, WARN, ERROR); bảo đảm mã lỗi có tính duy nhất toàn cục | Căn cứ: Chuẩn thiết kế mã lỗi phần mềm công nghiệp ISO/IEC 25010 | Tiêu chí hoàn thành: Quy tắc định dạng mã lỗi tường minh, giúp việc đối chiếu giữa tài liệu và mã nguồn hoàn toàn khớp nhau -->
+
+Toàn bộ các mã lỗi trong hệ thống được định nghĩa qua kiểu liệt kê `com.pfms.domain.exception.ErrorCode` theo cấu trúc:
+
+`ERR-[PHÂN_HỆ]-[SỐ_THỨ_TỰ]`
+
+Quy ước các thành phần định danh:
+- Tiền tố `ERR`: Ký hiệu cố định biểu thị mã lỗi của hệ thống.
+- Tiền tố quy tắc: Gồm 3 ký tự in hoa đại diện cho miền quy tắc nghiệp vụ hoặc phân hệ phát sinh lỗi, kế thừa trực tiếp từ hồ sơ yêu cầu SRS.
+- Số thứ tự: Gồm 3 chữ số từ `001` đến `999` đại diện cho nguyên nhân lỗi cụ thể.
+
+Bảng phân nhóm tiền tố mã lỗi chuẩn hóa hệ thống:
+
+| Tiền tố | Miền quy tắc nghiệp vụ | Phạm vi trách nhiệm kỹ thuật |
+| :--- | :--- | :--- |
+| **`FIN`** | Quy tắc tài chính chung | Lỗi số tiền giao dịch không hợp lệ nhỏ hơn hoặc bằng không, lỗi làm tròn số học tiền tệ. |
+| **`NAM`** | Định danh và tính duy nhất | Lỗi tên để trống, tên dài quá 50 ký tự hoặc trùng tên Ví, trùng tên Danh mục. |
+| **`WAL`** | Ràng buộc số dư ví | Lỗi số dư khả dụng không đủ chi trả, thao tác xuất quỹ làm âm số dư ví. |
+| **`TRF`** | Chuyển khoản nội bộ | Lỗi ví nguồn trùng ví đích, số tiền chuyển không hợp lệ. |
+| **`FEE`** | Chi phí giao dịch | Lỗi chi phí âm, giao dịch có chi phí nhưng chưa chọn danh mục chi tiêu cho phí. |
+| **`CAT`** | Cây danh mục ba cấp | Lỗi đổi loại khi đã có giao dịch, xóa nhóm cuối cùng, thao tác trên nhóm đã xóa. |
+| **`DAT`** | Quản trị và sao lưu tệp | Lỗi cấu trúc tệp sao lưu JSON, vi phạm liên kết chuyển tiền hoặc phí mồ côi khi phục hồi. |
+| **`SYS`** | Hạ tầng hệ thống | Lỗi I/O đọc ghi tệp cục bộ trên đĩa cứng hệ thống. |
 
 ### 8.3.2 Danh mục Mã Lỗi và Thông điệp Phản hồi
-<!-- PLACEHOLDER: Bảng từ điển mã lỗi hoàn chỉnh của hệ thống PFMS: gồm các cột Mã lỗi, Lớp ngoại lệ kích hoạt, Nguyên nhân kỹ thuật phát sinh, và Thông điệp tiếng Việt hiển thị cho người dùng; hướng dẫn hành động khắc phục cụ thể cho từng lỗi (ví dụ: thông báo số tiền cần nạp thêm khi số dư ví không đủ chi) | Căn cứ: Yêu cầu phản hồi người dùng trong ca sử dụng | Tiêu chí hoàn thành: Đầy đủ 100% các mã lỗi, thông điệp phản hồi lịch sự, chính xác và không dùng từ ngữ kỹ thuật gây khó hiểu cho người dùng cuối -->
 
-## 8.4 Cơ chế Ghi Nhật ký Hoạt động và Kiểm toán
+Bảng dưới đây xác lập từ điển mã lỗi chuẩn hóa của hệ thống PFMS, bảo đảm tính truy vết hai chiều nhất quán với tài liệu Yêu cầu SRS, đồng thời định rõ lớp ngoại lệ Java tương ứng và thông điệp hiển thị trên giao diện dòng lệnh:
 
-### 8.4.1 Cấu trúc Bản ghi Nhật ký Hệ thống
-<!-- PLACEHOLDER: Đặc tả cấu trúc một dòng bản ghi nhật ký (log entry): thời gian chính xác (yyyy-MM-dd HH:mm:ss.SSS), cấp độ nghiêm trọng (INFO cho hoạt động nghiệp vụ thành công, WARN cho cảnh báo ngân sách hoặc nhập sai, ERROR cho sự cố hệ thống), tên lớp phát sinh sự kiện, mã định danh thao tác, và nội dung chi tiết | Căn cứ: Chuẩn ghi nhật ký ứng dụng Java | Tiêu chí hoàn thành: Cấu trúc bản ghi đồng nhất, dễ đọc và hỗ trợ việc trích xuất, tìm kiếm tự động khi cần kiểm tra sự cố -->
-
-### 8.4.2 Chiến lược Ghi Tệp Nhật ký và Lưu vết Kiểm toán
-<!-- PLACEHOLDER: Đặc tả cơ chế ghi nhật ký ra tệp văn bản riêng biệt (app.log hoặc audit.log) độc lập với màn hình console của người dùng; cơ chế xoay vòng tệp nhật ký theo ngày hoặc theo dung lượng; quy định bắt buộc ghi nhận lịch sử kiểm toán đối với các giao dịch làm biến động số tiền lớn hoặc các thao tác xóa dữ liệu ví | Căn cứ: Nguyên tắc an toàn dữ liệu tài chính cá nhân | Tiêu chí hoàn thành: Tách biệt hoàn toàn luồng xuất màn hình giao diện (System.out) và luồng ghi vết nhật ký tệp, không làm chậm tốc độ phản hồi của chương trình dòng lệnh -->
+| Mã lỗi Enum | Lớp Ngoại lệ Java phụ trách | Nguyên nhân kích hoạt nghiệp vụ | Thông điệp phản hồi Console |
+| :--- | :--- | :--- | :--- |
+| **`ERR_FIN_001`** | `BusinessException` | Dữ liệu số tiền không đúng định dạng số học hoặc nhỏ hơn hoặc bằng 0. | Dữ liệu số tiền không đúng định dạng số học hợp lệ. |
+| **`ERR_FIN_002`** | `BusinessException` | Phép toán chia không xác định quy tắc làm tròn gây số thập phân vô hạn. | Lỗi số học: Phép toán chia không xác định quy tắc làm tròn. |
+| **`ERR_NAM_001`** | `BusinessException` | Tên để trống sau khi cắt khoảng trắng, hoặc dài quá 50 ký tự. | Tên phải có từ 1 đến 50 ký tự, không tính khoảng trắng ở hai đầu. |
+| **`ERR_NAM_002`** | `DuplicateEntityException` | Tên ví hoặc tên danh mục bị trùng lặp trong cùng phạm vi duy nhất. | Tên đã tồn tại trong hệ thống. Vui lòng chọn tên khác. |
+| **`ERR_WAL_001`** | `InsufficientBalanceException` | Giao dịch làm số dư ví âm hoặc không đủ thanh toán số tiền và chi phí. | Giao dịch bị từ chối: Số dư ví không đủ để thực hiện thao tác. |
+| **`ERR_TRF_001`** | `BusinessException` | Ví nguồn chuyển tiền trùng với ví đích nhận tiền. | Giao dịch không hợp lệ: Ví chuyển và ví nhận phải khác nhau. |
+| **`ERR_TRF_002`** | `BusinessException` | Số tiền yêu cầu chuyển khoản nhỏ hơn hoặc bằng 0. | Số tiền chuyển phải là một số dương lớn hơn 0. |
+| **`ERR_FEE_001`** | `BusinessException` | Chi phí giao dịch được nhập giá trị nhỏ hơn 0. | Chi phí không hợp lệ. |
+| **`ERR_FEE_002`** | `BusinessException` | Chi phí lớn hơn 0 nhưng chưa chọn danh mục chi tiêu cho khoản phí. | Vui lòng chọn danh mục cho phí giao dịch. |
+| **`ERR_FEE_003`** | `BusinessException` | Danh mục phí đã bị xóa hoặc không thuộc loại chi tiêu (`EXPENSE`). | Danh mục phí không hợp lệ hoặc không tương thích với loại chi tiêu. |
+| **`ERR_CAT_001`** | `BusinessException` | Chuyển danh mục sang nhóm khác loại, hoặc đổi loại khi đã có giao dịch. | Không được phép đổi loại thu chi hoặc chuyển danh mục sang nhóm khác loại. |
+| **`ERR_CAT_002`** | `BusinessException` | Thực hiện xóa nhóm nhu cầu đang dùng cuối cùng của một loại thu chi. | Không thể xóa nhóm cuối cùng của loại thu chi này. |
+| **`ERR_CAT_003`** | `BusinessException` | Chuyển danh mục chi tiết sang một nhóm nhu cầu đã bị xóa. | Không thể chuyển danh mục sang nhóm đã xóa. |
+| **`ERR_CAT_004`** | `BusinessException` | Khôi phục danh mục khi nhóm nhu cầu của nó còn ở trạng thái đã xóa. | Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước. |
+| **`ERR_CAT_005`** | `BusinessException` | Tạo danh mục mới vào một nhóm nhu cầu đang ở trạng thái đã xóa. | Không thể tạo danh mục trong nhóm đã xóa. Hãy chọn nhóm đang dùng. |
+| **`ERR_DAT_001`** | `DataCorruptionException` | Tệp sao lưu JSON sai cấu trúc schema hoặc vi phạm phân cấp 3 cấp. | Tệp sao lưu không hợp lệ hoặc cấu trúc dữ liệu JSON bị hỏng. |
+| **`ERR_DAT_002`** | `DataCorruptionException` | Tệp sao lưu JSON vi phạm liên kết chuyển tiền hoặc làm âm số dư ví. | Dữ liệu sao lưu vi phạm ràng buộc toàn vẹn số dư ví hoặc dòng tiền. |
+| **`ERR_SYS_001`** | `StorageException` | Lỗi I/O đọc ghi tệp cục bộ trên đĩa cứng hệ thống. | Lỗi hệ thống: Không thể truy xuất hoặc lưu trữ tệp dữ liệu cục bộ. |
 

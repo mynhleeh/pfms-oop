@@ -24,7 +24,7 @@
 - [05-so-do-tuong-tac-thiet-ke-sequence-diagram.md](05-so-do-tuong-tac-thiet-ke-sequence-diagram.md): Sơ đồ tuần tự thiết kế chi tiết cho các ca sử dụng của hệ thống
 - [06-ap-dung-nguyen-ly-solid-va-thiet-ke-mau-gof.md](06-ap-dung-nguyen-ly-solid-va-thiet-ke-mau-gof.md): Đánh giá tuân thủ nguyên lý thiết kế và chi tiết các mẫu thiết kế hướng đối tượng
 - [07-thiet-ke-giao-dien-nguoi-dung-console-cli.md](07-thiet-ke-giao-dien-nguoi-dung-console-cli.md): Thiết kế giao diện dòng lệnh, điều hướng menu, xác thực đầu vào và đối tượng truyền dữ liệu
-- [08-thiet-ke-xu-ly-ngoai-le-va-nhat-ky.md](08-thiet-ke-xu-ly-ngoai-le-va-nhat-ky.md): Cây phân cấp ngoại lệ hệ thống, từ điển mã lỗi nghiệp vụ và cơ chế ghi nhật ký
+- [08-thiet-ke-xu-ly-ngoai-le-va-nhat-ky.md](08-thiet-ke-xu-ly-ngoai-le-va-nhat-ky.md): Cây phân cấp ngoại lệ hệ thống và từ điển mã lỗi nghiệp vụ chuẩn hóa
 - [09-ma-tran-truy-vet-thiet-ke-sang-phan-tich-va-srs.md](09-ma-tran-truy-vet-thiet-ke-sang-phan-tich-va-srs.md): Ma trận truy vết hai chiều giữa yêu cầu, phân tích và bản vẽ thiết kế
 - [10-tong-ket-va-lo-trinh-cai-dat.md](10-tong-ket-va-lo-trinh-cai-dat.md): Tổng hợp chỉ số thiết kế hệ thống và lộ trình cài đặt mã nguồn
 - [11-tai-lieu-trich-dan.md](11-tai-lieu-trich-dan.md): Danh mục tài liệu tham khảo kỹ thuật và chuẩn mực quốc tế chuẩn APA
@@ -94,14 +94,13 @@
 - 7.3 Thiết kế Bộ Xác thực Dữ liệu Đầu vào
 - 7.4 Thiết kế các Đối tượng Truyền Dữ liệu
 
-### Phần 8: Thiết kế Xử lý Ngoại lệ và Ghi Nhật ký
+### Phần 8: Thiết kế Xử lý Ngoại lệ
 
-<!-- PLACEHOLDER: Mô tả cây phân cấp lớp ngoại lệ hệ thống, phân loại ngoại lệ kỹ thuật và nghiệp vụ, từ điển mã lỗi chuẩn hóa và cơ chế ghi nhật ký kiểm toán tệp tin | Căn cứ: Milestone 4 Rubric, Joshua Bloch Effective Java | Tiêu chí: Mọi lỗi nghiệp vụ đều có mã định danh lỗi và thông báo thân thiện -->
+<!-- PLACEHOLDER: Mô tả cây phân cấp lớp ngoại lệ hệ thống, phân loại ngoại lệ kỹ thuật và nghiệp vụ, và từ điển mã lỗi chuẩn hóa | Căn cứ: Milestone 4 Rubric, Joshua Bloch Effective Java | Tiêu chí: Mọi lỗi nghiệp vụ đều có mã định danh lỗi và thông báo thân thiện -->
 
 - 8.1 Chiến lược Quản lý Ngoại lệ Toàn hệ thống
 - 8.2 Cây Phân cấp Lớp Ngoại lệ Hệ thống
 - 8.3 Bảng Mã Lỗi Nghiệp vụ Chuẩn hóa
-- 8.4 Cơ chế Ghi Nhật ký Hoạt động và Kiểm toán
 
 ### Phần 9: Ma trận Truy vết Thiết kế
 
