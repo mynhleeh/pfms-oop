@@ -60,7 +60,7 @@ Các đối tượng giá trị bất biến và kiểu liệt kê nghiệp vụ
 
 ### 2.1.2 Danh mục Lớp và Kiểu Dữ liệu
 
-Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể, đối tượng giá trị và kiểu liệt kê trong Tầng Nghiệp vụ cốt lõi. Toàn bộ các thành phần này được định vị vật lý trong gói mã nguồn `com.pfms.domain.model` và được phân loại theo các nhóm nghiệp vụ tương ứng của hệ thống:
+Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể, lớp khởi tạo, đối tượng giá trị và kiểu liệt kê trong Tầng Nghiệp vụ cốt lõi. Toàn bộ các thành phần này được định vị vật lý trong gói mã nguồn `com.pfms.domain.model` và được phân loại theo các nhóm nghiệp vụ tương ứng của hệ thống:
 
 | Tên lớp / Kiểu dữ liệu | Phân loại OOP | Trách nhiệm kỹ thuật chính |
 | :--- | :--- | :--- |
@@ -69,11 +69,12 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | `BalanceAdjustmentRecord` | Thực thể | Bản ghi kiểm kê thực tế bất biến, ghi nhận chênh lệch kiểm kê để cân đối số dư ví về đúng thực tế quan sát. |
 | `WalletStatus` | Kiểu liệt kê | Trạng thái vòng đời của ví gồm Đang hoạt động (`ACTIVE`) hoặc Đã lưu trữ (`ARCHIVED`). |
 | **2. Nhóm Ghi nhận Thu chi (TXN)** |  |  |
+| `Transaction` | Thực thể trừu tượng | Lớp cơ sở trừu tượng định nghĩa các thuộc tính chung và hợp đồng phương thức đa hình cho giao dịch thu chi cùng chuyển tiền nội bộ. |
 | `IncomeExpenseTransaction` | Thực thể | Hiện thực hóa giao dịch thu nhập hoặc chi tiêu tại một ví, liên kết phân loại trực tiếp với danh mục cấp 3. |
 | `TransactionFee` | Thực thể | Quản lý khoản chi phí phát sinh phụ thuộc sinh tử kèm theo giao dịch thu chi hoặc chuyển tiền nội bộ. |
+| `TransactionFactory` | Lớp khởi tạo | Đóng gói quy trình khởi tạo đa hình `IncomeExpenseTransaction`, `TransferTransaction` kèm bản ghi `TransactionFee` hợp thành. |
 | `TransactionType` | Kiểu liệt kê | Xác định chiều tác động của dòng tiền gồm Thu nhập (`INCOME`) hoặc Chi tiêu (`EXPENSE`). |
 | **3. Nhóm Chuyển tiền Nội bộ (TRF)** |  |  |
-| `Transaction` | Thực thể trừu tượng | Lớp cơ sở trừu tượng định nghĩa các thuộc tính chung và hợp đồng phương thức đa hình cho các biến động dòng tiền. |
 | `TransferTransaction` | Thực thể | Hiện thực hóa giao dịch điều chuyển tiền nội bộ giữa hai ví độc lập theo cơ chế bảo toàn tổng tài sản. |
 | **4. Nhóm Danh mục Phân loại (CAT)** |  |  |
 | `NeedGroup` | Thực thể | Quản lý nhóm nhu cầu cấp 2 gom cụm các danh mục chi tiết, trực thuộc một nhánh loại thu chi cố định. |
@@ -101,7 +102,7 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 ### 2.2.1 Lớp Ví
 
-Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng, tiếp nhận biến động dòng tiền và giữ số dư khả dụng không âm (`BR-FIN-02`). Hệ thống dùng lớp này cho ví tiền mặt mặc định cùng các ví tạo thêm để tính cơ cấu phân bổ tài sản (`FR-WAL-04`).
+Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng, tiếp nhận biến động dòng tiền và giữ số dư khả dụng không âm. Hệ thống dùng lớp này cho ví tiền mặt mặc định cùng các ví tạo thêm để tính cơ cấu phân bổ tài sản.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`, `UC-WAL-02`, `UC-WAL-03`, `UC-WAL-04`
@@ -113,121 +114,134 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `walletId` | `UUID` | `private final` | Mã định danh duy nhất sinh tự động khi tạo mới (`FR-WAL-01`), giữ cố định và không tái sử dụng (`FR-WAL-03`). |
-| `name` | `String` | `private` | Chuỗi từ 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu, duy nhất toàn hệ thống không phân biệt hoa thường (`BR-NAM-01`); từ chối nếu tên sai định dạng (`ERR-NAM-001`) hoặc trùng tên ví (`ERR-NAM-002`). |
-| `currentBalance` | `Money` | `private` | Số dư khả dụng có đúng 2 chữ số thập phân (`BR-FIN-01`), khởi tạo bằng `0.00 VNĐ` (`FR-WAL-01`) và luôn không âm (`BR-FIN-02`); báo lỗi nếu sai định dạng số học (`ERR-FIN-001`) hoặc thiếu số dư (`ERR-WAL-001`). |
-| `status` | `WalletStatus` | `private` | Trạng thái vòng đời nhận giá trị `ACTIVE` khi tạo mới (`FR-WAL-01`) hoặc chuyển sang `ARCHIVED` khi ngừng giao dịch (`FR-WAL-03`). |
-| `isDefault` | `boolean` | `private final` | Cờ đánh dấu ví "Tiền mặt" mặc định; mang giá trị `true` cố định ở ví mặc định để chặn thao tác xóa hoặc lưu trữ (`FR-WAL-03`). |
-| `note` | `String` | `private` | Chuỗi ghi chú tùy chọn, dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-01`, `FR-WAL-03`). |
-| `createdAt` | `LocalDateTime` | `private final` | Mốc thời gian tạo ví bất biến, dùng để sắp xếp danh sách ví (`FR-WAL-02`). |
+| `walletId` | `UUID` | `private final` | Mã định danh duy nhất sinh tự động khi tạo mới, giữ cố định và không tái sử dụng. |
+| `name` | `String` | `private` | Chuỗi từ 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu, duy nhất toàn hệ thống không phân biệt hoa thường. |
+| `currentBalance` | `Money` | `private` | Số dư khả dụng có đúng 2 chữ số thập phân, khởi tạo bằng `0.00 VNĐ` và luôn không âm. |
+| `status` | `WalletStatus` | `private` | Trạng thái vòng đời nhận giá trị `ACTIVE` khi tạo mới hoặc chuyển sang `ARCHIVED` khi ngừng giao dịch. |
+| `isDefault` | `boolean` | `private final` | Cờ đánh dấu ví "Tiền mặt" mặc định; mang giá trị `true` cố định ở ví mặc định để chặn thao tác xóa hoặc lưu trữ. |
+| `note` | `String` | `private` | Chuỗi ghi chú tùy chọn, dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu. |
+| `createdAt` | `LocalDateTime` | `private final` | Mốc thời gian tạo ví bất biến, dùng để sắp xếp danh sách ví. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `Wallet` | `UUID walletId, String name, String note, boolean isDefault` | `Wallet` | `ValidationException` | Cắt khoảng trắng hai đầu, kiểm tra tên dài 1 đến 50 ký tự (`BR-NAM-01`) và ghi chú tối đa 255 ký tự, gán `status = ACTIVE` (`FR-WAL-01`) cùng `currentBalance = Money.ZERO` (`BR-FIN-02`); báo lỗi nếu tên sai định dạng (`ERR-NAM-001`). |
-| `credit` | `Money amount` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE` và `amount` lớn hơn `0.00 VNĐ` (`BR-FIN-01`), sau đó cộng `amount` vào `currentBalance` (`BR-FIN-02`); từ chối nếu số tiền sai định dạng (`ERR-FIN-001`) hoặc ví ngừng hoạt động (`ERR-WAL-001`). |
-| `debit` | `Money amount` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE`, `amount` lớn hơn `0.00 VNĐ` (`BR-FIN-01`) và `currentBalance` đủ chi trả (`BR-FIN-02`), sau đó trừ `amount` khỏi `currentBalance`; báo lỗi nếu số tiền sai định dạng (`ERR-FIN-001`) hoặc thiếu số dư (`ERR-WAL-001`). |
-| `adjustBalance` | `Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE`, `actualBalance` không âm (`BR-FIN-02`) và khác `currentBalance` (`FR-WAL-05`), cập nhật `currentBalance = actualBalance` rồi trả về bản ghi kiểm kê; từ chối nếu sai định dạng số (`ERR-FIN-001`), số dư âm hoặc ví lưu trữ (`ERR-WAL-001`). |
-| `updateInfo` | `String newName, String newNote` | `void` | `ValidationException` | Cắt khoảng trắng hai đầu, kiểm tra `newName` dài 1 đến 50 ký tự (`BR-NAM-01`) và `newNote` tối đa 255 ký tự, cập nhật tên cùng ghi chú mà giữ nguyên số dư (`FR-WAL-03`); báo lỗi nếu tên sai định dạng (`ERR-NAM-001`). |
-| `archive` | `Không` | `void` | `BusinessRuleException` | Kiểm tra `isDefault == false` rồi chuyển `status` từ `ACTIVE` sang `ARCHIVED` (`FR-WAL-03`); từ chối lưu trữ nếu thực hiện trên ví mặc định (`ERR-WAL-001`). |
-| `activate` | `Không` | `void` | `Không` | Chuyển `status` từ `ARCHIVED` về `ACTIVE` để ví tiếp nhận lại giao dịch mới (`FR-WAL-03`). |
-| `hasSufficientBalance` | `Money amount` | `boolean` | `ValidationException` | Trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount` (`BR-FIN-02`); báo lỗi nếu tham số số tiền truyền vào bị rỗng (`ERR-FIN-001`). |
+| `Wallet` | `UUID walletId, String name, String note, boolean isDefault` | `Wallet` | `ValidationException` | Kiểm tra `walletId` khác `null`, cắt khoảng trắng hai đầu, kiểm tra tên dài 1 đến 50 ký tự và ghi chú tối đa 255 ký tự, gán `status = ACTIVE`, `currentBalance = Money.ZERO` và `createdAt` hiện tại. |
+| `credit` | `Money amount` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE` và `amount` lớn hơn `0.00 VNĐ`, sau đó cộng `amount` vào `currentBalance`. |
+| `debit` | `Money amount` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE`, `amount` lớn hơn `0.00 VNĐ` và `currentBalance` đủ chi trả, sau đó trừ `amount` khỏi `currentBalance`. |
+| `adjustBalance` | `Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE`, khởi tạo và xác thực bản ghi `BalanceAdjustmentRecord` trước để bảo đảm `actualBalance` không âm, độ lệch khác không và `reason` hợp lệ, sau đó mới cập nhật `currentBalance = actualBalance` rồi trả về bản ghi. |
+| `updateInfo` | `String newName, String newNote` | `void` | `ValidationException` | Cắt khoảng trắng hai đầu, kiểm tra `newName` dài 1 đến 50 ký tự và `newNote` tối đa 255 ký tự, cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
+| `archive` | `Không` | `void` | `BusinessRuleException` | Kiểm tra `isDefault == false` và ví đang `ACTIVE`, sau đó chuyển `status` sang `ARCHIVED`. |
+| `activate` | `Không` | `void` | `BusinessRuleException` | Kiểm tra ví đang `ARCHIVED` rồi chuyển `status` về `ACTIVE` để ví tiếp nhận lại giao dịch mới. |
+| `getWalletId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất của ví để làm khóa lưu trữ trên kho dữ liệu và đối chiếu giao dịch liên kết. |
+| `getName` | `Không` | `String` | `Không` | Trả về tên ví hiện tại phục vụ kiểm tra trùng tên không phân biệt hoa thường tại kho lưu trữ và hiển thị. |
+| `getStatus` | `Không` | `WalletStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví để lọc danh sách và thống kê số lượng ví theo trạng thái. |
+| `isDefault` | `Không` | `boolean` | `Không` | Trả về `true` nếu đây là ví tiền mặt mặc định, giúp tầng dịch vụ chặn thao tác xóa hoặc lưu trữ ví mặc định. |
+| `isActive` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `WalletStatus.ACTIVE`, phục vụ kiểm tra trạng thái hoạt động trước khi hạch toán giao dịch. |
+| `getCurrentBalance` | `Không` | `Money` | `Không` | Trả về số dư khả dụng hiện tại phục vụ hiển thị và tính cơ cấu phân bổ tài sản mà không mở hàm gán trực tiếp. |
+| `hasSufficientBalance` | `Money amount` | `boolean` | `ValidationException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- Hàm khởi tạo cắt khoảng trắng tên ví, kiểm tra độ dài 1 đến 50 ký tự (`BR-NAM-01`), gán trạng thái `ACTIVE` và đặt `currentBalance` bằng `0.00 VNĐ` (`FR-WAL-01`). Thực thể từ chối tên sai định dạng (`ERR-NAM-001`), còn tầng dịch vụ kiểm tra và chặn trùng tên toàn cục (`ERR-NAM-002`).
-- Lớp `Wallet` đóng kín trường `currentBalance` và bỏ phương thức `setCurrentBalance`. Số dư chỉ đổi qua `credit`, `debit` hoặc `adjustBalance` để giữ số dư không âm (`BR-FIN-02`) và chặn khoản chi vượt số dư (`ERR-WAL-001`).
-- Từ khóa `final` khóa cố định thuộc tính `isDefault` ngay khi tạo ví "Tiền mặt" mặc định. Nhờ đó, phương thức `archive` và tầng dịch vụ chặn được mọi thao tác lưu trữ hoặc xóa nguồn tiền mặc định của hệ thống (`FR-WAL-03`).
+- Hàm khởi tạo cắt khoảng trắng tên ví, kiểm tra độ dài 1 đến 50 ký tự, gán trạng thái `ACTIVE` và đặt `currentBalance` bằng `0.00 VNĐ`. Thực thể kiểm tra định dạng tên nội bộ, còn tầng dịch vụ kiểm tra tính duy nhất của tên trên toàn hệ thống.
+- Lớp `Wallet` đóng kín các trường nội tại, chỉ mở các phương thức đọc chỉ đọc và loại bỏ mọi phương thức gán giá trị tự do như `setCurrentBalance`. Số dư chỉ thay đổi qua `credit`, `debit` hoặc `adjustBalance` để duy trì số dư khả dụng không âm và chặn mọi khoản chi vượt số dư.
+- Từ khóa `final` khóa cố định thuộc tính `isDefault` ngay khi tạo ví "Tiền mặt" mặc định, giúp phương thức `archive` và tầng dịch vụ chặn thao tác lưu trữ hoặc xóa nguồn tiền mặc định.
 
 ### 2.2.2 Lớp Giao dịch Cơ sở và Giao dịch Thu Chi
 
-Lớp trừu tượng `Transaction` định nghĩa các thuộc tính chung và cặp phương thức đa hình cho mọi biến động dòng tiền. Lớp con `IncomeExpenseTransaction` biểu diễn giao dịch thu (`FR-TXN-01`) hoặc chi (`FR-TXN-02`) gắn với danh mục cấp 3 (`BR-FIN-04`), cập nhật số dư ví cùng phí đi kèm (`BR-FIN-02`).
+Lớp trừu tượng `Transaction` định nghĩa các thuộc tính chung và cặp phương thức đa hình cho mọi biến động dòng tiền. Lớp con `IncomeExpenseTransaction` biểu diễn giao dịch thu hoặc chi gắn với danh mục cấp 3, cập nhật số dư ví cùng phí đi kèm.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TXN-01`, `UC-TXN-02`, `UC-TXN-03`, `UC-TXN-04`
 - Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-03`, `FR-TXN-04`, `FR-TXN-05`
 - Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
-- Mã lỗi: `ERR-FIN-001`, `ERR-WAL-001`, `ERR-CAT-001`
+- Mã lỗi: `ERR-FIN-001`, `ERR-WAL-001`, `ERR-CAT-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `transactionId` | `UUID` | `protected final` | Mã định danh duy nhất khai báo tại `Transaction`, sinh tự động khi tạo mới (`FR-TXN-01`) và giữ cố định suốt vòng đời (`FR-TXN-04`). |
-| `amount` | `Money` | `protected` | Số tiền giao dịch khai báo tại `Transaction`, lớn hơn `0.00 VNĐ` với 2 chữ số thập phân (`BR-FIN-01`); báo lỗi nếu số tiền không dương hoặc sai định dạng (`ERR-FIN-001`). |
-| `transactionDate` | `TransactionDate` | `protected` | Ngày phát sinh giao dịch khai báo tại `Transaction`, không vượt quá ngày hiện tại (`FR-TXN-01`) và dùng để lọc lịch sử (`FR-TXN-03`). |
-| `fee` | `TransactionFee` | `protected` | Thực thể chi phí giao dịch hợp thành (`0..1`) khai báo tại `Transaction`, gắn liền vòng đời với giao dịch gốc (`BR-FIN-02`). |
-| `note` | `String` | `protected` | Ghi chú diễn giải khai báo tại `Transaction`, tùy chọn, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-TXN-01`). |
-| `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến tại `Transaction`, dùng làm tiêu chí sắp xếp phụ khi các giao dịch trùng ngày (`FR-TXN-03`). |
-| `transactionType` | `TransactionType` | `private final` | Chiều dòng tiền (`INCOME` hoặc `EXPENSE`) tại `IncomeExpenseTransaction`, cố định theo nhánh danh mục (`BR-FIN-04`) và không đổi khi chỉnh sửa (`FR-TXN-04`). |
-| `wallet` | `Wallet` | `private` | Tham chiếu thực thể `Wallet` đang `ACTIVE` chịu tác động dòng tiền tại `IncomeExpenseTransaction` (`FR-TXN-01`); từ chối nếu ví ngừng hoạt động hoặc thiếu số dư (`ERR-WAL-001`). |
-| `category` | `Category` | `private` | Tham chiếu thực thể `Category` cấp 3 tại `IncomeExpenseTransaction`, bắt buộc cùng `transactionType` (`BR-FIN-04`); báo lỗi nếu danh mục khác loại thu chi (`ERR-CAT-001`). |
+| `transactionId` | `UUID` | `protected final` | Mã định danh duy nhất khai báo tại `Transaction`, sinh tự động khi tạo mới và giữ cố định suốt vòng đời. |
+| `amount` | `Money` | `protected` | Số tiền giao dịch khai báo tại `Transaction`, lớn hơn `0.00 VNĐ` với đúng 2 chữ số thập phân. |
+| `transactionDate` | `TransactionDate` | `protected` | Ngày phát sinh giao dịch khai báo tại `Transaction`, không vượt quá ngày hiện tại và dùng để lọc lịch sử. |
+| `fee` | `TransactionFee` | `protected` | Thực thể chi phí giao dịch hợp thành (`0..1`) khai báo tại `Transaction`, gắn liền vòng đời với giao dịch gốc. |
+| `note` | `String` | `protected` | Ghi chú diễn giải khai báo tại `Transaction`, tùy chọn, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu. |
+| `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến tại `Transaction`, dùng làm tiêu chí sắp xếp phụ khi các giao dịch trùng ngày. |
+| `transactionType` | `TransactionType` | `private final` | Chiều dòng tiền (`INCOME` hoặc `EXPENSE`) tại `IncomeExpenseTransaction`, cố định theo nhánh danh mục và không đổi khi chỉnh sửa. |
+| `wallet` | `Wallet` | `private` | Tham chiếu thực thể `Wallet` đang `ACTIVE` chịu tác động dòng tiền tại `IncomeExpenseTransaction`. |
+| `category` | `Category` | `private` | Tham chiếu thực thể `Category` cấp 3 tại `IncomeExpenseTransaction`, bắt buộc cùng `transactionType`. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `Transaction` | `UUID transactionId, Money amount, TransactionDate transactionDate, String note, TransactionFee fee` | `Transaction` | `ValidationException` | Hàm khởi tạo `protected` của lớp cha kiểm tra `amount` lớn hơn `0.00 VNĐ` (`BR-FIN-01`), `transactionDate` hợp lệ và `note` tối đa 255 ký tự; từ chối dữ liệu số tiền hoặc ngày sai định dạng (`ERR-FIN-001`). |
-| `IncomeExpenseTransaction` | `UUID transactionId, TransactionType transactionType, Wallet wallet, Category category, Money amount, TransactionDate date, String note, TransactionFee fee` | `IncomeExpenseTransaction` | `ValidationException`, `BusinessRuleException` | Gọi `super(...)`, kiểm tra `wallet` đang `ACTIVE` và `category` cấp 3 đang `ACTIVE` khớp `transactionType` (`BR-FIN-04`); báo lỗi nếu ví không hợp lệ (`ERR-WAL-001`) hoặc danh mục sai loại thu chi (`ERR-CAT-001`). |
-| `applyToWallet` | `Không` | `void` | `BusinessRuleException` | Ghi đè phương thức trừu tượng của `Transaction`: kiểm tra số dư `wallet` sau khi tính cả `amount` và `fee` không bị âm (`BR-FIN-02`), cộng `amount` nếu `INCOME` (`FR-TXN-01`) hoặc trừ `amount` nếu `EXPENSE` (`FR-TXN-02`) rồi gọi `fee.applyFee()` nếu có phí; từ chối nếu thiếu số dư (`ERR-WAL-001`). |
-| `revertFromWallet` | `Không` | `void` | `BusinessRuleException` | Ghi đè phương thức trừu tượng của `Transaction`: kiểm tra số dư `wallet` đủ hoàn nguyên (`BR-FIN-02`), gọi `fee.revertFee()` nếu có phí, rồi trừ `amount` nếu `INCOME` hoặc cộng lại `amount` nếu `EXPENSE` (`FR-TXN-05`); báo lỗi nếu hoàn thu làm âm ví (`ERR-WAL-001`). |
-| `updateDetails` | `Wallet newWallet, Category newCategory, Money newAmount, TransactionDate newDate, String newNote, TransactionFee newFee` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra `newAmount` dương, `newCategory` cùng `transactionType` (`BR-FIN-04`) và đang `ACTIVE` nếu đổi danh mục mới, xác nhận ví cũ và `newWallet` đủ số dư rồi gọi `revertFromWallet()`, cập nhật thuộc tính và gọi `applyToWallet()` (`FR-TXN-04`); từ chối nếu số tiền sai (`ERR-FIN-001`), lệch loại danh mục (`ERR-CAT-001`) hoặc thiếu số dư (`ERR-WAL-001`). |
-| `getFee` | `Không` | `Optional<TransactionFee>` | `Không` | Bọc trường `fee` trong `Optional` tại lớp `Transaction` để truy xuất an toàn khi giao dịch không kèm chi phí (`BR-FIN-02`). |
+| `Transaction` | `UUID transactionId, Money amount, TransactionDate transactionDate, String note, TransactionFee fee` | `Transaction` | `ValidationException` | Hàm khởi tạo `protected` của lớp cha kiểm tra `transactionId` cùng `transactionDate` khác `null`, `amount` lớn hơn `0.00 VNĐ`, cắt khoảng trắng và kiểm tra `note` tối đa 255 ký tự, đồng thời gán `createdAt` hiện tại. |
+| `IncomeExpenseTransaction` | `UUID transactionId, TransactionType transactionType, Wallet wallet, Category category, Money amount, TransactionDate date, String note, TransactionFee fee` | `IncomeExpenseTransaction` | `ValidationException`, `BusinessRuleException` | Gọi `super(...)`, kiểm tra `transactionType`, `wallet`, `category` khác `null`, `wallet.isActive()`, `category` cấp 3 đang `ACTIVE` khớp `transactionType` và nếu có `fee` thì khớp `transactionId` cùng `wallet`. |
+| `applyToWallet` | `Không` | `void` | `BusinessRuleException` | Khai báo trừu tượng tại `Transaction`; lớp con kiểm tra `wallet.isActive()` và số dư `wallet` sau khi tính cả `amount` cùng `fee` không bị âm, cộng `amount` nếu `INCOME` hoặc trừ `amount` nếu `EXPENSE` rồi gọi `fee.applyFee()` nếu có phí. |
+| `revertFromWallet` | `Không` | `void` | `BusinessRuleException` | Khai báo trừu tượng tại `Transaction`; lớp con kiểm tra `wallet.isActive()` và số dư `wallet` đủ hoàn nguyên, gọi `fee.revertFee()` nếu có phí, rồi trừ `amount` nếu `INCOME` hoặc cộng lại `amount` nếu `EXPENSE`. |
+| `updateDetails` | `Wallet newWallet, Category newCategory, Money newAmount, TransactionDate newDate, String newNote, TransactionFee newFee` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra `newWallet` cùng `newCategory` khác `null`, `newWallet.isActive()`, `newAmount` dương, `newDate` khác `null`, `newCategory` cùng `transactionType` và đang `ACTIVE` nếu đổi danh mục mới, `newFee` nếu có khớp `transactionId` cùng `newWallet`; kiểm tra trước số dư sau hoàn nguyên và sau áp dụng mới đều không âm, rồi gọi `revertFromWallet()`, cập nhật thuộc tính và gọi `applyToWallet()`. |
+| `getTransactionId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất tại lớp `Transaction` để làm khóa lưu trữ đa hình và đối chiếu `parentTransactionId` của chi phí. |
+| `getAmount` | `Không` | `Money` | `Không` | Trả về số tiền giao dịch bất biến tại lớp `Transaction` để tổng hợp dòng tiền và báo cáo định kỳ. |
+| `getTransactionDate` | `Không` | `TransactionDate` | `Không` | Trả về ngày phát sinh giao dịch tại lớp `Transaction` phục vụ lọc theo khoảng thời gian và báo cáo chuỗi 12 tháng. |
+| `getCreatedAt` | `Không` | `LocalDateTime` | `Không` | Trả về mốc thời gian tạo bản ghi tại lớp `Transaction` dùng làm tiêu chí sắp xếp thứ cấp khi các giao dịch trùng ngày. |
+| `getFee` | `Không` | `Optional<TransactionFee>` | `Không` | Bọc trường `fee` trong `Optional` tại lớp `Transaction` để truy xuất an toàn khi giao dịch không kèm chi phí. |
+| `getWallet` | `Không` | `Wallet` | `Không` | Trả về thực thể ví liên kết tại lớp `IncomeExpenseTransaction` phục vụ lọc giao dịch theo ví và đối soát số dư. |
+| `getCategory` | `Không` | `Category` | `Không` | Trả về thực thể danh mục cấp 3 tại lớp `IncomeExpenseTransaction` phục vụ lọc lịch sử và thống kê cơ cấu chi tiêu. |
+| `getTransactionType` | `Không` | `TransactionType` | `Không` | Trả về chiều thu chi cố định tại lớp `IncomeExpenseTransaction` phục vụ tổng hợp dòng tiền thuần và báo cáo cơ cấu. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- Lớp `IncomeExpenseTransaction` khởi tạo qua `super(...)` và khóa `transactionId`, `createdAt` cùng `transactionType` bằng từ khóa `final`. Thiết kế này ngăn việc đổi mã định danh hoặc đảo chiều thu chi khi chỉnh sửa giao dịch (`FR-TXN-04`).
-- Hai phương thức `applyToWallet` và `revertFromWallet` kiểm tra trước điều kiện số dư không âm rồi mới cập nhật `Wallet` và `TransactionFee` hợp thành (`BR-FIN-02`). Cách kiểm tra gộp cả tiền gốc lẫn phí giúp số dư ví không bị biến đổi dở dang và báo lỗi khi thiếu tiền (`ERR-WAL-001`).
-- Thực thể đối chiếu nhánh của `Category` cấp 3 với `transactionType` trong suốt vòng đời (`BR-FIN-04`). Khi sửa giao dịch (`FR-TXN-04`), lớp cho phép giữ danh mục cũ đã xóa mềm nhưng từ chối danh mục mới đã xóa hoặc khác loại thu chi (`ERR-CAT-001`).
+- Lớp `IncomeExpenseTransaction` khởi tạo qua `TransactionFactory` và hàm `super(...)`, khóa `transactionId`, `createdAt` cùng `transactionType` bằng từ khóa `final`, ngăn việc đổi mã định danh hoặc đảo chiều thu chi khi chỉnh sửa giao dịch.
+- Hai phương thức `applyToWallet` và `revertFromWallet` kiểm tra trước điều kiện số dư không âm trên tổng tiền gốc lẫn phí rồi mới cập nhật `Wallet` và `TransactionFee` hợp thành, bảo đảm số dư ví không bị biến đổi dở dang.
+- Thực thể đối chiếu nhánh của `Category` cấp 3 với `transactionType` trong suốt vòng đời; khi sửa giao dịch, lớp cho phép giữ danh mục cũ đã xóa mềm nhưng yêu cầu danh mục mới chọn phải đang `ACTIVE` và cùng loại thu chi.
 
 ### 2.2.3 Lớp Giao dịch Chuyển tiền
 
-Lớp `TransferTransaction` kế thừa `Transaction` để điều chuyển tiền nội bộ giữa hai ví độc lập (`FR-TRF-01`). Mọi lượt chuyển đều trừ ví nguồn và cộng ví đích cùng lúc, bảo toàn tổng tài sản trước chi phí phát sinh (`BR-FIN-03`).
+Lớp `TransferTransaction` kế thừa `Transaction` để điều chuyển tiền nội bộ giữa hai ví độc lập. Mọi lượt chuyển đều trừ ví nguồn và cộng ví đích cùng lúc, bảo toàn tổng tài sản trước chi phí phát sinh.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`
 - Yêu cầu chức năng: `FR-TRF-01`, `FR-TRF-02`
 - Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`
-- Mã lỗi: `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`
+- Mã lỗi: `ERR-FIN-001`, `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `transactionId` | `UUID` | `protected final` | Mã định danh giao dịch chuyển tiền kế thừa từ `Transaction`, sinh tự động khi tạo mới (`FR-TRF-01`) và giữ cố định (`FR-TRF-02`). |
-| `sourceWallet` | `Wallet` | `private final` | Tham chiếu thực thể `Wallet` nguồn trích tiền, bắt buộc đang `ACTIVE` và khác `destinationWallet` (`BR-FIN-03`); từ chối nếu ví ngừng hoạt động (`ERR-WAL-001`) hoặc trùng ví đích (`ERR-TRF-001`). |
-| `destinationWallet` | `Wallet` | `private final` | Tham chiếu thực thể `Wallet` đích nhận tiền, bắt buộc đang `ACTIVE` và khác `sourceWallet` (`BR-FIN-03`); từ chối nếu ví ngừng hoạt động (`ERR-WAL-001`) hoặc trùng ví nguồn (`ERR-TRF-001`). |
-| `amount` | `Money` | `protected` | Số tiền điều chuyển kế thừa từ `Transaction`, có 2 chữ số thập phân (`BR-FIN-01`) và lớn hơn `0.00 VNĐ` (`BR-FIN-03`); báo lỗi nếu số tiền chuyển không dương (`ERR-TRF-002`). |
-| `transactionDate` | `TransactionDate` | `protected` | Ngày thực hiện chuyển tiền kế thừa từ `Transaction`, không vượt quá ngày hiện tại (`FR-TRF-01`). |
-| `fee` | `TransactionFee` | `protected` | Thực thể chi phí chuyển tiền hợp thành (`0..1`) kế thừa từ `Transaction`, trích từ `sourceWallet` khi có phát sinh phí (`BR-FIN-02`); từ chối nếu chi phí âm (`ERR-FEE-001`). |
-| `note` | `String` | `protected` | Ghi chú mục đích chuyển tiền kế thừa từ `Transaction`, tùy chọn, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-TRF-01`). |
-| `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến kế thừa từ `Transaction`, phục vụ tra cứu và sắp xếp lịch sử (`FR-TRF-02`). |
+| `transactionId` | `UUID` | `protected final` | Mã định danh giao dịch chuyển tiền kế thừa từ `Transaction`, sinh tự động khi tạo mới và giữ cố định. |
+| `sourceWallet` | `Wallet` | `private final` | Tham chiếu thực thể `Wallet` nguồn trích tiền, bắt buộc đang `ACTIVE` và khác `destinationWallet`. |
+| `destinationWallet` | `Wallet` | `private final` | Tham chiếu thực thể `Wallet` đích nhận tiền, bắt buộc đang `ACTIVE` và khác `sourceWallet`. |
+| `amount` | `Money` | `protected` | Số tiền điều chuyển kế thừa từ `Transaction`, có 2 chữ số thập phân và lớn hơn `0.00 VNĐ`. |
+| `transactionDate` | `TransactionDate` | `protected` | Ngày thực hiện chuyển tiền kế thừa từ `Transaction`, không vượt quá ngày hiện tại. |
+| `fee` | `TransactionFee` | `protected` | Thực thể chi phí chuyển tiền hợp thành (`0..1`) kế thừa từ `Transaction`, trích từ `sourceWallet` khi có phát sinh phí. |
+| `note` | `String` | `protected` | Ghi chú mục đích chuyển tiền kế thừa từ `Transaction`, tùy chọn, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu. |
+| `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến kế thừa từ `Transaction`, phục vụ tra cứu và sắp xếp lịch sử. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `TransferTransaction` | `UUID transactionId, Wallet sourceWallet, Wallet destinationWallet, Money amount, TransactionDate date, String note, TransactionFee fee` | `TransferTransaction` | `ValidationException`, `BusinessRuleException` | Kiểm tra hai ví đang `ACTIVE`, có mã định danh khác nhau và `amount` lớn hơn `0.00 VNĐ` (`BR-FIN-03`); báo lỗi nếu trùng ví chuyển nhận (`ERR-TRF-001`), số tiền không dương (`ERR-TRF-002`), phí âm (`ERR-FEE-001`) hoặc ví không hoạt động (`ERR-WAL-001`). |
-| `applyToWallet` | `Không` | `void` | `BusinessRuleException` | Ghi đè phương thức lớp cha: kiểm tra `sourceWallet` đủ trả tổng `amount` và phí (`BR-FIN-02`), trừ `sourceWallet`, gọi `fee.applyFee()` nếu có và cộng `amount` vào `destinationWallet` (`BR-FIN-03`); từ chối nếu ví nguồn thiếu số dư (`ERR-WAL-001`). |
-| `revertFromWallet` | `Không` | `void` | `BusinessRuleException` | Ghi đè phương thức lớp cha khi xóa giao dịch (`FR-TRF-02`): kiểm tra `destinationWallet` có số dư tối thiểu bằng `amount` (`BR-FIN-02`), trừ `amount` ở `destinationWallet`, cộng trả `amount` về `sourceWallet` và gọi `fee.revertFee()` nếu có phí (`BR-FIN-03`); báo lỗi nếu ví đích thiếu số dư hoàn trả (`ERR-WAL-001`). |
-| `getTotalSourceDeduction` | `Không` | `Money` | `Không` | Tính tổng số tiền trích từ `sourceWallet` bằng `amount` cộng số tiền của `fee` nếu có (`BR-FIN-01`). |
-| `getSourceWallet` | `Không` | `Wallet` | `Không` | Trả về thực thể ví nguồn để đối soát và hiển thị lịch sử chuyển tiền (`FR-TRF-02`). |
-| `getDestinationWallet` | `Không` | `Wallet` | `Không` | Trả về thực thể ví đích để đối soát và hiển thị lịch sử chuyển tiền (`FR-TRF-02`). |
+| `TransferTransaction` | `UUID transactionId, Wallet sourceWallet, Wallet destinationWallet, Money amount, TransactionDate date, String note, TransactionFee fee` | `TransferTransaction` | `ValidationException`, `BusinessRuleException` | Gọi `super(...)`, kiểm tra hai ví khác `null`, cùng thỏa mãn `isActive()`, có mã định danh khác nhau và nếu có `fee` thì khớp `transactionId` cùng ví trích phí trùng `sourceWallet`. |
+| `applyToWallet` | `Không` | `void` | `BusinessRuleException` | Ghi đè phương thức lớp cha: kiểm tra hai ví đang `ACTIVE` và `sourceWallet` đủ trả tổng `amount` cùng phí, trừ `sourceWallet`, gọi `fee.applyFee()` nếu có và cộng `amount` vào `destinationWallet`. |
+| `revertFromWallet` | `Không` | `void` | `BusinessRuleException` | Ghi đè phương thức lớp cha khi xóa giao dịch: kiểm tra hai ví đang `ACTIVE` và `destinationWallet` có số dư tối thiểu bằng `amount`, trừ `amount` ở `destinationWallet`, gọi `fee.revertFee()` nếu có phí và cộng trả `amount` về `sourceWallet`. |
+| `getTotalSourceDeduction` | `Không` | `Money` | `Không` | Tính tổng số tiền trích từ `sourceWallet` bằng `amount` cộng số tiền của `fee` nếu có. |
+| `getSourceWallet` | `Không` | `Wallet` | `Không` | Trả về thực thể ví nguồn để đối soát và hiển thị lịch sử chuyển tiền. |
+| `getDestinationWallet` | `Không` | `Wallet` | `Không` | Trả về thực thể ví đích để đối soát và hiển thị lịch sử chuyển tiền. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- Hàm khởi tạo khóa cố định `sourceWallet` và `destinationWallet` bằng từ khóa `final`, yêu cầu cả hai ví đang ở trạng thái `ACTIVE`. Nếu hai ví trùng mã định danh (`BR-FIN-03`), thực thể từ chối khởi tạo vì lỗi trùng ví chuyển nhận (`ERR-TRF-001`).
-- Trước khi biến đổi số dư, `applyToWallet` kiểm tra `sourceWallet` đủ chi trả tổng `amount` cộng `fee` (`BR-FIN-02`). Sau bước kiểm tra này, phương thức trừ tiền ví nguồn và cộng tiền ví đích trong cùng một khối lệnh (`BR-FIN-03`).
-- Lớp `TransferTransaction` không cung cấp phương thức chỉnh sửa thuộc tính sau khi tạo. Khi xóa giao dịch (`FR-TRF-02`), `revertFromWallet` yêu cầu `destinationWallet` có số dư tối thiểu bằng `amount` (`BR-FIN-03`) và từ chối nếu ví đích thiếu số dư hoàn trả (`ERR-WAL-001`).
+- Lớp được khởi tạo qua `TransactionFactory`, khóa cố định `sourceWallet` và `destinationWallet` bằng từ khóa `final`, yêu cầu cả hai ví đang ở trạng thái `ACTIVE` và có mã định danh khác nhau.
+- Trước khi biến đổi số dư, `applyToWallet` kiểm tra `sourceWallet` đủ chi trả tổng `amount` cộng `fee`, sau đó trừ tiền ví nguồn và cộng tiền ví đích trong cùng một khối lệnh.
+- Lớp `TransferTransaction` không cung cấp phương thức chỉnh sửa thuộc tính sau khi tạo; khi xóa giao dịch, `revertFromWallet` chỉ hoàn nguyên khi `destinationWallet` có số dư tối thiểu bằng `amount`.
 
 ### 2.2.4 Lớp Chi phí Giao dịch
 
-Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh kèm theo giao dịch thu chi (`FR-TXN-01`) hoặc chuyển tiền nội bộ (`FR-TRF-01`). Khoản phí này mang bản chất chi tiêu và gắn kết hợp thành với giao dịch gốc để ngăn bản ghi phí mồ côi (`BR-FIN-02`).
+Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh kèm theo giao dịch thu chi hoặc chuyển tiền nội bộ. Khoản phí này mang bản chất chi tiêu và gắn kết hợp thành với giao dịch gốc để ngăn bản ghi phí mồ côi.
 
 **Quy chiếu yêu cầu:**
-- Ca sử dụng: `UC-TXN-01`, `UC-TXN-03`, `UC-TRF-01`, `UC-TRF-03`
-- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-04`, `FR-TRF-01`, `FR-TRF-02`
+- Ca sử dụng: `UC-TXN-01`, `UC-TXN-03`, `UC-TXN-04`, `UC-TRF-01`, `UC-TRF-03`
+- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`, `FR-TRF-01`, `FR-TRF-02`
 - Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
 - Mã lỗi: `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`, `ERR-WAL-001`
 
@@ -235,27 +249,31 @@ Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh kèm theo
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `feeId` | `UUID` | `private final` | Mã định danh duy nhất của bản ghi chi phí, sinh tự động khi tạo mới và giữ cố định (`BR-FIN-02`). |
-| `parentTransactionId` | `UUID` | `private final` | Mã định danh tham chiếu cố định tới giao dịch gốc (`Transaction`), dùng để ràng buộc vòng đời và ngăn chi phí mồ côi (`BR-FIN-02`). |
-| `amount` | `Money` | `private` | Số tiền chi phí có 2 chữ số thập phân (`BR-FIN-01`), lớn hơn `0.00 VNĐ` khi khởi tạo bản ghi phí (`BR-FIN-02`); từ chối nếu truyền chi phí âm (`ERR-FEE-001`). |
-| `wallet` | `Wallet` | `private` | Tham chiếu thực thể `Wallet` đang `ACTIVE` trích trả chi phí (`BR-FIN-02`); báo lỗi nếu ví không đủ số dư thanh toán (`ERR-WAL-001`). |
-| `category` | `Category` | `private` | Tham chiếu thực thể `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`); báo lỗi nếu bỏ trống danh mục phí (`ERR-FEE-002`) hoặc chọn danh mục đã xóa hay sai loại (`ERR-FEE-003`). |
+| `feeId` | `UUID` | `private final` | Mã định danh duy nhất của bản ghi chi phí, sinh tự động khi tạo mới và giữ cố định. |
+| `parentTransactionId` | `UUID` | `private final` | Mã định danh tham chiếu cố định tới giao dịch gốc (`Transaction`), dùng để ràng buộc vòng đời và ngăn chi phí mồ côi. |
+| `amount` | `Money` | `private` | Số tiền chi phí có 2 chữ số thập phân và lớn hơn `0.00 VNĐ` khi khởi tạo bản ghi phí. |
+| `wallet` | `Wallet` | `private` | Tham chiếu thực thể `Wallet` đang `ACTIVE` trích trả chi phí. |
+| `category` | `Category` | `private` | Tham chiếu thực thể `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE`. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `TransactionFee` | `UUID feeId, UUID parentTransactionId, Money amount, Wallet wallet, Category category` | `TransactionFee` | `ValidationException`, `BusinessRuleException` | Kiểm tra `parentTransactionId` khác `null`, `amount` lớn hơn `0.00 VNĐ` (`BR-FIN-02`) và `category` cấp 3 thuộc nhánh `EXPENSE` đang `ACTIVE` (`BR-FIN-04`); từ chối nếu chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`) hoặc danh mục phí không hợp lệ (`ERR-FEE-003`). |
-| `applyFee` | `Không` | `void` | `BusinessRuleException` | Gọi `wallet.debit(amount)` để trích khoản phí khỏi số dư ví thanh toán (`BR-FIN-02`); báo lỗi nếu ví thiếu số dư chi trả (`ERR-WAL-001`). |
-| `revertFee` | `Không` | `void` | `BusinessRuleException` | Gọi `wallet.credit(amount)` để hoàn lại khoản phí vào ví thanh toán khi chỉnh sửa (`FR-TXN-04`) hoặc xóa giao dịch gốc (`FR-TRF-02`). |
-| `updateFee` | `Money newAmount, Category newCategory, Wallet newWallet` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra `newAmount` lớn hơn `0.00 VNĐ` (`BR-FIN-01`) và `newCategory` đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`) trước khi cập nhật thông tin phí (`FR-TXN-04`); từ chối nếu chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`) hoặc danh mục phí sai loại (`ERR-FEE-003`). |
-| `getAmount` | `Không` | `Money` | `Không` | Trả về số tiền phí để tính tổng dòng tiền ra và tổng chi tiêu (`BR-FIN-01`). |
+| `TransactionFee` | `UUID feeId, UUID parentTransactionId, Money amount, Wallet wallet, Category category` | `TransactionFee` | `ValidationException`, `BusinessRuleException` | Kiểm tra các tham số bắt buộc khác `null`, `amount` lớn hơn `0.00 VNĐ`, `wallet.isActive()` và `category` cấp 3 thuộc nhánh `EXPENSE` đang `ACTIVE`. |
+| `applyFee` | `Không` | `void` | `BusinessRuleException` | Gọi `wallet.debit(amount)` để trích khoản phí khỏi số dư ví thanh toán. |
+| `revertFee` | `Không` | `void` | `BusinessRuleException` | Gọi `wallet.credit(amount)` để hoàn lại khoản phí vào ví thanh toán khi chỉnh sửa hoặc xóa giao dịch gốc. |
+| `updateFee` | `Money newAmount, Category newCategory, Wallet newWallet` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra `newAmount`, `newCategory`, `newWallet` khác `null`, `newAmount` lớn hơn `0.00 VNĐ`, `newWallet.isActive()` và `newCategory` đang `ACTIVE` thuộc nhánh `EXPENSE` trước khi cập nhật thông tin phí. |
+| `getFeeId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất của bản ghi chi phí phục vụ lưu trữ và đối soát lịch sử. |
+| `getParentTransactionId` | `Không` | `UUID` | `Không` | Trả về mã định danh giao dịch gốc để kiểm tra ràng buộc hợp thành và ngăn bản ghi phí mồ côi. |
+| `getFeeAmount` | `Không` | `Money` | `Không` | Trả về số tiền phí để tính tổng dòng tiền ra và tổng chi tiêu. |
+| `getWallet` | `Không` | `Wallet` | `Không` | Trả về thực thể ví trích trả chi phí để kiểm tra khớp với ví của giao dịch gốc. |
+| `getCategory` | `Không` | `Category` | `Không` | Trả về danh mục chi phí cấp 3 thuộc nhánh `EXPENSE` phục vụ thống kê cơ cấu chi tiêu. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- Lớp khóa cố định trường `parentTransactionId` bằng từ khóa `final`, và `TransactionFactory` chỉ khởi tạo `TransactionFee` khi mức phí lớn hơn `0.00 VNĐ`. Nhờ vậy, vòng đời bản ghi phí luôn đi liền với giao dịch gốc và tự động bị xóa theo giao dịch gốc (`BR-FIN-02`).
-- Hàm khởi tạo và `updateFee` từ chối ngay khi mức phí âm (`ERR-FEE-001`). Khi có phí dương, thực thể bắt buộc gắn `Category` cấp 3 thuộc nhánh `EXPENSE` (`BR-FIN-04`), báo lỗi nếu thiếu danh mục (`ERR-FEE-002`) hoặc chọn sai danh mục (`ERR-FEE-003`).
-- Giao dịch gốc gọi nội bộ `applyFee` và `revertFee` trong chu trình `applyToWallet` và `revertFromWallet`. Cơ chế này đồng bộ việc trích thu và hoàn phí với số dư ví (`BR-FIN-02`), từ chối thực hiện nếu ví thiếu số dư (`ERR-WAL-001`).
+- Lớp khóa cố định trường `parentTransactionId` bằng từ khóa `final`, và được `TransactionFactory` khởi tạo chỉ khi giao dịch phát sinh mức phí lớn hơn `0.00 VNĐ`, bảo đảm vòng đời bản ghi phí luôn đi liền và tự động hủy theo giao dịch gốc.
+- Hàm khởi tạo và `updateFee` yêu cầu mức phí dương, đồng thời bắt buộc gắn với một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE`.
+- Giao dịch gốc gọi nội bộ `applyFee` và `revertFee` trong chu trình `applyToWallet` và `revertFromWallet` để đồng bộ việc trích thu và hoàn phí trực tiếp trên số dư ví.
 
 ### 2.2.5 Lớp Danh mục Chi tiết
 
@@ -265,7 +283,7 @@ Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh kèm theo
 - Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
 - Yêu cầu chức năng: `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`
 - Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-04`
-- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-003`, `ERR-CAT-004`
+- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-003`, `ERR-CAT-004`, `ERR-CAT-005`
 
 **Cấu trúc thuộc tính**
 
@@ -293,7 +311,7 @@ Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh kèm theo
 - Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
 - Yêu cầu chức năng: `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`
 - Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-04`
-- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-002`, `ERR-CAT-005`
+- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-005`
 
 **Cấu trúc thuộc tính**
 
@@ -315,7 +333,7 @@ Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh kèm theo
 
 ### 2.2.7 Lớp Bản ghi Điều chỉnh Số dư
 
-Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê nhằm đưa số dư khả dụng của ví về khớp với số tiền thực tế quan sát được (`FR-WAL-05`). Bản ghi giữ trạng thái bất biến sau khi tạo để bảo vệ vết kiểm toán và không tính khoản chênh lệch vào thu chi (`BR-FIN-02`).
+Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê nhằm đưa số dư khả dụng của ví về khớp với số tiền thực tế quan sát được. Bản ghi giữ trạng thái bất biến sau khi tạo để bảo vệ vết kiểm toán và không tính khoản chênh lệch vào thu chi.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-04`
@@ -327,29 +345,32 @@ Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê nhằm đưa s
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `recordId` | `UUID` | `private final` | Mã định danh duy nhất của bản ghi kiểm kê, sinh tự động khi tạo mới (`FR-WAL-05`) và giữ cố định (`BR-FIN-02`). |
-| `walletId` | `UUID` | `private final` | Mã định danh tham chiếu cố định tới thực thể `Wallet` đang `ACTIVE` được kiểm kê (`FR-WAL-05`); từ chối kiểm kê nếu ví ở trạng thái lưu trữ (`ERR-WAL-001`). |
-| `previousBalance` | `Money` | `private final` | Số dư khả dụng của ví ngay trước thời điểm kiểm kê, lưu 2 chữ số thập phân (`BR-FIN-01`) và giữ cố định (`BR-FIN-02`). |
-| `actualBalance` | `Money` | `private final` | Số dư thực tế quan sát được, lưu 2 chữ số thập phân (`BR-FIN-01`) và bắt buộc từ `0.00 VNĐ` trở lên (`BR-FIN-02`); báo lỗi nếu sai định dạng số học (`ERR-FIN-001`) hoặc số dư thực tế âm (`ERR-WAL-001`). |
-| `difference` | `Money` | `private final` | Giá trị chênh lệch đại số tính bằng `actualBalance` trừ `previousBalance` (`BR-FIN-01`), bắt buộc khác `0.00 VNĐ` (`FR-WAL-05`). |
-| `adjustedAt` | `TransactionDate` | `private final` | Mốc ngày ghi nhận kiểm kê bất biến, không vượt quá ngày hiện tại (`FR-WAL-05`). |
-| `reason` | `String` | `private final` | Chuỗi diễn giải lý do điều chỉnh số dư, tùy chọn, dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-05`). |
+| `recordId` | `UUID` | `private final` | Mã định danh duy nhất của bản ghi kiểm kê, sinh tự động khi tạo mới và giữ cố định. |
+| `walletId` | `UUID` | `private final` | Mã định danh tham chiếu cố định tới thực thể `Wallet` được kiểm kê, bắt buộc khác `null`. |
+| `previousBalance` | `Money` | `private final` | Số dư khả dụng của ví ngay trước thời điểm kiểm kê, lưu 2 chữ số thập phân và giữ cố định. |
+| `actualBalance` | `Money` | `private final` | Số dư thực tế quan sát được, lưu 2 chữ số thập phân và bắt buộc từ `0.00 VNĐ` trở lên. |
+| `difference` | `Money` | `private final` | Giá trị chênh lệch đại số tính bằng `actualBalance` trừ `previousBalance`, bắt buộc khác `0.00 VNĐ`. |
+| `adjustedAt` | `TransactionDate` | `private final` | Mốc ngày ghi nhận kiểm kê bất biến, không vượt quá ngày hiện tại. |
+| `reason` | `String` | `private final` | Chuỗi diễn giải lý do điều chỉnh số dư, tùy chọn, dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `BalanceAdjustmentRecord` | `UUID recordId, UUID walletId, Money previousBalance, Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `ValidationException`, `BusinessRuleException` | Kiểm tra `actualBalance` không âm (`BR-FIN-02`), cắt khoảng trắng và kiểm tra `reason` tối đa 255 ký tự (`FR-WAL-05`), tính `difference = actualBalance.subtract(previousBalance)` (`BR-FIN-01`) khác `0.00 VNĐ`; từ chối nếu sai định dạng số học (`ERR-FIN-001`), số dư thực tế âm hoặc chênh lệch bằng 0 (`ERR-WAL-001`). |
-| `isSurplus` | `Không` | `boolean` | `Không` | Trả về `true` khi `difference` lớn hơn `0.00 VNĐ`, xác định khoản điều chỉnh làm tăng dòng tiền vào của ví (`BR-FIN-02`). |
-| `getAbsoluteDifference` | `Không` | `Money` | `Không` | Trả về trị tuyệt đối của `difference` để đưa vào công thức tính tổng dòng tiền vào hoặc ra trên ví (`BR-FIN-02`). |
-| `getDifference` | `Không` | `Money` | `Không` | Trả về giá trị chênh lệch có dấu đại số để đối soát biến động tổng tài sản (`BR-FIN-01`). |
-| `getActualBalance` | `Không` | `Money` | `Không` | Trả về số dư thực tế sau kiểm kê để đồng bộ với số dư khả dụng của ví (`FR-WAL-05`). |
+| `BalanceAdjustmentRecord` | `UUID recordId, UUID walletId, Money previousBalance, Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `ValidationException`, `BusinessRuleException` | Kiểm tra `recordId`, `walletId`, `previousBalance`, `actualBalance`, `adjustedAt` khác `null`, `actualBalance` không âm, cắt khoảng trắng và kiểm tra `reason` tối đa 255 ký tự, tính `difference = actualBalance.subtract(previousBalance)` và yêu cầu giá trị chênh lệch khác `0.00 VNĐ`. |
+| `getRecordId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất của bản ghi kiểm kê để lưu trữ và tra cứu vết kiểm toán. |
+| `getWalletId` | `Không` | `UUID` | `Không` | Trả về mã định danh của ví được kiểm kê phục vụ lọc lịch sử điều chỉnh theo ví. |
+| `getAdjustedAt` | `Không` | `TransactionDate` | `Không` | Trả về mốc ngày ghi nhận kiểm kê phục vụ sắp xếp và tìm bản ghi điều chỉnh gần nhất của ví. |
+| `isSurplus` | `Không` | `boolean` | `Không` | Trả về `true` khi `difference` lớn hơn `0.00 VNĐ`, xác định khoản điều chỉnh làm tăng dòng tiền vào của ví. |
+| `getAbsoluteDifference` | `Không` | `Money` | `Không` | Trả về trị tuyệt đối của `difference` để đưa vào công thức tính tổng dòng tiền vào hoặc ra trên ví. |
+| `getDifference` | `Không` | `Money` | `Không` | Trả về giá trị chênh lệch có dấu đại số để đối soát biến động tổng tài sản. |
+| `getActualBalance` | `Không` | `Money` | `Không` | Trả về số dư thực tế sau kiểm kê để đồng bộ với số dư khả dụng của ví. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- Lớp `BalanceAdjustmentRecord` khai báo `private final` cho cả 7 thuộc tính và không mở bất kỳ phương thức sửa đổi hay xóa bỏ nào. Thiết kế chỉ thêm này giữ nguyên bản ghi kiểm kê sau khi tạo (`FR-WAL-05`) và bảo toàn vết kiểm toán (`BR-FIN-02`).
-- Hàm khởi tạo tự động tính `difference = actualBalance.subtract(previousBalance)` (`BR-FIN-01`), yêu cầu `actualBalance` không âm (`BR-FIN-02`) và `difference` khác `0.00 VNĐ` (`FR-WAL-05`). Thực thể từ chối khởi tạo nếu dữ liệu sai định dạng số học (`ERR-FIN-001`), số dư thực tế âm hoặc chênh lệch bằng không (`ERR-WAL-001`).
-- Khoản chênh lệch `difference` chỉ cộng hoặc trừ trực tiếp vào số dư khả dụng của `Wallet` liên kết. Do bản ghi này tách biệt với `IncomeExpenseTransaction`, các báo cáo thu nhập và chi tiêu định kỳ không bị biến dạng bởi nghiệp vụ kiểm kê (`BR-FIN-02`).
+- Lớp `BalanceAdjustmentRecord` khai báo `private final` cho cả 7 thuộc tính và không mở bất kỳ phương thức sửa đổi hay xóa bỏ nào, giữ nguyên bản ghi kiểm kê sau khi tạo để bảo toàn vết kiểm toán.
+- Hàm khởi tạo tự động tính `difference = actualBalance.subtract(previousBalance)`, đồng thời kiểm tra điều kiện `actualBalance` không âm và `difference` khác `0.00 VNĐ`.
+- Khoản chênh lệch `difference` chỉ cộng hoặc trừ trực tiếp vào số dư khả dụng của `Wallet` liên kết và tách biệt hoàn toàn với `IncomeExpenseTransaction`, giúp báo cáo thu nhập và chi tiêu định kỳ không bị biến dạng.
 
 ## 2.3 Thiết kế các Đối tượng Giá trị
 
@@ -362,7 +383,7 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 ### 2.3.1 Tiền tệ
 
-Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất biến với 2 chữ số thập phân và làm tròn nửa chẵn `RoundingMode.HALF_EVEN`, loại bỏ sai số dấu chấm động (`BR-FIN-01`). Đối tượng thực hiện các phép toán số học và kiểm tra biên giá trị cho số dư ví (`FR-WAL-01`), giao dịch thu chi (`FR-TXN-01`), chuyển tiền (`FR-TRF-01`) cùng kiểm kê đối soát (`FR-WAL-05`).
+Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất biến với 2 chữ số thập phân và làm tròn nửa chẵn `RoundingMode.HALF_EVEN`, loại bỏ sai số dấu chấm động. Đối tượng thực hiện các phép toán số học và kiểm tra biên giá trị cho số dư ví, giao dịch thu chi, chuyển tiền cùng kiểm kê đối soát.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`, `UC-TXN-01`, `UC-TRF-01`, `UC-WAL-04`
@@ -374,30 +395,32 @@ Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất 
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `ZERO` | `Money` | `public static final` | Hằng số tiền tệ mang giá trị `0.00 VNĐ` (`BR-FIN-01`), làm mốc số dư ban đầu của ví mới (`FR-WAL-01`) và mốc so sánh dấu đại số (`BR-FIN-02`). |
-| `amount` | `BigDecimal` | `private final` | Số thập phân chuẩn hóa cố định 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN`, cấm khởi tạo từ `float` hoặc `double` (`BR-FIN-01`); báo lỗi nếu truyền giá trị rỗng hoặc sai định dạng số học (`ERR-FIN-001`). |
-| `currency` | `String` | `private final` | Mã đơn vị tiền tệ bất biến, cố định là `"VNĐ"` trên toàn hệ thống để đồng nhất các phép tính tài chính (`BR-FIN-01`). |
+| `ZERO` | `Money` | `public static final` | Hằng số tiền tệ mang giá trị `0.00 VNĐ`, làm mốc số dư ban đầu của ví mới và mốc so sánh dấu đại số. |
+| `amount` | `BigDecimal` | `private final` | Số thập phân chuẩn hóa cố định 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN`, cấm khởi tạo từ `float` hoặc `double`. |
+| `currency` | `String` | `private final` | Mã đơn vị tiền tệ bất biến, cố định là `"VNĐ"` trên toàn hệ thống để đồng nhất các phép tính tài chính. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `of` | `String rawAmount` | `Money` | `ValidationException` | Phân tích chuỗi thập phân, chuẩn hóa 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN` và gán đơn vị `"VNĐ"` (`BR-FIN-01`); từ chối nếu chuỗi rỗng hoặc sai định dạng số học (`ERR-FIN-001`). |
-| `of` | `BigDecimal value` | `Money` | `ValidationException` | Kiểm tra `value` khác `null`, chuẩn hóa `setScale(2, RoundingMode.HALF_EVEN)` và trả về thể hiện `Money` mới (`BR-FIN-01`); báo lỗi nếu tham số đầu vào bị rỗng (`ERR-FIN-001`). |
-| `add` | `Money other` | `Money` | `ValidationException` | Cộng `this.amount` với `other.amount` và trả về thể hiện `Money` mới (`BR-FIN-01`), dùng khi ghi nhận khoản thu (`FR-TXN-01`) hoặc nhận chuyển tiền (`FR-TRF-01`); báo lỗi nếu tham số rỗng (`ERR-FIN-001`). |
-| `subtract` | `Money other` | `Money` | `ValidationException` | Trừ `other.amount` khỏi `this.amount` và trả về thể hiện `Money` mới (`BR-FIN-01`), dùng khi trừ số dư ví (`BR-FIN-02`) hoặc tính chênh lệch kiểm kê (`FR-WAL-05`); báo lỗi nếu tham số rỗng (`ERR-FIN-001`). |
-| `abs` | `Không` | `Money` | `Không` | Trả về thể hiện `Money` mới mang giá trị tuyệt đối không âm (`BR-FIN-01`), dùng để tách dòng tiền vào hoặc ra từ khoản chênh lệch kiểm kê (`BR-FIN-02`). |
-| `requireNonNegative` | `Không` | `Money` | `BusinessRuleException` | Kiểm tra `amount` từ `0.00 VNĐ` trở lên để giữ số dư ví và số dư kiểm kê không âm (`BR-FIN-02`); từ chối nếu giá trị nhỏ hơn không (`ERR-WAL-001`). |
-| `isPositive` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` lớn hơn `0.00` (`BR-FIN-01`), dùng để kiểm tra số tiền giao dịch thu chi (`FR-TXN-01`) và chuyển tiền (`FR-TRF-01`) phải dương. |
-| `isNegative` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` nhỏ hơn `0.00` (`BR-FIN-01`), dùng để phát hiện và chặn thao tác làm âm số dư ví (`BR-FIN-02`). |
-| `compareTo` | `Money other` | `int` | `ValidationException` | So sánh thứ tự đại số qua `this.amount.compareTo(other.amount)` (`BR-FIN-01`), trả về số âm, `0` hoặc số dương; báo lỗi nếu đối tượng đem so sánh bị rỗng (`ERR-FIN-001`). |
-| `formatDisplay` | `Không` | `String` | `Không` | Định dạng số tiền thành chuỗi số nguyên đồng (0 chữ số thập phân) có dấu phân cách hàng nghìn kèm đơn vị `"VNĐ"` để hiển thị trên dòng lệnh (`BR-FIN-01`). |
+| `of` | `String rawAmount` | `Money` | `ValidationException` | Phân tích chuỗi thập phân hợp lệ, chuẩn hóa 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN` và gán đơn vị `"VNĐ"`. |
+| `of` | `BigDecimal value` | `Money` | `ValidationException` | Kiểm tra `value` khác `null`, chuẩn hóa `setScale(2, RoundingMode.HALF_EVEN)` và trả về thể hiện `Money` mới. |
+| `add` | `Money other` | `Money` | `ValidationException` | Kiểm tra `other` khác `null`, cộng `this.amount` với `other.amount` và trả về thể hiện `Money` mới, dùng khi ghi nhận khoản thu hoặc nhận chuyển tiền. |
+| `subtract` | `Money other` | `Money` | `ValidationException` | Kiểm tra `other` khác `null`, trừ `other.amount` khỏi `this.amount` và trả về thể hiện `Money` mới, dùng khi trừ số dư ví hoặc tính chênh lệch kiểm kê. |
+| `abs` | `Không` | `Money` | `Không` | Trả về thể hiện `Money` mới mang giá trị tuyệt đối không âm, dùng để tách dòng tiền vào hoặc ra từ khoản chênh lệch kiểm kê. |
+| `requireNonNegative` | `Không` | `Money` | `BusinessRuleException` | Kiểm tra `amount` từ `0.00 VNĐ` trở lên để bảo đảm số dư ví và số dư kiểm kê không âm. |
+| `isPositive` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` lớn hơn `0.00`, dùng để kiểm tra số tiền giao dịch thu chi và chuyển tiền phải dương. |
+| `isNegative` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` nhỏ hơn `0.00`, dùng để phát hiện và chặn thao tác làm âm số dư ví. |
+| `isZero` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` bằng `0.00`, dùng để kiểm tra chênh lệch kiểm kê bằng không hoặc mẫu số bằng không khi tính tỷ lệ. |
+| `getAmount` | `Không` | `BigDecimal` | `Không` | Trả về giá trị `BigDecimal` bất biến chuẩn 2 chữ số thập phân để tính tỷ trọng báo cáo và tuần tự hóa lưu trữ JSON. |
+| `compareTo` | `Money other` | `int` | `ValidationException` | Kiểm tra `other` khác `null` và so sánh thứ tự đại số qua `this.amount.compareTo(other.amount)`, trả về số âm, `0` hoặc số dương. |
+| `formatDisplay` | `Không` | `String` | `Không` | Định dạng số tiền thành chuỗi số nguyên đồng (0 chữ số thập phân) có dấu phân cách hàng nghìn kèm đơn vị `"VNĐ"` để hiển thị trên dòng lệnh. |
 
 **Tính bất biến và cơ chế so sánh**
 
-- Lớp `Money` khai báo `public final`, khóa toàn bộ thuộc tính bằng `private final` và bỏ mọi phương thức sửa đổi trạng thái. Các phép toán `add`, `subtract` và `abs` luôn tạo và trả về một thể hiện `Money` mới độc lập để giữ nguyên giá trị gốc (`BR-FIN-01`).
-- Phương thức `equals` và `hashCode` so sánh trực tiếp trên cặp thuộc tính `amount` (đã chuẩn hóa `scale = 2` khi khởi tạo) và `currency`. Nhờ vậy, hai đối tượng `Money` có cùng giá trị đại số thực luôn bằng nhau và sinh cùng mã băm (`BR-FIN-01`).
-- Lớp cài đặt giao diện `Comparable<Money>` và hiện thực hóa `compareTo` bằng phép so sánh đại số của `BigDecimal`. Cơ chế này giúp các thực thể miền kiểm tra điều kiện đủ số dư ví (`BR-FIN-02`), chặn thao tác làm âm ví (`ERR-WAL-001`) và sắp xếp danh sách theo quy mô tiền tệ.
+- Lớp `Money` khai báo `public final`, khóa toàn bộ thuộc tính bằng `private final` và bỏ mọi phương thức sửa đổi trạng thái; các phép toán `add`, `subtract` và `abs` luôn trả về một thể hiện `Money` mới độc lập.
+- Phương thức `equals` và `hashCode` so sánh trực tiếp trên cặp thuộc tính `amount` (đã chuẩn hóa `scale = 2` khi khởi tạo) và `currency`, bảo đảm hai đối tượng `Money` có cùng giá trị đại số thực luôn bằng nhau và sinh cùng mã băm.
+- Lớp cài đặt giao diện `Comparable<Money>` và hiện thực hóa `compareTo` bằng phép so sánh đại số của `BigDecimal`, giúp các thực thể miền kiểm tra điều kiện đủ số dư ví và sắp xếp danh sách theo quy mô tiền tệ.
 
 ### 2.3.2 Ngày Giao dịch
 
@@ -435,7 +458,7 @@ Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất 
 - Ca sử dụng: `UC-TXN-01`, `UC-CAT-01`, `UC-CAT-03`
 - Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-CAT-01`
 - Quy tắc nghiệp vụ: `BR-FIN-04`
-- Mã lỗi: `ERR-CAT-003`
+- Mã lỗi: `ERR-CAT-001`
 
 **Cấu trúc thuộc tính**
 
