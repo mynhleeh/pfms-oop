@@ -58,9 +58,7 @@ classDiagram
     +getTimestamp() Instant
   }
 
-  class BusinessException {
-    <<abstract>>
-  }
+  class BusinessException
 
   class TechnicalException {
     <<abstract>>
@@ -69,7 +67,6 @@ classDiagram
   class InsufficientBalanceException
   class EntityNotFoundException
   class DuplicateEntityException
-  class BudgetLimitExceededException
 
   class StorageException
   class DataCorruptionException
@@ -81,7 +78,6 @@ classDiagram
   BusinessException <|-- InsufficientBalanceException
   BusinessException <|-- EntityNotFoundException
   BusinessException <|-- DuplicateEntityException
-  BusinessException <|-- BudgetLimitExceededException
 
   TechnicalException <|-- StorageException
   TechnicalException <|-- DataCorruptionException
@@ -89,7 +85,7 @@ classDiagram
 
 Đặc điểm kiến trúc của cây phân cấp:
 - Lớp cơ sở `PfmsException` đóng gói thuộc tính `errorCode` (mã định danh nghiệp vụ) và `timestamp` (thời điểm phát sinh lỗi UTC), bảo đảm mọi ngoại lệ khi được ném ra đều mang đầy đủ ngữ cảnh phục vụ việc hiển thị và kiểm toán.
-- Nhánh `BusinessException` chỉ phục vụ các vi phạm ràng buộc dữ liệu do người dùng thao tác, không mang theo tham chiếu `Throwable cause` kỹ thuật.
+- Lớp `BusinessException` là lớp ngoại lệ cụ thể (*concrete class*), đóng vai trò ngoại lệ nghiệp vụ chung (*General Business Exception*). Lớp này có thể được khởi tạo trực tiếp với `ErrorCode` (`new BusinessException(errorCode)`) cho các vi phạm nghiệp vụ tiêu chuẩn mà không đòi hỏi thuộc tính mở rộng, đồng thời làm lớp cha cho các ngoại lệ nghiệp vụ chuyên biệt mang trạng thái mở rộng (`InsufficientBalanceException`, `DuplicateEntityException`, `EntityNotFoundException`). Nhánh này không mang theo tham chiếu `Throwable cause` kỹ thuật.
 - Nhánh `TechnicalException` luôn bắt buộc tiếp nhận tham chiếu `Throwable cause` qua hàm khởi tạo để bảo lưu trọn vẹn vết ngăn xếp gốc của hệ thống máy ảo Java.
 
 ### 8.2.2 Danh mục các Lớp Ngoại lệ Nghiệp vụ Chi tiết
@@ -99,9 +95,8 @@ Bảng dưới đây đặc tả chi tiết toàn bộ các lớp ngoại lệ c
 | Tên lớp ngoại lệ | Lớp cha trực tiếp | Tham số hàm khởi tạo | Điều kiện kích hoạt nghiệp vụ |
 | :--- | :--- | :--- | :--- |
 | **`InsufficientBalanceException`** | `BusinessException` | `ErrorCode code, String walletId, Money balance, Money amount` | Ném ra khi người dùng thực hiện rút tiền hoặc chuyển khoản với số tiền lớn hơn số dư khả dụng hiện có của ví nguồn. |
-| **`EntityNotFoundException`** | `BusinessException` | `ErrorCode code, String entityType, String identifier` | Ném ra khi tra cứu một thực thể (Ví, Danh mục, Giao dịch, Ngân sách) theo mã định danh hoặc tên nhưng không tồn tại trong hệ thống. |
+| **`EntityNotFoundException`** | `BusinessException` | `ErrorCode code, String entityType, String identifier` | Ném ra khi tra cứu một thực thể (Ví, Danh mục, Giao dịch) theo mã định danh hoặc tên nhưng không tồn tại trong hệ thống. |
 | **`DuplicateEntityException`** | `BusinessException` | `ErrorCode code, String entityType, String name` | Ném ra khi tạo mới hoặc cập nhật Ví, Danh mục có tên bị trùng lặp với một bản ghi đang hoạt động khác. |
-| **`BudgetLimitExceededException`** | `BusinessException` | `ErrorCode code, String budgetId, Money limit, Money currentSpent` | Ném ra khi ghi nhận một khoản chi tiêu làm tổng số tiền chi vượt quá hạn mức ngân sách đã thiết lập trong kỳ. |
 | **`StorageException`** | `TechnicalException` | `ErrorCode code, String message, Throwable cause` | Ném ra tại Tầng Hạ tầng khi xảy ra lỗi I/O đọc ghi tệp cục bộ (`.csv` hoặc `.dat`), bọc trọn vẹn ngoại lệ gốc `java.io.IOException`. |
 | **`DataCorruptionException`** | `TechnicalException` | `ErrorCode code, String fileName, int line, Throwable cause` | Ném ra khi tệp lưu trữ bị hỏng cấu trúc dòng, thiếu trường dữ liệu hoặc sai lệch định dạng không thể phân tích cú pháp. |
 
@@ -157,4 +152,4 @@ Bảng dưới đây xác lập từ điển mã lỗi chuẩn hóa của hệ t
 | **`ERR_DAT_001`** | `DataCorruptionException` | Tệp sao lưu JSON sai cấu trúc schema hoặc vi phạm phân cấp 3 cấp. | Tệp sao lưu không hợp lệ hoặc cấu trúc dữ liệu JSON bị hỏng. |
 | **`ERR_DAT_002`** | `DataCorruptionException` | Tệp sao lưu JSON vi phạm liên kết chuyển tiền hoặc làm âm số dư ví. | Dữ liệu sao lưu vi phạm ràng buộc toàn vẹn số dư ví hoặc dòng tiền. |
 | **`ERR_SYS_001`** | `StorageException` | Lỗi I/O đọc ghi tệp cục bộ trên đĩa cứng hệ thống. | Lỗi hệ thống: Không thể truy xuất hoặc lưu trữ tệp dữ liệu cục bộ. |
-
+| **`ERR_NOT_FOUND`** | `EntityNotFoundException` | Tra cứu thực thể (Ví, Danh mục, Giao dịch) theo định danh nhưng không tồn tại trong hệ thống. | Không tìm thấy thực thể yêu cầu trong hệ thống. |
