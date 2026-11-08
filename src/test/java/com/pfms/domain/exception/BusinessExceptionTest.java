@@ -2,6 +2,8 @@ package com.pfms.domain.exception;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.time.Instant;
 
@@ -64,5 +66,25 @@ class BusinessExceptionTest {
 
         assertInstanceOf(PfmsException.class, ex);
         assertInstanceOf(RuntimeException.class, ex);
+    }
+
+    @ParameterizedTest(name = "Should instantiate BusinessException with {0}")
+    @EnumSource(value = ErrorCode.class, names = {
+            "ERR_FIN_001", "ERR_FIN_002",
+            "ERR_NAM_001",
+            "ERR_TRF_001", "ERR_TRF_002",
+            "ERR_FEE_001", "ERR_FEE_002", "ERR_FEE_003",
+            "ERR_CAT_001", "ERR_CAT_002", "ERR_CAT_003", "ERR_CAT_004", "ERR_CAT_005"
+    })
+    @DisplayName("Should correctly instantiate BusinessException for all 13 standard business ErrorCodes")
+    void testAllStandardBusinessErrorCodes(ErrorCode errorCode) {
+        BusinessException ex = new BusinessException(errorCode);
+
+        assertEquals(errorCode, ex.getErrorCode());
+        assertEquals(errorCode.getDefaultMessage(), ex.getMessage());
+        assertNotNull(ex.getTimestamp());
+        assertNull(ex.getCause());
+        assertFalse(errorCode.getCode().isBlank(), "Mã lỗi không được rỗng");
+        assertFalse(errorCode.getDefaultMessage().isBlank(), "Thông điệp mặc định không được rỗng");
     }
 }
