@@ -4,7 +4,8 @@ import java.time.Instant;
 import java.util.Objects;
 
 /**
- * Root abstract unchecked exception for all PFMS domain and technical failures.
+ * Lớp ngoại lệ trừu tượng gốc của hệ thống PFMS.
+ * Đóng gói mã lỗi và thời điểm phát sinh cho mọi sự cố nghiệp vụ hoặc kỹ thuật.
  */
 public abstract class PfmsException extends RuntimeException {
 

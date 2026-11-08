@@ -1,5 +1,5 @@
 /**
- * Application service layer: Public use case orchestration contracts.
+ * Các giao diện dịch vụ điều phối logic nghiệp vụ của hệ thống.
  */
 package com.pfms.service;
 

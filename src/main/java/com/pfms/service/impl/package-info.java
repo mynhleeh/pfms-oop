@@ -1,5 +1,5 @@
 /**
- * Application service layer: Internal package-private service implementations.
+ * Cài đặt chi tiết các dịch vụ điều phối nghiệp vụ.
  */
 package com.pfms.service.impl;
 

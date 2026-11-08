@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Unit Tests for TechnicalException")
 class TechnicalExceptionTest {
 
-    // Concrete dummy subclass for testing abstract TechnicalException
     private static class TestTechnicalException extends TechnicalException {
         TestTechnicalException(ErrorCode errorCode, Throwable cause) {
             super(errorCode, cause);

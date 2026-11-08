@@ -67,8 +67,7 @@ class MoneyTest {
         Money result = m.divide(3L);
         assertEquals(Money.of("33.33"), result);
 
-        // Half-Even rounding tests (round to nearest even)
-        Money m1 = Money.of("2.50").divide(2L); // 1.25 -> 1.25
+        Money m1 = Money.of("2.50").divide(2L);
         assertEquals(Money.of("1.25"), m1);
 
         assertThrows(ArithmeticException.class, () -> m.divide(0L));

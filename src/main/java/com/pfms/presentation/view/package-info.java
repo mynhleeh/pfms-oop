@@ -1,5 +1,5 @@
 /**
- * Presentation layer: Console views, table renders, and text formatting.
+ * Các thành phần hiển thị giao diện bảng biểu và biểu mẫu trên dòng lệnh.
  */
 package com.pfms.presentation.view;
 

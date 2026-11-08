@@ -1,5 +1,5 @@
 /**
- * Infrastructure layer: In-memory repository adapters for unit testing and decoupling.
+ * Cài đặt lưu trữ dữ liệu trong bộ nhớ phục vụ kiểm thử và vận hành tạm thời.
  */
 package com.pfms.infrastructure.memory;
 

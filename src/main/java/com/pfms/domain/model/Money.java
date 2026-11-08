@@ -8,17 +8,12 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Immutable Value Object encapsulating monetary values and financial
- * arithmetic.
- * Complies with business rules BR-FIN-01 (banker's rounding, exact arithmetic)
- * and BR-FIN-02 (non-negative balance validation).
+ * Đối tượng giá trị bất biến đại diện cho số tiền và xử lý các phép toán tài chính.
+ * Đảm bảo tính toán chính xác và áp dụng quy tắc làm tròn ngân hàng.
  */
 public final class Money implements Comparable<Money> {
 
-    // region Constants and state
-    private final BigDecimal amount;
-    private final String currency;
-
+    // region Constants
     public static final String DEFAULT_CURRENCY = "VNĐ";
     public static final int COMPUTATION_SCALE = 2;
     public static final RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_EVEN;
@@ -28,12 +23,19 @@ public final class Money implements Comparable<Money> {
             DEFAULT_CURRENCY);
     // endregion
 
-    // region Constructors and factories
+    // region State
+    private final BigDecimal amount;
+    private final String currency;
+    // endregion
+
+    // region Constructors
     private Money(BigDecimal amount, String currency) {
         this.amount = amount.setScale(COMPUTATION_SCALE, DEFAULT_ROUNDING);
         this.currency = currency;
     }
+    // endregion
 
+    // region Factories
     public static Money of(String rawAmount) {
         if (rawAmount == null || rawAmount.trim().isEmpty()) {
             throw new IllegalArgumentException("Số tiền không được rỗng");
@@ -59,17 +61,9 @@ public final class Money implements Comparable<Money> {
     public static Money zero() {
         return ZERO;
     }
-
-    public BigDecimal getAmount() {
-        return this.amount;
-    }
-
-    public String getCurrency() {
-        return this.currency;
-    }
     // endregion
 
-    // region Arithmetic operations
+    // region Arithmetic
     public Money add(Money other) {
         if (other == null) {
             throw new IllegalArgumentException("Số tiền cộng thêm không được null");
@@ -118,7 +112,7 @@ public final class Money implements Comparable<Money> {
     }
     // endregion
 
-    // region Invariants and comparisons
+    // region Comparisons
     public Money requireNonNegative() {
         if (this.isNegative()) {
             throw new IllegalStateException("Số dư hoặc số tiền không được âm: " + this.amount);
@@ -161,7 +155,17 @@ public final class Money implements Comparable<Money> {
     }
     // endregion
 
-    // region Formatting and identity
+    // region Getters
+    public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    public String getCurrency() {
+        return this.currency;
+    }
+    // endregion
+
+    // region Identity
     public String formatDisplay() {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("vi-VN"));
         symbols.setGroupingSeparator('.');

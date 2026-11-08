@@ -1,10 +1,7 @@
 package com.pfms.domain.exception;
 
 /**
- * Base exception representing business rule violations and domain constraint
- * failures.
- * Originates from user actions and domain logic; does not wrap a technical
- * Throwable cause.
+ * Ngoại lệ đại diện cho các vi phạm quy tắc nghiệp vụ phát sinh từ thao tác của người dùng.
  */
 public class BusinessException extends PfmsException {
 
