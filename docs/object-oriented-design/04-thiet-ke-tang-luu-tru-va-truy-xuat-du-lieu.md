@@ -54,7 +54,7 @@ Các giao diện lưu trữ chuyên biệt kế thừa từ `GenericRepository<E
 
 ### 4.2.1 Kho Lưu trữ Ví tiền
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của WalletRepository trong việc kế thừa GenericRepository<Wallet, UUID>, cung cấp các thao tác truy vấn phục vụ kiểm tra tính duy nhất của tên ví, lọc trạng thái và kiểm soát điều kiện lưu trữ ví cho WalletService)
+Giao diện `com.pfms.domain.repository.WalletRepository` kế thừa `GenericRepository<Wallet, UUID>`, cung cấp các phương thức truy vấn mở rộng phục vụ `WalletService` kiểm tra tính duy nhất của tên ví trên toàn hệ thống, lọc danh sách ví theo trạng thái hoạt động và đếm số lượng ví phục vụ thống kê cơ cấu phân bổ số dư.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`, `UC-WAL-02`, `UC-WAL-03`
@@ -68,17 +68,20 @@ Giao diện `com.pfms.domain.repository.WalletRepository` kế thừa `GenericRe
 
 | Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên phương thức truy vấn) | (Kiểu và tên tham số) | (Kiểu trả về: Optional<Wallet>, List<Wallet>, boolean, long) | (Quy tắc lọc dữ liệu và mục đích phục vụ WalletService) |
+| `findByName` | `String name` | `Optional<Wallet>` | Tìm kiếm ví theo tên chính xác (so khớp không phân biệt hoa thường sau khi cắt tỉa khoảng trắng hai đầu); trả về ví tìm thấy hoặc `Optional.empty()` nếu không có ví nào khớp tên; phục vụ `WalletService` kiểm tra trùng tên ví trên toàn hệ thống theo quy tắc đặt tên. |
+| `existsByName` | `String name` | `boolean` | Kiểm tra sự tồn tại của ví có tên khớp (không phân biệt hoa thường) trên toàn hệ thống bao gồm cả ví đang hoạt động và ví đã lưu trữ; trả về `true` nếu đã tồn tại; phục vụ từ chối tạo hoặc đổi tên khi tên bị trùng lặp theo quy tắc đặt tên. |
+| `findByStatus` | `WalletStatus status` | `List<Wallet>` | Lọc danh sách ví theo trạng thái vòng đời (`ACTIVE` hoặc `ARCHIVED`); trả về danh sách rỗng nếu không có ví nào ở trạng thái đó; phục vụ `WalletService` hiển thị danh sách ví theo bộ lọc trạng thái cho người dùng. |
+| `countByStatus` | `WalletStatus status` | `long` | Đếm số lượng ví đang ở trạng thái xác định (`ACTIVE` hoặc `ARCHIVED`); phục vụ `WalletService` tổng hợp cơ cấu phân bổ số dư và xác định điều kiện thống kê ví. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu các phương thức truy vấn mở rộng cần đặc tả gồm: tìm ví theo tên chính xác trả về Optional<Wallet>, kiểm tra tồn tại tên ví trả về boolean, lọc danh sách ví theo trạng thái trả về List<Wallet>, và đếm số lượng ví theo trạng thái trả về long)
-- (Nêu quy tắc kế thừa 5 phương thức CRUD cơ sở từ GenericRepository<Wallet, UUID>, tuyệt đối không khai báo lặp lại)
-- (Nêu nguyên tắc so khớp tên ví không phân biệt hoa thường theo BR-NAM-01 và kiểm soát điều kiện duy trì tối thiểu một ví hoạt động ACTIVE)
+- Các phương thức truy vấn mở rộng được đặc tả đầy đủ theo yêu cầu nghiệp vụ quản lý ví: `findByName(String)` tìm ví theo tên chính xác trả về `Optional<Wallet>` phục vụ kiểm tra trùng lặp trước khi tạo hoặc đổi tên ví; `existsByName(String)` kiểm tra nhanh sự tồn tại của tên ví trả về `boolean` trên toàn hệ thống bao gồm cả ví `ARCHIVED`; `findByStatus(WalletStatus)` lọc danh sách ví theo trạng thái trả về `List<Wallet>` phục vụ hiển thị có lọc; `countByStatus(WalletStatus)` đếm số lượng ví theo trạng thái trả về `long` phục vụ thống kê.
+- Kế thừa 5 phương thức CRUD cơ sở từ `GenericRepository<Wallet, UUID>` (`save`, `findById`, `findAll`, `existsById`, `deleteById`) mà không khai báo lặp lại. Thao tác xóa ví vĩnh viễn chỉ hợp lệ khi ví chưa từng phát sinh giao dịch; tầng nghiệp vụ kiểm soát điều kiện này trước khi gọi `deleteById`; ví tiền mặt mặc định được bảo vệ ở tầng dịch vụ, không thể xóa hay chuyển sang `ARCHIVED` để bảo đảm hệ thống luôn duy trì tối thiểu một ví hoạt động.
+- So khớp tên ví theo quy tắc đặt tên áp dụng cắt tỉa khoảng trắng hai đầu (`trim`) và so sánh không phân biệt hoa thường (`case-insensitive`); phạm vi kiểm tra trùng lặp bao gồm toàn bộ ví hiện có, không loại trừ ví `ARCHIVED`, nhằm bảo toàn tính duy nhất tuyệt đối của tên ví. Khi xóa ví vĩnh viễn thành công, tên ví được giải phóng khỏi phạm vi kiểm tra trùng lặp.
 
 ### 4.2.2 Kho Lưu trữ Giao dịch
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của TransactionRepository trong việc kế thừa GenericRepository<Transaction, UUID>, lưu trữ đa hình các biến động dòng tiền, cung cấp các phương thức lọc lịch sử theo thời gian, ví, danh mục và tổng hợp số liệu cho TransactionService, TransferService và ReportService)
+Giao diện `com.pfms.domain.repository.TransactionRepository` kế thừa `GenericRepository<Transaction, UUID>`, quản lý truy xuất và lưu trữ đa hình các biến động dòng tiền trong hệ thống (bao gồm giao dịch thu chi và chuyển tiền). Kho lưu trữ cung cấp các phương thức truy vấn dữ liệu theo thời gian, ví, danh mục và tổng hợp số liệu thu chi, phục vụ điều phối luồng nghiệp vụ giao dịch đồng thời cung cấp dữ liệu chỉ đọc chuyên biệt cho `ReportService` để lập báo cáo tài chính và phân tích cơ cấu chi tiêu.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TXN-01`, `UC-TXN-02`, `UC-TXN-03`, `UC-TXN-04`, `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`, `UC-REP-01`, `UC-REP-02`
@@ -92,17 +95,21 @@ Giao diện `com.pfms.domain.repository.TransactionRepository` kế thừa `Gene
 
 | Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên phương thức truy vấn) | (Kiểu và tên tham số) | (Kiểu trả về: List<Transaction>, Optional<Transaction>, BigDecimal) | (Quy tắc lọc dữ liệu theo thời gian, ví, danh mục và mục đích phục vụ dịch vụ) |
+| `findByDateRange` | `LocalDate startDate, LocalDate endDate` | `List<Transaction>` | Lọc danh sách giao dịch phát sinh trong khoảng thời gian từ `startDate` đến `endDate` (bao gồm cả hai ngày) ở chế độ chỉ đọc; phục vụ `ReportService` tổng hợp dòng tiền 12 tháng theo yêu cầu báo cáo tài chính. |
+| `findByDateRangeAndType` | `LocalDate startDate, LocalDate endDate, TransactionType type` | `List<Transaction>` | Lọc danh sách giao dịch theo khoảng ngày và loại luồng tiền (`INCOME` hoặc `EXPENSE`) ở chế độ chỉ đọc; phục vụ `ReportService` phân tích cơ cấu thu chi theo nhóm nhu cầu và danh mục chi tiết. |
+| `findByCategoryId` | `UUID categoryId` | `List<Transaction>` | Truy vấn danh sách giao dịch liên kết với danh mục chi tiết xác định ở chế độ chỉ đọc; phục vụ gom cụm số liệu cơ cấu chi tiêu theo danh mục cho báo cáo tài chính. |
+| `existsByCategoryId` | `UUID categoryId` | `boolean` | Kiểm tra sự tồn tại của giao dịch liên kết với danh mục chi tiết xác định; phục vụ `CategoryService` kiểm tra ràng buộc toàn vẹn tham chiếu để quyết định xóa cứng hay xóa mềm danh mục. |
+| `sumAmountByFilter` | `LocalDate startDate, LocalDate endDate, TransactionType type` | `BigDecimal` | Tính tổng số tiền phát sinh theo khoảng thời gian và loại thu chi ở chế độ chỉ đọc; phục vụ kết xuất nhanh tổng thu, tổng chi và tỷ lệ tiết kiệm cho báo cáo tài chính theo quy tắc tính toán độ chính xác tài chính. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu các phương thức truy vấn mở rộng cần đặc tả gồm: tìm giao dịch theo mã ví findByWalletId trả về List<Transaction>, lọc giao dịch theo khoảng ngày findByDateRange nhận ngày bắt đầu và kết thúc trả về List<Transaction>, lọc giao dịch theo danh mục chi tiêu findByCategoryId trả về List<Transaction>, và tính tổng dòng tiền phát sinh sumAmountByFilter phục vụ kết xuất báo cáo nhanh)
-- (Nêu quy tắc kế thừa 5 phương thức CRUD cơ sở từ GenericRepository<Transaction, UUID>, lưu trữ đa hình cả giao dịch thu chi IncomeExpenseTransaction và chuyển tiền TransferTransaction)
-- (Nêu cơ chế sắp xếp mặc định theo ngày giao dịch giảm dần và bảo toàn quan hệ hợp thành sinh tử với chi phí giao dịch TransactionFee)
+- Các phương thức truy vấn mở rộng phục vụ phân hệ Báo cáo (hoạt động ở chế độ chỉ đọc, không làm biến đổi trạng thái dữ liệu): lọc giao dịch theo khoảng ngày `findByDateRange(LocalDate, LocalDate)` trả về `List<Transaction>`, lọc giao dịch theo khoảng ngày và loại thu chi `findByDateRangeAndType(LocalDate, LocalDate, TransactionType)` trả về `List<Transaction>`, lọc giao dịch theo danh mục chi tiêu `findByCategoryId(UUID)` trả về `List<Transaction>`, và tính tổng dòng tiền phát sinh `sumAmountByFilter(LocalDate, LocalDate, TransactionType)` trả về `BigDecimal` phục vụ kết xuất nhanh báo cáo tài chính định kỳ và cơ cấu chi tiêu; phương thức `existsByCategoryId(UUID)` kiểm tra nhanh sự tồn tại của giao dịch liên kết với danh mục phục vụ kiểm tra toàn vẹn trước khi xóa danh mục; riêng phương thức tìm giao dịch theo mã ví `findByWalletId` phục vụ TXN/WAL được giữ nguyên theo phạm vi thiết kế giao dịch.
+- Kế thừa 5 phương thức CRUD cơ sở từ `GenericRepository<Transaction, UUID>` (`save`, `findById`, `findAll`, `existsById`, `deleteById`) mà không khai báo lặp lại. Kho lưu trữ duy trì lưu trữ đa hình cho cả hai loại giao dịch: `IncomeExpenseTransaction` (giao dịch thu chi gắn với một ví và một danh mục cấp 3) và `TransferTransaction` (giao dịch chuyển tiền nội bộ giữa hai ví); lớp cài đặt sử dụng trường phân biệt loại (`discriminator field`) khi tuần tự hóa và giải tuần tự hóa JSON để tái tạo đúng kiểu thực thể giao dịch khi nạp từ tệp theo cơ chế đa hình của Tầng Hạ tầng.
+- Thứ tự sắp xếp mặc định của `findAll()` và các phương thức truy vấn trả về danh sách là theo ngày giao dịch (`transactionDate`) giảm dần; khi các giao dịch có cùng ngày, thứ tự thứ cấp sắp xếp theo thời điểm ghi nhận (`createdAt`) giảm dần phục vụ hiển thị sổ giao dịch theo trình tự thời gian. Quan hệ hợp thành sinh tử với `TransactionFee` được bảo toàn tại tầng hạ tầng: khi ghi tệp, bản ghi phí được nhúng lồng nhau (`nested object`) bên trong bản ghi giao dịch gốc; khi xóa giao dịch gốc qua `deleteById`, bản ghi phí liên kết bị loại bỏ đồng thời, tuyệt đối không để lại phí mồ côi nhằm bảo toàn tính toàn vẹn dữ liệu chi phí.
 
 ### 4.2.3 Kho Lưu trữ Danh mục Thu Chi
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của CategoryRepository trong việc kế thừa GenericRepository<Category, UUID>, quản lý cấu trúc cây phân loại 3 cấp, kiểm tra trùng lặp tên danh mục trong nhóm và xử lý xóa mềm bảo toàn lịch sử giao dịch cho CategoryService)
+Giao diện `com.pfms.domain.repository.CategoryRepository` kế thừa `GenericRepository<Category, UUID>`, đóng vai trò quản lý truy xuất và lưu trữ thực thể danh mục phân loại chi tiết (cấp 3) trong cấu trúc cây danh mục 3 cấp. Kho lưu trữ cung cấp các phương thức truy vấn chuyên biệt phục vụ `CategoryService` kiểm tra tính duy nhất của tên danh mục trong nhóm nhu cầu cha, lọc trạng thái hoạt động và thực thi cơ chế xóa mềm nhằm bảo toàn tính toàn vẹn tham chiếu cho lịch sử giao dịch.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
@@ -116,13 +123,19 @@ Giao diện `com.pfms.domain.repository.CategoryRepository` kế thừa `Generic
 
 | Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên phương thức truy vấn) | (Kiểu và tên tham số) | (Kiểu trả về: List<Category>, Optional<Category>, boolean) | (Quy tắc lọc phân cấp cây danh mục và mục đích phục vụ CategoryService) |
+| `findByType` | `TransactionType type` | `List<Category>` | Truy vấn danh sách toàn bộ danh mục chi tiết trực thuộc các nhóm nhu cầu của một nhánh loại thu chi cố định (`INCOME` hoặc `EXPENSE`) theo quy tắc phân cấp danh mục ba cấp. |
+| `findByNeedGroupId` | `UUID needGroupId` | `List<Category>` | Truy vấn danh sách các danh mục con chi tiết (cấp 3) trực thuộc một nhóm nhu cầu cha (cấp 2) xác định bởi `needGroupId`, phục vụ xây dựng cây phân cấp và duyệt danh mục theo nhóm phục vụ hiển thị cây danh mục. |
+| `existsByNameAndNeedGroupId` | `String name, UUID needGroupId` | `boolean` | Kiểm tra sự tồn tại của danh mục có tên trùng khớp (sau khi cắt tỉa khoảng trắng ở hai đầu và so khớp không phân biệt hoa thường theo chuẩn đặt tên) trong cùng một nhóm nhu cầu cha đang hoạt động; trả về `true` nếu đã tồn tại nhằm ngăn ngừa lỗi trùng tên danh mục. |
+| `existsByNameAndNeedGroupIdAndIdNot` | `String name, UUID needGroupId, UUID categoryId` | `boolean` | Kiểm tra sự tồn tại của danh mục khác có tên trùng khớp trong cùng nhóm nhu cầu cha loại trừ chính danh mục đang cập nhật; phục vụ kiểm tra tính duy nhất khi đổi tên danh mục. |
+| `findByNameAndNeedGroupId` | `String name, UUID needGroupId` | `Optional<Category>` | Tìm kiếm danh mục theo tên trong cùng nhóm nhu cầu cha; phục vụ phát hiện danh mục đã xóa mềm để hỗ trợ người dùng khôi phục hoặc tạo mới theo luồng nghiệp vụ. |
+| `countActiveByNeedGroupId` | `UUID needGroupId` | `long` | Đếm số lượng danh mục con chi tiết đang ở trạng thái hoạt động (`ACTIVE`) trực thuộc nhóm nhu cầu cha xác định; phục vụ `CategoryService` kiểm tra ràng buộc duy trì tối thiểu mục hoạt động trước khi xóa. |
+| `findActiveCategories` | Không | `List<Category>` | Lọc toàn bộ danh sách danh mục đang ở trạng thái hoạt động (`ACTIVE`), loại trừ các danh mục đã bị xóa mềm (`DELETED`), phục vụ hiển thị danh mục hợp lệ khi ghi nhận giao dịch thu chi mới. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu các phương thức truy vấn mở rộng cần đặc tả gồm: lấy danh sách danh mục theo loại thu chi findByType nhận TransactionType trả về List<Category>, tìm danh mục con theo mã nhóm nhu cầu cha findByGroupId trả về List<Category>, kiểm tra trùng tên danh mục trong cùng nhóm cha existsByNameAndGroupId trả về boolean, và lọc danh mục đang hoạt động findActiveCategories loại trừ trạng thái đã xóa mềm)
-- (Nêu quy tắc kế thừa 5 phương thức CRUD cơ sở từ GenericRepository<Category, UUID>, bảo đảm thao tác xóa deleteById áp dụng cơ chế xóa mềm cập nhật trạng thái DELETED thay vì xóa vật lý)
-- (Nêu quy tắc kiểm soát tính toàn vẹn cây danh mục 3 cấp theo BR-FIN-04 và bảo vệ nhóm nhu cầu duy nhất còn lại không bị xóa theo ERR-CAT-002)
+- Các phương thức truy vấn mở rộng được đặc tả đầy đủ theo yêu cầu nghiệp vụ quản lý cây danh mục 3 cấp: `findByType` lọc danh mục theo nhánh loại thu chi cố định cấp 1 (`INCOME`/`EXPENSE`); `findByNeedGroupId` lấy danh sách danh mục con cấp 3 trực thuộc nhóm nhu cầu cha cấp 2; `existsByNameAndNeedGroupId` kiểm tra trùng tên danh mục trong cùng nhóm cha theo quy chuẩn đặt tên duy nhất; `existsByNameAndNeedGroupIdAndIdNot` kiểm tra trùng tên khi đổi tên danh mục loại trừ chính danh mục đang cập nhật; `findByNameAndNeedGroupId` tìm kiếm danh mục theo tên trong nhóm phục vụ luồng khôi phục danh mục đã xóa mềm; `countActiveByNeedGroupId` đếm số danh mục con hoạt động trong nhóm cha bảo đảm ràng buộc toàn vẹn; và `findActiveCategories` lọc danh sách danh mục đang hoạt động (`ACTIVE`), loại trừ các danh mục đã xóa mềm.
+- Kế thừa 5 phương thức CRUD cơ sở từ `GenericRepository<Category, UUID>` (`save`, `findById`, `findAll`, `existsById`, `deleteById`) mà không khai báo lặp lại. Trong đó, theo quy định nghiệp vụ bảo toàn tham chiếu, thao tác xóa danh mục được tầng nghiệp vụ phối hợp kho lưu trữ xử lý: tầng nghiệp vụ kiểm tra liên kết lịch sử giao dịch thông qua `TransactionRepository.existsByCategoryId(categoryId)`; nếu danh mục đã từng phát sinh giao dịch lịch sử, hệ thống áp dụng cơ chế xóa mềm bằng cách cập nhật thuộc tính trạng thái sang `DELETED` và lưu lại thông qua `save` nhằm bảo toàn vẹn toàn lịch sử giao dịch và số liệu báo cáo; chỉ khi danh mục chưa từng phát sinh giao dịch nào mới thực thi xóa vật lý khỏi kho lưu trữ qua `deleteById`.
+- Kiểm soát tính toàn vẹn cây danh mục 3 cấp: mỗi danh mục cấp 3 bắt buộc phải trực thuộc một nhóm nhu cầu cha cấp 2 hợp lệ đang hoạt động, nghiêm cấm tạo danh mục vào nhóm đã xóa hoặc tạo danh mục mồ côi. Khi chuyển nhóm cha, nhóm đích bắt buộc phải đang hoạt động và thuộc cùng nhánh loại thu chi. Đồng thời, tầng dịch vụ kiểm soát quy tắc bảo vệ nhóm nhu cầu duy nhất còn lại của một nhánh loại thu chi không được phép xóa, bảo đảm mỗi nhánh luôn duy trì tối thiểu một nhóm hoạt động.
 
 ### 4.2.4 Kho Lưu trữ Kiểm kê Số dư
 
@@ -156,7 +169,7 @@ Hai cơ chế này đóng kín toàn bộ chi tiết thao tác vào ra vật lý
 
 ### 4.3.1 Định dạng và Cấu trúc Bản ghi
 
-(Mô tả khoảng 1 đến 2 câu về quy cách tổ chức tệp JSON lưu trữ dữ liệu bền vững của hệ thống trên ổ đĩa cục bộ mà không phụ thuộc vào hệ quản trị cơ sở dữ liệu bên ngoài)
+Hệ thống tổ chức lưu trữ dữ liệu bền vững và tệp sao lưu trên ổ đĩa cục bộ dưới dạng tệp văn bản JSON mã hóa UTF-8, vận hành hoàn toàn độc lập mà không phụ thuộc vào hệ quản trị cơ sở dữ liệu bên ngoài. Cấu trúc tệp đóng gói trạng thái nhất quán của các nhóm thực thể nghiệp vụ, bảo toàn độ chính xác số học tài chính và phục vụ trực tiếp cho các quy trình lưu trữ, xuất dữ liệu sao lưu và phục hồi dữ liệu an toàn.
 
 Tệp dữ liệu lưu trữ theo định dạng JSON với bảng mã UTF-8. Các trường số tiền lưu dưới dạng chuỗi số học cố định 2 chữ số thập phân để bảo toàn độ chính xác, mốc thời gian lưu theo định dạng `yyyy-MM-dd` và mã định danh lưu dưới dạng chuỗi UUID.
 
@@ -166,17 +179,20 @@ Cấu trúc các trường dữ liệu JSON lưu trữ trạng thái của 4 nh�
 
 | Trường dữ liệu | Kiểu dữ liệu JSON | Bắt buộc | Ràng buộc và Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên trường thuộc tính JSON) | (string, number, boolean, array, object) | (Bắt buộc / Tùy chọn) | (Quy tắc định dạng, ràng buộc giá trị và thực thể nghiệp vụ tương ứng) |
+| `wallets` | `array` | Bắt buộc | Mảng danh sách các đối tượng ví tiền (`Wallet`); mỗi phần tử gồm `walletId` (chuỗi UUID), `name` (chuỗi từ 1 đến 50 ký tự theo quy chuẩn đặt tên), `balance` (chuỗi số học 2 chữ số thập phân, không âm theo quy tắc số dư ví), và `status` (`ACTIVE`/`ARCHIVED`). |
+| `categories` | `array` | Bắt buộc | Mảng danh sách các bản ghi danh mục (`Category`) và nhóm nhu cầu (`NeedGroup`) theo cấu trúc phân cấp 3 cấp; mỗi phần tử gồm `categoryId`/`needGroupId` (chuỗi UUID), `name` (chuỗi theo quy chuẩn đặt tên), `needGroupId` (chuỗi UUID nhóm cha), `transactionType` (`INCOME`/`EXPENSE`), `status` (`ACTIVE`/`DELETED`), cùng các trường tùy chọn `icon`, `color`. |
+| `transactions` | `array` | Bắt buộc | Mảng danh sách các bản ghi giao dịch (`Transaction`); mỗi phần tử gồm `transactionId` (chuỗi UUID), loại giao dịch đa hình (thu chi hoặc chuyển tiền); đối với giao dịch thu chi gồm `walletId` (chuỗi UUID tham chiếu ví), `categoryId` (chuỗi UUID danh mục cấp 3); đối với giao dịch chuyển tiền gồm `sourceWalletId` và `targetWalletId` (chuỗi UUID hai ví liên kết); cùng `amount` (chuỗi số học 2 chữ số thập phân), `transactionDate` (định dạng chuỗi `yyyy-MM-dd`), `note` (chuỗi ghi chú), và đối tượng lồng nhau `fee` (`TransactionFee` nếu có phát sinh chi phí). |
+| `adjustments` | `array` | Bắt buộc | Mảng danh sách các bản ghi kiểm kê điều chỉnh số dư (`BalanceAdjustmentRecord`); mỗi phần tử gồm `adjustmentId` (chuỗi UUID), `walletId` (chuỗi UUID), `actualBalance` (chuỗi số học 2 chữ số thập phân không âm), `recordedBalance` (chuỗi số học), `difference` (chuỗi số học) và `adjustmentDate` (chuỗi `yyyy-MM-dd`). |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu cấu trúc 4 mảng đối tượng chính trong tệp dữ liệu gồm: mảng ví wallets, mảng giao dịch transactions, mảng danh mục categories, và mảng kiểm kê adjustments)
-- (Nêu chi tiết quy cách lưu trữ các trường định danh duy nhất dưới dạng chuỗi UUID và số tiền dưới dạng chuỗi hai chữ số thập phân)
-- (Nêu cơ chế biểu diễn đối tượng lồng nhau đối với chi phí giao dịch TransactionFee bên trong giao dịch gốc và quan hệ liên kết phân cấp ba cấp của danh mục)
+- Cấu trúc 4 mảng đối tượng chính trong tệp dữ liệu lưu trữ bền vững và sao lưu bao gồm: `wallets` (danh sách ví tiền), `categories` (danh mục phân loại và nhóm nhu cầu 3 cấp), `transactions` (toàn bộ giao dịch thu chi và chuyển tiền), và `adjustments` (các bản ghi kiểm kê điều chỉnh số dư). Khi xuất dữ liệu sao lưu toàn bộ hệ thống (`FULL`), tệp JSON đóng gói đầy đủ cả 4 mảng thực thể cùng các liên kết lịch sử; khi xuất phạm vi sổ giao dịch (`TRANSACTIONS`), tệp tập trung vào mảng giao dịch và các chi phí liên kết đang tồn tại.
+- Quy cách lưu trữ các trường dữ liệu tuân thủ nghiêm ngặt quy chuẩn của SRS và OOA: mọi trường định danh duy nhất (`walletId`, `categoryId`, `transactionId`, `adjustmentId`) đều lưu dưới dạng chuỗi chuẩn UUID bất biến; toàn bộ các trường số tiền (`balance`, `amount`, `feeAmount`, `actualBalance`) bắt buộc phải lưu dưới dạng chuỗi số học cố định 2 chữ số thập phân theo quy tắc độ chính xác tài chính hai chữ số thập phân, tuyệt đối không dùng số thực dấu chấm động nhị phân (`number`/`float`/`double`) nhằm tránh sai số làm tròn khi tuần tự hóa và phục hồi. Các mốc thời gian lưu dưới dạng chuỗi chuẩn `yyyy-MM-dd`.
+- Cơ chế biểu diễn đối tượng lồng nhau và phân cấp: chi phí giao dịch `TransactionFee` được biểu diễn như một đối tượng lồng nhau (`nested object`) bên trong bản ghi giao dịch chủ, phản ánh đúng quan hệ hợp thành sinh tử và bảo đảm tính đồng bộ khi sao lưu và phục hồi dữ liệu giao dịch. Cấu trúc danh mục duy trì quan hệ phân cấp 3 cấp qua tham chiếu `needGroupId` trỏ tới nhóm nhu cầu cha và xác định nhánh loại thu chi (`INCOME`/`EXPENSE`), phục vụ việc thẩm định toàn vẹn tham chiếu tại Bước 2 của quy trình phục hồi dữ liệu.
 
 ### 4.3.2 Cơ chế Đọc Ghi và An toàn Dữ liệu
 
-(Mô tả khoảng 1 đến 2 câu về cơ chế ghi tệp an toàn sử dụng kỹ thuật tệp tạm nhằm chống hỏng cấu trúc dữ liệu khi ứng dụng dừng đột ngột và quy trình tự động khởi tạo tệp khi chạy lần đầu)
+Hệ thống áp dụng cơ chế đọc ghi tệp an toàn qua luồng đệm UTF-8 và tệp trung gian tạm thời nhằm ngăn ngừa triệt để nguy cơ hỏng dữ liệu khi ứng dụng gặp sự cố dừng đột ngột trong quá trình lưu trữ hoặc xuất sao lưu. Đồng thời, cơ chế khởi tạo tự động thiết lập sẵn thư mục lưu trữ và cấu trúc dữ liệu ban đầu hợp lệ ngay trong lần khởi chạy đầu tiên theo quy định khởi tạo danh mục mẫu, kết hợp cơ chế tự động tạo bản sao lưu an toàn trước khi phục hồi dữ liệu hệ thống.
 
 **Quy trình ghi tệp nguyên tử**
 
@@ -184,13 +200,17 @@ Cấu trúc các trường dữ liệu JSON lưu trữ trạng thái của 4 nh�
 
 | Bước | Thao tác kỹ thuật | Mục đích và Cơ chế bảo vệ |
 | :--- | :--- | :--- |
-| (Thứ tự bước) | (Hành động xử lý luồng tệp) | (Quy tắc bảo đảm an toàn dữ liệu và xử lý lỗi) |
+| 1 | Ghi toàn bộ dữ liệu ra tệp tạm thời (`.tmp`) | Tuần tự hóa toàn bộ trạng thái dữ liệu hiện tại ra một tệp tạm thời mới (ví dụ `data.json.tmp`) sử dụng bộ đệm ghi với bảng mã UTF-8 không BOM; bảo đảm nếu quá trình ghi bị ngắt quãng giữa chừng thì tệp chính vẫn giữ nguyên vẹn 100%. |
+| 2 | Ép xả dữ liệu xuống đĩa vật lý (`flush` / `sync`) | Thực hiện ép xả luồng ghi dữ liệu từ bộ đệm của hệ điều hành xuống đĩa vật lý (`FileChannel.force` hoặc `flush`), bảo đảm toàn bộ nội dung của tệp tạm thời đã được lưu bền vững trên đĩa cứng trước khi thay thế tệp chính. |
+| 3 | Hoán đổi nguyên tử đè lên tệp chính (`atomic move` / `replace`) | Sử dụng thao tác di chuyển hoặc đổi tên tệp nguyên tử (như `Files.move` với tùy chọn `ATOMIC_MOVE` và `REPLACE_EXISTING`) để tráo đổi tệp tạm thời đè lên tệp dữ liệu chính; bảo đảm tệp dữ liệu luôn ở trạng thái hoàn chỉnh, không bao giờ bị rơi vào trạng thái dở dang. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu chi tiết quy trình ghi tệp an toàn qua 3 bước: ghi toàn bộ dữ liệu ra tệp tạm thời có phần mở rộng tmp, ép xả dữ liệu xuống đĩa vật lý, và thực hiện hoán đổi nguyên tử đè lên tệp chính)
-- (Nêu cơ chế kiểm tra và tự động khởi tạo thư mục dữ liệu cùng tệp dữ liệu ban đầu chứa cấu trúc mảng hợp lệ khi hệ thống khởi chạy lần đầu tiên)
-- (Nêu quy tắc xử lý khi xảy ra lỗi vào ra: hủy bỏ tệp tạm thời, giữ nguyên trạng thái vẹn toàn của tệp chính và ném ngoại lệ lưu trữ lên tầng trên)
+- Quy trình ghi tệp an toàn được thực hiện qua 3 bước chặt chẽ: đầu tiên, toàn bộ nội dung dữ liệu JSON được tuần tự hóa và ghi vào một tệp tạm thời có phần mở rộng `.tmp`; tiếp theo, hệ thống thực hiện ép xả (`flush` và đồng bộ đĩa) để bảo đảm toàn bộ dòng byte đã được ghi bền vững xuống thiết bị lưu trữ vật lý; cuối cùng, thực hiện hoán đổi nguyên tử (`atomic move/rename`) để thay thế tệp dữ liệu chính bằng tệp tạm thời, loại bỏ rủi ro tệp chính bị hỏng do mất điện hoặc tiến trình bị hủy đột ngột trong khi ghi.
+- Quy trình đọc tệp và kiểm soát an toàn dữ liệu: lớp điều hợp lưu trữ thực hiện đọc dữ liệu thông qua luồng đệm (`BufferedReader`) với bảng mã UTF-8 không BOM, giải tuần tự hóa các mảng JSON thành các tập thực thể miền tương ứng; kiểm tra quyền đọc (`READ permission`) trước khi thao tác. Nếu tệp không tồn tại hoặc phát sinh lỗi đọc vật lý, hệ thống đóng gói lỗi thành `StorageException`; nếu cấu trúc JSON bị hỏng, sai cú pháp hoặc thiếu các trường bắt buộc, hệ thống ném `DataCorruptionException` để kích hoạt cơ chế xử lý lỗi tầng trên.
+- Cơ chế bảo vệ và an toàn dữ liệu khi phục hồi (`restoreBackupData`): tuân thủ nghiêm ngặt quy định tại `CON-06`, trước khi nạp đè dữ liệu từ bản sao lưu bên ngoài, hệ thống tự động tạo một bản sao lưu dự phòng hiện thời có nhãn thời gian theo định dạng `backup_YYYYMMDD_HHMMSS.json` lưu trong thư mục `backups/`. Quá trình nạp phục hồi áp dụng cơ chế Tất cả hoặc Không (All-or-Nothing): toàn bộ dữ liệu hệ thống chỉ được thay thế khi và chỉ khi tệp sao lưu vượt qua đầy đủ 4 bước kiểm định toàn vẹn nghiêm ngặt (định dạng số liệu tài chính, cấu trúc phân cấp danh mục 3 cấp, tính toàn vẹn giao dịch/chuyển tiền/phí, và bảo toàn số dư ví không âm); nếu xuất hiện bất kỳ sai phạm nào, toàn bộ quá trình lập tức bị hủy bỏ, bảo toàn 100% dữ liệu đang vận hành.
+- Cơ chế kiểm tra và tự động khởi tạo dữ liệu ban đầu: khi hệ thống khởi chạy lần đầu tiên, lớp điều hợp lưu trữ kiểm tra sự tồn tại của thư mục lưu trữ và tệp dữ liệu cục bộ; nếu chưa tồn tại, hệ thống tự động tạo mới cây thư mục và khởi tạo tệp JSON rỗng với đầy đủ cấu trúc 4 mảng hợp lệ (`wallets`, `categories`, `transactions`, `adjustments`), đồng thời nạp cấu trúc danh mục mẫu ban đầu theo quy tắc phân cấp cây danh mục một lần duy nhất mà không lặp lại ở các lần khởi động kế tiếp.
+- Quy tắc xử lý khi phát sinh sự cố vào ra (I/O error): nếu quá trình ghi vào tệp tạm thời gặp lỗi quyền truy cập, đầy đĩa hoặc ngắt kết nối, hệ thống lập tức hủy bỏ và xóa tệp tạm thời (`.tmp`), giữ nguyên trạng thái vẹn toàn không bị thay đổi của tệp dữ liệu chính; toàn bộ ngoại lệ kỹ thuật cấp thấp (`IOException`) được bao bọc thành `StorageException` và chuyển tiếp lên tầng trên để Tầng Trình diễn thông báo lỗi rõ ràng cho người dùng mà không làm hỏng dữ liệu hệ thống.
 
 ### 4.3.3 Cài đặt Lưu trữ Trong Bộ Nhớ
 
@@ -202,13 +222,17 @@ Cấu trúc các lớp cài đặt kho lưu trữ hoạt động trên bộ nh�
 
 | Lớp cài đặt | Giao diện hiện thực | Cấu trúc dữ liệu nội bộ | Trách nhiệm chính |
 | :--- | :--- | :--- | :--- |
-| (Tên lớp cài đặt bộ nhớ) | (Tên giao diện kho lưu trữ) | (Cấu trúc bảng băm hoặc danh sách trong RAM) | (Thao tác lưu trữ tạm thời và phương thức dọn sạch dữ liệu) |
+| `MemoryGenericRepository<E, ID>` | `GenericRepository<E, ID>` | `ConcurrentHashMap<ID, E>` | Lớp cơ sở trừu tượng cung cấp các thao tác dữ liệu chuẩn (`save`, `findById`, `findAll`, `existsById`, `deleteById`) và phương thức `clear()` giải phóng toàn bộ dữ liệu trong bộ nhớ sau mỗi ca kiểm thử. |
+| `MemoryWalletRepository` | `WalletRepository` | `ConcurrentHashMap<UUID, Wallet>` | Kế thừa `MemoryGenericRepository<Wallet, UUID>`; hiện thực các thao tác truy vấn ví trên RAM (`findByName`, `existsByName`, `findByStatus`, `countByStatus`) phục vụ kiểm thử đơn vị luồng nghiệp vụ ví. |
+| `MemoryTransactionRepository` | `TransactionRepository` | `ConcurrentHashMap<UUID, Transaction>` | Kế thừa `MemoryGenericRepository<Transaction, UUID>`; lưu trữ đa hình các loại giao dịch và hiện thực truy vấn lọc (`findByDateRange`, `findByDateRangeAndType`, `findByCategoryId`, `existsByCategoryId`, `sumAmountByFilter`, `findByWalletId`). |
+| `MemoryCategoryRepository` | `CategoryRepository` | `ConcurrentHashMap<UUID, Category>` | Kế thừa `MemoryGenericRepository<Category, UUID>`; hiện thực các thao tác truy vấn phân cấp cây danh mục 3 cấp và kiểm tra trùng tên (`findByType`, `findByNeedGroupId`, `existsByNameAndNeedGroupId`, `findActiveCategories`). |
+| `MemoryBalanceAdjustmentRepository` | `BalanceAdjustmentRepository` | `ConcurrentHashMap<UUID, BalanceAdjustmentRecord>` | Kế thừa `MemoryGenericRepository<BalanceAdjustmentRecord, UUID>`; lưu trữ các bản ghi kiểm kê số dư ví theo cơ chế chỉ thêm (Append-only) và hiện thực truy vấn đối soát (`findByWalletId`, `findLatestByWalletId`). |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu việc sử dụng bảng băm ConcurrentHashMap để quản lý các thực thể theo khóa chính UUID trong bộ nhớ máy ảo)
-- (Nêu phương thức dọn sạch dữ liệu clear để thiết lập lại trạng thái ban đầu sau mỗi ca kiểm thử đơn vị)
-- (Nêu tính chất không bền vững: dữ liệu giải phóng hoàn toàn khi kết thúc tiến trình chạy kiểm thử mà không để lại tệp rác)
+- Sử dụng cấu trúc bảng băm an toàn luồng `ConcurrentHashMap<ID, E>` làm vùng chứa dữ liệu thực thể trên bộ nhớ RAM, đánh chỉ mục trực tiếp theo khóa chính `UUID`. Cấu trúc này bảo đảm tính toàn vẹn dữ liệu trong các kịch bản kiểm thử đồng thời (concurrent tests) mà không phát sinh xung đột khóa, cho phép thực thi các thao tác đọc ghi và tìm kiếm với độ phức tạp thời gian trung bình $O(1)$.
+- Cung cấp phương thức dọn sạch dữ liệu `clear()` trong lớp cơ sở `MemoryGenericRepository` (thực thi `storage.clear()`) để làm rỗng bảng băm lưu trữ. Phương thức này được tích hợp vào các bước chuẩn bị (`@BeforeEach`) hoặc dọn dẹp (`@AfterEach`) của vòng đời kiểm thử tự động (JUnit), bảo đảm thiết lập lại trạng thái ban đầu sạch sẽ và loại bỏ hoàn toàn sự phụ thuộc chéo giữa các ca kiểm thử.
+- Toàn bộ dữ liệu trong các kho lưu trữ bộ nhớ chỉ tồn tại tạm thời trên bộ nhớ heap của máy ảo JVM và mang tính chất không bền vững (non-persistent). Toàn bộ dữ liệu được tự động giải phóng hoàn toàn ngay khi tiến trình kiểm thử kết thúc, bảo đảm không tạo ra bất kỳ tệp dữ liệu rác nào trên hệ thống tệp và không gây ảnh hưởng đến dữ liệu vận hành thực tế của người dùng.
 
 ### 4.3.4 So sánh Đánh đổi Giữa Hai Cơ chế Lưu trữ
 
