@@ -54,7 +54,7 @@ Các giao diện lưu trữ chuyên biệt kế thừa từ `GenericRepository<E
 
 ### 4.2.1 Kho Lưu trữ Ví tiền
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của WalletRepository trong việc kế thừa GenericRepository<Wallet, UUID>, cung cấp các thao tác truy vấn phục vụ kiểm tra tính duy nhất của tên ví, lọc trạng thái và kiểm soát điều kiện lưu trữ ví cho WalletService)
+Giao diện `com.pfms.domain.repository.WalletRepository` kế thừa `GenericRepository<Wallet, UUID>`, cung cấp các phương thức truy vấn mở rộng phục vụ `WalletService` kiểm tra tính duy nhất của tên ví trên toàn hệ thống, lọc danh sách ví theo trạng thái hoạt động và đếm số lượng ví phục vụ thống kê cơ cấu phân bổ số dư.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`, `UC-WAL-02`, `UC-WAL-03`
@@ -68,13 +68,16 @@ Giao diện `com.pfms.domain.repository.WalletRepository` kế thừa `GenericRe
 
 | Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên phương thức truy vấn) | (Kiểu và tên tham số) | (Kiểu trả về: Optional<Wallet>, List<Wallet>, boolean, long) | (Quy tắc lọc dữ liệu và mục đích phục vụ WalletService) |
+| `findByName` | `String name` | `Optional<Wallet>` | Tìm kiếm ví theo tên chính xác (so khớp không phân biệt hoa thường sau khi cắt tỉa khoảng trắng hai đầu); trả về ví tìm thấy hoặc `Optional.empty()` nếu không có ví nào khớp tên; phục vụ `WalletService` kiểm tra trùng tên ví trên toàn hệ thống theo quy tắc đặt tên. |
+| `existsByName` | `String name` | `boolean` | Kiểm tra sự tồn tại của ví có tên khớp (không phân biệt hoa thường) trên toàn hệ thống bao gồm cả ví đang hoạt động và ví đã lưu trữ; trả về `true` nếu đã tồn tại; phục vụ từ chối tạo hoặc đổi tên khi tên bị trùng lặp theo quy tắc đặt tên. |
+| `findByStatus` | `WalletStatus status` | `List<Wallet>` | Lọc danh sách ví theo trạng thái vòng đời (`ACTIVE` hoặc `ARCHIVED`); trả về danh sách rỗng nếu không có ví nào ở trạng thái đó; phục vụ `WalletService` hiển thị danh sách ví theo bộ lọc trạng thái cho người dùng. |
+| `countByStatus` | `WalletStatus status` | `long` | Đếm số lượng ví đang ở trạng thái xác định (`ACTIVE` hoặc `ARCHIVED`); phục vụ `WalletService` tổng hợp cơ cấu phân bổ số dư và xác định điều kiện thống kê ví. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu các phương thức truy vấn mở rộng cần đặc tả gồm: tìm ví theo tên chính xác trả về Optional<Wallet>, kiểm tra tồn tại tên ví trả về boolean, lọc danh sách ví theo trạng thái trả về List<Wallet>, và đếm số lượng ví theo trạng thái trả về long)
-- (Nêu quy tắc kế thừa 5 phương thức CRUD cơ sở từ GenericRepository<Wallet, UUID>, tuyệt đối không khai báo lặp lại)
-- (Nêu nguyên tắc so khớp tên ví không phân biệt hoa thường theo BR-NAM-01 và kiểm soát điều kiện duy trì tối thiểu một ví hoạt động ACTIVE)
+- Các phương thức truy vấn mở rộng được đặc tả đầy đủ theo yêu cầu nghiệp vụ quản lý ví: `findByName(String)` tìm ví theo tên chính xác trả về `Optional<Wallet>` phục vụ kiểm tra trùng lặp trước khi tạo hoặc đổi tên ví; `existsByName(String)` kiểm tra nhanh sự tồn tại của tên ví trả về `boolean` trên toàn hệ thống bao gồm cả ví `ARCHIVED`; `findByStatus(WalletStatus)` lọc danh sách ví theo trạng thái trả về `List<Wallet>` phục vụ hiển thị có lọc; `countByStatus(WalletStatus)` đếm số lượng ví theo trạng thái trả về `long` phục vụ thống kê.
+- Kế thừa 5 phương thức CRUD cơ sở từ `GenericRepository<Wallet, UUID>` (`save`, `findById`, `findAll`, `existsById`, `deleteById`) mà không khai báo lặp lại. Thao tác xóa ví vĩnh viễn chỉ hợp lệ khi ví chưa từng phát sinh giao dịch; tầng nghiệp vụ kiểm soát điều kiện này trước khi gọi `deleteById`; ví tiền mặt mặc định được bảo vệ ở tầng dịch vụ, không thể xóa hay chuyển sang `ARCHIVED` để bảo đảm hệ thống luôn duy trì tối thiểu một ví hoạt động.
+- So khớp tên ví theo quy tắc đặt tên áp dụng cắt tỉa khoảng trắng hai đầu (`trim`) và so sánh không phân biệt hoa thường (`case-insensitive`); phạm vi kiểm tra trùng lặp bao gồm toàn bộ ví hiện có, không loại trừ ví `ARCHIVED`, nhằm bảo toàn tính duy nhất tuyệt đối của tên ví. Khi xóa ví vĩnh viễn thành công, tên ví được giải phóng khỏi phạm vi kiểm tra trùng lặp.
 
 ### 4.2.2 Kho Lưu trữ Giao dịch
 
@@ -95,13 +98,14 @@ Giao diện `com.pfms.domain.repository.TransactionRepository` kế thừa `Gene
 | `findByDateRange` | `LocalDate startDate, LocalDate endDate` | `List<Transaction>` | Lọc danh sách giao dịch phát sinh trong khoảng thời gian từ `startDate` đến `endDate` (bao gồm cả hai ngày) ở chế độ chỉ đọc; phục vụ `ReportService` tổng hợp dòng tiền 12 tháng theo yêu cầu báo cáo tài chính. |
 | `findByDateRangeAndType` | `LocalDate startDate, LocalDate endDate, TransactionType type` | `List<Transaction>` | Lọc danh sách giao dịch theo khoảng ngày và loại luồng tiền (`INCOME` hoặc `EXPENSE`) ở chế độ chỉ đọc; phục vụ `ReportService` phân tích cơ cấu thu chi theo nhóm nhu cầu và danh mục chi tiết. |
 | `findByCategoryId` | `UUID categoryId` | `List<Transaction>` | Truy vấn danh sách giao dịch liên kết với danh mục chi tiết xác định ở chế độ chỉ đọc; phục vụ gom cụm số liệu cơ cấu chi tiêu theo danh mục cho báo cáo tài chính. |
+| `existsByCategoryId` | `UUID categoryId` | `boolean` | Kiểm tra sự tồn tại của giao dịch liên kết với danh mục chi tiết xác định; phục vụ `CategoryService` kiểm tra ràng buộc toàn vẹn tham chiếu để quyết định xóa cứng hay xóa mềm danh mục. |
 | `sumAmountByFilter` | `LocalDate startDate, LocalDate endDate, TransactionType type` | `BigDecimal` | Tính tổng số tiền phát sinh theo khoảng thời gian và loại thu chi ở chế độ chỉ đọc; phục vụ kết xuất nhanh tổng thu, tổng chi và tỷ lệ tiết kiệm cho báo cáo tài chính theo quy tắc tính toán độ chính xác tài chính. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- Các phương thức truy vấn mở rộng phục vụ phân hệ Báo cáo (hoạt động ở chế độ chỉ đọc, không làm biến đổi trạng thái dữ liệu): lọc giao dịch theo khoảng ngày `findByDateRange(LocalDate, LocalDate)` trả về `List<Transaction>`, lọc giao dịch theo khoảng ngày và loại thu chi `findByDateRangeAndType(LocalDate, LocalDate, TransactionType)` trả về `List<Transaction>`, lọc giao dịch theo danh mục chi tiêu `findByCategoryId(UUID)` trả về `List<Transaction>`, và tính tổng dòng tiền phát sinh `sumAmountByFilter(LocalDate, LocalDate, TransactionType)` trả về `BigDecimal` phục vụ kết xuất nhanh báo cáo tài chính định kỳ và cơ cấu chi tiêu; riêng phương thức tìm giao dịch theo mã ví `findByWalletId` phục vụ TXN/WAL được giữ nguyên theo phạm vi thiết kế giao dịch.
-- (Nêu quy tắc kế thừa 5 phương thức CRUD cơ sở từ GenericRepository<Transaction, UUID>, lưu trữ đa hình cả giao dịch thu chi IncomeExpenseTransaction và chuyển tiền TransferTransaction)
-- (Nêu cơ chế sắp xếp mặc định theo ngày giao dịch giảm dần và bảo toàn quan hệ hợp thành sinh tử với chi phí giao dịch TransactionFee)
+- Các phương thức truy vấn mở rộng phục vụ phân hệ Báo cáo (hoạt động ở chế độ chỉ đọc, không làm biến đổi trạng thái dữ liệu): lọc giao dịch theo khoảng ngày `findByDateRange(LocalDate, LocalDate)` trả về `List<Transaction>`, lọc giao dịch theo khoảng ngày và loại thu chi `findByDateRangeAndType(LocalDate, LocalDate, TransactionType)` trả về `List<Transaction>`, lọc giao dịch theo danh mục chi tiêu `findByCategoryId(UUID)` trả về `List<Transaction>`, và tính tổng dòng tiền phát sinh `sumAmountByFilter(LocalDate, LocalDate, TransactionType)` trả về `BigDecimal` phục vụ kết xuất nhanh báo cáo tài chính định kỳ và cơ cấu chi tiêu; phương thức `existsByCategoryId(UUID)` kiểm tra nhanh sự tồn tại của giao dịch liên kết với danh mục phục vụ kiểm tra toàn vẹn trước khi xóa danh mục; riêng phương thức tìm giao dịch theo mã ví `findByWalletId` phục vụ TXN/WAL được giữ nguyên theo phạm vi thiết kế giao dịch.
+- Kế thừa 5 phương thức CRUD cơ sở từ `GenericRepository<Transaction, UUID>` (`save`, `findById`, `findAll`, `existsById`, `deleteById`) mà không khai báo lặp lại. Kho lưu trữ duy trì lưu trữ đa hình cho cả hai loại giao dịch: `IncomeExpenseTransaction` (giao dịch thu chi gắn với một ví và một danh mục cấp 3) và `TransferTransaction` (giao dịch chuyển tiền nội bộ giữa hai ví); lớp cài đặt sử dụng trường phân biệt loại (`discriminator field`) khi tuần tự hóa và giải tuần tự hóa JSON để tái tạo đúng kiểu thực thể giao dịch khi nạp từ tệp theo cơ chế đa hình của Tầng Hạ tầng.
+- Thứ tự sắp xếp mặc định của `findAll()` và các phương thức truy vấn trả về danh sách là theo ngày giao dịch (`transactionDate`) giảm dần; khi các giao dịch có cùng ngày, thứ tự thứ cấp sắp xếp theo thời điểm ghi nhận (`createdAt`) giảm dần phục vụ hiển thị sổ giao dịch theo trình tự thời gian. Quan hệ hợp thành sinh tử với `TransactionFee` được bảo toàn tại tầng hạ tầng: khi ghi tệp, bản ghi phí được nhúng lồng nhau (`nested object`) bên trong bản ghi giao dịch gốc; khi xóa giao dịch gốc qua `deleteById`, bản ghi phí liên kết bị loại bỏ đồng thời, tuyệt đối không để lại phí mồ côi nhằm bảo toàn tính toàn vẹn dữ liệu chi phí.
 
 ### 4.2.3 Kho Lưu trữ Danh mục Thu Chi
 
@@ -220,7 +224,7 @@ Cấu trúc các lớp cài đặt kho lưu trữ hoạt động trên bộ nh�
 | :--- | :--- | :--- | :--- |
 | `MemoryGenericRepository<E, ID>` | `GenericRepository<E, ID>` | `ConcurrentHashMap<ID, E>` | Lớp cơ sở trừu tượng cung cấp các thao tác dữ liệu chuẩn (`save`, `findById`, `findAll`, `existsById`, `deleteById`) và phương thức `clear()` giải phóng toàn bộ dữ liệu trong bộ nhớ sau mỗi ca kiểm thử. |
 | `MemoryWalletRepository` | `WalletRepository` | `ConcurrentHashMap<UUID, Wallet>` | Kế thừa `MemoryGenericRepository<Wallet, UUID>`; hiện thực các thao tác truy vấn ví trên RAM (`findByName`, `existsByName`, `findByStatus`, `countByStatus`) phục vụ kiểm thử đơn vị luồng nghiệp vụ ví. |
-| `MemoryTransactionRepository` | `TransactionRepository` | `ConcurrentHashMap<UUID, Transaction>` | Kế thừa `MemoryGenericRepository<Transaction, UUID>`; lưu trữ đa hình các loại giao dịch và hiện thực truy vấn lọc (`findByDateRange`, `findByDateRangeAndType`, `findByCategoryId`, `sumAmountByFilter`, `findByWalletId`). |
+| `MemoryTransactionRepository` | `TransactionRepository` | `ConcurrentHashMap<UUID, Transaction>` | Kế thừa `MemoryGenericRepository<Transaction, UUID>`; lưu trữ đa hình các loại giao dịch và hiện thực truy vấn lọc (`findByDateRange`, `findByDateRangeAndType`, `findByCategoryId`, `existsByCategoryId`, `sumAmountByFilter`, `findByWalletId`). |
 | `MemoryCategoryRepository` | `CategoryRepository` | `ConcurrentHashMap<UUID, Category>` | Kế thừa `MemoryGenericRepository<Category, UUID>`; hiện thực các thao tác truy vấn phân cấp cây danh mục 3 cấp và kiểm tra trùng tên (`findByType`, `findByNeedGroupId`, `existsByNameAndNeedGroupId`, `findActiveCategories`). |
 | `MemoryBalanceAdjustmentRepository` | `BalanceAdjustmentRepository` | `ConcurrentHashMap<UUID, BalanceAdjustmentRecord>` | Kế thừa `MemoryGenericRepository<BalanceAdjustmentRecord, UUID>`; lưu trữ các bản ghi kiểm kê số dư ví theo cơ chế chỉ thêm (Append-only) và hiện thực truy vấn đối soát (`findByWalletId`, `findLatestByWalletId`). |
 

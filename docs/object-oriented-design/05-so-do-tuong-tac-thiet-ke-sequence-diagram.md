@@ -301,7 +301,7 @@ sequenceDiagram
             CategoryService-->>CLI: 7. ném EntityNotFoundException
             CLI-->>User: 8. Hiển thị thông báo nhóm cha không tồn tại
         else Nhóm cha đang ở trạng thái DELETED
-            CategoryService-->>CLI: 9. ném BusinessRuleException
+            CategoryService-->>CLI: 9. ném BusinessException
             CLI-->>User: 10. Hiển thị thông báo nhóm cha đã bị xóa
         else Nhóm cha hợp lệ và đang hoạt động (ACTIVE)
             CategoryService->>+CategoryRepo: 11. existsByNameAndNeedGroupId(categoryName, parentCategoryId)
@@ -409,7 +409,7 @@ sequenceDiagram
         CategoryService->>+CategoryRepo: 7. findById(category.getNeedGroupId())
         CategoryRepo-->>-CategoryService: 8. Optional<Category> parentOpt
         alt Nhóm cha đang ở trạng thái DELETED
-            CategoryService-->>CLI: 9. ném BusinessRuleException
+            CategoryService-->>CLI: 9. ném BusinessException
             CLI-->>User: 10. Hiển thị thông báo từ chối do nhóm cha đang bị xóa
         else Nhóm cha đang hoạt động (ACTIVE)
             CategoryService->>+CategoryRepo: 11. existsByNameAndNeedGroupId(category.getName(), category.getNeedGroupId())
@@ -465,7 +465,7 @@ sequenceDiagram
         CategoryService->>+CategoryRepo: 7. countActiveByNeedGroupId(category.getNeedGroupId())
         CategoryRepo-->>-CategoryService: 8. long activeCount
         alt Danh mục là mục hoạt động duy nhất còn lại của nhóm cha
-            CategoryService-->>CLI: 9. ném BusinessRuleException
+            CategoryService-->>CLI: 9. ném BusinessException
             CLI-->>User: 10. Hiển thị thông báo không thể xóa mục hoạt động cuối cùng
         else Nhóm cha còn các danh mục hoạt động khác
             CategoryService->>+TxnRepo: 11. existsByCategoryId(categoryId)
@@ -501,7 +501,7 @@ Luồng tương tác mô tả quy trình truy vấn và tổng hợp dòng tiề
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-01`
-- Thao tác hệ thống: `generateCashFlowReport(year)`
+- Thao tác hệ thống: `generateCashFlowReport(endMonth, endYear)`
 - Yêu cầu chức năng: `FR-REP-01`
 - Quy tắc nghiệp vụ: `BR-FIN-01`
 - Mã lỗi xử lý: `ERR-FIN-002`
@@ -611,8 +611,8 @@ sequenceDiagram
     participant AdjRepo as BalanceAdjustmentRepository
     participant StorageAdapter as JsonStorageAdapter
 
-    User->>+CLI: 1. Nhập lệnh xuất sao lưu (destinationPath)
-    CLI->>+DataService: 2. exportBackupData(destinationPath)
+    User->>+CLI: 1. Nhập lệnh xuất sao lưu (destinationPath, scope)
+    CLI->>+DataService: 2. exportBackupData(ExportBackupRequestDto)
     DataService->>+WalletRepo: 3. findAll()
     WalletRepo-->>-DataService: 4. List<Wallet>
     DataService->>+TxnRepo: 5. findAll()
@@ -668,7 +668,7 @@ sequenceDiagram
     participant AdjRepo as BalanceAdjustmentRepository
 
     User->>+CLI: 1. Nhập đường dẫn tệp sao lưu (backupFilePath)
-    CLI->>+DataService: 2. restoreBackupData(backupFilePath)
+    CLI->>+DataService: 2. restoreBackupData(RestoreBackupRequestDto)
     DataService->>+StorageAdapter: 3. readBackupFile(backupFilePath)
     alt Tệp không tồn tại hoặc lỗi đọc I/O
         StorageAdapter-->>DataService: 4. ném StorageException
