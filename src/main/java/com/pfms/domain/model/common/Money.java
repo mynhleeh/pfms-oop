@@ -1,4 +1,4 @@
-package com.pfms.domain.model;
+package com.pfms.domain.model.common;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -8,7 +8,8 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Đối tượng giá trị bất biến đại diện cho số tiền và xử lý các phép toán tài chính.
+ * Đối tượng giá trị bất biến đại diện cho số tiền và xử lý các phép toán tài
+ * chính.
  * Đảm bảo tính toán chính xác và áp dụng quy tắc làm tròn ngân hàng.
  */
 public final class Money implements Comparable<Money> {

@@ -1,10 +1,12 @@
 package com.pfms.domain.exception;
 
-import com.pfms.domain.model.Money;
 import java.util.Objects;
 
+import com.pfms.domain.model.common.Money;
+
 /**
- * Ngoại lệ ném ra khi số dư ví không đủ để thực hiện giao dịch hoặc thanh toán chi phí.
+ * Ngoại lệ ném ra khi số dư ví không đủ để thực hiện giao dịch hoặc thanh toán
+ * chi phí.
  */
 public class InsufficientBalanceException extends BusinessException {
 

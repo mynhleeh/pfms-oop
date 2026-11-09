@@ -1,8 +1,9 @@
 package com.pfms.domain.exception;
 
-import com.pfms.domain.model.Money;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.pfms.domain.model.common.Money;
 
 import java.time.Instant;
 
@@ -74,4 +75,3 @@ class InsufficientBalanceExceptionTest {
         assertTrue(ex instanceof RuntimeException);
     }
 }
-

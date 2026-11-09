@@ -1,4 +1,4 @@
-package com.pfms.domain.model;
+package com.pfms.domain.model.common;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -161,3 +161,4 @@ class MoneyTest {
         assertEquals(Money.ZERO, Money.zero());
     }
 }
+
