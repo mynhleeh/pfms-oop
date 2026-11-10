@@ -60,7 +60,7 @@ Các đối tượng giá trị bất biến và kiểu liệt kê nghiệp vụ
 
 ### 2.1.2 Danh mục Lớp và Kiểu Dữ liệu
 
-Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể, đối tượng giá trị và kiểu liệt kê trong Tầng Nghiệp vụ cốt lõi. Toàn bộ các thành phần này được định vị vật lý trong gói mã nguồn `com.pfms.domain.model` và được phân loại theo các nhóm nghiệp vụ tương ứng của hệ thống:
+Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể, lớp khởi tạo, đối tượng giá trị và kiểu liệt kê trong Tầng Nghiệp vụ cốt lõi. Toàn bộ các thành phần này được định vị vật lý trong gói mã nguồn `com.pfms.domain.model` và được phân loại theo các nhóm nghiệp vụ tương ứng của hệ thống:
 
 | Tên lớp / Kiểu dữ liệu | Phân loại OOP | Trách nhiệm kỹ thuật chính |
 | :--- | :--- | :--- |
@@ -69,11 +69,12 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | `BalanceAdjustmentRecord` | Thực thể | Bản ghi kiểm kê thực tế bất biến, ghi nhận chênh lệch kiểm kê để cân đối số dư ví về đúng thực tế quan sát. |
 | `WalletStatus` | Kiểu liệt kê | Trạng thái vòng đời của ví gồm Đang hoạt động (`ACTIVE`) hoặc Đã lưu trữ (`ARCHIVED`). |
 | **2. Nhóm Ghi nhận Thu chi (TXN)** |  |  |
+| `Transaction` | Thực thể trừu tượng | Lớp cơ sở trừu tượng định nghĩa các thuộc tính chung và hợp đồng phương thức đa hình cho giao dịch thu chi cùng chuyển tiền nội bộ. |
 | `IncomeExpenseTransaction` | Thực thể | Hiện thực hóa giao dịch thu nhập hoặc chi tiêu tại một ví, liên kết phân loại trực tiếp với danh mục cấp 3. |
 | `TransactionFee` | Thực thể | Quản lý khoản chi phí phát sinh phụ thuộc sinh tử kèm theo giao dịch thu chi hoặc chuyển tiền nội bộ. |
+| `TransactionFactory` | Lớp khởi tạo | Đóng gói quy trình khởi tạo đa hình `IncomeExpenseTransaction`, `TransferTransaction` kèm bản ghi `TransactionFee` hợp thành. |
 | `TransactionType` | Kiểu liệt kê | Xác định chiều tác động của dòng tiền gồm Thu nhập (`INCOME`) hoặc Chi tiêu (`EXPENSE`). |
 | **3. Nhóm Chuyển tiền Nội bộ (TRF)** |  |  |
-| `Transaction` | Thực thể trừu tượng | Lớp cơ sở trừu tượng định nghĩa các thuộc tính chung và hợp đồng phương thức đa hình cho các biến động dòng tiền. |
 | `TransferTransaction` | Thực thể | Hiện thực hóa giao dịch điều chuyển tiền nội bộ giữa hai ví độc lập theo cơ chế bảo toàn tổng tài sản. |
 | **4. Nhóm Danh mục Phân loại (CAT)** |  |  |
 | `NeedGroup` | Thực thể | Quản lý nhóm nhu cầu cấp 2 gom cụm các danh mục chi tiết, trực thuộc một nhánh loại thu chi cố định. |
@@ -92,7 +93,7 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 
 ## 2.2 Thiết kế các Lớp Thực thể
 
-Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực thể thuộc Tầng Nghiệp vụ cốt lõi. Toàn bộ các lớp thực thể trong mục này được tổ chức thống nhất trong gói `com.pfms.model.entity`. Mỗi thực thể đại diện cho một đối tượng nghiệp vụ có mã định danh duy nhất và duy trì vòng đời biến đổi trạng thái xuyên suốt quá trình vận hành của hệ thống.
+Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực thể thuộc Tầng Nghiệp vụ cốt lõi. Toàn bộ các lớp thực thể trong mục này được tổ chức thống nhất trong gói `com.pfms.domain.model`. Mỗi thực thể đại diện cho một đối tượng nghiệp vụ có mã định danh duy nhất và duy trì vòng đời biến đổi trạng thái xuyên suốt quá trình vận hành của hệ thống.
 
 Để bảo đảm tính chặt chẽ trong thiết kế hướng đối tượng, mỗi lớp thực thể được quy chuẩn cấu trúc đồng nhất qua ba nội dung:
 1. Cấu trúc thuộc tính: Xác định tên trường dữ liệu, kiểu dữ liệu cụ thể, phạm vi truy cập nội bộ và ràng buộc hợp lệ.
@@ -101,7 +102,7 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 ### 2.2.1 Lớp Ví
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp Ví trong việc quản lý nguồn tiền và kiểm soát số dư)
+Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng, tiếp nhận biến động dòng tiền và giữ số dư khả dụng không âm. Hệ thống dùng lớp này cho ví tiền mặt mặc định cùng các ví tạo thêm để tính cơ cấu phân bổ tài sản.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`, `UC-WAL-02`, `UC-WAL-03`, `UC-WAL-04`
@@ -113,19 +114,38 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `walletId` | `UUID` | `private final` | Mã định danh duy nhất sinh tự động khi tạo mới, giữ cố định và không tái sử dụng. |
+| `name` | `String` | `private` | Chuỗi từ 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu, duy nhất toàn hệ thống không phân biệt hoa thường. |
+| `currentBalance` | `Money` | `private` | Số dư khả dụng có đúng 2 chữ số thập phân, khởi tạo bằng `0.00 VNĐ` và luôn không âm. |
+| `status` | `WalletStatus` | `private` | Trạng thái vòng đời nhận giá trị `ACTIVE` khi tạo mới hoặc chuyển sang `ARCHIVED` khi ngừng giao dịch. |
+| `isDefault` | `boolean` | `private final` | Cờ đánh dấu ví "Tiền mặt" mặc định; mang giá trị `true` cố định ở ví mặc định để chặn thao tác xóa hoặc lưu trữ. |
+| `note` | `String` | `private` | Chuỗi ghi chú tùy chọn, dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu. |
+| `createdAt` | `LocalDateTime` | `private final` | Mốc thời gian tạo ví bất biến, dùng để sắp xếp danh sách ví. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc kiểm tra và logic xử lý trạng thái) |
+| `Wallet` | `UUID walletId, String name, String note, boolean isDefault` | `Wallet` | `ValidationException` | Kiểm tra `walletId` khác `null`, cắt khoảng trắng hai đầu, kiểm tra tên dài 1 đến 50 ký tự và ghi chú tối đa 255 ký tự, gán `status = ACTIVE`, `currentBalance = Money.ZERO` và `createdAt` hiện tại. |
+| `credit` | `Money amount` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE` và `amount` lớn hơn `0.00 VNĐ`, sau đó cộng `amount` vào `currentBalance`. |
+| `debit` | `Money amount` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE`, `amount` lớn hơn `0.00 VNĐ` và `currentBalance` đủ chi trả, sau đó trừ `amount` khỏi `currentBalance`. |
+| `adjustBalance` | `Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE`, khởi tạo và xác thực bản ghi `BalanceAdjustmentRecord` trước để bảo đảm `actualBalance` không âm, độ lệch khác không và `reason` hợp lệ, sau đó mới cập nhật `currentBalance = actualBalance` rồi trả về bản ghi. |
+| `updateInfo` | `String newName, String newNote` | `void` | `ValidationException` | Cắt khoảng trắng hai đầu, kiểm tra `newName` dài 1 đến 50 ký tự và `newNote` tối đa 255 ký tự, cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
+| `archive` | `Không` | `void` | `BusinessRuleException` | Kiểm tra `isDefault == false` và ví đang `ACTIVE`, sau đó chuyển `status` sang `ARCHIVED`. |
+| `activate` | `Không` | `void` | `BusinessRuleException` | Kiểm tra ví đang `ARCHIVED` rồi chuyển `status` về `ACTIVE` để ví tiếp nhận lại giao dịch mới. |
+| `getWalletId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất của ví để làm khóa lưu trữ trên kho dữ liệu và đối chiếu giao dịch liên kết. |
+| `getName` | `Không` | `String` | `Không` | Trả về tên ví hiện tại phục vụ kiểm tra trùng tên không phân biệt hoa thường tại kho lưu trữ và hiển thị. |
+| `getStatus` | `Không` | `WalletStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví để lọc danh sách và thống kê số lượng ví theo trạng thái. |
+| `isDefault` | `Không` | `boolean` | `Không` | Trả về `true` nếu đây là ví tiền mặt mặc định, giúp tầng dịch vụ chặn thao tác xóa hoặc lưu trữ ví mặc định. |
+| `isActive` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `WalletStatus.ACTIVE`, phục vụ kiểm tra trạng thái hoạt động trước khi hạch toán giao dịch. |
+| `getCurrentBalance` | `Không` | `Money` | `Không` | Trả về số dư khả dụng hiện tại phục vụ hiển thị và tính cơ cấu phân bổ tài sản mà không mở hàm gán trực tiếp. |
+| `hasSufficientBalance` | `Money amount` | `boolean` | `ValidationException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- (Nêu logic kiểm tra tính hợp lệ trong phương thức khởi tạo)
-- (Nêu cơ chế bảo vệ số dư khả dụng, không mở setter tự do và duy trì số dư không âm)
-- (Nêu quy tắc bảo vệ ví tiền mặt mặc định không bị xóa hoặc lưu trữ)
+- Hàm khởi tạo cắt khoảng trắng tên ví, kiểm tra độ dài 1 đến 50 ký tự, gán trạng thái `ACTIVE` và đặt `currentBalance` bằng `0.00 VNĐ`. Thực thể kiểm tra định dạng tên nội bộ, còn tầng dịch vụ kiểm tra tính duy nhất của tên trên toàn hệ thống.
+- Lớp `Wallet` đóng kín các trường nội tại, chỉ mở các phương thức đọc chỉ đọc và loại bỏ mọi phương thức gán giá trị tự do như `setCurrentBalance`. Số dư chỉ thay đổi qua `credit`, `debit` hoặc `adjustBalance` để duy trì số dư khả dụng không âm và chặn mọi khoản chi vượt số dư.
+- Từ khóa `final` khóa cố định thuộc tính `isDefault` ngay khi tạo ví "Tiền mặt" mặc định, giúp phương thức `archive` và tầng dịch vụ chặn thao tác lưu trữ hoặc xóa nguồn tiền mặc định.
 
 ### 2.2.2 Lớp Giao dịch Cơ sở và Giao dịch Thu Chi
 
@@ -264,7 +284,7 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 - Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
 - Yêu cầu chức năng: `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`
 - Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-04`
-- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-003`, `ERR-CAT-004`
+- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-003`, `ERR-CAT-004`, `ERR-CAT-005`
 
 **Cấu trúc thuộc tính**
 
@@ -312,7 +332,7 @@ Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp
 - Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
 - Yêu cầu chức năng: `FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`
 - Quy tắc nghiệp vụ: `BR-NAM-01`, `BR-FIN-04`
-- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-002`, `ERR-CAT-005`
+- Mã lỗi: `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-005`
 
 **Cấu trúc thuộc tính**
 
@@ -407,7 +427,7 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 ### 2.3.1 Tiền tệ
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp Money trong việc bọc số học BigDecimal, quy chuẩn làm tròn ngân hàng và loại trừ sai số dấu chấm động)
+Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất biến với 2 chữ số thập phân và làm tròn nửa chẵn `RoundingMode.HALF_EVEN`, loại bỏ sai số dấu chấm động. Đối tượng thực hiện các phép toán số học và kiểm tra biên giá trị cho số dư ví, giao dịch thu chi, chuyển tiền cùng kiểm kê đối soát.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`, `UC-TXN-01`, `UC-TRF-01`, `UC-WAL-04`
@@ -419,19 +439,32 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tư�
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `ZERO` | `Money` | `public static final` | Hằng số tiền tệ mang giá trị `0.00 VNĐ`, làm mốc số dư ban đầu của ví mới và mốc so sánh dấu đại số. |
+| `amount` | `BigDecimal` | `private final` | Số thập phân chuẩn hóa cố định 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN`, cấm khởi tạo từ `float` hoặc `double`. |
+| `currency` | `String` | `private final` | Mã đơn vị tiền tệ bất biến, cố định là `"VNĐ"` trên toàn hệ thống để đồng nhất các phép tính tài chính. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc tính toán số học, so sánh hoặc định dạng kết xuất) |
+| `of` | `String rawAmount` | `Money` | `ValidationException` | Phân tích chuỗi thập phân hợp lệ, chuẩn hóa 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN` và gán đơn vị `"VNĐ"`. |
+| `of` | `BigDecimal value` | `Money` | `ValidationException` | Kiểm tra `value` khác `null`, chuẩn hóa `setScale(2, RoundingMode.HALF_EVEN)` và trả về thể hiện `Money` mới. |
+| `add` | `Money other` | `Money` | `ValidationException` | Kiểm tra `other` khác `null`, cộng `this.amount` với `other.amount` và trả về thể hiện `Money` mới, dùng khi ghi nhận khoản thu hoặc nhận chuyển tiền. |
+| `subtract` | `Money other` | `Money` | `ValidationException` | Kiểm tra `other` khác `null`, trừ `other.amount` khỏi `this.amount` và trả về thể hiện `Money` mới, dùng khi trừ số dư ví hoặc tính chênh lệch kiểm kê. |
+| `abs` | `Không` | `Money` | `Không` | Trả về thể hiện `Money` mới mang giá trị tuyệt đối không âm, dùng để tách dòng tiền vào hoặc ra từ khoản chênh lệch kiểm kê. |
+| `requireNonNegative` | `Không` | `Money` | `BusinessRuleException` | Kiểm tra `amount` từ `0.00 VNĐ` trở lên để bảo đảm số dư ví và số dư kiểm kê không âm. |
+| `isPositive` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` lớn hơn `0.00`, dùng để kiểm tra số tiền giao dịch thu chi và chuyển tiền phải dương. |
+| `isNegative` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` nhỏ hơn `0.00`, dùng để phát hiện và chặn thao tác làm âm số dư ví. |
+| `isZero` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` bằng `0.00`, dùng để kiểm tra chênh lệch kiểm kê bằng không hoặc mẫu số bằng không khi tính tỷ lệ. |
+| `getAmount` | `Không` | `BigDecimal` | `Không` | Trả về giá trị `BigDecimal` bất biến chuẩn 2 chữ số thập phân để tính tỷ trọng báo cáo và tuần tự hóa lưu trữ JSON. |
+| `compareTo` | `Money other` | `int` | `ValidationException` | Kiểm tra `other` khác `null` và so sánh thứ tự đại số qua `this.amount.compareTo(other.amount)`, trả về số âm, `0` hoặc số dương. |
+| `formatDisplay` | `Không` | `String` | `Không` | Định dạng số tiền thành chuỗi số nguyên đồng (0 chữ số thập phân) có dấu phân cách hàng nghìn kèm đơn vị `"VNĐ"` để hiển thị trên dòng lệnh. |
 
 **Tính bất biến và cơ chế so sánh**
 
-- (Nêu kỷ luật bất biến, từ khóa final, loại trừ setter và cơ chế luôn trả về thể hiện mới)
-- (Nêu cơ chế so sánh bằng nhau qua equals và hashCode dựa trên giá trị thuộc tính)
-- (Nêu việc cài đặt giao diện Comparable để so sánh thứ tự tự nhiên phục vụ sắp xếp)
+- Lớp `Money` khai báo `public final`, khóa toàn bộ thuộc tính bằng `private final` và bỏ mọi phương thức sửa đổi trạng thái; các phép toán `add`, `subtract` và `abs` luôn trả về một thể hiện `Money` mới độc lập.
+- Phương thức `equals` và `hashCode` so sánh trực tiếp trên cặp thuộc tính `amount` (đã chuẩn hóa `scale = 2` khi khởi tạo) và `currency`, bảo đảm hai đối tượng `Money` có cùng giá trị đại số thực luôn bằng nhau và sinh cùng mã băm.
+- Lớp cài đặt giao diện `Comparable<Money>` và hiện thực hóa `compareTo` bằng phép so sánh đại số của `BigDecimal`, giúp các thực thể miền kiểm tra điều kiện đủ số dư ví và sắp xếp danh sách theo quy mô tiền tệ.
 
 ### 2.3.2 Ngày Giao dịch
 
@@ -481,7 +514,7 @@ Kiểu liệt kê `TransactionType` xác lập tập giá trị đóng gồm đ�
 - Ca sử dụng: `UC-TXN-01`, `UC-CAT-01`, `UC-CAT-03`
 - Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-CAT-01`
 - Quy tắc nghiệp vụ: `BR-FIN-04`
-- Mã lỗi: `ERR-CAT-003`
+- Mã lỗi: `ERR-CAT-001`
 
 **Cấu trúc thuộc tính**
 
