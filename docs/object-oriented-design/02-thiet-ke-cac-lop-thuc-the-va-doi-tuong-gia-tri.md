@@ -178,31 +178,43 @@ Lớp trừu tượng `Transaction` định nghĩa các thuộc tính cốt lõi
 
 ### 2.2.3 Lớp Giao dịch Chuyển tiền
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp TransferTransaction trong việc điều chuyển dòng tiền giữa hai ví và bảo toàn tổng tài sản)
+Lớp `TransferTransaction` kế thừa từ lớp trừu tượng `Transaction` nhằm điều chuyển dòng tiền nội bộ giữa hai ví độc lập trong hệ thống. Mọi giao dịch chuyển tiền đều thực thi cơ chế hạch toán kép: trích nợ ví nguồn và ghi có ví đích đồng thời trong cùng một thao tác nghiệp vụ, bảo toàn tổng tài sản của người dùng trước khi tính chi phí chuyển tiền phát sinh nếu có.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`
 - Yêu cầu chức năng: `FR-TRF-01`, `FR-TRF-02`
 - Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`
-- Mã lỗi: `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`
+- Mã lỗi: `ERR-FIN-001`, `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `transactionId` | `UUID` | `protected final` | Mã định danh duy nhất của giao dịch chuyển tiền kế thừa từ `Transaction`, sinh tự động khi tạo mới và giữ cố định suốt vòng đời. |
+| `sourceWallet` | `Wallet` | `private final` | Tham chiếu thực thể `Wallet` nguồn trích tiền, bắt buộc đang hoạt động (`ACTIVE`) và có mã định danh khác với `destinationWallet`. |
+| `destinationWallet` | `Wallet` | `private final` | Tham chiếu thực thể `Wallet` đích nhận tiền, bắt buộc đang hoạt động (`ACTIVE`) và có mã định danh khác với `sourceWallet`. |
+| `amount` | `Money` | `protected` | Số tiền điều chuyển kế thừa từ `Transaction`, có đúng 2 chữ số thập phân và bắt buộc lớn hơn `0.00 VNĐ`. |
+| `transactionDate` | `TransactionDate` | `protected` | Ngày phát sinh giao dịch kế thừa từ `Transaction`, không được vượt quá ngày hiện tại từ đồng hồ hệ thống. |
+| `fee` | `TransactionFee` | `protected` | Thực thể chi phí giao dịch hợp thành (`0..1`) kế thừa từ `Transaction`, trích từ `sourceWallet` khi có phát sinh phí. |
+| `note` | `String` | `protected` | Chuỗi ghi chú diễn giải tùy chọn kế thừa từ `Transaction`, dài tối đa 255 ký tự sau khi cắt tỉa khoảng trắng hai đầu. |
+| `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến kế thừa từ `Transaction`, phục vụ sắp xếp lịch sử giao dịch thứ cấp khi trùng ngày. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc kiểm tra và logic xử lý trạng thái) |
+| `TransferTransaction` *(Constructor)* | `UUID transactionId, Wallet sourceWallet, Wallet destinationWallet, Money amount, TransactionDate transactionDate, String note, TransactionFee fee` | Không có | `BusinessException` | Gọi `super(...)`; kiểm tra hai ví khác `null`, cùng thỏa mãn `isActive()`, có mã định danh khác nhau (`ERR_TRF_001`), số tiền dương (`ERR_TRF_002`), và nếu có `fee` thì khớp `transactionId` cùng ví trích phí trùng `sourceWallet` (`ERR_FEE_001`). |
+| `applyToWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Kiểm tra hai ví đang `ACTIVE`, kiểm tra `sourceWallet` đủ trả tổng số tiền `amount` cùng phụ phí `fee`, thực hiện `sourceWallet.debit(amount)`, gọi `fee.applyFee()` nếu có và gọi `destinationWallet.credit(amount)`. |
+| `revertFromWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình khi xóa giao dịch: Kiểm tra hai ví đang `ACTIVE`, kiểm tra `destinationWallet` có số dư tối thiểu bằng `amount`, thực hiện `destinationWallet.debit(amount)`, gọi `fee.revertFee()` nếu có và gọi `sourceWallet.credit(amount)`. |
+| `getTotalSourceDeduction` | Không có | `Money` | Không có | Tính tổng số tiền bị trừ khỏi `sourceWallet` bao gồm tiền chuyển `amount` cộng số tiền của phụ phí `fee` nếu có. |
+| `getSourceWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví nguồn phục vụ tra cứu thông tin và đối soát lịch sử dòng tiền. |
+| `getDestinationWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví đích phục vụ tra cứu thông tin và đối soát lịch sử dòng tiền. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- (Nêu điều kiện kiểm tra ví nguồn khác ví đích và cả hai ví đều ở trạng thái hoạt động)
-- (Nêu cơ chế hạch toán đồng thời trừ ví nguồn và cộng ví đích để bảo toàn tổng tài sản)
-- (Nêu quy tắc hoàn nguyên số dư khi hủy bỏ giao dịch chuyển tiền)
+- Khóa định tuyến ví và bảo toàn tổng tài sản: Lớp `TransferTransaction` khóa cố định `sourceWallet` và `destinationWallet` bằng từ khóa `final`, không cung cấp phương thức chỉnh sửa lộ trình chuyển tiền sau khi tạo nhằm bảo toàn tính toàn vẹn của sổ nhật ký điều chuyển tài sản. Hai ví bắt buộc phải có mã định danh khác nhau (`ERR_TRF_001`) và đều ở trạng thái hoạt động (`ACTIVE`) tại thời điểm tạo và hạch toán.
+- Đảm bảo tính nguyên tử trong hạch toán dòng tiền: Phương thức `applyToWallet()` kiểm tra số dư khả dụng tổng thể của ví nguồn (`amount + fee.amount`) trước khi biến đổi trạng thái, sau đó trích nợ ví nguồn và ghi có ví đích trong cùng một khối lệnh, loại trừ nguy cơ ví nguồn bị trừ tiền nhưng ví đích chưa nhận được hoặc thiếu tiền thanh toán phụ phí theo `BR-FIN-02`.
+- Kiểm soát điều kiện biên khi hoàn nguyên giao dịch: Giao dịch chuyển tiền không hỗ trợ sửa đổi trực tiếp; khi người dùng thực hiện xóa giao dịch, phương thức `revertFromWallet()` chỉ cho phép hoàn nguyên khi số dư hiện tại của `destinationWallet` tối thiểu bằng khoản tiền đã nhận (`amount`), bảo đảm ví đích không bị rơi vào trạng thái số dư âm theo quy tắc bảo toàn số dư không âm `BR-FIN-02`.
 
 ### 2.2.4 Lớp Chi phí Giao dịch
 
