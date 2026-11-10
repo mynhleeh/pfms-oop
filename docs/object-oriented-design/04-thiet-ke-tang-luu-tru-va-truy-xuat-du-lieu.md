@@ -54,7 +54,7 @@ Các giao diện lưu trữ chuyên biệt kế thừa từ `GenericRepository<E
 
 ### 4.2.1 Kho Lưu trữ Ví tiền
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của WalletRepository trong việc kế thừa GenericRepository<Wallet, UUID>, cung cấp các thao tác truy vấn phục vụ kiểm tra tính duy nhất của tên ví, lọc trạng thái và kiểm soát điều kiện lưu trữ ví cho WalletService)
+Giao diện `WalletRepository` kế thừa `GenericRepository<Wallet, UUID>` để quản lý vòng đời lưu trữ của các nguồn tiền trong hệ thống. Kho lưu trữ cung cấp các phương thức truy vấn mở rộng giúp `WalletService` kiểm tra ví mặc định, xác thực tính duy nhất của tên ví, lọc danh sách theo trạng thái và thống kê số lượng ví phục vụ phân tích cơ cấu tài sản.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`, `UC-WAL-02`, `UC-WAL-03`
@@ -68,17 +68,21 @@ Giao diện `com.pfms.domain.repository.WalletRepository` kế thừa `GenericRe
 
 | Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên phương thức truy vấn) | (Kiểu và tên tham số) | (Kiểu trả về: Optional<Wallet>, List<Wallet>, boolean, long) | (Quy tắc lọc dữ liệu và mục đích phục vụ WalletService) |
+| `findByName` | `String name` | `Optional<Wallet>` | Tìm ví theo tên chính xác sau khi cắt khoảng trắng hai đầu và so khớp không phân biệt hoa thường; trả về `Optional.empty()` nếu chưa tồn tại, phục vụ `WalletService` đối chiếu tên ví khi tạo mới hoặc cập nhật. |
+| `existsByName` | `String name` | `boolean` | Kiểm tra nhanh sự tồn tại của tên ví không phân biệt hoa thường trên toàn bộ ví đang hoạt động lẫn ví đã lưu trữ; trả về `true` nếu tên đã tồn tại để chặn đặt tên trùng lặp. |
+| `findByStatus` | `WalletStatus status` | `List<Wallet>` | Lọc danh sách ví theo trạng thái vòng đời (`ACTIVE` hoặc `ARCHIVED`), trả về danh sách rỗng nếu không có kết quả, phục vụ hiển thị danh sách ví theo bộ lọc trạng thái. |
+| `countByStatus` | `WalletStatus status` | `long` | Đếm số lượng ví theo trạng thái xác định (`ACTIVE` hoặc `ARCHIVED`), phục vụ kiểm soát số lượng ví hoạt động và tổng hợp cơ cấu phân bổ số dư. |
+| `findDefaultWallet` | `Không` | `Optional<Wallet>` | Truy vấn ví tiền mặt mặc định của hệ thống (có cờ `isDefault` bằng `true`); trả về `Optional.empty()` khi khởi chạy lần đầu chưa có dữ liệu, phục vụ `WalletService` kiểm tra và khởi tạo ví mặc định. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu các phương thức truy vấn mở rộng cần đặc tả gồm: tìm ví theo tên chính xác trả về Optional<Wallet>, kiểm tra tồn tại tên ví trả về boolean, lọc danh sách ví theo trạng thái trả về List<Wallet>, và đếm số lượng ví theo trạng thái trả về long)
-- (Nêu quy tắc kế thừa 5 phương thức CRUD cơ sở từ GenericRepository<Wallet, UUID>, tuyệt đối không khai báo lặp lại)
-- (Nêu nguyên tắc so khớp tên ví không phân biệt hoa thường theo BR-NAM-01 và kiểm soát điều kiện duy trì tối thiểu một ví hoạt động ACTIVE)
+- Bổ sung 5 phương thức truy vấn chuyên biệt gồm `findByName(String)` trả về `Optional<Wallet>`, `existsByName(String)` trả về `boolean`, `findByStatus(WalletStatus)` trả về `List<Wallet>`, `countByStatus(WalletStatus)` trả về `long` và `findDefaultWallet()` trả về `Optional<Wallet>` để đáp ứng trọn vẹn nhu cầu khởi tạo ví mặc định, tra cứu theo tên và lọc trạng thái của `WalletService`.
+- Kế thừa trực tiếp 5 phương thức cơ sở (`save`, `findById`, `findAll`, `existsById`, `deleteById`) từ `GenericRepository<Wallet, UUID>` mà không khai báo lặp lại; thao tác `deleteById` chỉ được thực thi sau khi tầng dịch vụ xác nhận ví cần xóa không phải ví mặc định và chưa từng phát sinh lịch sử giao dịch hay kiểm kê.
+- Chuẩn hóa chuỗi đầu vào bằng cách cắt khoảng trắng hai đầu và so khớp tên ví không phân biệt hoa thường trên cả ví `ACTIVE` lẫn `ARCHIVED`; giải phóng tên ví khỏi phạm vi kiểm tra duy nhất khi xóa vĩnh viễn thành công và khóa thao tác xóa hoặc lưu trữ đối với ví `"Tiền mặt"` mặc định nhằm duy trì tối thiểu một ví `ACTIVE`.
 
 ### 4.2.2 Kho Lưu trữ Giao dịch
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của TransactionRepository trong việc kế thừa GenericRepository<Transaction, UUID>, lưu trữ đa hình các biến động dòng tiền, cung cấp các phương thức lọc lịch sử theo thời gian, ví, danh mục và tổng hợp số liệu cho TransactionService, TransferService và ReportService)
+Giao diện `TransactionRepository` kế thừa `GenericRepository<Transaction, UUID>` để lưu trữ đa hình toàn bộ biến động dòng tiền thu chi và chuyển tiền nội bộ. Kho lưu trữ cung cấp các phép lọc lịch sử theo ví, khoảng thời gian, danh mục và hàm tổng hợp số liệu chỉ đọc cho `TransactionService`, `TransferService`, `CategoryService` và `ReportService`.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TXN-01`, `UC-TXN-02`, `UC-TXN-03`, `UC-TXN-04`, `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`, `UC-REP-01`, `UC-REP-02`
@@ -92,13 +96,18 @@ Giao diện `com.pfms.domain.repository.TransactionRepository` kế thừa `Gene
 
 | Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên phương thức truy vấn) | (Kiểu và tên tham số) | (Kiểu trả về: List<Transaction>, Optional<Transaction>, BigDecimal) | (Quy tắc lọc dữ liệu theo thời gian, ví, danh mục và mục đích phục vụ dịch vụ) |
+| `findByWalletId` | `UUID walletId` | `List<Transaction>` | Truy vấn toàn bộ giao dịch thu chi tại ví, giao dịch chuyển tiền có ví làm nguồn hoặc đích và giao dịch có trích phí từ ví; phục vụ `WalletService` kiểm tra điều kiện xóa ví rỗng lịch sử và lọc biến động theo ví. |
+| `findByDateRange` | `LocalDate startDate, LocalDate endDate` | `List<Transaction>` | Lọc danh sách giao dịch phát sinh trong đoạn từ `startDate` đến `endDate` (tính cả hai mốc biên) ở chế độ chỉ đọc; phục vụ tra cứu lịch sử và tổng hợp báo cáo dòng tiền theo kỳ. |
+| `findByDateRangeAndType` | `LocalDate startDate, LocalDate endDate, TransactionType type` | `List<Transaction>` | Lọc các giao dịch thu chi thuộc khoảng ngày và chiều dòng tiền (`INCOME` hoặc `EXPENSE`) ở chế độ chỉ đọc; phục vụ `ReportService` phân tích cơ cấu thu chi theo kỳ. |
+| `findByCategoryId` | `UUID categoryId` | `List<Transaction>` | Truy vấn danh sách giao dịch thu chi hoặc giao dịch có khoản phí hợp thành gắn với mã danh mục cấp 3 xác định; phục vụ lọc lịch sử theo danh mục và gom cụm số liệu chi tiêu. |
+| `existsByCategoryId` | `UUID categoryId` | `boolean` | Kiểm tra nhanh sự tồn tại của giao dịch chính hoặc khoản phí hợp thành tham chiếu tới danh mục cấp 3; phục vụ `CategoryService` quyết định xóa vật lý hay xóa mềm danh mục. |
+| `sumAmountByFilter` | `LocalDate startDate, LocalDate endDate, TransactionType type` | `BigDecimal` | Tính tổng số tiền phát sinh theo khoảng ngày và chiều thu chi ở chế độ chỉ đọc, trả về `BigDecimal.ZERO` chuẩn 2 chữ số thập phân nếu không có bản ghi khớp, phục vụ kết xuất nhanh báo cáo tài chính. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu các phương thức truy vấn mở rộng cần đặc tả gồm: tìm giao dịch theo mã ví findByWalletId trả về List<Transaction>, lọc giao dịch theo khoảng ngày findByDateRange nhận ngày bắt đầu và kết thúc trả về List<Transaction>, lọc giao dịch theo danh mục chi tiêu findByCategoryId trả về List<Transaction>, và tính tổng dòng tiền phát sinh sumAmountByFilter phục vụ kết xuất báo cáo nhanh)
-- (Nêu quy tắc kế thừa 5 phương thức CRUD cơ sở từ GenericRepository<Transaction, UUID>, lưu trữ đa hình cả giao dịch thu chi IncomeExpenseTransaction và chuyển tiền TransferTransaction)
-- (Nêu cơ chế sắp xếp mặc định theo ngày giao dịch giảm dần và bảo toàn quan hệ hợp thành sinh tử với chi phí giao dịch TransactionFee)
+- Đặc tả nhóm phương thức truy vấn mở rộng ở chế độ chỉ đọc gồm `findByWalletId(UUID)`, `findByDateRange(LocalDate, LocalDate)`, `findByDateRangeAndType(LocalDate, LocalDate, TransactionType)`, `findByCategoryId(UUID)` trả về `List<Transaction>`, `existsByCategoryId(UUID)` trả về `boolean` và `sumAmountByFilter(LocalDate, LocalDate, TransactionType)` trả về `BigDecimal`; tầng dịch vụ trích xuất `LocalDate` từ `TransactionDate` khi truyền tham số lọc và bọc kết quả `BigDecimal` vào đối tượng giá trị `Money`.
+- Kế thừa 5 phương thức cơ sở từ `GenericRepository<Transaction, UUID>` mà không khai báo lặp lại, đồng thời lưu trữ đa hình cả `IncomeExpenseTransaction` và `TransferTransaction` thông qua trường phân biệt loại bản ghi khi tuần tự hóa và giải tuần tự hóa dữ liệu tại tầng hạ tầng.
+- Sắp xếp mặc định danh sách kết quả theo ngày giao dịch `transactionDate` giảm dần và tiêu chí phụ theo mốc tạo `createdAt` giảm dần; bảo toàn quan hệ hợp thành sinh tử với `TransactionFee` bằng cách lưu lồng đối tượng phí trong giao dịch gốc và xóa đồng thời khi gọi `deleteById` để ngăn phát sinh bản ghi phí mồ côi.
 
 ### 4.2.3 Kho Lưu trữ Danh mục Thu Chi
 
@@ -126,7 +135,7 @@ Giao diện `com.pfms.domain.repository.CategoryRepository` kế thừa `Generic
 
 ### 4.2.4 Kho Lưu trữ Kiểm kê Số dư
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của BalanceAdjustmentRepository trong việc kế thừa GenericRepository<BalanceAdjustmentRecord, UUID>, ghi nhận lịch sử kiểm kê thực tế và truy vấn vết đối soát phục vụ WalletService)
+Giao diện `BalanceAdjustmentRepository` kế thừa `GenericRepository<BalanceAdjustmentRecord, UUID>` để ghi nhận lịch sử kiểm kê số dư thực tế của các ví. Kho lưu trữ cung cấp các phương thức truy xuất vết kiểm toán theo ví và tra cứu lần đối soát gần nhất phục vụ `WalletService` cùng `DataManagementService`.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-04`
@@ -140,13 +149,14 @@ Giao diện `com.pfms.domain.repository.BalanceAdjustmentRepository` kế thừa
 
 | Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên phương thức truy vấn) | (Kiểu và tên tham số) | (Kiểu trả về: List<BalanceAdjustmentRecord>, Optional<BalanceAdjustmentRecord>) | (Quy tắc truy vấn lịch sử kiểm kê và mục đích phục vụ đối soát) |
+| `findByWalletId` | `UUID walletId` | `List<BalanceAdjustmentRecord>` | Truy vấn danh sách bản ghi kiểm kê của ví xác định, sắp xếp theo ngày ghi nhận `adjustedAt` giảm dần và thứ tự tạo bản ghi giảm dần; trả về danh sách rỗng nếu ví chưa từng kiểm kê, phục vụ kiểm tra điều kiện xóa ví và đối soát số dư. |
+| `findLatestByWalletId` | `UUID walletId` | `Optional<BalanceAdjustmentRecord>` | Truy vấn bản ghi kiểm kê gần nhất của một ví theo mốc ngày `adjustedAt` và thứ tự ghi nhận; trả về `Optional.empty()` nếu ví chưa có lịch sử kiểm kê, phục vụ tra cứu nhanh lần cân đối số dư cuối cùng. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu các phương thức truy vấn mở rộng cần đặc tả gồm: tìm lịch sử kiểm kê theo mã ví findByWalletId trả về List<BalanceAdjustmentRecord>, và lấy bản ghi kiểm kê gần nhất của một ví findLatestByWalletId trả về Optional<BalanceAdjustmentRecord>)
-- (Nêu quy tắc kế thừa từ GenericRepository<BalanceAdjustmentRecord, UUID>, nhấn mạnh tính chất chỉ thêm Append-only: không hỗ trợ thao tác cập nhật hay xóa bản ghi để bảo toàn vết kiểm toán)
-- (Nêu ràng buộc số dư quan sát thực tế không âm theo BR-FIN-02 và nguyên tắc ghi nhận chênh lệch trực tiếp vào ví mà không tạo giao dịch thu chi giả mạo)
+- Đặc tả 2 phương thức truy vấn mở rộng gồm `findByWalletId(UUID)` trả về `List<BalanceAdjustmentRecord>` để kiểm tra lịch sử trước khi xóa ví hoặc đối soát toàn vẹn, và `findLatestByWalletId(UUID)` trả về `Optional<BalanceAdjustmentRecord>` để lấy bản ghi điều chỉnh mới nhất của ví.
+- Kế thừa từ `GenericRepository<BalanceAdjustmentRecord, UUID>` nhưng thực thi nghiêm ngặt cơ chế chỉ cho phép ghi thêm bản ghi mới: phương thức `save` chỉ lưu bản ghi kiểm kê mới bất biến, trong khi thao tác cập nhật bản ghi cũ hoặc gọi `deleteById` bị chặn và ném `UnsupportedOperationException` nhằm bảo vệ tính toàn vẹn của vết kiểm toán.
+- Bảo đảm mọi bản ghi lưu trữ đều có số dư thực tế `actualBalance` không âm và độ lệch `difference` khác `0.00 VNĐ`; khoản chênh lệch chỉ được `WalletService` cập nhật trực tiếp vào số dư ví liên kết mà không sinh giao dịch thu chi giả mạo trong `TransactionRepository`.
 
 ## 4.3 Cài đặt Hạ tầng Lưu trữ
 
@@ -156,41 +166,46 @@ Hai cơ chế này đóng kín toàn bộ chi tiết thao tác vào ra vật lý
 
 ### 4.3.1 Định dạng và Cấu trúc Bản ghi
 
-(Mô tả khoảng 1 đến 2 câu về quy cách tổ chức tệp JSON lưu trữ dữ liệu bền vững của hệ thống trên ổ đĩa cục bộ mà không phụ thuộc vào hệ quản trị cơ sở dữ liệu bên ngoài)
+Hệ thống lưu trữ toàn bộ trạng thái nghiệp vụ trên tệp `data/pfms_data.json` tại ổ đĩa cục bộ mà không dùng hệ quản trị cơ sở dữ liệu bên ngoài. Bộ điều hợp `JsonDataStore` cùng bốn lớp `JsonWalletRepository`, `JsonTransactionRepository`, `JsonCategoryRepository` và `JsonBalanceAdjustmentRepository` trong gói `com.pfms.infrastructure.file` chuyển đổi hai chiều giữa bản ghi `JSON` và thực thể miền.
 
-Tệp dữ liệu lưu trữ theo định dạng JSON với bảng mã UTF-8. Các trường số tiền lưu dưới dạng chuỗi số học cố định 2 chữ số thập phân để bảo toàn độ chính xác, mốc thời gian lưu theo định dạng `yyyy-MM-dd` và mã định danh lưu dưới dạng chuỗi UUID.
+Tệp dữ liệu lưu trữ theo định dạng `JSON` với bảng mã `UTF-8`. Các trường số tiền lưu dưới dạng chuỗi số học cố định 2 chữ số thập phân để giữ độ chính xác, mốc thời gian lưu theo định dạng `yyyy-MM-dd` và mã định danh lưu dưới dạng chuỗi `UUID`.
 
 **Cấu trúc thuộc tính tệp dữ liệu:**
 
-Cấu trúc các trường dữ liệu JSON lưu trữ trạng thái của 4 nhóm thực thể trên đĩa cứng:
+Cấu trúc các trường dữ liệu `JSON` lưu trữ trạng thái của 4 nhóm thực thể trên đĩa cứng:
 
 | Trường dữ liệu | Kiểu dữ liệu JSON | Bắt buộc | Ràng buộc và Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
-| (Tên trường thuộc tính JSON) | (string, number, boolean, array, object) | (Bắt buộc / Tùy chọn) | (Quy tắc định dạng, ràng buộc giá trị và thực thể nghiệp vụ tương ứng) |
+| `wallets` | `array` | Bắt buộc | Danh sách thực thể `Wallet`, mỗi phần tử gồm `walletId` (chuỗi `UUID`), `name` (1 đến 50 ký tự), `currentBalance` (chuỗi thập phân 2 chữ số không âm), `status` (`ACTIVE` hoặc `ARCHIVED`), `isDefault` (`boolean`), `note` (tối đa 255 ký tự) và `createdAt`. |
+| `transactions` | `array` | Bắt buộc | Danh sách thực thể `Transaction` đa hình theo `recordType` (`INCOME_EXPENSE` gồm `walletId`, `categoryId`, `transactionType`; `TRANSFER` gồm `sourceWalletId`, `destinationWalletId`), các trường chung `transactionId`, `amount` (chuỗi thập phân dương 2 chữ số), `transactionDate` (`yyyy-MM-dd`), `note`, `createdAt` và đối tượng con `fee` (`TransactionFee`). |
+| `categories` | `array` | Bắt buộc | Danh sách cây phân loại 3 cấp gồm `NeedGroup` cấp 2 (`groupId`, `groupName`, `flowType`, `groupStatus`) và `Category` cấp 3 (`categoryId`, `name`, `groupId`, `flowType`, `status`, `createdAt`), gắn với nhánh `TransactionType` (`INCOME` hoặc `EXPENSE`) và trạng thái `ACTIVE` hoặc `DELETED`. |
+| `adjustments` | `array` | Bắt buộc | Danh sách bản ghi kiểm kê bất biến `BalanceAdjustmentRecord`, mỗi phần tử gồm `recordId`, `walletId` (chuỗi `UUID`), `previousBalance`, `actualBalance` (chuỗi thập phân không âm), `difference` (khác `0.00`), `adjustedAt` (`yyyy-MM-dd`) và `reason` (tối đa 255 ký tự). |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu cấu trúc 4 mảng đối tượng chính trong tệp dữ liệu gồm: mảng ví wallets, mảng giao dịch transactions, mảng danh mục categories, và mảng kiểm kê adjustments)
-- (Nêu chi tiết quy cách lưu trữ các trường định danh duy nhất dưới dạng chuỗi UUID và số tiền dưới dạng chuỗi hai chữ số thập phân)
-- (Nêu cơ chế biểu diễn đối tượng lồng nhau đối với chi phí giao dịch TransactionFee bên trong giao dịch gốc và quan hệ liên kết phân cấp ba cấp của danh mục)
+- Đối tượng gốc của tệp `JSON` luôn chứa đủ 4 mảng `wallets`, `transactions`, `categories` và `adjustments`; nhóm thực thể chưa có dữ liệu được biểu diễn bằng mảng rỗng `[]` thay vì `null` hoặc lược bỏ trường.
+- Các khóa định danh và tham chiếu (`walletId`, `transactionId`, `categoryId`, `groupId`, `recordId`, `feeId`) lưu dạng chuỗi `UUID` và khôi phục qua `UUID.fromString`. Các trường tiền tệ (`currentBalance`, `amount`, `previousBalance`, `actualBalance`, `difference`) lưu dạng chuỗi 2 chữ số thập phân và nạp vào `Money` (`BigDecimal`, `RoundingMode.HALF_EVEN`) để tránh sai số dấu chấm động.
+- Đối tượng `TransactionFee` (`feeId`, `parentTransactionId`, `amount`, `walletId`, `categoryId`) được nhúng trực tiếp vào trường `fee` của bản ghi `Transaction` gốc (`null` nếu miễn phí) để gắn kết vòng đời hợp thành. Cây danh mục 3 cấp được tái dựng qua liên kết từ `Category` lên `NeedGroup` (`groupId`) và nhánh `TransactionType` (`flowType`) khi nạp tệp.
 
 ### 4.3.2 Cơ chế Đọc Ghi và An toàn Dữ liệu
 
-(Mô tả khoảng 1 đến 2 câu về cơ chế ghi tệp an toàn sử dụng kỹ thuật tệp tạm nhằm chống hỏng cấu trúc dữ liệu khi ứng dụng dừng đột ngột và quy trình tự động khởi tạo tệp khi chạy lần đầu)
+`JsonDataStore` ghi dữ liệu qua tệp tạm kết hợp đổi tên nguyên tử để chống hỏng cấu trúc tệp khi ứng dụng dừng đột ngột, mất điện hoặc đầy đĩa. Trong lần chạy đầu tiên khi chưa có tệp lưu trữ, bộ điều hợp tự tạo thư mục dữ liệu và tệp `JSON` gốc chứa 4 mảng chuẩn cùng bộ danh mục mặc định.
 
 **Quy trình ghi tệp nguyên tử**
 
-Để loại trừ hoàn toàn nguy cơ hỏng tệp dữ liệu khi mất điện hoặc tiến trình bị ngắt đột ngột giữa chừng, toàn bộ thao tác lưu dữ liệu được thực thi qua quy trình hoán đổi tệp:
+Để ngăn hỏng tệp dữ liệu khi mất điện hoặc tiến trình bị ngắt giữa chừng, thao tác lưu dữ liệu được thực thi qua quy trình hoán đổi tệp:
 
 | Bước | Thao tác kỹ thuật | Mục đích và Cơ chế bảo vệ |
 | :--- | :--- | :--- |
-| (Thứ tự bước) | (Hành động xử lý luồng tệp) | (Quy tắc bảo đảm an toàn dữ liệu và xử lý lỗi) |
+| Bước 1 | Tuần tự hóa đồ thị đối tượng hiện hành thành chuỗi `JSON` mã hóa `UTF-8` và ghi vào tệp tạm (`pfms_data.json.tmp`) cùng thư mục với tệp chính. | Tách quá trình ghi luồng byte mới khỏi tệp dữ liệu chính; nếu tràn đĩa hoặc ngắt tiến trình giữa chừng thì tệp chính vẫn giữ nguyên trạng thái cũ. |
+| Bước 2 | Gọi `flush` trên luồng ghi và `FileChannel.force` để đẩy toàn bộ dữ liệu từ bộ đệm hệ điều hành xuống đĩa vật lý. | Bảo đảm nội dung tệp tạm đã ghi bền vững trên phần cứng lưu trữ trước khi thay thế tệp chính. |
+| Bước 3 | Đóng luồng tệp tạm và gọi `Files.move` với cờ `StandardCopyOption.ATOMIC_MOVE` cùng `StandardCopyOption.REPLACE_EXISTING` để đè tệp tạm lên tệp chính. | Hoán đổi con trỏ tệp ở mức hệ thống tệp trong một thao tác nguyên tử, giữ cho tệp chính luôn ở trạng thái hợp lệ trước hoặc sau giao tác. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- (Nêu chi tiết quy trình ghi tệp an toàn qua 3 bước: ghi toàn bộ dữ liệu ra tệp tạm thời có phần mở rộng tmp, ép xả dữ liệu xuống đĩa vật lý, và thực hiện hoán đổi nguyên tử đè lên tệp chính)
-- (Nêu cơ chế kiểm tra và tự động khởi tạo thư mục dữ liệu cùng tệp dữ liệu ban đầu chứa cấu trúc mảng hợp lệ khi hệ thống khởi chạy lần đầu tiên)
-- (Nêu quy tắc xử lý khi xảy ra lỗi vào ra: hủy bỏ tệp tạm thời, giữ nguyên trạng thái vẹn toàn của tệp chính và ném ngoại lệ lưu trữ lên tầng trên)
+- Mọi thao tác cập nhật ở các kho lưu trữ `JSON` đều ủy quyền cho `JsonDataStore` thực thi tuần tự 3 bước gồm ghi tệp tạm `.tmp`, ép xả dữ liệu xuống đĩa vật lý và hoán đổi nguyên tử đè lên tệp chính, không mở luồng ghi đè cắt ngắn trực tiếp lên tệp đang vận hành.
+- Khi khởi động, `JsonDataStore` tự tạo cây thư mục qua `Files.createDirectories` và ghi tệp khởi tạo 4 mảng rỗng nếu đường dẫn chưa tồn tại; nếu tệp đã có thì đọc qua `BufferedReader` (`StandardCharsets.UTF_8`) và ném `DataCorruptionException` khi phát hiện lỗi cú pháp hoặc sai kiểu dữ liệu.
+- Khi gặp lỗi vào ra (`IOException`, thiếu quyền ghi, đầy đĩa), khối xử lý ngoại lệ đóng luồng, xóa tệp `.tmp` dở dang qua `Files.deleteIfExists`, giữ nguyên tệp chính và bọc lỗi gốc thành `StorageException`. Riêng thao tác khôi phục từ `DataManagementService` tự tạo bản sao lưu dự phòng (`backup_YYYYMMDD_HHMMSS.json` tại `backups/`) và xác thực 4 bước tệp nguồn trước khi hoán đổi nguyên tử.
 
 ### 4.3.3 Cài đặt Lưu trữ Trong Bộ Nhớ
 
