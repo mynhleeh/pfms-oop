@@ -355,7 +355,7 @@ Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp
 
 ### 2.2.7 Lớp Bản ghi Điều chỉnh Số dư
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp BalanceAdjustmentRecord trong việc lưu vết kiểm kê đối soát và điều chỉnh số dư thực tế)
+Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê đối soát nhằm đưa số dư khả dụng của ví về khớp với số tiền thực tế quan sát được. Bản ghi giữ trạng thái bất biến tuyệt đối sau khi tạo để bảo toàn vết kiểm toán và tách biệt khoản chênh lệch khỏi dòng tiền thu chi định kỳ.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-04`
@@ -367,19 +367,34 @@ Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `recordId` | `UUID` | `private final` | Mã định danh duy nhất của bản ghi kiểm kê, sinh tự động khi tạo mới và giữ cố định. |
+| `walletId` | `String` | `private final` | Mã định danh tham chiếu cố định tới thực thể `Wallet` được kiểm kê, bắt buộc khác `null` và không rỗng. |
+| `previousBalance` | `Money` | `private final` | Số dư khả dụng của ví ngay trước thời điểm kiểm kê, giữ cố định. |
+| `actualBalance` | `Money` | `private final` | Số dư thực tế quan sát được, có đúng 2 chữ số thập phân và bắt buộc không âm (`>= 0.00 VNĐ`). |
+| `difference` | `Money` | `private final` | Giá trị chênh lệch đại số tính bằng `actualBalance.subtract(previousBalance)`, bắt buộc khác `0.00 VNĐ`. |
+| `adjustedAt` | `TransactionDate` | `private final` | Mốc ngày ghi nhận kiểm kê bất biến, không vượt quá ngày hiện tại từ đồng hồ hệ thống. |
+| `reason` | `String` | `private final` | Chuỗi diễn giải lý do điều chỉnh số dư, tùy chọn, dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc kiểm tra và logic xử lý trạng thái) |
+| `BalanceAdjustmentRecord` *(Constructor)* | `UUID recordId, String walletId, Money previousBalance, Money actualBalance, TransactionDate adjustedAt, String reason` | Không có | `BusinessException`, `IllegalArgumentException` | Kiểm tra các trường bắt buộc khác `null`; `actualBalance` không âm (`ERR_FIN_001`); `difference` khác `0.00 VNĐ` (`ERR_FIN_001`); chuẩn hóa `reason` tối đa 255 ký tự; tính tự động `difference = actualBalance.subtract(previousBalance)`. |
+| `getRecordId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của bản ghi kiểm kê phục vụ lưu trữ và tra cứu vết kiểm toán. |
+| `getWalletId` | Không có | `String` | Không có | Trả về mã định danh của ví được kiểm kê phục vụ lọc lịch sử điều chỉnh theo từng ví. |
+| `getPreviousBalance` | Không có | `Money` | Không có | Trả về số dư của ví trước thời điểm kiểm kê phục vụ đối chiếu lịch sử. |
+| `getActualBalance` | Không có | `Money` | Không có | Trả về số dư thực tế sau kiểm kê để đồng bộ với số dư khả dụng của ví. |
+| `getDifference` | Không có | `Money` | Không có | Trả về giá trị chênh lệch đại số có dấu để đối soát biến động tổng tài sản. |
+| `getAbsoluteDifference` | Không có | `Money` | Không có | Trả về trị tuyệt đối của `difference` (`difference.abs()`) phục vụ hiển thị và thống kê quy mô điều chỉnh. |
+| `getAdjustedAt` | Không có | `TransactionDate` | Không có | Trả về mốc ngày ghi nhận kiểm kê phục vụ sắp xếp dòng thời gian đối soát. |
+| `getReason` | Không có | `String` | Không có | Trả về lý do diễn giải điều chỉnh số dư. |
+| `isSurplus` | Không có | `boolean` | Không có | Trả về `true` khi `difference` lớn hơn `0.00 VNĐ` (khoản điều chỉnh làm tăng số dư ví). |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- (Nêu tính bất biến tuyệt đối của bản ghi sau khi khởi tạo, không hỗ trợ chỉnh sửa hay xóa bỏ)
-- (Nêu công thức tính độ chênh lệch kiểm kê và ràng buộc số dư quan sát không âm)
-- (Nêu nguyên tắc ghi nhận đối soát trực tiếp vào ví mà không sinh ra doanh thu hay chi phí)
+- Tính bất biến tuyệt đối bảo vệ vết kiểm toán: Toàn bộ 7 thuộc tính đều khai báo `private final`, lớp không cung cấp bất kỳ phương thức setter nào, bảo đảm bản ghi sau khi khởi tạo sẽ không bị biến dạng theo quy tắc dấu vết kiểm tra lại của `UC-WAL-04`.
+- Tự động tính chênh lệch và kiểm tra điều kiện biên: Hàm khởi tạo tự động tính toán `difference = actualBalance.subtract(previousBalance)`. Bắt buộc `actualBalance >= 0.00 VNĐ` (không cho phép ví âm tiền theo `BR-FIN-02`) và `difference != 0.00 VNĐ` (từ chối tạo bản ghi kiểm kê rỗng khi số dư thực tế trùng số dư sổ sách).
+- Phân lập hoàn toàn khỏi giao dịch thu chi: Biến động chênh lệch kiểm kê được ghi nhận riêng biệt, không đi qua `IncomeExpenseTransaction`, giữ cho báo cáo phân tích thu chi định kỳ theo danh mục không bị sai lệch cấu trúc dòng tiền.
 
 ## 2.3 Thiết kế các Đối tượng Giá trị
 
