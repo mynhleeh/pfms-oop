@@ -11,8 +11,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Lớp cơ sở trừu tượng đại diện cho mọi giao dịch biến động dòng tiền trong hệ thống PFMS.
- * Định nghĩa các thuộc tính cốt lõi chung và cặp phương thức hợp đồng đa hình applyToWallet/revertFromWallet.
+ * Lớp cơ sở trừu tượng đại diện cho mọi giao dịch biến động dòng tiền trong hệ
+ * thống PFMS.
+ * Định nghĩa các thuộc tính cốt lõi chung và cặp phương thức hợp đồng đa hình
+ * applyToWallet/revertFromWallet.
  */
 public abstract class Transaction {
 
@@ -26,8 +28,10 @@ public abstract class Transaction {
     // endregion
 
     // region Constructors
-    protected Transaction(UUID transactionId, Money amount, TransactionDate transactionDate,
-                          String note, TransactionFee fee) {
+    protected Transaction(
+            UUID transactionId, Money amount, TransactionDate transactionDate,
+            String note, TransactionFee fee) {
+
         this.transactionId = Objects.requireNonNull(transactionId, "Mã giao dịch không được để null");
         this.amount = validateAmount(amount);
         this.transactionDate = Objects.requireNonNull(transactionDate, "Ngày giao dịch không được để null");
@@ -86,14 +90,14 @@ public abstract class Transaction {
     // endregion
 
     // region Helpers
-    private static Money validateAmount(Money amount) {
+    protected static Money validateAmount(Money amount) {
         if (amount == null || !amount.isGreaterThan(Money.ZERO)) {
             throw new BusinessException(ErrorCode.ERR_FIN_001, "Số tiền giao dịch không hợp lệ.");
         }
         return amount;
     }
 
-    private static String normalizeNote(String rawNote) {
+    protected static String normalizeNote(String rawNote) {
         if (rawNote == null) {
             return "";
         }
@@ -104,7 +108,7 @@ public abstract class Transaction {
         return trimmed;
     }
 
-    private static TransactionFee validateFee(TransactionFee fee, UUID transactionId) {
+    protected static TransactionFee validateFee(TransactionFee fee, UUID transactionId) {
         if (fee != null && !fee.getParentTransactionId().equals(transactionId)) {
             throw new BusinessException(ErrorCode.ERR_FEE_001, "Mã giao dịch gốc của phí không khớp với giao dịch.");
         }
@@ -115,8 +119,10 @@ public abstract class Transaction {
     // region Identity
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Transaction that = (Transaction) o;
         return Objects.equals(this.transactionId, that.transactionId);
     }
@@ -139,4 +145,3 @@ public abstract class Transaction {
     }
     // endregion
 }
-

@@ -54,7 +54,8 @@ public class Wallet {
                 LocalDateTime.now(), new ActiveWalletState(), Money.ZERO);
     }
 
-    public Wallet(String id, String name, String note, boolean defaultWallet,
+    public Wallet(
+            String id, String name, String note, boolean defaultWallet,
             LocalDateTime createdAt, WalletState state, Money currentBalance) {
 
         this.id = Objects.requireNonNull(id, "Mã ví không được để null");
