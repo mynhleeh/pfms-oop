@@ -176,7 +176,19 @@ public class Wallet {
     }
 
     public boolean isActive() {
-        return this.state.getStatus() == WalletStatus.ACTIVE;
+        try {
+            return this.state.getStatus() == WalletStatus.ACTIVE;
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
+
+    public boolean isArchived() {
+        try {
+            return this.state.getStatus() == WalletStatus.ARCHIVED;
+        } catch (IllegalStateException e) {
+            return false;
+        }
     }
 
     public Money getCurrentBalance() {

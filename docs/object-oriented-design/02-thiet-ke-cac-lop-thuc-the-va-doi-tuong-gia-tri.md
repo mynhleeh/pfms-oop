@@ -126,20 +126,20 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `Wallet` | `UUID walletId, String name, String note, boolean isDefault` | `Wallet` | `ValidationException` | Kiểm tra `walletId` khác `null`, cắt khoảng trắng hai đầu, kiểm tra tên dài 1 đến 50 ký tự và ghi chú tối đa 255 ký tự, gán `status = ACTIVE`, `currentBalance = Money.ZERO` và `createdAt` hiện tại. |
-| `credit` | `Money amount` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE` và `amount` lớn hơn `0.00 VNĐ`, sau đó cộng `amount` vào `currentBalance`. |
-| `debit` | `Money amount` | `void` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE`, `amount` lớn hơn `0.00 VNĐ` và `currentBalance` đủ chi trả, sau đó trừ `amount` khỏi `currentBalance`. |
-| `adjustBalance` | `Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `ValidationException`, `BusinessRuleException` | Kiểm tra ví đang `ACTIVE`, khởi tạo và xác thực bản ghi `BalanceAdjustmentRecord` trước để bảo đảm `actualBalance` không âm, độ lệch khác không và `reason` hợp lệ, sau đó mới cập nhật `currentBalance = actualBalance` rồi trả về bản ghi. |
-| `updateInfo` | `String newName, String newNote` | `void` | `ValidationException` | Cắt khoảng trắng hai đầu, kiểm tra `newName` dài 1 đến 50 ký tự và `newNote` tối đa 255 ký tự, cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
-| `archive` | `Không` | `void` | `BusinessRuleException` | Kiểm tra `isDefault == false` và ví đang `ACTIVE`, sau đó chuyển `status` sang `ARCHIVED`. |
-| `activate` | `Không` | `void` | `BusinessRuleException` | Kiểm tra ví đang `ARCHIVED` rồi chuyển `status` về `ACTIVE` để ví tiếp nhận lại giao dịch mới. |
+| `Wallet` | `UUID walletId, String name, String note, boolean isDefault` | `Wallet` | `BusinessException, IllegalArgumentException` | Kiểm tra `walletId` khác `null`, cắt khoảng trắng hai đầu, kiểm tra tên dài 1 đến 50 ký tự (`ERR_NAM_001`) và ghi chú tối đa 255 ký tự, gán `status = ACTIVE`, `currentBalance = Money.ZERO` và `createdAt` hiện tại. |
+| `credit` | `Money amount` | `void` | `BusinessException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`) và `amount` lớn hơn `0.00 VNĐ`, sau đó cộng `amount` vào `currentBalance`. |
+| `debit` | `Money amount` | `void` | `BusinessException, InsufficientBalanceException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`), `amount` lớn hơn `0.00 VNĐ` và `currentBalance` đủ chi trả (`ERR_WAL_001`), sau đó trừ `amount` khỏi `currentBalance`. |
+| `adjustBalance` | `Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `BusinessException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`), khởi tạo và xác thực bản ghi `BalanceAdjustmentRecord` trước để bảo đảm `actualBalance` không âm (`ERR_FIN_001`), độ lệch khác không (`ERR_FIN_001`) và `reason` hợp lệ, sau đó mới cập nhật `currentBalance = actualBalance` rồi trả về bản ghi. |
+| `updateInfo` | `String newName, String newNote` | `void` | `BusinessException, IllegalArgumentException` | Cắt khoảng trắng hai đầu, kiểm tra `newName` dài 1 đến 50 ký tự (`ERR_NAM_001`) và `newNote` tối đa 255 ký tự, cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
+| `archive` | `Không` | `void` | `IllegalStateException, BusinessException` | Kiểm tra `isDefault == false` và ví đang `ACTIVE`, sau đó chuyển `status` sang `ARCHIVED`. |
+| `activate` | `Không` | `void` | `IllegalStateException, BusinessException` | Kiểm tra ví đang `ARCHIVED` rồi chuyển `status` về `ACTIVE` để ví tiếp nhận lại giao dịch mới. |
 | `getWalletId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất của ví để làm khóa lưu trữ trên kho dữ liệu và đối chiếu giao dịch liên kết. |
 | `getName` | `Không` | `String` | `Không` | Trả về tên ví hiện tại phục vụ kiểm tra trùng tên không phân biệt hoa thường tại kho lưu trữ và hiển thị. |
 | `getStatus` | `Không` | `WalletStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví để lọc danh sách và thống kê số lượng ví theo trạng thái. |
 | `isDefault` | `Không` | `boolean` | `Không` | Trả về `true` nếu đây là ví tiền mặt mặc định, giúp tầng dịch vụ chặn thao tác xóa hoặc lưu trữ ví mặc định. |
 | `isActive` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `WalletStatus.ACTIVE`, phục vụ kiểm tra trạng thái hoạt động trước khi hạch toán giao dịch. |
 | `getCurrentBalance` | `Không` | `Money` | `Không` | Trả về số dư khả dụng hiện tại phục vụ hiển thị và tính cơ cấu phân bổ tài sản mà không mở hàm gán trực tiếp. |
-| `hasSufficientBalance` | `Money amount` | `boolean` | `ValidationException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
+| `hasSufficientBalance` | `Money amount` | `boolean` | `IllegalArgumentException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
@@ -447,17 +447,17 @@ Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất 
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `of` | `String rawAmount` | `Money` | `ValidationException` | Phân tích chuỗi thập phân hợp lệ, chuẩn hóa 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN` và gán đơn vị `"VNĐ"`. |
-| `of` | `BigDecimal value` | `Money` | `ValidationException` | Kiểm tra `value` khác `null`, chuẩn hóa `setScale(2, RoundingMode.HALF_EVEN)` và trả về thể hiện `Money` mới. |
-| `add` | `Money other` | `Money` | `ValidationException` | Kiểm tra `other` khác `null`, cộng `this.amount` với `other.amount` và trả về thể hiện `Money` mới, dùng khi ghi nhận khoản thu hoặc nhận chuyển tiền. |
-| `subtract` | `Money other` | `Money` | `ValidationException` | Kiểm tra `other` khác `null`, trừ `other.amount` khỏi `this.amount` và trả về thể hiện `Money` mới, dùng khi trừ số dư ví hoặc tính chênh lệch kiểm kê. |
+| `of` | `String rawAmount` | `Money` | `IllegalArgumentException` | Phân tích chuỗi thập phân hợp lệ, chuẩn hóa 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN` và gán đơn vị `"VNĐ"`. |
+| `of` | `BigDecimal value` | `Money` | `IllegalArgumentException` | Kiểm tra `value` khác `null`, chuẩn hóa `setScale(2, RoundingMode.HALF_EVEN)` và trả về thể hiện `Money` mới. |
+| `add` | `Money other` | `Money` | `IllegalArgumentException` | Kiểm tra `other` khác `null`, cộng `this.amount` với `other.amount` và trả về thể hiện `Money` mới, dùng khi ghi nhận khoản thu hoặc nhận chuyển tiền. |
+| `subtract` | `Money other` | `Money` | `IllegalArgumentException` | Kiểm tra `other` khác `null`, trừ `other.amount` khỏi `this.amount` và trả về thể hiện `Money` mới, dùng khi trừ số dư ví hoặc tính chênh lệch kiểm kê. |
 | `abs` | `Không` | `Money` | `Không` | Trả về thể hiện `Money` mới mang giá trị tuyệt đối không âm, dùng để tách dòng tiền vào hoặc ra từ khoản chênh lệch kiểm kê. |
-| `requireNonNegative` | `Không` | `Money` | `BusinessRuleException` | Kiểm tra `amount` từ `0.00 VNĐ` trở lên để bảo đảm số dư ví và số dư kiểm kê không âm. |
+| `requireNonNegative` | `Không` | `Money` | `IllegalStateException` | Kiểm tra `amount` từ `0.00 VNĐ` trở lên để bảo đảm số dư ví và số dư kiểm kê không âm. |
 | `isPositive` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` lớn hơn `0.00`, dùng để kiểm tra số tiền giao dịch thu chi và chuyển tiền phải dương. |
 | `isNegative` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` nhỏ hơn `0.00`, dùng để phát hiện và chặn thao tác làm âm số dư ví. |
 | `isZero` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` bằng `0.00`, dùng để kiểm tra chênh lệch kiểm kê bằng không hoặc mẫu số bằng không khi tính tỷ lệ. |
 | `getAmount` | `Không` | `BigDecimal` | `Không` | Trả về giá trị `BigDecimal` bất biến chuẩn 2 chữ số thập phân để tính tỷ trọng báo cáo và tuần tự hóa lưu trữ JSON. |
-| `compareTo` | `Money other` | `int` | `ValidationException` | Kiểm tra `other` khác `null` và so sánh thứ tự đại số qua `this.amount.compareTo(other.amount)`, trả về số âm, `0` hoặc số dương. |
+| `compareTo` | `Money other` | `int` | `NullPointerException` | Kiểm tra `other` khác `null` và so sánh thứ tự đại số qua `this.amount.compareTo(other.amount)`, trả về số âm, `0` hoặc số dương. |
 | `formatDisplay` | `Không` | `String` | `Không` | Định dạng số tiền thành chuỗi số nguyên đồng (0 chữ số thập phân) có dấu phân cách hàng nghìn kèm đơn vị `"VNĐ"` để hiển thị trên dòng lệnh. |
 
 **Tính bất biến và cơ chế so sánh**

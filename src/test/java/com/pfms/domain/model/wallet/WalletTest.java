@@ -307,6 +307,28 @@ class WalletTest {
             wallet.archive();
             assertFalse(wallet.isActive());
         }
+
+        @Test
+        @DisplayName("isArchived() should return false for active and true for archived")
+        void testIsArchivedQuery() {
+            Wallet wallet = new Wallet("Ví phụ", "", false);
+            assertFalse(wallet.isArchived());
+
+            wallet.archive();
+            assertTrue(wallet.isArchived());
+
+            wallet.activate();
+            assertFalse(wallet.isArchived());
+        }
+
+        @Test
+        @DisplayName("isArchived() and isActive() on deleted wallet should return false safely")
+        void testQueriesOnDeletedWallet() {
+            Wallet wallet = new Wallet("Ví phụ", "", false);
+            wallet.delete();
+            assertFalse(wallet.isArchived());
+            assertFalse(wallet.isActive());
+        }
     }
 
     @Nested
