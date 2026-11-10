@@ -9,13 +9,9 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Bộ kiểm thử hợp đồng định hình hành vi cho GenericRepository.
- */
-@DisplayName("Contract Tests for GenericRepository")
-class GenericRepositoryContractTest {
+@DisplayName("GenericRepository Tests")
+class GenericRepositoryTest {
 
-    // region Test Doubles
     static class DummyEntity {
         private final UUID id;
         private final String name;
@@ -88,7 +84,6 @@ class GenericRepositoryContractTest {
             return storage.remove(id) != null;
         }
     }
-    // endregion
 
     private InMemoryDummyRepository repository;
     private DummyEntity entity1;
@@ -101,7 +96,6 @@ class GenericRepositoryContractTest {
         entity2 = new DummyEntity(UUID.randomUUID(), "Tài Khoản Ngân Hàng");
     }
 
-    // region Save Tests
     @Nested
     @DisplayName("Tests for save(E entity)")
     class SaveTests {
@@ -135,9 +129,7 @@ class GenericRepositoryContractTest {
             assertThrows(IllegalArgumentException.class, () -> repository.save(null));
         }
     }
-    // endregion
 
-    // region FindById Tests
     @Nested
     @DisplayName("Tests for findById(ID id)")
     class FindByIdTests {
@@ -168,9 +160,7 @@ class GenericRepositoryContractTest {
             assertThrows(IllegalArgumentException.class, () -> repository.findById(null));
         }
     }
-    // endregion
 
-    // region FindAll Tests
     @Nested
     @DisplayName("Tests for findAll()")
     class FindAllTests {
@@ -207,9 +197,7 @@ class GenericRepositoryContractTest {
             assertThrows(UnsupportedOperationException.class, () -> all.add(entity2));
         }
     }
-    // endregion
 
-    // region ExistsById Tests
     @Nested
     @DisplayName("Tests for existsById(ID id)")
     class ExistsByIdTests {
@@ -234,9 +222,7 @@ class GenericRepositoryContractTest {
             assertThrows(IllegalArgumentException.class, () -> repository.existsById(null));
         }
     }
-    // endregion
 
-    // region DeleteById Tests
     @Nested
     @DisplayName("Tests for deleteById(ID id)")
     class DeleteByIdTests {
@@ -267,6 +253,5 @@ class GenericRepositoryContractTest {
             assertThrows(IllegalArgumentException.class, () -> repository.deleteById(null));
         }
     }
-    // endregion
 }
 

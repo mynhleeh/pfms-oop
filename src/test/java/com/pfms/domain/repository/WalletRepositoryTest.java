@@ -15,13 +15,9 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Bộ kiểm thử hợp đồng định hình hành vi cho WalletRepository.
- */
-@DisplayName("WalletRepository Contract Tests")
-class WalletRepositoryContractTest {
+@DisplayName("WalletRepository Tests")
+class WalletRepositoryTest {
 
-    // region Test Doubles
     static class InMemoryWalletRepositoryStub implements WalletRepository {
         private final Map<String, Wallet> storage = new LinkedHashMap<>();
 
@@ -111,7 +107,6 @@ class WalletRepositoryContractTest {
                     .findFirst();
         }
     }
-    // endregion
 
     private InMemoryWalletRepositoryStub repository;
     private Wallet defaultCashWallet;
@@ -150,7 +145,6 @@ class WalletRepositoryContractTest {
                 Money.ZERO);
     }
 
-    // region FindByName Tests
     @Nested
     @DisplayName("Tests for findByName(String name)")
     class FindByNameTests {
@@ -207,9 +201,7 @@ class WalletRepositoryContractTest {
             assertThrows(IllegalArgumentException.class, () -> repository.findByName(null));
         }
     }
-    // endregion
 
-    // region ExistsByName Tests
     @Nested
     @DisplayName("Tests for existsByName(String name)")
     class ExistsByNameTests {
@@ -253,9 +245,7 @@ class WalletRepositoryContractTest {
             assertThrows(IllegalArgumentException.class, () -> repository.existsByName(null));
         }
     }
-    // endregion
 
-    // region FindByStatus Tests
     @Nested
     @DisplayName("Tests for findByStatus(WalletStatus status)")
     class FindByStatusTests {
@@ -304,9 +294,7 @@ class WalletRepositoryContractTest {
             assertThrows(IllegalArgumentException.class, () -> repository.findByStatus(null));
         }
     }
-    // endregion
 
-    // region CountByStatus Tests
     @Nested
     @DisplayName("Tests for countByStatus(WalletStatus status)")
     class CountByStatusTests {
@@ -336,9 +324,7 @@ class WalletRepositoryContractTest {
             assertThrows(IllegalArgumentException.class, () -> repository.countByStatus(null));
         }
     }
-    // endregion
 
-    // region FindDefaultWallet Tests
     @Nested
     @DisplayName("Tests for findDefaultWallet()")
     class FindDefaultWalletTests {
@@ -367,9 +353,7 @@ class WalletRepositoryContractTest {
             assertTrue(result.isEmpty());
         }
     }
-    // endregion
 
-    // region Generic CRUD Integration Tests
     @Nested
     @DisplayName("Tests for inherited GenericRepository operations")
     class InheritedCrudTests {
@@ -388,5 +372,5 @@ class WalletRepositoryContractTest {
             assertEquals(0, repository.findAll().size());
         }
     }
-    // endregion
 }
+
