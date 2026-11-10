@@ -129,31 +129,52 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 ### 2.2.2 Lớp Giao dịch Cơ sở và Giao dịch Thu Chi
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp trừu tượng Transaction và lớp con IncomeExpenseTransaction trong việc quản lý và hạch toán các khoản thu chi phát sinh)
+Lớp trừu tượng `Transaction` định nghĩa các thuộc tính cốt lõi chung và cặp phương thức hợp đồng đa hình cho mọi biến động dòng tiền trong hệ thống. Lớp con cụ thể `IncomeExpenseTransaction` hiện thực hóa giao dịch thu nhập hoặc chi tiêu phát sinh tại một ví xác định, liên kết trực tiếp với danh mục cấp 3 và hạch toán số dư ví kèm theo phụ phí hợp thành nếu có.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TXN-01`, `UC-TXN-02`, `UC-TXN-03`, `UC-TXN-04`
 - Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-03`, `FR-TXN-04`, `FR-TXN-05`
 - Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
-- Mã lỗi: `ERR-FIN-001`, `ERR-WAL-001`, `ERR-CAT-001`
+- Mã lỗi: `ERR-FIN-001`, `ERR-WAL-001`, `ERR-CAT-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
 **Cấu trúc thuộc tính**
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `transactionId` | `UUID` | `protected final` | Mã định danh duy nhất của giao dịch, sinh tự động khi tạo mới và giữ cố định suốt vòng đời. |
+| `amount` | `Money` | `protected` | Số tiền giao dịch, có đúng 2 chữ số thập phân và bắt buộc lớn hơn `0.00 VNĐ`. |
+| `transactionDate` | `TransactionDate` | `protected` | Ngày phát sinh giao dịch, bọc đối tượng giá trị lịch pháp và không được vượt quá ngày hiện tại. |
+| `fee` | `TransactionFee` | `protected` | Bản ghi chi phí giao dịch hợp thành (`0..1`), gắn liền sinh tử với giao dịch gốc (nhận `null` nếu không có phí). |
+| `note` | `String` | `protected` | Chuỗi ghi chú diễn giải tùy chọn, dài tối đa 255 ký tự sau khi cắt tỉa khoảng trắng hai đầu. |
+| `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến, phục vụ sắp xếp lịch sử giao dịch thứ cấp khi trùng ngày. |
+| `transactionType` | `TransactionType` | `private final` | Chiều biến động dòng tiền (`INCOME` hoặc `EXPENSE`) tại `IncomeExpenseTransaction`, mang tính bất biến. |
+| `wallet` | `Wallet` | `private` | Tham chiếu thực thể `Wallet` đang hoạt động (`ACTIVE`) tiếp nhận hoặc trích xuất dòng tiền. |
+| `category` | `Category` | `private` | Tham chiếu thực thể `Category` cấp 3 đang `ACTIVE`, bắt buộc có loại thu chi khớp với `transactionType`. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc kiểm tra và logic xử lý trạng thái) |
+| `Transaction` *(Constructor)* | `UUID transactionId, Money amount, TransactionDate transactionDate, String note, TransactionFee fee` | Không có | `BusinessException` | Hàm khởi tạo của lớp cha trừu tượng; kiểm tra `transactionId` và `transactionDate` khác `null`, `amount` lớn hơn `0.00 VNĐ` (`ERR_FIN_001`), chuẩn hóa `note` (tối đa 255 ký tự) và gán `createdAt` thời điểm hiện tại. |
+| `IncomeExpenseTransaction` *(Constructor)* | `UUID transactionId, TransactionType transactionType, Wallet wallet, Category category, Money amount, TransactionDate date, String note, TransactionFee fee` | Không có | `BusinessException` | Gọi `super(...)`; kiểm tra `wallet.isActive()`, `category.isActive()` khớp `transactionType` (`ERR_CAT_001`), và nếu có `fee` thì khớp `transactionId` cùng `wallet`. |
+| `applyToWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Lớp con kiểm tra `wallet.isActive()` và tính toán số dư ròng; thực hiện `wallet.credit(amount)` nếu là `INCOME` hoặc `wallet.debit(amount)` nếu là `EXPENSE`, sau đó gọi `fee.applyFee()` nếu có phí. |
+| `revertFromWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Lớp con kiểm tra số dư đủ điều kiện hoàn nguyên; gọi `fee.revertFee()` nếu có phí, sau đó gọi `wallet.debit(amount)` nếu là `INCOME` hoặc `wallet.credit(amount)` nếu là `EXPENSE`. |
+| `updateDetails` | `Wallet newWallet, Category newCategory, Money newAmount, TransactionDate newDate, String newNote, TransactionFee newFee` | `void` | `BusinessException` | Kiểm tra tham số hợp lệ; hoàn nguyên giao dịch cũ thông qua `revertFromWallet()`, cập nhật thông tin mới và thực thi hạch toán lại qua `applyToWallet()`. |
+| `getTransactionId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của giao dịch để làm khóa tra cứu và đối soát liên kết. |
+| `getAmount` | Không có | `Money` | Không có | Trả về đối tượng giá trị số tiền của giao dịch phục vụ tính toán dòng tiền. |
+| `getTransactionDate` | Không có | `TransactionDate` | Không có | Trả về mốc ngày ghi nhận giao dịch phục vụ bộ lọc thời gian và báo cáo chuỗi thời gian. |
+| `getCreatedAt` | Không có | `LocalDateTime` | Không có | Trả về thời điểm tạo bản ghi giao dịch bất biến trong hệ thống. |
+| `getFee` | Không có | `Optional<TransactionFee>` | Không có | Bọc trường `fee` trong `Optional` để truy xuất an toàn khi giao dịch không có chi phí đi kèm. |
+| `getNote` | Không có | `String` | Không có | Trả về nội dung ghi chú diễn giải của giao dịch. |
+| `getWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví thanh toán chịu tác động tại `IncomeExpenseTransaction`. |
+| `getCategory` | Không có | `Category` | Không có | Trả về thực thể danh mục phân loại mục đích chi tiêu tại `IncomeExpenseTransaction`. |
+| `getTransactionType` | Không có | `TransactionType` | Không có | Trả về chiều dòng tiền (`INCOME` hoặc `EXPENSE`) cố định của giao dịch. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- (Nêu cơ chế kế thừa từ Transaction, hàm khởi tạo và tính bất biến của mã giao dịch, ngày giao dịch)
-- (Nêu cơ chế đa hình qua các phương thức thực thi và hoàn nguyên dòng tiền tác động lên số dư ví)
-- (Nêu quy tắc kiểm soát tính tương thích giữa loại giao dịch và danh mục thu chi)
+- Khung kế thừa trừu tượng và tính bất biến: Lớp `Transaction` bảo vệ tính toàn vẹn định danh bằng cách khóa cố định `transactionId` và `createdAt` bằng từ khóa `final`. Toàn bộ các thuộc tính dùng chung được phân quyền truy cập `protected` để các lớp con (`IncomeExpenseTransaction`, `TransferTransaction`) kế thừa trọn vẹn mà không phá vỡ tính đóng gói đối với bên ngoài.
+- Đa hình hóa hạch toán dòng tiền (Polymorphism): Cặp phương thức trừu tượng `applyToWallet()` và `revertFromWallet()` chuyển giao toàn bộ logic tác động số dư cho các lớp con cụ thể, loại bỏ hoàn toàn các cấu trúc điều kiện rẽ nhánh thủ công (`if-else` trên loại giao dịch) theo nguyên lý Đóng/Mở (OCP).
+- Kiểm soát tương thích danh mục và phí liên kết: Tại `IncomeExpenseTransaction`, thuộc tính `category` bắt buộc phải đang hoạt động (`ACTIVE`) và có loại thu chi tương thích tuyệt đối với `transactionType`, ngăn chặn hoàn toàn việc phân loại nhầm thu nhập vào danh mục chi tiêu theo `BR-FIN-04`. Nếu giao dịch có kèm theo `fee`, bản ghi phí bắt buộc phải có `parentTransactionId` trùng khớp với `transactionId` của giao dịch chủ.
 
 ### 2.2.3 Lớp Giao dịch Chuyển tiền
 
@@ -185,11 +206,11 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 ### 2.2.4 Lớp Chi phí Giao dịch
 
-(Mô tả khoảng 1 đến 2 câu về vai trò của lớp TransactionFee trong việc ghi nhận phụ phí phát sinh và quan hệ sinh tử với giao dịch gốc)
+Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh phụ thuộc sinh tử kèm theo giao dịch thu chi hoặc chuyển tiền nội bộ. Khoản phí này mang bản chất chi tiêu và gắn kết hợp thành với giao dịch gốc nhằm bảo đảm tính toàn vẹn dữ liệu và loại trừ nguy cơ phát sinh bản ghi chi phí mồ côi.
 
 **Quy chiếu yêu cầu:**
-- Ca sử dụng: `UC-TXN-01`, `UC-TXN-03`, `UC-TRF-01`, `UC-TRF-03`
-- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-04`, `FR-TRF-01`, `FR-TRF-02`
+- Ca sử dụng: `UC-TXN-01`, `UC-TXN-03`, `UC-TXN-04`, `UC-TRF-01`, `UC-TRF-03`
+- Yêu cầu chức năng: `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`, `FR-TRF-01`, `FR-TRF-02`
 - Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
 - Mã lỗi: `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`, `ERR-WAL-001`
 
@@ -197,19 +218,31 @@ Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| (Tên thuộc tính) | (Kiểu dữ liệu) | (Phạm vi truy cập) | (Điều kiện hợp lệ, tính bất biến hoặc giá trị mặc định) |
+| `feeId` | `UUID` | `private final` | Mã định danh duy nhất của bản ghi chi phí, sinh tự động khi khởi tạo và giữ cố định suốt vòng đời. |
+| `parentTransactionId` | `UUID` | `private final` | Mã định danh giao dịch gốc (`Transaction`), dùng để ràng buộc vòng đời hợp thành và ngăn bản ghi phí mồ côi. |
+| `amount` | `Money` | `private` | Số tiền chi phí có đúng 2 chữ số thập phân và bắt buộc lớn hơn `0.00 VNĐ`. |
+| `wallet` | `Wallet` | `private` | Tham chiếu thực thể `Wallet` đang hoạt động (`ACTIVE`) dùng để trích chi phí. |
+| `category` | `Category` | `private` | Tham chiếu thực thể `Category` cấp 3 đang hoạt động (`ACTIVE`) thuộc nhánh chi tiêu (`EXPENSE`). |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| (Tên phương thức) | (Kiểu và tên tham số) | (Kiểu trả về) | (Ngoại lệ ném ra nếu có) | (Quy tắc kiểm tra và logic xử lý trạng thái) |
+| `TransactionFee` *(Constructor)* | `UUID feeId, UUID parentTransactionId, Money amount, Wallet wallet, Category category` | Không có | `BusinessException` | Kiểm tra các tham số khác `null`; kiểm tra `amount` lớn hơn `0.00 VNĐ` (`ERR_FEE_001`); kiểm tra `category` khác `null` (`ERR_FEE_002`); kiểm tra `wallet.isActive()` và `category.isActive()` thuộc loại `EXPENSE` (`ERR_FEE_003`). |
+| `applyFee` | Không có | `void` | `BusinessException` | Gọi `wallet.debit(amount)` để trích tiền phí khỏi ví thanh toán; ném `ERR_WAL_001` nếu số dư ví không đủ chi trả. |
+| `revertFee` | Không có | `void` | `BusinessException` | Gọi `wallet.credit(amount)` để hoàn lại tiền phí vào ví khi giao dịch gốc bị hủy hoặc hoàn nguyên. |
+| `updateFee` | `Money newAmount, Category newCategory, Wallet newWallet` | `void` | `BusinessException` | Kiểm tra tham số hợp lệ, ví và danh mục mới đang `ACTIVE` thuộc nhánh `EXPENSE` trước khi cập nhật lại số tiền, danh mục hoặc ví trích phí. |
+| `getFeeId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của bản ghi phí giao dịch. |
+| `getParentTransactionId` | Không có | `UUID` | Không có | Trả về mã định danh giao dịch chủ quản để phục vụ kiểm tra toàn vẹn liên kết. |
+| `getAmount` | Không có | `Money` | Không có | Trả về đối tượng giá trị số tiền phí phục vụ tổng hợp dòng tiền ra và báo cáo chi phí. |
+| `getWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví thanh toán đang chịu khoản trích phí. |
+| `getCategory` | Không có | `Category` | Không có | Trả về danh mục phân loại chi phí cấp 3 thuộc nhánh `EXPENSE`. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- (Nêu quan hệ hợp thành phụ thuộc hoàn toàn vào vòng đời của giao dịch chủ)
-- (Nêu quy tắc bắt buộc số tiền phí không âm và danh mục hạch toán phải thuộc loại chi tiêu)
-- (Nêu cơ chế trích xuất phí tác động đến số dư ví thanh toán)
+- Quan hệ hợp thành phụ thuộc vòng đời: Trường `parentTransactionId` được khóa cố định bằng từ khóa `final`. Thực thể `TransactionFee` chỉ được khởi tạo thông qua `TransactionFactory` khi giao dịch phát sinh chi phí lớn hơn `0.00 VNĐ`, bảo đảm bản ghi phí luôn đồng hành và tự động giải phóng theo vòng đời của giao dịch gốc.
+- Ràng buộc phân loại và số dư tài chính: Mức phí bắt buộc phải mang giá trị dương (`amount > 0.00 VNĐ`) và gắn cố định với một `Category` chi tiêu đang hoạt động (`ACTIVE`). Giao dịch chủ quản chịu trách nhiệm kiểm tra số dư khả dụng tổng thể của ví trước khi thực thi nhằm bảo đảm bất biến số dư không âm theo `BR-FIN-02`.
+- Cơ chế hạch toán dòng tiền: Phương thức `applyFee()` và `revertFee()` thực thi trích xuất và hoàn nguyên trực tiếp trên đối tượng `Wallet` thông qua các hành vi `debit()` và `credit()`, bảo đảm dữ liệu số dư ví luôn đồng bộ với sổ nhật ký giao dịch.
 
 ### 2.2.5 Lớp Danh mục Chi tiết
 
