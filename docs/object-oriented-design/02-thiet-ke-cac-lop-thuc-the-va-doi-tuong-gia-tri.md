@@ -251,7 +251,7 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 | `changeNeedGroup` | `UUID newNeedGroupId, TransactionType targetGroupType` | `void` | `BusinessException` | Chuyển danh mục sang nhóm nhu cầu cha mới; ném ngoại lệ nếu nhóm đích khác loại thu chi hoặc nhóm đích đã bị xóa theo quy tắc cấu trúc danh mục ba cấp. |
 | `updateAppearance` | `String newIcon, String newColor` | `void` | Không có | Cập nhật biểu tượng nhận diện và mã màu hiển thị của danh mục theo tùy biến người dùng. |
 | `markDeleted` | Không có | `void` | Không có | Chuyển trạng thái sang `DELETED` (xóa mềm), ẩn danh mục khỏi danh sách lựa chọn cho giao dịch mới nhưng bảo toàn liên kết với các giao dịch lịch sử và báo cáo theo quy tắc xóa mềm bảo toàn lịch sử và cấu trúc danh mục ba cấp. |
-| `restore` | `CategoryStatus parentGroupStatus` | `void` | `BusinessException` | Khôi phục danh mục về trạng thái `ACTIVE`; ném ngoại lệ từ chối nếu nhóm nhu cầu cha vẫn đang ở trạng thái đã xóa theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi khôi phục. |
+| `restore` | `boolean isParentGroupActive` | `void` | `BusinessException` | Khôi phục danh mục về trạng thái `ACTIVE`; ném ngoại lệ từ chối nếu nhóm nhu cầu cha không ở trạng thái hoạt động (`isParentGroupActive == false`) theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi khôi phục. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 

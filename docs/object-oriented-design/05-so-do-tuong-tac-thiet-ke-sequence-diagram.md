@@ -418,7 +418,7 @@ sequenceDiagram
                 CategoryService-->>CLI: 13. ném DuplicateEntityException
                 CLI-->>User: 14. Hiển thị thông báo xung đột tên danh mục đang hoạt động
             else Không bị trùng tên (Đủ điều kiện khôi phục)
-                CategoryService->>+Category: 15. restore(parentGroupStatus)
+                CategoryService->>+Category: 15. restore(isParentGroupActive)
                 Category-->>-CategoryService: 16. void (chuyển trạng thái sang ACTIVE)
                 CategoryService->>+CategoryRepo: 17. save(category)
                 CategoryRepo-->>-CategoryService: 18. restoredCategory
