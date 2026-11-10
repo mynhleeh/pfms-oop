@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,7 +60,7 @@ class WalletTest {
         @Test
         @DisplayName("Full constructor should populate all fields and preserve state")
         void testFullConstructor() {
-            String id = "WAL-12345";
+            UUID id = UUID.randomUUID();
             LocalDateTime now = LocalDateTime.now();
             Wallet wallet = new Wallet(id, "Vietcombank", "Ví chính", false,
                     now, new ActiveWalletState(), Money.of(500_000));
@@ -70,6 +71,21 @@ class WalletTest {
             assertFalse(wallet.isDefaultWallet());
             assertEquals(now, wallet.getCreatedAt());
             assertEquals(Money.of(500_000), wallet.getCurrentBalance());
+            assertEquals(WalletStatus.ACTIVE, wallet.getStatus());
+        }
+
+        @Test
+        @DisplayName("Constructor with UUID, name, note, defaultWallet should match Doc 02 specification")
+        void testFourParameterConstructor() {
+            UUID id = UUID.randomUUID();
+            Wallet wallet = new Wallet(id, "MoMo", "Ví điện tử", false);
+
+            assertEquals(id, wallet.getId());
+            assertEquals(id, wallet.getWalletId());
+            assertEquals("MoMo", wallet.getName());
+            assertEquals("Ví điện tử", wallet.getNote());
+            assertFalse(wallet.isDefault());
+            assertEquals(Money.ZERO, wallet.getCurrentBalance());
             assertEquals(WalletStatus.ACTIVE, wallet.getStatus());
         }
     }
@@ -202,7 +218,7 @@ class WalletTest {
             InsufficientBalanceException ex = assertThrows(InsufficientBalanceException.class,
                     () -> wallet.debit(Money.of(70_000)));
 
-            assertEquals(wallet.getId(), ex.getWalletId());
+            assertEquals(wallet.getId().toString(), ex.getWalletId());
             assertEquals(Money.of(50_000), ex.getBalance());
             assertEquals(Money.of(70_000), ex.getAmount());
             assertEquals(Money.of(50_000), wallet.getCurrentBalance());
@@ -300,7 +316,7 @@ class WalletTest {
         @Test
         @DisplayName("Two wallets with identical id should be equal regardless of other fields")
         void testEqualsSameId() {
-            String sharedId = "WAL-SHARED-001";
+            UUID sharedId = UUID.randomUUID();
             LocalDateTime time = LocalDateTime.now();
 
             Wallet w1 = new Wallet(sharedId, "Ví A", "Ghi chú A", false, time, new ActiveWalletState(), Money.of(10_000));
@@ -335,7 +351,7 @@ class WalletTest {
             Wallet wallet = new Wallet("Ví ShopeePay");
             String output = wallet.toString();
 
-            assertTrue(output.contains(wallet.getId()));
+            assertTrue(output.contains(wallet.getId().toString()));
             assertTrue(output.contains("Ví ShopeePay"));
             assertTrue(output.contains("0 VNĐ"));
             assertTrue(output.contains("ACTIVE"));

@@ -18,7 +18,7 @@ import java.util.UUID;
 public class Wallet {
 
     // region State
-    private final String id;
+    private final UUID id;
     private String name;
     private String note;
     private final boolean defaultWallet;
@@ -41,22 +41,27 @@ public class Wallet {
     }
 
     public Wallet(Money initialBalance) {
-        this(UUID.randomUUID().toString(), "Ví chính", "", false,
+        this(UUID.randomUUID(), "Ví chính", "", false,
                 LocalDateTime.now(), new ActiveWalletState(), initialBalance);
     }
 
     public Wallet(WalletState initialState, Money initialBalance) {
-        this(UUID.randomUUID().toString(), "Ví chính", "", false,
+        this(UUID.randomUUID(), "Ví chính", "", false,
                 LocalDateTime.now(), initialState, initialBalance);
     }
 
     public Wallet(String name, String note, boolean defaultWallet) {
-        this(UUID.randomUUID().toString(), name, note, defaultWallet,
+        this(UUID.randomUUID(), name, note, defaultWallet,
+                LocalDateTime.now(), new ActiveWalletState(), Money.ZERO);
+    }
+
+    public Wallet(UUID id, String name, String note, boolean defaultWallet) {
+        this(id, name, note, defaultWallet,
                 LocalDateTime.now(), new ActiveWalletState(), Money.ZERO);
     }
 
     public Wallet(
-            String id, String name, String note, boolean defaultWallet,
+            UUID id, String name, String note, boolean defaultWallet,
             LocalDateTime createdAt, WalletState state, Money currentBalance) {
 
         this.id = Objects.requireNonNull(id, "Mã ví không được để null");
@@ -66,6 +71,13 @@ public class Wallet {
         this.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo không được để null");
         this.state = Objects.requireNonNull(state, "Trạng thái khởi tạo không được để null");
         this.currentBalance = Objects.requireNonNull(currentBalance, "Số dư khởi tạo không được để null");
+    }
+
+    public Wallet(
+            String id, String name, String note, boolean defaultWallet,
+            LocalDateTime createdAt, WalletState state, Money currentBalance) {
+
+        this(parseId(id), name, note, defaultWallet, createdAt, state, currentBalance);
     }
     // endregion
 
@@ -123,12 +135,16 @@ public class Wallet {
     // endregion
 
     // region Queries
-    public String getId() {
+    public UUID getId() {
         return this.id;
     }
 
-    public String getWalletId() {
+    public UUID getWalletId() {
         return this.id;
+    }
+
+    public String getWalletIdAsString() {
+        return this.id.toString();
     }
 
     public String getName() {
@@ -220,6 +236,15 @@ public class Wallet {
         Objects.requireNonNull(amount, "Số tiền không được để null");
         if (!amount.isPositive()) {
             throw new IllegalArgumentException("Số tiền giao dịch phải là số dương lớn hơn 0.");
+        }
+    }
+
+    private static UUID parseId(String id) {
+        Objects.requireNonNull(id, "Mã ví không được để null");
+        try {
+            return UUID.fromString(id.trim());
+        } catch (IllegalArgumentException ex) {
+            return UUID.nameUUIDFromBytes(id.trim().getBytes(java.nio.charset.StandardCharsets.UTF_8));
         }
     }
     // endregion

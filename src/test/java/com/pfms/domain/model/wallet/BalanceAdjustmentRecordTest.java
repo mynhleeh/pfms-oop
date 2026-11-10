@@ -17,13 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class BalanceAdjustmentRecordTest {
 
     private UUID recordId;
-    private String walletId;
+    private UUID walletId;
     private TransactionDate validDate;
 
     @BeforeEach
     void setUp() {
         recordId = UUID.randomUUID();
-        walletId = UUID.randomUUID().toString();
+        walletId = UUID.randomUUID();
         validDate = TransactionDate.now();
     }
 
@@ -128,7 +128,7 @@ class BalanceAdjustmentRecordTest {
         @DisplayName("Khởi tạo với walletId null ném NullPointerException")
         void testConstructor_NullWalletId_ThrowsException() {
             assertThrows(NullPointerException.class, () -> new BalanceAdjustmentRecord(
-                    recordId, null, Money.of(100_000), Money.of(150_000), validDate, "Reason"));
+                    recordId, (UUID) null, Money.of(100_000), Money.of(150_000), validDate, "Reason"));
         }
 
         @Test
@@ -238,7 +238,7 @@ class BalanceAdjustmentRecordTest {
             String str = record.toString();
 
             assertTrue(str.contains(recordId.toString()));
-            assertTrue(str.contains(walletId));
+            assertTrue(str.contains(walletId.toString()));
             assertTrue(str.contains("150.000"));
             assertTrue(str.contains("50.000"));
         }

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class WalletRepositoryTest {
 
     static class InMemoryWalletRepositoryStub implements WalletRepository {
-        private final Map<String, Wallet> storage = new LinkedHashMap<>();
+        private final Map<UUID, Wallet> storage = new LinkedHashMap<>();
 
         @Override
         public Wallet save(Wallet entity) {
@@ -31,7 +31,7 @@ class WalletRepositoryTest {
         }
 
         @Override
-        public Optional<Wallet> findById(String id) {
+        public Optional<Wallet> findById(UUID id) {
             if (id == null) {
                 throw new IllegalArgumentException("ID must not be null");
             }
@@ -44,7 +44,7 @@ class WalletRepositoryTest {
         }
 
         @Override
-        public boolean existsById(String id) {
+        public boolean existsById(UUID id) {
             if (id == null) {
                 throw new IllegalArgumentException("ID must not be null");
             }
@@ -52,7 +52,7 @@ class WalletRepositoryTest {
         }
 
         @Override
-        public boolean deleteById(String id) {
+        public boolean deleteById(UUID id) {
             if (id == null) {
                 throw new IllegalArgumentException("ID must not be null");
             }
@@ -118,7 +118,7 @@ class WalletRepositoryTest {
         repository = new InMemoryWalletRepositoryStub();
 
         defaultCashWallet = new Wallet(
-                "w-default",
+                UUID.fromString("00000000-0000-0000-0000-000000000001"),
                 "Tiền mặt",
                 "Ví tiền mặt mặc định",
                 true,
@@ -127,7 +127,7 @@ class WalletRepositoryTest {
                 Money.ZERO);
 
         savingsWallet = new Wallet(
-                "w-savings",
+                UUID.fromString("00000000-0000-0000-0000-000000000002"),
                 "Tiết kiệm",
                 "Quỹ dự phòng khẩn cấp",
                 false,
@@ -136,7 +136,7 @@ class WalletRepositoryTest {
                 Money.of("5000000.00"));
 
         archivedWallet = new Wallet(
-                "w-archived",
+                UUID.fromString("00000000-0000-0000-0000-000000000003"),
                 "Tài khoản cũ",
                 "Ví đã ngừng sử dụng",
                 false,

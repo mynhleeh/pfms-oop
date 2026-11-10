@@ -110,17 +110,17 @@ public class MemoryTransactionRepository
     // region Helpers
     private boolean isTransactionRelatedToWallet(Transaction tx, String targetId) {
         if (tx instanceof IncomeExpenseTransaction iet) {
-            if (iet.getWallet().getId().equalsIgnoreCase(targetId)) {
+            if (iet.getWallet().getId().toString().equalsIgnoreCase(targetId)) {
                 return true;
             }
         } else if (tx instanceof TransferTransaction tt) {
-            if (tt.getSourceWallet().getId().equalsIgnoreCase(targetId)
-                    || tt.getDestinationWallet().getId().equalsIgnoreCase(targetId)) {
+            if (tt.getSourceWallet().getId().toString().equalsIgnoreCase(targetId)
+                    || tt.getDestinationWallet().getId().toString().equalsIgnoreCase(targetId)) {
                 return true;
             }
         }
         return tx.getFee()
-                .map(fee -> fee.getWallet().getId().equalsIgnoreCase(targetId))
+                .map(fee -> fee.getWallet().getId().toString().equalsIgnoreCase(targetId))
                 .orElse(false);
     }
 

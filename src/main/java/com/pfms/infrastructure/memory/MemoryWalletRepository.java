@@ -6,12 +6,13 @@ import com.pfms.domain.repository.WalletRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Kho lưu trữ Ví tiền trong bộ nhớ RAM phục vụ môi trường kiểm thử.
  */
 public class MemoryWalletRepository
-        extends MemoryGenericRepository<Wallet, String>
+        extends MemoryGenericRepository<Wallet, UUID>
         implements WalletRepository {
 
     // region Constructors

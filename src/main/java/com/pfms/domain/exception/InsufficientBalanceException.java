@@ -18,18 +18,18 @@ public class InsufficientBalanceException extends BusinessException {
 
     // region Constructors
     public InsufficientBalanceException(
-            ErrorCode errorCode, String walletId, Money balance, Money amount) {
+            ErrorCode errorCode, Object walletId, Money balance, Money amount) {
 
         super(errorCode, String.format(
                 "Giao dịch bị từ chối: Số dư ví [%s] hiện có (%s) không đủ để thực hiện số tiền (%s).",
                 walletId, balance, amount));
 
-        this.walletId = Objects.requireNonNull(walletId, "Mã ví không được để null");
+        this.walletId = Objects.requireNonNull(walletId, "Mã ví không được để null").toString();
         this.balance = Objects.requireNonNull(balance, "Số dư không được để null");
         this.amount = Objects.requireNonNull(amount, "Số tiền không được để null");
     }
 
-    public InsufficientBalanceException(String walletId, Money balance, Money amount) {
+    public InsufficientBalanceException(Object walletId, Money balance, Money amount) {
         this(ErrorCode.ERR_WAL_001, walletId, balance, amount);
     }
     // endregion

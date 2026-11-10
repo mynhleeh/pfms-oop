@@ -5,11 +5,12 @@ import com.pfms.domain.model.wallet.WalletStatus;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Kho lưu trữ chuyên biệt cho thực thể Ví tiền.
  */
-public interface WalletRepository extends GenericRepository<Wallet, String> {
+public interface WalletRepository extends GenericRepository<Wallet, UUID> {
 
     // region Queries
     Optional<Wallet> findByName(String name);

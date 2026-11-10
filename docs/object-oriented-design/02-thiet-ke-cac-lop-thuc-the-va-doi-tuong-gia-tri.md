@@ -388,7 +388,7 @@ Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê đối soát n
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
 | `recordId` | `UUID` | `private final` | Mã định danh duy nhất của bản ghi kiểm kê, sinh tự động khi tạo mới và giữ cố định. |
-| `walletId` | `String` | `private final` | Mã định danh tham chiếu cố định tới thực thể `Wallet` được kiểm kê, bắt buộc khác `null` và không rỗng. |
+| `walletId` | `UUID` | `private final` | Mã định danh tham chiếu cố định tới thực thể `Wallet` được kiểm kê, bắt buộc khác `null`. |
 | `previousBalance` | `Money` | `private final` | Số dư khả dụng của ví ngay trước thời điểm kiểm kê, giữ cố định. |
 | `actualBalance` | `Money` | `private final` | Số dư thực tế quan sát được, có đúng 2 chữ số thập phân và bắt buộc không âm (`>= 0.00 VNĐ`). |
 | `difference` | `Money` | `private final` | Giá trị chênh lệch đại số tính bằng `actualBalance.subtract(previousBalance)`, bắt buộc khác `0.00 VNĐ`. |
@@ -399,9 +399,9 @@ Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê đối soát n
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `BalanceAdjustmentRecord` *(Constructor)* | `UUID recordId, String walletId, Money previousBalance, Money actualBalance, TransactionDate adjustedAt, String reason` | Không có | `BusinessException`, `IllegalArgumentException` | Kiểm tra các trường bắt buộc khác `null`; `actualBalance` không âm (`ERR_FIN_001`); `difference` khác `0.00 VNĐ` (`ERR_FIN_001`); chuẩn hóa `reason` tối đa 255 ký tự; tính tự động `difference = actualBalance.subtract(previousBalance)`. |
+| `BalanceAdjustmentRecord` *(Constructor)* | `UUID recordId, UUID walletId, Money previousBalance, Money actualBalance, TransactionDate adjustedAt, String reason` | Không có | `BusinessException`, `IllegalArgumentException` | Kiểm tra các trường bắt buộc khác `null`; `actualBalance` không âm (`ERR_FIN_001`); `difference` khác `0.00 VNĐ` (`ERR_FIN_001`); chuẩn hóa `reason` tối đa 255 ký tự; tính tự động `difference = actualBalance.subtract(previousBalance)`. |
 | `getRecordId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của bản ghi kiểm kê phục vụ lưu trữ và tra cứu vết kiểm toán. |
-| `getWalletId` | Không có | `String` | Không có | Trả về mã định danh của ví được kiểm kê phục vụ lọc lịch sử điều chỉnh theo từng ví. |
+| `getWalletId` | Không có | `UUID` | Không có | Trả về mã định danh của ví được kiểm kê phục vụ lọc lịch sử điều chỉnh theo từng ví. |
 | `getPreviousBalance` | Không có | `Money` | Không có | Trả về số dư của ví trước thời điểm kiểm kê phục vụ đối chiếu lịch sử. |
 | `getActualBalance` | Không có | `Money` | Không có | Trả về số dư thực tế sau kiểm kê để đồng bộ với số dư khả dụng của ví. |
 | `getDifference` | Không có | `Money` | Không có | Trả về giá trị chênh lệch đại số có dấu để đối soát biến động tổng tài sản. |

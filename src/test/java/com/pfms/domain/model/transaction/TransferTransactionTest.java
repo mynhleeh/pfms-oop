@@ -426,8 +426,8 @@ class TransferTransactionTest {
 
             String result = tx.toString();
             assertTrue(result.contains(txId.toString()));
-            assertTrue(result.contains(sourceWallet.getId()));
-            assertTrue(result.contains(destinationWallet.getId()));
+            assertTrue(result.contains(sourceWallet.getId().toString()));
+            assertTrue(result.contains(destinationWallet.getId().toString()));
             assertTrue(result.contains("100.000"));
         }
     }

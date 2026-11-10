@@ -16,7 +16,7 @@ public class BalanceAdjustmentRecord {
 
     // region State
     private final UUID recordId;
-    private final String walletId;
+    private final UUID walletId;
     private final Money previousBalance;
     private final Money actualBalance;
     private final Money difference;
@@ -26,16 +26,23 @@ public class BalanceAdjustmentRecord {
 
     // region Constructors
     public BalanceAdjustmentRecord(
-            UUID recordId, String walletId, Money previousBalance,
+            UUID recordId, UUID walletId, Money previousBalance,
             Money actualBalance, TransactionDate adjustedAt, String reason) {
 
         this.recordId = Objects.requireNonNull(recordId, "Mã bản ghi kiểm kê không được để null");
-        this.walletId = validateWalletId(walletId);
+        this.walletId = Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
         this.previousBalance = validatePreviousBalance(previousBalance);
         this.actualBalance = validateActualBalance(actualBalance);
         this.adjustedAt = Objects.requireNonNull(adjustedAt, "Mốc ngày kiểm kê không được để null");
         this.reason = normalizeReason(reason);
         this.difference = calculateAndValidateDifference(this.actualBalance, this.previousBalance);
+    }
+
+    public BalanceAdjustmentRecord(
+            UUID recordId, String walletId, Money previousBalance,
+            Money actualBalance, TransactionDate adjustedAt, String reason) {
+
+        this(recordId, parseWalletId(walletId), previousBalance, actualBalance, adjustedAt, reason);
     }
     // endregion
 
@@ -44,7 +51,7 @@ public class BalanceAdjustmentRecord {
         return this.recordId;
     }
 
-    public String getWalletId() {
+    public UUID getWalletId() {
         return this.walletId;
     }
 
@@ -78,13 +85,17 @@ public class BalanceAdjustmentRecord {
     // endregion
 
     // region Helpers
-    private static String validateWalletId(String walletId) {
+    private static UUID parseWalletId(String walletId) {
         Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
         String trimmed = walletId.trim();
         if (trimmed.isEmpty()) {
             throw new IllegalArgumentException("Mã ví kiểm kê không được để trống");
         }
-        return trimmed;
+        try {
+            return UUID.fromString(trimmed);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Mã ví kiểm kê không đúng định dạng UUID: " + walletId, ex);
+        }
     }
 
     private static Money validatePreviousBalance(Money previousBalance) {

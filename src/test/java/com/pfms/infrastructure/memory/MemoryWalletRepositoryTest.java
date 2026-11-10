@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,6 +25,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemoryWalletRepositoryTest {
 
     private MemoryWalletRepository repository;
+    private UUID defaultId;
+    private UUID savingsId;
+    private UUID archivedId;
     private Wallet defaultCashWallet;
     private Wallet savingsWallet;
     private Wallet archivedWallet;
@@ -31,9 +35,12 @@ class MemoryWalletRepositoryTest {
     @BeforeEach
     void setUp() {
         repository = new MemoryWalletRepository();
+        defaultId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        savingsId = UUID.fromString("00000000-0000-0000-0000-000000000002");
+        archivedId = UUID.fromString("00000000-0000-0000-0000-000000000003");
 
         defaultCashWallet = new Wallet(
-                "w-default",
+                defaultId,
                 "Tiền mặt",
                 "Ví tiền mặt mặc định",
                 true,
@@ -43,7 +50,7 @@ class MemoryWalletRepositoryTest {
         );
 
         savingsWallet = new Wallet(
-                "w-savings",
+                savingsId,
                 "Tiết kiệm",
                 "Quỹ dự phòng khẩn cấp",
                 false,
@@ -53,7 +60,7 @@ class MemoryWalletRepositoryTest {
         );
 
         archivedWallet = new Wallet(
-                "w-archived",
+                archivedId,
                 "Tài khoản cũ",
                 "Ví đã ngừng sử dụng",
                 false,
@@ -75,7 +82,7 @@ class MemoryWalletRepositoryTest {
             assertTrue(repository.findAll().isEmpty());
 
             repository.save(defaultCashWallet);
-            assertTrue(repository.existsById("w-default"));
+            assertTrue(repository.existsById(defaultId));
         }
     }
     // endregion
@@ -93,7 +100,7 @@ class MemoryWalletRepositoryTest {
             Optional<Wallet> found = repository.findByName("Tiền mặt");
 
             assertTrue(found.isPresent());
-            assertEquals("w-default", found.get().getId());
+            assertEquals(defaultId, found.get().getId());
             assertEquals("Tiền mặt", found.get().getName());
         }
 
@@ -315,7 +322,7 @@ class MemoryWalletRepositoryTest {
             repository.clear();
 
             assertEquals(0, repository.findAll().size());
-            assertFalse(repository.existsById("w-default"));
+            assertFalse(repository.existsById(defaultId));
             assertFalse(repository.existsByName("Tiền mặt"));
         }
     }
@@ -339,7 +346,7 @@ class MemoryWalletRepositoryTest {
                 executor.submit(() -> {
                     try {
                         for (int i = 0; i < walletsPerThread; i++) {
-                            String walletId = "w-" + threadIndex + "-" + i;
+                            UUID walletId = UUID.randomUUID();
                             String walletName = "Ví-" + threadIndex + "-" + i;
                             Wallet w = new Wallet(
                                     walletId,
