@@ -4,6 +4,7 @@ import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
 import com.pfms.domain.model.common.Money;
+import com.pfms.domain.model.common.TransactionDate;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -109,10 +110,24 @@ public class Wallet {
         this.name = validateAndNormalizeName(newName);
         this.note = normalizeNote(newNote);
     }
+
+    public BalanceAdjustmentRecord adjustBalance(Money actualBalance, TransactionDate adjustedAt, String reason) {
+        if (!isActive()) {
+            throw new BusinessException(ErrorCode.ERR_WAL_001, "Ví thanh toán không ở trạng thái hoạt động.");
+        }
+        BalanceAdjustmentRecord record = new BalanceAdjustmentRecord(
+                UUID.randomUUID(), this.id, this.currentBalance, actualBalance, adjustedAt, reason);
+        this.currentBalance = actualBalance;
+        return record;
+    }
     // endregion
 
     // region Queries
     public String getId() {
+        return this.id;
+    }
+
+    public String getWalletId() {
         return this.id;
     }
 
@@ -125,6 +140,10 @@ public class Wallet {
     }
 
     public boolean isDefaultWallet() {
+        return this.defaultWallet;
+    }
+
+    public boolean isDefault() {
         return this.defaultWallet;
     }
 

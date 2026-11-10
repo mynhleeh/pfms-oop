@@ -4,6 +4,7 @@ import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
 import com.pfms.domain.model.common.Money;
+import com.pfms.domain.model.common.TransactionDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -349,6 +350,98 @@ class WalletTest {
             String output = wallet.toString();
             assertTrue(output.contains("DELETED"));
             assertTrue(output.contains("Ví phụ"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Group 8: Balance Adjustment and Design Parity [UC-WAL-04, FR-WAL-05, BR-FIN-01, BR-FIN-02]")
+    class BalanceAdjustmentAndParityTests {
+
+        @Test
+        @DisplayName("adjustBalance with higher actual balance should create surplus record and update balance")
+        void testAdjustBalanceSurplus() {
+            Wallet wallet = new Wallet("Ví Tiết kiệm");
+            wallet.credit(Money.of(100_000));
+
+            TransactionDate today = TransactionDate.now();
+            BalanceAdjustmentRecord record = wallet.adjustBalance(Money.of(150_000), today, "Kiểm đếm tiền thưởng");
+
+            assertNotNull(record);
+            assertEquals(wallet.getId(), record.getWalletId());
+            assertEquals(Money.of(100_000), record.getPreviousBalance());
+            assertEquals(Money.of(150_000), record.getActualBalance());
+            assertEquals(Money.of(50_000), record.getDifference());
+            assertTrue(record.isSurplus());
+            assertEquals(today, record.getAdjustedAt());
+            assertEquals("Kiểm đếm tiền thưởng", record.getReason());
+            assertEquals(Money.of(150_000), wallet.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("adjustBalance with lower actual balance should create deficit record and update balance")
+        void testAdjustBalanceDeficit() {
+            Wallet wallet = new Wallet("Ví Tiền mặt");
+            wallet.credit(Money.of(200_000));
+
+            TransactionDate today = TransactionDate.now();
+            BalanceAdjustmentRecord record = wallet.adjustBalance(Money.of(120_000), today, "Kiểm kê hao hụt lẻ");
+
+            assertNotNull(record);
+            assertEquals(Money.of(200_000), record.getPreviousBalance());
+            assertEquals(Money.of(120_000), record.getActualBalance());
+            assertEquals(Money.of(-80_000), record.getDifference());
+            assertFalse(record.isSurplus());
+            assertEquals(Money.of(80_000), record.getAbsoluteDifference());
+            assertEquals(Money.of(120_000), wallet.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("adjustBalance with identical balance should throw BusinessException with ERR_FIN_001")
+        void testAdjustBalanceZeroDifferenceThrows() {
+            Wallet wallet = new Wallet("Ví Test");
+            wallet.credit(Money.of(100_000));
+
+            BusinessException ex = assertThrows(BusinessException.class, () ->
+                    wallet.adjustBalance(Money.of(100_000), TransactionDate.now(), "Không lệch"));
+            assertEquals(ErrorCode.ERR_FIN_001, ex.getErrorCode());
+            assertEquals(Money.of(100_000), wallet.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("adjustBalance with negative actual balance should throw BusinessException with ERR_FIN_001")
+        void testAdjustBalanceNegativeActualThrows() {
+            Wallet wallet = new Wallet("Ví Test");
+            wallet.credit(Money.of(50_000));
+
+            BusinessException ex = assertThrows(BusinessException.class, () ->
+                    wallet.adjustBalance(Money.of(-10_000), TransactionDate.now(), "Âm tiền"));
+            assertEquals(ErrorCode.ERR_FIN_001, ex.getErrorCode());
+            assertEquals(Money.of(50_000), wallet.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("adjustBalance on inactive wallet should throw BusinessException with ERR_WAL_001")
+        void testAdjustBalanceInactiveWalletThrows() {
+            Wallet wallet = new Wallet("Ví Phụ", "", false);
+            wallet.archive();
+
+            BusinessException ex = assertThrows(BusinessException.class, () ->
+                    wallet.adjustBalance(Money.of(50_000), TransactionDate.now(), "Ví lưu trữ"));
+            assertEquals(ErrorCode.ERR_WAL_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("getWalletId() and isDefault() aliases should match getId() and isDefaultWallet()")
+        void testDesignParityAliases() {
+            Wallet defaultWallet = new Wallet("Tiền mặt", "Ví mặc định", true);
+            assertEquals(defaultWallet.getId(), defaultWallet.getWalletId());
+            assertTrue(defaultWallet.isDefault());
+            assertEquals(defaultWallet.isDefaultWallet(), defaultWallet.isDefault());
+
+            Wallet regularWallet = new Wallet("Ví ngân hàng", "Ví phụ", false);
+            assertEquals(regularWallet.getId(), regularWallet.getWalletId());
+            assertFalse(regularWallet.isDefault());
+            assertEquals(regularWallet.isDefaultWallet(), regularWallet.isDefault());
         }
     }
 }
