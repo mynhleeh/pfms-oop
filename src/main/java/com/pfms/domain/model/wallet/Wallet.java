@@ -4,6 +4,7 @@ import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
 import com.pfms.domain.model.common.EntityName;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.Note;
 import com.pfms.domain.model.common.TransactionDate;
@@ -181,24 +182,20 @@ public class Wallet {
         return this.state;
     }
 
-    public WalletStatus getStatus() {
+    public EntityStatus getStatus() {
         return this.state.getStatus();
     }
 
     public boolean isActive() {
-        try {
-            return this.state.getStatus() == WalletStatus.ACTIVE;
-        } catch (IllegalStateException e) {
-            return false;
-        }
+        return this.state.getStatus() == EntityStatus.ACTIVE;
     }
 
     public boolean isArchived() {
-        try {
-            return this.state.getStatus() == WalletStatus.ARCHIVED;
-        } catch (IllegalStateException e) {
-            return false;
-        }
+        return this.state.getStatus() == EntityStatus.ARCHIVED;
+    }
+
+    public boolean isDeleted() {
+        return this.state.getStatus() == EntityStatus.DELETED;
     }
 
     public Money getCurrentBalance() {
@@ -268,14 +265,8 @@ public class Wallet {
 
     @Override
     public String toString() {
-        String statusLabel;
-        try {
-            statusLabel = getStatus().name();
-        } catch (IllegalStateException e) {
-            statusLabel = "DELETED";
-        }
         return String.format("Wallet[id=%s, name='%s', balance=%s, status=%s]",
-                this.id, this.name, this.currentBalance.formatDisplay(), statusLabel);
+                this.id, this.name, this.currentBalance.formatDisplay(), getStatus().name());
     }
     // endregion
 }

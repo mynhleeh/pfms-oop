@@ -1,13 +1,14 @@
-package com.pfms.domain.model.category;
+package com.pfms.domain.model.common;
 
 /**
- * Trạng thái của danh mục (Category).
- * Gồm hai trạng thái: đang dùng (ACTIVE) hoặc đã xóa (DELETED).
+ * Trạng thái vòng đời của các thực thể miền trong hệ thống PFMS (Ví, Danh mục, Nhóm nhu cầu).
+ * Định nghĩa thống nhất các trạng thái khả dụng cho luồng xử lý tài chính và lưu trữ lịch sử.
  */
-public enum CategoryStatus {
+public enum EntityStatus {
 
     // region Constants
     ACTIVE("ACTIVE", "Đang hoạt động"),
+    ARCHIVED("ARCHIVED", "Đã lưu trữ"),
     DELETED("DELETED", "Đã xóa");
     // endregion
 
@@ -17,7 +18,7 @@ public enum CategoryStatus {
     // endregion
 
     // region Constructors
-    CategoryStatus(String code, String displayLabel) {
+    EntityStatus(String code, String displayLabel) {
         this.code = code;
         this.displayLabel = displayLabel;
     }
@@ -38,23 +39,27 @@ public enum CategoryStatus {
         return this == ACTIVE;
     }
 
+    public boolean isArchived() {
+        return this == ARCHIVED;
+    }
+
     public boolean isDeleted() {
         return this == DELETED;
     }
     // endregion
 
     // region Parsers
-    public static CategoryStatus fromString(String rawValue) {
+    public static EntityStatus fromString(String rawValue) {
         if (rawValue == null || rawValue.trim().isEmpty()) {
-            throw new IllegalArgumentException("Trạng thái danh mục không được để trống.");
+            throw new IllegalArgumentException("Trạng thái không được để trống.");
         }
         String normalized = rawValue.trim().toUpperCase();
-        for (CategoryStatus status : values()) {
+        for (EntityStatus status : values()) {
             if (status.name().equals(normalized) || status.code.equalsIgnoreCase(normalized)) {
                 return status;
             }
         }
-        throw new IllegalArgumentException("Trạng thái danh mục không hợp lệ: " + rawValue);
+        throw new IllegalArgumentException("Trạng thái không hợp lệ: " + rawValue);
     }
     // endregion
 }

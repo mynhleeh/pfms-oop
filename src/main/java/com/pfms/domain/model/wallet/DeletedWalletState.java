@@ -2,6 +2,7 @@ package com.pfms.domain.model.wallet;
 
 import java.util.Objects;
 
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 
 /**
@@ -45,8 +46,8 @@ public class DeletedWalletState implements WalletState {
 
     // region Queries
     @Override
-    public WalletStatus getStatus() {
-        throw new IllegalStateException("Ví đã bị xóa khỏi hệ thống, không còn trạng thái vòng đời hợp lệ.");
+    public EntityStatus getStatus() {
+        return EntityStatus.DELETED;
     }
     // endregion
 }

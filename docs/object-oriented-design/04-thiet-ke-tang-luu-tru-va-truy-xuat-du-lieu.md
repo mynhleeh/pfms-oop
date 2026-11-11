@@ -70,13 +70,13 @@ Giao diện `com.pfms.domain.repository.WalletRepository` kế thừa `GenericRe
 | :--- | :--- | :--- | :--- |
 | `findByName` | `String name` | `Optional<Wallet>` | Tìm ví theo tên chính xác sau khi cắt khoảng trắng hai đầu và so khớp không phân biệt hoa thường; trả về `Optional.empty()` nếu chưa tồn tại, phục vụ `WalletService` đối chiếu tên ví khi tạo mới hoặc cập nhật. |
 | `existsByName` | `String name` | `boolean` | Kiểm tra nhanh sự tồn tại của tên ví không phân biệt hoa thường trên toàn bộ ví đang hoạt động lẫn ví đã lưu trữ; trả về `true` nếu tên đã tồn tại để chặn đặt tên trùng lặp. |
-| `findByStatus` | `WalletStatus status` | `List<Wallet>` | Lọc danh sách ví theo trạng thái vòng đời (`ACTIVE` hoặc `ARCHIVED`), trả về danh sách rỗng nếu không có kết quả, phục vụ hiển thị danh sách ví theo bộ lọc trạng thái. |
-| `countByStatus` | `WalletStatus status` | `long` | Đếm số lượng ví theo trạng thái xác định (`ACTIVE` hoặc `ARCHIVED`), phục vụ kiểm soát số lượng ví hoạt động và tổng hợp cơ cấu phân bổ số dư. |
+| `findByStatus` | `EntityStatus status` | `List<Wallet>` | Lọc danh sách ví theo trạng thái vòng đời (`ACTIVE` hoặc `ARCHIVED`), trả về danh sách rỗng nếu không có kết quả, phục vụ hiển thị danh sách ví theo bộ lọc trạng thái. |
+| `countByStatus` | `EntityStatus status` | `long` | Đếm số lượng ví theo trạng thái xác định (`ACTIVE` hoặc `ARCHIVED`), phục vụ kiểm soát số lượng ví hoạt động và tổng hợp cơ cấu phân bổ số dư. |
 | `findDefaultWallet` | `Không` | `Optional<Wallet>` | Truy vấn ví tiền mặt mặc định của hệ thống (có cờ `isDefault` bằng `true`); trả về `Optional.empty()` khi khởi chạy lần đầu chưa có dữ liệu, phục vụ `WalletService` kiểm tra và khởi tạo ví mặc định. |
 
 **Chỉ dẫn thiết kế và cài đặt:**
 
-- Bổ sung 5 phương thức truy vấn chuyên biệt gồm `findByName(String)` trả về `Optional<Wallet>`, `existsByName(String)` trả về `boolean`, `findByStatus(WalletStatus)` trả về `List<Wallet>`, `countByStatus(WalletStatus)` trả về `long` và `findDefaultWallet()` trả về `Optional<Wallet>` để đáp ứng trọn vẹn nhu cầu khởi tạo ví mặc định, tra cứu theo tên và lọc trạng thái của `WalletService`.
+- Bổ sung 5 phương thức truy vấn chuyên biệt gồm `findByName(String)` trả về `Optional<Wallet>`, `existsByName(String)` trả về `boolean`, `findByStatus(EntityStatus)` trả về `List<Wallet>`, `countByStatus(EntityStatus)` trả về `long` và `findDefaultWallet()` trả về `Optional<Wallet>` để đáp ứng trọn vẹn nhu cầu khởi tạo ví mặc định, tra cứu theo tên và lọc trạng thái của `WalletService`.
 - Kế thừa trực tiếp 5 phương thức cơ sở (`save`, `findById`, `findAll`, `existsById`, `deleteById`) từ `GenericRepository<Wallet, UUID>` mà không khai báo lặp lại; thao tác `deleteById` chỉ được thực thi sau khi tầng dịch vụ xác nhận ví cần xóa không phải ví mặc định và chưa từng phát sinh lịch sử giao dịch hay kiểm kê.
 - Chuẩn hóa chuỗi đầu vào bằng cách cắt khoảng trắng hai đầu và so khớp tên ví không phân biệt hoa thường trên cả ví `ACTIVE` lẫn `ARCHIVED`; giải phóng tên ví khỏi phạm vi kiểm tra duy nhất khi xóa vĩnh viễn thành công và khóa thao tác xóa hoặc lưu trữ đối với ví `"Tiền mặt"` mặc định nhằm duy trì tối thiểu một ví `ACTIVE`.
 

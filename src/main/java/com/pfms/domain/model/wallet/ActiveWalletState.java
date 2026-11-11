@@ -2,6 +2,7 @@ package com.pfms.domain.model.wallet;
 
 import java.util.Objects;
 
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 
 /**
@@ -47,8 +48,8 @@ public class ActiveWalletState implements WalletState {
 
     // region Queries
     @Override
-    public WalletStatus getStatus() {
-        return WalletStatus.ACTIVE;
+    public EntityStatus getStatus() {
+        return EntityStatus.ACTIVE;
     }
     // endregion
 }

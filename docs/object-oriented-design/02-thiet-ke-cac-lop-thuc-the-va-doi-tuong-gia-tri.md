@@ -67,7 +67,6 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | **1. Nhóm Quản lý Ví (WAL)** |  |  |
 | `Wallet` | Thực thể | Quản lý nguồn tiền khả dụng, bảo toàn bất biến số dư không âm và tiếp nhận các biến động dòng tiền. |
 | `BalanceAdjustmentRecord` | Thực thể | Bản ghi kiểm kê thực tế bất biến, ghi nhận chênh lệch kiểm kê để cân đối số dư ví về đúng thực tế quan sát. |
-| `WalletStatus` | Kiểu liệt kê | Trạng thái vòng đời của ví gồm Đang hoạt động (`ACTIVE`) hoặc Đã lưu trữ (`ARCHIVED`). |
 | **2. Nhóm Ghi nhận Thu chi (TXN)** |  |  |
 | `Transaction` | Thực thể trừu tượng | Lớp cơ sở trừu tượng định nghĩa các thuộc tính chung và hợp đồng phương thức đa hình cho giao dịch thu chi cùng chuyển tiền nội bộ. |
 | `IncomeExpenseTransaction` | Thực thể | Hiện thực hóa giao dịch thu nhập hoặc chi tiêu tại một ví, liên kết phân loại trực tiếp với danh mục cấp 3. |
@@ -79,9 +78,8 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | **4. Nhóm Danh mục Phân loại (CAT)** |  |  |
 | `NeedGroup` | Thực thể | Quản lý nhóm nhu cầu cấp 2 gom cụm các danh mục chi tiết, trực thuộc một nhánh loại thu chi cố định. |
 | `Category` | Thực thể | Quản lý danh mục chi tiết cấp 3 gán nhãn mục đích cho giao dịch thu chi, áp dụng cơ chế xóa mềm bảo toàn lịch sử. |
-| `GroupStatus` | Kiểu liệt kê | Trạng thái vòng đời của nhóm nhu cầu gồm Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`). |
-| `CategoryStatus` | Kiểu liệt kê | Trạng thái vòng đời của danh mục gồm Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`). |
 | **5. Nhóm Thống kê, Báo cáo (REP) và Đối tượng Giá trị Dùng chung** |  |  |
+| `EntityStatus` | Kiểu liệt kê | Trạng thái vòng đời dùng chung cho các thực thể miền (Ví, Danh mục, Nhóm nhu cầu), gồm Đang hoạt động (`ACTIVE`), Đã lưu trữ (`ARCHIVED`) và Đã xóa (`DELETED`). |
 | `EntityName` | Đối tượng giá trị | Bọc tên định danh cho Ví và Danh mục, chuẩn hóa khoảng trắng và bảo đảm độ dài 1 đến 50 ký tự theo quy tắc đặt tên `BR-NAM-01`. |
 | `Note` | Đối tượng giá trị | Bọc chuỗi ghi chú diễn giải cho Ví và Giao dịch, giới hạn tối đa 255 ký tự kèm cơ chế đối tượng rỗng an toàn (`Null Object`). |
 | `Money` | Đối tượng giá trị | Bọc giá trị tiền tệ bằng `BigDecimal` kèm quy tắc làm tròn nửa chẵn, loại trừ hoàn toàn sai số dấu chấm động. |
@@ -119,7 +117,7 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 | `walletId` | `UUID` | `private final` | Mã định danh duy nhất sinh tự động khi tạo mới, giữ cố định và không tái sử dụng. |
 | `name` | `EntityName` | `private` | Đối tượng giá trị bọc tên ví từ 1 đến 50 ký tự sau khi chuẩn hóa khoảng trắng, duy nhất toàn hệ thống không phân biệt hoa thường. |
 | `currentBalance` | `Money` | `private` | Số dư khả dụng có đúng 2 chữ số thập phân, khởi tạo bằng `0.00 VNĐ` và luôn không âm. |
-| `status` | `WalletStatus` | `private` | Trạng thái vòng đời nhận giá trị `ACTIVE` khi tạo mới hoặc chuyển sang `ARCHIVED` khi ngừng giao dịch. |
+| `status` | `EntityStatus` | `private` | Trạng thái vòng đời nhận giá trị `ACTIVE` khi tạo mới hoặc chuyển sang `ARCHIVED` khi ngừng giao dịch. |
 | `isDefault` | `boolean` | `private final` | Cờ đánh dấu ví "Tiền mặt" mặc định; mang giá trị `true` cố định ở ví mặc định để chặn thao tác xóa hoặc lưu trữ. |
 | `note` | `Note` | `private` | Đối tượng giá trị bọc chuỗi ghi chú tùy chọn, dài tối đa 255 ký tự, áp dụng đối tượng rỗng an toàn (`Note.EMPTY`) khi để trống. |
 | `createdAt` | `LocalDateTime` | `private final` | Mốc thời gian tạo ví bất biến, dùng để sắp xếp danh sách ví. |
@@ -140,9 +138,11 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 | `getEntityName` | `Không` | `EntityName` | `Không` | Trả về đối tượng giá trị tên ví phục vụ thao tác định danh và so sánh khóa chuẩn hóa. |
 | `getNote` | `Không` | `String` | `Không` | Trả về chuỗi nội dung ghi chú diễn giải của ví phục vụ hiển thị trên giao diện người dùng. |
 | `getNoteValue` | `Không` | `Note` | `Không` | Trả về đối tượng giá trị ghi chú diễn giải của ví phục vụ truy xuất an toàn. |
-| `getStatus` | `Không` | `WalletStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví để lọc danh sách và thống kê số lượng ví theo trạng thái. |
+| `getStatus` | `Không` | `EntityStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví để lọc danh sách và thống kê số lượng ví theo trạng thái. |
 | `isDefault` | `Không` | `boolean` | `Không` | Trả về `true` nếu đây là ví tiền mặt mặc định, giúp tầng dịch vụ chặn thao tác xóa hoặc lưu trữ ví mặc định. |
-| `isActive` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `WalletStatus.ACTIVE`, phục vụ kiểm tra trạng thái hoạt động trước khi hạch toán giao dịch. |
+| `isActive` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.ACTIVE`, phục vụ kiểm tra trạng thái hoạt động trước khi hạch toán giao dịch. |
+| `isArchived` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.ARCHIVED`, phục vụ kiểm tra trạng thái lưu trữ của ví. |
+| `isDeleted` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.DELETED`, phục vụ kiểm tra trạng thái đã xóa của ví. |
 | `getCurrentBalance` | `Không` | `Money` | `Không` | Trả về số dư khả dụng hiện tại phục vụ hiển thị và tính cơ cấu phân bổ tài sản mà không mở hàm gán trực tiếp. |
 | `hasSufficientBalance` | `Money amount` | `boolean` | `IllegalArgumentException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
 
@@ -300,7 +300,7 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 | `name` | `EntityName` | `private` | Đối tượng giá trị bọc tên gọi danh mục từ 1 đến 50 ký tự sau khi chuẩn hóa khoảng trắng hai đầu theo quy tắc đặt tên `BR-NAM-01`; duy nhất trong cùng nhóm nhu cầu cha đang hoạt động theo cơ chế so sánh không phân biệt hoa thường. |
 | `needGroupId` | `UUID` | `private` | Mã định danh tham chiếu đến nhóm nhu cầu cha cấp 2 trực thuộc; bắt buộc trỏ tới một `NeedGroup` đang hoạt động (`ACTIVE`), loại trừ hoàn toàn danh mục mồ côi hoặc thuộc nhóm đã xóa theo quy tắc cấu trúc danh mục ba cấp. |
 | `transactionType` | `TransactionType` | `private final` | Nhánh loại thu chi (`INCOME` hoặc `EXPENSE`) kế thừa từ nhóm nhu cầu cha; mang tính bất biến tuyệt đối sau khởi tạo nhằm bảo vệ tính toàn vẹn dữ liệu lịch sử theo quy tắc cấu trúc danh mục ba cấp, ngăn chặn đổi loại thu chi. |
-| `status` | `CategoryStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
+| `status` | `EntityStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
 | `icon` | `String` | `private` | Ký hiệu hoặc mã biểu tượng đồ họa đại diện trên giao diện người dùng; tùy chọn, độ dài tối đa 50 ký tự phục vụ tùy biến hiển thị. |
 | `color` | `String` | `private` | Chuỗi mã màu định dạng Hex (ví dụ `#4CAF50`) phục vụ hiển thị trực quan; tùy chọn, độ dài tối đa 10 ký tự. |
 
@@ -314,7 +314,7 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 | `getEntityName` | Không có | `EntityName` | Không có | Trả về đối tượng giá trị tên danh mục phục vụ thao tác định danh và so sánh khóa chuẩn hóa. |
 | `getNeedGroupId` | Không có | `UUID` | Không có | Trả về mã định danh nhóm nhu cầu cha cấp 2 mà danh mục trực thuộc. |
 | `getTransactionType` | Không có | `TransactionType` | Không có | Trả về loại thu chi (`INCOME` hoặc `EXPENSE`) của danh mục. |
-| `getStatus` | Không có | `CategoryStatus` | Không có | Trả về trạng thái hoạt động vòng đời hiện tại của danh mục. |
+| `getStatus` | Không có | `EntityStatus` | Không có | Trả về trạng thái hoạt động vòng đời hiện tại của danh mục. |
 | `getIcon` | Không có | `String` | Không có | Trả về mã biểu tượng đồ họa đại diện của danh mục. |
 | `getColor` | Không có | `String` | Không có | Trả về chuỗi mã màu hiển thị trực quan của danh mục. |
 | `isActive` | Không có | `boolean` | Không có | Kiểm tra danh mục có đang ở trạng thái hoạt động (`ACTIVE`) hay không. |

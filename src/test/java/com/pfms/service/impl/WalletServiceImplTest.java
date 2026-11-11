@@ -1,13 +1,12 @@
 package com.pfms.service.impl;
 
 import com.pfms.domain.model.category.Category;
-import com.pfms.domain.model.category.CategoryStatus;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 import com.pfms.domain.model.wallet.Wallet;
-import com.pfms.domain.model.wallet.WalletStatus;
 import com.pfms.infrastructure.memory.MemoryBalanceAdjustmentRepository;
 import com.pfms.infrastructure.memory.MemoryTransactionRepository;
 import com.pfms.infrastructure.memory.MemoryWalletRepository;
@@ -89,7 +88,7 @@ class WalletServiceImplTest {
             Wallet defaultWallet = defaultWalletOpt.get();
             assertEquals("Tiền mặt", defaultWallet.getName());
             assertTrue(defaultWallet.isDefaultWallet());
-            assertEquals(WalletStatus.ACTIVE, defaultWallet.getStatus());
+            assertEquals(EntityStatus.ACTIVE, defaultWallet.getStatus());
             assertEquals(Money.ZERO, defaultWallet.getCurrentBalance());
             assertNotNull(defaultWallet.getId());
         }
@@ -181,7 +180,7 @@ class WalletServiceImplTest {
             walletService.createWallet(new CreateWalletRequestDTO("Ví MoMo"));
 
             // Act
-            WalletsSummaryDTO summary = walletService.getWalletsSummary(WalletStatus.ACTIVE);
+            WalletsSummaryDTO summary = walletService.getWalletsSummary(EntityStatus.ACTIVE);
 
             // Assert
             assertNotNull(summary);
@@ -262,11 +261,11 @@ class WalletServiceImplTest {
             walletRepository.save(archivedWallet);
 
             // Act & Assert
-            WalletsSummaryDTO activeOnly = walletService.getWalletsSummary(WalletStatus.ACTIVE);
+            WalletsSummaryDTO activeOnly = walletService.getWalletsSummary(EntityStatus.ACTIVE);
             assertEquals(1, activeOnly.getWalletCount());
             assertEquals("Ví Active", activeOnly.getWallets().get(0).getName());
 
-            WalletsSummaryDTO archivedOnly = walletService.getWalletsSummary(WalletStatus.ARCHIVED);
+            WalletsSummaryDTO archivedOnly = walletService.getWalletsSummary(EntityStatus.ARCHIVED);
             assertEquals(1, archivedOnly.getWalletCount());
             assertEquals("Ví Archived", archivedOnly.getWallets().get(0).getName());
 
@@ -370,7 +369,7 @@ class WalletServiceImplTest {
             // Assert
             assertEquals("ARCHIVED", archived.getStatus());
             Wallet saved = walletRepository.findById(created.getId()).orElseThrow();
-            assertEquals(WalletStatus.ARCHIVED, saved.getStatus());
+            assertEquals(EntityStatus.ARCHIVED, saved.getStatus());
         }
 
         @Test
@@ -401,7 +400,7 @@ class WalletServiceImplTest {
             // Assert
             assertEquals("ACTIVE", activated.getStatus());
             Wallet saved = walletRepository.findById(created.getId()).orElseThrow();
-            assertEquals(WalletStatus.ACTIVE, saved.getStatus());
+            assertEquals(EntityStatus.ACTIVE, saved.getStatus());
         }
 
         @Test

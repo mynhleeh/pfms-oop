@@ -158,13 +158,7 @@ public class IncomeExpenseTransaction extends Transaction {
     }
 
     private static void validateWalletActive(Wallet wallet) {
-        boolean active;
-        try {
-            active = wallet.isActive();
-        } catch (IllegalStateException e) {
-            throw new BusinessException(ErrorCode.ERR_WAL_001, "Ví thanh toán không ở trạng thái hoạt động.");
-        }
-        if (!active) {
+        if (!wallet.isActive()) {
             throw new BusinessException(ErrorCode.ERR_WAL_001, "Ví thanh toán không ở trạng thái hoạt động.");
         }
     }

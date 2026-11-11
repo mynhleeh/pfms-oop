@@ -4,11 +4,11 @@ import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.DuplicateEntityException;
 import com.pfms.domain.exception.EntityNotFoundException;
 import com.pfms.domain.exception.ErrorCode;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 import com.pfms.domain.model.wallet.Wallet;
-import com.pfms.domain.model.wallet.WalletStatus;
 import com.pfms.domain.repository.BalanceAdjustmentRepository;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
@@ -221,7 +221,7 @@ public class WalletServiceImpl implements WalletService {
 
     // region Queries
     @Override
-    public WalletsSummaryDTO getWalletsSummary(WalletStatus statusFilter) {
+    public WalletsSummaryDTO getWalletsSummary(EntityStatus statusFilter) {
         List<Wallet> filteredWallets = (statusFilter == null)
                 ? walletRepository.findAll()
                 : walletRepository.findByStatus(statusFilter);
@@ -229,8 +229,8 @@ public class WalletServiceImpl implements WalletService {
         List<Wallet> allWallets = walletRepository.findAll();
         Money totalSystemMoney = Money.ZERO;
         for (Wallet w : allWallets) {
-            if (w.getStatus() == WalletStatus.ACTIVE ||
-                    (w.getStatus() == WalletStatus.ARCHIVED && w.getCurrentBalance().isPositive())) {
+            if (w.getStatus() == EntityStatus.ACTIVE ||
+                    (w.getStatus() == EntityStatus.ARCHIVED && w.getCurrentBalance().isPositive())) {
                 totalSystemMoney = totalSystemMoney.add(w.getCurrentBalance());
             }
         }
@@ -254,7 +254,7 @@ public class WalletServiceImpl implements WalletService {
         boolean isTotalZero = totalBalance.compareTo(BigDecimal.ZERO) == 0;
 
         for (Wallet w : filteredWallets) {
-            if (w.getStatus() == WalletStatus.ARCHIVED && w.getCurrentBalance().isZero()) {
+            if (w.getStatus() == EntityStatus.ARCHIVED && w.getCurrentBalance().isZero()) {
                 continue;
             }
 

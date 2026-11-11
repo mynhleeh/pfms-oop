@@ -1,5 +1,6 @@
 package com.pfms.domain.model.wallet;
 
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -45,7 +46,7 @@ class WalletStateTest {
             state.archive(wallet);
 
             assertInstanceOf(ArchivedWalletState.class, wallet.getState());
-            assertEquals(WalletStatus.ARCHIVED, wallet.getStatus());
+            assertEquals(EntityStatus.ARCHIVED, wallet.getStatus());
         }
 
         @Test
@@ -67,6 +68,13 @@ class WalletStateTest {
 
             IllegalStateException ex = assertThrows(IllegalStateException.class, () -> state.activate(wallet));
             assertTrue(ex.getMessage().contains("hoạt động"));
+        }
+
+        @Test
+        @DisplayName("getStatus() on ActiveWalletState should return EntityStatus.ACTIVE")
+        void testActiveState_getStatusReturnsActive() {
+            ActiveWalletState state = new ActiveWalletState();
+            assertEquals(EntityStatus.ACTIVE, state.getStatus());
         }
     }
 
@@ -112,7 +120,7 @@ class WalletStateTest {
             state.activate(wallet);
 
             assertInstanceOf(ActiveWalletState.class, wallet.getState());
-            assertEquals(WalletStatus.ACTIVE, wallet.getStatus());
+            assertEquals(EntityStatus.ACTIVE, wallet.getStatus());
         }
 
         @Test
@@ -122,6 +130,13 @@ class WalletStateTest {
             ArchivedWalletState state = new ArchivedWalletState();
 
             assertThrows(IllegalStateException.class, () -> state.delete(wallet));
+        }
+
+        @Test
+        @DisplayName("getStatus() on ArchivedWalletState should return EntityStatus.ARCHIVED")
+        void testArchivedState_getStatusReturnsArchived() {
+            ArchivedWalletState state = new ArchivedWalletState();
+            assertEquals(EntityStatus.ARCHIVED, state.getStatus());
         }
     }
 
@@ -143,11 +158,11 @@ class WalletStateTest {
         }
 
         @Test
-        @DisplayName("getStatus() on DeletedWalletState should throw IllegalStateException")
-        void testDeletedState_getStatusThrowsIllegalStateException() {
+        @DisplayName("getStatus() on DeletedWalletState should return EntityStatus.DELETED")
+        void testDeletedState_getStatusReturnsDeleted() {
             DeletedWalletState state = new DeletedWalletState();
 
-            assertThrows(IllegalStateException.class, state::getStatus);
+            assertEquals(EntityStatus.DELETED, state.getStatus());
         }
     }
 

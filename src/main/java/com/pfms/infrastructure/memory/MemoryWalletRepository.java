@@ -1,7 +1,7 @@
 package com.pfms.infrastructure.memory;
 
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.wallet.Wallet;
-import com.pfms.domain.model.wallet.WalletStatus;
 import com.pfms.domain.repository.WalletRepository;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class MemoryWalletRepository
     }
 
     @Override
-    public List<Wallet> findByStatus(WalletStatus status) {
+    public List<Wallet> findByStatus(EntityStatus status) {
         if (status == null) {
             throw new IllegalArgumentException("Trạng thái ví không được để null");
         }
@@ -54,7 +54,7 @@ public class MemoryWalletRepository
     }
 
     @Override
-    public long countByStatus(WalletStatus status) {
+    public long countByStatus(EntityStatus status) {
         if (status == null) {
             throw new IllegalArgumentException("Trạng thái ví không được để null");
         }
