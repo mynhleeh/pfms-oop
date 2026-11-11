@@ -1,6 +1,8 @@
 ---
 header-includes: |
   \usepackage{longtable}
+  \usepackage{tikz}
+  \usetikzlibrary{calc}
   \usepackage{array}
   \usepackage{float}
   \floatplacement{figure}{H}
@@ -15,15 +17,58 @@ header-includes: |
   \setlength{\emergencystretch}{3em}
   \setlength{\LTpre}{8pt}
   \setlength{\LTpost}{8pt}
+  \usepackage{etoolbox}
+  \ifPDFTeX\else\newfontfamily\tablefont{Times New Roman}\AtBeginEnvironment{longtable}{\tablefont}\fi
+  \usepackage{enumitem}
+  \setlist[itemize,1]{label={}}
+  \setlist[itemize,2]{label={}}
+  \setlist[itemize,3]{label={}}
 ---
+
+
+\begin{center}
+  {\LARGE\bfseries HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG\par}
+\end{center}
+
+
+\vspace*{1cm}
+
+\begin{tikzpicture}[remember picture, overlay]
+  % Viền ngoài
+  \draw[line width=1.6pt]
+    ([shift={(1.2cm,-1.2cm)}]current page.north west)
+    rectangle
+    ([shift={(-1.2cm,1.2cm)}]current page.south east);
+  % Viền trong
+  \draw[line width=0.5pt]
+    ([shift={(1.45cm,-1.45cm)}]current page.north west)
+    rectangle
+    ([shift={(-1.45cm,1.45cm)}]current page.south east);
+\end{tikzpicture}
+
+```{=latex}
+\begin{center}
+  \includegraphics[width=0.2\textwidth]{docs/images/logo.jpg}
+\end{center}
+
+```
+
+\vspace*{1cm}
+
+\begin{center}
+  {\LARGE\bfseries HỆ THỐNG QUẢN LÝ TÀI CHÍNH CÁ NHÂN\par}
+\end{center}
+
+
+\newpage
 
 # Đặc tả Yêu cầu Phần mềm và Ca sử dụng Hệ thống Quản lý Tài chính Cá nhân (PFMS)
 
-> **HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG (PTIT)**
+
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1957}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8043}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1957}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8043}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thông tin &
@@ -48,10 +93,11 @@ Lê Anh Minh (B24DCCE180)\newline Ứng Trọng Trình (B24DCCE271)\newline Nguy
 \endgroup
 ```
 
+\newpage
 
 ## MỤC LỤC TỔNG QUAN
 
-- [1. Giới thiệu tổng quan](#1-giới-thiệu-tổng-quan)
+- **[1. Giới thiệu tổng quan](#1-giới-thiệu-tổng-quan)**
   - [1.1 Mục đích](#11-mục-đích)
   - [1.2 Phạm vi sản phẩm](#12-phạm-vi-sản-phẩm)
     - [1.2.1 Phạm vi chức năng trong hệ thống](#121-phạm-vi-chức-năng-trong-hệ-thống)
@@ -60,20 +106,20 @@ Lê Anh Minh (B24DCCE180)\newline Ứng Trọng Trình (B24DCCE271)\newline Nguy
   - [1.4 Thuật ngữ, từ viết tắt và định nghĩa](#14-thuật-ngữ-từ-viết-tắt-và-định-nghĩa)
   - [1.5 Quy ước mã định danh](#15-quy-ước-mã-định-danh)
   - [1.6 Quy ước mức độ bắt buộc của yêu cầu](#16-quy-ước-mức-độ-bắt-buộc-của-yêu-cầu)
-- [2. Mô tả tổng quát hệ thống](#2-mô-tả-tổng-quát-hệ-thống)
+- **[2. Mô tả tổng quát hệ thống](#2-mô-tả-tổng-quát-hệ-thống)**
   - [2.1 Bối cảnh hệ thống](#21-bối-cảnh-hệ-thống)
   - [2.2 Mục tiêu hệ thống](#22-mục-tiêu-hệ-thống)
   - [2.3 Đặc điểm người dùng](23-đặc-điểm-người-dùng)
   - [2.4 Giới hạn kỹ thuật, giả định và sự phụ thuộc](#24giới-hạn-kỹ-thuật-giả-định-và-sự-phụ-thuộc)
   - [2.5 Môi trường vận hành](#25-môi-trường-vận-hành)
   - [2.5 Luận đề kỹ thuật và phân tích đánh đổi](#25-luận-đề-kỹ-thuật-và-phân-tích-đánh-đổi)
-- [3. Quy tắc nghiệp vụ và quy định tài chính](#3-quy-tắc-nghiệp-vụ-và-quy-định-tài-chính)
+- **[3. Quy tắc nghiệp vụ và quy định tài chính](#3-quy-tắc-nghiệp-vụ-và-quy-định-tài-chính)**
   - [3.1 BR-FIN-01: Quy tắc độ chính xác tài chính](#31-br-fin-01-quy-tắc-độ-chính-xác-tài-chính)
   - [3.2 BR-FIN-02: Quy tắc bảo toàn số dư ví](#32-br-fin-02-quy-tắc-bảo-toàn-số-dư-ví)
   - [3.3 BR-FIN-03: Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ](#33-br-fin-03-quy-tắc-ghi-nhận-đồng-thời-khi-chuyển-tiền-nội-bộ)
   - [3.4 BR-FIN-04: Quy tắc phân cấp danh mục thu chi 3 cấp](#34-br-fin-04-quy-tắc-phân-cấp-danh-mục-thu-chi-3-cấp)
   - [3.5 BR-NAM-01: Quy tắc tên của ví, nhóm nhu cầu và danh mục](#35-br-nam-01-quy-tắc-tên-của-ví-nhóm-nhu-cầu-và-danh-mục)
-- [4. Yêu cầu chức năng chi tiết](#4-yêu-cầu-chức-năng-chi-tiết)
+- **[4. Yêu cầu chức năng chi tiết](#4-yêu-cầu-chức-năng-chi-tiết)**
   - [4.1 FR-WAL: Nhóm chức năng Ví](#41-fr-wal-nhóm-chức-năng-ví)
     - [4.1.1 FR-WAL-01: Tạo ví mới](#411-fr-wal-01-tạo-ví-mới)
     - [4.1.2 FR-WAL-02: Xem danh sách và chi tiết số dư tính lại từ lịch sử dòng tiền](#412-fr-wal-02-xem-danh-sách-và-chi-tiết-số-dư-tính-lại-từ-lịch-sử-dòng-tiền)
@@ -100,14 +146,14 @@ Lê Anh Minh (B24DCCE180)\newline Ứng Trọng Trình (B24DCCE271)\newline Nguy
     - [4.6.1 FR-DAT-01: Xuất dữ liệu tài chính](#461-fr-dat-01-xuất-dữ-liệu-tài-chính)
     - [4.6.2 FR-DAT-02: Phục hồi dữ liệu hệ thống từ bản sao lưu](#462-fr-dat-02-phục-hồi-dữ-liệu-hệ-thống-từ-bản-sao-lưu)
     - [4.6.3 FR-DAT-03: Kiểm tra lại dữ liệu hệ thống](#463-fr-dat-03-kiểm-tra-lại-dữ-liệu-hệ-thống)
-- [5. Yêu cầu phi chức năng](#5-yêu-cầu-phi-chức-năng)
+- **[5. Yêu cầu phi chức năng](#5-yêu-cầu-phi-chức-năng)**
   - [5.1 NFR-01: Độ chính xác và toàn vẹn dữ liệu tài chính](#51-nfr-01-độ-chính-xác-và-toàn-vẹn-dữ-liệu-tài-chính)
   - [5.2 NFR-02: Hiệu năng và độ trễ phản hồi](#52-nfr-02-hiệu-năng-và-độ-trễ-phản-hồi)
   - [5.3 NFR-03: Độ tin cậy và lưu trữ an toàn](#53-nfr-03-độ-tin-cậy-và-lưu-trữ-an-toàn)
   - [5.4 NFR-04: Khả năng bảo trì và kiến trúc hướng đối tượng](#54-nfr-04-khả-năng-bảo-trì-và-kiến-trúc-hướng-đối-tượng)
   - [5.5 NFR-05: Tính khả dụng và trải nghiệm người dùng](#55-nfr-05-tính-khả-dụng-và-trải-nghiệm-người-dùng)
   - [5.6 NFR-06: Tính tương thích và môi trường chạy](#56-nfr-06-tính-tương-thích-và-môi-trường-chạy)
-- [6. Đặc tả 20 ca sử dụng chi tiết](#6-đặc-tả-20-ca-sử-dụng-chi-tiết)
+- **[6. Đặc tả 20 ca sử dụng chi tiết](#6-đặc-tả-20-ca-sử-dụng-chi-tiết)**
   - [6.1 UC-WAL-01: Tạo ví mới](#61-uc-wal-01-tạo-ví-mới)
   - [6.2 UC-WAL-02: Theo dõi số dư tính lại từ lịch sử dòng tiền và cơ cấu ví](#62-uc-wal-02-theo-dõi-số-dư-tính-lại-từ-lịch-sử-dòng-tiền-và-cơ-cấu-ví)
   - [6.3 UC-WAL-03: Cập nhật thông tin ví](#63-uc-wal-03-cập-nhật-thông-tin-ví)
@@ -128,12 +174,12 @@ Lê Anh Minh (B24DCCE180)\newline Ứng Trọng Trình (B24DCCE271)\newline Nguy
   - [6.18 UC-DAT-01: Xuất dữ liệu tài chính](#618-uc-dat-01-xuất-dữ-liệu-tài-chính)
   - [6.19 UC-DAT-02: Phục hồi dữ liệu hệ thống từ bản sao lưu](#619-uc-dat-02-phục-hồi-dữ-liệu-hệ-thống-từ-bản-sao-lưu)
   - [6.20 UC-DAT-03: Kiểm tra lại dữ liệu hệ thống](#620-uc-dat-03-kiểm-tra-lại-dữ-liệu-hệ-thống)
-- [7. Sơ đồ ca sử dụng hệ thống](#7-sơ-đồ-ca-sử-dụng-hệ-thống)
+- **[7. Sơ đồ ca sử dụng hệ thống](#7-sơ-đồ-ca-sử-dụng-hệ-thống)**
   - [7.1 Sơ đồ Ca sử dụng tổng quan kiến trúc nhóm chức năng](#71-sơ-đồ-ca-sử-dụng-tổng-quan-kiến-trúc-nhóm-chức-năng)
   - [7.2 Sơ đồ Ca sử dụng chi tiết theo 2 nhóm chức năng nghiệp vụ](#72-sơ-đồ-ca-sử-dụng-chi-tiết-theo-2-nhóm-chức-năng-nghiệp-vụ)
     - [7.2.1 Nhóm chức năng Dòng tiền và Tiền trong ví](#721-nhóm-chức-năng-dòng-tiền-và-tiền-trong-ví)
     - [7.2.2 Nhóm chức năng Thống kê, Báo cáo và Quản trị dữ liệu](#722-nhóm-chức-năng-thống-kê-báo-cáo-và-quản-trị-dữ-liệu)
-- [8. Ma trận kiểm chứng và truy vết yêu cầu](#8-ma-trận-kiểm-chứng-và-truy-vết-yêu-cầu)
+- **[8. Ma trận kiểm chứng và truy vết yêu cầu](#8-ma-trận-kiểm-chứng-và-truy-vết-yêu-cầu)**
   - [8.1 Ma trận truy vết yêu cầu theo yêu cầu chức năng](#81-ma-trận-truy-vết-yêu-cầu-theo-yêu-cầu-chức-năng)
     - [8.1.1 Ma trận mục tiêu hệ thống theo yêu cầu chức năng](#811-ma-trận-mục-tiêu-hệ-thống-theo-yêu-cầu-chức-năng)
     - [8.1.2 Ma trận ca sử dụng theo yêu cầu chức năng](#812-ma-trận-ca-sử-dụng-theo-yêu-cầu-chức-năng)
@@ -142,9 +188,10 @@ Lê Anh Minh (B24DCCE180)\newline Ứng Trọng Trình (B24DCCE271)\newline Nguy
   - [8.2 Ma trận phương pháp kiểm chứng yêu cầu](#82-ma-trận-phương-pháp-kiểm-chứng-yêu-cầu)
     - [8.2.1 Ma trận phương pháp kiểm chứng yêu cầu chức năng (20 FRs)](#821-ma-trận-phương-pháp-kiểm-chứng-yêu-cầu-chức-năng-20-frs)
     - [8.2.2 Ma trận phương pháp kiểm chứng yêu cầu phi chức năng (6 NFRs)](#822-ma-trận-phương-pháp-kiểm-chứng-yêu-cầu-phi-chức-năng-6-nfrs)
-- [9. Tổng kết](#9-tổng-kết)
-- [10. Tài liệu trích dẫn](#10-tài-liệu-trích-dẫn)
+- **[9. Tổng kết](#9-tổng-kết)**
+- **[10. Tài liệu trích dẫn](#10-tài-liệu-trích-dẫn)**
 
+\newpage
 
 ## 1. GIỚI THIỆU TỔNG QUAN
 
@@ -162,7 +209,7 @@ Hệ thống cung cấp các nhóm năng lực nghiệp vụ sau đây, với qu
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0648}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1362}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0648}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.7341}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0648}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1362}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0648}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.7341}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -224,7 +271,7 @@ Các hạng mục kỹ thuật và nghiệp vụ được loại trừ khỏi ra
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0366}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2115}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3864}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3655}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0366}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2115}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3864}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3655}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -270,7 +317,7 @@ Tài liệu phục vụ nhóm vai trò kỹ thuật với mục tiêu sử dụn
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1894}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6229}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1877}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1894}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6229}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1877}}|}
 \hline
 \rowcolor[gray]{0.9}
 Nhóm đối tượng &
@@ -309,7 +356,7 @@ Danh mục các thuật ngữ chuyên môn và định nghĩa nghiệp vụ đư
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1571}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8429}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1571}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8429}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuật ngữ &
@@ -421,7 +468,7 @@ Danh mục các từ viết tắt kỹ thuật và nghiệp vụ xuất hiện t
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0998}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2941}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6061}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0998}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2941}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6061}}|}
 \hline
 \rowcolor[gray]{0.9}
 Viết tắt &
@@ -471,7 +518,7 @@ Mã định danh gồm 12 dạng mã sau, dùng 10 tiền tố:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0996}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1712}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2346}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0861}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.4085}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0996}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1712}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2346}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0861}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.4085}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tiền tố &
@@ -556,7 +603,7 @@ Danh sách giá trị của biến `DOMAIN` là tập hợp cố định gồm c
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1081}}|>{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.2297}}|>{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1081}}|>{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1525}}|>{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1853}}|>{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1081}}|>{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1081}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1081}}|>{\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.2297}}|>{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1081}}|>{\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1525}}|>{\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1853}}|>{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1081}}|>{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep - 8\arrayrulewidth) * \real{0.1081}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -636,7 +683,7 @@ Tài liệu dùng từ chỉ mức, viết thường, để xác định mức �
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1108}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1360}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.7531}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1108}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1360}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.7531}}|}
 \hline
 \rowcolor[gray]{0.9}
 Từ chỉ mức &
@@ -667,7 +714,7 @@ Chức năng hoặc lựa chọn mà người dùng có thể dùng hoặc bỏ 
 \endgroup
 ```
 
-
+\newpage
 
 ## 2. MÔ TẢ TỔNG QUÁT HỆ THỐNG
 
@@ -679,7 +726,7 @@ Các nguyên tắc thiết kế nền tảng chi phối hành vi nghiệp vụ v
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2593}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7407}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2593}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7407}}|}
 \hline
 \rowcolor[gray]{0.9}
 Nguyên tắc &
@@ -719,7 +766,7 @@ Các mục tiêu nghiệp vụ định lượng và tiêu chí kiểm chứng t�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0383}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1874}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3830}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3912}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0383}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1874}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3830}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3912}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã mục tiêu &
@@ -775,7 +822,7 @@ Bảng dưới đây liệt kê những giới hạn kỹ thuật mà hệ thố
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.0821}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.9179}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.0821}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.9179}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã giới hạn &
@@ -818,7 +865,7 @@ Thiết kế hệ thống dựa trên các giả định sau đây về phạm v
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1005}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8995}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1005}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8995}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã giả định &
@@ -847,7 +894,7 @@ Hệ thống cần các thành phần bên ngoài sau đây của máy tính đ�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0853}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1899}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.7248}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0853}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1899}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.7248}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã phụ thuộc &
@@ -879,7 +926,7 @@ Bảng yêu cầu môi trường vận hành tối thiểu, gồm hệ điều h
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1183}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4842}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3975}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1183}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4842}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3975}}|}
 \hline
 \rowcolor[gray]{0.9}
 Yếu tố môi trường &
@@ -921,7 +968,7 @@ Hệ thống giải quyết bài toán quản lý tài chính cá nhân cho mộ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0684}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2999}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3158}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3158}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0684}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2999}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3158}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3158}}|}
 \hline
 \rowcolor[gray]{0.9}
 Hạng mục &
@@ -970,6 +1017,7 @@ Hệ thống được thiết kế cho quy mô vận hành cá nhân. Điểm g�
 1. Quy mô dữ liệu vượt xa mức sử dụng cá nhân thông thường: Kiến trúc lưu trữ tệp tin phẳng JSON nguyên khối đọc toàn bộ vào bộ nhớ khi khởi động. Kiến trúc này sẽ trở thành điểm nghẽn hiệu năng và bộ nhớ khi khối lượng dữ liệu tăng đủ lớn. Khi đạt ngưỡng này (sẽ xác định bằng đo đạc thực tế), kiến trúc lưu trữ cần tái cấu trúc sang cơ sở dữ liệu quan hệ nhúng cục bộ. Cơ sở dữ liệu này có đánh chỉ mục và phân trang.
 2. Nhu cầu đồng bộ ngay lập tức giữa nhiều thiết bị: Khi cập nhật đồng thời từ nhiều thiết bị, cách lưu tệp cục bộ đơn tiến trình không còn đáp ứng. Nguyên nhân là xung đột ghi dữ liệu. Khi đó, hệ thống phải chuyển sang kiến trúc dịch vụ mạng Client-Server hoặc Cloud API có kiểm soát tương tranh.
 
+\newpage
 
 ## 3. QUY TẮC NGHIỆP VỤ VÀ QUY ĐỊNH TÀI CHÍNH
 
@@ -986,7 +1034,7 @@ Bảng tổng hợp 5 quy tắc nghiệp vụ của hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0580}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2089}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1561}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2215}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3555}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0580}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2089}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1561}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2215}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3555}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã quy tắc &
@@ -1043,7 +1091,7 @@ Quy tắc áp dụng cho mọi thực thể dữ liệu, phép tính toán số 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2228}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7772}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2228}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7772}}|}
 \hline
 \rowcolor[gray]{0.9}
 Quy định &
@@ -1085,7 +1133,7 @@ phần thập phân. \\ \hline
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0577}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1299}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3134}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2000}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2990}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0577}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1299}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3134}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2000}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2990}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1142,7 +1190,7 @@ Mỗi số hạng trong công thức được xác định như sau:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1604}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1185}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0607}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6604}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1604}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1185}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0607}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6604}}|}
 \hline
 \rowcolor[gray]{0.9}
 Số hạng &
@@ -1199,7 +1247,7 @@ Chênh lệch từ khoản điều chỉnh số dư theo Điều chỉnh số d�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1775}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8225}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1775}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8225}}|}
 \hline
 \rowcolor[gray]{0.9}
 Quy định &
@@ -1229,7 +1277,7 @@ số dư ví không đủ (\texttt{ERR-WAL-001}) nếu số dư không đủ. \\
 #### Lỗi vi phạm
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0636}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1438}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3104}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1896}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2926}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0636}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1438}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3104}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1896}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2926}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1313,7 +1361,7 @@ Quy tắc áp dụng cho thực thể giao dịch chuyển tiền, cặp thực 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1993}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8007}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1993}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8007}}|}
 \hline
 \rowcolor[gray]{0.9}
 Quy định &
@@ -1356,7 +1404,7 @@ nhỏ hơn số tiền chuyển. \\ \hline
 #### Lỗi vi phạm
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0724}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1654}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1990}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1964}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3669}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0724}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1654}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1990}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1964}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3669}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1408,7 +1456,7 @@ Quy tắc áp dụng cho thực thể danh mục, nhóm nhu cầu, loại thu ch
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1620}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8380}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1620}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8380}}|}
 \hline
 \rowcolor[gray]{0.9}
 Quy định &
@@ -1451,7 +1499,7 @@ lệch dữ liệu phân tích thu chi trong quá khứ. \\ \hline
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0574}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1769}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2747}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1298}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3612}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0574}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1769}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2747}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1298}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3612}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1517,7 +1565,7 @@ Bảng phạm vi duy nhất của tên:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1462}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3726}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4811}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1462}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3726}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4811}}|}
 \hline
 \rowcolor[gray]{0.9}
 Đối tượng &
@@ -1547,7 +1595,7 @@ Các danh mục đang dùng khác \\ \hline
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1550}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8450}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1550}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8450}}|}
 \hline
 \rowcolor[gray]{0.9}
 Quy định &
@@ -1585,7 +1633,7 @@ Dữ liệu giữ nguyên. \\ \hline
 #### Lỗi vi phạm
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0729}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0964}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3464}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1406}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3438}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0729}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0964}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3464}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1406}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3438}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1620,7 +1668,7 @@ Thông điệp của Lỗi trùng tên (`ERR-NAM-002`) theo đối tượng và 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1391}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8609}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1391}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8609}}|}
 \hline
 \rowcolor[gray]{0.9}
 Đối tượng và thao tác &
@@ -1646,6 +1694,7 @@ rồi thử lại.'' \\ \hline
 \end{longtable}
 \endgroup
 ```
+\newpage
 
 ## 4. YÊU CẦU CHỨC NĂNG CHI TIẾT
 
@@ -1680,7 +1729,7 @@ Bảng chia các yêu cầu chức năng theo 6 nhóm chức năng:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1886}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4343}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1886}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1886}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1886}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4343}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1886}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1886}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -1737,7 +1786,7 @@ Bảng thuộc tính của yêu cầu chức năng Tạo mới ví (FR-WAL-01), 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2852}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7148}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2852}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7148}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -1770,7 +1819,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1226}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1604}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5802}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1368}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1226}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1604}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5802}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1368}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -1809,7 +1858,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1953}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8047}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1953}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8047}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -1834,7 +1883,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1294}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4676}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4029}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1294}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4676}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4029}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -1866,7 +1915,7 @@ Bảng thuộc tính của yêu cầu chức năng Xem danh sách ví (FR-WAL-02
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3049}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6951}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3049}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6951}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -1898,7 +1947,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1967}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1967}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4344}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1721}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1967}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1967}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4344}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1721}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -1932,7 +1981,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2033}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7967}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2033}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7967}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -1954,7 +2003,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1053}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3397}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5550}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1053}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3397}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5550}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -1989,7 +2038,7 @@ Bảng thuộc tính của yêu cầu chức năng Cập nhật thông tin ví (
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3125}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6875}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3125}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6875}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -2020,7 +2069,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1994}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1833}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4727}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1447}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1994}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1833}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4727}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1447}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -2070,7 +2119,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2188}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7812}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2188}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7812}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -2094,7 +2143,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1302}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5207}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3491}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1302}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5207}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3491}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2126,7 +2175,7 @@ Bảng thuộc tính của yêu cầu chức năng Thống kê cơ cấu số d�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3488}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6512}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3488}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6512}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -2157,7 +2206,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1765}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2941}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3529}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1765}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1765}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2941}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3529}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1765}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -2192,7 +2241,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2660}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7340}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2660}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7340}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -2213,7 +2262,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1229}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3631}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5140}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1229}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3631}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5140}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2246,7 +2295,7 @@ Bảng thuộc tính của yêu cầu chức năng Điều chỉnh số dư ví 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3012}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6988}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3012}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6988}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -2278,7 +2327,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2216}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1773}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4765}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1247}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2216}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1773}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4765}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1247}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -2327,7 +2376,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2000}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8000}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2000}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8000}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -2352,7 +2401,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0920}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4682}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4398}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0920}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4682}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4398}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2394,7 +2443,7 @@ Bảng thuộc tính của yêu cầu chức năng Tạo mới giao dịch thu n
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2381}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7619}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2381}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7619}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -2429,7 +2478,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2006}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1646}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4922}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1426}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2006}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1646}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4922}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1426}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -2495,7 +2544,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1991}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8009}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1991}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8009}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -2519,7 +2568,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0889}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4523}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4588}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0889}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4523}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4588}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2558,7 +2607,7 @@ Bảng thuộc tính của yêu cầu chức năng Tạo mới giao dịch chi t
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2381}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7619}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2381}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7619}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -2608,7 +2657,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1991}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8009}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1991}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8009}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -2632,7 +2681,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0960}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4677}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4363}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0960}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4677}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4363}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2670,7 +2719,7 @@ Bảng thuộc tính của yêu cầu chức năng Tra cứu và lọc lịch s�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2419}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7581}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2419}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7581}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -2704,7 +2753,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1976}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1785}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5182}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1057}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1976}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1785}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5182}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1057}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -2759,7 +2808,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2315}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7685}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2315}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7685}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -2781,7 +2830,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1040}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3830}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5130}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1040}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3830}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5130}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2815,7 +2864,7 @@ Bảng thuộc tính của yêu cầu chức năng Chỉnh sửa giao dịch thu
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2373}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7627}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2373}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7627}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -2851,7 +2900,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2460}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1841}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4127}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1571}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2460}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1841}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4127}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1571}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -2926,7 +2975,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1858}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8142}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1858}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8142}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -2951,7 +3000,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0902}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5033}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4066}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0902}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5033}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4066}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2991,7 +3040,7 @@ Bảng thuộc tính của yêu cầu chức năng Xóa giao dịch thu chi (FR-
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2632}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7368}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2632}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7368}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -3026,7 +3075,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2216}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1676}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4541}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1568}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2216}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1676}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4541}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1568}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -3067,7 +3116,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2019}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7981}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2019}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7981}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -3091,7 +3140,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0957}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4935}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4109}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0957}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4935}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4109}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3129,7 +3178,7 @@ Bảng thuộc tính của yêu cầu chức năng Chuyển tiền giữa hai v�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2443}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7557}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2443}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7557}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -3163,7 +3212,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2110}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1691}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4734}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1465}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2110}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1691}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4734}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1465}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -3229,7 +3278,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1826}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8174}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1826}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8174}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -3255,7 +3304,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0913}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3679}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5408}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0913}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3679}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5408}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3297,7 +3346,7 @@ Bảng thuộc tính của yêu cầu chức năng Tra cứu và xóa giao dịc
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2113}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7887}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2113}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7887}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -3332,7 +3381,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2077}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1498}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4251}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2174}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2077}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1498}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4251}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2174}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -3371,7 +3420,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1826}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8174}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1826}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8174}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -3397,7 +3446,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1017}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4196}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4787}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1017}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4196}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4787}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3439,7 +3488,7 @@ Bảng thuộc tính của yêu cầu chức năng Tạo cấu trúc danh mục 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3099}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6901}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3099}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6901}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -3484,7 +3533,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2442}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7558}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2442}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7558}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -3507,7 +3556,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1007}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3158}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5835}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1007}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3158}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5835}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3541,7 +3590,7 @@ Bảng thuộc tính của yêu cầu chức năng Tùy biến danh mục ngư�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2500}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7500}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2500}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7500}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -3575,7 +3624,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1769}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1376}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5749}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1106}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1769}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1376}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5749}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1106}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -3627,7 +3676,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2877}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7123}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2877}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7123}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -3650,7 +3699,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1011}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4688}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4301}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1011}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4688}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4301}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3687,7 +3736,7 @@ Bảng thuộc tính của yêu cầu chức năng Kiểm soát toàn vẹn khi 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2351}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7649}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2351}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7649}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -3721,7 +3770,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2013}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1462}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4809}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1716}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2013}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1462}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4809}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1716}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -3780,7 +3829,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1826}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8174}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1826}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8174}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -3805,7 +3854,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0904}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4384}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4712}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0904}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4384}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4712}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3856,7 +3905,7 @@ Bảng thuộc tính của yêu cầu chức năng Thống kê dòng tiền 12 t
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2941}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7059}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2941}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7059}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -3889,7 +3938,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1701}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2165}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4639}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1495}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1701}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2165}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4639}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1495}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -3931,7 +3980,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2033}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7967}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2033}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7967}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -3953,7 +4002,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1078}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3765}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5157}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1078}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3765}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5157}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3989,7 +4038,7 @@ Bảng thuộc tính của yêu cầu chức năng Phân tích cơ cấu thu chi
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2451}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7549}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2451}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7549}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -4023,7 +4072,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2500}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2217}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3915}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1368}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2500}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2217}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3915}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1368}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -4063,7 +4112,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2033}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7967}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2033}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7967}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -4085,7 +4134,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0948}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3664}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5388}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0948}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3664}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5388}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4124,7 +4173,7 @@ Bảng thuộc tính của yêu cầu chức năng Xuất dữ liệu tài chín
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3440}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6560}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3440}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6560}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -4155,7 +4204,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2183}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1655}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4859}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1303}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2183}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1655}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4859}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1303}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -4199,7 +4248,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3289}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6711}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3289}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6711}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -4220,7 +4269,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0917}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3521}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5563}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0917}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3521}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5563}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4256,7 +4305,7 @@ Bảng thuộc tính của yêu cầu chức năng Phục hồi dữ liệu hệ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2344}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7656}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2344}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7656}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -4293,7 +4342,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2059}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1691}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4706}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1544}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2059}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1691}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4706}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1544}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -4331,7 +4380,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1826}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8174}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1826}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8174}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -4356,7 +4405,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0878}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4112}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5010}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0878}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4112}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5010}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4391,7 +4440,7 @@ Bảng thuộc tính của yêu cầu chức năng Kiểm tra lại dữ liệu 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2344}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7656}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2344}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7656}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính &
@@ -4428,7 +4477,7 @@ Dữ liệu đầu vào:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1842}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1579}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5197}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1382}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1842}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1579}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5197}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1382}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tham số &
@@ -4465,7 +4514,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2252}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7748}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2252}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7748}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -4487,7 +4536,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0885}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3380}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5734}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0885}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3380}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5734}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4515,6 +4564,7 @@ Phát hiện đúng theo quy tắc Ghi nhận đồng thời khi chuyển tiền
 \end{longtable}
 \endgroup
 ```
+\newpage
 
 ## 5. YÊU CẦU PHI CHỨC NĂNG
 
@@ -4531,7 +4581,7 @@ Bảng tổng hợp danh mục các yêu cầu phi chức năng của hệ thố
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0383}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1790}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3096}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0383}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.4347}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0383}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1790}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3096}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0383}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.4347}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã yêu cầu &
@@ -4616,7 +4666,7 @@ Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với độ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4009}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4510}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1480}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4009}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4510}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1480}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính đo kiểm &
@@ -4659,7 +4709,7 @@ Bảng quy định phương pháp và quy trình kiểm chứng kỹ thuật cho
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1837}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1484}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6678}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1837}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1484}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6678}}|}
 \hline
 \rowcolor[gray]{0.9}
 Phương pháp &
@@ -4703,7 +4753,7 @@ Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với hiệ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2720}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4400}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2880}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2720}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4400}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2880}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính đo kiểm &
@@ -4735,7 +4785,7 @@ Bảng quy định phương pháp và quy trình kiểm chứng hiệu năng cho
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1938}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1522}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6540}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1938}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1522}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6540}}|}
 \hline
 \rowcolor[gray]{0.9}
 Phương pháp &
@@ -4778,7 +4828,7 @@ Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với độ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4225}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4487}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1288}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4225}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1288}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính đo kiểm &
@@ -4811,7 +4861,7 @@ Bảng quy định phương pháp và quy trình kiểm chứng an toàn lưu tr
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1951}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1463}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6585}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1951}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1463}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6585}}|}
 \hline
 \rowcolor[gray]{0.9}
 Phương pháp &
@@ -4862,7 +4912,7 @@ Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với khả
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3470}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5160}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1370}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3470}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5160}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1370}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính đo kiểm &
@@ -4898,7 +4948,7 @@ Bảng quy định phương pháp và quy trình kiểm chứng kiến trúc cho
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2116}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1433}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6451}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2116}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1433}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6451}}|}
 \hline
 \rowcolor[gray]{0.9}
 Phương pháp &
@@ -4947,7 +4997,7 @@ Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với tính
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3465}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5224}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1311}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3465}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5224}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1311}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính đo kiểm &
@@ -4982,7 +5032,7 @@ Bảng quy định phương pháp và quy trình kiểm chứng tính khả dụ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2285}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1457}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6258}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2285}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1457}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6258}}|}
 \hline
 \rowcolor[gray]{0.9}
 Phương pháp &
@@ -5025,7 +5075,7 @@ Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với tính
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3600}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5583}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0817}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3600}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5583}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0817}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính đo kiểm &
@@ -5061,7 +5111,7 @@ Bảng quy định phương pháp và quy trình kiểm chứng tính tương th
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2548}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1355}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6097}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2548}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1355}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.6097}}|}
 \hline
 \rowcolor[gray]{0.9}
 Phương pháp &
@@ -5085,6 +5135,7 @@ mã UTF-8 và sử dụng đường dẫn trừu tượng độc lập nền t�
 \end{longtable}
 \endgroup
 ```
+\newpage
 
 ## 6. ĐẶC TẢ 20 CA SỬ DỤNG CHI TIẾT
 
@@ -5113,7 +5164,7 @@ Bảng phân bổ số lượng 20 ca sử dụng theo 6 nhóm chức năng nghi
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1965}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4105}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1965}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1965}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1965}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4105}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1965}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1965}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -5164,7 +5215,7 @@ Bảng danh mục 20 ca sử dụng chi tiết cùng nhóm chức năng và yêu
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0955}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1202}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3840}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2131}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1871}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0955}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1202}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3840}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2131}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1871}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -5292,7 +5343,7 @@ Bảng thuộc tính đặc tả mục tiêu, các bên liên quan và điều k
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2198}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7802}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2198}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7802}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -5372,7 +5423,7 @@ Bảng thuộc tính đặc tả mục tiêu nghiệp vụ và điều kiện k�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2126}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7874}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2126}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7874}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -5415,7 +5466,12 @@ Hệ thống chỉ đọc, không thay đổi bất kỳ dữ liệu nào trong 
 
 1. Người dùng mở danh sách ví và chọn bộ lọc trạng thái (`ACTIVE` mặc định, `ARCHIVED` hoặc `ALL`).
 2. Hệ thống quét dòng tiền của từng ví thỏa điều kiện lọc và tính lại số dư theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`):
-   $$WalletBalance_w = \sum Income_w + \sum TransferIn_w - \sum Expense_w - \sum TransferOut_w + \sum Adjustment_w$$
+   $$
+   \begin{aligned}
+   WalletBalance_w &= \sum Income_w + \sum TransferIn_w \\
+   &\quad - \sum Expense_w - \sum TransferOut_w + \sum Adjustment_w
+   \end{aligned}
+   $$
 3. Hệ thống tính tổng số dư hệ thống (`FR-WAL-02`, quy tắc 3) bằng số thập phân chính xác, gồm các ví `ACTIVE` và các ví `ARCHIVED` có số dư lớn hơn 0.00 VNĐ, không phụ thuộc bộ lọc hiển thị.
 4. Hệ thống hiển thị bảng gồm Mã ví, Tên ví, Trạng thái, Số dư tính lại; chân bảng có tổng số dư toàn hệ thống.
 
@@ -5450,7 +5506,7 @@ Bảng thuộc tính đặc tả phạm vi cập nhật thông tin và điều k
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2178}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7822}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2178}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7822}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -5565,7 +5621,7 @@ Bảng thuộc tính đặc tả mục tiêu đối soát chênh lệch và đi�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2082}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7918}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2082}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7918}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -5655,7 +5711,7 @@ Bảng thuộc tính đặc tả mục tiêu ghi nhận thu chi và điều ki�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2126}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7874}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2126}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7874}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -5787,7 +5843,7 @@ Bảng thuộc tính đặc tả phạm vi tra cứu, lọc giao dịch và đi�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2219}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7781}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2219}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7781}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -5868,7 +5924,7 @@ Bảng thuộc tính đặc tả cơ chế hoàn tác và cập nhật thông ti
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2305}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7695}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2305}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7695}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -5998,7 +6054,7 @@ Bảng thuộc tính đặc tả quy trình hoàn nguyên dòng tiền và đi�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2351}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7649}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2351}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7649}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6090,7 +6146,7 @@ Bảng thuộc tính đặc tả cơ chế ghi nhận đồng thời hai ví và
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2336}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7664}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2336}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7664}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6212,7 +6268,7 @@ Bảng thuộc tính đặc tả phạm vi theo dõi lịch sử chuyển khoả
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2198}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7802}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2198}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7802}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6277,7 +6333,7 @@ Bảng thuộc tính đặc tả quy trình hoàn nguyên kép giữa hai ví c�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2198}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7802}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2198}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7802}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6362,7 +6418,7 @@ Bảng thuộc tính đặc tả cấu trúc phân cấp danh mục 3 cấp củ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2165}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7835}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2165}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7835}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6468,7 +6524,7 @@ Bảng thuộc tính đặc tả phạm vi đổi tên và chuyển nhóm của 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2185}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7815}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2185}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7815}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6579,7 +6635,7 @@ Bảng thuộc tính đặc tả quy trình khôi phục mục đã ẩn của c
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2034}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7966}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2034}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7966}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6684,7 +6740,7 @@ Bảng thuộc tính đặc tả cơ chế xóa cứng hoặc ẩn mềm của c
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2145}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7855}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2145}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7855}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6763,7 +6819,7 @@ Bảng thuộc tính đặc tả chu kỳ tổng hợp dòng tiền 12 tháng c�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2185}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7815}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2185}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7815}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6846,7 +6902,7 @@ Bảng thuộc tính đặc tả cơ cấu tỷ lệ chi tiêu theo nhóm và da
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2094}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7906}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2094}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7906}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6920,7 +6976,7 @@ Bảng thuộc tính đặc tả cấu trúc định dạng dữ liệu xuất t
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2165}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7835}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2165}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7835}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -6998,7 +7054,7 @@ Bảng thuộc tính đặc tả quy trình xác thực dữ liệu và tự đ�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2240}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7760}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2240}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7760}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -7088,7 +7144,7 @@ Bảng thuộc tính đặc tả thuật toán rà soát bất biến toàn vẹ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2240}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7760}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.2240}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.7760}}|}
 \hline
 \rowcolor[gray]{0.9}
 Trường &
@@ -7153,6 +7209,8 @@ Không có luồng ngoại lệ nghiệp vụ bổ sung ngoài việc phân lo�
 1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp  (`BR-FIN-04`) và liên kết phí chuyển tiền.
 2. Yêu cầu chức năng liên quan: `FR-DAT-03`.
 
+\newpage
+
 ## 7. Sơ đồ ca sử dụng hệ thống
 
 Sơ đồ ca sử dụng thể hiện phạm vi chức năng, tác nhân và mối liên hệ của 20 ca sử dụng trong Hệ thống Quản lý Tài chính Cá nhân (PFMS). Hệ thống được tổ chức phân tầng thành hai cấp độ:
@@ -7172,7 +7230,7 @@ Bảng tổng hợp danh mục sơ đồ ca sử dụng của hệ thống phân
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2403}}|>{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2844}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2230}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2403}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2844}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2230}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tầng &
@@ -7253,7 +7311,7 @@ Bảng phân loại chi tiết 20 ca sử dụng theo mục tiêu tương tác c
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0714}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0902}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3411}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4973}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0714}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0902}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3411}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4973}}|}
 \hline
 \rowcolor[gray]{0.9}
 Gói &
@@ -7407,7 +7465,7 @@ Bảng tổng hợp cấu trúc danh mục 5 ma trận truy vết và kiểm ch�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0691}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0691}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3043}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1793}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3783}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0691}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0691}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3043}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1793}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3783}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -7452,6 +7510,7 @@ Cách nghiệm thu và môi trường thực hiện \\ \hline
 \end{longtable}
 \endgroup
 ```
+\newpage
 
 ### 8.1 Ma trận truy vết yêu cầu theo yêu cầu chức năng
 
@@ -7463,7 +7522,7 @@ Bảng ma trận truy vết đối chiếu giữa 20 yêu cầu chức năng và
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1424}}|>{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.5125}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1150}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1150}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1150}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1424}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.5125}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1150}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1150}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1150}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã &
@@ -7590,7 +7649,7 @@ Bảng ma trận ánh xạ giữa 20 yêu cầu chức năng và các kịch b�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3972}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6028}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.3972}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.6028}}|}
 \hline
 \rowcolor[gray]{0.9}
 Yêu cầu chức năng &
@@ -7651,7 +7710,7 @@ Bảng ma trận xác định phạm vi các thực thể dữ liệu miền bà
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.4119}}|>{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.5881}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.4119}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.5881}}|}
 \hline
 \rowcolor[gray]{0.9}
 Yêu cầu chức năng &
@@ -7696,7 +7755,7 @@ Bảng ma trận truy vết mức độ bao phủ của 5 quy tắc nghiệp v�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0889}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3199}}|>{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5913}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0889}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3199}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5913}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã quy tắc &
@@ -7737,7 +7796,7 @@ Bảng định nghĩa 4 phương pháp kiểm chứng yêu cầu phần mềm ch
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0647}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1553}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0887}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6913}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0647}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1553}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6913}}|}
 \hline
 \rowcolor[gray]{0.9}
 Ký hiệu &
@@ -7782,7 +7841,7 @@ Bảng ma trận phương pháp kiểm chứng và tiêu chí nghiệm thu kỹ 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0696}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2392}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0538}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6374}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0696}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2392}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0538}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6374}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã yêu cầu &
@@ -7912,7 +7971,7 @@ Bảng ma trận phương pháp kiểm chứng, môi trường thực thi và ng
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0330}}|>{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.1542}}|>{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2155}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0330}}|>{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2444}}|>{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.3199}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0330}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.1542}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2155}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0330}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2444}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.3199}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã yêu cầu &
@@ -7974,7 +8033,7 @@ native library \\ \hline
 \end{longtable}
 \endgroup
 ```
-
+\newpage
 
 ## 9. Tổng kết
 
@@ -7982,7 +8041,7 @@ Bảng dưới đây tổng hợp quy mô các thành phần trong bản đặc 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1838}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2264}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0670}}|>{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5228}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1838}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2264}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0670}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5228}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -8036,6 +8095,8 @@ tắc nghiệp vụ; kiểm chứng cả yêu cầu chức năng lẫn phi chứ
 \end{longtable}
 \endgroup
 ```
+
+\newpage
 
 ## 10. TÀI LIỆU TRÍCH DẪN
 

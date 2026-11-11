@@ -144,7 +144,7 @@ Hệ thống chỉ đọc, không thay đổi bất kỳ dữ liệu nào trong 
 
 1. Người dùng mở danh sách ví và chọn bộ lọc trạng thái (`ACTIVE` mặc định, `ARCHIVED` hoặc `ALL`).
 2. Hệ thống quét dòng tiền của từng ví thỏa điều kiện lọc và tính lại số dư theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`):
-   $$WalletBalance_w = \sum Income_w + \sum TransferIn_w - \sum Expense_w - \sum TransferOut_w + \sum Adjustment_w$$
+   $$\footnotesize WalletBalance_w = \sum Income_w + \sum TransferIn_w - \sum Expense_w - \sum TransferOut_w + \sum Adjustment_w$$
 3. Hệ thống tính tổng số dư hệ thống (`FR-WAL-02`, quy tắc 3) bằng số thập phân chính xác, gồm các ví `ACTIVE` và các ví `ARCHIVED` có số dư lớn hơn 0.00 VNĐ, không phụ thuộc bộ lọc hiển thị.
 4. Hệ thống hiển thị bảng gồm Mã ví, Tên ví, Trạng thái, Số dư tính lại; chân bảng có tổng số dư toàn hệ thống.
 
