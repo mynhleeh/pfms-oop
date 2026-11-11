@@ -366,7 +366,7 @@ sequenceDiagram
     else Khoảng thời gian lọc hợp lệ
         TransactionService->>+TxnRepo: 5. findByDateRange(...) hoặc findByWalletId / findByCategoryId
         TxnRepo-->>-TransactionService: 6. List<Transaction> rawTransactions
-        Note over TransactionService: Lọc theo tiêu chí, sắp xếp theo ngày giảm dần,<br/>tính tổng thu, tổng chi và dòng tiền thuần
+        Note over TransactionService: Lọc theo tiêu chí, sắp xếp theo ngày giảm dần, tính tổng thu, tổng chi và dòng tiền thuần
         TransactionService-->>-GUI: 7. TransactionListResponseDto
         GUI-->>-User: 8. Cập nhật bảng danh sách giao dịch và bảng chỉ số tổng hợp
     end
