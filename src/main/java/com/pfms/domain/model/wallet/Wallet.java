@@ -3,7 +3,9 @@ package com.pfms.domain.model.wallet;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
+import com.pfms.domain.model.common.EntityName;
 import com.pfms.domain.model.common.Money;
+import com.pfms.domain.model.common.Note;
 import com.pfms.domain.model.common.TransactionDate;
 
 import java.time.LocalDateTime;
@@ -19,8 +21,8 @@ public class Wallet {
 
     // region State
     private final UUID id;
-    private String name;
-    private String note;
+    private EntityName name;
+    private Note note;
     private final boolean defaultWallet;
     private final LocalDateTime createdAt;
     private WalletState state;
@@ -65,8 +67,8 @@ public class Wallet {
             LocalDateTime createdAt, WalletState state, Money currentBalance) {
 
         this.id = Objects.requireNonNull(id, "Mã ví không được để null");
-        this.name = validateAndNormalizeName(name);
-        this.note = normalizeNote(note);
+        this.name = EntityName.of(name, "Tên ví");
+        this.note = Note.of(note, "Ghi chú ví");
         this.defaultWallet = defaultWallet;
         this.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo không được để null");
         this.state = Objects.requireNonNull(state, "Trạng thái khởi tạo không được để null");
@@ -111,16 +113,16 @@ public class Wallet {
     }
 
     public void rename(String newName) {
-        this.name = validateAndNormalizeName(newName);
+        this.name = EntityName.of(newName, "Tên ví");
     }
 
     public void updateNote(String newNote) {
-        this.note = normalizeNote(newNote);
+        this.note = Note.of(newNote, "Ghi chú ví");
     }
 
     public void updateInfo(String newName, String newNote) {
-        this.name = validateAndNormalizeName(newName);
-        this.note = normalizeNote(newNote);
+        this.name = EntityName.of(newName, "Tên ví");
+        this.note = Note.of(newNote, "Ghi chú ví");
     }
 
     public BalanceAdjustmentRecord adjustBalance(Money actualBalance, TransactionDate adjustedAt, String reason) {
@@ -148,10 +150,18 @@ public class Wallet {
     }
 
     public String getName() {
+        return this.name.getValue();
+    }
+
+    public EntityName getEntityName() {
         return this.name;
     }
 
     public String getNote() {
+        return this.note.getValue();
+    }
+
+    public Note getNoteValue() {
         return this.note;
     }
 
@@ -219,29 +229,6 @@ public class Wallet {
             throw new InsufficientBalanceException(this.id, this.currentBalance, amount);
         }
         this.currentBalance = this.currentBalance.subtract(amount);
-    }
-
-    private static String validateAndNormalizeName(String rawName) {
-        if (rawName == null) {
-            throw new BusinessException(ErrorCode.ERR_NAM_001, "Tên ví không được để null.");
-        }
-        String trimmed = rawName.trim();
-        if (trimmed.isEmpty() || trimmed.length() > 50) {
-            throw new BusinessException(ErrorCode.ERR_NAM_001,
-                    "Tên phải có từ 1 đến 50 ký tự, không tính khoảng trắng ở hai đầu.");
-        }
-        return trimmed;
-    }
-
-    private static String normalizeNote(String rawNote) {
-        if (rawNote == null) {
-            return "";
-        }
-        String trimmed = rawNote.trim();
-        if (trimmed.length() > 255) {
-            throw new IllegalArgumentException("Ghi chú ví không được vượt quá 255 ký tự.");
-        }
-        return trimmed;
     }
 
     private static void validatePositiveAmount(Money amount) {

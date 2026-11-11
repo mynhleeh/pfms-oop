@@ -5,6 +5,7 @@ import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.common.Money;
+import com.pfms.domain.model.common.Note;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.wallet.Wallet;
 
@@ -100,7 +101,7 @@ public class IncomeExpenseTransaction extends Transaction {
         Category validCategory = validateCategory(newCategory, this.transactionType);
         Money validAmount = validateAmount(newAmount);
         TransactionDate validDate = Objects.requireNonNull(newDate, "Ngày giao dịch không được để null");
-        String validNote = normalizeNote(newNote);
+        Note validNote = Note.of(newNote, "Ghi chú giao dịch");
         TransactionFee validFee = validateFee(newFee, this.transactionId);
         validateFeeWallet(validFee, validWallet);
 
@@ -108,7 +109,7 @@ public class IncomeExpenseTransaction extends Transaction {
         Category oldCategory = this.category;
         Money oldAmount = this.amount;
         TransactionDate oldDate = this.transactionDate;
-        String oldNote = this.note;
+        Note oldNote = this.note;
         TransactionFee oldFee = this.fee;
 
         revertFromWallet();
