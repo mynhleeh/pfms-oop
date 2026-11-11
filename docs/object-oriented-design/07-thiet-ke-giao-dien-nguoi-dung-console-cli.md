@@ -47,31 +47,31 @@ Sơ đồ máy trạng thái dưới đây mô tả chu trình vận hành và c
 ```mermaid
 stateDiagram-v2
     [*] --> Initializing : Khởi động ứng dụng
-    
+
     Initializing --> ShowingMainMenu : Nạp cấu hình và khởi tạo các dịch vụ
-    
+
     ShowingMainMenu --> ShowingMainMenu : Lựa chọn không hợp lệ (nhắc nhập lại)
-    
+
     ShowingMainMenu --> ExecutingModule : Nhập số 1 đến N (Chọn phân hệ)
-    
+
     state ExecutingModule {
         [*] --> SubMenuScreen : Hiển thị menu phân hệ
         SubMenuScreen --> ProcessingAction : Nhập phím chức năng ca sử dụng
-        
+
         ProcessingAction --> ResultScreen : Xử lý thành công
         ProcessingAction --> ErrorRecovery : Phát sinh ngoại lệ (Nghiệp vụ / Hệ thống)
-        
+
         ResultScreen --> WaitingConfirmation : In bảng kết quả
         ErrorRecovery --> WaitingConfirmation : In thông báo lỗi hoặc ghi log
-        
+
         WaitingConfirmation --> SubMenuScreen : Nhấn Enter để tiếp tục
         SubMenuScreen --> [*] : Nhập phím 0 (Quay lại)
     }
 
     ExecutingModule --> ShowingMainMenu : Trở về Menu Chính
-    
+
     ShowingMainMenu --> Terminating : Nhập phím 0 (Thoát)
-    
+
     Terminating --> [*] : Đóng Scanner và giải phóng tài nguyên
 ```
 
@@ -94,10 +94,10 @@ Bảng ánh xạ chi tiết các lựa chọn menu đến ca sử dụng nghiệ
 
 | Phân hệ Menu | Phím chọn | Tên thao tác màn hình | Mã ca sử dụng | Controller điều phối |
 | :--- | :--- | :--- | :--- | :--- |
-| **Quản lý Ví** | 1 | Xem danh sách và số dư các ví | `UC-WAL-04` | `WalletController` |
+| **Quản lý Ví** | 1 | Xem danh sách và số dư các ví | `UC-WAL-02` | `WalletController` |
 | **Quản lý Ví** | 2 | Thêm ví tài chính mới | `UC-WAL-01` | `WalletController` |
-| **Quản lý Ví** | 3 | Cập nhật tên và thông tin ví | `UC-WAL-02` | `WalletController` |
-| **Quản lý Ví** | 4 | Kiểm kê và điều chỉnh số dư thực tế | `UC-WAL-03` | `WalletController` |
+| **Quản lý Ví** | 3 | Cập nhật tên và thông tin ví | `UC-WAL-03` | `WalletController` |
+| **Quản lý Ví** | 4 | Kiểm kê và điều chỉnh số dư thực tế | `UC-WAL-04` | `WalletController` |
 | **Quản lý Ví** | 0 | Quay lại Menu Chính | Điều hướng | `MainController` |
 | **Ghi nhận Thu Chi** | 1 | Thêm giao dịch thu hoặc chi | `UC-TXN-01` | `TransactionController` |
 | **Ghi nhận Thu Chi** | 2 | Tra cứu và lọc lịch sử giao dịch | `UC-TXN-02` | `TransactionController` |
@@ -232,29 +232,43 @@ Toàn bộ các lớp DTO trong hệ thống được định vị trong gói `c
 
 Bảng Danh mục các Lớp DTO Yêu cầu:
 
-| Phân hệ nghiệp vụ | Tên lớp DTO Yêu cầu | Danh sách Thuộc tính và Kiểu dữ liệu | Mô tả Mục đích Dữ liệu |
-| :--- | :--- | :--- | :--- |
-| Quản lý Danh mục (CAT) | `CreateCategoryRequestDTO` | `parentGroupId: UUID, name: String` | Đóng gói dữ liệu đầu vào để tạo danh mục chi tiết cấp 3 thuộc nhóm nhu cầu cha đang hoạt động. |
-| Quản lý Danh mục (CAT) | `RenameCategoryRequestDTO` | `categoryId: UUID, name: String, newParentGroupId: UUID` | Đóng gói dữ liệu đầu vào để đổi tên hiển thị hoặc chuyển đổi nhóm nhu cầu cha trực thuộc của danh mục cấp 3. |
-| Quản lý Danh mục (CAT) | `RestoreCategoryRequestDTO` | `categoryId: UUID` | Đóng gói định danh danh mục đã xóa mềm cần khôi phục trạng thái hoạt động. |
-| Quản lý Danh mục (CAT) | `DeleteCategoryRequestDTO` | `categoryId: UUID` | Đóng gói định danh danh mục cần xóa; hệ thống tự động kiểm tra lịch sử giao dịch để xóa vĩnh viễn hoặc xóa mềm. |
-| Báo cáo Thống kê (REP) | `CashFlowReportRequestDTO` | `endMonth: int, endYear: int` | Đóng gói mốc thời gian tháng và năm kết thúc để yêu cầu truy vấn chuỗi dòng tiền 12 tháng liên tục lùi. |
-| Báo cáo Thống kê (REP) | `SpendingStructureRequestDTO` | `startDate: LocalDate, endDate: LocalDate, transactionType: String` | Đóng gói khoảng ngày phân tích và loại luồng tiền (`EXPENSE` hoặc `INCOME`) để yêu cầu phân tích cơ cấu tỷ trọng thu chi 2 cấp. |
-| Quản trị Dữ liệu (DAT) | `ExportBackupRequestDTO` | `destinationPath: String, scope: String` | Đóng gói đường dẫn tệp xuất và phạm vi sao lưu (`FULL` toàn hệ thống hoặc `TRANSACTIONS` riêng sổ giao dịch) để trích xuất dữ liệu an toàn. |
-| Quản trị Dữ liệu (DAT) | `RestoreBackupRequestDTO` | `backupFilePath: String` | Đóng gói đường dẫn tệp sao lưu JSON cần nạp để phục hồi dữ liệu qua quy trình kiểm định toàn vẹn 4 bước. |
-| Quản trị Dữ liệu (DAT) | `ReconcileDataRequestDTO` | `triggerMode: String` | Đóng gói chế độ kích hoạt đối soát độc lập 4 điều kiện toàn vẹn sổ cái. |
+| Tên lớp DTO Yêu cầu | Danh sách Thuộc tính và Kiểu dữ liệu | Mô tả Mục đích Dữ liệu |
+| :--- | :--- | :--- |
+| **Phân hệ Quản lý Ví (WAL)** |  |  |
+| `CreateWalletRequestDTO` | `name: String, note: String` | Đóng gói dữ liệu đầu vào (tên ví và ghi chú mô tả) để tạo ví tài chính mới ở trạng thái hoạt động với số dư khởi điểm bằng 0. |
+| `UpdateWalletRequestDTO` | `walletId: UUID, name: String, note: String` | Đóng gói dữ liệu đầu vào gồm mã định danh ví, tên ví mới và ghi chú mới cần cập nhật mà giữ nguyên số dư hiện hành. |
+| `AdjustBalanceRequestDTO` | `walletId: UUID, actualBalance: BigDecimal, reason: String, adjustedAt: LocalDate` | Đóng gói dữ liệu kiểm kê thực tế gồm mã ví, số dư quan sát được, lý do điều chỉnh và ngày kiểm kê để đối soát và cân đối số dư sổ cái. |
+| **Phân hệ Quản lý Danh mục (CAT)** |  |  |
+| `CreateCategoryRequestDTO` | `parentGroupId: UUID, name: String` | Đóng gói dữ liệu đầu vào để tạo danh mục chi tiết cấp 3 thuộc nhóm nhu cầu cha đang hoạt động. |
+| `RenameCategoryRequestDTO` | `categoryId: UUID, name: String, newParentGroupId: UUID` | Đóng gói dữ liệu đầu vào để đổi tên hiển thị hoặc chuyển đổi nhóm nhu cầu cha trực thuộc của danh mục cấp 3. |
+| `RestoreCategoryRequestDTO` | `categoryId: UUID` | Đóng gói định danh danh mục đã xóa mềm cần khôi phục trạng thái hoạt động. |
+| `DeleteCategoryRequestDTO` | `categoryId: UUID` | Đóng gói định danh danh mục cần xóa; hệ thống tự động kiểm tra lịch sử giao dịch để xóa vĩnh viễn hoặc xóa mềm. |
+| **Phân hệ Báo cáo Thống kê (REP)** |  |  |
+| `CashFlowReportRequestDTO` | `endMonth: int, endYear: int` | Đóng gói mốc thời gian tháng và năm kết thúc để yêu cầu truy vấn chuỗi dòng tiền 12 tháng liên tục lùi. |
+| `SpendingStructureRequestDTO` | `startDate: LocalDate, endDate: LocalDate, transactionType: String` | Đóng gói khoảng ngày phân tích và loại luồng tiền (`EXPENSE` hoặc `INCOME`) để yêu cầu phân tích cơ cấu tỷ trọng thu chi 2 cấp. |
+| **Phân hệ Quản trị Dữ liệu (DAT)** |  |  |
+| `ExportBackupRequestDTO` | `destinationPath: String, scope: String` | Đóng gói đường dẫn tệp xuất và phạm vi sao lưu (`FULL` toàn hệ thống hoặc `TRANSACTIONS` riêng sổ giao dịch) để trích xuất dữ liệu an toàn. |
+| `RestoreBackupRequestDTO` | `backupFilePath: String` | Đóng gói đường dẫn tệp sao lưu JSON cần nạp để phục hồi dữ liệu qua quy trình kiểm định toàn vẹn 4 bước. |
+| `ReconcileDataRequestDTO` | `triggerMode: String` | Đóng gói chế độ kích hoạt đối soát độc lập 4 điều kiện toàn vẹn sổ cái. |
 
 Bảng Danh mục các Lớp DTO Phản hồi:
 
-| Phân hệ nghiệp vụ | Tên lớp DTO Phản hồi | Danh sách Thuộc tính và Kiểu dữ liệu | Mô tả Dữ liệu Kết xuất |
-| :--- | :--- | :--- | :--- |
-| Quản lý Danh mục (CAT) | `CategoryResponseDTO` | `categoryId: UUID, name: String, parentGroupId: UUID, parentGroupName: String, transactionType: String, status: String, createdAt: LocalDateTime` | Thông tin chi tiết một danh mục phân loại cấp 3 kèm thông tin nhóm cha và loại thu chi; phục vụ hiển thị kết quả thao tác và danh sách lựa chọn thu chi. |
-| Quản lý Danh mục (CAT) | `CategoryHierarchyResponseDTO` | `transactionType: String, needGroupId: UUID, needGroupName: String, needGroupStatus: String, categories: List<CategoryResponseDTO>` | Cấu trúc phân cấp 3 cấp theo từng nhóm nhu cầu kèm danh sách các danh mục con trực thuộc ở cả hai trạng thái hoạt động và đã xóa mềm; phục vụ kết xuất màn hình cây danh mục. |
-| Báo cáo Thống kê (REP) | `MonthlyCashFlowResponseDTO` | `yearMonth: String, totalIncome: BigDecimal, totalExpense: BigDecimal, netCashFlow: BigDecimal, savingsRate: BigDecimal` | Dữ liệu tài chính tổng hợp của một tháng trong chuỗi 12 tháng, bao gồm tổng thu, tổng chi kèm phí, dòng tiền thuần và tỷ lệ tiết kiệm; phục vụ hiển thị từng dòng trong bảng báo cáo dòng tiền. |
-| Báo cáo Thống kê (REP) | `CashFlowReportResponseDTO` | `months: List<MonthlyCashFlowResponseDTO>, avgIncome: BigDecimal, avgExpense: BigDecimal, avgNetCashFlow: BigDecimal` | Bảng tổng hợp số liệu chuỗi 12 tháng liên tục kèm các chỉ số bình quân năm; phục vụ kết xuất bảng thống kê dòng tiền trên màn hình console. |
-| Báo cáo Thống kê (REP) | `CategoryShareResponseDTO` | `categoryId: UUID, name: String, status: String, totalAmount: BigDecimal, share: BigDecimal` | Số liệu chi tiết một danh mục cấp 3 gồm tổng tiền và tỷ trọng phần trăm trong kỳ phân tích; phục vụ hiển thị dòng chi tiết cấp 3. |
-| Báo cáo Thống kê (REP) | `NeedGroupShareResponseDTO` | `needGroupId: UUID, name: String, status: String, totalAmount: BigDecimal, share: BigDecimal, categories: List<CategoryShareResponseDTO>` | Số liệu nhóm nhu cầu cấp 2 gồm tổng tiền, tỷ trọng phần trăm và danh sách danh mục con trực thuộc; phục vụ hiển thị nhóm cấp 2. |
-| Báo cáo Thống kê (REP) | `SpendingStructureReportResponseDTO` | `transactionType: String, startDate: LocalDate, endDate: LocalDate, totalAmount: BigDecimal, groups: List<NeedGroupShareResponseDTO>` | Báo cáo phân tích cơ cấu dòng tiền 2 cấp hoàn chỉnh kèm tổng giá trị toàn kỳ; phục vụ kết xuất bảng cơ cấu chi tiêu trên màn hình console. |
-| Quản trị Dữ liệu (DAT) | `BackupResponseDTO` | `backupPath: String, fileSize: long, recordCount: int, exportedAt: LocalDateTime` | Kết quả xuất tệp sao lưu JSON gồm đường dẫn lưu trữ, kích thước tệp, số lượng bản ghi và mốc thời gian thực hiện. |
-| Quản trị Dữ liệu (DAT) | `RestoreResultResponseDTO` | `success: boolean, recordCount: int, message: String, restoredAt: LocalDateTime` | Kết quả phục hồi dữ liệu hệ thống từ bản sao lưu gồm trạng thái thành công, tổng số thực thể tái tạo và thời điểm hoàn tất. |
-| Quản trị Dữ liệu (DAT) | `ReconciliationReportResponseDTO` | `allPassed: boolean, balancePassed: boolean, transferPassed: boolean, categoryPassed: boolean, feePassed: boolean, details: List<String>, checkedAt: LocalDateTime` | Báo cáo chi tiết kết quả đối soát độc lập 4 điều kiện toàn vẹn tài chính kèm danh sách cảnh báo sai lệch; phục vụ hiển thị bảng kết quả đối soát. |
+| Tên lớp DTO Phản hồi | Danh sách Thuộc tính và Kiểu dữ liệu | Mô tả Dữ liệu Kết xuất |
+| :--- | :--- | :--- |
+| **Phân hệ Quản lý Ví (WAL)** |  |  |
+| `WalletResponseDTO` | `id: UUID, name: String, balance: BigDecimal, currency: String, isDefault: boolean, status: String, note: String, createdAt: LocalDateTime` | Thông tin chi tiết một ví tài chính (mã, tên, số dư khả dụng, đơn vị tiền tệ, cờ mặc định, trạng thái và ghi chú) phục vụ hiển thị kết quả thao tác hoặc từng dòng trong bảng danh sách ví. |
+| `WalletsSummaryDTO` | `wallets: List<WalletResponseDTO>, totalBalance: BigDecimal, currency: String, walletShares: Map<UUID, BigDecimal>` | Bảng tổng hợp toàn bộ các ví khả dụng gồm danh sách ví, tổng số dư toàn hệ thống, đơn vị tiền tệ và tỷ trọng phân bổ tài sản (%) của từng ví làm tròn ngân hàng 2 chữ số thập phân. |
+| `BalanceAdjustmentResponseDTO` | `recordId: UUID, walletId: UUID, previousBalance: BigDecimal, actualBalance: BigDecimal, difference: BigDecimal, currency: String, reason: String, adjustedAt: LocalDate, createdAt: LocalDateTime` | Kết quả điều chỉnh số dư gồm mã bản ghi kiểm kê, số dư trước kiểm kê, số dư thực tế, giá trị chênh lệch (âm hoặc dương) và thời điểm kiểm kê phục vụ lưu vết kiểm toán tài chính. |
+| **Phân hệ Quản lý Danh mục (CAT)** |  |  |
+| `CategoryResponseDTO` | `categoryId: UUID, name: String, parentGroupId: UUID, parentGroupName: String, transactionType: String, status: String, createdAt: LocalDateTime` | Thông tin chi tiết một danh mục phân loại cấp 3 kèm thông tin nhóm cha và loại thu chi; phục vụ hiển thị kết quả thao tác và danh sách lựa chọn thu chi. |
+| `CategoryHierarchyResponseDTO` | `transactionType: String, needGroupId: UUID, needGroupName: String, needGroupStatus: String, categories: List<CategoryResponseDTO>` | Cấu trúc phân cấp 3 cấp theo từng nhóm nhu cầu kèm danh sách các danh mục con trực thuộc ở cả hai trạng thái hoạt động và đã xóa mềm; phục vụ kết xuất màn hình cây danh mục. |
+| **Phân hệ Báo cáo Thống kê (REP)** |  |  |
+| `MonthlyCashFlowResponseDTO` | `yearMonth: String, totalIncome: BigDecimal, totalExpense: BigDecimal, netCashFlow: BigDecimal, savingsRate: BigDecimal` | Dữ liệu tài chính tổng hợp của một tháng trong chuỗi 12 tháng, bao gồm tổng thu, tổng chi kèm phí, dòng tiền thuần và tỷ lệ tiết kiệm; phục vụ hiển thị từng dòng trong bảng báo cáo dòng tiền. |
+| `CashFlowReportResponseDTO` | `months: List<MonthlyCashFlowResponseDTO>, avgIncome: BigDecimal, avgExpense: BigDecimal, avgNetCashFlow: BigDecimal` | Bảng tổng hợp số liệu chuỗi 12 tháng liên tục kèm các chỉ số bình quân năm; phục vụ kết xuất bảng thống kê dòng tiền trên màn hình console. |
+| `CategoryShareResponseDTO` | `categoryId: UUID, name: String, status: String, totalAmount: BigDecimal, share: BigDecimal` | Số liệu chi tiết một danh mục cấp 3 gồm tổng tiền và tỷ trọng phần trăm trong kỳ phân tích; phục vụ hiển thị dòng chi tiết cấp 3. |
+| `NeedGroupShareResponseDTO` | `needGroupId: UUID, name: String, status: String, totalAmount: BigDecimal, share: BigDecimal, categories: List<CategoryShareResponseDTO>` | Số liệu nhóm nhu cầu cấp 2 gồm tổng tiền, tỷ trọng phần trăm và danh sách danh mục con trực thuộc; phục vụ hiển thị nhóm cấp 2. |
+| `SpendingStructureReportResponseDTO` | `transactionType: String, startDate: LocalDate, endDate: LocalDate, totalAmount: BigDecimal, groups: List<NeedGroupShareResponseDTO>` | Báo cáo phân tích cơ cấu dòng tiền 2 cấp hoàn chỉnh kèm tổng giá trị toàn kỳ; phục vụ kết xuất bảng cơ cấu chi tiêu trên màn hình console. |
+| **Phân hệ Quản trị Dữ liệu (DAT)** |  |  |
+| `BackupResponseDTO` | `backupPath: String, fileSize: long, recordCount: int, exportedAt: LocalDateTime` | Kết quả xuất tệp sao lưu JSON gồm đường dẫn lưu trữ, kích thước tệp, số lượng bản ghi và mốc thời gian thực hiện. |
+| `RestoreResultResponseDTO` | `success: boolean, recordCount: int, message: String, restoredAt: LocalDateTime` | Kết quả phục hồi dữ liệu hệ thống từ bản sao lưu gồm trạng thái thành công, tổng số thực thể tái tạo và thời điểm hoàn tất. |
+| `ReconciliationReportResponseDTO` | `allPassed: boolean, balancePassed: boolean, transferPassed: boolean, categoryPassed: boolean, feePassed: boolean, details: List<String>, checkedAt: LocalDateTime` | Báo cáo chi tiết kết quả đối soát độc lập 4 điều kiện toàn vẹn tài chính kèm danh sách cảnh báo sai lệch; phục vụ hiển thị bảng kết quả đối soát. |
