@@ -1,6 +1,6 @@
 # 08. Thiết kế Xử lý Ngoại lệ
 
-Tài liệu này xác lập thiết kế kiểm soát ngoại lệ và bảng từ điển mã lỗi chuẩn hóa cho Hệ thống Quản lý Tài chính Cá nhân PFMS trên nền tảng Java Console. Nội dung tập trung vào quy tắc phân tách ngoại lệ kỹ thuật với ngoại lệ nghiệp vụ, cơ chế bọc lỗi xuyên tầng kiến trúc và bảo vệ giao diện dòng lệnh trước các sự cố dữ liệu.
+Tài liệu này xác lập thiết kế kiểm soát ngoại lệ và bảng từ điển mã lỗi chuẩn hóa cho Hệ thống Quản lý Tài chính Cá nhân PFMS trên môi trường giao diện đồ họa người dùng. Nội dung tập trung vào quy tắc phân tách ngoại lệ kỹ thuật với ngoại lệ nghiệp vụ, cơ chế bọc lỗi xuyên tầng kiến trúc và bảo vệ giao diện đồ họa người dùng trước các sự cố dữ liệu.
 
 Thiết kế tập trung giải quyết các trọng tâm kỹ thuật: cô lập ngoại lệ kỹ thuật không để rò rỉ lên tầng trình diễn, gán mã định danh duy nhất cho từng vi phạm nghiệp vụ và bảo đảm tính toàn vẹn trạng thái ứng dụng trước các tình huống bất thường.
 
@@ -16,12 +16,12 @@ Hệ thống phân tách toàn bộ các tình huống bất thường thành ha
 | :--- | :--- | :--- |
 | **Bản chất lỗi** | Vi phạm quy tắc tài chính do thao tác người dùng (ví dụ: không đủ số dư, vượt hạn mức). | Sự cố hệ thống, đọc ghi tệp đĩa cứng hoặc hỏng dữ liệu lưu trữ. |
 | **Nơi phát sinh** | Tầng Nghiệp vụ cốt lõi (`domain`) và Tầng Dịch vụ (`service`). | Tầng Hạ tầng lưu trữ (`infrastructure`). |
-| **Xử lý hiển thị** | Trích xuất thông điệp tiếng Việt thân thiện ra màn hình dòng lệnh. | Thông báo lỗi hệ thống và an toàn đưa người dùng quay lại menu chính. |
+| **Xử lý hiển thị** | Trích xuất thông điệp tiếng Việt thân thiện lên hộp thoại giao diện người dùng. | Thông báo lỗi hệ thống và an toàn giữ nguyên màn hình làm việc. |
 
 Toàn bộ các lớp ngoại lệ của hệ thống đều kế thừa từ `java.lang.RuntimeException` (Unchecked Exception) nhằm:
 - Loại bỏ từ khóa `throws` cồng kềnh trên chữ ký phương thức, tránh rò rỉ chi tiết cài đặt giữa các tầng.
 - Đảm bảo tính đóng gói của Clean Architecture: Tầng Trình diễn và Tầng Dịch vụ giao tiếp qua Interface mà không bị ràng buộc bởi ngoại lệ kiểm tra (Checked Exception).
-- Phù hợp với cơ chế tương tác Console: khi có lỗi, giao dịch bị hủy và điều hướng người dùng quay lại vòng lặp menu chính một cách an toàn.
+- Phù hợp với cơ chế tương tác giao diện đồ họa: khi có lỗi, giao dịch bị hủy và bộ điều khiển hiển thị hộp thoại cảnh báo `JOptionPane` mà không làm sập giao diện.
 
 ### 8.1.2 Nguyên tắc Bắt và Chuyển đổi Ngoại lệ Xuyên tầng
 
@@ -31,9 +31,9 @@ Bảng phân định trách nhiệm bắt và ném ngoại lệ giữa bốn t�
 
 | Tầng kiến trúc | Trách nhiệm ném ngoại lệ | Trách nhiệm bắt và chuyển đổi ngoại lệ |
 | :--- | :--- | :--- |
-| **Tầng Trình diễn**<br/>(`com.pfms.presentation`) | Ném ngoại lệ định dạng đầu vào khi chuỗi nhập liệu sai cú pháp. | Điểm chốt chặn cuối cùng: Bắt toàn bộ ngoại lệ tại vòng lặp menu chính, hiển thị thông báo thân thiện và an toàn đưa người dùng quay lại menu. |
+| **Tầng Trình diễn**<br/>(`com.pfms.presentation`) | Ném ngoại lệ định dạng đầu vào khi chuỗi nhập liệu sai cú pháp. | Điểm chốt chặn cuối cùng: Bắt toàn bộ ngoại lệ tại bộ điều khiển sự kiện, hiển thị thông báo hộp thoại thân thiện và giữ an toàn trạng thái màn hình. |
 | **Tầng Dịch vụ**<br/>(`com.pfms.service`) | Ném Ngoại lệ Nghiệp vụ kèm mã lỗi khi điều kiện ca sử dụng không thỏa mãn. | Không nuốt lỗi; cho phép ngoại lệ từ Tầng Miền và Tầng Hạ tầng lan truyền tự nhiên lên Tầng Trình diễn. |
-| **Tầng Nghiệp vụ cốt lõi**<br/>(`com.pfms.domain`) | Ném Ngoại lệ Nghiệp vụ ngay tại thực thể khi vi phạm ràng buộc số dư hoặc ngân sách. | Không bắt giữ lỗi; tuyệt đối không tiếp xúc với các thư viện I/O hoặc Console. |
+| **Tầng Nghiệp vụ cốt lõi**<br/>(`com.pfms.domain`) | Ném Ngoại lệ Nghiệp vụ ngay tại thực thể khi vi phạm ràng buộc số dư hoặc ngân sách. | Không bắt giữ lỗi; tuyệt đối không tiếp xúc với các thư viện I/O hoặc giao diện đồ họa. |
 | **Tầng Hạ tầng lưu trữ**<br/>(`com.pfms.infrastructure`) | Ném ngoại lệ hạ tầng (`StorageException`). | Bắt giữ toàn bộ `IOException`, chuyển đổi và đóng gói nguyên nhân gốc vào `StorageException` trước khi ném ra ngoài. |
 
 ## 8.2 Cây Phân cấp Lớp Ngoại lệ Hệ thống
@@ -130,9 +130,9 @@ Bảng phân nhóm tiền tố mã lỗi chuẩn hóa hệ thống:
 
 ### 8.3.2 Danh mục Mã Lỗi và Thông điệp Phản hồi
 
-Bảng dưới đây xác lập từ điển mã lỗi chuẩn hóa của hệ thống PFMS, bảo đảm tính truy vết hai chiều nhất quán với tài liệu Yêu cầu SRS, đồng thời định rõ lớp ngoại lệ Java tương ứng và thông điệp hiển thị trên giao diện dòng lệnh:
+Bảng dưới đây xác lập từ điển mã lỗi chuẩn hóa của hệ thống PFMS, bảo đảm tính truy vết hai chiều nhất quán với tài liệu Yêu cầu SRS, đồng thời định rõ lớp ngoại lệ Java tương ứng và thông điệp hiển thị trên giao diện đồ họa:
 
-| Mã lỗi Enum | Lớp Ngoại lệ Java phụ trách | Nguyên nhân kích hoạt nghiệp vụ | Thông điệp phản hồi Console |
+| Mã lỗi Enum | Lớp Ngoại lệ Java phụ trách | Nguyên nhân kích hoạt nghiệp vụ | Thông điệp phản hồi Giao diện |
 | :--- | :--- | :--- | :--- |
 | **`ERR_FIN_001`** | `BusinessException` | Dữ liệu số tiền không đúng định dạng số học hoặc nhỏ hơn hoặc bằng 0. | Dữ liệu số tiền không đúng định dạng số học hợp lệ. |
 | **`ERR_FIN_002`** | `BusinessException` | Phép toán chia không xác định quy tắc làm tròn gây số thập phân vô hạn. | Lỗi số học: Phép toán chia không xác định quy tắc làm tròn. |

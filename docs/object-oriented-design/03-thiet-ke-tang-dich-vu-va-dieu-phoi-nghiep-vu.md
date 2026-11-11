@@ -2,7 +2,7 @@
 
 Tài liệu này xác lập bản vẽ thiết kế chi tiết cho Tầng Dịch vụ ứng dụng của Hệ thống Quản lý Tài chính Cá nhân PFMS. Nội dung văn bản thực hiện chuyển đổi các ca sử dụng và kịch bản tương tác đã được xác thực trong hồ sơ Phân tích Hướng đối tượng sang cấu trúc các lớp dịch vụ điều phối luồng nghiệp vụ trên nền tảng ngôn ngữ Java.
 
-Bản vẽ thiết kế tập trung giải quyết ba mục tiêu kỹ thuật trọng tâm: quản lý vòng đời và điều phối luồng thực thi của các ca sử dụng nghiệp vụ, đóng vai trò cầu nối trung gian giữa giao diện dòng lệnh và các thực thể nghiệp vụ; phân tách rạch ròi giữa giao diện công khai và lớp cài đặt nội bộ nhằm đóng kín chi tiết điều phối; và bảo đảm tính nguyên tử của dữ liệu tài chính khi thao tác qua các kho lưu trữ trừu tượng, đồng thời ủy quyền toàn bộ các phép tính số học cho Tầng Nghiệp vụ cốt lõi.
+Bản vẽ thiết kế tập trung giải quyết ba mục tiêu kỹ thuật trọng tâm: quản lý vòng đời và điều phối luồng thực thi của các ca sử dụng nghiệp vụ, đóng vai trò cầu nối trung gian giữa giao diện người dùng và các thực thể nghiệp vụ; phân tách rạch ròi giữa giao diện công khai và lớp cài đặt nội bộ nhằm đóng kín chi tiết điều phối; và bảo đảm tính nguyên tử của dữ liệu tài chính khi thao tác qua các kho lưu trữ trừu tượng, đồng thời ủy quyền toàn bộ các phép tính số học cho Tầng Nghiệp vụ cốt lõi.
 
 ## 3.1 Tổng quan và Danh mục Dịch vụ Ứng dụng
 
@@ -237,7 +237,7 @@ Lớp cài đặt `com.pfms.service.impl.CategoryServiceImpl` nhận `CategoryRe
   1. *Bước 1 - Kiểm tra tiền điều kiện:* Tiếp nhận yêu cầu truy vấn cấu trúc danh mục phân loại từ Tầng Trình diễn.
   2. *Bước 2 - Nạp dữ liệu từ kho lưu trữ:* Gọi `NeedGroupRepository.findAll()` và `CategoryRepository.findAll()` để nạp toàn bộ danh sách nhóm nhu cầu và danh mục chi tiết ở cả hai trạng thái `ACTIVE` và `DELETED`.
   3. *Bước 3 - Tổ chức và chuẩn hóa dữ liệu:* Sắp xếp và gom cụm các danh mục chi tiết trực thuộc từng nhóm nhu cầu cha tương ứng theo đúng cấu trúc phân cấp 3 cấp, giữ nguyên nhãn nhận diện trạng thái cho các mục đã xóa mềm.
-  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Ánh xạ toàn bộ cấu trúc cây phân loại sang danh sách `CategoryResponseDto` bất biến và trả về Tầng Trình diễn phục vụ kết xuất bảng trên giao diện dòng lệnh.
+  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Ánh xạ toàn bộ cấu trúc cây phân loại sang danh sách `CategoryResponseDto` bất biến và trả về Tầng Trình diễn phục vụ kết xuất dữ liệu trên giao diện đồ họa.
 
 ## 3.6 Dịch vụ Báo cáo và Thống kê Tài chính
 
@@ -273,7 +273,7 @@ Dịch vụ vận hành hoàn toàn ở chế độ chỉ đọc (Read-only), tu
      - Tính dòng tiền thuần từng tháng bằng hiệu số giữa tổng thu nhập và tổng chi tiêu theo quy tắc độ chính xác số học tài chính.
      - Tính tỷ lệ tiết kiệm từng tháng: trường hợp tổng thu nhập lớn hơn 0, tính bằng công thức $\frac{\text{Dòng tiền thuần}}{\text{Tổng thu nhập}} \times 100\%$ và áp dụng quy tắc làm tròn ngân hàng hai chữ số thập phân; trường hợp tổng thu nhập nhỏ hơn hoặc bằng 0, gán tỷ lệ tiết kiệm mặc định là 0.00% nhằm phòng ngừa triệt để lỗi chia cho không.
      - Tính các chỉ số bình quân cả năm: lấy tổng thu nhập, tổng chi tiêu và tổng dòng tiền thuần của cả 12 tháng chia đều cho mẫu số cố định là 12, trong đó các tháng không phát sinh giao dịch được tính bằng 0.00 VNĐ.
-  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Đóng gói bảng số liệu 12 tháng cùng các chỉ số bình quân vào đối tượng `CashFlowReportDto` bất biến và chuyển giao cho Tầng Trình diễn kết xuất bảng và biểu đồ trên màn hình dòng lệnh.
+  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Đóng gói bảng số liệu 12 tháng cùng các chỉ số bình quân vào đối tượng `CashFlowReportDto` bất biến và chuyển giao cho Tầng Trình diễn kết xuất bảng và biểu đồ trên giao diện đồ họa.
 
 - **Quy trình thực thi phương thức `generateSpendingStructureReport(SpendingReportCriteriaDto criteriaDto)`:**
   1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Kiểm tra khoảng ngày phân tích (`startDate` không được lớn hơn `endDate`, ném `ValidationException` nếu vi phạm). Xác thực loại luồng tiền phân tích (`transactionType` là `EXPENSE` hoặc `INCOME`, mặc định là `EXPENSE` theo yêu cầu phân tích).

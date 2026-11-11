@@ -1,6 +1,6 @@
 # 05. Sơ đồ Tuần tự Thiết kế
 
-Tài liệu này đặc tả luồng tương tác động giữa các đối tượng trong hệ thống nhằm hiện thực hóa các ca sử dụng trên môi trường dòng lệnh Java. Các kịch bản tương tác phân rã luồng xử lý từ sự kiện đầu vào của người dùng qua các tầng kiến trúc: tiếp nhận lệnh tại tầng trình diễn, điều phối nghiệp vụ tại tầng dịch vụ, thực thi quy tắc nghiệp vụ tại tầng miền và ghi nhận dữ liệu bền vững tại tầng hạ tầng.
+Tài liệu này đặc tả luồng tương tác động giữa các đối tượng trong hệ thống nhằm hiện thực hóa các ca sử dụng trên môi trường giao diện đồ họa người dùng. Các kịch bản tương tác phân rã luồng xử lý từ sự kiện đầu vào của người dùng qua các tầng kiến trúc: tiếp nhận lệnh tại tầng trình diễn, điều phối nghiệp vụ tại tầng dịch vụ, thực thi quy tắc nghiệp vụ tại tầng miền và ghi nhận dữ liệu bền vững tại tầng hạ tầng.
 
 Các sơ đồ tuần tự xác định trình tự gọi phương thức đồng bộ, quy chuẩn truyền nhận đối tượng truyền dữ liệu và cơ chế biến đổi trạng thái nội tại của thực thể. Mọi thông điệp trao đổi trên sơ đồ đều khớp với cấu trúc lớp tĩnh đã thiết kế, đồng thời mô hình hóa đầy đủ các nhánh ngoại lệ nghiệp vụ phát sinh trong quá trình vận hành để duy trì tính nhất quán của dữ liệu tài chính.
 
@@ -23,8 +23,8 @@ Bảng so sánh đặc điểm giữa sơ đồ tuần tự hệ thống và sơ
 
 Các cột đối tượng tham gia tương tác trên sơ đồ được sắp xếp theo thứ tự cố định từ trái qua phải, phản ánh chiều phụ thuộc và luồng điều khiển của kiến trúc:
 
-1. Tác nhân ngoài: Người dùng thực hiện thao tác trên bàn phím.
-2. Tầng Trình diễn: Lớp giao diện dòng lệnh đọc dữ liệu nhập, kiểm tra định dạng và đóng gói đối tượng truyền dữ liệu.
+1. Tác nhân ngoài: Người dùng thực hiện thao tác chuột và phím trên giao diện đồ họa.
+2. Tầng Trình diễn: Lớp giao diện đồ họa đọc dữ liệu biểu mẫu, kiểm tra định dạng và đóng gói đối tượng truyền dữ liệu.
 3. Tầng Dịch vụ: Lớp dịch vụ ứng dụng tiếp nhận yêu cầu, nạp dữ liệu và điều phối quy trình xử lý ca sử dụng.
 4. Tầng Nghiệp vụ: Các thực thể và đối tượng giá trị thực hiện tính toán, kiểm tra ràng buộc và cập nhật trạng thái.
 5. Tầng Hạ tầng: Kho lưu trữ dữ liệu thực hiện các thao tác truy xuất hoặc lưu trữ bền vững.
@@ -35,21 +35,21 @@ Sơ đồ dưới đây minh họa luồng tương tác tổng quát qua bốn t
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant Service as Tầng Dịch vụ
     participant Domain as Tầng Nghiệp vụ
     participant Repo as Tầng Hạ tầng
 
-    User->>+CLI: 1. Nhập lệnh thao tác nghiệp vụ
-    CLI->>+Service: 2. executeUseCase(requestDto)
+    User->>+GUI: 1. Nhập lệnh thao tác nghiệp vụ
+    GUI->>+Service: 2. executeUseCase(requestDto)
     Service->>+Repo: 3. findById(id)
     Repo-->>-Service: 4. Optional<Entity>
     Service->>+Domain: 5. businessOperation(parameters)
     Domain-->>-Service: 6. result
     Service->>+Repo: 7. save(entity)
     Repo-->>-Service: 8. entity
-    Service-->>-CLI: 9. responseDto
-    CLI-->>-User: 10. Kết xuất bảng kết quả hiển thị
+    Service-->>-GUI: 9. responseDto
+    GUI-->>-User: 10. Kết xuất bảng kết quả hiển thị
 ```
 
 Mọi thông điệp trao đổi trên sơ đồ tuần tự bắt buộc phải khớp chính xác với chữ ký phương thức đã công bố trong các giao diện dịch vụ, thực thể miền và kho lưu trữ dữ liệu.
@@ -75,7 +75,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> WalletServiceImpl -> Wallet -> WalletRepository; kích hoạt đầy đủ thanh thực thi; sử dụng khung alt phân tách các nhánh ném ngoại lệ ValidationException với mã ERR-NAM-001 khi tên ví không hợp lệ, DuplicateEntityException với mã ERR-NAM-002 khi tên ví trùng lặp, và luồng thành công khởi tạo thực thể Wallet ở trạng thái ACTIVE với số dư ban đầu bằng không, lưu qua WalletRepository và phản hồi WalletResponseDto)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> WalletServiceImpl -> Wallet -> WalletRepository; kích hoạt đầy đủ thanh thực thi; sử dụng khung alt phân tách các nhánh ném ngoại lệ ValidationException với mã ERR-NAM-001 khi tên ví không hợp lệ, DuplicateEntityException với mã ERR-NAM-002 khi tên ví trùng lặp, và luồng thành công khởi tạo thực thể Wallet ở trạng thái ACTIVE với số dư ban đầu bằng không, lưu qua WalletRepository và phản hồi WalletResponseDto)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: ví mới luôn được khởi tạo với số dư bằng không thông qua đối tượng tiền tệ bất biến, loại trừ việc gán số dư tùy tiện khi chưa kiểm kê)
 
@@ -92,7 +92,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> WalletServiceImpl -> WalletRepository -> Money; không có tham số đầu vào; WalletServiceImpl gọi WalletRepository.findAll nạp danh sách ví, tính tổng số dư toàn hệ thống; sử dụng khung alt xử lý trường hợp tổng tài sản bằng không thì gán tỷ trọng 0.00% cho mọi ví tránh lỗi chia cho không ERR-FIN-002, trường hợp tổng tài sản dương thì tính tỷ trọng phân bổ từng ví làm tròn ngân hàng hai chữ số thập phân, đóng gói kết quả và phản hồi WalletsSummaryDto)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> WalletServiceImpl -> WalletRepository -> Money; không có tham số đầu vào; WalletServiceImpl gọi WalletRepository.findAll nạp danh sách ví, tính tổng số dư toàn hệ thống; sử dụng khung alt xử lý trường hợp tổng tài sản bằng không thì gán tỷ trọng 0.00% cho mọi ví tránh lỗi chia cho không ERR-FIN-002, trường hợp tổng tài sản dương thì tính tỷ trọng phân bổ từng ví làm tròn ngân hàng hai chữ số thập phân, đóng gói kết quả và phản hồi WalletsSummaryDto)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể ví nào trong hệ thống)
 
@@ -109,7 +109,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> WalletServiceImpl -> Wallet -> WalletRepository; tiếp nhận UpdateWalletRequestDto; WalletServiceImpl gọi WalletRepository.findById, sử dụng khung alt ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy ví; kiểm tra định dạng tên ném ValidationException với mã ERR-NAM-001; nếu đổi tên mới thì gọi WalletRepository.existsByName ném DuplicateEntityException với mã ERR-NAM-002 khi bị trùng; nạp thực thể Wallet, cập nhật tên và ghi chú qua phương thức nội tại, gọi WalletRepository.save lưu thay đổi và phản hồi WalletResponseDto)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> WalletServiceImpl -> Wallet -> WalletRepository; tiếp nhận UpdateWalletRequestDto; WalletServiceImpl gọi WalletRepository.findById, sử dụng khung alt ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy ví; kiểm tra định dạng tên ném ValidationException với mã ERR-NAM-001; nếu đổi tên mới thì gọi WalletRepository.existsByName ném DuplicateEntityException với mã ERR-NAM-002 khi bị trùng; nạp thực thể Wallet, cập nhật tên và ghi chú qua phương thức nội tại, gọi WalletRepository.save lưu thay đổi và phản hồi WalletResponseDto)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc cập nhật thông tin định danh giữ nguyên mã định danh và số dư hiện hành, không làm đứt gãy lịch sử liên kết giao dịch)
 
@@ -126,7 +126,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> WalletServiceImpl -> Wallet -> WalletRepository -> BalanceAdjustmentRepository; tiếp nhận AdjustBalanceRequestDto; WalletServiceImpl kiểm tra số dư thực tế không âm ném ValidationException với mã ERR-FIN-001 nếu vi phạm; gọi WalletRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu ví không tồn tại hoặc không ở trạng thái ACTIVE; từ chối nếu số dư thực tế trùng số dư hiện tại; ủy quyền Wallet tính chênh lệch và cập nhật số dư, khởi tạo bản ghi BalanceAdjustmentRecord bất biến, lưu đồng thời qua WalletRepository và BalanceAdjustmentRepository, phản hồi BalanceAdjustmentResponseDto)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> WalletServiceImpl -> Wallet -> WalletRepository -> BalanceAdjustmentRepository; tiếp nhận AdjustBalanceRequestDto; WalletServiceImpl kiểm tra số dư thực tế không âm ném ValidationException với mã ERR-FIN-001 nếu vi phạm; gọi WalletRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu ví không tồn tại hoặc không ở trạng thái ACTIVE; từ chối nếu số dư thực tế trùng số dư hiện tại; ủy quyền Wallet tính chênh lệch và cập nhật số dư, khởi tạo bản ghi BalanceAdjustmentRecord bất biến, lưu đồng thời qua WalletRepository và BalanceAdjustmentRepository, phản hồi BalanceAdjustmentResponseDto)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: mọi chênh lệch kiểm kê bắt buộc tạo bản ghi điều chỉnh bất biến để lưu vết kiểm toán, số dư khả dụng mới luôn duy trì không âm)
 
@@ -149,7 +149,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransactionServiceImpl -> WalletRepository -> CategoryRepository -> Wallet -> IncomeExpenseTransaction -> TransactionRepository; tiếp nhận RecordTransactionRequestDto; TransactionServiceImpl kiểm tra số tiền hợp lệ ném ValidationException với mã ERR-FIN-001; nạp ví từ WalletRepository ném EntityNotFoundException với mã ERR-WAL-001 nếu ví không tồn tại hoặc không ở trạng thái ACTIVE; nạp danh mục từ CategoryRepository ném ValidationException với mã ERR-CAT-001 nếu danh mục sai cấp hoặc đã xóa; kiểm tra chi phí phát sinh nếu có ném ERR-FEE-001 đến ERR-FEE-003; kiểm tra số dư ví khả dụng ném BusinessRuleException với mã ERR-WAL-001 nếu chi tiêu vượt quá số dư; khởi tạo thực thể IncomeExpenseTransaction kèm TransactionFee nếu có, ủy quyền Wallet cập nhật số dư, lưu đồng thời qua TransactionRepository và WalletRepository, phản hồi TransactionResponseDto)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransactionServiceImpl -> WalletRepository -> CategoryRepository -> Wallet -> IncomeExpenseTransaction -> TransactionRepository; tiếp nhận RecordTransactionRequestDto; TransactionServiceImpl kiểm tra số tiền hợp lệ ném ValidationException với mã ERR-FIN-001; nạp ví từ WalletRepository ném EntityNotFoundException với mã ERR-WAL-001 nếu ví không tồn tại hoặc không ở trạng thái ACTIVE; nạp danh mục từ CategoryRepository ném ValidationException với mã ERR-CAT-001 nếu danh mục sai cấp hoặc đã xóa; kiểm tra chi phí phát sinh nếu có ném ERR-FEE-001 đến ERR-FEE-003; kiểm tra số dư ví khả dụng ném BusinessRuleException với mã ERR-WAL-001 nếu chi tiêu vượt quá số dư; khởi tạo thực thể IncomeExpenseTransaction kèm TransactionFee nếu có, ủy quyền Wallet cập nhật số dư, lưu đồng thời qua TransactionRepository và WalletRepository, phản hồi TransactionResponseDto)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: mọi giao dịch chi tiêu và chi phí liên kết bắt buộc kiểm soát số dư khả dụng không âm trước khi ghi nhận lưu trữ)
 
@@ -166,7 +166,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransactionServiceImpl -> TransactionRepository; tiếp nhận FilterTransactionsRequestDto; TransactionServiceImpl kiểm tra tính hợp lệ của khoảng thời gian lọc ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu sau ngày kết thúc; chuyển đổi tiêu chí lọc và gọi TransactionRepository.findByCriteria nạp danh sách giao dịch thỏa mãn; sắp xếp kết quả theo thứ tự ngày phát sinh giảm dần, đóng gói và phản hồi TransactionListResponseDto về tầng trình diễn)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransactionServiceImpl -> TransactionRepository; tiếp nhận FilterTransactionsRequestDto; TransactionServiceImpl kiểm tra tính hợp lệ của khoảng thời gian lọc ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu sau ngày kết thúc; chuyển đổi tiêu chí lọc và gọi TransactionRepository.findByCriteria nạp danh sách giao dịch thỏa mãn; sắp xếp kết quả theo thứ tự ngày phát sinh giảm dần, đóng gói và phản hồi TransactionListResponseDto về tầng trình diễn)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi dữ liệu hay trạng thái của các thực thể giao dịch)
 
@@ -183,7 +183,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransactionServiceImpl -> TransactionRepository -> WalletRepository -> CategoryRepository -> Wallet -> IncomeExpenseTransaction; tiếp nhận UpdateTransactionRequestDto; TransactionServiceImpl nạp giao dịch cũ từ TransactionRepository ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy; nạp ví liên kết; thực hiện hoàn nguyên số tiền và phí cũ về ví; kiểm tra điều kiện áp dụng số tiền và danh mục mới, ném ngoại lệ tương ứng nếu vi phạm hoặc không đủ số dư ví sau khi sửa với mã ERR-WAL-001; cập nhật thuộc tính giao dịch, hạch toán số dư ví mới, lưu đồng thời qua TransactionRepository và WalletRepository, phản hồi TransactionResponseDto)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransactionServiceImpl -> TransactionRepository -> WalletRepository -> CategoryRepository -> Wallet -> IncomeExpenseTransaction; tiếp nhận UpdateTransactionRequestDto; TransactionServiceImpl nạp giao dịch cũ từ TransactionRepository ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy; nạp ví liên kết; thực hiện hoàn nguyên số tiền và phí cũ về ví; kiểm tra điều kiện áp dụng số tiền và danh mục mới, ném ngoại lệ tương ứng nếu vi phạm hoặc không đủ số dư ví sau khi sửa với mã ERR-WAL-001; cập nhật thuộc tính giao dịch, hạch toán số dư ví mới, lưu đồng thời qua TransactionRepository và WalletRepository, phản hồi TransactionResponseDto)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: cơ chế hoàn nguyên hai pha bảo đảm giao dịch chỉ được cập nhật khi số dư ví sau điều chỉnh thỏa mãn ràng buộc không âm)
 
@@ -200,7 +200,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransactionServiceImpl -> TransactionRepository -> WalletRepository -> Wallet; tiếp nhận transactionId; TransactionServiceImpl gọi TransactionRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy; nạp ví liên kết; kiểm tra ràng buộc hoàn tác nếu là giao dịch thu nhập thì trừ tiền ví, ném BusinessRuleException với mã ERR-WAL-001 nếu số dư ví hiện tại không đủ để hoàn tác; ủy quyền Wallet phục hồi số dư, gọi TransactionRepository.deleteById xóa bản ghi giao dịch và chi phí liên kết, gọi WalletRepository.save lưu số dư ví đã phục hồi, phản hồi thông báo xóa thành công)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransactionServiceImpl -> TransactionRepository -> WalletRepository -> Wallet; tiếp nhận transactionId; TransactionServiceImpl gọi TransactionRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy; nạp ví liên kết; kiểm tra ràng buộc hoàn tác nếu là giao dịch thu nhập thì trừ tiền ví, ném BusinessRuleException với mã ERR-WAL-001 nếu số dư ví hiện tại không đủ để hoàn tác; ủy quyền Wallet phục hồi số dư, gọi TransactionRepository.deleteById xóa bản ghi giao dịch và chi phí liên kết, gọi WalletRepository.save lưu số dư ví đã phục hồi, phản hồi thông báo xóa thành công)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc xóa giao dịch loại bỏ hoàn toàn các bản ghi chi phí phụ thuộc nhằm chống phát sinh dữ liệu mồ côi và bảo toàn số dư không âm)
 
@@ -223,7 +223,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransferServiceImpl -> WalletRepository -> TransferRepository -> TransactionFeeRepository -> Wallet; tiếp nhận TransferRequestDto; TransferServiceImpl kiểm tra hai ví phân biệt ném BusinessRuleException với mã ERR-TRF-001 nếu trùng; kiểm tra số tiền dương ném ValidationException với mã ERR-TRF-002 nếu nhỏ hơn hoặc bằng không; gọi WalletRepository.findById nạp ví nguồn và ví đích, ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy ví hoặc ví không ở trạng thái ACTIVE; kiểm tra chi phí giao dịch ném ValidationException với mã ERR-FEE-001 nếu âm hoặc ERR-FEE-002 nếu thiếu danh mục chi phí khi feeAmount lớn hơn không; kiểm tra số dư ví nguồn ném BusinessRuleException với mã ERR-WAL-001 nếu không đủ thanh toán tổng số tiền chuyển và phí; thực thi chuyển tiền nguyên tử bằng cách trừ tiền ví nguồn, cộng tiền ví đích; khởi tạo TransferTransaction và TransactionFee liên kết nếu có; gọi WalletRepository.save lưu cập nhật hai ví, TransferRepository.save lưu giao dịch chuyển tiền và TransactionFeeRepository.save lưu chi phí; phản hồi TransferResponseDto)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransferServiceImpl -> WalletRepository -> TransferRepository -> TransactionFeeRepository -> Wallet; tiếp nhận TransferRequestDto; TransferServiceImpl kiểm tra hai ví phân biệt ném BusinessRuleException với mã ERR-TRF-001 nếu trùng; kiểm tra số tiền dương ném ValidationException với mã ERR-TRF-002 nếu nhỏ hơn hoặc bằng không; gọi WalletRepository.findById nạp ví nguồn và ví đích, ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy ví hoặc ví không ở trạng thái ACTIVE; kiểm tra chi phí giao dịch ném ValidationException với mã ERR-FEE-001 nếu âm hoặc ERR-FEE-002 nếu thiếu danh mục chi phí khi feeAmount lớn hơn không; kiểm tra số dư ví nguồn ném BusinessRuleException với mã ERR-WAL-001 nếu không đủ thanh toán tổng số tiền chuyển và phí; thực thi chuyển tiền nguyên tử bằng cách trừ tiền ví nguồn, cộng tiền ví đích; khởi tạo TransferTransaction và TransactionFee liên kết nếu có; gọi WalletRepository.save lưu cập nhật hai ví, TransferRepository.save lưu giao dịch chuyển tiền và TransactionFeeRepository.save lưu chi phí; phản hồi TransferResponseDto)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: giao dịch chuyển tiền được thực hiện theo cơ chế nguyên tử bảo đảm tổng tài sản toàn hệ thống được bảo toàn ngoại trừ phần chi phí phát sinh thực tế và số dư ví nguồn luôn duy trì không âm)
 
@@ -240,7 +240,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransferServiceImpl -> TransferRepository -> WalletRepository; tiếp nhận TransferFilterCriteriaDto; TransferServiceImpl kiểm tra tính hợp lệ của khoảng thời gian, sử dụng khung alt ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu lớn hơn ngày kết thúc; gọi TransferRepository.findByCriteria truy vấn danh sách giao dịch thỏa mãn điều kiện lọc kèm chi phí liên kết; sắp xếp kết quả theo ngày giao dịch giảm dần; nạp tên các ví liên quan qua WalletRepository nếu cần hiển thị trực quan; tính tổng tiền chuyển và tổng phí phát sinh; đóng gói và phản hồi TransferHistoryResponseDto)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransferServiceImpl -> TransferRepository -> WalletRepository; tiếp nhận TransferFilterCriteriaDto; TransferServiceImpl kiểm tra tính hợp lệ của khoảng thời gian, sử dụng khung alt ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu lớn hơn ngày kết thúc; gọi TransferRepository.findByCriteria truy vấn danh sách giao dịch thỏa mãn điều kiện lọc kèm chi phí liên kết; sắp xếp kết quả theo ngày giao dịch giảm dần; nạp tên các ví liên quan qua WalletRepository nếu cần hiển thị trực quan; tính tổng tiền chuyển và tổng phí phát sinh; đóng gói và phản hồi TransferHistoryResponseDto)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm thay đổi trạng thái của các thực thể giao dịch hay số dư của bất kỳ ví nào trong hệ thống)
 
@@ -257,7 +257,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> CLI -> TransferServiceImpl -> TransferRepository -> WalletRepository -> TransactionFeeRepository -> Wallet; tiếp nhận transferId; TransferServiceImpl gọi TransferRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy giao dịch; nạp ví nguồn và ví đích qua WalletRepository; kiểm tra ràng buộc hoàn tác: số dư khả dụng hiện tại của ví đích phải lớn hơn hoặc bằng số tiền chuyển, ném BusinessRuleException với mã ERR-WAL-001 nếu ví đích không đủ số dư để hoàn trả tránh làm âm ví; thực hiện hoàn nguyên hai pha: cộng hoàn trả số tiền chuyển cùng phí vào ví nguồn, trừ số tiền chuyển khỏi ví đích; gọi TransferRepository.deleteById xóa bản ghi chuyển tiền và xóa bản ghi TransactionFee liên kết nếu có; gọi WalletRepository.save lưu cập nhật trạng thái hai ví; phản hồi thông báo xóa thành công)
+(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransferServiceImpl -> TransferRepository -> WalletRepository -> TransactionFeeRepository -> Wallet; tiếp nhận transferId; TransferServiceImpl gọi TransferRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy giao dịch; nạp ví nguồn và ví đích qua WalletRepository; kiểm tra ràng buộc hoàn tác: số dư khả dụng hiện tại của ví đích phải lớn hơn hoặc bằng số tiền chuyển, ném BusinessRuleException với mã ERR-WAL-001 nếu ví đích không đủ số dư để hoàn trả tránh làm âm ví; thực hiện hoàn nguyên hai pha: cộng hoàn trả số tiền chuyển cùng phí vào ví nguồn, trừ số tiền chuyển khỏi ví đích; gọi TransferRepository.deleteById xóa bản ghi chuyển tiền và xóa bản ghi TransactionFee liên kết nếu có; gọi WalletRepository.save lưu cập nhật trạng thái hai ví; phản hồi thông báo xóa thành công)
 
 (Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: cơ chế hoàn nguyên hai pha bảo đảm thu hồi đồng thời số dư cả hai ví và xóa sạch các bản ghi chi phí phụ thuộc, ngăn chặn tuyệt đối tình trạng âm số dư ví đích)
 
@@ -284,38 +284,38 @@ Luồng tương tác mô tả quá trình tiếp nhận yêu cầu bổ sung dan
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant CategoryService as CategoryServiceImpl
     participant CategoryRepo as CategoryRepository
     participant Category as Category
 
-    User->>+CLI: 1. Nhập thông tin danh mục mới (categoryName, parentCategoryId)
-    CLI->>+CategoryService: 2. createCategory(CreateCategoryRequestDto)
+    User->>+GUI: 1. Nhập thông tin danh mục mới (categoryName, parentCategoryId)
+    GUI->>+CategoryService: 2. createCategory(CreateCategoryRequestDto)
     alt Tên danh mục rỗng hoặc vượt quá 50 ký tự
-        CategoryService-->>CLI: 3. ném ValidationException
-        CLI-->>User: 4. Hiển thị thông báo tên danh mục không hợp lệ
+        CategoryService-->>GUI: 3. ném ValidationException
+        GUI-->>User: 4. Hiển thị thông báo tên danh mục không hợp lệ
     else Tên danh mục hợp lệ
         CategoryService->>+CategoryRepo: 5. findById(parentCategoryId)
         CategoryRepo-->>-CategoryService: 6. Optional<Category> parentOpt
         alt Nhóm cha không tồn tại trong hệ thống
-            CategoryService-->>CLI: 7. ném EntityNotFoundException
-            CLI-->>User: 8. Hiển thị thông báo nhóm cha không tồn tại
+            CategoryService-->>GUI: 7. ném EntityNotFoundException
+            GUI-->>User: 8. Hiển thị thông báo nhóm cha không tồn tại
         else Nhóm cha đang ở trạng thái DELETED
-            CategoryService-->>CLI: 9. ném BusinessException
-            CLI-->>User: 10. Hiển thị thông báo nhóm cha đã bị xóa
+            CategoryService-->>GUI: 9. ném BusinessException
+            GUI-->>User: 10. Hiển thị thông báo nhóm cha đã bị xóa
         else Nhóm cha hợp lệ và đang hoạt động (ACTIVE)
             CategoryService->>+CategoryRepo: 11. existsByNameAndNeedGroupId(categoryName, parentCategoryId)
             CategoryRepo-->>-CategoryService: 12. boolean isDuplicate
             alt Tên danh mục đã tồn tại trong cùng nhóm cha
-                CategoryService-->>CLI: 13. ném DuplicateEntityException
-                CLI-->>User: 14. Hiển thị thông báo tên danh mục bị trùng lặp
+                CategoryService-->>GUI: 13. ném DuplicateEntityException
+                GUI-->>User: 14. Hiển thị thông báo tên danh mục bị trùng lặp
             else Tên danh mục chưa tồn tại (Hợp lệ)
                 CategoryService->>+Category: 15. new Category(newId, categoryName, parentCategoryId, transactionType, icon, color)
                 Category-->>-CategoryService: 16. newCategory
                 CategoryService->>+CategoryRepo: 17. save(newCategory)
                 CategoryRepo-->>-CategoryService: 18. savedCategory
-                CategoryService-->>-CLI: 19. CategoryResponseDto
-                CLI-->>-User: 20. Kết xuất thông tin danh mục mới khởi tạo
+                CategoryService-->>-GUI: 19. CategoryResponseDto
+                GUI-->>-User: 20. Kết xuất thông tin danh mục mới khởi tạo
             end
         end
     end
@@ -340,35 +340,35 @@ Luồng tương tác mô tả quy trình tiếp nhận yêu cầu cập nhật t
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant CategoryService as CategoryServiceImpl
     participant CategoryRepo as CategoryRepository
     participant Category as Category
 
-    User->>+CLI: 1. Nhập yêu cầu đổi tên (categoryId, newName)
-    CLI->>+CategoryService: 2. renameCategory(RenameCategoryRequestDto)
+    User->>+GUI: 1. Nhập yêu cầu đổi tên (categoryId, newName)
+    GUI->>+CategoryService: 2. renameCategory(RenameCategoryRequestDto)
     alt Tên mới rỗng hoặc vượt quá 50 ký tự
-        CategoryService-->>CLI: 3. ném ValidationException
-        CLI-->>User: 4. Hiển thị thông báo tên mới không hợp lệ
+        CategoryService-->>GUI: 3. ném ValidationException
+        GUI-->>User: 4. Hiển thị thông báo tên mới không hợp lệ
     else Định dạng tên mới hợp lệ
         CategoryService->>+CategoryRepo: 5. findById(categoryId)
         CategoryRepo-->>-CategoryService: 6. Optional<Category> categoryOpt
         alt Danh mục không tồn tại trong hệ thống
-            CategoryService-->>CLI: 7. ném EntityNotFoundException
-            CLI-->>User: 8. Hiển thị thông báo danh mục không tồn tại
+            CategoryService-->>GUI: 7. ném EntityNotFoundException
+            GUI-->>User: 8. Hiển thị thông báo danh mục không tồn tại
         else Danh mục tồn tại
             CategoryService->>+CategoryRepo: 9. existsByNameAndNeedGroupIdAndIdNot(newName, category.getNeedGroupId(), categoryId)
             CategoryRepo-->>-CategoryService: 10. boolean isDuplicate
             alt Tên mới trùng với danh mục khác trong cùng nhóm cha
-                CategoryService-->>CLI: 11. ném DuplicateEntityException
-                CLI-->>User: 12. Hiển thị thông báo tên mới bị trùng lặp
+                CategoryService-->>GUI: 11. ném DuplicateEntityException
+                GUI-->>User: 12. Hiển thị thông báo tên mới bị trùng lặp
             else Tên mới duy nhất (Hợp lệ)
                 CategoryService->>+Category: 13. rename(newName)
                 Category-->>-CategoryService: 14. void
                 CategoryService->>+CategoryRepo: 15. save(category)
                 CategoryRepo-->>-CategoryService: 16. updatedCategory
-                CategoryService-->>-CLI: 17. CategoryResponseDto
-                CLI-->>-User: 18. Kết xuất thông tin danh mục sau khi đổi tên
+                CategoryService-->>-GUI: 17. CategoryResponseDto
+                GUI-->>-User: 18. Kết xuất thông tin danh mục sau khi đổi tên
             end
         end
     end
@@ -393,37 +393,37 @@ Luồng tương tác mô tả quy trình phục hồi danh mục đã xóa mềm
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant CategoryService as CategoryServiceImpl
     participant CategoryRepo as CategoryRepository
     participant Category as Category
 
-    User->>+CLI: 1. Chọn yêu cầu khôi phục danh mục (categoryId)
-    CLI->>+CategoryService: 2. restoreCategory(categoryId)
+    User->>+GUI: 1. Chọn yêu cầu khôi phục danh mục (categoryId)
+    GUI->>+CategoryService: 2. restoreCategory(categoryId)
     CategoryService->>+CategoryRepo: 3. findById(categoryId)
     CategoryRepo-->>-CategoryService: 4. Optional<Category> categoryOpt
     alt Danh mục không tồn tại hoặc đang ở trạng thái ACTIVE
-        CategoryService-->>CLI: 5. ném EntityNotFoundException
-        CLI-->>User: 6. Hiển thị thông báo danh mục không hợp lệ để khôi phục
+        CategoryService-->>GUI: 5. ném EntityNotFoundException
+        GUI-->>User: 6. Hiển thị thông báo danh mục không hợp lệ để khôi phục
     else Danh mục tồn tại và đang ở trạng thái DELETED
         CategoryService->>+CategoryRepo: 7. findById(category.getNeedGroupId())
         CategoryRepo-->>-CategoryService: 8. Optional<Category> parentOpt
         alt Nhóm cha đang ở trạng thái DELETED
-            CategoryService-->>CLI: 9. ném BusinessException
-            CLI-->>User: 10. Hiển thị thông báo từ chối do nhóm cha đang bị xóa
+            CategoryService-->>GUI: 9. ném BusinessException
+            GUI-->>User: 10. Hiển thị thông báo từ chối do nhóm cha đang bị xóa
         else Nhóm cha đang hoạt động (ACTIVE)
             CategoryService->>+CategoryRepo: 11. existsByNameAndNeedGroupId(category.getName(), category.getNeedGroupId())
             CategoryRepo-->>-CategoryService: 12. boolean isDuplicate
             alt Tên danh mục trùng với danh mục đang hoạt động trong nhóm
-                CategoryService-->>CLI: 13. ném DuplicateEntityException
-                CLI-->>User: 14. Hiển thị thông báo xung đột tên danh mục đang hoạt động
+                CategoryService-->>GUI: 13. ném DuplicateEntityException
+                GUI-->>User: 14. Hiển thị thông báo xung đột tên danh mục đang hoạt động
             else Không bị trùng tên (Đủ điều kiện khôi phục)
                 CategoryService->>+Category: 15. restore(isParentGroupActive)
                 Category-->>-CategoryService: 16. void (chuyển trạng thái sang ACTIVE)
                 CategoryService->>+CategoryRepo: 17. save(category)
                 CategoryRepo-->>-CategoryService: 18. restoredCategory
-                CategoryService-->>-CLI: 19. CategoryResponseDto
-                CLI-->>-User: 20. Kết xuất thông báo khôi phục danh mục thành công
+                CategoryService-->>-GUI: 19. CategoryResponseDto
+                GUI-->>-User: 20. Kết xuất thông báo khôi phục danh mục thành công
             end
         end
     end
@@ -448,40 +448,40 @@ Luồng tương tác mô tả quy trình tiếp nhận yêu cầu loại bỏ da
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant CategoryService as CategoryServiceImpl
     participant CategoryRepo as CategoryRepository
     participant TxnRepo as TransactionRepository
     participant Category as Category
 
-    User->>+CLI: 1. Yêu cầu xóa danh mục (categoryId)
-    CLI->>+CategoryService: 2. deleteCategory(categoryId)
+    User->>+GUI: 1. Yêu cầu xóa danh mục (categoryId)
+    GUI->>+CategoryService: 2. deleteCategory(categoryId)
     CategoryService->>+CategoryRepo: 3. findById(categoryId)
     CategoryRepo-->>-CategoryService: 4. Optional<Category> categoryOpt
     alt Danh mục không tồn tại trong hệ thống
-        CategoryService-->>CLI: 5. ném EntityNotFoundException
-        CLI-->>User: 6. Hiển thị thông báo không tìm thấy danh mục
+        CategoryService-->>GUI: 5. ném EntityNotFoundException
+        GUI-->>User: 6. Hiển thị thông báo không tìm thấy danh mục
     else Danh mục tồn tại
         CategoryService->>+CategoryRepo: 7. countActiveByNeedGroupId(category.getNeedGroupId())
         CategoryRepo-->>-CategoryService: 8. long activeCount
         alt Danh mục là mục hoạt động duy nhất còn lại của nhóm cha
-            CategoryService-->>CLI: 9. ném BusinessException
-            CLI-->>User: 10. Hiển thị thông báo không thể xóa mục hoạt động cuối cùng
+            CategoryService-->>GUI: 9. ném BusinessException
+            GUI-->>User: 10. Hiển thị thông báo không thể xóa mục hoạt động cuối cùng
         else Nhóm cha còn các danh mục hoạt động khác
             CategoryService->>+TxnRepo: 11. existsByCategoryId(categoryId)
             TxnRepo-->>-CategoryService: 12. boolean hasTransactions
             alt Chưa từng phát sinh giao dịch (Xóa cứng)
                 CategoryService->>+CategoryRepo: 13. deleteById(categoryId)
                 CategoryRepo-->>-CategoryService: 14. void
-                CategoryService-->>CLI: 15. phản hồi xóa cứng thành công
-                CLI-->>User: 16. Hiển thị thông báo đã xóa hoàn toàn danh mục khỏi hệ thống
+                CategoryService-->>GUI: 15. phản hồi xóa cứng thành công
+                GUI-->>User: 16. Hiển thị thông báo đã xóa hoàn toàn danh mục khỏi hệ thống
             else Đã từng phát sinh giao dịch lịch sử (Xóa mềm)
                 CategoryService->>+Category: 17. markDeleted()
                 Category-->>-CategoryService: 18. void (chuyển trạng thái sang DELETED)
                 CategoryService->>+CategoryRepo: 19. save(category)
                 CategoryRepo-->>-CategoryService: 20. updatedCategory
-                CategoryService-->>-CLI: 21. phản hồi xóa mềm thành công
-                CLI-->>-User: 22. Hiển thị thông báo đã chuyển danh mục sang trạng thái đã xóa
+                CategoryService-->>-GUI: 21. phản hồi xóa mềm thành công
+                GUI-->>-User: 22. Hiển thị thông báo đã chuyển danh mục sang trạng thái đã xóa
             end
         end
     end
@@ -512,13 +512,13 @@ Luồng tương tác mô tả quy trình truy vấn và tổng hợp dòng tiề
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant ReportService as ReportServiceImpl
     participant TxnRepo as TransactionRepository
     participant Money as Money
 
-    User->>+CLI: 1. Yêu cầu lập báo cáo dòng tiền (endMonth, endYear)
-    CLI->>+ReportService: 2. generateCashFlowReport(endMonth, endYear)
+    User->>+GUI: 1. Yêu cầu lập báo cáo dòng tiền (endMonth, endYear)
+    GUI->>+ReportService: 2. generateCashFlowReport(endMonth, endYear)
     ReportService->>+TxnRepo: 3. findByDateRange(startDate, endDate)
     TxnRepo-->>-ReportService: 4. List<Transaction> transactions
     loop Xử lý tổng hợp 12 tháng liên tục
@@ -532,8 +532,8 @@ sequenceDiagram
         end
     end
     ReportService->>ReportService: 10. tính bình quân tháng và đóng gói CashFlowReportDto
-    ReportService-->>-CLI: 11. CashFlowReportDto
-    CLI-->>-User: 12. Kết xuất bảng báo cáo dòng tiền 12 tháng kèm biểu đồ
+    ReportService-->>-GUI: 11. CashFlowReportDto
+    GUI-->>-User: 12. Kết xuất bảng báo cáo dòng tiền 12 tháng kèm biểu đồ
 ```
 
 Thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể hay số dư tài chính nào trong hệ thống.
@@ -555,17 +555,17 @@ Luồng tương tác mô tả quy trình trích xuất và phân tích cơ cấu
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant ReportService as ReportServiceImpl
     participant TxnRepo as TransactionRepository
     participant CategoryRepo as CategoryRepository
     participant Money as Money
 
-    User->>+CLI: 1. Nhập tiêu chí báo cáo (startDate, endDate, transactionType)
-    CLI->>+ReportService: 2. generateSpendingStructureReport(SpendingReportCriteriaDto)
+    User->>+GUI: 1. Nhập tiêu chí báo cáo (startDate, endDate, transactionType)
+    GUI->>+ReportService: 2. generateSpendingStructureReport(SpendingReportCriteriaDto)
     alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
-        ReportService-->>CLI: 3. ném ValidationException
-        CLI-->>User: 4. Hiển thị thông báo khoảng thời gian không hợp lệ
+        ReportService-->>GUI: 3. ném ValidationException
+        GUI-->>User: 4. Hiển thị thông báo khoảng thời gian không hợp lệ
     else Khoảng thời gian hợp lệ
         ReportService->>+TxnRepo: 5. findByDateRangeAndType(startDate, endDate, transactionType)
         TxnRepo-->>-ReportService: 6. List<Transaction> transactions
@@ -577,8 +577,8 @@ sequenceDiagram
             Money-->>-ReportService: 11. SpendingStructureShare (làm tròn ngân hàng 2 chữ số)
         end
         ReportService->>ReportService: 12. đóng gói SpendingStructureReportDto
-        ReportService-->>-CLI: 13. SpendingStructureReportDto
-        CLI-->>-User: 14. Kết xuất báo cáo cơ cấu chi tiêu theo phân cấp hai tầng
+        ReportService-->>-GUI: 13. SpendingStructureReportDto
+        GUI-->>-User: 14. Kết xuất báo cáo cơ cấu chi tiêu theo phân cấp hai tầng
     end
 ```
 
@@ -601,7 +601,7 @@ Luồng tương tác mô tả quy trình trích xuất toàn bộ dữ liệu t�
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant DataService as DataManagementServiceImpl
     participant WalletRepo as WalletRepository
     participant TxnRepo as TransactionRepository
@@ -611,8 +611,8 @@ sequenceDiagram
     participant AdjRepo as BalanceAdjustmentRepository
     participant StorageAdapter as JsonStorageAdapter
 
-    User->>+CLI: 1. Nhập lệnh xuất sao lưu (destinationPath, scope)
-    CLI->>+DataService: 2. exportBackupData(ExportBackupRequestDto)
+    User->>+GUI: 1. Nhập lệnh xuất sao lưu (destinationPath, scope)
+    GUI->>+DataService: 2. exportBackupData(ExportBackupRequestDto)
     DataService->>+WalletRepo: 3. findAll()
     WalletRepo-->>-DataService: 4. List<Wallet>
     DataService->>+TxnRepo: 5. findAll()
@@ -629,12 +629,12 @@ sequenceDiagram
     DataService->>+StorageAdapter: 16. writeBackupFile(destinationPath, backupPayloadDto)
     alt Sự cố I/O, lỗi quyền ghi hoặc không đủ dung lượng đĩa
         StorageAdapter-->>DataService: 17. ném StorageException
-        DataService-->>CLI: 18. ném StorageException
-        CLI-->>User: 19. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
+        DataService-->>GUI: 18. ném StorageException
+        GUI-->>User: 19. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
     else Ghi tệp sao lưu an toàn thành công
         StorageAdapter-->>-DataService: 20. BackupFileMetadata
-        DataService-->>-CLI: 21. phản hồi xuất sao lưu thành công kèm đường dẫn tệp
-        CLI-->>-User: 22. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
+        DataService-->>-GUI: 21. phản hồi xuất sao lưu thành công kèm đường dẫn tệp
+        GUI-->>-User: 22. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
     end
 ```
 
@@ -657,7 +657,7 @@ Luồng tương tác mô tả quy trình nạp dữ liệu từ tệp sao lưu J
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant DataService as DataManagementServiceImpl
     participant StorageAdapter as JsonStorageAdapter
     participant WalletRepo as WalletRepository
@@ -667,34 +667,34 @@ sequenceDiagram
     participant NeedGroupRepo as NeedGroupRepository
     participant AdjRepo as BalanceAdjustmentRepository
 
-    User->>+CLI: 1. Nhập đường dẫn tệp sao lưu (backupFilePath)
-    CLI->>+DataService: 2. restoreBackupData(RestoreBackupRequestDto)
+    User->>+GUI: 1. Nhập đường dẫn tệp sao lưu (backupFilePath)
+    GUI->>+DataService: 2. restoreBackupData(RestoreBackupRequestDto)
     DataService->>+StorageAdapter: 3. readBackupFile(backupFilePath)
     alt Tệp không tồn tại hoặc lỗi đọc I/O
         StorageAdapter-->>DataService: 4. ném StorageException
-        DataService-->>CLI: 5. ném StorageException
-        CLI-->>User: 6. Hiển thị thông báo không thể đọc tệp sao lưu
+        DataService-->>GUI: 5. ném StorageException
+        GUI-->>User: 6. Hiển thị thông báo không thể đọc tệp sao lưu
     else Đọc tệp thành công
         StorageAdapter-->>-DataService: 7. BackupPayloadDto
         Note over DataService: Bước 1: Kiểm tra cấu trúc cú pháp JSON và schema bắt buộc
         alt Sai cú pháp JSON hoặc thiếu các khóa thực thể bắt buộc
-            DataService-->>CLI: 8. ném DataCorruptionException
-            CLI-->>User: 9. Từ chối: Sai cấu trúc schema tệp sao lưu
+            DataService-->>GUI: 8. ném DataCorruptionException
+            GUI-->>User: 9. Từ chối: Sai cấu trúc schema tệp sao lưu
         else Cấu trúc JSON hợp lệ
             Note over DataService: Bước 2: Kiểm tra cấu trúc phân cấp danh mục 3 cấp
             alt Vi phạm phân cấp 3 cấp hoặc phát hiện danh mục mồ côi
-                DataService-->>CLI: 10. ném DataCorruptionException
-                CLI-->>User: 11. Từ chối: Vi phạm cấu trúc phân cấp danh mục
+                DataService-->>GUI: 10. ném DataCorruptionException
+                GUI-->>User: 11. Từ chối: Vi phạm cấu trúc phân cấp danh mục
             else Phân cấp danh mục hợp lệ
                 Note over DataService: Bước 3: Kiểm tra liên kết chuyển tiền hai chiều và phí
                 alt Sai lệch cặp giao dịch chuyển tiền hoặc phí mồ côi
-                    DataService-->>CLI: 12. ném DataCorruptionException
-                    CLI-->>User: 13. Từ chối: Vi phạm liên kết chuyển tiền hoặc phí mồ côi
+                    DataService-->>GUI: 12. ném DataCorruptionException
+                    GUI-->>User: 13. Từ chối: Vi phạm liên kết chuyển tiền hoặc phí mồ côi
                 else Liên kết giao dịch hợp lệ
                     Note over DataService: Bước 4: Tái tính toán số dư ví từ lịch sử
                     alt Phát hiện số dư ví bị âm tại bất kỳ thời điểm nào
-                        DataService-->>CLI: 14. ném DataCorruptionException
-                        CLI-->>User: 15. Từ chối: Vi phạm quy tắc số dư ví không được âm
+                        DataService-->>GUI: 14. ném DataCorruptionException
+                        GUI-->>User: 15. Từ chối: Vi phạm quy tắc số dư ví không được âm
                     else Vượt qua toàn bộ 4 bước kiểm định (All-or-Nothing)
                         DataService->>+WalletRepo: 16. deleteAll(), saveAll(wallets)
                         WalletRepo-->>-DataService: 17. void
@@ -708,8 +708,8 @@ sequenceDiagram
                         TransferRepo-->>-DataService: 25. void
                         DataService->>+AdjRepo: 26. deleteAll(), saveAll(adjustments)
                         AdjRepo-->>-DataService: 27. void
-                        DataService-->>-CLI: 28. phản hồi phục hồi thành công
-                        CLI-->>-User: 29. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
+                        DataService-->>-GUI: 28. phản hồi phục hồi thành công
+                        GUI-->>-User: 29. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
                     end
                 end
             end
@@ -736,15 +736,15 @@ Luồng tương tác mô tả quy trình quét kiểm tra độc lập bốn đi
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant CLI as Tầng Trình diễn
+    participant GUI as Tầng Trình diễn
     participant DataService as DataManagementServiceImpl
     participant WalletRepo as WalletRepository
     participant TxnRepo as TransactionRepository
     participant TransferRepo as TransferRepository
     participant CategoryRepo as CategoryRepository
 
-    User->>+CLI: 1. Yêu cầu đối soát dữ liệu hệ thống
-    CLI->>+DataService: 2. reconcileSystemData()
+    User->>+GUI: 1. Yêu cầu đối soát dữ liệu hệ thống
+    GUI->>+DataService: 2. reconcileSystemData()
     DataService->>+WalletRepo: 3. findAll()
     WalletRepo-->>-DataService: 4. List<Wallet>
     DataService->>+TxnRepo: 5. findAll()
@@ -763,8 +763,8 @@ sequenceDiagram
     else Phát hiện sai lệch dữ liệu
         DataService->>DataService: 13. đóng gói danh sách chi tiết bất thường kèm khuyến nghị (WARNING/ERROR)
     end
-    DataService-->>-CLI: 14. ReconciliationReportDto
-    CLI-->>-User: 15. Kết xuất Báo cáo đối soát toàn vẹn dữ liệu tài chính chi tiết
+    DataService-->>-GUI: 14. ReconciliationReportDto
+    GUI-->>-User: 15. Kết xuất Báo cáo đối soát toàn vẹn dữ liệu tài chính chi tiết
 ```
 
 Thao tác đối soát vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi bất kỳ bản ghi tài chính nào và cung cấp báo cáo minh bạch về mức độ nhất quán của sổ cái.

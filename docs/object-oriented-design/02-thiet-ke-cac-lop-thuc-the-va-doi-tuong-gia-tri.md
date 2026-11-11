@@ -458,7 +458,7 @@ Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất 
 | `isZero` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` bằng `0.00`, dùng để kiểm tra chênh lệch kiểm kê bằng không hoặc mẫu số bằng không khi tính tỷ lệ. |
 | `getAmount` | `Không` | `BigDecimal` | `Không` | Trả về giá trị `BigDecimal` bất biến chuẩn 2 chữ số thập phân để tính tỷ trọng báo cáo và tuần tự hóa lưu trữ JSON. |
 | `compareTo` | `Money other` | `int` | `NullPointerException` | Kiểm tra `other` khác `null` và so sánh thứ tự đại số qua `this.amount.compareTo(other.amount)`, trả về số âm, `0` hoặc số dương. |
-| `formatDisplay` | `Không` | `String` | `Không` | Định dạng số tiền thành chuỗi số nguyên đồng (0 chữ số thập phân) có dấu phân cách hàng nghìn kèm đơn vị `"VNĐ"` để hiển thị trên dòng lệnh. |
+| `formatDisplay` | `Không` | `String` | `Không` | Định dạng số tiền thành chuỗi số nguyên đồng (0 chữ số thập phân) có dấu phân cách hàng nghìn kèm đơn vị `"VNĐ"` để hiển thị trên giao diện người dùng. |
 
 **Tính bất biến và cơ chế so sánh**
 
@@ -522,7 +522,7 @@ Kiểu liệt kê `TransactionType` xác lập tập giá trị đóng gồm đ�
 | :--- | :--- | :--- | :--- |
 | `INCOME` | `TransactionType` | `public static final` | Hằng số biểu diễn chiều dòng tiền vào (Thu nhập); khi gắn với giao dịch, hệ thống cộng số tiền vào số dư ví tiếp nhận; khi gắn với nhóm nhu cầu hoặc danh mục, xác lập nhánh phân loại Thu nhập trong cấu trúc cây danh mục 3 cấp. |
 | `EXPENSE` | `TransactionType` | `public static final` | Hằng số biểu diễn chiều dòng tiền ra (Chi tiêu); khi gắn với giao dịch, hệ thống trừ số tiền khỏi số dư ví chi trả; khi gắn với nhóm nhu cầu hoặc danh mục, xác lập nhánh phân loại Chi tiêu trong cấu trúc cây danh mục 3 cấp. |
-| `displayLabel` | `String` | `private final` | Nhãn hiển thị tiếng Việt tương ứng: `"Thu nhập"` cho `INCOME` và `"Chi tiêu"` cho `EXPENSE`; phục vụ kết xuất bảng giao dịch và báo cáo trên giao diện dòng lệnh. |
+| `displayLabel` | `String` | `private final` | Nhãn hiển thị tiếng Việt tương ứng: `"Thu nhập"` cho `INCOME` và `"Chi tiêu"` cho `EXPENSE`; phục vụ kết xuất bảng giao dịch và báo cáo trên giao diện đồ họa người dùng. |
 
 **Phương thức nghiệp vụ**
 

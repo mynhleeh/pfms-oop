@@ -23,7 +23,7 @@
 - [04-thiet-ke-tang-luu-tru-va-truy-xuat-du-lieu.md](04-thiet-ke-tang-luu-tru-va-truy-xuat-du-lieu.md): Thiết kế tầng lưu trữ dữ liệu, giao diện kho lưu trữ và các bộ điều hợp
 - [05-so-do-tuong-tac-thiet-ke-sequence-diagram.md](05-so-do-tuong-tac-thiet-ke-sequence-diagram.md): Sơ đồ tuần tự thiết kế chi tiết cho các ca sử dụng của hệ thống
 - [06-ap-dung-nguyen-ly-solid-va-thiet-ke-mau-gof.md](06-ap-dung-nguyen-ly-solid-va-thiet-ke-mau-gof.md): Đánh giá tuân thủ nguyên lý thiết kế và chi tiết các mẫu thiết kế hướng đối tượng
-- [07-thiet-ke-giao-dien-nguoi-dung-console-cli.md](07-thiet-ke-giao-dien-nguoi-dung-console-cli.md): Thiết kế giao diện dòng lệnh, điều hướng menu, xác thực đầu vào và đối tượng truyền dữ liệu
+- [07-thiet-ke-giao-dien-nguoi-dung.md](07-thiet-ke-giao-dien-nguoi-dung.md): Thiết kế giao diện đồ họa người dùng, bố cục màn hình, bắt sự kiện và đối tượng truyền dữ liệu
 - [08-thiet-ke-xu-ly-ngoai-le-va-nhat-ky.md](08-thiet-ke-xu-ly-ngoai-le-va-nhat-ky.md): Cây phân cấp ngoại lệ hệ thống và từ điển mã lỗi nghiệp vụ chuẩn hóa
 - [09-ma-tran-truy-vet-thiet-ke-sang-phan-tich-va-srs.md](09-ma-tran-truy-vet-thiet-ke-sang-phan-tich-va-srs.md): Ma trận truy vết hai chiều giữa yêu cầu, phân tích và bản vẽ thiết kế
 - [10-tong-ket-va-lo-trinh-cai-dat.md](10-tong-ket-va-lo-trinh-cai-dat.md): Tổng kết kết quả thiết kế và lộ trình cài đặt mã nguồn
@@ -85,13 +85,13 @@
 - 6.1 Đánh giá Tuân thủ Năm Nguyên lý SOLID
 - 6.2 Áp dụng các Mẫu Thiết kế trong Hệ thống
 
-### Phần 7: Thiết kế Giao diện Dòng lệnh
+### Phần 7: Thiết kế Giao diện Người dùng
 
-<!-- PLACEHOLDER: Mô tả cấu trúc tầng giao diện theo mô hình hiển thị và điều phối, cây menu phân cấp, quy chuẩn hiển thị bảng, bộ xác thực đầu vào và các đối tượng truyền dữ liệu | Căn cứ: Đề tài học thuật PTIT số 10, Martin Fowler DTO Pattern | Tiêu chí: Không để rò rỉ bất kỳ logic tính toán tài chính nào tại tầng giao diện -->
+<!-- PLACEHOLDER: Mô tả cấu trúc tầng giao diện đồ họa theo mô hình hiển thị và điều phối, bố cục cửa sổ và thanh điều hướng, quy chuẩn hiển thị bảng, hộp thoại nhập liệu, bắt sự kiện và các đối tượng truyền dữ liệu | Căn cứ: Đề tài học thuật PTIT số 10, Martin Fowler DTO Pattern | Tiêu chí: Không để rò rỉ bất kỳ logic tính toán tài chính nào tại tầng giao diện -->
 
 - 7.1 Cấu trúc Tầng Giao diện Người dùng
-- 7.2 Cấu trúc Cây Menu Phân cấp
-- 7.3 Thiết kế Bộ Xác thực Dữ liệu Đầu vào
+- 7.2 Bố cục Cửa sổ Chính và Màn hình Phân hệ
+- 7.3 Thiết kế Biểu mẫu Nhập liệu và Bắt Sự kiện
 - 7.4 Thiết kế các Đối tượng Truyền Dữ liệu
 
 ### Phần 8: Thiết kế Xử lý Ngoại lệ

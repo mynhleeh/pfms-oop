@@ -2,7 +2,7 @@
 
 Tài liệu này xác lập hồ sơ đánh giá chất lượng kiến trúc và đặc tả các mẫu thiết kế hướng đối tượng cho Hệ thống Quản lý Tài chính Cá nhân PFMS. Văn bản định hình cầu nối kỹ thuật giữa mô hình cấu trúc tĩnh và luồng tương tác động đã xác lập ở các phần trước với giai đoạn triển khai mã nguồn, bảo đảm toàn bộ hệ thống tuân thủ nghiêm ngặt các tiêu chuẩn thiết kế phần mềm sạch.
 
-Nội dung tài liệu tập trung giải quyết ba mục tiêu kỹ thuật trọng tâm: rà soát và đối chiếu định lượng mức độ tuân thủ năm nguyên lý thiết kế SOLID trên các cặp lớp và giao diện thực tế trong hệ thống, xác lập điểm cân bằng kỹ thuật để phòng tránh việc thiết kế quá mức cho một ứng dụng dòng lệnh; thiết lập cơ sở lựa chọn và đặc tả chi tiết bốn mẫu thiết kế hướng đối tượng nhằm triệt tiêu các khối lệnh rẽ nhánh thủ công và phân tách các tác vụ phụ trợ khỏi luồng nghiệp vụ chính; và xác lập khung tương tác chuẩn mực bảo đảm mã nguồn Java đạt độ ghép nối lỏng, tính gắn kết cao cùng khả năng kiểm thử độc lập toàn diện bằng JUnit 5.
+Nội dung tài liệu tập trung giải quyết ba mục tiêu kỹ thuật trọng tâm: rà soát và đối chiếu định lượng mức độ tuân thủ năm nguyên lý thiết kế SOLID trên các cặp lớp và giao diện thực tế trong hệ thống, xác lập điểm cân bằng kỹ thuật để phòng tránh việc thiết kế quá mức cho ứng dụng máy tính để bàn; thiết lập cơ sở lựa chọn và đặc tả chi tiết bốn mẫu thiết kế hướng đối tượng nhằm triệt tiêu các khối lệnh rẽ nhánh thủ công và phân tách các tác vụ phụ trợ khỏi luồng nghiệp vụ chính; và xác lập khung tương tác chuẩn mực bảo đảm mã nguồn Java đạt độ ghép nối lỏng, tính gắn kết cao cùng khả năng kiểm thử độc lập toàn diện bằng JUnit 5.
 
 ## 6.1 Đánh giá Tuân thủ Năm Nguyên lý SOLID
 
@@ -17,12 +17,12 @@ Hệ thống tuân thủ trọn vẹn năm nguyên lý thiết kế thông qua v
 | **Đơn trách nhiệm**<br/>(Single Responsibility Principle - SRP) | Mỗi lớp chỉ đảm nhiệm một lý do duy nhất để thay đổi; tách biệt giữa quy tắc nghiệp vụ, điều phối ca sử dụng và lưu trữ tệp. | Bộ ba lớp: thực thể `Wallet` (gói `domain.model`), dịch vụ `WalletServiceImpl` (gói `service.impl`) và kho lưu trữ `WalletRepository` (gói `domain.repository`). Mỗi lớp có một lý do duy nhất để thay đổi: `Wallet` chỉ sửa khi quy tắc tính số dư thay đổi; `WalletServiceImpl` chỉ sửa khi luồng phối hợp ca sử dụng đổi khác; `WalletRepository` chỉ sửa khi cấu trúc đọc ghi tệp thay đổi. Thay đổi ở lớp này không làm ảnh hưởng sang lớp khác. |
 | **Đóng mở**<br/>(Open/Closed Principle - OCP) | Thực thể phần mềm mở rộng cho việc phát triển thêm hành vi mới nhưng đóng kín trước việc sửa đổi mã nguồn sẵn có. | Lớp cơ sở trừu tượng `Transaction` và hai lớp con kế thừa `IncomeExpenseTransaction`, `TransferTransaction` (gói `domain.model`). Khi hệ thống cần bổ sung một loại giao dịch mới trong tương lai, lập trình viên chỉ cần tạo thêm lớp con kế thừa từ `Transaction` mà không phải sửa đổi mã nguồn lớp cha, đồng thời không phải viết thêm các lệnh rẽ nhánh `switch-case` trong các lớp dịch vụ. |
 | **Thay thế Liskov**<br/>(Liskov Substitution Principle - LSP) | Các đối tượng của lớp con có thể thay thế hoàn toàn cho đối tượng của lớp cha mà không làm thay đổi tính đúng đắn của chương trình. | Lớp cha `Transaction` và hai lớp con cụ thể. Các phương thức trong `TransactionRepository` (như `save(Transaction)`) và phương thức tính toán trong `ReportServiceImpl` đều nhận tham số kiểu lớp cha `Transaction`. Mọi thể hiện của `IncomeExpenseTransaction` hay `TransferTransaction` đều có thể truyền vào thay thế hoàn hảo mà không làm sai lệch kết quả, không cần ép kiểu thủ công (`cast`) và không ném ngoại lệ ngoài hợp đồng của lớp cha. |
-| **Phân tách Giao diện**<br/>(Interface Segregation Principle - ISP) | Không ép buộc các thành phần phụ thuộc vào các giao diện chứa phương thức mà chúng không có nhu cầu sử dụng. | Thay vì tạo một giao diện khổng lồ cho toàn bộ hệ thống, hệ thống chia nhỏ thành 6 giao diện dịch vụ độc lập: `WalletService`, `TransactionService`, `TransferService`, `CategoryService`, `ReportService`, `DataManagementService`. Mỗi bộ điều khiển giao diện dòng lệnh (Controller) chỉ phụ thuộc vào đúng giao diện dịch vụ mà nó cần dùng. Ví dụ: `WalletController` chỉ gọi `WalletService`, hoàn toàn không bị ảnh hưởng hay phải biên dịch lại khi `ReportService` thay đổi. |
+| **Phân tách Giao diện**<br/>(Interface Segregation Principle - ISP) | Không ép buộc các thành phần phụ thuộc vào các giao diện chứa phương thức mà chúng không có nhu cầu sử dụng. | Thay vì tạo một giao diện khổng lồ cho toàn bộ hệ thống, hệ thống chia nhỏ thành 6 giao diện dịch vụ độc lập: `WalletService`, `TransactionService`, `TransferService`, `CategoryService`, `ReportService`, `DataManagementService`. Mỗi bộ điều khiển giao diện người dùng (Controller) chỉ phụ thuộc vào đúng giao diện dịch vụ mà nó cần dùng. Ví dụ: `WalletGUIController` chỉ gọi `WalletService`, hoàn toàn không bị ảnh hưởng hay phải biên dịch lại khi `ReportService` thay đổi. |
 | **Nghịch đảo Phụ thuộc**<br/>(Dependency Inversion Principle - DIP) | Mô đun cấp cao không phụ thuộc mô đun cấp thấp; cả hai phụ thuộc vào sự trừu tượng hóa; trừu tượng hóa không phụ thuộc chi tiết cài đặt. | Tầng Dịch vụ (`WalletServiceImpl`) không phụ thuộc trực tiếp vào lớp lưu tệp cụ thể (`JsonFileWalletRepository`), mà phụ thuộc vào giao diện trừu tượng `WalletRepository` nằm trong Tầng Nghiệp vụ. Lớp cài đặt cụ thể được tiêm từ bên ngoài vào qua hàm khởi tạo (Constructor Injection). Nhờ đó, hệ thống có thể dễ dàng tráo đổi sang kho lưu trữ trên bộ nhớ tạm (`MemoryWalletRepository`) để chạy kiểm thử đơn vị tự động tốc độ cao mà không phải sửa một dòng mã nghiệp vụ nào. |
 
 **Phân tích đánh đổi kỹ thuật và giới hạn áp dụng:**
 
-Việc tuân thủ nghiêm ngặt năm nguyên lý thiết kế giúp mã nguồn có độ ghép nối lỏng và dễ kiểm thử độc lập, nhưng đòi hỏi sự cân nhắc kỹ lưỡng về chi phí đánh đổi trong bối cảnh một ứng dụng dòng lệnh Java chạy cục bộ:
+Việc tuân thủ nghiêm ngặt năm nguyên lý thiết kế giúp mã nguồn có độ ghép nối lỏng và dễ kiểm thử độc lập, nhưng đòi hỏi sự cân nhắc kỹ lưỡng về chi phí đánh đổi trong bối cảnh ứng dụng máy tính để bàn Java chạy cục bộ:
 
 **Chi phí kỹ thuật phát sinh:**
 - Gia tăng số lượng tệp mã nguồn: Việc phân tách giao diện và lớp cài đặt làm tăng số lượng tệp cần quản lý trong dự án (mỗi giao diện đều đi kèm ít nhất một lớp cài đặt tương ứng).
@@ -30,13 +30,13 @@ Việc tuân thủ nghiêm ngặt năm nguyên lý thiết kế giúp mã nguồ
 - Đòi hỏi thời gian làm quen kiến trúc: Thành viên phát triển cần nắm vững mô hình phân tầng và cách tương tác qua giao diện thay vì lối viết mã kịch bản thủ tục đơn giản.
 
 **Điểm cân bằng thực tế trong PFMS nhằm tránh thiết kế quá mức:**
-- Tiêm phụ thuộc thủ công qua hàm khởi tạo: Hệ thống sử dụng cơ chế Dependency Injection thuần Java tại điểm khởi động chương trình (`Main`), không đưa các khung công nghệ nặng như Spring Framework hay Google Guice vào ứng dụng dòng lệnh.
+- Tiêm phụ thuộc thủ công qua hàm khởi tạo: Hệ thống sử dụng cơ chế Dependency Injection thuần Java tại điểm khởi động chương trình (`Main`), không đưa các khung công nghệ nặng như Spring Framework hay Google Guice vào ứng dụng.
 - Tái sử dụng giao diện kho lưu trữ cơ sở: Áp dụng `GenericRepository<E, ID>` với 5 phương thức CRUD chuẩn để loại bỏ trùng lặp mã nguồn, chỉ khai báo thêm các phương thức truy vấn thực sự cần thiết theo ca sử dụng.
 - Đóng gói phạm vi lớp cài đặt nội bộ: Khai báo các lớp cài đặt dịch vụ ở phạm vi `package-private`, chỉ công khai giao diện trừu tượng ra ngoài gói nhằm bảo vệ tính toàn vẹn và giữ cho không gian tên của hệ thống luôn tinh gọn.
 
 ## 6.2 Áp dụng các Mẫu Thiết kế trong Hệ thống
 
-Mục này đặc tả việc áp dụng các mẫu thiết kế hướng đối tượng vào cấu trúc phần mềm của Hệ thống Quản lý Tài chính Cá nhân PFMS. Hệ thống chọn lọc bốn giải pháp cấu trúc và hành vi cốt lõi nhằm chuẩn hóa quá trình tạo đối tượng, đóng gói thuật toán kết xuất dữ liệu, kiểm soát vòng đời thực thể và phân tách sự kiện kiểm toán; loại trừ việc áp dụng hình thức các mẫu thiết kế gây phức tạp hóa không cần thiết cho ứng dụng dòng lệnh.
+Mục này đặc tả việc áp dụng các mẫu thiết kế hướng đối tượng vào cấu trúc phần mềm của Hệ thống Quản lý Tài chính Cá nhân PFMS. Hệ thống chọn lọc bốn giải pháp cấu trúc và hành vi cốt lõi nhằm chuẩn hóa quá trình tạo đối tượng, đóng gói thuật toán kết xuất dữ liệu, kiểm soát vòng đời thực thể và phân tách sự kiện kiểm toán; loại trừ việc áp dụng hình thức các mẫu thiết kế gây phức tạp hóa không cần thiết cho ứng dụng.
 
 Bốn mẫu thiết kế gồm Factory Method, Strategy, State và Observer được đặc tả chi tiết dưới đây theo cấu trúc đồng nhất: động lực áp dụng và bài toán thực tế, cấu trúc lớp và phân định vai trò, quy trình thực thi và lợi ích kỹ thuật thu được khi bảo trì hệ thống.
 
@@ -120,7 +120,7 @@ Lớp `TransactionFactory` cung cấp các phương thức tĩnh nhằm chuẩn 
 **Bài toán thực tế và Động lực áp dụng:**
 
 Phân hệ Báo cáo (`REP`) chịu trách nhiệm tổng hợp dữ liệu thu chi theo kỳ quan sát (`UC-REP-01`) và phân tích cơ cấu chi tiêu theo nhóm danh mục (`UC-REP-02`). Dữ liệu tài chính sau khi được tính toán cần được kết xuất ra bên ngoài theo hai nhu cầu hoàn toàn khác biệt của người dùng:
-- Hiển thị trực quan trên giao diện dòng lệnh: Dữ liệu được định dạng thành bảng văn bản ASCII có khung viền, căn lề chuẩn và hiển thị dấu phân cách hàng nghìn.
+- Hiển thị trực quan trên giao diện đồ họa: Dữ liệu được định dạng thành bảng đồ họa `JTable`, có căn lề chuẩn và hiển thị dấu phân cách hàng nghìn.
 - Kết xuất tệp phẳng bền vững: Dữ liệu được chuyển đổi thành cấu trúc JSON lưu xuống đĩa cục bộ phục vụ việc lưu trữ lâu dài hoặc tái sử dụng cho các công cụ phân tích khác.
 
 Nếu `ReportServiceImpl` tự đảm nhiệm toàn bộ việc vẽ bảng và xuất tệp:
@@ -148,7 +148,7 @@ classDiagram
         +export(FinancialReportDTO) String*
     }
 
-    class ConsoleTableReportStrategy {
+    class TableViewReportStrategy {
         +export(FinancialReportDTO) String
     }
 
@@ -166,7 +166,7 @@ classDiagram
     }
 
     ReportServiceImpl ..> ReportExportStrategy : ủy quyền kết xuất
-    ReportExportStrategy <|.. ConsoleTableReportStrategy : cài đặt
+    ReportExportStrategy <|.. TableViewReportStrategy : cài đặt
     ReportExportStrategy <|.. JsonReportStrategy : cài đặt
     ReportExportStrategy ..> FinancialReportDTO : nhận dữ liệu
 ```
@@ -175,7 +175,7 @@ classDiagram
 
 Mẫu Strategy mang lại cơ chế vận hành linh hoạt và các giá trị kỹ thuật thực tế cho hệ thống:
 
-- Tráo đổi định dạng tại thời điểm chạy: Khi người dùng lựa chọn xem trên màn hình dòng lệnh hoặc xuất tệp trên Menu chức năng, Tầng Trình diễn (`presentation.controller`) sẽ truyền lớp chiến lược tương ứng (`ConsoleTableReportStrategy` hoặc `JsonReportStrategy`) vào phương thức của `ReportServiceImpl`. Dịch vụ thực hiện tính toán số liệu và chuyển giao đối tượng `FinancialReportDTO` cho chiến lược được chọn tự kết xuất kết quả.
+- Tráo đổi định dạng tại thời điểm chạy: Khi người dùng lựa chọn xem trên màn hình đồ họa hoặc xuất tệp trên Menu chức năng, Tầng Trình diễn (`presentation.controller`) sẽ truyền lớp chiến lược tương ứng (`TableViewReportStrategy` hoặc `JsonReportStrategy`) vào phương thức của `ReportServiceImpl`. Dịch vụ thực hiện tính toán số liệu và chuyển giao đối tượng `FinancialReportDTO` cho chiến lược được chọn tự kết xuất kết quả.
 - Tách biệt tính toán và định dạng trình bày: `ReportServiceImpl` chỉ tập trung thực hiện các phép tính số học tài chính chính xác (`NetCashFlow`, `SavingsRate`). Toàn bộ việc xử lý căn lề chuỗi, vẽ khung viền hay tuần tự hóa JSON được chuyển giao trọn vẹn cho các lớp chiến lược.
 - Khả năng mở rộng không xâm lấn: Khi hệ thống cần bổ sung định dạng xuất mới trong tương lai (như `CsvReportStrategy` để mở trên Excel), lập trình viên chỉ cần tạo thêm một lớp mới cài đặt giao diện `ReportExportStrategy` mà không phải chỉnh sửa bất kỳ dòng mã nào trong `ReportServiceImpl`.
 - Năng lực kiểm thử độc lập: Thuật toán tính toán số liệu của dịch vụ có thể được kiểm thử độc lập bằng cách truyền vào một chiến lược giả lập (Mock Strategy), đồng thời quy tắc vẽ bảng hiển thị cũng được kiểm thử riêng biệt mà không phụ thuộc vào kho lưu trữ dữ liệu.
