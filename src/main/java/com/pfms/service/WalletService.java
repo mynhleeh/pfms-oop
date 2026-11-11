@@ -1,6 +1,6 @@
 package com.pfms.service;
 
-import com.pfms.domain.model.wallet.WalletStatus;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.presentation.dto.AdjustBalanceRequestDTO;
 import com.pfms.presentation.dto.BalanceAdjustmentResponseDTO;
 import com.pfms.presentation.dto.CreateWalletRequestDTO;
@@ -32,6 +32,6 @@ public interface WalletService {
     // endregion
 
     // region Queries
-    WalletsSummaryDTO getWalletsSummary(WalletStatus statusFilter);
+    WalletsSummaryDTO getWalletsSummary(EntityStatus statusFilter);
     // endregion
 }

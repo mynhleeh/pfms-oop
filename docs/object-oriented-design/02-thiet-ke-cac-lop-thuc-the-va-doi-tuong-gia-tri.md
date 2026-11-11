@@ -67,7 +67,6 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | **1. Nhóm Quản lý Ví (WAL)** |  |  |
 | `Wallet` | Thực thể | Quản lý nguồn tiền khả dụng, bảo toàn bất biến số dư không âm và tiếp nhận các biến động dòng tiền. |
 | `BalanceAdjustmentRecord` | Thực thể | Bản ghi kiểm kê thực tế bất biến, ghi nhận chênh lệch kiểm kê để cân đối số dư ví về đúng thực tế quan sát. |
-| `WalletStatus` | Kiểu liệt kê | Trạng thái vòng đời của ví gồm Đang hoạt động (`ACTIVE`) hoặc Đã lưu trữ (`ARCHIVED`). |
 | **2. Nhóm Ghi nhận Thu chi (TXN)** |  |  |
 | `Transaction` | Thực thể trừu tượng | Lớp cơ sở trừu tượng định nghĩa các thuộc tính chung và hợp đồng phương thức đa hình cho giao dịch thu chi cùng chuyển tiền nội bộ. |
 | `IncomeExpenseTransaction` | Thực thể | Hiện thực hóa giao dịch thu nhập hoặc chi tiêu tại một ví, liên kết phân loại trực tiếp với danh mục cấp 3. |
@@ -79,9 +78,10 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | **4. Nhóm Danh mục Phân loại (CAT)** |  |  |
 | `NeedGroup` | Thực thể | Quản lý nhóm nhu cầu cấp 2 gom cụm các danh mục chi tiết, trực thuộc một nhánh loại thu chi cố định. |
 | `Category` | Thực thể | Quản lý danh mục chi tiết cấp 3 gán nhãn mục đích cho giao dịch thu chi, áp dụng cơ chế xóa mềm bảo toàn lịch sử. |
-| `GroupStatus` | Kiểu liệt kê | Trạng thái vòng đời của nhóm nhu cầu gồm Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`). |
-| `CategoryStatus` | Kiểu liệt kê | Trạng thái vòng đời của danh mục gồm Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`). |
-| **5. Nhóm Thống kê và Báo cáo (REP)** |  |  |
+| **5. Nhóm Thống kê, Báo cáo (REP) và Đối tượng Giá trị Dùng chung** |  |  |
+| `EntityStatus` | Kiểu liệt kê | Trạng thái vòng đời dùng chung cho các thực thể miền (Ví, Danh mục, Nhóm nhu cầu), gồm Đang hoạt động (`ACTIVE`), Đã lưu trữ (`ARCHIVED`) và Đã xóa (`DELETED`). |
+| `EntityName` | Đối tượng giá trị | Bọc tên định danh cho Ví và Danh mục, chuẩn hóa khoảng trắng và bảo đảm độ dài 1 đến 50 ký tự theo quy tắc đặt tên `BR-NAM-01`. |
+| `Note` | Đối tượng giá trị | Bọc chuỗi ghi chú diễn giải cho Ví và Giao dịch, giới hạn tối đa 255 ký tự kèm cơ chế đối tượng rỗng an toàn (`Null Object`). |
 | `Money` | Đối tượng giá trị | Bọc giá trị tiền tệ bằng `BigDecimal` kèm quy tắc làm tròn nửa chẵn, loại trừ hoàn toàn sai số dấu chấm động. |
 | `TransactionDate` | Đối tượng giá trị | Bọc mốc ngày phát sinh giao dịch, kiểm soát tính hợp lệ lịch pháp và ràng buộc thời gian không vượt quá hiện tại. |
 | `NetCashFlow` | Đối tượng giá trị | Đo lường dòng tiền thuần ròng bằng tổng thu nhập trừ tổng chi tiêu trong một kỳ quan sát định kỳ. |
@@ -115,35 +115,40 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
 | `walletId` | `UUID` | `private final` | Mã định danh duy nhất sinh tự động khi tạo mới, giữ cố định và không tái sử dụng. |
-| `name` | `String` | `private` | Chuỗi từ 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu, duy nhất toàn hệ thống không phân biệt hoa thường. |
+| `name` | `EntityName` | `private` | Đối tượng giá trị bọc tên ví từ 1 đến 50 ký tự sau khi chuẩn hóa khoảng trắng, duy nhất toàn hệ thống không phân biệt hoa thường. |
 | `currentBalance` | `Money` | `private` | Số dư khả dụng có đúng 2 chữ số thập phân, khởi tạo bằng `0.00 VNĐ` và luôn không âm. |
-| `status` | `WalletStatus` | `private` | Trạng thái vòng đời nhận giá trị `ACTIVE` khi tạo mới hoặc chuyển sang `ARCHIVED` khi ngừng giao dịch. |
+| `status` | `EntityStatus` | `private` | Trạng thái vòng đời nhận giá trị `ACTIVE` khi tạo mới hoặc chuyển sang `ARCHIVED` khi ngừng giao dịch. |
 | `isDefault` | `boolean` | `private final` | Cờ đánh dấu ví "Tiền mặt" mặc định; mang giá trị `true` cố định ở ví mặc định để chặn thao tác xóa hoặc lưu trữ. |
-| `note` | `String` | `private` | Chuỗi ghi chú tùy chọn, dài tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu. |
+| `note` | `Note` | `private` | Đối tượng giá trị bọc chuỗi ghi chú tùy chọn, dài tối đa 255 ký tự, áp dụng đối tượng rỗng an toàn (`Note.EMPTY`) khi để trống. |
 | `createdAt` | `LocalDateTime` | `private final` | Mốc thời gian tạo ví bất biến, dùng để sắp xếp danh sách ví. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `Wallet` | `UUID walletId, String name, String note, boolean isDefault` | `Wallet` | `BusinessException, IllegalArgumentException` | Kiểm tra `walletId` khác `null`, cắt khoảng trắng hai đầu, kiểm tra tên dài 1 đến 50 ký tự (`ERR_NAM_001`) và ghi chú tối đa 255 ký tự, gán `status = ACTIVE`, `currentBalance = Money.ZERO` và `createdAt` hiện tại. |
+| `Wallet` | `UUID walletId, String name, String note, boolean isDefault` | `Wallet` | `BusinessException, IllegalArgumentException` | Kiểm tra `walletId` khác `null`; chuẩn hóa và đóng gói `name` vào `EntityName` (1-50 ký tự theo `ERR_NAM_001`) và `note` vào `Note` (tối đa 255 ký tự); gán `status = ACTIVE`, `currentBalance = Money.ZERO` và `createdAt` hiện tại. |
 | `credit` | `Money amount` | `void` | `BusinessException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`) và `amount` lớn hơn `0.00 VNĐ`, sau đó cộng `amount` vào `currentBalance`. |
 | `debit` | `Money amount` | `void` | `BusinessException, InsufficientBalanceException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`), `amount` lớn hơn `0.00 VNĐ` và `currentBalance` đủ chi trả (`ERR_WAL_001`), sau đó trừ `amount` khỏi `currentBalance`. |
 | `adjustBalance` | `Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `BusinessException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`), khởi tạo và xác thực bản ghi `BalanceAdjustmentRecord` trước để bảo đảm `actualBalance` không âm (`ERR_FIN_001`), độ lệch khác không (`ERR_FIN_001`) và `reason` hợp lệ, sau đó mới cập nhật `currentBalance = actualBalance` rồi trả về bản ghi. |
-| `updateInfo` | `String newName, String newNote` | `void` | `BusinessException, IllegalArgumentException` | Cắt khoảng trắng hai đầu, kiểm tra `newName` dài 1 đến 50 ký tự (`ERR_NAM_001`) và `newNote` tối đa 255 ký tự, cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
+| `updateInfo` | `String newName, String newNote` | `void` | `BusinessException, IllegalArgumentException` | Chuẩn hóa và đóng gói `newName` vào `EntityName` (1-50 ký tự theo `ERR_NAM_001`) và `newNote` vào `Note` (tối đa 255 ký tự); cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
 | `archive` | `Không` | `void` | `IllegalStateException, BusinessException` | Kiểm tra `isDefault == false` và ví đang `ACTIVE`, sau đó chuyển `status` sang `ARCHIVED`. |
 | `activate` | `Không` | `void` | `IllegalStateException, BusinessException` | Kiểm tra ví đang `ARCHIVED` rồi chuyển `status` về `ACTIVE` để ví tiếp nhận lại giao dịch mới. |
 | `getWalletId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất của ví để làm khóa lưu trữ trên kho dữ liệu và đối chiếu giao dịch liên kết. |
-| `getName` | `Không` | `String` | `Không` | Trả về tên ví hiện tại phục vụ kiểm tra trùng tên không phân biệt hoa thường tại kho lưu trữ và hiển thị. |
-| `getStatus` | `Không` | `WalletStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví để lọc danh sách và thống kê số lượng ví theo trạng thái. |
+| `getName` | `Không` | `String` | `Không` | Trả về chuỗi tên ví hiện tại phục vụ kiểm tra trùng tên không phân biệt hoa thường tại kho lưu trữ và hiển thị. |
+| `getEntityName` | `Không` | `EntityName` | `Không` | Trả về đối tượng giá trị tên ví phục vụ thao tác định danh và so sánh khóa chuẩn hóa. |
+| `getNote` | `Không` | `String` | `Không` | Trả về chuỗi nội dung ghi chú diễn giải của ví phục vụ hiển thị trên giao diện người dùng. |
+| `getNoteValue` | `Không` | `Note` | `Không` | Trả về đối tượng giá trị ghi chú diễn giải của ví phục vụ truy xuất an toàn. |
+| `getStatus` | `Không` | `EntityStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví để lọc danh sách và thống kê số lượng ví theo trạng thái. |
 | `isDefault` | `Không` | `boolean` | `Không` | Trả về `true` nếu đây là ví tiền mặt mặc định, giúp tầng dịch vụ chặn thao tác xóa hoặc lưu trữ ví mặc định. |
-| `isActive` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `WalletStatus.ACTIVE`, phục vụ kiểm tra trạng thái hoạt động trước khi hạch toán giao dịch. |
+| `isActive` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.ACTIVE`, phục vụ kiểm tra trạng thái hoạt động trước khi hạch toán giao dịch. |
+| `isArchived` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.ARCHIVED`, phục vụ kiểm tra trạng thái lưu trữ của ví. |
+| `isDeleted` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.DELETED`, phục vụ kiểm tra trạng thái đã xóa của ví. |
 | `getCurrentBalance` | `Không` | `Money` | `Không` | Trả về số dư khả dụng hiện tại phục vụ hiển thị và tính cơ cấu phân bổ tài sản mà không mở hàm gán trực tiếp. |
 | `hasSufficientBalance` | `Money amount` | `boolean` | `IllegalArgumentException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
-- Hàm khởi tạo cắt khoảng trắng tên ví, kiểm tra độ dài 1 đến 50 ký tự, gán trạng thái `ACTIVE` và đặt `currentBalance` bằng `0.00 VNĐ`. Thực thể kiểm tra định dạng tên nội bộ, còn tầng dịch vụ kiểm tra tính duy nhất của tên trên toàn hệ thống.
+- Hàm khởi tạo chuẩn hóa tên ví qua đối tượng giá trị `EntityName` (1 đến 50 ký tự theo `ERR_NAM_001`) và ghi chú qua `Note` (tối đa 255 ký tự), gán trạng thái `ACTIVE` và đặt `currentBalance` bằng `0.00 VNĐ`. Thực thể kiểm tra định dạng tên nội bộ qua `EntityName`, còn tầng dịch vụ kiểm tra tính duy nhất của tên trên toàn hệ thống.
 - Lớp `Wallet` đóng kín các trường nội tại, chỉ mở các phương thức đọc chỉ đọc và loại bỏ mọi phương thức gán giá trị tự do như `setCurrentBalance`. Số dư chỉ thay đổi qua `credit`, `debit` hoặc `adjustBalance` để duy trì số dư khả dụng không âm và chặn mọi khoản chi vượt số dư.
 - Từ khóa `final` khóa cố định thuộc tính `isDefault` ngay khi tạo ví "Tiền mặt" mặc định, giúp phương thức `archive` và tầng dịch vụ chặn thao tác lưu trữ hoặc xóa nguồn tiền mặc định.
 
@@ -165,7 +170,7 @@ Lớp trừu tượng `Transaction` định nghĩa các thuộc tính cốt lõi
 | `amount` | `Money` | `protected` | Số tiền giao dịch, có đúng 2 chữ số thập phân và bắt buộc lớn hơn `0.00 VNĐ`. |
 | `transactionDate` | `TransactionDate` | `protected` | Ngày phát sinh giao dịch, bọc đối tượng giá trị lịch pháp và không được vượt quá ngày hiện tại. |
 | `fee` | `TransactionFee` | `protected` | Bản ghi chi phí giao dịch hợp thành (`0..1`), gắn liền sinh tử với giao dịch gốc (nhận `null` nếu không có phí). |
-| `note` | `String` | `protected` | Chuỗi ghi chú diễn giải tùy chọn, dài tối đa 255 ký tự sau khi cắt tỉa khoảng trắng hai đầu. |
+| `note` | `Note` | `protected` | Đối tượng giá trị bọc chuỗi ghi chú diễn giải tùy chọn, dài tối đa 255 ký tự sau khi cắt tỉa khoảng trắng hai đầu, áp dụng đối tượng rỗng an toàn (`Note.EMPTY`). |
 | `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến, phục vụ sắp xếp lịch sử giao dịch thứ cấp khi trùng ngày. |
 | `transactionType` | `TransactionType` | `private final` | Chiều biến động dòng tiền (`INCOME` hoặc `EXPENSE`) tại `IncomeExpenseTransaction`, mang tính bất biến. |
 | `wallet` | `Wallet` | `private` | Tham chiếu thực thể `Wallet` đang hoạt động (`ACTIVE`) tiếp nhận hoặc trích xuất dòng tiền. |
@@ -175,7 +180,7 @@ Lớp trừu tượng `Transaction` định nghĩa các thuộc tính cốt lõi
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `Transaction` *(Constructor)* | `UUID transactionId, Money amount, TransactionDate transactionDate, String note, TransactionFee fee` | Không có | `BusinessException` | Hàm khởi tạo của lớp cha trừu tượng; kiểm tra `transactionId` và `transactionDate` khác `null`, `amount` lớn hơn `0.00 VNĐ` (`ERR_FIN_001`), chuẩn hóa `note` (tối đa 255 ký tự) và gán `createdAt` thời điểm hiện tại. |
+| `Transaction` *(Constructor)* | `UUID transactionId, Money amount, TransactionDate transactionDate, String note, TransactionFee fee` | Không có | `BusinessException` | Hàm khởi tạo của lớp cha trừu tượng; kiểm tra `transactionId` và `transactionDate` khác `null`, `amount` lớn hơn `0.00 VNĐ` (`ERR_FIN_001`), đóng gói `note` vào đối tượng giá trị `Note` (tối đa 255 ký tự) và gán `createdAt` thời điểm hiện tại. |
 | `IncomeExpenseTransaction` *(Constructor)* | `UUID transactionId, TransactionType transactionType, Wallet wallet, Category category, Money amount, TransactionDate date, String note, TransactionFee fee` | Không có | `BusinessException` | Gọi `super(...)`; kiểm tra `wallet.isActive()`, `category.isActive()` khớp `transactionType` (`ERR_CAT_001`), và nếu có `fee` thì khớp `transactionId` cùng `wallet`. |
 | `applyToWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Lớp con kiểm tra `wallet.isActive()` và tính toán số dư ròng; thực hiện `wallet.credit(amount)` nếu là `INCOME` hoặc `wallet.debit(amount)` nếu là `EXPENSE`, sau đó gọi `fee.applyFee()` nếu có phí. |
 | `revertFromWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Lớp con kiểm tra số dư đủ điều kiện hoàn nguyên; gọi `fee.revertFee()` nếu có phí, sau đó gọi `wallet.debit(amount)` nếu là `INCOME` hoặc `wallet.credit(amount)` nếu là `EXPENSE`. |
@@ -185,7 +190,8 @@ Lớp trừu tượng `Transaction` định nghĩa các thuộc tính cốt lõi
 | `getTransactionDate` | Không có | `TransactionDate` | Không có | Trả về mốc ngày ghi nhận giao dịch phục vụ bộ lọc thời gian và báo cáo chuỗi thời gian. |
 | `getCreatedAt` | Không có | `LocalDateTime` | Không có | Trả về thời điểm tạo bản ghi giao dịch bất biến trong hệ thống. |
 | `getFee` | Không có | `Optional<TransactionFee>` | Không có | Bọc trường `fee` trong `Optional` để truy xuất an toàn khi giao dịch không có chi phí đi kèm. |
-| `getNote` | Không có | `String` | Không có | Trả về nội dung ghi chú diễn giải của giao dịch. |
+| `getNote` | Không có | `String` | Không có | Trả về chuỗi nội dung ghi chú diễn giải của giao dịch. |
+| `getNoteValue` | Không có | `Note` | Không có | Trả về đối tượng giá trị ghi chú của giao dịch phục vụ truy xuất an toàn. |
 | `getWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví thanh toán chịu tác động tại `IncomeExpenseTransaction`. |
 | `getCategory` | Không có | `Category` | Không có | Trả về thực thể danh mục phân loại mục đích chi tiêu tại `IncomeExpenseTransaction`. |
 | `getTransactionType` | Không có | `TransactionType` | Không có | Trả về chiều dòng tiền (`INCOME` hoặc `EXPENSE`) cố định của giao dịch. |
@@ -216,14 +222,14 @@ Lớp `TransferTransaction` kế thừa từ lớp trừu tượng `Transaction`
 | `amount` | `Money` | `protected` | Số tiền điều chuyển kế thừa từ `Transaction`, có đúng 2 chữ số thập phân và bắt buộc lớn hơn `0.00 VNĐ`. |
 | `transactionDate` | `TransactionDate` | `protected` | Ngày phát sinh giao dịch kế thừa từ `Transaction`, không được vượt quá ngày hiện tại từ đồng hồ hệ thống. |
 | `fee` | `TransactionFee` | `protected` | Thực thể chi phí giao dịch hợp thành (`0..1`) kế thừa từ `Transaction`, trích từ `sourceWallet` khi có phát sinh phí. |
-| `note` | `String` | `protected` | Chuỗi ghi chú diễn giải tùy chọn kế thừa từ `Transaction`, dài tối đa 255 ký tự sau khi cắt tỉa khoảng trắng hai đầu. |
+| `note` | `Note` | `protected` | Đối tượng giá trị bọc chuỗi ghi chú diễn giải tùy chọn kế thừa từ `Transaction`, dài tối đa 255 ký tự sau khi cắt tỉa khoảng trắng hai đầu, áp dụng đối tượng rỗng an toàn (`Note.EMPTY`). |
 | `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến kế thừa từ `Transaction`, phục vụ sắp xếp lịch sử giao dịch thứ cấp khi trùng ngày. |
 
 **Phương thức nghiệp vụ**
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `TransferTransaction` *(Constructor)* | `UUID transactionId, Wallet sourceWallet, Wallet destinationWallet, Money amount, TransactionDate transactionDate, String note, TransactionFee fee` | Không có | `BusinessException` | Gọi `super(...)`; kiểm tra hai ví khác `null`, cùng thỏa mãn `isActive()`, có mã định danh khác nhau (`ERR_TRF_001`), số tiền dương (`ERR_TRF_002`), và nếu có `fee` thì khớp `transactionId` cùng ví trích phí trùng `sourceWallet` (`ERR_FEE_001`). |
+| `TransferTransaction` *(Constructor)* | `UUID transactionId, Wallet sourceWallet, Wallet destinationWallet, Money amount, TransactionDate transactionDate, String note, TransactionFee fee` | Không có | `BusinessException` | Gọi `super(...)` đóng gói `note` vào `Note`; kiểm tra hai ví khác `null`, cùng thỏa mãn `isActive()`, có mã định danh khác nhau (`ERR_TRF_001`), số tiền dương (`ERR_TRF_002`), và nếu có `fee` thì khớp `transactionId` cùng ví trích phí trùng `sourceWallet` (`ERR_FEE_001`). |
 | `applyToWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Kiểm tra hai ví đang `ACTIVE`, kiểm tra `sourceWallet` đủ trả tổng số tiền `amount` cùng phụ phí `fee`, thực hiện `sourceWallet.debit(amount)`, gọi `fee.applyFee()` nếu có và gọi `destinationWallet.credit(amount)`. |
 | `revertFromWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình khi xóa giao dịch: Kiểm tra hai ví đang `ACTIVE`, kiểm tra `destinationWallet` có số dư tối thiểu bằng `amount`, thực hiện `destinationWallet.debit(amount)`, gọi `fee.revertFee()` nếu có và gọi `sourceWallet.credit(amount)`. |
 | `getTotalSourceDeduction` | Không có | `Money` | Không có | Tính tổng số tiền bị trừ khỏi `sourceWallet` bao gồm tiền chuyển `amount` cộng số tiền của phụ phí `fee` nếu có. |
@@ -291,10 +297,10 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
 | `categoryId` | `UUID` | `private final` | Mã định danh duy nhất của danh mục, sinh tự động khi khởi tạo, bất biến và không bao giờ tái sử dụng (theo quy tắc cấu trúc danh mục ba cấp và yêu cầu tùy biến danh mục). |
-| `name` | `String` | `private` | Tên gọi danh mục từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng hai đầu (`trim`), không được để trống theo quy tắc đặt tên; duy nhất trong cùng nhóm nhu cầu cha đang hoạt động theo cơ chế so sánh không phân biệt hoa thường và kiểm tra trùng lặp. |
+| `name` | `EntityName` | `private` | Đối tượng giá trị bọc tên gọi danh mục từ 1 đến 50 ký tự sau khi chuẩn hóa khoảng trắng hai đầu theo quy tắc đặt tên `BR-NAM-01`; duy nhất trong cùng nhóm nhu cầu cha đang hoạt động theo cơ chế so sánh không phân biệt hoa thường. |
 | `needGroupId` | `UUID` | `private` | Mã định danh tham chiếu đến nhóm nhu cầu cha cấp 2 trực thuộc; bắt buộc trỏ tới một `NeedGroup` đang hoạt động (`ACTIVE`), loại trừ hoàn toàn danh mục mồ côi hoặc thuộc nhóm đã xóa theo quy tắc cấu trúc danh mục ba cấp. |
 | `transactionType` | `TransactionType` | `private final` | Nhánh loại thu chi (`INCOME` hoặc `EXPENSE`) kế thừa từ nhóm nhu cầu cha; mang tính bất biến tuyệt đối sau khởi tạo nhằm bảo vệ tính toàn vẹn dữ liệu lịch sử theo quy tắc cấu trúc danh mục ba cấp, ngăn chặn đổi loại thu chi. |
-| `status` | `CategoryStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
+| `status` | `EntityStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
 | `icon` | `String` | `private` | Ký hiệu hoặc mã biểu tượng đồ họa đại diện trên giao diện người dùng; tùy chọn, độ dài tối đa 50 ký tự phục vụ tùy biến hiển thị. |
 | `color` | `String` | `private` | Chuỗi mã màu định dạng Hex (ví dụ `#4CAF50`) phục vụ hiển thị trực quan; tùy chọn, độ dài tối đa 10 ký tự. |
 
@@ -302,17 +308,18 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `Category` *(Constructor)* | `UUID categoryId, String name, UUID needGroupId, TransactionType transactionType, String icon, String color` | Không có | `BusinessException` | Khởi tạo thực thể danh mục mới ở trạng thái `ACTIVE`; kiểm tra định dạng tên theo quy tắc đặt tên, bắt buộc có mã nhóm cha và loại thu chi kế thừa theo cấu trúc danh mục ba cấp. |
+| `Category` *(Constructor)* | `UUID categoryId, String name, UUID needGroupId, TransactionType transactionType, String icon, String color` | Không có | `BusinessException` | Khởi tạo thực thể danh mục mới ở trạng thái `ACTIVE`; chuẩn hóa và đóng gói `name` vào `EntityName` theo quy tắc đặt tên `BR-NAM-01`, bắt buộc có mã nhóm cha và loại thu chi kế thừa theo cấu trúc danh mục ba cấp. |
 | `getCategoryId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của danh mục chi tiết. |
-| `getName` | Không có | `String` | Không có | Trả về tên hiển thị hiện tại của danh mục. |
+| `getName` | Không có | `String` | Không có | Trả về chuỗi tên hiển thị hiện tại của danh mục từ đối tượng giá trị `EntityName`. |
+| `getEntityName` | Không có | `EntityName` | Không có | Trả về đối tượng giá trị tên danh mục phục vụ thao tác định danh và so sánh khóa chuẩn hóa. |
 | `getNeedGroupId` | Không có | `UUID` | Không có | Trả về mã định danh nhóm nhu cầu cha cấp 2 mà danh mục trực thuộc. |
 | `getTransactionType` | Không có | `TransactionType` | Không có | Trả về loại thu chi (`INCOME` hoặc `EXPENSE`) của danh mục. |
-| `getStatus` | Không có | `CategoryStatus` | Không có | Trả về trạng thái hoạt động vòng đời hiện tại của danh mục. |
+| `getStatus` | Không có | `EntityStatus` | Không có | Trả về trạng thái hoạt động vòng đời hiện tại của danh mục. |
 | `getIcon` | Không có | `String` | Không có | Trả về mã biểu tượng đồ họa đại diện của danh mục. |
 | `getColor` | Không có | `String` | Không có | Trả về chuỗi mã màu hiển thị trực quan của danh mục. |
 | `isActive` | Không có | `boolean` | Không có | Kiểm tra danh mục có đang ở trạng thái hoạt động (`ACTIVE`) hay không. |
 | `isDeleted` | Không có | `boolean` | Không có | Kiểm tra danh mục có đang ở trạng thái đã xóa mềm (`DELETED`) hay không. |
-| `rename` | `String newName` | `void` | `BusinessException` | Cập nhật tên danh mục sau khi chuẩn hóa cắt tỉa khoảng trắng (1-50 ký tự), ném ngoại lệ nếu tên để trống; giữ nguyên mã định danh và toàn bộ liên kết lịch sử theo quy tắc đặt tên và bảo toàn dữ liệu lịch sử. |
+| `rename` | `String newName` | `void` | `BusinessException` | Cập nhật tên danh mục qua `EntityName.of(newName, ...)` (1-50 ký tự theo `BR-NAM-01`), ném ngoại lệ nếu tên để trống; giữ nguyên mã định danh và toàn bộ liên kết lịch sử theo quy tắc đặt tên và bảo toàn dữ liệu lịch sử. |
 | `changeNeedGroup` | `UUID newNeedGroupId, TransactionType targetGroupType` | `void` | `BusinessException` | Chuyển danh mục sang nhóm nhu cầu cha mới; ném ngoại lệ nếu nhóm đích khác loại thu chi hoặc nhóm đích đã bị xóa theo quy tắc cấu trúc danh mục ba cấp. |
 | `updateAppearance` | `String newIcon, String newColor` | `void` | Không có | Cập nhật biểu tượng nhận diện và mã màu hiển thị của danh mục theo tùy biến người dùng. |
 | `markDeleted` | Không có | `void` | Không có | Chuyển trạng thái sang `DELETED` (xóa mềm), ẩn danh mục khỏi danh sách lựa chọn cho giao dịch mới nhưng bảo toàn liên kết với các giao dịch lịch sử và báo cáo theo quy tắc xóa mềm bảo toàn lịch sử và cấu trúc danh mục ba cấp. |
@@ -321,7 +328,7 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 **Cơ chế đóng gói và quy tắc bất biến**
 
 - Ràng buộc liên kết phân cấp cha con: Danh mục chi tiết cấp 3 bắt buộc phải luôn trực thuộc một nhóm nhu cầu cha cấp 2 (`NeedGroup`) hợp lệ đang hoạt động; hệ thống nghiêm cấm tồn tại danh mục mồ côi hoặc tạo danh mục trong nhóm đã xóa theo quy tắc cấu trúc danh mục ba cấp. Thuộc tính `transactionType` được kế thừa trực tiếp từ nhóm cha và mang tính bất biến tuyệt đối; khi chuyển nhóm cha (`changeNeedGroup`), nhóm đích bắt buộc phải đang hoạt động và có cùng loại thu chi, từ chối mọi hành vi chuyển nhóm chéo loại hoặc chuyển vào nhóm đã xóa.
-- Quy tắc kiểm soát định danh và tính duy nhất: Thuộc tính `name` được bảo vệ đóng gói chặt chẽ qua phương thức `rename()`, bắt buộc chuẩn hóa cắt tỉa khoảng trắng ở hai đầu (`trim`) với độ dài từ 1 đến 50 ký tự, không được để trống hoặc vượt quá độ dài quy định. Tên danh mục là duy nhất trong phạm vi cùng nhóm nhu cầu cha đang hoạt động, so sánh không phân biệt chữ hoa chữ thường theo quy tắc đặt tên và kiểm tra trùng lặp. Hai danh mục thuộc hai nhóm cha khác nhau được phép trùng tên.
+- Quy tắc kiểm soát định danh và tính duy nhất: Thuộc tính `name` được bọc trong đối tượng giá trị `EntityName` và bảo vệ đóng gói chặt chẽ qua phương thức `rename()`, bắt buộc chuẩn hóa cắt tỉa khoảng trắng ở hai đầu (`trim`) với độ dài từ 1 đến 50 ký tự theo `BR-NAM-01`, không được để trống hoặc vượt quá độ dài quy định. Tên danh mục là duy nhất trong phạm vi cùng nhóm nhu cầu cha đang hoạt động, so sánh không phân biệt chữ hoa chữ thường qua `normalizedKey` theo quy tắc đặt tên và kiểm tra trùng lặp. Hai danh mục thuộc hai nhóm cha khác nhau được phép trùng tên.
 - Cơ chế xóa mềm bảo toàn lịch sử và điều kiện khôi phục: Khi thực hiện xóa danh mục đã phát sinh giao dịch lịch sử, thực thể chuyển sang trạng thái xóa mềm (`DELETED`) thông qua `markDeleted()`. Danh mục bị ẩn khỏi danh sách lựa chọn khi tạo giao dịch mới, nhưng liên kết tham chiếu trong sổ giao dịch và báo cáo tài chính được giữ nguyên vẹn kèm nhãn "(đã xóa)" theo quy tắc xóa mềm bảo toàn dữ liệu lịch sử. Thao tác khôi phục (`restore()`) chỉ được kích hoạt khi nhóm cha trực thuộc đang ở trạng thái `ACTIVE` (không bị xóa) và tên danh mục không bị trùng lặp với một danh mục đang dùng khác trong cùng nhóm cha.
 
 ### 2.2.6 Lớp Nhóm Nhu cầu
@@ -653,3 +660,82 @@ Lớp `SpendingStructureShare` là đối tượng giá trị tỷ trọng bất
 - Tính bất biến và ràng buộc giá trị tỷ trọng nằm trong khoảng từ không đến một trăm phần trăm: Tất cả thuộc tính được khai báo `private final`; không cung cấp phương thức thay đổi trạng thái. Ràng buộc bất biến $0.00 \le \text{share} \le 100.00$ được kiểm tra nghiêm ngặt ngay tại constructor và factory method. Khi tổng số tiền phân tích bằng 0, phương thức factory gán mặc định $0.00\%$ nhằm loại trừ lỗi chia cho số không. Sai số tổng tỷ trọng các thành phần cho phép độ lệch $\pm 0.01\%$ do hiệu ứng tích lũy làm tròn ngân hàng độc lập.
 - Cơ chế so sánh bằng nhau qua equals và hashCode: Phương thức `equals` được ghi đè để so sánh hai đối tượng `SpendingStructureShare` dựa trên giá trị tỷ trọng `share` (so sánh bằng `compareTo` trên `BigDecimal` để bỏ qua khác biệt về scale hiển thị) kết hợp với phạm vi phân cấp `scope`; phương thức `hashCode` được sinh nhất quán từ các trường tương ứng.
 - Cài đặt Comparable để sắp xếp tỷ trọng chi tiêu giảm dần: Lớp cài đặt giao diện `Comparable<SpendingStructureShare>`; phương thức `compareTo` thực hiện so sánh đảo ngược (`other.share.compareTo(this.share)`) để tự động sắp xếp danh sách nhóm nhu cầu và danh mục theo thứ tự tỷ trọng giảm dần từ cao xuống thấp khi kết xuất bảng báo cáo cơ cấu chi tiêu.
+
+### 2.3.7 Tên Định danh Thực thể
+
+Lớp `EntityName` là đối tượng giá trị bất biến đại diện cho tên gọi định danh của các thực thể cốt lõi trong hệ thống (`Wallet`, `Category` và `NeedGroup`). Lớp này đóng gói quy tắc cắt tỉa khoảng trắng, kiểm soát độ dài hợp lệ từ 1 đến 50 ký tự theo quy tắc đặt tên `BR-NAM-01`, tạo khóa chuẩn hóa chữ thường phục vụ kiểm tra trùng lặp không phân biệt hoa thường và loại bỏ hoàn toàn mã lặp tại các thực thể.
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-01`, `UC-WAL-03`, `UC-CAT-01`, `UC-CAT-02`
+- Yêu cầu chức năng: `FR-WAL-01`, `FR-WAL-02`, `FR-CAT-01`, `FR-CAT-02`
+- Quy tắc nghiệp vụ: `BR-NAM-01`
+- Mã lỗi: `ERR-NAM-001`
+
+**Cấu trúc thuộc tính**
+
+| Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
+| :--- | :--- | :--- | :--- |
+| `value` | `String` | `private final` | Chuỗi ký tự tên gọi sau khi cắt tỉa khoảng trắng hai đầu; bắt buộc có độ dài từ 1 đến 50 ký tự; không bao giờ mang giá trị `null` hoặc rỗng; bất biến sau khi khởi tạo. |
+| `normalizedKey` | `String` | `private final` | Khóa chuỗi viết thường chuẩn hóa theo ngôn ngữ (`value.toLowerCase(Locale.ROOT)`); dùng để so sánh bằng nhau và kiểm tra trùng lặp không phân biệt hoa thường; bất biến sau khi khởi tạo. |
+
+**Phương thức nghiệp vụ**
+
+| Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
+| :--- | :--- | :--- | :--- | :--- |
+| `EntityName` *(Constructor)* | `String rawName, String fieldLabel` | Không có | `BusinessException` | Cắt tỉa khoảng trắng hai đầu; kiểm tra `rawName` không được `null` hoặc rỗng và độ dài từ 1 đến 50 ký tự theo `BR-NAM-01`; ném `BusinessException(ErrorCode.ERR_NAM_001)` nếu vi phạm; khởi tạo `value` và `normalizedKey`. |
+| `of` *(Factory method)* | `String rawName` | `EntityName` | `BusinessException` | Phương thức tĩnh thuận tiện tạo thể hiện `EntityName` với nhãn mặc định `"Tên"`. |
+| `of` *(Factory method)* | `String rawName, String fieldLabel` | `EntityName` | `BusinessException` | Phương thức tĩnh tạo thể hiện `EntityName` kèm theo nhãn trường tùy biến phục vụ thông báo lỗi chi tiết. |
+| `getValue` | Không có | `String` | Không có | Trả về chuỗi tên nguyên bản đã cắt khoảng trắng phục vụ hiển thị trên giao diện người dùng. |
+| `getNormalizedKey` | Không có | `String` | Không có | Trả về khóa chuẩn hóa chữ thường phục vụ kiểm tra trùng lặp tại kho lưu trữ. |
+| `length` | Không có | `int` | Không có | Trả về độ dài chuỗi ký tự của tên đã chuẩn hóa. |
+| `compareTo` | `EntityName other` | `int` | Không có | So sánh thứ tự tự nhiên giữa hai tên dựa trên `value` theo thứ tự từ điển; phục vụ sắp xếp danh sách ví và danh mục. |
+| `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên `normalizedKey` theo ngữ nghĩa đối tượng giá trị không phân biệt hoa thường. |
+| `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên `normalizedKey` phục vụ tìm kiếm và quản lý trong tập hợp `Set` hoặc `Map`. |
+| `toString` | Không có | `String` | Không có | Trả về chuỗi giá trị tên `value` tương đương với phương thức `getValue()`. |
+
+**Tính bất biến và cơ chế so sánh**
+
+- Tính bất biến tuyệt đối và đóng gói quy tắc đặt tên: Tất cả thuộc tính được khai báo `private final`; lớp không cung cấp bất kỳ phương thức setter nào. Mọi thao tác đổi tên thực thể đều thực hiện bằng cách tạo một thể hiện `EntityName` mới thay thế. Quy tắc kiểm tra độ dài 1 đến 50 ký tự và cắt tỉa khoảng trắng theo `BR-NAM-01` được tập trung hoàn toàn tại đây, giải phóng các thực thể `Wallet` và `Category` khỏi việc trùng lặp mã kiểm tra.
+- Cơ chế so sánh bằng nhau không phân biệt chữ hoa chữ thường: Phương thức `equals()` so sánh trực tiếp thuộc tính `normalizedKey` (`value.toLowerCase(Locale.ROOT)`), bảo đảm các chuỗi chỉ khác nhau về cách viết hoa thường (ví dụ `"Tiền mặt"` và `"TIỀN MẶT"`) được hệ thống định danh là cùng một giá trị, ngăn chặn triệt để hiện tượng trùng tên logic tại kho lưu trữ.
+- Cài đặt Comparable và Serializable: Lớp cài đặt giao diện `Comparable<EntityName>` ủy quyền so sánh thứ tự từ điển tự nhiên cho `value.compareTo(other.value)` và cài đặt `java.io.Serializable` bảo đảm an toàn khi lưu trữ dữ liệu hoặc truyền tải giữa các thành phần phần mềm.
+
+### 2.3.8 Ghi chú Diễn giải
+
+Lớp `Note` là đối tượng giá trị bất biến đại diện cho nội dung ghi chú diễn giải tùy chọn đi kèm theo các thực thể tài chính (`Wallet`, `Transaction` và các lớp con giao dịch). Lớp này đóng gói quy tắc cắt tỉa khoảng trắng, giới hạn độ dài tối đa 255 ký tự, loại bỏ hoàn toàn giá trị `null` thông qua mô hình Đối tượng Rỗng (`Null Object Pattern`) và cung cấp hằng số rỗng dùng chung `Note.EMPTY`.
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-WAL-01`, `UC-WAL-03`, `UC-TXN-01`, `UC-TXN-02`, `UC-TRF-01`
+- Yêu cầu chức năng: `FR-WAL-01`, `FR-WAL-02`, `FR-TXN-01`, `FR-TXN-02`, `FR-TRF-01`
+- Quy tắc nghiệp vụ: `BR-FIN-01`
+- Mã lỗi: `ERR-FIN-001`
+
+**Cấu trúc thuộc tính**
+
+| Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
+| :--- | :--- | :--- | :--- |
+| `EMPTY` | `Note` | `public static final` | Thể hiện đối tượng rỗng đại diện cho trường hợp không có ghi chú hoặc ghi chú chỉ chứa khoảng trắng, mang giá trị chuỗi rỗng `""`. |
+| `MAX_LENGTH` | `int` | `public static final` | Hằng số quy định độ dài tối đa cho phép của ghi chú, cố định là 255 ký tự trên toàn hệ thống. |
+| `value` | `String` | `private final` | Chuỗi ghi chú sau khi chuẩn hóa; không bao giờ mang giá trị `null`; độ dài từ 0 đến 255 ký tự; bất biến sau khi khởi tạo. |
+
+**Phương thức nghiệp vụ**
+
+| Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
+| :--- | :--- | :--- | :--- | :--- |
+| `Note` *(Constructor)* | `String rawNote, String fieldLabel` | Không có | `BusinessException` | Cắt tỉa khoảng trắng hai đầu; chuyển `null` thành chuỗi rỗng; kiểm tra độ dài không vượt quá 255 ký tự; ném `BusinessException(ErrorCode.ERR_FIN_001)` nếu vượt quá; gán cho `value`. |
+| `empty` *(Factory method)* | Không có | `Note` | Không có | Trả về thể hiện đối tượng rỗng `Note.EMPTY`. |
+| `of` *(Factory method)* | `String rawNote` | `Note` | `BusinessException` | Phương thức tĩnh tạo thể hiện `Note` với nhãn mặc định `"Ghi chú"`; tự động trả về `Note.EMPTY` nếu đầu vào là `null` hoặc rỗng. |
+| `of` *(Factory method)* | `String rawNote, String fieldLabel` | `Note` | `BusinessException` | Phương thức tĩnh tạo thể hiện `Note` kèm nhãn trường tùy biến phục vụ thông báo lỗi chi tiết; tự động trả về `Note.EMPTY` nếu rỗng. |
+| `getValue` | Không có | `String` | Không có | Trả về chuỗi nội dung ghi chú đã chuẩn hóa; bảo đảm không bao giờ trả về `null`. |
+| `length` | Không có | `int` | Không có | Trả về số lượng ký tự của chuỗi ghi chú nội tại. |
+| `isEmpty` | Không có | `boolean` | Không có | Kiểm tra ghi chú có rỗng hay không; trả về `true` khi `value.isEmpty()`. |
+| `isPresent` | Không có | `boolean` | Không có | Kiểm tra ghi chú có chứa nội dung hay không; tương đương `!isEmpty()`. |
+| `compareTo` | `Note other` | `int` | Không có | So sánh thứ tự tự nhiên giữa hai ghi chú dựa trên giá trị chuỗi `value`; phục vụ sắp xếp danh sách nhật ký giao dịch. |
+| `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên thuộc tính `value` theo ngữ nghĩa đối tượng giá trị. |
+| `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên `value` phục vụ lưu trữ trong tập hợp. |
+| `toString` | Không có | `String` | Không có | Trả về chuỗi nội dung ghi chú `value` tương đương với phương thức `getValue()`. |
+
+**Tính bất biến và cơ chế so sánh**
+
+- Áp dụng mô hình Đối tượng Rỗng (Null Object Pattern): Lớp `Note` loại bỏ hoàn toàn các lỗi truy cập con trỏ rỗng (`NullPointerException`) bằng cách chuẩn hóa mọi đầu vào `null` hoặc khoảng trắng rỗng về thể hiện duy nhất `Note.EMPTY`. Các thực thể sở hữu không cần thực hiện kiểm tra `null` thủ công trước khi truy xuất chuỗi ghi chú.
+- Tính bất biến và kiểm soát giới hạn độ dài: Thuộc tính `value` được bảo vệ đóng gói `private final`; mọi thao tác chỉnh sửa ghi chú trong `Wallet.updateInfo()` hay `Transaction.updateDetails()` đều tạo thể hiện `Note` mới độc lập. Logic giới hạn độ dài tối đa 255 ký tự được tập trung tại một nơi duy nhất.
+- Cài đặt Comparable và Serializable: Lớp cài đặt giao diện `Comparable<Note>` và `java.io.Serializable`, bảo đảm khả năng sắp xếp từ điển và tính tương thích tuần tự hóa dữ liệu khi lưu trữ JSON hoặc sao lưu hệ thống.

@@ -1,7 +1,7 @@
 package com.pfms.domain.repository;
 
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.wallet.Wallet;
-import com.pfms.domain.model.wallet.WalletStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +17,9 @@ public interface WalletRepository extends GenericRepository<Wallet, UUID> {
 
     boolean existsByName(String name);
 
-    List<Wallet> findByStatus(WalletStatus status);
+    List<Wallet> findByStatus(EntityStatus status);
 
-    long countByStatus(WalletStatus status);
+    long countByStatus(EntityStatus status);
 
     Optional<Wallet> findDefaultWallet();
     // endregion

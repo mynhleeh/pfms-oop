@@ -1,5 +1,6 @@
 package com.pfms.domain.model.wallet;
 
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 
 /**
@@ -22,6 +23,6 @@ public interface WalletState {
     // endregion
 
     // region Queries
-    WalletStatus getStatus();
+    EntityStatus getStatus();
     // endregion
 }

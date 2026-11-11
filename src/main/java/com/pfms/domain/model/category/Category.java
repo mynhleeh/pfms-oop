@@ -2,6 +2,8 @@ package com.pfms.domain.model.category;
 
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
+import com.pfms.domain.model.common.EntityName;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.transaction.TransactionType;
 
 import java.util.Objects;
@@ -15,10 +17,10 @@ public class Category {
 
     // region State
     private final UUID categoryId;
-    private String name;
+    private EntityName name;
     private UUID needGroupId;
     private final TransactionType transactionType;
-    private CategoryStatus status;
+    private EntityStatus status;
     private String icon;
     private String color;
     // endregion
@@ -28,10 +30,10 @@ public class Category {
                     TransactionType transactionType, String icon, String color) {
 
         this.categoryId = Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
-        this.name = validateAndNormalizeName(name);
+        this.name = EntityName.of(name, "Tên danh mục");
         this.needGroupId = Objects.requireNonNull(needGroupId, "Mã nhóm nhu cầu không được để null");
         this.transactionType = Objects.requireNonNull(transactionType, "Loại thu chi không được để null");
-        this.status = CategoryStatus.ACTIVE;
+        this.status = EntityStatus.ACTIVE;
         this.icon = normalizeIcon(icon);
         this.color = normalizeColor(color);
     }
@@ -39,7 +41,7 @@ public class Category {
 
     // region Commands
     public void rename(String newName) {
-        this.name = validateAndNormalizeName(newName);
+        this.name = EntityName.of(newName, "Tên danh mục");
     }
 
     public void changeNeedGroup(UUID newNeedGroupId, TransactionType targetGroupType) {
@@ -59,7 +61,7 @@ public class Category {
     }
 
     public void markDeleted() {
-        this.status = CategoryStatus.DELETED;
+        this.status = EntityStatus.DELETED;
     }
 
     public void restore(boolean isParentGroupActive) {
@@ -67,7 +69,7 @@ public class Category {
             throw new BusinessException(ErrorCode.ERR_CAT_004,
                     "Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước.");
         }
-        this.status = CategoryStatus.ACTIVE;
+        this.status = EntityStatus.ACTIVE;
     }
     // endregion
 
@@ -77,6 +79,10 @@ public class Category {
     }
 
     public String getName() {
+        return this.name.getValue();
+    }
+
+    public EntityName getEntityName() {
         return this.name;
     }
 
@@ -88,7 +94,7 @@ public class Category {
         return this.transactionType;
     }
 
-    public CategoryStatus getStatus() {
+    public EntityStatus getStatus() {
         return this.status;
     }
 
@@ -101,27 +107,15 @@ public class Category {
     }
 
     public boolean isActive() {
-        return this.status == CategoryStatus.ACTIVE;
+        return this.status == EntityStatus.ACTIVE;
     }
 
     public boolean isDeleted() {
-        return this.status == CategoryStatus.DELETED;
+        return this.status == EntityStatus.DELETED;
     }
     // endregion
 
     // region Helpers
-    private static String validateAndNormalizeName(String rawName) {
-        if (rawName == null) {
-            throw new BusinessException(ErrorCode.ERR_NAM_001, "Tên danh mục không được để null.");
-        }
-        String trimmed = rawName.trim();
-        if (trimmed.isEmpty() || trimmed.length() > 50) {
-            throw new BusinessException(ErrorCode.ERR_NAM_001,
-                    "Tên phải có từ 1 đến 50 ký tự, không tính khoảng trắng ở hai đầu.");
-        }
-        return trimmed;
-    }
-
     private static String normalizeIcon(String rawIcon) {
         if (rawIcon == null) {
             return "";

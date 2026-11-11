@@ -2,6 +2,7 @@ package com.pfms.domain.model.category;
 
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.transaction.TransactionType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +53,7 @@ class CategoryTest {
             assertEquals("Ăn uống", category.getName());
             assertEquals(needGroupId, category.getNeedGroupId());
             assertEquals(TransactionType.EXPENSE, category.getTransactionType());
-            assertEquals(CategoryStatus.ACTIVE, category.getStatus());
+            assertEquals(EntityStatus.ACTIVE, category.getStatus());
             assertEquals("food-icon", category.getIcon());
             assertEquals("#FF5733", category.getColor());
             assertTrue(category.isActive());
@@ -274,7 +275,7 @@ class CategoryTest {
             category.markDeleted();
             assertFalse(category.isActive());
             assertTrue(category.isDeleted());
-            assertEquals(CategoryStatus.DELETED, category.getStatus());
+            assertEquals(EntityStatus.DELETED, category.getStatus());
         }
 
         @Test
@@ -289,7 +290,7 @@ class CategoryTest {
             category.restore(true);
             assertTrue(category.isActive());
             assertFalse(category.isDeleted());
-            assertEquals(CategoryStatus.ACTIVE, category.getStatus());
+            assertEquals(EntityStatus.ACTIVE, category.getStatus());
         }
 
         @Test
