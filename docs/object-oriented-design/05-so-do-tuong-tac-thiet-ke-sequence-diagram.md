@@ -64,7 +64,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 ### 5.2.1 Sơ đồ Tạo Mới Ví
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều phối khởi tạo ví mới, kiểm tra tính duy nhất của tên ví tại tầng dịch vụ, khởi tạo thực thể ví với số dư ban đầu bằng không và lưu trữ bản ghi vào kho dữ liệu)
+Luồng điều phối khởi tạo ví mới tiếp nhận yêu cầu từ giao diện, xác thực chuẩn định dạng tên ví và kiểm tra tính duy nhất trên toàn hệ thống trước khi khởi tạo thực thể ví với số dư ban đầu bằng không. Dữ liệu thực thể được ghi nhận bền vững xuống kho lưu trữ và chuyển đổi sang đối tượng truyền dữ liệu phản hồi về tầng trình diễn.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-01`
@@ -75,13 +75,42 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> WalletServiceImpl -> Wallet -> WalletRepository; kích hoạt đầy đủ thanh thực thi; sử dụng khung alt phân tách các nhánh ném ngoại lệ ValidationException với mã ERR-NAM-001 khi tên ví không hợp lệ, DuplicateEntityException với mã ERR-NAM-002 khi tên ví trùng lặp, và luồng thành công khởi tạo thực thể Wallet ở trạng thái ACTIVE với số dư ban đầu bằng không, lưu qua WalletRepository và phản hồi WalletResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant WalletService as WalletServiceImpl
+    participant WalletRepo as WalletRepository
+    participant Wallet as Wallet
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: ví mới luôn được khởi tạo với số dư bằng không thông qua đối tượng tiền tệ bất biến, loại trừ việc gán số dư tùy tiện khi chưa kiểm kê)
+    User->>+GUI: 1. Nhập tên ví, ghi chú và bấm "Lưu ví"
+    GUI->>+WalletService: 2. createWallet(requestDto)
+    alt Tên ví để trống hoặc vượt quá 50 ký tự
+        WalletService-->>GUI: 3. ném ValidationException
+        GUI-->>User: 4. Hiển thị thông báo tên ví không hợp lệ
+    else Tên ví hợp lệ về độ dài
+        WalletService->>+WalletRepo: 5. existsByName(trimmedName)
+        WalletRepo-->>-WalletService: 6. boolean isDuplicate
+        alt Tên ví đã tồn tại trong hệ thống
+            WalletService-->>GUI: 7. ném DuplicateEntityException
+            GUI-->>User: 8. Hiển thị thông báo tên ví đã tồn tại
+        else Tên ví hợp lệ và duy nhất
+            WalletService->>+Wallet: 9. new Wallet(walletId, trimmedName, trimmedNote, false)
+            Wallet-->>-WalletService: 10. newWallet
+            WalletService->>+WalletRepo: 11. save(newWallet)
+            WalletRepo-->>-WalletService: 12. savedWallet
+            WalletService-->>-GUI: 13. WalletResponseDto
+            GUI-->>-User: 14. Hiển thị thông báo tạo ví thành công và làm mới danh sách
+        end
+    end
+```
+
+Toàn vẹn tài chính được bảo đảm tuyệt đối khi thực thể ví mới luôn được khởi tạo với số dư ban đầu bằng không thông qua đối tượng giá trị bất biến `Money.ZERO`, loại trừ hoàn toàn rủi ro gán số dư tùy tiện khi chưa qua thủ tục kiểm kê thực tế.
 
 ### 5.2.2 Sơ đồ Xem Tổng hợp Số dư và Cơ cấu Ví
 
-(Mô tả khoảng 1 đến 2 câu về luồng truy vấn danh sách ví, tính lại số dư khả dụng tức thời và xác định tỷ trọng phân bổ tài sản toàn hệ thống ở chế độ chỉ đọc)
+Luồng truy vấn danh sách ví trích xuất toàn bộ nguồn tiền khả dụng, tính toán tổng tài sản tức thời và xác định tỷ trọng phân bổ tài sản toàn hệ thống ở chế độ chỉ đọc. Cơ chế tính toán áp dụng nguyên tắc làm tròn nửa chẵn và kiểm soát giá trị mẫu số triệt tiêu nhằm chống lỗi số học chia cho không.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-02`
@@ -92,13 +121,38 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> WalletServiceImpl -> WalletRepository -> Money; không có tham số đầu vào; WalletServiceImpl gọi WalletRepository.findAll nạp danh sách ví, tính tổng số dư toàn hệ thống; sử dụng khung alt xử lý trường hợp tổng tài sản bằng không thì gán tỷ trọng 0.00% cho mọi ví tránh lỗi chia cho không ERR-FIN-002, trường hợp tổng tài sản dương thì tính tỷ trọng phân bổ từng ví làm tròn ngân hàng hai chữ số thập phân, đóng gói kết quả và phản hồi WalletsSummaryDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant WalletService as WalletServiceImpl
+    participant WalletRepo as WalletRepository
+    participant Wallet as Wallet
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể ví nào trong hệ thống)
+    User->>+GUI: 1. Mở màn hình danh sách ví / Bảng điều khiển
+    GUI->>+WalletService: 2. getWalletsSummary(statusFilter)
+    WalletService->>+WalletRepo: 3. findAll()
+    WalletRepo-->>-WalletService: 4. List<Wallet>
+    alt Tổng số dư bằng 0
+        WalletService-->>GUI: 5. WalletsSummaryDto (Tỷ trọng 0.00%)
+        GUI-->>User: 6. Hiển thị tổng số dư 0.00 VNĐ và cơ cấu phân bổ 0%
+    else Tổng số dư lớn hơn 0
+        loop Duyệt qua từng ví trong danh sách
+            WalletService->>+Wallet: 7. getCurrentBalance()
+            Wallet-->>-WalletService: 8. currentBalance
+        end
+        Note over WalletService: Tính tỷ trọng % theo làm tròn nửa chẵn (HALF_EVEN)
+        WalletService-->>-GUI: 9. WalletsSummaryDto (Kèm tỷ trọng phân bổ)
+        GUI-->>-User: 10. Cập nhật bảng dữ liệu ví, tổng tài sản và biểu đồ cơ cấu
+    end
+```
+
+Thao tác vận hành hoàn toàn ở chế độ chỉ đọc, truy xuất thông tin qua các phương thức đọc bất biến và không làm thay đổi trạng thái nội tại của bất kỳ thực thể ví nào trong hệ thống.
 
 ### 5.2.3 Sơ đồ Cập nhật Thông tin Ví
 
-(Mô tả khoảng 1 đến 2 câu về luồng cập nhật tên gọi và ghi chú mô tả của ví hiện có, bảo đảm kiểm soát tính duy nhất của tên mới mà không làm xáo trộn số dư tài chính)
+Luồng cập nhật thông tin ví tiếp nhận tên gọi và ghi chú mới từ giao diện người dùng, kiểm tra sự tồn tại của nguồn tiền, xác thực quy chuẩn định dạng và kiểm tra tính duy nhất trước khi ủy quyền thực thể cập nhật thuộc tính. Mã định danh và số dư khả dụng hiện hành được bảo toàn nguyên vẹn xuyên suốt quá trình xử lý.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-03`
@@ -109,13 +163,51 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> WalletServiceImpl -> Wallet -> WalletRepository; tiếp nhận UpdateWalletRequestDto; WalletServiceImpl gọi WalletRepository.findById, sử dụng khung alt ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy ví; kiểm tra định dạng tên ném ValidationException với mã ERR-NAM-001; nếu đổi tên mới thì gọi WalletRepository.existsByName ném DuplicateEntityException với mã ERR-NAM-002 khi bị trùng; nạp thực thể Wallet, cập nhật tên và ghi chú qua phương thức nội tại, gọi WalletRepository.save lưu thay đổi và phản hồi WalletResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant WalletService as WalletServiceImpl
+    participant WalletRepo as WalletRepository
+    participant Wallet as Wallet
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc cập nhật thông tin định danh giữ nguyên mã định danh và số dư hiện hành, không làm đứt gãy lịch sử liên kết giao dịch)
+    User->>+GUI: 1. Nhập tên mới, ghi chú mới và bấm "Cập nhật"
+    GUI->>+WalletService: 2. updateWallet(requestDto)
+    WalletService->>+WalletRepo: 3. findById(walletId)
+    WalletRepo-->>-WalletService: 4. Optional<Wallet> walletOpt
+    alt Không tìm thấy ví
+        WalletService-->>GUI: 5. ném EntityNotFoundException
+        GUI-->>User: 6. Hiển thị thông báo không tìm thấy ví
+    else Tìm thấy thực thể ví
+        alt Tên ví mới để trống hoặc vượt quá 50 ký tự
+            WalletService-->>GUI: 7. ném ValidationException
+            GUI-->>User: 8. Hiển thị thông báo tên ví không hợp lệ
+        else Tên mới khác tên hiện tại và đã tồn tại trong hệ thống
+            WalletService->>+WalletRepo: 9. existsByName(trimmedNewName)
+            WalletRepo-->>-WalletService: 10. boolean isDuplicate (true)
+            WalletService-->>GUI: 11. ném DuplicateEntityException
+            GUI-->>User: 12. Hiển thị thông báo tên ví đã tồn tại
+        else Tên mới hợp lệ và không bị trùng
+            opt Tên mới khác tên hiện tại
+                WalletService->>+WalletRepo: 13. existsByName(trimmedNewName)
+                WalletRepo-->>-WalletService: 14. boolean isDuplicate (false)
+            end
+            WalletService->>+Wallet: 15. updateInfo(trimmedNewName, trimmedNewNote)
+            Wallet-->>-WalletService: 16. void
+            WalletService->>+WalletRepo: 17. save(wallet)
+            WalletRepo-->>-WalletService: 18. updatedWallet
+            WalletService-->>-GUI: 19. WalletResponseDto
+            GUI-->>-User: 20. Đóng hộp thoại và làm mới danh sách ví
+        end
+    end
+```
+
+Việc cập nhật thông tin định danh giữ nguyên mã định danh `walletId` và số dư khả dụng `currentBalance`, bảo đảm không làm đứt gãy tính toàn vẹn tham chiếu của các giao dịch lịch sử gắn liền với ví.
 
 ### 5.2.4 Sơ đồ Điều chỉnh Số dư Ví Thực tế
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều chỉnh số dư ví khớp với kết quả kiểm kê thực tế, ghi nhận chênh lệch kiểm kê và lưu vết kiểm toán cố định)
+Luồng điều chỉnh số dư ví đồng bộ số dư trên hệ thống khớp với kết quả kiểm kê thực tế của người dùng. Chuỗi tương tác xác thực tính hợp lệ của số dư thực tế, kiểm tra trạng thái hoạt động của ví, cập nhật số dư mới và khởi tạo bản ghi kiểm kê bất biến để lưu vết kiểm toán tài chính cố định.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-WAL-04`
@@ -126,9 +218,46 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> WalletServiceImpl -> Wallet -> WalletRepository -> BalanceAdjustmentRepository; tiếp nhận AdjustBalanceRequestDto; WalletServiceImpl kiểm tra số dư thực tế không âm ném ValidationException với mã ERR-FIN-001 nếu vi phạm; gọi WalletRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu ví không tồn tại hoặc không ở trạng thái ACTIVE; từ chối nếu số dư thực tế trùng số dư hiện tại; ủy quyền Wallet tính chênh lệch và cập nhật số dư, khởi tạo bản ghi BalanceAdjustmentRecord bất biến, lưu đồng thời qua WalletRepository và BalanceAdjustmentRepository, phản hồi BalanceAdjustmentResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant WalletService as WalletServiceImpl
+    participant WalletRepo as WalletRepository
+    participant AdjustRepo as BalanceAdjustmentRepository
+    participant Wallet as Wallet
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: mọi chênh lệch kiểm kê bắt buộc tạo bản ghi điều chỉnh bất biến để lưu vết kiểm toán, số dư khả dụng mới luôn duy trì không âm)
+    User->>+GUI: 1. Nhập số dư thực tế, lý do kiểm kê và bấm "Xác nhận kiểm kê"
+    GUI->>+WalletService: 2. adjustBalance(requestDto)
+    alt Số dư thực tế âm (< 0)
+        WalletService-->>GUI: 3. ném ValidationException
+        GUI-->>User: 4. Hiển thị thông báo số dư thực tế không được âm
+    else Số dư thực tế hợp lệ
+        WalletService->>+WalletRepo: 5. findById(walletId)
+        WalletRepo-->>-WalletService: 6. Optional<Wallet> walletOpt
+        alt Ví không tồn tại hoặc không ở trạng thái ACTIVE
+            WalletService-->>GUI: 7. ném EntityNotFoundException
+            GUI-->>User: 8. Hiển thị thông báo ví không khả dụng
+        else Ví tồn tại và đang hoạt động (ACTIVE)
+            alt Số dư thực tế trùng khớp số dư hiện tại (độ lệch bằng 0)
+                WalletService-->>GUI: 9. ném BusinessException
+                GUI-->>User: 10. Hiển thị thông báo không có chênh lệch số dư kiểm kê
+            else Có phát sinh chênh lệch
+                WalletService->>+Wallet: 11. adjustBalance(actualBalance, date, reason)
+                Wallet-->>-WalletService: 12. BalanceAdjustmentRecord record
+                WalletService->>+WalletRepo: 13. save(wallet)
+                WalletRepo-->>-WalletService: 14. savedWallet
+                WalletService->>+AdjustRepo: 15. save(record)
+                AdjustRepo-->>-WalletService: 16. savedRecord
+                WalletService-->>-GUI: 17. BalanceAdjustmentResponseDto
+                GUI-->>-User: 18. Đóng hộp thoại, cập nhật số dư ví và hiển thị thông báo thành công
+            end
+        end
+    end
+```
+
+Mọi chênh lệch kiểm kê bắt buộc khởi tạo bản ghi kiểm kê bất biến `BalanceAdjustmentRecord` để lưu giữ vết kiểm toán độc lập, bảo đảm số dư khả dụng mới luôn duy trì giá trị không âm và không làm xáo trộn các số liệu thu chi nguyên thủy.
 
 ## 5.3 Sơ đồ Tuần tự Nhóm Ghi nhận Thu Chi
 
@@ -138,7 +267,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 ### 5.3.1 Sơ đồ Ghi nhận Giao dịch Thu Chi
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều phối ghi nhận giao dịch thu nhập hoặc chi tiêu kèm chi phí phát sinh, xác thực danh mục hợp lệ và cập nhật số dư ví)
+Luồng điều phối ghi nhận giao dịch thu chi tiếp nhận thông tin thu nhập hoặc chi tiêu kèm chi phí phát sinh (nếu có), xác thực tính hợp lệ của nguồn tiền và danh mục chi tiết, kiểm soát số dư ví khả dụng không âm trước khi khởi tạo thực thể và lưu trữ đồng thời vào kho dữ liệu.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TXN-01`
@@ -149,13 +278,68 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransactionServiceImpl -> WalletRepository -> CategoryRepository -> Wallet -> IncomeExpenseTransaction -> TransactionRepository; tiếp nhận RecordTransactionRequestDto; TransactionServiceImpl kiểm tra số tiền hợp lệ ném ValidationException với mã ERR-FIN-001; nạp ví từ WalletRepository ném EntityNotFoundException với mã ERR-WAL-001 nếu ví không tồn tại hoặc không ở trạng thái ACTIVE; nạp danh mục từ CategoryRepository ném ValidationException với mã ERR-CAT-001 nếu danh mục sai cấp hoặc đã xóa; kiểm tra chi phí phát sinh nếu có ném ERR-FEE-001 đến ERR-FEE-003; kiểm tra số dư ví khả dụng ném BusinessRuleException với mã ERR-WAL-001 nếu chi tiêu vượt quá số dư; khởi tạo thực thể IncomeExpenseTransaction kèm TransactionFee nếu có, ủy quyền Wallet cập nhật số dư, lưu đồng thời qua TransactionRepository và WalletRepository, phản hồi TransactionResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant TransactionService as TransactionServiceImpl
+    participant WalletRepo as WalletRepository
+    participant CatRepo as CategoryRepository
+    participant TxnRepo as TransactionRepository
+    participant Transaction as IncomeExpenseTransaction
+    participant Wallet as Wallet
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: mọi giao dịch chi tiêu và chi phí liên kết bắt buộc kiểm soát số dư khả dụng không âm trước khi ghi nhận lưu trữ)
+    User->>+GUI: 1. Nhập thông tin giao dịch (ví, danh mục, số tiền, ngày, phí) và bấm "Lưu"
+    GUI->>+TransactionService: 2. recordIncomeExpense(requestDto)
+    alt Số tiền <= 0 hoặc phí < 0
+        TransactionService-->>GUI: 3. ném ValidationException
+        GUI-->>User: 4. Hiển thị thông báo số tiền hoặc chi phí không hợp lệ
+    else Có phí phát sinh nhưng chưa chọn danh mục phí
+        TransactionService-->>GUI: 5. ném BusinessException
+        GUI-->>User: 6. Hiển thị thông báo chọn danh mục cho phí giao dịch
+    else Dữ liệu hợp lệ
+        TransactionService->>+WalletRepo: 7. findById(walletId)
+        WalletRepo-->>-TransactionService: 8. Optional<Wallet> walletOpt
+        alt Ví không tồn tại hoặc không hoạt động
+            TransactionService-->>GUI: 9. ném EntityNotFoundException
+            GUI-->>User: 10. Hiển thị thông báo ví không khả dụng
+        else Ví hợp lệ và đang hoạt động
+            TransactionService->>+CatRepo: 11. findById(categoryId)
+            CatRepo-->>-TransactionService: 12. Optional<Category> catOpt
+            alt Danh mục không tồn tại hoặc đã bị xóa
+                TransactionService-->>GUI: 13. ném EntityNotFoundException
+                GUI-->>User: 14. Hiển thị thông báo danh mục không hợp lệ
+            else Danh mục hợp lệ
+                opt Có phí phát sinh (feeAmount > 0)
+                    TransactionService->>+CatRepo: 15. findById(feeCategoryId)
+                    CatRepo-->>-TransactionService: 16. Optional<Category> feeCatOpt
+                end
+                alt Số dư ví không đủ chi trả (tiền chi + phí)
+                    TransactionService-->>GUI: 17. ném InsufficientBalanceException
+                    GUI-->>User: 18. Hiển thị cảnh báo số dư ví không đủ
+                else Số dư ví khả dụng đủ chi trả
+                    TransactionService->>+Transaction: 19. create(txnId, walletId, categoryId, amount, date, fee)
+                    Transaction-->>-TransactionService: 20. newTransaction
+                    TransactionService->>+Wallet: 21. applyTransaction(newTransaction)
+                    Wallet-->>-TransactionService: 22. void
+                    TransactionService->>+TxnRepo: 23. save(newTransaction)
+                    TxnRepo-->>-TransactionService: 24. savedTransaction
+                    TransactionService->>+WalletRepo: 25. save(wallet)
+                    WalletRepo-->>-TransactionService: 26. savedWallet
+                    TransactionService-->>-GUI: 27. TransactionResponseDto
+                    GUI-->>-User: 28. Đóng hộp thoại, làm mới sổ giao dịch và cập nhật số dư ví
+                end
+            end
+        end
+    end
+```
+
+Mọi giao dịch chi tiêu và chi phí liên kết bắt buộc kiểm soát số dư khả dụng không âm trước khi ghi nhận, bảo đảm dữ liệu luôn nhất quán giữa sổ giao dịch và số dư ví.
 
 ### 5.3.2 Sơ đồ Tra cứu và Lọc Lịch sử Giao dịch
 
-(Mô tả khoảng 1 đến 2 câu về luồng truy vấn danh sách lịch sử giao dịch thu chi theo các tiêu chí thời gian, nguồn tiền và danh mục phân loại ở chế độ chỉ đọc)
+Luồng tra cứu và trích xuất lịch sử giao dịch vận hành hoàn toàn ở chế độ chỉ đọc. Chuỗi tương tác tiếp nhận các tiêu chí lọc thời gian, nguồn tiền, danh mục, kiểm tra tính hợp lệ của khoảng ngày, nạp dữ liệu và tính toán tổng dòng tiền trước khi đóng gói phản hồi về tầng trình diễn.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TXN-02`
@@ -166,13 +350,33 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransactionServiceImpl -> TransactionRepository; tiếp nhận FilterTransactionsRequestDto; TransactionServiceImpl kiểm tra tính hợp lệ của khoảng thời gian lọc ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu sau ngày kết thúc; chuyển đổi tiêu chí lọc và gọi TransactionRepository.findByCriteria nạp danh sách giao dịch thỏa mãn; sắp xếp kết quả theo thứ tự ngày phát sinh giảm dần, đóng gói và phản hồi TransactionListResponseDto về tầng trình diễn)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant TransactionService as TransactionServiceImpl
+    participant TxnRepo as TransactionRepository
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi dữ liệu hay trạng thái của các thực thể giao dịch)
+    User->>+GUI: 1. Chọn tiêu chí lọc (khoảng ngày, ví, danh mục) và bấm "Tìm kiếm"
+    GUI->>+TransactionService: 2. filterTransactions(filterCriteriaDto)
+    alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
+        TransactionService-->>GUI: 3. ném ValidationException
+        GUI-->>User: 4. Hiển thị thông báo khoảng thời gian lọc không hợp lệ
+    else Khoảng thời gian lọc hợp lệ
+        TransactionService->>+TxnRepo: 5. findByDateRange(...) hoặc findByWalletId / findByCategoryId
+        TxnRepo-->>-TransactionService: 6. List<Transaction> rawTransactions
+        Note over TransactionService: Lọc theo tiêu chí, sắp xếp theo ngày giảm dần,<br/>tính tổng thu, tổng chi và dòng tiền thuần
+        TransactionService-->>-GUI: 7. TransactionListResponseDto
+        GUI-->>-User: 8. Cập nhật bảng danh sách giao dịch và bảng chỉ số tổng hợp
+    end
+```
+
+Thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi dữ liệu hay trạng thái của các thực thể giao dịch và số dư nguồn tiền trong hệ thống.
 
 ### 5.3.3 Sơ đồ Chỉnh sửa Giao dịch Thu Chi
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều chỉnh thông tin giao dịch đã ghi nhận, áp dụng cơ chế hoàn nguyên hai pha để kiểm soát số dư ví an toàn)
+Luồng chỉnh sửa giao dịch điều phối việc cập nhật thông tin khoản thu chi đã ghi nhận, áp dụng quy trình kiểm soát hoàn nguyên an toàn nhằm bảo đảm số dư ví sau điều chỉnh luôn thỏa mãn ràng buộc không âm.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TXN-03`
@@ -183,13 +387,60 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransactionServiceImpl -> TransactionRepository -> WalletRepository -> CategoryRepository -> Wallet -> IncomeExpenseTransaction; tiếp nhận UpdateTransactionRequestDto; TransactionServiceImpl nạp giao dịch cũ từ TransactionRepository ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy; nạp ví liên kết; thực hiện hoàn nguyên số tiền và phí cũ về ví; kiểm tra điều kiện áp dụng số tiền và danh mục mới, ném ngoại lệ tương ứng nếu vi phạm hoặc không đủ số dư ví sau khi sửa với mã ERR-WAL-001; cập nhật thuộc tính giao dịch, hạch toán số dư ví mới, lưu đồng thời qua TransactionRepository và WalletRepository, phản hồi TransactionResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant TransactionService as TransactionServiceImpl
+    participant TxnRepo as TransactionRepository
+    participant WalletRepo as WalletRepository
+    participant CatRepo as CategoryRepository
+    participant Wallet as Wallet
+    participant Transaction as IncomeExpenseTransaction
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: cơ chế hoàn nguyên hai pha bảo đảm giao dịch chỉ được cập nhật khi số dư ví sau điều chỉnh thỏa mãn ràng buộc không âm)
+    User->>+GUI: 1. Nhập thông tin chỉnh sửa giao dịch và bấm "Cập nhật"
+    GUI->>+TransactionService: 2. updateTransaction(requestDto)
+    TransactionService->>+TxnRepo: 3. findById(transactionId)
+    TxnRepo-->>-TransactionService: 4. Optional<Transaction> oldTxnOpt
+    alt Không tìm thấy giao dịch
+        TransactionService-->>GUI: 5. ném EntityNotFoundException
+        GUI-->>User: 6. Hiển thị thông báo không tìm thấy giao dịch
+    else Tìm thấy giao dịch
+        TransactionService->>+WalletRepo: 7. findById(walletId)
+        WalletRepo-->>-TransactionService: 8. Optional<Wallet> walletOpt
+        TransactionService->>+CatRepo: 9. findById(newCategoryId)
+        CatRepo-->>-TransactionService: 10. Optional<Category> newCatOpt
+        alt Ví hoặc danh mục mới không tồn tại / không hợp lệ
+            TransactionService-->>GUI: 11. ném EntityNotFoundException
+            GUI-->>User: 12. Hiển thị thông báo lỗi danh mục hoặc ví không hợp lệ
+        else Thông tin hợp lệ
+            alt Số dư ví sau khi sửa bị âm (balanceAfterUpdate < 0)
+                TransactionService-->>GUI: 13. ném InsufficientBalanceException
+                GUI-->>User: 14. Hiển thị cảnh báo số dư ví không đủ để áp dụng thay đổi
+            else Số dư ví sau khi sửa hợp lệ (>= 0)
+                TransactionService->>+Transaction: 15. revertFromWallet(wallet)
+                Transaction-->>-TransactionService: 16. void
+                TransactionService->>+Transaction: 17. updateDetails(newAmount, newDate, newCategoryId, newFee)
+                Transaction-->>-TransactionService: 18. void
+                TransactionService->>+Transaction: 19. applyToWallet(wallet)
+                Transaction-->>-TransactionService: 20. void
+                TransactionService->>+TxnRepo: 21. save(txn)
+                TxnRepo-->>-TransactionService: 22. updatedTxn
+                TransactionService->>+WalletRepo: 23. save(wallet)
+                WalletRepo-->>-TransactionService: 24. updatedWallet
+                TransactionService-->>-GUI: 25. TransactionResponseDto
+                GUI-->>-User: 26. Đóng hộp thoại, làm mới sổ giao dịch và cập nhật số dư ví
+            end
+        end
+    end
+```
+
+Quy trình kiểm soát hai pha bảo đảm giao dịch chỉ được chấp nhận cập nhật khi trạng thái số dư ví sau điều chỉnh duy trì không âm, loại trừ nguy cơ xuất quỹ vượt quá khả năng tài chính.
 
 ### 5.3.4 Sơ đồ Xóa Giao dịch Thu Chi
 
-(Mô tả khoảng 1 đến 2 câu về luồng loại bỏ giao dịch khỏi hệ thống, phục hồi trạng thái số dư ví gốc và giải phóng các chi phí phụ thuộc liên kết)
+Luồng xóa giao dịch loại bỏ bản ghi thu chi khỏi hệ thống, thu hồi khoản chi tiêu hoặc hoàn trả khoản thu nhập về ví nguồn, đồng thời xóa sạch bản ghi chi phí phụ thuộc liên kết.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TXN-04`
@@ -200,9 +451,44 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransactionServiceImpl -> TransactionRepository -> WalletRepository -> Wallet; tiếp nhận transactionId; TransactionServiceImpl gọi TransactionRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy; nạp ví liên kết; kiểm tra ràng buộc hoàn tác nếu là giao dịch thu nhập thì trừ tiền ví, ném BusinessRuleException với mã ERR-WAL-001 nếu số dư ví hiện tại không đủ để hoàn tác; ủy quyền Wallet phục hồi số dư, gọi TransactionRepository.deleteById xóa bản ghi giao dịch và chi phí liên kết, gọi WalletRepository.save lưu số dư ví đã phục hồi, phản hồi thông báo xóa thành công)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant TransactionService as TransactionServiceImpl
+    participant TxnRepo as TransactionRepository
+    participant WalletRepo as WalletRepository
+    participant Transaction as IncomeExpenseTransaction
+    participant Wallet as Wallet
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: việc xóa giao dịch loại bỏ hoàn toàn các bản ghi chi phí phụ thuộc nhằm chống phát sinh dữ liệu mồ côi và bảo toàn số dư không âm)
+    User->>+GUI: 1. Chọn giao dịch và bấm "Xóa giao dịch"
+    GUI->>+TransactionService: 2. deleteTransaction(transactionId)
+    TransactionService->>+TxnRepo: 3. findById(transactionId)
+    TxnRepo-->>-TransactionService: 4. Optional<Transaction> txnOpt
+    alt Không tìm thấy giao dịch
+        TransactionService-->>GUI: 5. ném EntityNotFoundException
+        GUI-->>User: 6. Hiển thị thông báo không tìm thấy giao dịch
+    else Tìm thấy giao dịch cần xóa
+        TransactionService->>+WalletRepo: 7. findById(walletId)
+        WalletRepo-->>-TransactionService: 8. Optional<Wallet> walletOpt
+        alt Là giao dịch thu nhập và số dư ví không đủ để trừ hoàn nguyên
+            TransactionService-->>GUI: 9. ném InsufficientBalanceException
+            GUI-->>User: 10. Hiển thị cảnh báo số dư ví không đủ để hoàn tác khoản thu
+        else Đủ điều kiện hoàn tác (hoặc là giao dịch chi tiêu)
+            TransactionService->>+Transaction: 11. revertFromWallet(wallet)
+            Transaction-->>-TransactionService: 12. void
+            TransactionService->>+TxnRepo: 13. deleteById(transactionId)
+            TxnRepo-->>-TransactionService: 14. boolean (deleted)
+            TransactionService->>+WalletRepo: 15. save(wallet)
+            WalletRepo-->>-TransactionService: 16. savedWallet
+            TransactionService-->>-GUI: 17. phản hồi xóa thành công
+            GUI-->>-User: 18. Đóng hộp thoại, làm mới sổ giao dịch và cập nhật số dư ví
+        end
+    end
+```
+
+Việc xóa giao dịch đồng thời thu hồi hoặc hoàn trả số dư ví và loại bỏ hoàn toàn các bản ghi chi phí phụ thuộc liên kết, triệt tiêu nguy cơ phát sinh dữ liệu chi phí mồ côi và bảo đảm số dư không âm.
 
 ## 5.4 Sơ đồ Tuần tự Nhóm Chuyển tiền Nội bộ
 
@@ -212,7 +498,7 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 ### 5.4.1 Sơ đồ Chuyển tiền giữa Hai Ví
 
-(Mô tả khoảng 1 đến 2 câu về luồng điều phối chuyển tiền từ ví nguồn sang ví đích, kiểm tra điều kiện hai ví phân biệt, kiểm tra số dư khả dụng ví nguồn đủ chi trả khoản chuyển cùng chi phí, trừ tiền ví nguồn, cộng tiền ví đích và lưu vết giao dịch)
+Luồng điều phối chuyển tiền từ ví nguồn sang ví đích kiểm tra tính phân biệt của cặp ví, xác thực số tiền chuyển và chi phí hợp lệ, kiểm tra số dư ví nguồn đủ thanh toán tổng tiền chuyển cùng phí trước khi cập nhật đồng thời số dư hai ví và lưu vết giao dịch.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TRF-01`
@@ -223,13 +509,69 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransferServiceImpl -> WalletRepository -> TransferRepository -> TransactionFeeRepository -> Wallet; tiếp nhận TransferRequestDto; TransferServiceImpl kiểm tra hai ví phân biệt ném BusinessRuleException với mã ERR-TRF-001 nếu trùng; kiểm tra số tiền dương ném ValidationException với mã ERR-TRF-002 nếu nhỏ hơn hoặc bằng không; gọi WalletRepository.findById nạp ví nguồn và ví đích, ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy ví hoặc ví không ở trạng thái ACTIVE; kiểm tra chi phí giao dịch ném ValidationException với mã ERR-FEE-001 nếu âm hoặc ERR-FEE-002 nếu thiếu danh mục chi phí khi feeAmount lớn hơn không; kiểm tra số dư ví nguồn ném BusinessRuleException với mã ERR-WAL-001 nếu không đủ thanh toán tổng số tiền chuyển và phí; thực thi chuyển tiền nguyên tử bằng cách trừ tiền ví nguồn, cộng tiền ví đích; khởi tạo TransferTransaction và TransactionFee liên kết nếu có; gọi WalletRepository.save lưu cập nhật hai ví, TransferRepository.save lưu giao dịch chuyển tiền và TransactionFeeRepository.save lưu chi phí; phản hồi TransferResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant TransferService as TransferServiceImpl
+    participant WalletRepo as WalletRepository
+    participant CatRepo as CategoryRepository
+    participant TxnRepo as TransactionRepository
+    participant Transfer as TransferTransaction
+    participant SourceWallet as SourceWallet
+    participant DestWallet as DestWallet
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: giao dịch chuyển tiền được thực hiện theo cơ chế nguyên tử bảo đảm tổng tài sản toàn hệ thống được bảo toàn ngoại trừ phần chi phí phát sinh thực tế và số dư ví nguồn luôn duy trì không âm)
+    User->>+GUI: 1. Nhập thông tin chuyển tiền (ví nguồn, ví đích, số tiền, ngày, phí) và bấm "Chuyển tiền"
+    GUI->>+TransferService: 2. transferFunds(requestDto)
+    alt Ví nguồn trùng với ví đích
+        TransferService-->>GUI: 3. ném BusinessException
+        GUI-->>User: 4. Hiển thị thông báo ví chuyển và nhận phải khác nhau
+    else Số tiền chuyển <= 0 hoặc phí < 0
+        TransferService-->>GUI: 5. ném ValidationException
+        GUI-->>User: 6. Hiển thị thông báo số tiền hoặc chi phí không hợp lệ
+    else Có phí phát sinh nhưng chưa chọn danh mục phí
+        TransferService-->>GUI: 7. ném BusinessException
+        GUI-->>User: 8. Hiển thị thông báo chọn danh mục cho phí chuyển tiền
+    else Dữ liệu đầu vào hợp lệ
+        TransferService->>+WalletRepo: 9. findById(sourceWalletId)
+        WalletRepo-->>-TransferService: 10. Optional<Wallet> sourceOpt
+        TransferService->>+WalletRepo: 11. findById(destWalletId)
+        WalletRepo-->>-TransferService: 12. Optional<Wallet> destOpt
+        alt Một trong hai ví không tồn tại hoặc không hoạt động
+            TransferService-->>GUI: 13. ném EntityNotFoundException
+            GUI-->>User: 14. Hiển thị thông báo ví chuyển hoặc nhận không khả dụng
+        else Cả hai ví hợp lệ và đang hoạt động
+            alt Ví nguồn không đủ số dư chi trả (tiền chuyển + phí)
+                TransferService-->>GUI: 15. ném InsufficientBalanceException
+                GUI-->>User: 16. Hiển thị cảnh báo số dư ví nguồn không đủ
+            else Ví nguồn đủ số dư chi trả
+                critical Chuyển tiền nguyên tử hai chiều
+                    TransferService->>+Transfer: 17. create(transferId, sourceId, destId, amount, date, fee)
+                    Transfer-->>-TransferService: 18. newTransferInstance
+                    TransferService->>+SourceWallet: 19. debit(amount + feeAmount)
+                    SourceWallet-->>-TransferService: 20. void
+                    TransferService->>+DestWallet: 21. credit(amount)
+                    DestWallet-->>-TransferService: 22. void
+                    TransferService->>+WalletRepo: 23. save(sourceWallet)
+                    WalletRepo-->>-TransferService: 24. savedSourceWallet
+                    TransferService->>+WalletRepo: 25. save(destWallet)
+                    WalletRepo-->>-TransferService: 26. savedDestWallet
+                    TransferService->>+TxnRepo: 27. save(newTransferInstance)
+                    TxnRepo-->>-TransferService: 28. savedTransfer
+                end
+                TransferService-->>-GUI: 29. TransferResponseDto
+                GUI-->>-User: 30. Đóng hộp thoại, làm mới lịch sử và cập nhật số dư hai ví
+            end
+        end
+    end
+```
+
+Giao dịch chuyển tiền được thực hiện theo cơ chế nguyên tử bảo đảm tổng tài sản toàn hệ thống được bảo toàn (trừ phần chi phí phát sinh thực tế), đồng thời số dư ví nguồn luôn duy trì không âm.
 
 ### 5.4.2 Sơ đồ Tra cứu Lịch sử Chuyển tiền
 
-(Mô tả khoảng 1 đến 2 câu về luồng truy vấn và lọc danh sách giao dịch chuyển tiền theo khoảng thời gian và ví liên quan ở chế độ chỉ đọc)
+Luồng truy vấn và trích xuất lịch sử chuyển tiền vận hành hoàn toàn ở chế độ chỉ đọc. Chuỗi tương tác nạp các giao dịch chuyển tiền theo khoảng thời gian và cặp ví liên quan, tính tổng tiền chuyển và chi phí phát sinh trước khi đóng gói phản hồi về tầng trình diễn.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TRF-02`
@@ -240,13 +582,38 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransferServiceImpl -> TransferRepository -> WalletRepository; tiếp nhận TransferFilterCriteriaDto; TransferServiceImpl kiểm tra tính hợp lệ của khoảng thời gian, sử dụng khung alt ném ValidationException với mã ERR-FIN-001 nếu ngày bắt đầu lớn hơn ngày kết thúc; gọi TransferRepository.findByCriteria truy vấn danh sách giao dịch thỏa mãn điều kiện lọc kèm chi phí liên kết; sắp xếp kết quả theo ngày giao dịch giảm dần; nạp tên các ví liên quan qua WalletRepository nếu cần hiển thị trực quan; tính tổng tiền chuyển và tổng phí phát sinh; đóng gói và phản hồi TransferHistoryResponseDto)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant TransferService as TransferServiceImpl
+    participant TxnRepo as TransactionRepository
+    participant WalletRepo as WalletRepository
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm thay đổi trạng thái của các thực thể giao dịch hay số dư của bất kỳ ví nào trong hệ thống)
+    User->>+GUI: 1. Chọn tiêu chí lọc (khoảng ngày, ví nguồn, ví đích) và bấm "Tìm kiếm"
+    GUI->>+TransferService: 2. filterTransfers(criteriaDto)
+    alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
+        TransferService-->>GUI: 3. ném ValidationException
+        GUI-->>User: 4. Hiển thị thông báo khoảng thời gian lọc không hợp lệ
+    else Khoảng thời gian lọc hợp lệ
+        TransferService->>+TxnRepo: 5. findByDateRange(startDate, endDate)
+        TxnRepo-->>-TransferService: 6. List<Transaction> allTransactions
+        Note over TransferService: Lọc giao dịch TransferTransaction, tính tổng tiền chuyển và phí
+        loop Với mỗi giao dịch chuyển tiền trong danh sách
+            TransferService->>+WalletRepo: 7. findById(sourceId), findById(destId)
+            WalletRepo-->>-TransferService: 8. Optional<Wallet> (Lấy tên ví hiển thị)
+        end
+        TransferService-->>-GUI: 9. TransferHistoryResponseDto
+        GUI-->>-User: 10. Cập nhật bảng dữ liệu lịch sử chuyển tiền và bảng tổng hợp
+    end
+```
+
+Thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm thay đổi trạng thái của các thực thể giao dịch hay số dư của bất kỳ ví nào trong hệ thống.
 
 ### 5.4.3 Sơ đồ Xóa và Hoàn tác Giao dịch Chuyển tiền
 
-(Mô tả khoảng 1 đến 2 câu về luồng hủy giao dịch chuyển tiền, hoàn nguyên đồng thời số dư của hai ví liên quan và xóa bản ghi chi phí phát sinh)
+Luồng hủy giao dịch chuyển tiền thực hiện thu hồi tiền chuyển từ ví đích, hoàn trả tiền chuyển cùng khoản phí về ví nguồn, đồng thời xóa sạch bản ghi chuyển tiền và chi phí phát sinh liên kết.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-TRF-03`
@@ -257,9 +624,51 @@ Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều ph
 
 **Sơ đồ tuần tự tương tác:**
 
-(Vẽ sơ đồ tuần tự chi tiết mô tả luồng tương tác qua bốn tầng kiến trúc: User -> GUI -> TransferServiceImpl -> TransferRepository -> WalletRepository -> TransactionFeeRepository -> Wallet; tiếp nhận transferId; TransferServiceImpl gọi TransferRepository.findById ném EntityNotFoundException với mã ERR-WAL-001 nếu không tìm thấy giao dịch; nạp ví nguồn và ví đích qua WalletRepository; kiểm tra ràng buộc hoàn tác: số dư khả dụng hiện tại của ví đích phải lớn hơn hoặc bằng số tiền chuyển, ném BusinessRuleException với mã ERR-WAL-001 nếu ví đích không đủ số dư để hoàn trả tránh làm âm ví; thực hiện hoàn nguyên hai pha: cộng hoàn trả số tiền chuyển cùng phí vào ví nguồn, trừ số tiền chuyển khỏi ví đích; gọi TransferRepository.deleteById xóa bản ghi chuyển tiền và xóa bản ghi TransactionFee liên kết nếu có; gọi WalletRepository.save lưu cập nhật trạng thái hai ví; phản hồi thông báo xóa thành công)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant GUI as Tầng Trình diễn
+    participant TransferService as TransferServiceImpl
+    participant TxnRepo as TransactionRepository
+    participant WalletRepo as WalletRepository
+    participant Transfer as TransferTransaction
+    participant SourceWallet as SourceWallet
+    participant DestWallet as DestWallet
 
-(Mô tả khoảng 1 câu về việc bảo đảm tính toàn vẹn: cơ chế hoàn nguyên hai pha bảo đảm thu hồi đồng thời số dư cả hai ví và xóa sạch các bản ghi chi phí phụ thuộc, ngăn chặn tuyệt đối tình trạng âm số dư ví đích)
+    User->>+GUI: 1. Chọn giao dịch chuyển tiền và bấm "Xóa/Hủy chuyển tiền"
+    GUI->>+TransferService: 2. deleteTransfer(transferId)
+    TransferService->>+TxnRepo: 3. findById(transferId)
+    TxnRepo-->>-TransferService: 4. Optional<Transaction> txnOpt
+    alt Không tìm thấy giao dịch chuyển tiền
+        TransferService-->>GUI: 5. ném EntityNotFoundException
+        GUI-->>User: 6. Hiển thị thông báo không tìm thấy giao dịch cần xóa
+    else Tìm thấy giao dịch
+        TransferService->>+WalletRepo: 7. findById(sourceWalletId)
+        WalletRepo-->>-TransferService: 8. Optional<Wallet> sourceOpt
+        TransferService->>+WalletRepo: 9. findById(destWalletId)
+        WalletRepo-->>-TransferService: 10. Optional<Wallet> destOpt
+        alt Ví đích không đủ số dư để hoàn trả (destBalance < transferAmount)
+            TransferService-->>GUI: 11. ném InsufficientBalanceException
+            GUI-->>User: 12. Hiển thị cảnh báo ví nhận không đủ số dư để hoàn trả
+        else Ví đích đủ số dư khả dụng
+            critical Hoàn nguyên hai chiều số dư hai ví
+                TransferService->>+Transfer: 13. revertFromWallet(sourceWallet, destWallet)
+                Transfer-->>-TransferService: 14. void
+                TransferService->>+TxnRepo: 15. deleteById(transferId)
+                TxnRepo-->>-TransferService: 16. boolean (deleted)
+                TransferService->>+WalletRepo: 17. save(destWallet)
+                WalletRepo-->>-TransferService: 18. savedDestWallet
+                TransferService->>+WalletRepo: 19. save(sourceWallet)
+                WalletRepo-->>-TransferService: 20. savedSourceWallet
+            end
+            TransferService-->>-GUI: 21. phản hồi xóa thành công
+            GUI-->>-User: 22. Đóng hộp thoại, làm mới bảng chuyển tiền và cập nhật số dư cả hai ví
+        end
+    end
+```
+
+Cơ chế hoàn nguyên hai pha bảo đảm thu hồi đồng thời số dư cả hai ví và xóa sạch các bản ghi chi phí phụ thuộc, ngăn chặn tuyệt đối tình trạng âm số dư ví nhận.
 
 ## 5.5 Sơ đồ Tuần tự Nhóm Danh mục Phân loại
 
