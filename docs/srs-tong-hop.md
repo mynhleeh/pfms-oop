@@ -59,38 +59,23 @@ header-includes: |
   {\LARGE\bfseries HỆ THỐNG QUẢN LÝ TÀI CHÍNH CÁ NHÂN\par}
 \end{center}
 
-
-\newpage
-
-# Đặc tả Yêu cầu Phần mềm và Ca sử dụng Hệ thống Quản lý Tài chính Cá nhân (PFMS)
-
-
+\vspace*{1.5cm}
 
 ```{=latex}
-\begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.1957}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.8043}}|}
-\hline
-\rowcolor[gray]{0.9}
-Thông tin &
-Chi tiết \\ \hline
-\endfirsthead
-\hline
-\rowcolor[gray]{0.9}
-Thông tin &
-Chi tiết \\ \hline
-\endhead
-\textbf{Khoa} &
-Khoa Công nghệ Thông tin 1 \\ \hline
-\textbf{Học phần} &
-Lập trình Hướng đối tượng \\ \hline
-\textbf{Giảng viên} &
-Phạm Hoàng Việt \newline Nguyễn Đình Quảng \\ \hline
-\textbf{Nhóm} &
-3 \\ \hline
-\textbf{Thành viên} &
-Lê Anh Minh (B24DCCE180)\newline Ứng Trọng Trình (B24DCCE271)\newline Nguyễn Đình Tiến (B24DCCE264)\newline Nguyễn Đinh Anh Quân (B24DCCE222) \\ \hline
-\end{longtable}
-\endgroup
+\newcommand{\cell}[1]{\begin{tabular}[t]{@{}l@{}}#1\end{tabular}}
+
+\begin{center}
+{\large
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{@{}>{\bfseries}l@{\hspace{2em}}l@{}}
+Khoa & Công nghệ Thông tin 1 \\
+Học phần & Lập trình Hướng đối tượng \\
+Giảng viên & \cell{Phạm Hoàng Việt \\ Nguyễn Đình Quảng} \\
+Nhóm & 3 \\
+Thành viên & \cell{Lê Anh Minh - B24DCCE180 \\ Ứng Trọng Trình - B24DCCE271 \\ Nguyễn Đình Tiến - B24DCCE264 \\ Nguyễn Đinh Anh Quân - B24DCCE222} \\
+\end{tabular}
+}
+\end{center}
 ```
 
 \newpage
@@ -109,16 +94,16 @@ Lê Anh Minh (B24DCCE180)\newline Ứng Trọng Trình (B24DCCE271)\newline Nguy
 - **[2. Mô tả tổng quát hệ thống](#2-mô-tả-tổng-quát-hệ-thống)**
   - [2.1 Bối cảnh hệ thống](#21-bối-cảnh-hệ-thống)
   - [2.2 Mục tiêu hệ thống](#22-mục-tiêu-hệ-thống)
-  - [2.3 Đặc điểm người dùng](23-đặc-điểm-người-dùng)
-  - [2.4 Giới hạn kỹ thuật, giả định và sự phụ thuộc](#24giới-hạn-kỹ-thuật-giả-định-và-sự-phụ-thuộc)
+  - [2.3 Đặc điểm người dùng](#23-đặc-điểm-người-dùng)
+  - [2.4 Giới hạn kỹ thuật, giả định và sự phụ thuộc](#24-giới-hạn-kỹ-thuật-giả-định-và-sự-phụ-thuộc)
   - [2.5 Môi trường vận hành](#25-môi-trường-vận-hành)
-  - [2.5 Luận đề kỹ thuật và phân tích đánh đổi](#25-luận-đề-kỹ-thuật-và-phân-tích-đánh-đổi)
+  - [2.6 Luận đề kỹ thuật và phân tích đánh đổi](#26-luận-đề-kỹ-thuật-và-phân-tích-đánh-đổi)
 - **[3. Quy tắc nghiệp vụ và quy định tài chính](#3-quy-tắc-nghiệp-vụ-và-quy-định-tài-chính)**
-  - [3.1 BR-FIN-01: Quy tắc độ chính xác tài chính](#31-br-fin-01-quy-tắc-độ-chính-xác-tài-chính)
-  - [3.2 BR-FIN-02: Quy tắc bảo toàn số dư ví](#32-br-fin-02-quy-tắc-bảo-toàn-số-dư-ví)
-  - [3.3 BR-FIN-03: Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ](#33-br-fin-03-quy-tắc-ghi-nhận-đồng-thời-khi-chuyển-tiền-nội-bộ)
-  - [3.4 BR-FIN-04: Quy tắc phân cấp danh mục thu chi 3 cấp](#34-br-fin-04-quy-tắc-phân-cấp-danh-mục-thu-chi-3-cấp)
-  - [3.5 BR-NAM-01: Quy tắc tên của ví, nhóm nhu cầu và danh mục](#35-br-nam-01-quy-tắc-tên-của-ví-nhóm-nhu-cầu-và-danh-mục)
+  - [3.1 Quy tắc độ chính xác tài chính (BR-FIN-01)](#31-quy-tắc-độ-chính-xác-tài-chính-br-fin-01)
+  - [3.2 Quy tắc bảo toàn số dư ví (BR-FIN-02)](#32-quy-tắc-bảo-toàn-số-dư-ví-br-fin-02)
+  - [3.3 Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (BR-FIN-03)](#33-quy-tắc-ghi-nhận-đồng-thời-khi-chuyển-tiền-nội-bộ-br-fin-03)
+  - [3.4 Quy tắc phân cấp danh mục thu chi 3 cấp (BR-FIN-04)](#34-quy-tắc-phân-cấp-danh-mục-thu-chi-3-cấp-br-fin-04)
+  - [3.5 Quy tắc tên của ví, nhóm nhu cầu và danh mục (BR-NAM-01)](#35-quy-tắc-tên-của-ví-nhóm-nhu-cầu-và-danh-mục-br-nam-01)
 - **[4. Yêu cầu chức năng chi tiết](#4-yêu-cầu-chức-năng-chi-tiết)**
   - [4.1 FR-WAL: Nhóm chức năng Ví](#41-fr-wal-nhóm-chức-năng-ví)
     - [4.1.1 FR-WAL-01: Tạo ví mới](#411-fr-wal-01-tạo-ví-mới)
@@ -271,7 +256,7 @@ Các hạng mục kỹ thuật và nghiệp vụ được loại trừ khỏi ra
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0366}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2115}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3864}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3655}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0527}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2080}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3800}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3594}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -297,8 +282,8 @@ hay phụ thuộc vào hạ tầng mạng ngoài. \\ \hline
 Quản trị đa tài khoản và kiểm soát truy cập phân quyền &
 Hệ thống chỉ phục vụ một Người dùng duy nhất; loại trừ việc đăng ký
 nhiều tài khoản trực tuyến qua mạng hoặc phân cấp quyền hạn quản trị. &
-Ứng dụng máy tính để bàn đơn tiến trình phục vụ một người dùng duy nhất
-hệ thống đơn người dùng, đơn nhiệm(\texttt{AS-01}), nên không cần phân
+Ứng dụng máy tính để bàn đơn tiến trình, phục vụ một người dùng duy nhất
+hệ thống (đơn người dùng, đơn nhiệm) (\texttt{AS-01}), nên không cần phân
 quyền nhiều cấp và không phát sinh xung đột ghi đồng thời. \\ \hline
 3 &
 Chuyển mạch thanh toán và tạo giao dịch tiền thực &
@@ -518,7 +503,7 @@ Mã định danh gồm 12 dạng mã sau, dùng 10 tiền tố:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0996}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1712}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2346}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0861}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.4085}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1847}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1847}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1758}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3062}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tiền tố &
@@ -544,17 +529,17 @@ Bảng mục tiêu hệ thống tại Mục 2.2 \\ \hline
 Constraint &
 Giới hạn kỹ thuật bắt buộc &
 \texttt{CON-01} &
-Danh mục giới hạn tại Mục 2.3 \\ \hline
+Danh mục giới hạn tại Mục 2.4 \\ \hline
 \texttt{AS-NN} &
 Assumption &
 Giả định vận hành hệ thống &
 \texttt{AS-01} &
-Danh mục giả định tại Mục 2.3 \\ \hline
+Danh mục giả định tại Mục 2.4 \\ \hline
 \texttt{DE-NN} &
 Dependency &
 Sự phụ thuộc hệ thống &
 \texttt{DE-01} &
-Danh mục phụ thuộc tại Mục 2.3 \\ \hline
+Danh mục phụ thuộc tại Mục 2.4 \\ \hline
 \texttt{BR-FIN-NN} &
 Business Rule, Finance &
 Quy tắc nghiệp vụ tài chính &
@@ -766,7 +751,7 @@ Các mục tiêu nghiệp vụ định lượng và tiêu chí kiểm chứng t�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0383}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1874}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3830}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3912}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0647}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1823}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3725}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3805}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã mục tiêu &
@@ -822,7 +807,7 @@ Bảng dưới đây liệt kê những giới hạn kỹ thuật mà hệ thố
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.0821}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.9179}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 4\tabcolsep - 3\arrayrulewidth) * \real{0.9113}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã giới hạn &
@@ -968,7 +953,7 @@ Hệ thống giải quyết bài toán quản lý tài chính cá nhân cho mộ
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0684}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2999}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3158}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3158}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0767}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2972}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3130}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3130}}|}
 \hline
 \rowcolor[gray]{0.9}
 Hạng mục &
@@ -1021,20 +1006,21 @@ Hệ thống được thiết kế cho quy mô vận hành cá nhân. Điểm g�
 
 ## 3. QUY TẮC NGHIỆP VỤ VÀ QUY ĐỊNH TÀI CHÍNH
 
-Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán và bảo vệ tính toàn vẹn của mục tiêu hệ thống: 
+Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán và bảo vệ tính toàn vẹn của mục tiêu hệ thống. 
 
 Mỗi quy tắc nghiệp vụ được đặc tả nhất quán theo khuôn mẫu:
-1. Tên và mã quy tắc: cú pháp `<Tên quy tắc> (BR-<DOMAIN>-NN)`, phân loại theo miền nghiệp vụ tài chính (`BR-FIN`) hoặc miền định danh (`BR-NAM`).
+
+1. Tên và mã quy tắc: cú pháp `<Tên quy tắc> (BR-<NHÓM>-NN)`, phân loại theo miền nghiệp vụ tài chính (`BR-FIN`) hoặc miền định danh (`BR-NAM`).
 2. Phạm vi áp dụng và mục đích: xác định các thực thể dữ liệu chịu sự chi phối và mục đích bảo vệ tính đúng đắn của dữ liệu.
 3. Nội dung quy tắc và biểu thức toán học: phát biểu nguyên tắc nghiệp vụ bằng câu văn định chuẩn kết hợp công thức toán học hình thức xác định các bất biến số học.
 4. Quy định xử lý chi tiết: bảng các ràng buộc nghiệp vụ cụ thể về biểu diễn số học, cơ chế làm tròn và các trường hợp biên ở tầng bài toán, không rò rỉ mã nguồn cài đặt.
-5. Bảng lỗi vi phạm và phản hồi hệ thống: bảng 4 cột chuẩn hóa gồm Tên lỗi (mã lỗi `ERR-*`), điều kiện vi phạm, hành động của hệ thống, thông điệp thông báo người dùng.
+5. Bảng lỗi vi phạm và phản hồi hệ thống: bảng 5 cột chuẩn hóa gồm Mã lỗi (`ERR-*`), Tên lỗi, điều kiện vi phạm, hành động của hệ thống, thông điệp thông báo người dùng.
 
 Bảng tổng hợp 5 quy tắc nghiệp vụ của hệ thống:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0580}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2089}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1561}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2215}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3555}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1247}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1941}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1451}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2058}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3303}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã quy tắc &
@@ -1133,7 +1119,7 @@ phần thập phân. \\ \hline
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0577}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1299}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3134}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2000}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2990}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1174}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2831}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1807}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2701}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1160,6 +1146,11 @@ Lỗi phép chia thiếu quy tắc làm tròn &
 Phép toán chia không xác định quy tắc làm tròn gây số thập phân vô hạn &
 Hủy giao dịch hiện tại và ghi nhật ký cảnh báo &
 ``Lỗi số học: Phép toán chia không xác định quy tắc làm tròn.'' \\ \hline
+\texttt{ERR-FIN-003} &
+Lỗi chia cho 0 &
+Mẫu số của phép chia tỷ lệ bằng 0.00 VNĐ &
+Bỏ qua phép chia và gán kết quả 0.00\% &
+``Không có dữ liệu để tính tỷ lệ, hệ thống hiển thị 0.00\%.'' \\ \hline
 \end{longtable}
 \endgroup
 ```
@@ -1277,7 +1268,7 @@ số dư ví không đủ (\texttt{ERR-WAL-001}) nếu số dư không đủ. \\
 #### Lỗi vi phạm
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0636}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1438}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3104}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1896}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2926}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1307}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2822}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1724}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2660}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1344,7 +1335,7 @@ Quy tắc áp dụng cho thực thể giao dịch chuyển tiền, cặp thực 
    \sum_{w \in \text{Wallets}} \text{WalletBalance}_w(\text{sau}) = \sum_{w \in \text{Wallets}} \text{WalletBalance}_w(\text{trước})
    $$
 
-3. Ghi nhận phí giao dịch độc lập: khi có phí chuyển tiền (chi phí lớn hơn hoặc bằng 0) do bên thứ ba thu:
+3. Ghi nhận phí giao dịch độc lập: khi có phí chuyển tiền (chi phí lớn hơn 0) do bên thứ ba thu:
    - Số tiền trừ ví nguồn bằng số tiền chuyển cộng chi phí.
    - Số tiền cộng ví đích bằng số tiền chuyển.
    - Chi phí chuyển tiền được ghi nhận thành một phí giao dịch độc lập (loại `EXPENSE`) từ ví nguồn:
@@ -1404,7 +1395,7 @@ nhỏ hơn số tiền chuyển. \\ \hline
 #### Lỗi vi phạm
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0724}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1654}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1990}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1964}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3669}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1518}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1826}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1803}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3367}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1430,7 +1421,7 @@ Từ chối thực hiện giao dịch &
 Lỗi số tiền chuyển không hợp lệ &
 Số tiền chuyển nhỏ hơn hoặc bằng 0 &
 Từ chối thực hiện giao dịch &
-``Số tiền chuyển phải là một số dư­ơng lớn hơn 0.'' \\ \hline
+``Số tiền chuyển phải là một số dương lớn hơn 0.'' \\ \hline
 \end{longtable}
 \endgroup
 ```
@@ -1499,7 +1490,7 @@ lệch dữ liệu phân tích thu chi trong quá khứ. \\ \hline
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0574}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1769}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2747}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1298}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3612}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1598}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2481}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1172}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3262}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1633,7 +1624,7 @@ Dữ liệu giữ nguyên. \\ \hline
 #### Lỗi vi phạm
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0729}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0964}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3464}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1406}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3438}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0885}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3181}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1291}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3157}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã lỗi &
@@ -1707,13 +1698,13 @@ Mỗi yêu cầu chức năng được đặc tả theo khuôn mẫu:
 3. Dữ liệu đầu vào: tham số, kiểu dữ liệu, ràng buộc giá trị và tính bắt buộc.
 4. Quy tắc xử lý: các bước xử lý tuần tự, kiểm tra hợp lệ và mã lỗi tương ứng (`ERR-*`).
 5. Dữ liệu đầu ra và bất biến: kết quả ghi nhận, thông điệp phản hồi và bất biến tài chính sau xử lý.
-6. Tiêu chí nghiệm thu: kịch bản Given-When-Then kèm mã `AC-FR-xxx-yy`.
+6. Tiêu chí nghiệm thu: kịch bản Given-When-Then kèm mã `AC-<DOMAIN>-NN.x`.
 
 **Quy ước chung:**
 
 - Tên nhóm nhu cầu và danh mục trong tiêu chí nghiệm thu là dữ liệu giả lập, không phải quy định cứng; khi kiểm thử thay bằng nhóm và danh mục thực tế trong cấu hình triển khai.
-- Các yêu cầu chức năng gắn nhãn chỉ truy vấn không làm thay đổi số dư ví hay bất kỳ bản ghi nào, nên không nhắc lại bất biến này ở từng yêu cầu chức năng.
-- Quy tắc nghiệp vụ được viện dẫn bằng tên đầy đủ kèm mã. Mọi số tiền dùng số thập phân chính xác, làm tròn ngân hàng, hiển thị 2 chữ số thập phân theo quy tắc Độ chính xác tài chính (`BR-FIN-01`). Thao tác ghi nhiều bước là nguyên tử: cùng thành công hoặc cùng hủy.
+- Các yêu cầu chức năng chỉ truy vấn (`FR-WAL-02`, `FR-WAL-04`, `FR-TXN-03`, `FR-REP-01`, `FR-REP-02`) không làm thay đổi số dư ví hay bất kỳ bản ghi nào, nên không nhắc lại bất biến này ở từng yêu cầu chức năng.
+- Quy tắc nghiệp vụ được viện dẫn bằng tên đầy đủ kèm mã. Mọi số tiền dùng số thập phân chính xác, làm tròn ngân hàng, tính toán 2 chữ số thập phân (giao diện hiển thị VNĐ không có phần thập phân) theo quy tắc Độ chính xác tài chính (`BR-FIN-01`). Thao tác ghi nhiều bước là nguyên tử: cùng thành công hoặc cùng hủy.
 - **Quy tắc phí giao dịch**, dùng chung cho các yêu cầu chức năng sau:
   - Tạo mới giao dịch thu nhập (`FR-TXN-01`).
   - Tạo mới giao dịch chi tiêu (`FR-TXN-02`).
@@ -1883,7 +1874,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1294}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4676}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4029}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4573}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3940}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -1903,7 +1894,7 @@ Tạo ví \texttt{ACTIVE}, số dư 0.00 VNĐ. \\ \hline
 Nhập tên chỉ gồm khoảng trắng hoặc dài hơn 50 ký tự &
 Từ chối, báo lỗi tên không hợp lệ (\texttt{ERR-NAM-001}). \\ \hline
 \texttt{AC-WAL-01.3} &
-Đã có ví ``MB Bank''; tạo ví ``mb bank'' hoặc '' MB Bank '' &
+Đã có ví ``MB Bank''; tạo ví ``mb bank'' hoặc `` MB Bank '' &
 Từ chối, báo lỗi tên bị trùng (\texttt{ERR-NAM-002}). \\ \hline
 \end{longtable}
 \endgroup
@@ -2003,7 +1994,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1053}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3397}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5550}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3232}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5281}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2143,7 +2134,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1302}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5207}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3491}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5096}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3417}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2233,7 +2224,7 @@ Quy tắc xử lý:
 
 1. Chọn các ví `ACTIVE` và các ví `ARCHIVED` có số dư lớn hơn 0.00 VNĐ; ví `ARCHIVED` số dư 0.00 VNĐ không đưa vào.
 2. Tổng số dư bằng tổng số dư các ví được chọn, tính theo quy tắc Độ chính xác tài chính (`BR-FIN-01`).
-3. Tổng bằng 0.00 VNĐ: tỷ lệ mọi ví là 0.00%, không chia cho 0, tránh lỗi chia cho 0 (`ERR-FIN-002`).
+3. Tổng bằng 0.00 VNĐ: tỷ lệ mọi ví là 0.00%, không chia cho 0, tránh lỗi chia cho 0 (`ERR-FIN-003`).
 4. Tổng lớn hơn 0: tỷ lệ bằng số dư ví chia tổng số dư nhân 100%, tính với tối thiểu 4 chữ số thập phân trung gian, làm tròn ngân hàng 2 chữ số thập phân. Ví `ARCHIVED` hiển thị kèm nhãn "đã lưu trữ".
 5. Sắp xếp theo tỷ lệ giảm dần.
 
@@ -2262,7 +2253,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1229}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3631}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5140}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3524}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4989}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2280,7 +2271,7 @@ Ví A 6,000,000 VNĐ, ví B 4,000,000 VNĐ &
 Tỷ lệ A 60.00\%, B 40.00\%. \\ \hline
 \texttt{AC-WAL-04.2} &
 Mọi ví có số dư 0.00 VNĐ &
-Mọi tỷ lệ 0.00\%, không phát sinh lỗi chia cho 0 (\texttt{ERR-FIN-002}). \\ \hline
+Mọi tỷ lệ 0.00\%, không phát sinh lỗi chia cho 0 (\texttt{ERR-FIN-003}). \\ \hline
 \texttt{AC-WAL-04.3} &
 Ví hoạt động 9,950,000 VNĐ, ví lưu trữ 50,000 VNĐ &
 Ví lưu trữ hiển thị dòng riêng kèm nhãn, tỷ lệ 0.50\%, tổng các tỷ lệ
@@ -2401,7 +2392,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0920}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4682}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4398}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4390}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4124}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2568,7 +2559,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0889}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4523}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4588}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4226}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4287}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2681,7 +2672,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0960}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4677}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4363}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4405}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4109}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2830,7 +2821,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1040}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3830}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5130}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3639}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4874}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -2844,7 +2835,7 @@ Mã tiêu chí &
 Kết quả kỳ vọng \\ \hline
 \endhead
 \texttt{AC-TXN-03.1} &
-Lọc từ 01/01/2026 đến 31/01/2026, loại \texttt{EXPENSE} &
+Lọc từ 2026-01-01 đến 2026-01-31, loại \texttt{EXPENSE} &
 Trả đúng các khoản chi trong kỳ, tổng chi tiêu chính xác 2 chữ số thập
 phân theo quy tắc Độ chính xác tài chính (\texttt{BR-FIN-01}). \\ \hline
 \texttt{AC-TXN-03.2} &
@@ -3000,7 +2991,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0902}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5033}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4066}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4710}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3805}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3140,7 +3131,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0957}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4935}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4109}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4646}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3868}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3299,12 +3290,12 @@ chi phí theo quy tắc Ghi nhận đồng thời khi chuyển tiền nội bộ
 \end{longtable}
 \endgroup
 ```
-f
+
 Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0913}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3679}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5408}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3447}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5067}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3446,7 +3437,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1017}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4196}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4787}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3977}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4537}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3556,7 +3547,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1007}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3158}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5835}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.2990}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5524}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3699,7 +3690,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1011}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4688}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4301}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4440}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4073}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3854,7 +3845,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0904}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4384}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4712}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4103}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4410}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -3972,7 +3963,7 @@ Quy tắc xử lý:
    - Tổng thu nhập tháng.
    - Tổng chi tiêu tháng, gồm phí giao dịch liên kết đang tồn tại.
    - Dòng tiền thuần tháng bằng tổng thu nhập trừ tổng chi tiêu.
-   - Tỷ lệ tiết kiệm bằng dòng tiền thuần chia tổng thu nhập nhân 100 khi tổng thu nhập lớn hơn 0; ngược lại bằng 0.00% để tránh lỗi chia cho 0 (`ERR-FIN-002`).
+   - Tỷ lệ tiết kiệm bằng dòng tiền thuần chia tổng thu nhập nhân 100 khi tổng thu nhập lớn hơn 0; ngược lại bằng 0.00% để tránh lỗi chia cho 0 (`ERR-FIN-003`).
 3. Chỉ số bình quân cả chuỗi: thu nhập, chi tiêu và dòng tiền thuần bình quân bằng tổng 12 tháng chia 12. Mẫu số luôn là 12, tháng chưa có giao dịch tính 0.00 VNĐ.
 4. Làm tròn ngân hàng, hiển thị 2 chữ số thập phân theo quy tắc Độ chính xác tài chính (`BR-FIN-01`).
 
@@ -4002,7 +3993,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1078}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3765}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5157}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3593}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4921}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4024,7 +4015,7 @@ Dòng tiền thuần +12,000,000.00 VNĐ; tỷ lệ tiết kiệm 40.00\%. \\ \h
 \texttt{AC-REP-01.3} &
 Một tháng không có thu nhập, chi 5,000,000.00 VNĐ &
 Dòng tiền thuần -5,000,000.00 VNĐ, tỷ lệ tiết kiệm 0.00\%, tránh lỗi
-chia cho 0 (\texttt{ERR-FIN-002}). \\ \hline
+chia cho 0 (\texttt{ERR-FIN-003}). \\ \hline
 \texttt{AC-REP-01.4} &
 Chuỗi có tháng chưa phát sinh giao dịch &
 Tháng không giao dịch tính 0.00 VNĐ vào bình quân 12 tháng. \\ \hline
@@ -4103,9 +4094,9 @@ Quy tắc xử lý:
 
 1. Ngày bắt đầu sau ngày kết thúc: từ chối, báo lỗi khoảng ngày không hợp lệ.
 2. Gom nhóm các giao dịch đang tồn tại theo quy tắc Phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`): theo Nhóm nhu cầu cấp 2 (theo nhóm cha hiện tại của danh mục chi tiết) và theo Danh mục chi tiết cấp 3.
-3. Tỷ lệ cơ cấu bằng tổng tiền của mục chia tổng tiền của loại luồng tiền nhân 100, làm tròn ngân hàng, 2 chữ số thập phân theo quy tắc Độ chính xác tài chính (`BR-FIN-01`). Tổng bằng 0.00 VNĐ: tỷ lệ 0.00%, tránh lỗi chia cho 0 (`ERR-FIN-002`).
+3. Tỷ lệ cơ cấu bằng tổng tiền của mục chia tổng tiền của loại luồng tiền nhân 100, làm tròn ngân hàng, 2 chữ số thập phân theo quy tắc Độ chính xác tài chính (`BR-FIN-01`). Tổng bằng 0.00 VNĐ: tỷ lệ 0.00%, tránh lỗi chia cho 0 (`ERR-FIN-003`).
 4. Sắp xếp theo số tiền giảm dần.
-5. Khi so sánh với kỳ liền kề cùng độ dài: tính chênh lệch giá trị và tỷ lệ tăng giảm; kỳ trước bằng 0.00 VNĐ thì hiển thị "mới phát sinh".
+5. Khi so sánh với kỳ liền kề cùng độ dài: tính chênh lệch giá trị và tỷ lệ tăng giảm; kỳ trước bằng 0.00 VNĐ thì hiển thị "Mới".
 6. Nhóm hoặc danh mục đã xóa nhưng có giao dịch trong kỳ: hiển thị riêng kèm nhãn "đã xóa", không gộp vào mục khác, để tổng cơ cấu khớp tổng giao dịch thực tế.
 
 Dữ liệu đầu ra và bất biến hệ thống:
@@ -4134,7 +4125,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0948}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3664}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5388}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3446}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5067}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4154,7 +4145,7 @@ Tỷ lệ nhóm là 40.00\% theo quy tắc Độ chính xác tài chính
 \texttt{AC-REP-02.2} &
 Khoảng thời gian không có giao dịch &
 Tổng 0.00 VNĐ, danh sách rỗng, không phát sinh lỗi chia cho 0
-(\texttt{ERR-FIN-002}). \\ \hline
+(\texttt{ERR-FIN-003}). \\ \hline
 \texttt{AC-REP-02.3} &
 Kỳ có giao dịch thuộc nhóm hoặc danh mục đã xóa &
 Vẫn hiển thị mục đó kèm nhãn ``đã xóa'' với đúng số tiền và tỷ trọng;
@@ -4269,7 +4260,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0917}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3521}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5563}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3300}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5214}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4374,7 +4365,7 @@ Quy tắc xử lý:
    - Bước 3, theo quy tắc Ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`): mọi giao dịch thu chi và chuyển tiền trỏ tới ví có trong danh sách ví; mỗi bản ghi phí chuyển tiền liên kết tới một chuyển tiền có trong tệp.
    - Bước 4, theo quy tắc Bảo toàn số dư ví (`BR-FIN-02`): tính lại số dư mọi ví, không ví nào âm.
 3. Phát hiện sai lệch ở bất kỳ bước nào: hủy toàn bộ phục hồi, giữ nguyên 100% dữ liệu hiện tại và báo danh sách lỗi cụ thể.
-4. Cả 4 bước đạt: thay toàn bộ dữ liệu hiện tại bằng dữ liệu sao lưu, tính lại số dư ví và cập nhật chuỗi thống kê 12 tháng.
+4. Cả 4 bước đạt: tạo bản sao lưu tự động `backup_YYYYMMDD_HHMMSS.json` trong thư mục `backups/` (`CON-06`), sau đó thay toàn bộ dữ liệu hiện tại bằng dữ liệu sao lưu, tính lại số dư ví và cập nhật chuỗi thống kê 12 tháng.
 
 Dữ liệu đầu ra và bất biến hệ thống:
 
@@ -4405,7 +4396,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0878}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4112}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5010}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3838}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.4676}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4536,7 +4527,7 @@ Tiêu chí nghiệm thu:
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0885}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3380}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5734}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1487}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3157}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5355}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã tiêu chí &
@@ -4581,7 +4572,7 @@ Bảng tổng hợp danh mục các yêu cầu phi chức năng của hệ thố
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0383}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1790}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3096}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0383}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.4347}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1595}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2758}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3873}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã yêu cầu &
@@ -4741,7 +4732,7 @@ tiếp để đối chiếu số dư tính toán với số dư thực tế. \\ 
 
 Đặc tính chất lượng: Hiệu quả vận hành, đặc tính con Hành vi thời gian và Mức sử dụng tài nguyên.
 
-Mô tả yêu cầu: với quy mô dữ liệu cá nhân thông thường (tối thiểu 10.000 giao dịch), hệ thống đáp ứng tức thì và không gây gián đoạn trải nghiệm ở các thao tác:
+Mô tả yêu cầu: với quy mô dữ liệu cá nhân thông thường (tối thiểu 10,000 giao dịch), hệ thống đáp ứng tức thì và không gây gián đoạn trải nghiệm ở các thao tác:
 
 1. Ghi nhận giao dịch (thu chi hoặc chuyển tiền): cập nhật bộ nhớ và đồng bộ số dư các thực thể liên quan ngay lập tức.
 2. Truy vấn dữ liệu: lọc theo khoảng thời gian, danh mục hoặc ví, tìm kiếm từ khóa và phân trang dữ liệu.
@@ -5075,7 +5066,7 @@ Bảng chỉ số đo và ngưỡng nghiệm thu kỹ thuật đối với tính
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3600}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5583}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0817}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3479}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5395}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1127}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thuộc tính đo kiểm &
@@ -5215,7 +5206,7 @@ Bảng danh mục 20 ca sử dụng chi tiết cùng nhóm chức năng và yêu
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0955}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1202}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3840}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2131}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1871}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0950}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1247}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3821}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.2120}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1862}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -5491,7 +5482,7 @@ Hệ thống chỉ đọc, không thay đổi bất kỳ dữ liệu nào trong 
 ##### Luồng ngoại lệ 3a: Tổng số dư các ví bằng 0
 
 1. Tại bước 3 của luồng rẽ nhánh 1a, tổng số dư bằng 0.
-2. Hệ thống bỏ qua phép chia cho 0 (`ERR-FIN-002`) và gán tỷ lệ 0.00% cho mọi ví.
+2. Hệ thống bỏ qua phép chia cho 0 (`ERR-FIN-003`) và gán tỷ lệ 0.00% cho mọi ví.
 3. Hệ thống hiển thị bảng kèm thông báo: "Tổng số dư các ví hiện tại bằng 0, không có cơ cấu phân bổ."
 
 #### Quy tắc nghiệp vụ đặc thù
@@ -5920,7 +5911,7 @@ Không có.
 
 ### 6.7 UC-TXN-03: Chỉnh sửa giao dịch thu chi
 
-Bảng thuộc tính đặc tả cơ chế hoàn tác và cập nhật thông tin của ca sử dụng Chỉnh sửa giao dịch thu chi (`UC-TXN-03`):
+Bảng thuộc tính đặc tả cơ chế hoàn nguyên và cập nhật thông tin của ca sử dụng Chỉnh sửa giao dịch thu chi (`UC-TXN-03`):
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
@@ -6706,7 +6697,7 @@ Nếu bị từ chối hoặc lỗi ghi, mục đã xóa giữ nguyên trạng t
 
 ##### Luồng ngoại lệ 3b: Tên trùng hoặc nhóm cha đã xóa khi tạo mới
 
-1. Tại bước 2 của luồng rẽ nhánh 3a, tên trùng mục đang dùng trong cùng phạm vi (`ERR-NAM-002`), hoặc nhóm cha của danh mục đang đã xóa.
+1. Tại bước 2 của luồng rẽ nhánh 3a, tên trùng mục đang dùng trong cùng phạm vi (`ERR-NAM-002`), hoặc nhóm cha của danh mục đang ở trạng thái đã xóa.
 2. Hệ thống từ chối và thông báo theo trường hợp: "Tên danh mục này đã tồn tại trong nhóm. Vui lòng đặt tên khác." (danh mục trùng tên); "Tên nhóm này đã tồn tại trong loại thu chi. Vui lòng đặt tên khác." (nhóm trùng tên); hoặc báo `ERR-CAT-005` với thông báo "Không thể tạo danh mục trong nhóm đã xóa. Hãy chọn nhóm đang dùng hoặc khôi phục nhóm trước." (nhóm cha đã xóa).
 3. Quay lại bước 2 của luồng rẽ nhánh 3a để nhập lại tên hoặc chọn nơi chứa khác.
 
@@ -6813,7 +6804,7 @@ Không có.
 2. Người dùng chỉ thấy một thao tác "Xóa"; xóa hẳn hay ẩn do hệ thống quyết định theo số giao dịch.
 3. Yêu cầu chức năng liên quan: `FR-CAT-03`.
 
-###  UC-REP-01: Thống kê dòng tiền 12 tháng gần nhất
+### 6.16 UC-REP-01: Thống kê dòng tiền 12 tháng gần nhất
 
 Bảng thuộc tính đặc tả chu kỳ tổng hợp dòng tiền 12 tháng của ca sử dụng Thống kê dòng tiền 12 tháng gần nhất (`UC-REP-01`):
 
@@ -6887,7 +6878,7 @@ Không có.
 ##### Luồng ngoại lệ 5a: Tháng có thu nhập không dương nhưng có chi tiêu
 
 1. Tại bước 5, tổng thu nhập của tháng nhỏ hơn hoặc bằng 0 nhưng tổng chi tiêu lớn hơn 0.
-2. Chia trực tiếp sẽ gây lỗi chia cho 0 (`ERR-FIN-002`), nên hệ thống áp dụng hàm từng nhánh và gán tỷ lệ tiết kiệm 0.00%.
+2. Chia trực tiếp sẽ gây lỗi chia cho 0 (`ERR-FIN-003`), nên hệ thống áp dụng hàm từng nhánh và gán tỷ lệ tiết kiệm 0.00%.
 3. Hệ thống hiển thị dòng tiền thuần âm (bằng âm của tổng chi tiêu) và chỉ báo thâm hụt ngân sách.
 
 #### Quy tắc nghiệp vụ đặc thù
@@ -6962,7 +6953,7 @@ Không có.
 ##### Luồng ngoại lệ 4a: Kỳ trước không có giao dịch khi so sánh biến động
 
 1. Tại bước 4, kỳ trước không có giao dịch trong danh mục nhưng kỳ này có.
-2. Hệ thống hiển thị chênh lệch tuyệt đối bằng số tiền kỳ này và tỷ lệ biến động "Mới", tránh phép chia cho 0 (`ERR-FIN-002`).
+2. Hệ thống hiển thị chênh lệch tuyệt đối bằng số tiền kỳ này và tỷ lệ biến động "Mới", tránh phép chia cho 0 (`ERR-FIN-003`).
 
 #### Quy tắc nghiệp vụ đặc thù
 
@@ -7106,7 +7097,7 @@ Nếu tệp không hợp lệ hoặc quá trình nhập bị hủy, dữ liệu 
    - Bước 2 (Quy tắc phân cấp danh mục thu chi 3 cấp `BR-FIN-04`): mọi mã danh mục dùng trong giao dịch trỏ tới danh mục hợp lệ (đang dùng hoặc đã xóa) có Loại thu chi tương thích.
    - Bước 3 (ví và liên kết chuyển tiền): mọi giao dịch thu chi và chuyển tiền trỏ tới ví có trong danh sách; mỗi phí giao dịch phát sinh từ chuyển tiền trỏ tới một giao dịch chuyển tiền tồn tại.
    - Bước 4 (Quy tắc bảo toàn số dư ví `BR-FIN-02`): tính lại số dư từng ví từ lịch sử dòng tiền trong tệp, không ví nào âm.
-7. Nếu cả 4 bước đều đạt, hệ thống bắt đầu ghi tệp, xóa dữ liệu cũ, nạp toàn bộ bản ghi từ tệp sao lưu, hoàn tất ghi, rồi tính lại toàn bộ số dư và bảng thống kê 12 tháng gần nhất.
+7. Nếu cả 4 bước đều đạt, hệ thống tạo bản sao lưu tự động của dữ liệu hiện tại (`backup_YYYYMMDD_HHMMSS.json` trong `backups/`, `CON-06`), rồi bắt đầu ghi tệp, xóa dữ liệu cũ, nạp toàn bộ bản ghi từ tệp sao lưu, hoàn tất ghi, rồi tính lại toàn bộ số dư và bảng thống kê 12 tháng gần nhất.
 8. Hệ thống hiển thị báo cáo nhập thành công gồm tổng số bản ghi và số lượng từng loại thực thể đã phục hồi.
 
 #### Các luồng rẽ nhánh
@@ -7206,7 +7197,7 @@ Không có luồng ngoại lệ nghiệp vụ bổ sung ngoài việc phân lo�
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp  (`BR-FIN-04`) và liên kết phí chuyển tiền.
+1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và liên kết phí chuyển tiền.
 2. Yêu cầu chức năng liên quan: `FR-DAT-03`.
 
 \newpage
@@ -7230,7 +7221,7 @@ Bảng tổng hợp danh mục sơ đồ ca sử dụng của hệ thống phân
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2403}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2844}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0841}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2230}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0837}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2391}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2830}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0837}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2219}}|}
 \hline
 \rowcolor[gray]{0.9}
 Tầng &
@@ -7311,7 +7302,7 @@ Bảng phân loại chi tiết 20 ca sử dụng theo mục tiêu tương tác c
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0714}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0902}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3411}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4973}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0767}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1247}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.3249}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.4737}}|}
 \hline
 \rowcolor[gray]{0.9}
 Gói &
@@ -7367,7 +7358,7 @@ danh mục thu chi 3 cấp (\texttt{BR-FIN-04}) \\ \hline
 
 #### 7.2.1 Nhóm chức năng Dòng tiền và Tiền trong ví
 
-Nhóm chức năng này gồm các ca sử dụng, được phân rã thành bốn sơ đồ chi tiết: ví, ghi nhận thu chi, chuyển tiền nội bộ (cơ chế ghi nhận đồng thời: trừ ví nguồn, cộng ví đích) và danh mục phân loại.
+Nhóm chức năng này gồm 15 ca sử dụng, được phân rã thành bốn sơ đồ chi tiết: ví, ghi nhận thu chi, chuyển tiền nội bộ (cơ chế ghi nhận đồng thời: trừ ví nguồn, cộng ví đích) và danh mục phân loại.
 
 ##### 7.2.1a Nhóm Ví (WAL)
 
@@ -7400,13 +7391,14 @@ Quy tắc nghiệp vụ chi phối: số thập phân chính xác theo Quy tắc
 - `UC-TRF-03`: Xóa giao dịch chuyển tiền cùng phí liên kết, tự động hoàn nguyên số dư cho cả hai ví.
 
 Quy tắc nghiệp vụ chi phối:
+
 - Quy tắc độ chính xác tài chính (`BR-FIN-01`): dùng số thập phân chính xác cho số tiền chuyển và phí giao dịch (chi phối `UC-TRF-01`).
 - Quy tắc bảo toàn số dư ví (`BR-FIN-02`): số dư ví luôn không âm và tính lại từ lịch sử dòng tiền (chi phối cả 3 ca).
 - Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`): ghi nhận đồng thời giữa hai ví; bảo toàn tổng số dư hệ thống trừ chi phí chuyển tiền; tự động hoàn phí liên kết khi xóa giao dịch (chi phối cả 3 ca).
 
 ##### 7.2.1d Nhóm Danh mục phân loại (CAT)
 
-Nhóm chức năng này quản lý cấu trúc danh mục 3 cấp: loại thu chi -> nhóm nhu cầu -> danh mục chi tiết.
+Nhóm chức năng này quản lý cấu trúc danh mục 3 cấp: loại thu chi → nhóm nhu cầu → danh mục chi tiết.
 
 ![Sơ đồ ca sử dụng Nhóm Danh mục](docs/images/so-do-uc-cat.png){width=80%}
 
@@ -7431,6 +7423,7 @@ Nhóm chức năng này gồm 5 ca sử dụng, được phân rã thành hai s�
 Quy tắc nghiệp vụ chi phối: Quy tắc độ chính xác tài chính (`BR-FIN-01`) chi phối cả hai ca sử dụng; Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) chi phối `UC-REP-02`.
 
 Yêu cầu chức năng liên quan:
+
 - `FR-REP-01`: thống kê chuỗi 12 tháng liên tục từ mốc chỉ định; tỷ lệ tiết kiệm bằng 0.00% khi tổng thu nhập không dương.
 - `FR-REP-02`: phân tích cơ cấu chi tiêu theo nhóm và danh mục; danh mục đã xóa vẫn hiển thị đầy đủ kèm nhãn trạng thái.
 
@@ -7445,12 +7438,14 @@ Nhóm chức năng này xuất dữ liệu tài chính, phục hồi từ bản 
 - `UC-DAT-03`: Kiểm tra độc lập 4 điều kiện toàn vẹn hệ thống theo yêu cầu của Người dùng.
 
 Quy tắc nghiệp vụ chi phối:
+
 - Quy tắc độ chính xác tài chính (`BR-FIN-01`): bảo đảm độ chính xác số học khi xuất tệp (chi phối `UC-DAT-01`).
 - Quy tắc bảo toàn số dư ví (`BR-FIN-02`): bảo toàn số dư ví không âm và tính lại từ lịch sử dòng tiền (chi phối `UC-DAT-02`, `UC-DAT-03`).
 - Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`): cân bằng nguồn - đích khi chuyển tiền nội bộ (chi phối `UC-DAT-03`).
 - Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`): kiểm soát tính hợp lệ của cây danh mục 3 cấp (chi phối `UC-DAT-02`, `UC-DAT-03`).
 
 Yêu cầu chức năng liên quan:
+
 - `FR-DAT-01`: xuất dữ liệu ra tệp JSON, giữ nguyên độ chính xác số học thập phân.
 - `FR-DAT-02`: quy trình kiểm tra 4 bước khi nạp dữ liệu, tự động sao lưu trước khi thay thế và tự hoàn nguyên nếu lỗi.
 - `FR-DAT-03`: thuật toán quét độc lập kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng chuyển tiền, liên kết danh mục và liên kết phí chuyển tiền.
@@ -7465,7 +7460,7 @@ Bảng tổng hợp cấu trúc danh mục 5 ma trận truy vết và kiểm ch�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0691}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0691}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3043}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1793}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3783}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0685}}|>{\centering\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.0767}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3018}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.1778}}|>{\arraybackslash}p{(\linewidth - 10\tabcolsep - 6\arrayrulewidth) * \real{0.3752}}|}
 \hline
 \rowcolor[gray]{0.9}
 STT &
@@ -7755,7 +7750,7 @@ Bảng ma trận truy vết mức độ bao phủ của 5 quy tắc nghiệp v�
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.0889}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3199}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5913}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.1247}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.3073}}|>{\arraybackslash}p{(\linewidth - 6\tabcolsep - 4\arrayrulewidth) * \real{0.5681}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã quy tắc &
@@ -7796,7 +7791,7 @@ Bảng định nghĩa 4 phương pháp kiểm chứng yêu cầu phần mềm ch
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0647}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1553}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6913}}|}
+\begin{longtable}[l]{|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0587}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1410}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1727}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6276}}|}
 \hline
 \rowcolor[gray]{0.9}
 Ký hiệu &
@@ -7841,7 +7836,7 @@ Bảng ma trận phương pháp kiểm chứng và tiêu chí nghiệm thu kỹ 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0696}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2392}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0538}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.6374}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1247}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2147}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5720}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã yêu cầu &
@@ -7900,7 +7895,7 @@ chi \\ \hline
 \texttt{FR-TXN-04} &
 Chỉnh sửa giao dịch thu chi &
 T, D &
-Hoàn tác số tiền và chi phí cũ trên ví cũ, áp dụng số tiền và chi phí
+Hoàn nguyên số tiền và chi phí cũ trên ví cũ, áp dụng số tiền và chi phí
 mới trên ví mới. Phí giao dịch liên kết được tạo, cập nhật hoặc xóa theo
 chi phí mới. Số dư các ví luôn khớp \\ \hline
 \texttt{FR-TXN-05} &
@@ -7971,7 +7966,7 @@ Bảng ma trận phương pháp kiểm chứng, môi trường thực thi và ng
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0330}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.1542}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2155}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0330}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2444}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.3199}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.1358}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.1898}}|>{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.0887}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2153}}|>{\arraybackslash}p{(\linewidth - 12\tabcolsep - 7\arrayrulewidth) * \real{0.2818}}|}
 \hline
 \rowcolor[gray]{0.9}
 Mã yêu cầu &
@@ -8041,7 +8036,7 @@ Bảng dưới đây tổng hợp quy mô các thành phần trong bản đặc 
 
 ```{=latex}
 \begingroup\small\renewcommand{\arraystretch}{1.35}
-\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1838}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2264}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0670}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5228}}|}
+\begin{longtable}[l]{|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.1819}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.2241}}|>{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.0767}}|>{\arraybackslash}p{(\linewidth - 8\tabcolsep - 5\arrayrulewidth) * \real{0.5174}}|}
 \hline
 \rowcolor[gray]{0.9}
 Thành phần &
@@ -8076,7 +8071,7 @@ Chia theo 6 nhóm chức năng nghiệp vụ \\ \hline
 Yêu cầu phi chức năng &
 \texttt{NFR-01} đến \texttt{NFR-06} &
 6 &
-Có ngưỡng nghiệm thu; \texttt{NFR-02} là định tính, \texttt{NFR-05} có
+Có ngưỡng nghiệm thu; \texttt{NFR-02} có ngưỡng thời gian định lượng (chỉ số ổn định bộ nhớ là định tính), \texttt{NFR-05} có
 một chỉ số định tính \\ \hline
 Ca sử dụng chi tiết &
 \texttt{UC-WAL-01} đến \texttt{UC-DAT-03} &
