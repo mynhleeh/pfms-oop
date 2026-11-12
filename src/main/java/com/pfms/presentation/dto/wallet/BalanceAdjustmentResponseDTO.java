@@ -1,4 +1,4 @@
-package com.pfms.presentation.dto;
+package com.pfms.presentation.dto.wallet;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

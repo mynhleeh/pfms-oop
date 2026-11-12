@@ -12,12 +12,12 @@ import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.repository.BalanceAdjustmentRepository;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
-import com.pfms.presentation.dto.AdjustBalanceRequestDTO;
-import com.pfms.presentation.dto.BalanceAdjustmentResponseDTO;
-import com.pfms.presentation.dto.CreateWalletRequestDTO;
-import com.pfms.presentation.dto.UpdateWalletRequestDTO;
-import com.pfms.presentation.dto.WalletResponseDTO;
-import com.pfms.presentation.dto.WalletsSummaryDTO;
+import com.pfms.presentation.dto.wallet.AdjustBalanceRequestDTO;
+import com.pfms.presentation.dto.wallet.BalanceAdjustmentResponseDTO;
+import com.pfms.presentation.dto.wallet.CreateWalletRequestDTO;
+import com.pfms.presentation.dto.wallet.UpdateWalletRequestDTO;
+import com.pfms.presentation.dto.wallet.WalletResponseDTO;
+import com.pfms.presentation.dto.wallet.WalletsSummaryDTO;
 import com.pfms.service.WalletService;
 
 import java.math.BigDecimal;

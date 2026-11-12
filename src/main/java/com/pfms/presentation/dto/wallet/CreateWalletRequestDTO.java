@@ -1,4 +1,4 @@
-package com.pfms.presentation.dto;
+package com.pfms.presentation.dto.wallet;
 
 import java.util.Objects;
 
