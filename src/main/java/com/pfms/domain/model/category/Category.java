@@ -1,173 +1,98 @@
 package com.pfms.domain.model.category;
 
-import com.pfms.domain.exception.BusinessException;
-import com.pfms.domain.exception.ErrorCode;
-import com.pfms.domain.model.transaction.TransactionType;
-
-import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Thực thể miền Danh mục chi tiết (Category) trong hệ thống PFMS.
- * Đại diện cho đơn vị phân loại cấp 3 gán nhãn mục đích cho các giao dịch thu chi.
- */
+import com.pfms.domain.exception.BusinessException;
+import com.pfms.domain.model.transaction.TransactionType;
+import com.pfms.domain.exception.ErrorCode ;
+
+
 public class Category {
-
-    // region State
-    private final UUID categoryId;
-    private String name;
-    private UUID needGroupId;
-    private final TransactionType transactionType;
+    private final UUID categoryId ;
+    private String name ;
+    private UUID needGroupId ;
+    private final TransactionType transactionType ;
     private CategoryStatus status;
-    private String icon;
-    private String color;
-    // endregion
+    private String icon ;
+    private String color ; 
 
-    // region Constructors
-    public Category(UUID categoryId, String name, UUID needGroupId,
-                    TransactionType transactionType, String icon, String color) {
-
-        this.categoryId = Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
-        this.name = validateAndNormalizeName(name);
-        this.needGroupId = Objects.requireNonNull(needGroupId, "Mã nhóm nhu cầu không được để null");
-        this.transactionType = Objects.requireNonNull(transactionType, "Loại thu chi không được để null");
-        this.status = CategoryStatus.ACTIVE;
-        this.icon = normalizeIcon(icon);
-        this.color = normalizeColor(color);
-    }
-    // endregion
-
-    // region Commands
-    public void rename(String newName) {
-        this.name = validateAndNormalizeName(newName);
+    public Category(UUID categoryId, String name, UUID needGroupId, TransactionType transactionType, String icon, String color){
+        this.categoryId = UUID.randomUUID() ;
+        this.name = name ;
+        this.needGroupId = needGroupId ;
+        this.transactionType = transactionType ;
+        this.status = CategoryStatus.ACTIVE ;
+        this.icon = icon ;
+        this.color = color ;
     }
 
-    public void changeNeedGroup(UUID newNeedGroupId, TransactionType targetGroupType) {
-        Objects.requireNonNull(newNeedGroupId, "Mã nhóm nhu cầu mới không được để null");
-        Objects.requireNonNull(targetGroupType, "Loại thu chi nhóm đích không được để null");
-
-        if (targetGroupType != this.transactionType) {
-            throw new BusinessException(ErrorCode.ERR_CAT_001,
-                    "Không được phép đổi loại thu chi hoặc chuyển danh mục sang nhóm khác loại.");
-        }
-        this.needGroupId = newNeedGroupId;
-    }
-
-    public void updateAppearance(String newIcon, String newColor) {
-        this.icon = normalizeIcon(newIcon);
-        this.color = normalizeColor(newColor);
-    }
-
-    public void markDeleted() {
-        this.status = CategoryStatus.DELETED;
-    }
-
-    public void restore(boolean isParentGroupActive) {
-        if (!isParentGroupActive) {
-            throw new BusinessException(ErrorCode.ERR_CAT_004,
-                    "Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước.");
-        }
-        this.status = CategoryStatus.ACTIVE;
-    }
-    // endregion
-
-    // region Queries
     public UUID getCategoryId() {
-        return this.categoryId;
+        return categoryId ;
     }
 
     public String getName() {
-        return this.name;
+        return name ;
     }
 
-    public UUID getNeedGroupId() {
-        return this.needGroupId;
+    public UUID getNeedGroupId(){
+        return needGroupId ;
     }
 
-    public TransactionType getTransactionType() {
-        return this.transactionType;
+    public TransactionType getTransactionType(){
+        return transactionType ;
     }
 
-    public CategoryStatus getStatus() {
-        return this.status;
+    public CategoryStatus getStatus(){
+        return status ;
     }
 
-    public String getIcon() {
-        return this.icon;
+    public String getIcon(){
+        return icon ;
     }
 
-    public String getColor() {
-        return this.color;
+    public String getColor(){
+        return color ;
     }
 
     public boolean isActive() {
-        return this.status == CategoryStatus.ACTIVE;
+        return status == CategoryStatus.ACTIVE ;
     }
 
-    public boolean isDeleted() {
-        return this.status == CategoryStatus.DELETED;
-    }
-    // endregion
-
-    // region Helpers
-    private static String validateAndNormalizeName(String rawName) {
-        if (rawName == null) {
-            throw new BusinessException(ErrorCode.ERR_NAM_001, "Tên danh mục không được để null.");
-        }
-        String trimmed = rawName.trim();
-        if (trimmed.isEmpty() || trimmed.length() > 50) {
-            throw new BusinessException(ErrorCode.ERR_NAM_001,
-                    "Tên phải có từ 1 đến 50 ký tự, không tính khoảng trắng ở hai đầu.");
-        }
-        return trimmed;
+    public boolean isDeleted(){
+        return status == CategoryStatus.DELETED ;
     }
 
-    private static String normalizeIcon(String rawIcon) {
-        if (rawIcon == null) {
-            return "";
+    public void rename(String newName){
+        if(newName == null || newName.trim().isEmpty() || newName.trim().length() > 50){
+            throw new BusinessException(ErrorCode.ERR_NAM_002) ;
+            return ;
         }
-        String trimmed = rawIcon.trim();
-        if (trimmed.length() > 50) {
-            throw new IllegalArgumentException("Biểu tượng danh mục không được vượt quá 50 ký tự.");
-        }
-        return trimmed;
+        this.name = newName.trim() ;
     }
 
-    private static String normalizeColor(String rawColor) {
-        if (rawColor == null) {
-            return "";
+    public void changeNeedGroup(UUID newNeedGroupId,TransactionType targetGroupType){
+        if(newNeedGroupId.isDeleted() || targetGroupType != this.transactionType){
+            throw new BusinessException(ErrorCode.ERR_CAT_003) ;
+            return ;
         }
-        String trimmed = rawColor.trim();
-        if (trimmed.length() > 10) {
-            throw new IllegalArgumentException("Mã màu danh mục không được vượt quá 10 ký tự.");
-        }
-        return trimmed;
-    }
-    // endregion
-
-    // region Identity
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Category category = (Category) o;
-        return Objects.equals(this.categoryId, category.categoryId);
+        this.needGroupId = newNeedGroupId ;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.categoryId);
+    public void updateAppearance(String newIcon , String newColor){
+        this.icon = newIcon ;
+        this.color = newColor ;
     }
 
-    @Override
-    public String toString() {
-        return String.format("Category[id=%s, name='%s', needGroupId=%s, type=%s, status=%s]",
-                this.categoryId, this.name, this.needGroupId, this.transactionType, this.status);
+    public void markDeleted(){
+        this.status = CategoryStatus.DELETED ;
     }
-    // endregion
+
+    public void restore(boolean isParentGroupActive){
+        if(!isParentGroupActive){
+            throw new BusinessException(ErrorCode.ERR-CAT-004) ;
+            return ;
+        }
+        this.status = CategoryStatus.ACTIVE ;
+    }
+
 }
-
