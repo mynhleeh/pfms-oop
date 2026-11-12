@@ -52,7 +52,8 @@ class UpdateWalletRequestDTOTest {
         @Test
         @DisplayName("Tự động cắt tỉa khoảng trắng ghi chú nếu có nội dung")
         void shouldTrimNoteWhenProvided() {
-            UpdateWalletRequestDTO dto = new UpdateWalletRequestDTO(sampleId, "Ví Tiết Kiệm", "   Quỹ đầu tư dài hạn   ");
+            UpdateWalletRequestDTO dto = new UpdateWalletRequestDTO(sampleId, "Ví Tiết Kiệm",
+                    "   Quỹ đầu tư dài hạn   ");
 
             assertEquals("Ví Tiết Kiệm", dto.getName());
             assertEquals("Quỹ đầu tư dài hạn", dto.getNote());
@@ -64,24 +65,22 @@ class UpdateWalletRequestDTOTest {
     class InvalidInputTests {
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi mã ví walletId bị null")
+        @DisplayName("Ném NullPointerException khi mã ví walletId bị null")
         void shouldThrowExceptionWhenWalletIdIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new UpdateWalletRequestDTO(null, "Tên hợp lệ", "Ghi chú")
-            );
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
+                    () -> new UpdateWalletRequestDTO(null, "Tên hợp lệ", "Ghi chú"));
             assertTrue(ex.getMessage().contains("Mã ví"));
         }
 
         @ParameterizedTest
         @NullAndEmptySource
-        @ValueSource(strings = {"   ", "\t", "\n"})
+        @ValueSource(strings = { "   ", "\t", "\n" })
         @DisplayName("Ném IllegalArgumentException khi tên ví null, rỗng hoặc chỉ toàn khoảng trắng")
         void shouldThrowExceptionWhenNameIsInvalid(String invalidName) {
             IllegalArgumentException ex = assertThrows(
                     IllegalArgumentException.class,
-                    () -> new UpdateWalletRequestDTO(sampleId, invalidName, "Ghi chú")
-            );
+                    () -> new UpdateWalletRequestDTO(sampleId, invalidName, "Ghi chú"));
             assertTrue(ex.getMessage().contains("Tên ví"));
         }
     }

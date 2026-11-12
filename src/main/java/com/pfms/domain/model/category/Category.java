@@ -1,5 +1,6 @@
 package com.pfms.domain.model.category;
 
+import com.pfms.common.util.Preconditions;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.common.EntityName;
@@ -121,9 +122,7 @@ public class Category {
             return "";
         }
         String trimmed = rawIcon.trim();
-        if (trimmed.length() > 50) {
-            throw new IllegalArgumentException("Biểu tượng danh mục không được vượt quá 50 ký tự.");
-        }
+        Preconditions.checkArgument(trimmed.length() <= 50, "Biểu tượng danh mục không được vượt quá 50 ký tự.");
         return trimmed;
     }
 
@@ -132,9 +131,7 @@ public class Category {
             return "";
         }
         String trimmed = rawColor.trim();
-        if (trimmed.length() > 10) {
-            throw new IllegalArgumentException("Mã màu danh mục không được vượt quá 10 ký tự.");
-        }
+        Preconditions.checkArgument(trimmed.length() <= 10, "Mã màu danh mục không được vượt quá 10 ký tự.");
         return trimmed;
     }
     // endregion

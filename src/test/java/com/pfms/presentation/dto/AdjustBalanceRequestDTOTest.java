@@ -51,7 +51,8 @@ class AdjustBalanceRequestDTOTest {
         @DisplayName("Khởi tạo với mã ví, số dư và lý do, tự động gán ngày hiện tại")
         void shouldCreateWithIdBalanceAndReason() {
             BigDecimal amount = new BigDecimal("2500000.00");
-            AdjustBalanceRequestDTO dto = new AdjustBalanceRequestDTO(sampleId, amount, "Tìm thấy tiền mặt quên trong túi");
+            AdjustBalanceRequestDTO dto = new AdjustBalanceRequestDTO(sampleId, amount,
+                    "Tìm thấy tiền mặt quên trong túi");
 
             assertEquals(sampleId, dto.getWalletId());
             assertEquals(amount, dto.getActualBalance());
@@ -86,33 +87,30 @@ class AdjustBalanceRequestDTOTest {
     class InvalidInputTests {
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi mã ví walletId bị null")
+        @DisplayName("Ném NullPointerException khi mã ví walletId bị null")
         void shouldThrowExceptionWhenWalletIdIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new AdjustBalanceRequestDTO(null, new BigDecimal("100000"))
-            );
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
+                    () -> new AdjustBalanceRequestDTO(null, new BigDecimal("100000")));
             assertTrue(ex.getMessage().contains("Mã ví"));
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi số dư thực tế actualBalance bị null")
+        @DisplayName("Ném NullPointerException khi số dư thực tế actualBalance bị null")
         void shouldThrowExceptionWhenActualBalanceIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new AdjustBalanceRequestDTO(sampleId, null)
-            );
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
+                    () -> new AdjustBalanceRequestDTO(sampleId, null));
             assertTrue(ex.getMessage().contains("Số dư thực tế"));
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"-0.01", "-1", "-500000"})
+        @ValueSource(strings = { "-0.01", "-1", "-500000" })
         @DisplayName("Ném IllegalArgumentException khi số dư thực tế mang giá trị âm")
         void shouldThrowExceptionWhenActualBalanceIsNegative(String negativeAmount) {
             IllegalArgumentException ex = assertThrows(
                     IllegalArgumentException.class,
-                    () -> new AdjustBalanceRequestDTO(sampleId, new BigDecimal(negativeAmount))
-            );
+                    () -> new AdjustBalanceRequestDTO(sampleId, new BigDecimal(negativeAmount)));
             assertTrue(ex.getMessage().contains("không được âm"));
         }
     }
@@ -129,9 +127,11 @@ class AdjustBalanceRequestDTOTest {
             AdjustBalanceRequestDTO dto1 = new AdjustBalanceRequestDTO(sampleId, amount, "Lý do", sampleDate);
             AdjustBalanceRequestDTO dto2 = new AdjustBalanceRequestDTO(sampleId, amount, "Lý do", sampleDate);
             AdjustBalanceRequestDTO dtoDiffId = new AdjustBalanceRequestDTO(otherId, amount, "Lý do", sampleDate);
-            AdjustBalanceRequestDTO dtoDiffAmount = new AdjustBalanceRequestDTO(sampleId, new BigDecimal("600000.00"), "Lý do", sampleDate);
+            AdjustBalanceRequestDTO dtoDiffAmount = new AdjustBalanceRequestDTO(sampleId, new BigDecimal("600000.00"),
+                    "Lý do", sampleDate);
             AdjustBalanceRequestDTO dtoDiffReason = new AdjustBalanceRequestDTO(sampleId, amount, "Khác", sampleDate);
-            AdjustBalanceRequestDTO dtoDiffDate = new AdjustBalanceRequestDTO(sampleId, amount, "Lý do", sampleDate.plusDays(1));
+            AdjustBalanceRequestDTO dtoDiffDate = new AdjustBalanceRequestDTO(sampleId, amount, "Lý do",
+                    sampleDate.plusDays(1));
 
             assertEquals(dto1, dto2);
             assertEquals(dto1.hashCode(), dto2.hashCode());

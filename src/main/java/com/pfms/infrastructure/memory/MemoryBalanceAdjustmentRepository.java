@@ -4,6 +4,7 @@ import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 import com.pfms.domain.repository.BalanceAdjustmentRepository;
 
 import java.util.*;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -28,13 +29,8 @@ public class MemoryBalanceAdjustmentRepository
     // region Commands
     @Override
     public BalanceAdjustmentRecord save(BalanceAdjustmentRecord entity) {
-        if (entity == null) {
-            throw new IllegalArgumentException("Thực thể bản ghi kiểm kê không được để null");
-        }
-        UUID id = entity.getRecordId();
-        if (id == null) {
-            throw new IllegalArgumentException("Mã bản ghi kiểm kê không được để null");
-        }
+        Objects.requireNonNull(entity, "Thực thể bản ghi kiểm kê không được để null");
+        UUID id = Objects.requireNonNull(entity.getRecordId(), "Mã bản ghi kiểm kê không được để null");
         if (storage.containsKey(id)) {
             throw new UnsupportedOperationException(
                     "Bản ghi kiểm kê mang tính bất biến kiểm toán, không hỗ trợ cập nhật bản ghi đã tồn tại.");
@@ -46,9 +42,7 @@ public class MemoryBalanceAdjustmentRepository
 
     @Override
     public boolean deleteById(UUID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Mã bản ghi kiểm kê không được để null");
-        }
+        Objects.requireNonNull(id, "Mã bản ghi kiểm kê không được để null");
         throw new UnsupportedOperationException(
                 "Bản ghi kiểm kê mang tính bất biến kiểm toán, không hỗ trợ thao tác xóa khỏi hệ thống.");
     }
@@ -64,9 +58,7 @@ public class MemoryBalanceAdjustmentRepository
     // region Queries
     @Override
     public List<BalanceAdjustmentRecord> findByWalletId(UUID walletId) {
-        if (walletId == null) {
-            throw new IllegalArgumentException("Mã ví kiểm kê không được để null");
-        }
+        Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
         List<BalanceAdjustmentRecord> matched = new ArrayList<>(storage.values().stream()
                 .filter(record -> record.getWalletId().equals(walletId))
                 .toList());
@@ -86,9 +78,7 @@ public class MemoryBalanceAdjustmentRepository
 
     @Override
     public Optional<BalanceAdjustmentRecord> findLatestByWalletId(UUID walletId) {
-        if (walletId == null) {
-            throw new IllegalArgumentException("Mã ví kiểm kê không được để null");
-        }
+        Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
         List<BalanceAdjustmentRecord> list = findByWalletId(walletId);
         return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
     }

@@ -31,7 +31,7 @@ class MoneyTest {
         assertThrows(IllegalArgumentException.class, () -> Money.of(""));
         assertThrows(IllegalArgumentException.class, () -> Money.of("   "));
         assertThrows(IllegalArgumentException.class, () -> Money.of("invalid_number"));
-        assertThrows(IllegalArgumentException.class, () -> Money.of((BigDecimal) null));
+        assertThrows(NullPointerException.class, () -> Money.of((BigDecimal) null));
     }
 
     @Test
@@ -47,8 +47,8 @@ class MoneyTest {
         assertEquals(Money.of("100000.25"), diff);
         assertEquals(Money.of("150000.50"), initial, "Original instance must remain immutable");
 
-        assertThrows(IllegalArgumentException.class, () -> initial.add(null));
-        assertThrows(IllegalArgumentException.class, () -> initial.subtract(null));
+        assertThrows(NullPointerException.class, () -> initial.add(null));
+        assertThrows(NullPointerException.class, () -> initial.subtract(null));
     }
 
     @Test
@@ -57,7 +57,7 @@ class MoneyTest {
         Money m = Money.of("50000.00");
         assertEquals(Money.of("150000.00"), m.multiply(3L));
         assertEquals(Money.of("75000.00"), m.multiply(new BigDecimal("1.5")));
-        assertThrows(IllegalArgumentException.class, () -> m.multiply((BigDecimal) null));
+        assertThrows(NullPointerException.class, () -> m.multiply((BigDecimal) null));
     }
 
     @Test
@@ -72,7 +72,7 @@ class MoneyTest {
 
         assertThrows(ArithmeticException.class, () -> m.divide(0L));
         assertThrows(ArithmeticException.class, () -> m.divide(BigDecimal.ZERO));
-        assertThrows(IllegalArgumentException.class, () -> m.divide((BigDecimal) null));
+        assertThrows(NullPointerException.class, () -> m.divide((BigDecimal) null));
     }
 
     @Test

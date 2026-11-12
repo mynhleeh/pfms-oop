@@ -5,8 +5,11 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.pfms.common.util.Preconditions;
+
 /**
- * DTO đóng gói dữ liệu yêu cầu kiểm kê và điều chỉnh số dư thực tế từ giao diện gửi xuống tầng dịch vụ.
+ * DTO đóng gói dữ liệu yêu cầu kiểm kê và điều chỉnh số dư thực tế từ giao diện
+ * gửi xuống tầng dịch vụ.
  */
 public final class AdjustBalanceRequestDTO {
 
@@ -27,17 +30,10 @@ public final class AdjustBalanceRequestDTO {
     }
 
     public AdjustBalanceRequestDTO(UUID walletId, BigDecimal actualBalance, String reason, LocalDate adjustedAt) {
-        if (walletId == null) {
-            throw new IllegalArgumentException("Mã ví kiểm kê không được để null");
-        }
-        if (actualBalance == null) {
-            throw new IllegalArgumentException("Số dư thực tế quan sát được không được để null");
-        }
-        if (actualBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Số dư thực tế quan sát được không được âm: " + actualBalance);
-        }
-        this.walletId = walletId;
-        this.actualBalance = actualBalance;
+        this.walletId = Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
+        Objects.requireNonNull(actualBalance, "Số dư thực tế quan sát được không được để null");
+        this.actualBalance = Preconditions.requireNonNegative(actualBalance,
+                "Số dư thực tế quan sát được không được âm: " + actualBalance);
         this.reason = (reason == null) ? "" : reason.trim();
         this.adjustedAt = (adjustedAt == null) ? LocalDate.now() : adjustedAt;
     }
@@ -82,8 +78,7 @@ public final class AdjustBalanceRequestDTO {
                 this.walletId,
                 this.actualBalance.stripTrailingZeros(),
                 this.reason,
-                this.adjustedAt
-        );
+                this.adjustedAt);
     }
 
     @Override

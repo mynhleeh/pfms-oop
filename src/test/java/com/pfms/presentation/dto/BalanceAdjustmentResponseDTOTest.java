@@ -118,51 +118,51 @@ class BalanceAdjustmentResponseDTOTest {
     class InvalidInputTests {
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi recordId bị null")
+        @DisplayName("Ném NullPointerException khi recordId bị null")
         void shouldThrowExceptionWhenRecordIdIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> new BalanceAdjustmentResponseDTO(
-                            null, walletId, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate, createdTime)
-            );
+                            null, walletId, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate,
+                            createdTime));
             assertTrue(ex.getMessage().contains("Mã bản ghi"));
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi walletId bị null")
+        @DisplayName("Ném NullPointerException khi walletId bị null")
         void shouldThrowExceptionWhenWalletIdIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> new BalanceAdjustmentResponseDTO(
-                            recordId, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate, createdTime)
-            );
+                            recordId, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate,
+                            createdTime));
             assertTrue(ex.getMessage().contains("Mã ví"));
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi previousBalance bị null")
+        @DisplayName("Ném NullPointerException khi previousBalance bị null")
         void shouldThrowExceptionWhenPreviousBalanceIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> new BalanceAdjustmentResponseDTO(
-                            recordId, walletId, null, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate, createdTime)
-            );
+                            recordId, walletId, null, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate,
+                            createdTime));
             assertTrue(ex.getMessage().contains("Số dư trước"));
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi actualBalance bị null")
+        @DisplayName("Ném NullPointerException khi actualBalance bị null")
         void shouldThrowExceptionWhenActualBalanceIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> new BalanceAdjustmentResponseDTO(
-                            recordId, walletId, BigDecimal.ZERO, null, BigDecimal.ZERO, "VND", "", adjustedDate, createdTime)
-            );
+                            recordId, walletId, BigDecimal.ZERO, null, BigDecimal.ZERO, "VND", "", adjustedDate,
+                            createdTime));
             assertTrue(ex.getMessage().contains("Số dư thực tế"));
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"-0.01", "-100000"})
+        @ValueSource(strings = { "-0.01", "-100000" })
         @DisplayName("Ném IllegalArgumentException khi previousBalance hoặc actualBalance mang giá trị âm")
         void shouldThrowExceptionWhenBalancesAreNegative(String negativeAmount) {
             BigDecimal neg = new BigDecimal(negativeAmount);
@@ -170,13 +170,13 @@ class BalanceAdjustmentResponseDTOTest {
             assertThrows(
                     IllegalArgumentException.class,
                     () -> new BalanceAdjustmentResponseDTO(
-                            recordId, walletId, neg, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate, createdTime)
-            );
+                            recordId, walletId, neg, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate,
+                            createdTime));
             assertThrows(
                     IllegalArgumentException.class,
                     () -> new BalanceAdjustmentResponseDTO(
-                            recordId, walletId, BigDecimal.ZERO, neg, BigDecimal.ZERO, "VND", "", adjustedDate, createdTime)
-            );
+                            recordId, walletId, BigDecimal.ZERO, neg, BigDecimal.ZERO, "VND", "", adjustedDate,
+                            createdTime));
         }
     }
 
@@ -199,7 +199,8 @@ class BalanceAdjustmentResponseDTOTest {
             BalanceAdjustmentResponseDTO dtoDiffRecordId = new BalanceAdjustmentResponseDTO(
                     otherId, walletId, prev, actual, diff, "VND", "Lý do", adjustedDate, createdTime);
             BalanceAdjustmentResponseDTO dtoDiffDiff = new BalanceAdjustmentResponseDTO(
-                    recordId, walletId, prev, actual, new BigDecimal("300.00"), "VND", "Lý do", adjustedDate, createdTime);
+                    recordId, walletId, prev, actual, new BigDecimal("300.00"), "VND", "Lý do", adjustedDate,
+                    createdTime);
 
             assertEquals(dto1, dto2);
             assertEquals(dto1.hashCode(), dto2.hashCode());
@@ -226,4 +227,3 @@ class BalanceAdjustmentResponseDTOTest {
         }
     }
 }
-

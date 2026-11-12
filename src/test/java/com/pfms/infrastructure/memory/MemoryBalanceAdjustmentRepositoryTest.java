@@ -112,10 +112,10 @@ class MemoryBalanceAdjustmentRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when saving null entity")
+        @DisplayName("Should throw NullPointerException when saving null entity")
         void shouldRejectNullEntity() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.save(null));
 
             assertTrue(ex.getMessage().contains("không được để null"));
@@ -167,10 +167,10 @@ class MemoryBalanceAdjustmentRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when id is null")
-        void shouldRejectNullIdWithIllegalArgumentException() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Should throw NullPointerException when id is null")
+        void shouldRejectNullIdWithNullPointerException() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.deleteById(null));
 
             assertTrue(ex.getMessage().contains("không được để null"));
@@ -259,10 +259,10 @@ class MemoryBalanceAdjustmentRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when walletId is null")
+        @DisplayName("Should throw NullPointerException when walletId is null")
         void shouldRejectNullWalletId() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.findByWalletId(null));
 
             assertTrue(ex.getMessage().contains("không được để null"));
@@ -339,10 +339,10 @@ class MemoryBalanceAdjustmentRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when walletId is null")
+        @DisplayName("Should throw NullPointerException when walletId is null")
         void shouldRejectNullWalletId() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.findLatestByWalletId(null));
 
             assertTrue(ex.getMessage().contains("không được để null"));
@@ -375,9 +375,9 @@ class MemoryBalanceAdjustmentRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when findById null")
+        @DisplayName("Should throw NullPointerException when findById null")
         void shouldRejectNullIdOnFindById() {
-            assertThrows(IllegalArgumentException.class, () -> repository.findById(null));
+            assertThrows(NullPointerException.class, () -> repository.findById(null));
         }
 
         @Test
