@@ -4,24 +4,25 @@ import java.util.* ;
 
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
+import com.pfms.domain.model.common.EntityName;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.transaction.TransactionType ;
-import status ;
 
 
 public class NeedGroup{
     private final UUID needGroupId ;
-    private String name ;
+    private EntityName name ;
     private final TransactionType transactionType ;
-    private GroupStatus status ;
+    private EntityStatus status ;
     private String icon ;
     private String color ;
     private final List<Category> categories ;
 
     public NeedGroup(UUID needGroupId, String name, TransactionType transactionType, String icon, String color){
         this.needGroupId = needGroupId ;
-        this.name = name.trim() ;
+        this.name = EntityName.of(name,"GroupName") ;
         this.transactionType = transactionType ;
-        this.status = GroupStatus.ACTIVE ;
+        this.status = EntityStatus.ACTIVE ;
         this.icon = icon ;
         this.categories = new ArrayList<>() ;
     }
@@ -31,8 +32,7 @@ public class NeedGroup{
     }
     
     public String getName(){
-
-        return name ;
+        return name.getValue() ;
     }
 
     public TransactionType getTransactionType(){
@@ -52,15 +52,15 @@ public class NeedGroup{
     }
 
     public boolean isActive() {
-        return status == CategoryStatus.ACTIVE ;
+        return status.isActive() ;
     }
 
     public boolean isDeleted(){
-        return status == CategoryStatus.DELETED ;
+        return status.isDeleted() ;
     }
 
     public void rename(String newName){
-        this.name = newName.trim() ;
+        this.name = EntityName.of(newName,"GroupName") ;
     }
 
     public void updateAppearance(String newIcon , String newColor){
@@ -70,6 +70,7 @@ public class NeedGroup{
     }
 
     public void addCategory(Category category){
+        // region findbyId
         if(category.isDeleted() || category.getTransactionType() != this.transactionType){
             throw new BusinessException(ErrorCode.ERR_FEE_003);
             return ;
@@ -85,11 +86,11 @@ public class NeedGroup{
     }
 
     public void markDeleted(){
-        this.status = CategoryStatus.DELETED ;
+        this.status = EntityStatus.DELETED ;
     }
 
     public void restore(boolean isParentGroupActive){
-        this.status = CategoryStatus.ACTIVE ;
+        this.status = EntityStatus.ACTIVE ;
     }
 
 }

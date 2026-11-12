@@ -3,25 +3,27 @@ package com.pfms.domain.model.category;
 import java.util.UUID;
 
 import com.pfms.domain.exception.BusinessException;
+import com.pfms.domain.model.common.EntityName;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.exception.ErrorCode ;
 
 
 public class Category {
     private final UUID categoryId ;
-    private String name ;
+    private EntityName name ;
     private UUID needGroupId ;
     private final TransactionType transactionType ;
-    private CategoryStatus status;
+    private EntityStatus status;
     private String icon ;
     private String color ; 
 
     public Category(UUID categoryId, String name, UUID needGroupId, TransactionType transactionType, String icon, String color){
         this.categoryId = UUID.randomUUID() ;
-        this.name = name ;
+        this.name = EntityName.of(name,"CategoryName") ;
         this.needGroupId = needGroupId ;
         this.transactionType = transactionType ;
-        this.status = CategoryStatus.ACTIVE ;
+        this.status = EntityStatus.ACTIVE ;
         this.icon = icon ;
         this.color = color ;
     }
@@ -31,7 +33,7 @@ public class Category {
     }
 
     public String getName() {
-        return name ;
+        return name.getValue() ;
     }
 
     public UUID getNeedGroupId(){
@@ -42,7 +44,7 @@ public class Category {
         return transactionType ;
     }
 
-    public CategoryStatus getStatus(){
+    public EntityStatus getStatus(){
         return status ;
     }
 
@@ -55,25 +57,21 @@ public class Category {
     }
 
     public boolean isActive() {
-        return status == CategoryStatus.ACTIVE ;
+        return status.isActive() ;
     }
 
     public boolean isDeleted(){
-        return status == CategoryStatus.DELETED ;
+        return status.isDeleted() ;
     }
 
     public void rename(String newName){
-        if(newName == null || newName.trim().isEmpty() || newName.trim().length() > 50){
-            throw new BusinessException(ErrorCode.ERR_NAM_002) ;
-            return ;
-        }
-        this.name = newName.trim() ;
+        this.name = EntityName.of(newName,"CategoryName") ;
     }
 
     public void changeNeedGroup(UUID newNeedGroupId,TransactionType targetGroupType){
-        if(newNeedGroupId.isDeleted() || targetGroupType != this.transactionType){
+        // region FindBYID
+        if(findID(newNeedGroupId).isDeleted() || targetGroupType != this.transactionType){
             throw new BusinessException(ErrorCode.ERR_CAT_003) ;
-            return ;
         }
         this.needGroupId = newNeedGroupId ;
     }
@@ -84,15 +82,14 @@ public class Category {
     }
 
     public void markDeleted(){
-        this.status = CategoryStatus.DELETED ;
+        this.status = EntityStatus.DELETED ;
     }
 
     public void restore(boolean isParentGroupActive){
         if(!isParentGroupActive){
-            throw new BusinessException(ErrorCode.ERR-CAT-004) ;
-            return ;
+            throw new BusinessException(ErrorCode.ERR_CAT_004) ;
         }
-        this.status = CategoryStatus.ACTIVE ;
+        this.status = EntityStatus.ACTIVE ;
     }
 
 }
