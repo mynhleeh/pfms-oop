@@ -3,6 +3,7 @@ package com.pfms.domain.model.wallet;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +34,7 @@ class WalletTest {
             assertEquals("", wallet.getNote());
             assertFalse(wallet.isDefaultWallet());
             assertEquals(Money.ZERO, wallet.getCurrentBalance());
-            assertEquals(WalletStatus.ACTIVE, wallet.getStatus());
+            assertEquals(EntityStatus.ACTIVE, wallet.getStatus());
             assertNotNull(wallet.getCreatedAt());
         }
 
@@ -71,7 +72,7 @@ class WalletTest {
             assertFalse(wallet.isDefaultWallet());
             assertEquals(now, wallet.getCreatedAt());
             assertEquals(Money.of(500_000), wallet.getCurrentBalance());
-            assertEquals(WalletStatus.ACTIVE, wallet.getStatus());
+            assertEquals(EntityStatus.ACTIVE, wallet.getStatus());
         }
 
         @Test
@@ -86,7 +87,7 @@ class WalletTest {
             assertEquals("Ví điện tử", wallet.getNote());
             assertFalse(wallet.isDefault());
             assertEquals(Money.ZERO, wallet.getCurrentBalance());
-            assertEquals(WalletStatus.ACTIVE, wallet.getStatus());
+            assertEquals(EntityStatus.ACTIVE, wallet.getStatus());
         }
     }
 
@@ -270,7 +271,7 @@ class WalletTest {
 
             IllegalStateException ex = assertThrows(IllegalStateException.class, defaultWallet::archive);
             assertTrue(ex.getMessage().contains("mặc định"));
-            assertEquals(WalletStatus.ACTIVE, defaultWallet.getStatus());
+            assertEquals(EntityStatus.ACTIVE, defaultWallet.getStatus());
         }
 
         @Test
@@ -280,7 +281,7 @@ class WalletTest {
 
             IllegalStateException ex = assertThrows(IllegalStateException.class, defaultWallet::delete);
             assertTrue(ex.getMessage().contains("mặc định"));
-            assertEquals(WalletStatus.ACTIVE, defaultWallet.getStatus());
+            assertEquals(EntityStatus.ACTIVE, defaultWallet.getStatus());
         }
 
         @Test
@@ -289,10 +290,10 @@ class WalletTest {
             Wallet normalWallet = new Wallet("Ví phụ", "", false);
 
             normalWallet.archive();
-            assertEquals(WalletStatus.ARCHIVED, normalWallet.getStatus());
+            assertEquals(EntityStatus.ARCHIVED, normalWallet.getStatus());
 
             normalWallet.activate();
-            assertEquals(WalletStatus.ACTIVE, normalWallet.getStatus());
+            assertEquals(EntityStatus.ACTIVE, normalWallet.getStatus());
 
             normalWallet.delete();
             assertInstanceOf(DeletedWalletState.class, normalWallet.getState());
@@ -322,12 +323,14 @@ class WalletTest {
         }
 
         @Test
-        @DisplayName("isArchived() and isActive() on deleted wallet should return false safely")
+        @DisplayName("isArchived() and isActive() on deleted wallet should return false safely, isDeleted() true")
         void testQueriesOnDeletedWallet() {
             Wallet wallet = new Wallet("Ví phụ", "", false);
             wallet.delete();
             assertFalse(wallet.isArchived());
             assertFalse(wallet.isActive());
+            assertTrue(wallet.isDeleted());
+            assertEquals(EntityStatus.DELETED, wallet.getStatus());
         }
     }
 

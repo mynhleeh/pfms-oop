@@ -35,7 +35,7 @@ Giao diện `com.pfms.service.WalletService` cung cấp các phương thức sau
 | :--- | :--- | :--- | :--- | :--- |
 | `initializeDefaultWallet` | `Không có` | `void` | `StorageException` | Kiểm tra khi khởi động ứng dụng; nếu chưa có ví mặc định thì tạo sẵn ví `"Tiền mặt"` ở trạng thái hoạt động với số dư bằng không. |
 | `createWallet` | `CreateWalletRequestDto request` | `WalletResponseDto` | `BusinessException`, `DuplicateEntityException`, `StorageException` | Kiểm tra hợp lệ tên ví, kiểm tra trùng tên và khởi tạo ví mới ở trạng thái hoạt động với số dư bằng không. |
-| `getWalletsSummary` | `WalletStatus statusFilter` | `WalletsSummaryDto` | `StorageException` | Truy xuất danh sách ví theo bộ lọc trạng thái, tính tổng số dư hệ thống và tỷ trọng phân bổ của từng ví ở chế độ chỉ đọc. |
+| `getWalletsSummary` | `EntityStatus statusFilter` | `WalletsSummaryDto` | `StorageException` | Truy xuất danh sách ví theo bộ lọc trạng thái, tính tổng số dư hệ thống và tỷ trọng phân bổ của từng ví ở chế độ chỉ đọc. |
 | `updateWallet` | `UpdateWalletRequestDto request` | `WalletResponseDto` | `EntityNotFoundException`, `BusinessException`, `DuplicateEntityException`, `StorageException` | Nạp ví cần sửa, xác thực tên mới không trùng với ví khác và cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
 | `archiveWallet` | `UUID walletId` | `WalletResponseDto` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Chuyển một ví đang hoạt động không phải ví mặc định sang trạng thái lưu trữ để ngừng phát sinh giao dịch mới. |
 | `activateWallet` | `UUID walletId` | `WalletResponseDto` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Mở lại một ví đang ở trạng thái lưu trữ về trạng thái hoạt động bình thường. |

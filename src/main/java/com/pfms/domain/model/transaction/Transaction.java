@@ -3,6 +3,7 @@ package com.pfms.domain.model.transaction;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.common.Money;
+import com.pfms.domain.model.common.Note;
 import com.pfms.domain.model.common.TransactionDate;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ public abstract class Transaction {
     protected final UUID transactionId;
     protected Money amount;
     protected TransactionDate transactionDate;
-    protected String note;
+    protected Note note;
     protected TransactionFee fee;
     protected final LocalDateTime createdAt;
     // endregion
@@ -35,7 +36,7 @@ public abstract class Transaction {
         this.transactionId = Objects.requireNonNull(transactionId, "Mã giao dịch không được để null");
         this.amount = validateAmount(amount);
         this.transactionDate = Objects.requireNonNull(transactionDate, "Ngày giao dịch không được để null");
-        this.note = normalizeNote(note);
+        this.note = Note.of(note, "Ghi chú giao dịch");
         this.fee = validateFee(fee, transactionId);
         this.createdAt = LocalDateTime.now();
     }
@@ -55,7 +56,11 @@ public abstract class Transaction {
     }
 
     protected void setNote(String note) {
-        this.note = normalizeNote(note);
+        this.note = Note.of(note, "Ghi chú giao dịch");
+    }
+
+    protected void setNote(Note note) {
+        this.note = (note != null) ? note : Note.EMPTY;
     }
 
     protected void setFee(TransactionFee fee) {
@@ -77,6 +82,10 @@ public abstract class Transaction {
     }
 
     public String getNote() {
+        return this.note.getValue();
+    }
+
+    public Note getNoteValue() {
         return this.note;
     }
 
@@ -95,17 +104,6 @@ public abstract class Transaction {
             throw new BusinessException(ErrorCode.ERR_FIN_001, "Số tiền giao dịch không hợp lệ.");
         }
         return amount;
-    }
-
-    protected static String normalizeNote(String rawNote) {
-        if (rawNote == null) {
-            return "";
-        }
-        String trimmed = rawNote.trim();
-        if (trimmed.length() > 255) {
-            throw new IllegalArgumentException("Ghi chú giao dịch không được vượt quá 255 ký tự.");
-        }
-        return trimmed;
     }
 
     protected static TransactionFee validateFee(TransactionFee fee, UUID transactionId) {

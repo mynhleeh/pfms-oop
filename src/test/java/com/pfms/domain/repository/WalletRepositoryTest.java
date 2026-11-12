@@ -1,10 +1,10 @@
 package com.pfms.domain.repository;
 
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.wallet.ActiveWalletState;
 import com.pfms.domain.model.wallet.ArchivedWalletState;
 import com.pfms.domain.model.wallet.Wallet;
-import com.pfms.domain.model.wallet.WalletStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -81,7 +81,7 @@ class WalletRepositoryTest {
         }
 
         @Override
-        public List<Wallet> findByStatus(WalletStatus status) {
+        public List<Wallet> findByStatus(EntityStatus status) {
             if (status == null) {
                 throw new IllegalArgumentException("Status must not be null");
             }
@@ -91,7 +91,7 @@ class WalletRepositoryTest {
         }
 
         @Override
-        public long countByStatus(WalletStatus status) {
+        public long countByStatus(EntityStatus status) {
             if (status == null) {
                 throw new IllegalArgumentException("Status must not be null");
             }
@@ -247,7 +247,7 @@ class WalletRepositoryTest {
     }
 
     @Nested
-    @DisplayName("Tests for findByStatus(WalletStatus status)")
+    @DisplayName("Tests for findByStatus(EntityStatus status)")
     class FindByStatusTests {
 
         @Test
@@ -257,7 +257,7 @@ class WalletRepositoryTest {
             repository.save(savingsWallet);
             repository.save(archivedWallet);
 
-            List<Wallet> activeWallets = repository.findByStatus(WalletStatus.ACTIVE);
+            List<Wallet> activeWallets = repository.findByStatus(EntityStatus.ACTIVE);
 
             assertEquals(2, activeWallets.size());
             assertTrue(activeWallets.contains(defaultCashWallet));
@@ -271,7 +271,7 @@ class WalletRepositoryTest {
             repository.save(defaultCashWallet);
             repository.save(archivedWallet);
 
-            List<Wallet> archivedWallets = repository.findByStatus(WalletStatus.ARCHIVED);
+            List<Wallet> archivedWallets = repository.findByStatus(EntityStatus.ARCHIVED);
 
             assertEquals(1, archivedWallets.size());
             assertTrue(archivedWallets.contains(archivedWallet));
@@ -282,7 +282,7 @@ class WalletRepositoryTest {
         void shouldReturnEmptyListWhenNoWalletsMatchStatus() {
             repository.save(defaultCashWallet);
 
-            List<Wallet> archived = repository.findByStatus(WalletStatus.ARCHIVED);
+            List<Wallet> archived = repository.findByStatus(EntityStatus.ARCHIVED);
 
             assertNotNull(archived);
             assertTrue(archived.isEmpty());
@@ -296,7 +296,7 @@ class WalletRepositoryTest {
     }
 
     @Nested
-    @DisplayName("Tests for countByStatus(WalletStatus status)")
+    @DisplayName("Tests for countByStatus(EntityStatus status)")
     class CountByStatusTests {
 
         @Test
@@ -306,8 +306,8 @@ class WalletRepositoryTest {
             repository.save(savingsWallet);
             repository.save(archivedWallet);
 
-            assertEquals(2, repository.countByStatus(WalletStatus.ACTIVE));
-            assertEquals(1, repository.countByStatus(WalletStatus.ARCHIVED));
+            assertEquals(2, repository.countByStatus(EntityStatus.ACTIVE));
+            assertEquals(1, repository.countByStatus(EntityStatus.ARCHIVED));
         }
 
         @Test
@@ -315,7 +315,7 @@ class WalletRepositoryTest {
         void shouldReturnZeroWhenNoWalletsMatchStatus() {
             repository.save(defaultCashWallet);
 
-            assertEquals(0, repository.countByStatus(WalletStatus.ARCHIVED));
+            assertEquals(0, repository.countByStatus(EntityStatus.ARCHIVED));
         }
 
         @Test
