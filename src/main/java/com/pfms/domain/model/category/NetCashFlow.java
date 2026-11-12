@@ -22,7 +22,7 @@ public class NetCashFlow {
             throw new BusinessException(ErrorCode.ERR_FIN_001);
         }
 
-        return new NetCashFlow(totalIncome - totalExpense);
+        return new NetCashFlow(totalIncome.subtract(totalExpense));
     }
 
     public BigDecimal getAmount(){
