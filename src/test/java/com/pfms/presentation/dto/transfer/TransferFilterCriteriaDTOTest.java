@@ -1,0 +1,251 @@
+package com.pfms.presentation.dto.transfer;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@DisplayName("Kiểm thử TransferFilterCriteriaDTO")
+class TransferFilterCriteriaDTOTest {
+
+    private final UUID sampleSourceWalletId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private final UUID sampleDestinationWalletId = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    private final LocalDate startDate = LocalDate.of(2026, 11, 1);
+    private final LocalDate endDate = LocalDate.of(2026, 11, 30);
+
+    @Nested
+    @DisplayName("Nhóm 1: Happy Path - Khởi tạo và đóng gói tiêu chí lọc hợp lệ")
+    class HappyPathTests {
+
+        @Test
+        @DisplayName("Khởi tạo thành công với đầy đủ 6 tiêu chí lọc và phân trang")
+        void shouldCreateWithAllCriteria() {
+            TransferFilterCriteriaDTO dto = new TransferFilterCriteriaDTO(
+                    startDate,
+                    endDate,
+                    sampleSourceWalletId,
+                    sampleDestinationWalletId,
+                    2,
+                    25
+            );
+
+            assertEquals(startDate, dto.getStartDate());
+            assertEquals(endDate, dto.getEndDate());
+            assertEquals(sampleSourceWalletId, dto.getSourceWalletId());
+            assertEquals(sampleDestinationWalletId, dto.getDestinationWalletId());
+            assertEquals(2, dto.getPageNumber());
+            assertEquals(25, dto.getPageSize());
+            assertTrue(dto.hasDateFilter());
+            assertTrue(dto.hasSourceWalletFilter());
+            assertTrue(dto.hasDestinationWalletFilter());
+        }
+
+        @Test
+        @DisplayName("Khởi tạo không đối số (mặc định xem tất cả, trang 1, 50 bản ghi/trang)")
+        void shouldCreateDefaultEmptyFilter() {
+            TransferFilterCriteriaDTO dto = new TransferFilterCriteriaDTO();
+
+            assertNull(dto.getStartDate());
+            assertNull(dto.getEndDate());
+            assertNull(dto.getSourceWalletId());
+            assertNull(dto.getDestinationWalletId());
+            assertEquals(1, dto.getPageNumber());
+            assertEquals(50, dto.getPageSize());
+            assertFalse(dto.hasDateFilter());
+            assertFalse(dto.hasSourceWalletFilter());
+            assertFalse(dto.hasDestinationWalletFilter());
+        }
+
+        @Test
+        @DisplayName("Khởi tạo 4 tham số không phân trang (tự động gán trang 1, kích thước 50)")
+        void shouldCreateWith4ParamsDefaultPagination() {
+            TransferFilterCriteriaDTO dto = new TransferFilterCriteriaDTO(
+                    startDate,
+                    endDate,
+                    sampleSourceWalletId,
+                    null
+            );
+
+            assertEquals(startDate, dto.getStartDate());
+            assertEquals(endDate, dto.getEndDate());
+            assertEquals(sampleSourceWalletId, dto.getSourceWalletId());
+            assertNull(dto.getDestinationWalletId());
+            assertEquals(1, dto.getPageNumber());
+            assertEquals(50, dto.getPageSize());
+            assertTrue(dto.hasDateFilter());
+            assertTrue(dto.hasSourceWalletFilter());
+            assertFalse(dto.hasDestinationWalletFilter());
+        }
+
+        @Test
+        @DisplayName("Nhận diện đúng bộ lọc ngày khi chỉ có startDate hoặc chỉ có endDate")
+        void shouldDetectDateFilterWhenOnlyOneBoundProvided() {
+            TransferFilterCriteriaDTO onlyStart = new TransferFilterCriteriaDTO(
+                    startDate, null, null, null
+            );
+            TransferFilterCriteriaDTO onlyEnd = new TransferFilterCriteriaDTO(
+                    null, endDate, null, sampleDestinationWalletId
+            );
+
+            assertTrue(onlyStart.hasDateFilter());
+            assertTrue(onlyEnd.hasDateFilter());
+            assertTrue(onlyEnd.hasDestinationWalletFilter());
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 2: Boundary & Precision - Giá trị biên phân trang và khoảng ngày")
+    class BoundaryAndPrecisionTests {
+
+        @ParameterizedTest(name = "Chấp nhận pageSize tại biên hợp lệ: {0}")
+        @ValueSource(ints = {10, 50, 100})
+        @DisplayName("Chấp nhận kích thước trang tại cận dưới (10) và cận trên (100)")
+        void shouldAcceptBoundaryPageSizes(int validPageSize) {
+            TransferFilterCriteriaDTO dto = new TransferFilterCriteriaDTO(
+                    null, null, null, null, 1, validPageSize
+            );
+
+            assertEquals(1, dto.getPageNumber());
+            assertEquals(validPageSize, dto.getPageSize());
+        }
+
+        @Test
+        @DisplayName("Chấp nhận khoảng thời gian biên trong cùng 1 ngày (startDate trùng endDate)")
+        void shouldAcceptSameStartAndEndDate() {
+            LocalDate singleDay = LocalDate.of(2026, 11, 12);
+
+            TransferFilterCriteriaDTO dto = new TransferFilterCriteriaDTO(
+                    singleDay, singleDay, sampleSourceWalletId, sampleDestinationWalletId
+            );
+
+            assertEquals(singleDay, dto.getStartDate());
+            assertEquals(singleDay, dto.getEndDate());
+            assertTrue(dto.hasDateFilter());
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 3: Negative & Zero Values - Kiểm soát số trang âm, bằng 0 và ngoài biên")
+    class NegativeAndZeroValueTests {
+
+        @ParameterizedTest(name = "Chỉ số trang không hợp lệ: {0}")
+        @ValueSource(ints = {-100, -1, 0})
+        @DisplayName("Ném IllegalArgumentException khi chỉ số trang pageNumber nhỏ hơn 1")
+        void shouldThrowWhenPageNumberIsLessThanOne(int invalidPageNumber) {
+            IllegalArgumentException ex = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> new TransferFilterCriteriaDTO(
+                            startDate, endDate, null, null, invalidPageNumber, 50
+                    )
+            );
+            assertTrue(ex.getMessage().contains("Chỉ số trang phải lớn hơn hoặc bằng 1"));
+        }
+
+        @ParameterizedTest(name = "Kích thước trang ngoài biên: {0}")
+        @ValueSource(ints = {-10, 0, 9, 101, 500})
+        @DisplayName("Ném IllegalArgumentException khi pageSize ngoài đoạn [10, 100]")
+        void shouldThrowWhenPageSizeIsOutOfRange(int invalidPageSize) {
+            IllegalArgumentException ex = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> new TransferFilterCriteriaDTO(
+                            startDate, endDate, null, null, 1, invalidPageSize
+                    )
+            );
+            assertTrue(ex.getMessage().contains("Kích thước trang phải nằm trong khoảng từ 10 đến 100"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 4: Temporal Invariants - Bất biến thời gian và lịch pháp")
+    class TemporalInvariantTests {
+
+        @Test
+        @DisplayName("Ném IllegalArgumentException khi ngày bắt đầu đứng sau ngày kết thúc")
+        void shouldThrowWhenStartDateIsAfterEndDate() {
+            LocalDate invalidStart = LocalDate.of(2026, 11, 25);
+            LocalDate invalidEnd = LocalDate.of(2026, 11, 10);
+
+            IllegalArgumentException ex = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> new TransferFilterCriteriaDTO(
+                            invalidStart, invalidEnd, sampleSourceWalletId, sampleDestinationWalletId, 1, 50
+                    )
+            );
+            assertTrue(ex.getMessage().contains("Ngày bắt đầu không được sau ngày kết thúc"));
+        }
+
+        @Test
+        @DisplayName("Chấp nhận khoảng ngày năm nhuận (29/02) và biên cuối tháng")
+        void shouldAcceptLeapYearDateRange() {
+            LocalDate leapStart = LocalDate.of(2024, 2, 1);
+            LocalDate leapEnd = LocalDate.of(2024, 2, 29);
+
+            TransferFilterCriteriaDTO dto = new TransferFilterCriteriaDTO(
+                    leapStart, leapEnd, null, null
+            );
+
+            assertEquals(leapStart, dto.getStartDate());
+            assertEquals(leapEnd, dto.getEndDate());
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 5: State & Robustness - Hợp đồng equals, hashCode và toString")
+    class StateAndRobustnessTests {
+
+        @Test
+        @DisplayName("Hai đối tượng bằng nhau và cùng hashCode khi khớp toàn bộ tiêu chí")
+        void shouldBeEqualWhenAllFieldsMatch() {
+            TransferFilterCriteriaDTO dto1 = new TransferFilterCriteriaDTO(
+                    startDate, endDate, sampleSourceWalletId, sampleDestinationWalletId, 1, 20
+            );
+            TransferFilterCriteriaDTO dto2 = new TransferFilterCriteriaDTO(
+                    startDate, endDate, sampleSourceWalletId, sampleDestinationWalletId, 1, 20
+            );
+
+            assertEquals(dto1, dto2);
+            assertEquals(dto1.hashCode(), dto2.hashCode());
+        }
+
+        @Test
+        @DisplayName("Không bằng nhau khi khác bất kỳ tiêu chí lọc hoặc thông số phân trang nào")
+        void shouldNotEqualWhenFieldsDiffer() {
+            TransferFilterCriteriaDTO base = new TransferFilterCriteriaDTO(
+                    startDate, endDate, sampleSourceWalletId, sampleDestinationWalletId, 1, 50
+            );
+            TransferFilterCriteriaDTO diffPage = new TransferFilterCriteriaDTO(
+                    startDate, endDate, sampleSourceWalletId, sampleDestinationWalletId, 2, 50
+            );
+            TransferFilterCriteriaDTO diffSource = new TransferFilterCriteriaDTO(
+                    startDate, endDate, UUID.randomUUID(), sampleDestinationWalletId, 1, 50
+            );
+
+            assertEquals(base, base);
+            assertNotEquals(base, diffPage);
+            assertNotEquals(base, diffSource);
+            assertNotEquals(base, null);
+            assertNotEquals(base, "other");
+        }
+
+        @Test
+        @DisplayName("toString thể hiện đầy đủ tên lớp và các tiêu chí lọc")
+        void shouldProduceInformativeToString() {
+            TransferFilterCriteriaDTO dto = new TransferFilterCriteriaDTO(
+                    startDate, endDate, sampleSourceWalletId, sampleDestinationWalletId, 3, 25
+            );
+
+            String str = dto.toString();
+            assertTrue(str.contains("TransferFilterCriteriaDTO"));
+            assertTrue(str.contains(sampleSourceWalletId.toString()));
+            assertTrue(str.contains(sampleDestinationWalletId.toString()));
+            assertTrue(str.contains("pageNumber=3"));
+            assertTrue(str.contains("pageSize=25"));
+        }
+    }
+}
