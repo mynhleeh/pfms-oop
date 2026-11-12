@@ -1,10 +1,13 @@
-package com.pfms.presentation.dto;
+package com.pfms.presentation.dto.wallet;
 
 import java.util.Objects;
 import java.util.UUID;
 
+import com.pfms.common.util.Preconditions;
+
 /**
- * DTO đóng gói dữ liệu yêu cầu cập nhật thông tin ví tài chính từ giao diện gửi xuống tầng dịch vụ.
+ * DTO đóng gói dữ liệu yêu cầu cập nhật thông tin ví tài chính từ giao diện gửi
+ * xuống tầng dịch vụ.
  */
 public final class UpdateWalletRequestDTO {
 
@@ -20,14 +23,8 @@ public final class UpdateWalletRequestDTO {
     }
 
     public UpdateWalletRequestDTO(UUID walletId, String name, String note) {
-        if (walletId == null) {
-            throw new IllegalArgumentException("Mã ví cần cập nhật không được để null");
-        }
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Tên ví không được để trống hoặc chỉ chứa khoảng trắng");
-        }
-        this.walletId = walletId;
-        this.name = name.trim();
+        this.walletId = Objects.requireNonNull(walletId, "Mã ví cần cập nhật không được để null");
+        this.name = Preconditions.requireNonBlank(name, "Tên ví không được để trống hoặc chỉ chứa khoảng trắng");
         this.note = (note == null) ? "" : note.trim();
     }
     // endregion

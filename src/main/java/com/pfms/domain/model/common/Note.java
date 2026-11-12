@@ -4,6 +4,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.pfms.common.util.Preconditions;
+
 /**
  * Đối tượng giá trị bất biến đại diện cho ghi chú diễn giải trong PFMS.
  * Đảm bảo chuẩn hóa chuỗi tối đa 255 ký tự sau khi cắt tỉa khoảng trắng
@@ -49,12 +51,11 @@ public final class Note implements Comparable<Note>, Serializable {
             return EMPTY;
         }
 
-        if (trimmed.length() > MAX_LENGTH) {
-            String resolvedLabel = (label != null && !label.trim().isEmpty())
-                    ? label.trim()
-                    : DEFAULT_LABEL;
-            throw new IllegalArgumentException(resolvedLabel + " không được vượt quá 255 ký tự.");
-        }
+        String resolvedLabel = (label != null && !label.trim().isEmpty())
+                ? label.trim()
+                : DEFAULT_LABEL;
+        Preconditions.checkArgument(trimmed.length() <= MAX_LENGTH,
+                resolvedLabel + " không được vượt quá 255 ký tự.");
 
         return new Note(trimmed);
     }

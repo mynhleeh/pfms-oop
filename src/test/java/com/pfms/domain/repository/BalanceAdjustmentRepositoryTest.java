@@ -310,10 +310,10 @@ class BalanceAdjustmentRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when id is null before checking operation")
-        void shouldRejectNullIdWithIllegalArgumentException() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Should throw NullPointerException when id is null before checking operation")
+        void shouldRejectNullIdWithNullPointerException() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.deleteById(null));
 
             assertTrue(ex.getMessage().contains("không được để null"));

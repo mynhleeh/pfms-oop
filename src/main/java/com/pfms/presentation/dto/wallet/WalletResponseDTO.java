@@ -1,12 +1,15 @@
-package com.pfms.presentation.dto;
+package com.pfms.presentation.dto.wallet;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.pfms.common.util.Preconditions;
+
 /**
- * DTO đóng gói dữ liệu chi tiết ví tài chính trả về từ tầng dịch vụ lên giao diện.
+ * DTO đóng gói dữ liệu chi tiết ví tài chính trả về từ tầng dịch vụ lên giao
+ * diện.
  */
 public final class WalletResponseDTO {
 
@@ -32,19 +35,9 @@ public final class WalletResponseDTO {
             String note,
             LocalDateTime createdAt) {
 
-        if (id == null) {
-            throw new IllegalArgumentException("Mã ví không được để null");
-        }
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Tên ví không được để trống hoặc chỉ chứa khoảng trắng");
-        }
-        if (balance == null) {
-            throw new IllegalArgumentException("Số dư ví không được để null");
-        }
-
-        this.id = id;
-        this.name = name.trim();
-        this.balance = balance;
+        this.id = Objects.requireNonNull(id, "Mã ví không được để null");
+        this.name = Preconditions.requireNonBlank(name, "Tên ví không được để trống hoặc chỉ chứa khoảng trắng");
+        this.balance = Objects.requireNonNull(balance, "Số dư ví không được để null");
         this.currency = (currency == null || currency.trim().isEmpty()) ? "VND" : currency.trim();
         this.defaultWallet = defaultWallet;
         this.status = (status == null || status.trim().isEmpty()) ? "ACTIVE" : status.trim();
@@ -122,8 +115,7 @@ public final class WalletResponseDTO {
                 this.currency,
                 this.defaultWallet,
                 this.status,
-                this.note
-        );
+                this.note);
     }
 
     @Override

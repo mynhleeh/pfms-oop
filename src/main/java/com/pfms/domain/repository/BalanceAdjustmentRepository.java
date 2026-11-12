@@ -3,6 +3,7 @@ package com.pfms.domain.repository;
 import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,9 +24,7 @@ public interface BalanceAdjustmentRepository extends GenericRepository<BalanceAd
 
     @Override
     default boolean deleteById(UUID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Mã bản ghi kiểm kê không được để null");
-        }
+        Objects.requireNonNull(id, "Mã bản ghi kiểm kê không được để null");
         throw new UnsupportedOperationException(
                 "Bản ghi kiểm kê mang tính bất biến kiểm toán, không hỗ trợ thao tác xóa khỏi hệ thống.");
     }

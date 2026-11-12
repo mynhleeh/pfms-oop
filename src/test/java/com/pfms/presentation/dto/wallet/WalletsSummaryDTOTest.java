@@ -1,4 +1,4 @@
-package com.pfms.presentation.dto;
+package com.pfms.presentation.dto.wallet;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,13 +33,11 @@ class WalletsSummaryDTOTest {
         void shouldCreateWithAllFields() {
             List<WalletResponseDTO> walletList = List.of(
                     createWallet(id1, "Ví Tiền Mặt", "4000000.00"),
-                    createWallet(id2, "Ví MB Bank", "6000000.00")
-            );
+                    createWallet(id2, "Ví MB Bank", "6000000.00"));
             BigDecimal total = new BigDecimal("10000000.00");
             Map<UUID, BigDecimal> shares = Map.of(
                     id1, new BigDecimal("40.00"),
-                    id2, new BigDecimal("60.00")
-            );
+                    id2, new BigDecimal("60.00"));
 
             WalletsSummaryDTO dto = new WalletsSummaryDTO(walletList, total, "VND", shares);
 
@@ -109,17 +107,14 @@ class WalletsSummaryDTOTest {
                     List.of(createWallet(id1, "Ví Tiền Mặt", "1000000.00")),
                     new BigDecimal("1000000.00"),
                     "VND",
-                    Map.of(id1, new BigDecimal("100.00"))
-            );
+                    Map.of(id1, new BigDecimal("100.00")));
 
             assertThrows(
                     UnsupportedOperationException.class,
-                    () -> dto.getWallets().add(createWallet(id2, "Ví Thêm", "500000.00"))
-            );
+                    () -> dto.getWallets().add(createWallet(id2, "Ví Thêm", "500000.00")));
             assertThrows(
                     UnsupportedOperationException.class,
-                    () -> dto.getWalletShares().put(id2, new BigDecimal("20.00"))
-            );
+                    () -> dto.getWalletShares().put(id2, new BigDecimal("20.00")));
         }
     }
 
@@ -128,23 +123,22 @@ class WalletsSummaryDTOTest {
     class InvalidInputTests {
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi tổng số dư totalBalance bị null")
+        @DisplayName("Ném NullPointerException khi tổng số dư totalBalance bị null")
         void shouldThrowExceptionWhenTotalBalanceIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new WalletsSummaryDTO(Collections.emptyList(), null, "VND", Collections.emptyMap())
-            );
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
+                    () -> new WalletsSummaryDTO(Collections.emptyList(), null, "VND", Collections.emptyMap()));
             assertTrue(ex.getMessage().contains("Tổng số dư"));
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"-0.01", "-100000"})
+        @ValueSource(strings = { "-0.01", "-100000" })
         @DisplayName("Ném IllegalArgumentException khi tổng số dư totalBalance mang giá trị âm")
         void shouldThrowExceptionWhenTotalBalanceIsNegative(String negativeAmount) {
             IllegalArgumentException ex = assertThrows(
                     IllegalArgumentException.class,
-                    () -> new WalletsSummaryDTO(Collections.emptyList(), new BigDecimal(negativeAmount), "VND", Collections.emptyMap())
-            );
+                    () -> new WalletsSummaryDTO(Collections.emptyList(), new BigDecimal(negativeAmount), "VND",
+                            Collections.emptyMap()));
             assertTrue(ex.getMessage().contains("không được âm"));
         }
     }

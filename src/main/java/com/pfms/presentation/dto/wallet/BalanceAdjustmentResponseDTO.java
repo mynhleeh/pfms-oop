@@ -1,4 +1,4 @@
-package com.pfms.presentation.dto;
+package com.pfms.presentation.dto.wallet;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -6,8 +6,11 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.pfms.common.util.Preconditions;
+
 /**
- * DTO đóng gói kết quả kiểm kê và điều chỉnh số dư trả về từ tầng dịch vụ lên giao diện.
+ * DTO đóng gói kết quả kiểm kê và điều chỉnh số dư trả về từ tầng dịch vụ lên
+ * giao diện.
  */
 public final class BalanceAdjustmentResponseDTO {
 
@@ -35,29 +38,14 @@ public final class BalanceAdjustmentResponseDTO {
             LocalDate adjustedAt,
             LocalDateTime createdAt) {
 
-        if (recordId == null) {
-            throw new IllegalArgumentException("Mã bản ghi kiểm kê không được để null");
-        }
-        if (walletId == null) {
-            throw new IllegalArgumentException("Mã ví kiểm kê không được để null");
-        }
-        if (previousBalance == null) {
-            throw new IllegalArgumentException("Số dư trước kiểm kê không được để null");
-        }
-        if (previousBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Số dư trước kiểm kê không được âm: " + previousBalance);
-        }
-        if (actualBalance == null) {
-            throw new IllegalArgumentException("Số dư thực tế sau kiểm kê không được để null");
-        }
-        if (actualBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Số dư thực tế sau kiểm kê không được âm: " + actualBalance);
-        }
-
-        this.recordId = recordId;
-        this.walletId = walletId;
-        this.previousBalance = previousBalance;
-        this.actualBalance = actualBalance;
+        this.recordId = Objects.requireNonNull(recordId, "Mã bản ghi kiểm kê không được để null");
+        this.walletId = Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
+        Objects.requireNonNull(previousBalance, "Số dư trước kiểm kê không được để null");
+        this.previousBalance = Preconditions.requireNonNegative(previousBalance,
+                "Số dư trước kiểm kê không được âm: " + previousBalance);
+        Objects.requireNonNull(actualBalance, "Số dư thực tế sau kiểm kê không được để null");
+        this.actualBalance = Preconditions.requireNonNegative(actualBalance,
+                "Số dư thực tế sau kiểm kê không được âm: " + actualBalance);
         this.difference = (difference != null) ? difference : actualBalance.subtract(previousBalance);
         this.currency = (currency == null || currency.trim().isEmpty()) ? "VND" : currency.trim();
         this.reason = (reason == null) ? "" : reason.trim();
@@ -151,8 +139,7 @@ public final class BalanceAdjustmentResponseDTO {
                 this.difference.stripTrailingZeros(),
                 this.currency,
                 this.reason,
-                this.adjustedAt
-        );
+                this.adjustedAt);
     }
 
     @Override
@@ -171,4 +158,3 @@ public final class BalanceAdjustmentResponseDTO {
     }
     // endregion
 }
-

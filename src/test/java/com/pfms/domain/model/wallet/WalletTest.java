@@ -256,7 +256,7 @@ class WalletTest {
             assertTrue(wallet.hasSufficientBalance(Money.of(50_000)));
             assertTrue(wallet.hasSufficientBalance(Money.of(100_000)));
             assertFalse(wallet.hasSufficientBalance(Money.of(150_000)));
-            assertThrows(IllegalArgumentException.class, () -> wallet.hasSufficientBalance(null));
+            assertThrows(NullPointerException.class, () -> wallet.hasSufficientBalance(null));
         }
     }
 

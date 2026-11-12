@@ -1,10 +1,12 @@
 package com.pfms.infrastructure.memory;
 
+import com.pfms.common.util.Preconditions;
 import com.pfms.domain.repository.GenericRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -23,9 +25,7 @@ public abstract class MemoryGenericRepository<E, ID> implements GenericRepositor
 
     // region Constructors
     protected MemoryGenericRepository(Function<E, ID> idExtractor) {
-        if (idExtractor == null) {
-            throw new IllegalArgumentException("idExtractor must not be null");
-        }
+        Preconditions.checkArgument(idExtractor != null, "idExtractor must not be null");
         this.idExtractor = idExtractor;
     }
     // endregion
@@ -33,22 +33,15 @@ public abstract class MemoryGenericRepository<E, ID> implements GenericRepositor
     // region Commands
     @Override
     public E save(E entity) {
-        if (entity == null) {
-            throw new IllegalArgumentException("Entity must not be null");
-        }
-        ID id = getId(entity);
-        if (id == null) {
-            throw new IllegalArgumentException("Entity ID must not be null");
-        }
+        Objects.requireNonNull(entity, "Entity must not be null");
+        ID id = Objects.requireNonNull(getId(entity), "Entity ID must not be null");
         storage.put(id, entity);
         return entity;
     }
 
     @Override
     public boolean deleteById(ID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID must not be null");
-        }
+        Objects.requireNonNull(id, "ID must not be null");
         return storage.remove(id) != null;
     }
     // endregion
@@ -56,9 +49,7 @@ public abstract class MemoryGenericRepository<E, ID> implements GenericRepositor
     // region Queries
     @Override
     public Optional<E> findById(ID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID must not be null");
-        }
+        Objects.requireNonNull(id, "ID must not be null");
         return Optional.ofNullable(storage.get(id));
     }
 
@@ -69,9 +60,7 @@ public abstract class MemoryGenericRepository<E, ID> implements GenericRepositor
 
     @Override
     public boolean existsById(ID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID must not be null");
-        }
+        Objects.requireNonNull(id, "ID must not be null");
         return storage.containsKey(id);
     }
     // endregion
