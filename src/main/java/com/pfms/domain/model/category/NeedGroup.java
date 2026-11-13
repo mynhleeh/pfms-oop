@@ -73,7 +73,6 @@ public class NeedGroup{
         // region findbyId
         if(category.isDeleted() || category.getTransactionType() != this.transactionType){
             throw new BusinessException(ErrorCode.ERR_FEE_003);
-            return ;
         }
         this.categories.add(category) ;
     }

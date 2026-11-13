@@ -1,95 +1,166 @@
 package com.pfms.domain.model.category;
 
-import java.util.UUID;
-
 import com.pfms.domain.exception.BusinessException;
+import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.common.EntityName;
 import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.transaction.TransactionType;
-import com.pfms.domain.exception.ErrorCode ;
 
+import java.util.Objects;
+import java.util.UUID;
 
+/**
+ * Thực thể miền Danh mục chi tiết (Category) trong hệ thống PFMS.
+ * Đại diện cho đơn vị phân loại cấp 3 gán nhãn mục đích cho các giao dịch thu chi.
+ */
 public class Category {
-    private final UUID categoryId ;
-    private EntityName name ;
-    private UUID needGroupId ;
-    private final TransactionType transactionType ;
-    private EntityStatus status;
-    private String icon ;
-    private String color ; 
 
-    public Category(UUID categoryId, String name, UUID needGroupId, TransactionType transactionType, String icon, String color){
-        this.categoryId = UUID.randomUUID() ;
-        this.name = EntityName.of(name,"CategoryName") ;
-        this.needGroupId = needGroupId ;
-        this.transactionType = transactionType ;
-        this.status = EntityStatus.ACTIVE ;
-        this.icon = icon ;
-        this.color = color ;
+    // region State
+    private final UUID categoryId;
+    private EntityName name;
+    private UUID needGroupId;
+    private final TransactionType transactionType;
+    private EntityStatus status;
+    private String icon;
+    private String color;
+    // endregion
+
+    // region Constructors
+    public Category(UUID categoryId, String name, UUID needGroupId,
+                    TransactionType transactionType, String icon, String color) {
+
+        this.categoryId = Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
+        this.name = EntityName.of(name, "Tên danh mục");
+        this.needGroupId = Objects.requireNonNull(needGroupId, "Mã nhóm nhu cầu không được để null");
+        this.transactionType = Objects.requireNonNull(transactionType, "Loại thu chi không được để null");
+        this.status = EntityStatus.ACTIVE;
+        this.icon = normalizeIcon(icon);
+        this.color = normalizeColor(color);
+    }
+    // endregion
+
+    // region Commands
+    public void rename(String newName) {
+        this.name = EntityName.of(newName, "Tên danh mục");
     }
 
+    public void changeNeedGroup(UUID newNeedGroupId, TransactionType targetGroupType) {
+        Objects.requireNonNull(newNeedGroupId, "Mã nhóm nhu cầu mới không được để null");
+        Objects.requireNonNull(targetGroupType, "Loại thu chi nhóm đích không được để null");
+
+        if (targetGroupType != this.transactionType) {
+            throw new BusinessException(ErrorCode.ERR_CAT_001,
+                    "Không được phép đổi loại thu chi hoặc chuyển danh mục sang nhóm khác loại.");
+        }
+        this.needGroupId = newNeedGroupId;
+    }
+
+    public void updateAppearance(String newIcon, String newColor) {
+        this.icon = normalizeIcon(newIcon);
+        this.color = normalizeColor(newColor);
+    }
+
+    public void markDeleted() {
+        this.status = EntityStatus.DELETED;
+    }
+
+    public void restore(boolean isParentGroupActive) {
+        if (!isParentGroupActive) {
+            throw new BusinessException(ErrorCode.ERR_CAT_004,
+                    "Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước.");
+        }
+        this.status = EntityStatus.ACTIVE;
+    }
+    // endregion
+
+    // region Queries
     public UUID getCategoryId() {
-        return categoryId ;
+        return this.categoryId;
     }
 
     public String getName() {
-        return name.getValue() ;
+        return this.name.getValue();
     }
 
-    public UUID getNeedGroupId(){
-        return needGroupId ;
+    public EntityName getEntityName() {
+        return this.name;
     }
 
-    public TransactionType getTransactionType(){
-        return transactionType ;
+    public UUID getNeedGroupId() {
+        return this.needGroupId;
     }
 
-    public EntityStatus getStatus(){
-        return status ;
+    public TransactionType getTransactionType() {
+        return this.transactionType;
     }
 
-    public String getIcon(){
-        return icon ;
+    public EntityStatus getStatus() {
+        return this.status;
     }
 
-    public String getColor(){
-        return color ;
+    public String getIcon() {
+        return this.icon;
+    }
+
+    public String getColor() {
+        return this.color;
     }
 
     public boolean isActive() {
-        return status.isActive() ;
+        return this.status == EntityStatus.ACTIVE;
     }
 
-    public boolean isDeleted(){
-        return status.isDeleted() ;
+    public boolean isDeleted() {
+        return this.status == EntityStatus.DELETED;
     }
+    // endregion
 
-    public void rename(String newName){
-        this.name = EntityName.of(newName,"CategoryName") ;
-    }
-
-    public void changeNeedGroup(UUID newNeedGroupId,TransactionType targetGroupType){
-        // region FindBYID
-        if(findID(newNeedGroupId).isDeleted() || targetGroupType != this.transactionType){
-            throw new BusinessException(ErrorCode.ERR_CAT_003) ;
+    // region Helpers
+    private static String normalizeIcon(String rawIcon) {
+        if (rawIcon == null) {
+            return "";
         }
-        this.needGroupId = newNeedGroupId ;
-    }
-
-    public void updateAppearance(String newIcon , String newColor){
-        this.icon = newIcon ;
-        this.color = newColor ;
-    }
-
-    public void markDeleted(){
-        this.status = EntityStatus.DELETED ;
-    }
-
-    public void restore(boolean isParentGroupActive){
-        if(!isParentGroupActive){
-            throw new BusinessException(ErrorCode.ERR_CAT_004) ;
+        String trimmed = rawIcon.trim();
+        if (trimmed.length() > 50) {
+            throw new IllegalArgumentException("Biểu tượng danh mục không được vượt quá 50 ký tự.");
         }
-        this.status = EntityStatus.ACTIVE ;
+        return trimmed;
     }
 
+    private static String normalizeColor(String rawColor) {
+        if (rawColor == null) {
+            return "";
+        }
+        String trimmed = rawColor.trim();
+        if (trimmed.length() > 10) {
+            throw new IllegalArgumentException("Mã màu danh mục không được vượt quá 10 ký tự.");
+        }
+        return trimmed;
+    }
+    // endregion
+
+    // region Identity
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Category category = (Category) o;
+        return Objects.equals(this.categoryId, category.categoryId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.categoryId);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Category[id=%s, name='%s', needGroupId=%s, type=%s, status=%s]",
+                this.categoryId, this.name, this.needGroupId, this.transactionType, this.status);
+    }
+    // endregion
 }
