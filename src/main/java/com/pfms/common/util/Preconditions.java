@@ -1,6 +1,7 @@
 package com.pfms.common.util;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * Tiện ích kiểm tra tiền điều kiện (Guard Clauses) cho tham số đầu vào.
@@ -39,6 +40,13 @@ public final class Preconditions {
     public static void checkArgument(boolean expression, String message) {
         if (!expression) {
             throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static void requireValidDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException(
+                    "Ngày bắt đầu không được sau ngày kết thúc: " + startDate + " > " + endDate);
         }
     }
     // endregion

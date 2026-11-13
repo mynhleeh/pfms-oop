@@ -10,7 +10,6 @@ import com.pfms.common.util.Preconditions;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -40,7 +39,7 @@ public class MemoryTransactionRepository
         String targetId = Preconditions.requireNonBlank(walletId, "Mã ví không được để null hoặc rỗng");
         return storage.values().stream()
                 .filter(tx -> isTransactionRelatedToWallet(tx, targetId))
-                .sorted(getDescendingOrderComparator())
+                .sorted(Transaction.DESCENDING_ORDER)
                 .toList();
     }
 
@@ -52,7 +51,7 @@ public class MemoryTransactionRepository
                     LocalDate d = tx.getTransactionDate().getDate();
                     return !d.isBefore(startDate) && !d.isAfter(endDate);
                 })
-                .sorted(getDescendingOrderComparator())
+                .sorted(Transaction.DESCENDING_ORDER)
                 .toList();
     }
 
@@ -68,7 +67,7 @@ public class MemoryTransactionRepository
                     LocalDate d = iet.getTransactionDate().getDate();
                     return iet.getTransactionType() == type && !d.isBefore(startDate) && !d.isAfter(endDate);
                 })
-                .sorted(getDescendingOrderComparator())
+                .sorted(Transaction.DESCENDING_ORDER)
                 .toList();
     }
 
@@ -77,7 +76,7 @@ public class MemoryTransactionRepository
         Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
         return storage.values().stream()
                 .filter(tx -> isTransactionRelatedToCategory(tx, categoryId))
-                .sorted(getDescendingOrderComparator())
+                .sorted(Transaction.DESCENDING_ORDER)
                 .toList();
     }
 
@@ -128,12 +127,7 @@ public class MemoryTransactionRepository
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {
         Preconditions.checkArgument(startDate != null && endDate != null, "Ngày biên khoảng thời gian không được để null");
-        Preconditions.checkArgument(!startDate.isAfter(endDate), "Ngày bắt đầu không được sau ngày kết thúc");
-    }
-
-    private Comparator<Transaction> getDescendingOrderComparator() {
-        return Comparator.comparing((Transaction tx) -> tx.getTransactionDate().getDate()).reversed()
-                .thenComparing(Comparator.comparing(Transaction::getCreatedAt).reversed());
+        Preconditions.requireValidDateRange(startDate, endDate);
     }
     // endregion
 }

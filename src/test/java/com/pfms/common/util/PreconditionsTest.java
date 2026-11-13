@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -163,6 +164,35 @@ class PreconditionsTest {
                     () -> Preconditions.checkArgument(false, "Biểu thức không thỏa mãn")
             );
             assertEquals("Biểu thức không thỏa mãn", ex.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("Kiểm thử requireValidDateRange")
+    class RequireValidDateRangeTests {
+
+        @Test
+        @DisplayName("Chấp nhận khoảng ngày mở một đầu, cả hai null, cùng ngày hoặc startDate trước endDate")
+        void shouldAcceptValidOrOpenEndedDateRanges() {
+            LocalDate leapDay = LocalDate.of(2024, 2, 29);
+            assertDoesNotThrow(() -> Preconditions.requireValidDateRange(null, null));
+            assertDoesNotThrow(() -> Preconditions.requireValidDateRange(leapDay, null));
+            assertDoesNotThrow(() -> Preconditions.requireValidDateRange(null, leapDay));
+            assertDoesNotThrow(() -> Preconditions.requireValidDateRange(leapDay, leapDay));
+            assertDoesNotThrow(() -> Preconditions.requireValidDateRange(leapDay.minusDays(1), leapDay));
+        }
+
+        @Test
+        @DisplayName("Ném IllegalArgumentException khi startDate đứng sau endDate")
+        void shouldThrowWhenStartDateAfterEndDate() {
+            LocalDate startDate = LocalDate.of(2026, 11, 20);
+            LocalDate endDate = LocalDate.of(2026, 11, 10);
+
+            IllegalArgumentException exception = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> Preconditions.requireValidDateRange(startDate, endDate)
+            );
+            assertTrue(exception.getMessage().contains("Ngày bắt đầu không được sau ngày kết thúc"));
         }
     }
 }
