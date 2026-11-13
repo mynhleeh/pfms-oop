@@ -4,6 +4,7 @@ import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.EntityNotFoundException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.category.Category;
+import com.pfms.domain.model.category.NeedGroup;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.model.wallet.ActiveWalletState;
@@ -11,6 +12,7 @@ import com.pfms.domain.model.wallet.ArchivedWalletState;
 import com.pfms.domain.model.wallet.DeletedWalletState;
 import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.repository.CategoryRepository;
+import com.pfms.domain.repository.NeedGroupRepository;
 import com.pfms.domain.repository.WalletRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,21 +44,29 @@ class EntityLookupSupportTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private NeedGroupRepository needGroupRepository;
+
     private UUID walletId;
     private UUID categoryId;
+    private UUID needGroupId;
     private Wallet activeWallet;
     private Category expenseCategory;
+    private NeedGroup needGroup;
 
     @BeforeEach
     void setUp() {
         walletId = UUID.randomUUID();
         categoryId = UUID.randomUUID();
+        needGroupId = UUID.randomUUID();
         activeWallet = new Wallet(
                 walletId, "Ví Chính", "", true,
                 LocalDateTime.now().minusDays(3), new ActiveWalletState(), Money.of("100000.00"));
         expenseCategory = new Category(
                 categoryId, "Ăn uống", UUID.randomUUID(),
                 TransactionType.EXPENSE, "food", "#FF9800");
+        needGroup = new NeedGroup(
+                needGroupId, "Ăn uống", TransactionType.EXPENSE, "utensils", "#FF5722");
     }
 
     @Nested
@@ -75,44 +85,85 @@ class EntityLookupSupportTest {
     }
 
     @Nested
-    @DisplayName("Nhóm 1: Tra cứu Ví (findWalletOrThrow & loadActiveWallet)")
-    class WalletLookupTests {
+    @DisplayName("Nhóm 1: Tra cứu Thực thể Tổng quát (findEntityOrThrow)")
+    class GenericEntityLookupTests {
 
         @Test
-        @DisplayName("findWalletOrThrow trả về ví dù ở trạng thái ARCHIVED khi tồn tại")
-        void shouldFindExistingArchivedWallet() {
+        @DisplayName("findEntityOrThrow trả về đúng Ví khi tồn tại")
+        void shouldFindExistingWallet() {
             Wallet archivedWallet = new Wallet(
                     walletId, "Ví Cũ", "", false,
                     LocalDateTime.now().minusDays(10), new ArchivedWalletState(), Money.ZERO);
             when(walletRepository.findById(walletId)).thenReturn(Optional.of(archivedWallet));
 
-            Wallet found = EntityLookupSupport.findWalletOrThrow(walletRepository, walletId);
+            Wallet found = EntityLookupSupport.findEntityOrThrow(
+                    walletRepository, walletId, EntityLookupSupport.LABEL_WALLET);
 
             assertSame(archivedWallet, found);
         }
 
         @Test
-        @DisplayName("findWalletOrThrow ném EntityNotFoundException ERR_NOT_FOUND khi thiếu ví")
-        void shouldThrowNotFoundWhenWalletMissing() {
+        @DisplayName("findEntityOrThrow trả về đúng Danh mục khi tồn tại")
+        void shouldFindExistingCategory() {
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(expenseCategory));
+
+            Category found = EntityLookupSupport.findEntityOrThrow(
+                    categoryRepository, categoryId, EntityLookupSupport.LABEL_CATEGORY);
+
+            assertSame(expenseCategory, found);
+        }
+
+        @Test
+        @DisplayName("findEntityOrThrow trả về đúng Nhóm nhu cầu khi tồn tại")
+        void shouldFindExistingNeedGroup() {
+            when(needGroupRepository.findById(needGroupId)).thenReturn(Optional.of(needGroup));
+
+            NeedGroup found = EntityLookupSupport.findEntityOrThrow(
+                    needGroupRepository, needGroupId, EntityLookupSupport.LABEL_NEED_GROUP);
+
+            assertSame(needGroup, found);
+        }
+
+        @Test
+        @DisplayName("findEntityOrThrow ném EntityNotFoundException ERR_NOT_FOUND khi thiếu thực thể")
+        void shouldThrowNotFoundWhenEntityMissing() {
             when(walletRepository.findById(walletId)).thenReturn(Optional.empty());
 
             EntityNotFoundException exception = assertThrows(
                     EntityNotFoundException.class,
-                    () -> EntityLookupSupport.findWalletOrThrow(walletRepository, walletId));
+                    () -> EntityLookupSupport.findEntityOrThrow(
+                            walletRepository, walletId, EntityLookupSupport.LABEL_WALLET));
 
             assertEquals(ErrorCode.ERR_NOT_FOUND, exception.getErrorCode());
             assertEquals("Ví", exception.getEntityType());
             assertEquals(walletId.toString(), exception.getIdentifier());
+
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+            EntityNotFoundException feeException = assertThrows(
+                    EntityNotFoundException.class,
+                    () -> EntityLookupSupport.findEntityOrThrow(
+                            categoryRepository, categoryId, "Danh mục phí"));
+            assertEquals("Danh mục phí", feeException.getEntityType());
+            assertEquals(categoryId.toString(), feeException.getIdentifier());
         }
 
         @Test
-        @DisplayName("findWalletOrThrow từ chối repository hoặc walletId null")
-        void shouldRejectNullArgumentsForWalletLookup() {
+        @DisplayName("findEntityOrThrow từ chối repository null, id null và nhãn rỗng")
+        void shouldRejectInvalidArgumentsForGenericLookup() {
             assertThrows(NullPointerException.class,
-                    () -> EntityLookupSupport.findWalletOrThrow(null, walletId));
+                    () -> EntityLookupSupport.findEntityOrThrow(null, walletId, EntityLookupSupport.LABEL_WALLET));
             assertThrows(NullPointerException.class,
-                    () -> EntityLookupSupport.findWalletOrThrow(walletRepository, null));
+                    () -> EntityLookupSupport.findEntityOrThrow(walletRepository, null, EntityLookupSupport.LABEL_WALLET));
+            assertThrows(IllegalArgumentException.class,
+                    () -> EntityLookupSupport.findEntityOrThrow(walletRepository, walletId, "   "));
+            assertThrows(IllegalArgumentException.class,
+                    () -> EntityLookupSupport.findEntityOrThrow(walletRepository, walletId, null));
         }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 2: Tải Ví Hoạt Động (loadActiveWallet)")
+    class LoadActiveWalletTests {
 
         @Test
         @DisplayName("loadActiveWallet trả về ví khi đang ở trạng thái ACTIVE")
@@ -146,53 +197,6 @@ class EntityLookupSupportTest {
                     BusinessException.class,
                     () -> EntityLookupSupport.loadActiveWallet(walletRepository, walletId));
             assertEquals(ErrorCode.ERR_WAL_001, deletedException.getErrorCode());
-        }
-    }
-
-    @Nested
-    @DisplayName("Nhóm 2: Tra cứu Danh mục (findCategoryOrThrow)")
-    class CategoryLookupTests {
-
-        @Test
-        @DisplayName("findCategoryOrThrow trả về đúng danh mục khi tồn tại")
-        void shouldFindExistingCategory() {
-            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(expenseCategory));
-
-            Category found = EntityLookupSupport.findCategoryOrThrow(categoryRepository, categoryId);
-
-            assertSame(expenseCategory, found);
-        }
-
-        @Test
-        @DisplayName("findCategoryOrThrow sử dụng nhãn mặc định 'Danh mục' hoặc nhãn tùy biến khi thiếu")
-        void shouldThrowNotFoundWithExpectedEntityLabel() {
-            when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
-
-            EntityNotFoundException defaultException = assertThrows(
-                    EntityNotFoundException.class,
-                    () -> EntityLookupSupport.findCategoryOrThrow(categoryRepository, categoryId));
-            assertEquals(ErrorCode.ERR_NOT_FOUND, defaultException.getErrorCode());
-            assertEquals("Danh mục", defaultException.getEntityType());
-            assertEquals(categoryId.toString(), defaultException.getIdentifier());
-
-            EntityNotFoundException feeException = assertThrows(
-                    EntityNotFoundException.class,
-                    () -> EntityLookupSupport.findCategoryOrThrow(categoryRepository, categoryId, "Danh mục phí"));
-            assertEquals("Danh mục phí", feeException.getEntityType());
-            assertEquals(categoryId.toString(), feeException.getIdentifier());
-        }
-
-        @Test
-        @DisplayName("findCategoryOrThrow từ chối repository null, categoryId null và nhãn rỗng")
-        void shouldRejectInvalidArgumentsForCategoryLookup() {
-            assertThrows(NullPointerException.class,
-                    () -> EntityLookupSupport.findCategoryOrThrow(null, categoryId));
-            assertThrows(NullPointerException.class,
-                    () -> EntityLookupSupport.findCategoryOrThrow(categoryRepository, null));
-            assertThrows(IllegalArgumentException.class,
-                    () -> EntityLookupSupport.findCategoryOrThrow(categoryRepository, categoryId, "   "));
-            assertThrows(IllegalArgumentException.class,
-                    () -> EntityLookupSupport.findCategoryOrThrow(categoryRepository, categoryId, null));
         }
     }
 }

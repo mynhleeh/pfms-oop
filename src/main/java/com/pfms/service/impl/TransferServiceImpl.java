@@ -72,7 +72,7 @@ public class TransferServiceImpl implements TransferService {
         Wallet destinationWallet = EntityLookupSupport.loadActiveWallet(
                 walletRepository, request.getDestinationWalletId());
         Category feeCategory = feeAmount.isPositive()
-                ? EntityLookupSupport.findCategoryOrThrow(
+                ? EntityLookupSupport.findEntityOrThrow(
                         categoryRepository, request.getFeeCategoryId(), "Danh mục phí")
                 : null;
 
@@ -88,10 +88,10 @@ public class TransferServiceImpl implements TransferService {
     public void deleteTransfer(UUID transferId) {
         Objects.requireNonNull(transferId, "Mã giao dịch chuyển tiền không được để null");
         TransferTransaction transfer = loadTransferOrThrow(transferId);
-        Wallet liveSourceWallet = EntityLookupSupport.findWalletOrThrow(
-                walletRepository, transfer.getSourceWallet().getId());
-        Wallet liveDestinationWallet = EntityLookupSupport.findWalletOrThrow(
-                walletRepository, transfer.getDestinationWallet().getId());
+        Wallet liveSourceWallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, transfer.getSourceWallet().getId(), EntityLookupSupport.LABEL_WALLET);
+        Wallet liveDestinationWallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, transfer.getDestinationWallet().getId(), EntityLookupSupport.LABEL_WALLET);
 
         Wallet destinationSnapshot = liveDestinationWallet.copy();
         transfer.revertFromWallet(liveSourceWallet, liveDestinationWallet);

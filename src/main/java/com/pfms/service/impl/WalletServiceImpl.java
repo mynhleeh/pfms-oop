@@ -102,7 +102,8 @@ public class WalletServiceImpl implements WalletService {
         String validName = EntityName.of(request.getName(), "Tên ví").getValue();
         Note.of(request.getNote(), "Ghi chú ví");
 
-        Wallet wallet = EntityLookupSupport.findWalletOrThrow(walletRepository, request.getWalletId());
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, request.getWalletId(), EntityLookupSupport.LABEL_WALLET);
 
         if (!wallet.getName().equalsIgnoreCase(validName)) {
             if (walletRepository.existsByName(validName)) {
@@ -120,7 +121,8 @@ public class WalletServiceImpl implements WalletService {
     public WalletResponseDTO archiveWallet(UUID walletId) {
         Objects.requireNonNull(walletId, "Mã ví không được để null");
 
-        Wallet wallet = EntityLookupSupport.findWalletOrThrow(walletRepository, walletId);
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, walletId, EntityLookupSupport.LABEL_WALLET);
 
         wallet.archive();
         Wallet saved = walletRepository.save(wallet);
@@ -132,7 +134,8 @@ public class WalletServiceImpl implements WalletService {
     public WalletResponseDTO activateWallet(UUID walletId) {
         Objects.requireNonNull(walletId, "Mã ví không được để null");
 
-        Wallet wallet = EntityLookupSupport.findWalletOrThrow(walletRepository, walletId);
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, walletId, EntityLookupSupport.LABEL_WALLET);
 
         wallet.activate();
         Wallet saved = walletRepository.save(wallet);
@@ -144,7 +147,8 @@ public class WalletServiceImpl implements WalletService {
     public void deleteWallet(UUID walletId) {
         Objects.requireNonNull(walletId, "Mã ví không được để null");
 
-        Wallet wallet = EntityLookupSupport.findWalletOrThrow(walletRepository, walletId);
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, walletId, EntityLookupSupport.LABEL_WALLET);
 
         if (wallet.isDefaultWallet()) {
             throw new BusinessException(ErrorCode.ERR_WAL_001, "Không thể xóa ví mặc định của hệ thống.");
@@ -169,7 +173,8 @@ public class WalletServiceImpl implements WalletService {
         Money actualBalance = Money.of(request.getActualBalance());
         TransactionDate adjustedAt = TransactionDate.ofOrToday(request.getAdjustedAt());
 
-        Wallet wallet = EntityLookupSupport.findWalletOrThrow(walletRepository, request.getWalletId());
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, request.getWalletId(), EntityLookupSupport.LABEL_WALLET);
         Wallet previousSnapshot = wallet.copy();
         BalanceAdjustmentRecord record = wallet.adjustBalance(actualBalance, adjustedAt, request.getReason());
 
