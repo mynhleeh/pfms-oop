@@ -30,6 +30,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -162,7 +163,45 @@ class EntityLookupSupportTest {
     }
 
     @Nested
-    @DisplayName("Nhóm 2: Tải Ví Hoạt Động (loadActiveWallet)")
+    @DisplayName("Nhóm 2: Tải Thực Thể Hoạt Động Tổng Quát (loadActiveEntity)")
+    class LoadActiveEntityGenericTests {
+
+        @Test
+        @DisplayName("loadActiveEntity ném NullPointerException khi activePredicate là null")
+        void shouldThrowNullPointerExceptionWhenPredicateIsNull() {
+            assertThrows(NullPointerException.class,
+                    () -> EntityLookupSupport.loadActiveEntity(
+                            walletRepository, walletId, "Ví", null, ErrorCode.ERR_WAL_001, "msg"));
+        }
+
+        @Test
+        @DisplayName("loadActiveEntity trả về thực thể khi điều kiện activePredicate thỏa mãn")
+        void shouldReturnEntityWhenPredicateMatches() {
+            when(walletRepository.findById(walletId)).thenReturn(Optional.of(activeWallet));
+
+            Wallet result = EntityLookupSupport.loadActiveEntity(
+                    walletRepository, walletId, "Ví", Wallet::isActive, ErrorCode.ERR_WAL_001, "msg");
+
+            assertSame(activeWallet, result);
+        }
+
+        @Test
+        @DisplayName("loadActiveEntity ném BusinessException khi điều kiện activePredicate không thỏa mãn")
+        void shouldThrowBusinessExceptionWhenPredicateFails() {
+            when(walletRepository.findById(walletId)).thenReturn(Optional.of(activeWallet));
+
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> EntityLookupSupport.loadActiveEntity(
+                            walletRepository, walletId, "Ví", w -> false, ErrorCode.ERR_WAL_001, "Lỗi trạng thái"));
+
+            assertEquals(ErrorCode.ERR_WAL_001, ex.getErrorCode());
+            assertEquals("Lỗi trạng thái", ex.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 3: Tải Ví Hoạt Động (loadActiveWallet)")
     class LoadActiveWalletTests {
 
         @Test
@@ -197,6 +236,164 @@ class EntityLookupSupportTest {
                     BusinessException.class,
                     () -> EntityLookupSupport.loadActiveWallet(walletRepository, walletId));
             assertEquals(ErrorCode.ERR_WAL_001, deletedException.getErrorCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 3: Tải Danh Mục Hoạt Động (loadActiveCategory)")
+    class LoadActiveCategoryTests {
+
+        @Test
+        @DisplayName("loadActiveCategory trả về danh mục khi đang ở trạng thái ACTIVE")
+        void shouldLoadActiveCategory() {
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(expenseCategory));
+
+            Category loaded = EntityLookupSupport.loadActiveCategory(categoryRepository, categoryId);
+
+            assertSame(expenseCategory, loaded);
+        }
+
+        @Test
+        @DisplayName("loadActiveCategory ném BusinessException ERR_CAT_001 khi danh mục không active (đã xóa)")
+        void shouldRejectInactiveCategory() {
+            Category deletedCategory = new Category(
+                    categoryId, "Đã Xóa", UUID.randomUUID(),
+                    TransactionType.EXPENSE, "food", "#FF9800");
+            deletedCategory.markDeleted();
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(deletedCategory));
+
+            BusinessException exception = assertThrows(
+                    BusinessException.class,
+                    () -> EntityLookupSupport.loadActiveCategory(categoryRepository, categoryId));
+            assertEquals(ErrorCode.ERR_CAT_001, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("loadActiveCategory ném EntityNotFoundException khi không tìm thấy danh mục")
+        void shouldThrowNotFoundWhenCategoryDoesNotExist() {
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+            EntityNotFoundException exception = assertThrows(
+                    EntityNotFoundException.class,
+                    () -> EntityLookupSupport.loadActiveCategory(categoryRepository, categoryId));
+            assertEquals(ErrorCode.ERR_NOT_FOUND, exception.getErrorCode());
+            assertEquals("Danh mục", exception.getEntityType());
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 4: Thẩm định Danh Mục Phí Hợp Lệ (resolveActiveExpenseFeeCategory)")
+    class ResolveActiveExpenseFeeCategoryTests {
+
+        @Test
+        @DisplayName("resolveActiveExpenseFeeCategory trả về null khi feeAmount là null hoặc không dương (<= 0)")
+        void shouldReturnNullWhenFeeNotPositive() {
+            assertNull(EntityLookupSupport.resolveActiveExpenseFeeCategory(categoryRepository, null, categoryId));
+            assertNull(EntityLookupSupport.resolveActiveExpenseFeeCategory(categoryRepository, Money.ZERO, categoryId));
+            assertNull(EntityLookupSupport.resolveActiveExpenseFeeCategory(categoryRepository, Money.of("-1000"), categoryId));
+        }
+
+        @Test
+        @DisplayName("resolveActiveExpenseFeeCategory ném ERR_FEE_002 khi feeAmount > 0 nhưng feeCategoryId là null")
+        void shouldThrowErrFee002WhenFeeCategoryMissing() {
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> EntityLookupSupport.resolveActiveExpenseFeeCategory(
+                            categoryRepository, Money.of("5000"), null));
+            assertEquals(ErrorCode.ERR_FEE_002, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("resolveActiveExpenseFeeCategory ném ERR_NOT_FOUND khi danh mục phí không tồn tại")
+        void shouldThrowNotFoundWhenFeeCategoryDoesNotExist() {
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+            EntityNotFoundException ex = assertThrows(
+                    EntityNotFoundException.class,
+                    () -> EntityLookupSupport.resolveActiveExpenseFeeCategory(
+                            categoryRepository, Money.of("5000"), categoryId));
+            assertEquals(ErrorCode.ERR_NOT_FOUND, ex.getErrorCode());
+            assertEquals("Danh mục phí", ex.getEntityType());
+        }
+
+        @Test
+        @DisplayName("resolveActiveExpenseFeeCategory ném ERR_FEE_003 khi danh mục phí không active hoặc không phải EXPENSE")
+        void shouldThrowErrFee003WhenFeeCategoryInvalid() {
+            // Không active
+            Category inactiveCategory = new Category(
+                    categoryId, "Phí CK", UUID.randomUUID(),
+                    TransactionType.EXPENSE, "fee", "#999999");
+            inactiveCategory.markDeleted();
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(inactiveCategory));
+
+            BusinessException exInactive = assertThrows(
+                    BusinessException.class,
+                    () -> EntityLookupSupport.resolveActiveExpenseFeeCategory(
+                            categoryRepository, Money.of("5000"), categoryId));
+            assertEquals(ErrorCode.ERR_FEE_003, exInactive.getErrorCode());
+
+            // Type là INCOME thay vì EXPENSE
+            Category incomeCategory = new Category(
+                    categoryId, "Thu nhập khác", UUID.randomUUID(),
+                    TransactionType.INCOME, "income", "#00FF00");
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(incomeCategory));
+
+            BusinessException exIncome = assertThrows(
+                    BusinessException.class,
+                    () -> EntityLookupSupport.resolveActiveExpenseFeeCategory(
+                            categoryRepository, Money.of("5000"), categoryId));
+            assertEquals(ErrorCode.ERR_FEE_003, exIncome.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("resolveActiveExpenseFeeCategory trả về đúng danh mục phí hợp lệ")
+        void shouldReturnValidFeeCategory() {
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(expenseCategory));
+
+            Category resolved = EntityLookupSupport.resolveActiveExpenseFeeCategory(
+                    categoryRepository, Money.of("5000"), categoryId);
+
+            assertSame(expenseCategory, resolved);
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 5: Tra cứu Thực thể để Hiển thị với Fallback (resolveForDisplay)")
+    class ResolveForDisplayTests {
+
+        @Test
+        @DisplayName("resolveForDisplay trả về fallback khi repository hoặc id là null")
+        void shouldReturnFallbackWhenRepoOrIdNull() {
+            assertSame(expenseCategory, EntityLookupSupport.resolveForDisplay(null, categoryId, expenseCategory));
+            assertSame(expenseCategory, EntityLookupSupport.resolveForDisplay(categoryRepository, null, expenseCategory));
+        }
+
+        @Test
+        @DisplayName("resolveForDisplay trả về entity từ repo khi tìm thấy")
+        void shouldReturnEntityFromRepositoryWhenFound() {
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(expenseCategory));
+
+            Category fallback = new Category(
+                    UUID.randomUUID(), "Dự phòng", UUID.randomUUID(),
+                    TransactionType.EXPENSE, "fb", "#000000");
+
+            Category result = EntityLookupSupport.resolveForDisplay(categoryRepository, categoryId, fallback);
+
+            assertSame(expenseCategory, result);
+        }
+
+        @Test
+        @DisplayName("resolveForDisplay trả về fallback khi không tìm thấy trong repo")
+        void shouldReturnFallbackWhenNotFoundInRepository() {
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+            Category fallback = new Category(
+                    UUID.randomUUID(), "Dự phòng", UUID.randomUUID(),
+                    TransactionType.EXPENSE, "fb", "#000000");
+
+            Category result = EntityLookupSupport.resolveForDisplay(categoryRepository, categoryId, fallback);
+
+            assertSame(fallback, result);
         }
     }
 }

@@ -182,7 +182,7 @@ public class WalletServiceImpl implements WalletService {
         try {
             balanceAdjustmentRepository.save(record);
         } catch (StorageException storageException) {
-            runRollbackStep(() -> walletRepository.save(previousSnapshot), storageException);
+            RollbackSupport.runRollbackStep(() -> walletRepository.save(previousSnapshot), storageException);
             throw storageException;
         }
 
@@ -272,14 +272,6 @@ public class WalletServiceImpl implements WalletService {
                 .multiply(BigDecimal.valueOf(100))
                 .divide(totalBalance, 4, RoundingMode.HALF_EVEN)
                 .setScale(2, RoundingMode.HALF_EVEN);
-    }
-
-    private void runRollbackStep(Runnable compensatingStep, StorageException primaryException) {
-        try {
-            compensatingStep.run();
-        } catch (RuntimeException rollbackException) {
-            primaryException.addSuppressed(rollbackException);
-        }
     }
     // endregion
 }

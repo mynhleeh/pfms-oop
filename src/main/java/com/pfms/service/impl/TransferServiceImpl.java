@@ -185,11 +185,11 @@ public class TransferServiceImpl implements TransferService {
 
         transfer.revertFromWallet();
         if (sourceSaved) {
-            runRollbackStep(() -> walletRepository.save(sourceSnapshot), primaryException);
+            RollbackSupport.runRollbackStep(() -> walletRepository.save(sourceSnapshot), primaryException);
         }
         if (destinationSaved) {
-            runRollbackStep(() -> walletRepository.save(destinationSnapshot), primaryException);
-            runRollbackStep(() -> transactionRepository.deleteById(transfer.getTransactionId()), primaryException);
+            RollbackSupport.runRollbackStep(() -> walletRepository.save(destinationSnapshot), primaryException);
+            RollbackSupport.runRollbackStep(() -> transactionRepository.deleteById(transfer.getTransactionId()), primaryException);
         }
     }
 
@@ -287,18 +287,10 @@ public class TransferServiceImpl implements TransferService {
 
         restoreRevertedInMemoryWallets(transfer, sourceWallet, destinationWallet);
         if (destinationSaved) {
-            runRollbackStep(() -> walletRepository.save(destinationSnapshot), primaryException);
+            RollbackSupport.runRollbackStep(() -> walletRepository.save(destinationSnapshot), primaryException);
         }
         if (transactionDeleted) {
-            runRollbackStep(() -> transactionRepository.save(transfer), primaryException);
-        }
-    }
-
-    private void runRollbackStep(Runnable compensatingStep, StorageException primaryException) {
-        try {
-            compensatingStep.run();
-        } catch (RuntimeException rollbackException) {
-            primaryException.addSuppressed(rollbackException);
+            RollbackSupport.runRollbackStep(() -> transactionRepository.save(transfer), primaryException);
         }
     }
 
