@@ -138,8 +138,8 @@ class UpdateTransactionRequestDTOTest {
     }
 
     @Nested
-    @DisplayName("Kiểm soát Tiền điều kiện và Dữ liệu biên không hợp lệ")
-    class InvalidInputTests {
+    @DisplayName("Kiểm soát Cấu trúc (Null-Check) và Cho phép Dữ liệu Nghiệp vụ Đi qua Tới Domain")
+    class PreconditionAndPassthroughTests {
 
         @Test
         @DisplayName("Ném NullPointerException khi mã giao dịch transactionId bị null")
@@ -162,24 +162,23 @@ class UpdateTransactionRequestDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi số tiền newAmount bằng 0")
-        void shouldThrowWhenNewAmountIsZero() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép số tiền newAmount bằng 0 đi qua DTO để Domain/Service xử lý ERR_FIN_001")
+        void shouldAllowZeroNewAmountPassthroughForDomainValidation() {
+            UpdateTransactionRequestDTO dto = assertDoesNotThrow(
                     () -> new UpdateTransactionRequestDTO(sampleTxnId, BigDecimal.ZERO, sampleCategoryId)
             );
-            assertTrue(ex.getMessage().contains("Số tiền giao dịch mới phải lớn hơn 0"));
+            assertEquals(0, BigDecimal.ZERO.compareTo(dto.getNewAmount()));
         }
 
-        @ParameterizedTest(name = "Số tiền mới âm {0} phải bị từ chối")
+        @ParameterizedTest(name = "Số tiền mới âm {0} được giữ nguyên để Domain/Service ném ERR_FIN_001")
         @ValueSource(strings = {"-0.01", "-50000", "-1000000.00"})
-        @DisplayName("Ném IllegalArgumentException khi số tiền newAmount âm")
-        void shouldThrowWhenNewAmountIsNegative(String invalidAmount) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new UpdateTransactionRequestDTO(sampleTxnId, new BigDecimal(invalidAmount), sampleCategoryId)
+        @DisplayName("Cho phép số tiền newAmount âm đi qua DTO để Domain/Service xử lý ERR_FIN_001")
+        void shouldAllowNegativeNewAmountPassthroughForDomainValidation(String negativeAmount) {
+            BigDecimal expected = new BigDecimal(negativeAmount);
+            UpdateTransactionRequestDTO dto = assertDoesNotThrow(
+                    () -> new UpdateTransactionRequestDTO(sampleTxnId, expected, sampleCategoryId)
             );
-            assertTrue(ex.getMessage().contains("Số tiền giao dịch mới phải lớn hơn 0"));
+            assertEquals(0, expected.compareTo(dto.getNewAmount()));
         }
 
         @Test
@@ -192,30 +191,31 @@ class UpdateTransactionRequestDTOTest {
             assertTrue(ex.getMessage().contains("Mã danh mục mới"));
         }
 
-        @ParameterizedTest(name = "Mức phí mới âm {0} phải bị từ chối")
+        @ParameterizedTest(name = "Mức phí mới âm {0} đi qua DTO và tự đưa newFeeCategoryId về null")
         @ValueSource(strings = {"-0.01", "-500", "-10000.00"})
-        @DisplayName("Ném IllegalArgumentException khi mức phí newFeeAmount âm")
-        void shouldThrowWhenNewFeeAmountIsNegative(String invalidFee) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép mức phí newFeeAmount âm đi qua DTO để Domain/Service xử lý ERR_FEE_001")
+        void shouldAllowNegativeNewFeeAmountPassthroughForDomainValidation(String negativeFee) {
+            BigDecimal expectedFee = new BigDecimal(negativeFee);
+            UpdateTransactionRequestDTO dto = assertDoesNotThrow(
                     () -> new UpdateTransactionRequestDTO(
                             sampleTxnId,
                             new BigDecimal("100000"),
                             sampleDate,
                             sampleCategoryId,
                             "",
-                            new BigDecimal(invalidFee),
+                            expectedFee,
                             sampleFeeCategoryId
                     )
             );
-            assertTrue(ex.getMessage().contains("Mức phí giao dịch mới không được âm"));
+            assertEquals(0, expectedFee.compareTo(dto.getNewFeeAmount()));
+            assertNull(dto.getNewFeeCategoryId());
+            assertFalse(dto.hasFee());
         }
 
         @Test
-        @DisplayName("Ném NullPointerException khi mức phí mới dương nhưng mã danh mục phí bị null")
-        void shouldThrowWhenFeeIsPositiveButFeeCategoryIdIsNull() {
-            NullPointerException ex = assertThrows(
-                    NullPointerException.class,
+        @DisplayName("Cho phép mức phí mới dương nhưng newFeeCategoryId null đi qua DTO để Domain xử lý ERR_FEE_002")
+        void shouldAllowPositiveFeeWithNullFeeCategoryIdPassthrough() {
+            UpdateTransactionRequestDTO dto = assertDoesNotThrow(
                     () -> new UpdateTransactionRequestDTO(
                             sampleTxnId,
                             new BigDecimal("100000"),
@@ -226,7 +226,29 @@ class UpdateTransactionRequestDTOTest {
                             null
                     )
             );
-            assertTrue(ex.getMessage().contains("danh mục phí mới không được để trống"));
+            assertEquals(0, new BigDecimal("5000.00").compareTo(dto.getNewFeeAmount()));
+            assertNull(dto.getNewFeeCategoryId());
+            assertTrue(dto.hasFee());
+        }
+
+        @Test
+        @DisplayName("Cho phép ngày giao dịch tương lai và ghi chú vượt 255 ký tự đi qua DTO")
+        void shouldAllowFutureNewDateAndOversizedNewNotePassthrough() {
+            LocalDate futureDate = LocalDate.now().plusDays(1);
+            String oversizedNote = "b".repeat(256);
+
+            UpdateTransactionRequestDTO dto = assertDoesNotThrow(
+                    () -> new UpdateTransactionRequestDTO(
+                            sampleTxnId,
+                            new BigDecimal("100000"),
+                            futureDate,
+                            sampleCategoryId,
+                            oversizedNote
+                    )
+            );
+
+            assertEquals(futureDate, dto.getNewDate());
+            assertEquals(oversizedNote, dto.getNewNote());
         }
     }
 
@@ -235,7 +257,7 @@ class UpdateTransactionRequestDTOTest {
     class EqualityAndContractTests {
 
         @Test
-        @DisplayName("Hai đối tượng bằng nhau khi cùng thuộc tính dù khác scale số học")
+        @DisplayName("Hai đối tượng bằng nhau khi cùng thuộc tính dù khác scale số học (kể cả số âm)")
         void shouldBeEqualRegardlessOfScale() {
             UpdateTransactionRequestDTO dto1 = new UpdateTransactionRequestDTO(
                     sampleTxnId,
@@ -257,8 +279,58 @@ class UpdateTransactionRequestDTOTest {
                     sampleFeeCategoryId
             );
 
+            UpdateTransactionRequestDTO dtoNeg1 = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
+                    new BigDecimal("-100"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Test âm",
+                    new BigDecimal("-50"),
+                    null
+            );
+
+            UpdateTransactionRequestDTO dtoNeg2 = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
+                    new BigDecimal("-100.00"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Test âm",
+                    new BigDecimal("-50.00"),
+                    null
+            );
+
+            assertEquals(dto1, dto1);
             assertEquals(dto1, dto2);
             assertEquals(dto1.hashCode(), dto2.hashCode());
+            assertEquals(dtoNeg1, dtoNeg2);
+            assertEquals(dtoNeg1.hashCode(), dtoNeg2.hashCode());
+        }
+
+        @Test
+        @DisplayName("An toàn equals, hashCode và toString khi phí mới dương nhưng newFeeCategoryId bị null")
+        void shouldHandleNullNewFeeCategoryIdSafelyInIdentityContract() {
+            UpdateTransactionRequestDTO dto1 = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
+                    new BigDecimal("100000"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Phí thiếu danh mục",
+                    new BigDecimal("5000"),
+                    null
+            );
+            UpdateTransactionRequestDTO dto2 = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
+                    new BigDecimal("100000"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Phí thiếu danh mục",
+                    new BigDecimal("5000.00"),
+                    null
+            );
+
+            assertEquals(dto1, dto2);
+            assertEquals(dto1.hashCode(), dto2.hashCode());
+            assertTrue(dto1.toString().contains("newFeeCategoryId=null"));
         }
 
         @Test

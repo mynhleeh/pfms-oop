@@ -1,7 +1,5 @@
 package com.pfms.presentation.dto.transfer;
 
-import com.pfms.common.util.Preconditions;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -48,20 +46,9 @@ public final class TransferRequestDTO {
 
         this.sourceWalletId = Objects.requireNonNull(sourceWalletId, "Mã ví nguồn không được để null");
         this.destinationWalletId = Objects.requireNonNull(destinationWalletId, "Mã ví đích không được để null");
-        Preconditions.checkArgument(
-                !this.sourceWalletId.equals(this.destinationWalletId),
-                "Ví nguồn và ví đích phải khác nhau: " + this.sourceWalletId);
+        this.amount = Objects.requireNonNull(amount, "Số tiền chuyển không được để null");
 
-        Objects.requireNonNull(amount, "Số tiền chuyển không được để null");
-        this.amount = Preconditions.requirePositive(amount, "Số tiền chuyển phải lớn hơn 0: " + amount);
-
-        BigDecimal normalizedFee = (feeAmount == null) ? BigDecimal.ZERO : feeAmount;
-        this.feeAmount = Preconditions.requireNonNegative(
-                normalizedFee, "Mức phí chuyển tiền không được âm: " + normalizedFee);
-        Preconditions.checkArgument(
-                !(this.feeAmount.compareTo(BigDecimal.ZERO) > 0 && feeCategoryId == null),
-                "Khi phát sinh phí chuyển tiền, danh mục phí không được để trống");
-
+        this.feeAmount = (feeAmount == null) ? BigDecimal.ZERO : feeAmount;
         this.transferDate = (transferDate == null) ? LocalDate.now() : transferDate;
         this.note = (note == null) ? "" : note.trim();
         this.feeCategoryId = (this.feeAmount.compareTo(BigDecimal.ZERO) > 0) ? feeCategoryId : null;

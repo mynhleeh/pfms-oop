@@ -167,51 +167,80 @@ class FilterTransactionsRequestDTOTest {
     }
 
     @Nested
-    @DisplayName("Kiểm soát Tiền điều kiện và Dữ liệu biên không hợp lệ")
-    class InvalidInputTests {
+    @DisplayName("Cho phép Dữ liệu Nghiệp vụ / Phân trang Đi qua DTO (Data Carrier thuần túy)")
+    class DomainValidationPassthroughTests {
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi ngày bắt đầu đứng sau ngày kết thúc")
-        void shouldThrowWhenStartDateIsAfterEndDate() {
+        @DisplayName("Cho phép khoảng ngày đảo ngược (startDate > endDate) đi qua DTO để Service/Domain xử lý ERR_FIN_001")
+        void shouldAllowInvertedDateRangePassthroughForServiceValidation() {
             LocalDate start = LocalDate.of(2026, 11, 20);
             LocalDate end = LocalDate.of(2026, 11, 10);
 
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            FilterTransactionsRequestDTO dto = assertDoesNotThrow(
                     () -> new FilterTransactionsRequestDTO(start, end, null, null, null, "", 1, 50)
             );
-            assertTrue(ex.getMessage().contains("Ngày bắt đầu không được sau ngày kết thúc"));
+
+            assertEquals(start, dto.getStartDate());
+            assertEquals(end, dto.getEndDate());
+            assertTrue(dto.hasDateFilter());
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi loại thu chi không hợp lệ")
-        void shouldThrowWhenInvalidTransactionType() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new FilterTransactionsRequestDTO(null, null, null, "TRANSFER", null, "", 1, 50)
+        @DisplayName("Cho phép mốc ngày tương lai đi qua DTO để Service/Domain xử lý ERR_FIN_001")
+        void shouldAllowFutureDatesPassthroughForServiceValidation() {
+            LocalDate futureDate = LocalDate.now().plusDays(1);
+
+            FilterTransactionsRequestDTO dto = assertDoesNotThrow(
+                    () -> new FilterTransactionsRequestDTO(futureDate, futureDate, null, null, null, "", 1, 50)
             );
-            assertTrue(ex.getMessage().contains("Loại giao dịch không hợp lệ"));
+
+            assertEquals(futureDate, dto.getStartDate());
+            assertEquals(futureDate, dto.getEndDate());
         }
 
-        @Test
-        @DisplayName("Ném IllegalArgumentException khi chỉ số trang pageNumber nhỏ hơn 1")
-        void shouldThrowWhenPageNumberIsLessThanOne() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new FilterTransactionsRequestDTO(null, null, null, null, null, "", 0, 50)
+        @ParameterizedTest(name = "Chuỗi transactionType không chuẩn \"{0}\" đi qua DTO và được chuẩn hóa viết hoa")
+        @ValueSource(strings = {"TRANSFER", "  transfer  ", "unknown"})
+        @DisplayName("Chỉ chuẩn hóa trim().toUpperCase() cho transactionType thay vì ném lỗi tại DTO")
+        void shouldNormalizeAndAllowArbitraryTransactionTypePassthrough(String rawType) {
+            FilterTransactionsRequestDTO dto = assertDoesNotThrow(
+                    () -> new FilterTransactionsRequestDTO(null, null, null, rawType, null, "", 1, 50)
             );
-            assertTrue(ex.getMessage().contains("Chỉ số trang phải lớn hơn hoặc bằng 1"));
+
+            assertEquals(rawType.trim().toUpperCase(), dto.getTransactionType());
+            assertTrue(dto.hasTypeFilter());
         }
 
-        @ParameterizedTest(name = "Kích thước trang không hợp lệ: {0}")
+        @ParameterizedTest(name = "Chuỗi transactionType rỗng/khoảng trắng \"{0}\" chuẩn hóa thành null")
+        @ValueSource(strings = {"", "   ", "\t"})
+        @DisplayName("Chuyển transactionType toàn khoảng trắng thành null")
+        void shouldNormalizeBlankTransactionTypeToNull(String blankType) {
+            FilterTransactionsRequestDTO dto = new FilterTransactionsRequestDTO(
+                    null, null, null, blankType, null, "", 1, 50);
+
+            assertNull(dto.getTransactionType());
+            assertFalse(dto.hasTypeFilter());
+        }
+
+        @ParameterizedTest(name = "Chỉ số trang không hợp lệ {0} đi qua DTO để tầng Service kiểm tra")
+        @ValueSource(ints = { 0, -1, -10 })
+        @DisplayName("Cho phép pageNumber < 1 đi qua DTO")
+        void shouldAllowOutOfRangePageNumberPassthrough(int invalidPageNumber) {
+            FilterTransactionsRequestDTO dto = assertDoesNotThrow(
+                    () -> new FilterTransactionsRequestDTO(null, null, null, null, null, "", invalidPageNumber, 50)
+            );
+
+            assertEquals(invalidPageNumber, dto.getPageNumber());
+        }
+
+        @ParameterizedTest(name = "Kích thước trang ngoài biên {0} đi qua DTO để tầng Service kiểm tra")
         @ValueSource(ints = { -5, 0, 9, 101, 500 })
-        @DisplayName("Ném IllegalArgumentException khi pageSize ngoài khoảng 10 đến 100")
-        void shouldThrowWhenPageSizeIsOutOfRange(int invalidSize) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép pageSize ngoài khoảng 10 đến 100 đi qua DTO")
+        void shouldAllowOutOfRangePageSizePassthrough(int invalidSize) {
+            FilterTransactionsRequestDTO dto = assertDoesNotThrow(
                     () -> new FilterTransactionsRequestDTO(null, null, null, null, null, "", 1, invalidSize)
             );
-            assertTrue(ex.getMessage().contains("Kích thước trang phải nằm trong khoảng từ 10 đến 100"));
+
+            assertEquals(invalidSize, dto.getPageSize());
         }
     }
 
@@ -227,6 +256,7 @@ class FilterTransactionsRequestDTOTest {
             FilterTransactionsRequestDTO dto2 = new FilterTransactionsRequestDTO(
                     startDate, endDate, Set.of(wallet1), "EXPENSE", Set.of(cat1), "cà phê", 1, 20);
 
+            assertEquals(dto1, dto1);
             assertEquals(dto1, dto2);
             assertEquals(dto1.hashCode(), dto2.hashCode());
         }

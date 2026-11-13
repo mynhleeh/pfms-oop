@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.pfms.common.util.Preconditions;
-
 /**
  * DTO đóng gói kết quả kiểm kê và điều chỉnh số dư trả về từ tầng dịch vụ lên
  * giao diện.
@@ -40,12 +38,8 @@ public final class BalanceAdjustmentResponseDTO {
 
         this.recordId = Objects.requireNonNull(recordId, "Mã bản ghi kiểm kê không được để null");
         this.walletId = Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
-        Objects.requireNonNull(previousBalance, "Số dư trước kiểm kê không được để null");
-        this.previousBalance = Preconditions.requireNonNegative(previousBalance,
-                "Số dư trước kiểm kê không được âm: " + previousBalance);
-        Objects.requireNonNull(actualBalance, "Số dư thực tế sau kiểm kê không được để null");
-        this.actualBalance = Preconditions.requireNonNegative(actualBalance,
-                "Số dư thực tế sau kiểm kê không được âm: " + actualBalance);
+        this.previousBalance = Objects.requireNonNull(previousBalance, "Số dư trước kiểm kê không được để null");
+        this.actualBalance = Objects.requireNonNull(actualBalance, "Số dư thực tế sau kiểm kê không được để null");
         this.difference = (difference != null) ? difference : actualBalance.subtract(previousBalance);
         this.currency = (currency == null || currency.trim().isEmpty()) ? "VND" : currency.trim();
         this.reason = (reason == null) ? "" : reason.trim();

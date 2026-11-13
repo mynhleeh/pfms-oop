@@ -1,7 +1,5 @@
 package com.pfms.presentation.dto.transaction;
 
-import com.pfms.common.util.Preconditions;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -70,30 +68,21 @@ public final class TransactionResponseDTO {
 
         this.transactionId = Objects.requireNonNull(transactionId, "Mã giao dịch không được để null");
         this.walletId = Objects.requireNonNull(walletId, "Mã ví không được để null");
-        this.walletName = Preconditions.requireNonBlank(walletName, "Tên ví không được để trống hoặc chỉ chứa khoảng trắng");
+        this.walletName = (walletName == null) ? null : walletName.trim();
         this.categoryId = Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
-        this.categoryName = Preconditions.requireNonBlank(categoryName, "Tên danh mục không được để trống hoặc chỉ chứa khoảng trắng");
-
-        Objects.requireNonNull(amount, "Số tiền giao dịch không được để null");
-        this.amount = Preconditions.requirePositive(amount, "Số tiền giao dịch phải lớn hơn 0: " + amount);
-
-        Objects.requireNonNull(transactionType, "Loại giao dịch không được để null");
-        String normalizedType = transactionType.trim().toUpperCase();
-        if (!"INCOME".equals(normalizedType) && !"EXPENSE".equals(normalizedType)) {
-            throw new IllegalArgumentException("Loại giao dịch không hợp lệ: " + transactionType);
-        }
-        this.transactionType = normalizedType;
-
+        this.categoryName = (categoryName == null) ? null : categoryName.trim();
+        this.amount = Objects.requireNonNull(amount, "Số tiền giao dịch không được để null");
+        this.transactionType = Objects.requireNonNull(transactionType, "Loại giao dịch không được để null")
+                .trim()
+                .toUpperCase();
         this.walletBalanceAfter = Objects.requireNonNull(walletBalanceAfter, "Số dư ví sau giao dịch không được để null");
 
         BigDecimal normalizedFee = (feeAmount == null) ? BigDecimal.ZERO : feeAmount;
-        Preconditions.requireNonNegative(normalizedFee, "Mức phí giao dịch không được âm: " + normalizedFee);
-
         if (normalizedFee.compareTo(BigDecimal.ZERO) > 0) {
             this.hasFee = true;
             this.feeAmount = normalizedFee;
-            this.feeCategoryId = Objects.requireNonNull(feeCategoryId, "Mã danh mục phí không được để null khi có phí");
-            this.feeCategoryName = Preconditions.requireNonBlank(feeCategoryName, "Tên danh mục phí không được để trống khi có phí");
+            this.feeCategoryId = feeCategoryId;
+            this.feeCategoryName = (feeCategoryName == null) ? "" : feeCategoryName.trim();
         } else {
             this.hasFee = false;
             this.feeAmount = BigDecimal.ZERO;

@@ -1,7 +1,5 @@
 package com.pfms.presentation.dto.transfer;
 
-import com.pfms.common.util.Preconditions;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,17 +30,10 @@ public final class TransferHistoryResponseDTO {
             BigDecimal totalFees,
             int totalRecords) {
 
-        Objects.requireNonNull(totalTransferredAmount, "Tổng số tiền chuyển không được để null");
-        this.totalTransferredAmount = Preconditions.requireNonNegative(
-                totalTransferredAmount, "Tổng số tiền chuyển không được âm: " + totalTransferredAmount);
-
-        Objects.requireNonNull(totalFees, "Tổng chi phí phát sinh không được để null");
-        this.totalFees = Preconditions.requireNonNegative(
-                totalFees, "Tổng chi phí phát sinh không được âm: " + totalFees);
-
-        Preconditions.checkArgument(
-                totalRecords >= 0,
-                "Tổng số bản ghi không được âm: " + totalRecords);
+        this.totalTransferredAmount = Objects.requireNonNull(
+                totalTransferredAmount, "Tổng số tiền chuyển không được để null");
+        this.totalFees = Objects.requireNonNull(
+                totalFees, "Tổng chi phí phát sinh không được để null");
 
         this.items = (items == null)
                 ? Collections.emptyList()

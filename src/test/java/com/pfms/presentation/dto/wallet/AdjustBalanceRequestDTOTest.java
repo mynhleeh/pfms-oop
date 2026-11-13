@@ -106,12 +106,26 @@ class AdjustBalanceRequestDTOTest {
 
         @ParameterizedTest
         @ValueSource(strings = { "-0.01", "-1", "-500000" })
-        @DisplayName("Ném IllegalArgumentException khi số dư thực tế mang giá trị âm")
-        void shouldThrowExceptionWhenActualBalanceIsNegative(String negativeAmount) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new AdjustBalanceRequestDTO(sampleId, new BigDecimal(negativeAmount)));
-            assertTrue(ex.getMessage().contains("không được âm"));
+        @DisplayName("Chuyển tiếp số dư thực tế âm sang Domain để ném BusinessException(ERR_FIN_001) thay vì chặn tại DTO")
+        void shouldPreserveNegativeActualBalanceForDomainValidation(String negativeAmount) {
+            BigDecimal negativeValue = new BigDecimal(negativeAmount);
+            AdjustBalanceRequestDTO dto = assertDoesNotThrow(
+                    () -> new AdjustBalanceRequestDTO(sampleId, negativeValue));
+
+            assertEquals(0, negativeValue.compareTo(dto.getActualBalance()));
+        }
+
+        @Test
+        @DisplayName("Chuyển tiếp ngày kiểm kê tương lai và lý do dài > 255 ký tự sang Domain kiểm soát")
+        void shouldPreserveFutureDateAndLongReasonForDomainValidation() {
+            LocalDate futureDate = LocalDate.now().plusDays(1);
+            String longReason = "R".repeat(256);
+
+            AdjustBalanceRequestDTO dto = assertDoesNotThrow(
+                    () -> new AdjustBalanceRequestDTO(sampleId, new BigDecimal("100000"), longReason, futureDate));
+
+            assertEquals(futureDate, dto.getAdjustedAt());
+            assertEquals(256, dto.getReason().length());
         }
     }
 
@@ -120,7 +134,7 @@ class AdjustBalanceRequestDTOTest {
     class EqualityAndContractTests {
 
         @Test
-        @DisplayName("Hai DTO cùng thuộc tính phải bình đẳng và cùng hashCode")
+        @DisplayName("Hai DTO cùng thuộc tính phải bình đẳng và cùng hashCode (bao gồm số âm khác scale)")
         void shouldRespectEqualsAndHashCodeContract() {
             UUID otherId = UUID.fromString("00000000-0000-0000-0000-000000000002");
             BigDecimal amount = new BigDecimal("500000.00");
@@ -132,14 +146,21 @@ class AdjustBalanceRequestDTOTest {
             AdjustBalanceRequestDTO dtoDiffReason = new AdjustBalanceRequestDTO(sampleId, amount, "Khác", sampleDate);
             AdjustBalanceRequestDTO dtoDiffDate = new AdjustBalanceRequestDTO(sampleId, amount, "Lý do",
                     sampleDate.plusDays(1));
+            AdjustBalanceRequestDTO dtoNeg1 = new AdjustBalanceRequestDTO(sampleId, new BigDecimal("-100"), "Lý do",
+                    sampleDate);
+            AdjustBalanceRequestDTO dtoNeg2 = new AdjustBalanceRequestDTO(sampleId, new BigDecimal("-100.00"), "Lý do",
+                    sampleDate);
 
+            assertEquals(dto1, dto1);
             assertEquals(dto1, dto2);
             assertEquals(dto1.hashCode(), dto2.hashCode());
+            assertEquals(dtoNeg1, dtoNeg2);
+            assertEquals(dtoNeg1.hashCode(), dtoNeg2.hashCode());
             assertNotEquals(dto1, dtoDiffId);
             assertNotEquals(dto1, dtoDiffAmount);
             assertNotEquals(dto1, dtoDiffReason);
             assertNotEquals(dto1, dtoDiffDate);
-            assertNotEquals(null, dto1);
+            assertNotEquals(dto1, null);
             assertNotEquals(dto1, "NotAnAdjustBalanceRequestDTO");
         }
 

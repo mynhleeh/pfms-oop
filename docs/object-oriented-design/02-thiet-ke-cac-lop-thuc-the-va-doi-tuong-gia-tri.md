@@ -127,8 +127,8 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
 | `Wallet` | `UUID walletId, String name, String note, boolean isDefault` | `Wallet` | `BusinessException, IllegalArgumentException` | Kiểm tra `walletId` khác `null`; chuẩn hóa và đóng gói `name` vào `EntityName` (1-50 ký tự theo `ERR_NAM_001`) và `note` vào `Note` (tối đa 255 ký tự); gán `status = ACTIVE`, `currentBalance = Money.ZERO` và `createdAt` hiện tại. |
-| `credit` | `Money amount` | `void` | `BusinessException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`) và `amount` lớn hơn `0.00 VNĐ`, sau đó cộng `amount` vào `currentBalance`. |
-| `debit` | `Money amount` | `void` | `BusinessException, InsufficientBalanceException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`), `amount` lớn hơn `0.00 VNĐ` và `currentBalance` đủ chi trả (`ERR_WAL_001`), sau đó trừ `amount` khỏi `currentBalance`. |
+| `credit` | `Money amount` | `void` | `BusinessException, NullPointerException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`) và `amount` lớn hơn `0.00 VNĐ` (`ERR_FIN_001`), sau đó cộng `amount` vào `currentBalance`. |
+| `debit` | `Money amount` | `void` | `BusinessException, InsufficientBalanceException, NullPointerException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`), `amount` lớn hơn `0.00 VNĐ` (`ERR_FIN_001`) và `currentBalance` đủ chi trả (`ERR_WAL_001`), sau đó trừ `amount` khỏi `currentBalance`. |
 | `adjustBalance` | `Money actualBalance, TransactionDate adjustedAt, String reason` | `BalanceAdjustmentRecord` | `BusinessException, IllegalArgumentException` | Kiểm tra ví đang `ACTIVE` (`ERR_WAL_001`), khởi tạo và xác thực bản ghi `BalanceAdjustmentRecord` trước để bảo đảm `actualBalance` không âm (`ERR_FIN_001`), độ lệch khác không (`ERR_FIN_001`) và `reason` hợp lệ, sau đó mới cập nhật `currentBalance = actualBalance` rồi trả về bản ghi. |
 | `updateInfo` | `String newName, String newNote` | `void` | `BusinessException, IllegalArgumentException` | Chuẩn hóa và đóng gói `newName` vào `EntityName` (1-50 ký tự theo `ERR_NAM_001`) và `newNote` vào `Note` (tối đa 255 ký tự); cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
 | `archive` | `Không` | `void` | `IllegalStateException, BusinessException` | Kiểm tra `isDefault == false` và ví đang `ACTIVE`, sau đó chuyển `status` sang `ARCHIVED`. |
@@ -144,7 +144,7 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 | `isArchived` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.ARCHIVED`, phục vụ kiểm tra trạng thái lưu trữ của ví. |
 | `isDeleted` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.DELETED`, phục vụ kiểm tra trạng thái đã xóa của ví. |
 | `getCurrentBalance` | `Không` | `Money` | `Không` | Trả về số dư khả dụng hiện tại phục vụ hiển thị và tính cơ cấu phân bổ tài sản mà không mở hàm gán trực tiếp. |
-| `hasSufficientBalance` | `Money amount` | `boolean` | `IllegalArgumentException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
+| `hasSufficientBalance` | `Money amount` | `boolean` | `NullPointerException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
@@ -454,10 +454,10 @@ Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất 
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `of` | `String rawAmount` | `Money` | `IllegalArgumentException` | Phân tích chuỗi thập phân hợp lệ, chuẩn hóa 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN` và gán đơn vị `"VNĐ"`. |
-| `of` | `BigDecimal value` | `Money` | `IllegalArgumentException` | Kiểm tra `value` khác `null`, chuẩn hóa `setScale(2, RoundingMode.HALF_EVEN)` và trả về thể hiện `Money` mới. |
-| `add` | `Money other` | `Money` | `IllegalArgumentException` | Kiểm tra `other` khác `null`, cộng `this.amount` với `other.amount` và trả về thể hiện `Money` mới, dùng khi ghi nhận khoản thu hoặc nhận chuyển tiền. |
-| `subtract` | `Money other` | `Money` | `IllegalArgumentException` | Kiểm tra `other` khác `null`, trừ `other.amount` khỏi `this.amount` và trả về thể hiện `Money` mới, dùng khi trừ số dư ví hoặc tính chênh lệch kiểm kê. |
+| `of` | `String rawAmount` | `Money` | `BusinessException` | Phân tích chuỗi thập phân hợp lệ, kiểm tra rỗng và định dạng theo `ERR_FIN_001`, chuẩn hóa 2 chữ số thập phân bằng `RoundingMode.HALF_EVEN` và gán đơn vị `"VNĐ"`. |
+| `of` | `BigDecimal value` | `Money` | `NullPointerException` | Kiểm tra `value` khác `null`, chuẩn hóa `setScale(2, RoundingMode.HALF_EVEN)` và trả về thể hiện `Money` mới. |
+| `add` | `Money other` | `Money` | `NullPointerException` | Kiểm tra `other` khác `null`, cộng `this.amount` với `other.amount` và trả về thể hiện `Money` mới, dùng khi ghi nhận khoản thu hoặc nhận chuyển tiền. |
+| `subtract` | `Money other` | `Money` | `NullPointerException` | Kiểm tra `other` khác `null`, trừ `other.amount` khỏi `this.amount` và trả về thể hiện `Money` mới, dùng khi trừ số dư ví hoặc tính chênh lệch kiểm kê. |
 | `abs` | `Không` | `Money` | `Không` | Trả về thể hiện `Money` mới mang giá trị tuyệt đối không âm, dùng để tách dòng tiền vào hoặc ra từ khoản chênh lệch kiểm kê. |
 | `requireNonNegative` | `Không` | `Money` | `IllegalStateException` | Kiểm tra `amount` từ `0.00 VNĐ` trở lên để bảo đảm số dư ví và số dư kiểm kê không âm. |
 | `isPositive` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` lớn hơn `0.00`, dùng để kiểm tra số tiền giao dịch thu chi và chuyển tiền phải dương. |

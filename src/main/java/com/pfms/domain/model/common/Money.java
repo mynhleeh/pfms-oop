@@ -7,7 +7,8 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Objects;
 
-import com.pfms.common.util.Preconditions;
+import com.pfms.domain.exception.BusinessException;
+import com.pfms.domain.exception.ErrorCode;
 
 /**
  * Đối tượng giá trị bất biến đại diện cho số tiền và xử lý các phép toán tài
@@ -40,11 +41,13 @@ public final class Money implements Comparable<Money> {
 
     // region Factories
     public static Money of(String rawAmount) {
-        String cleanAmount = Preconditions.requireNonBlank(rawAmount, "Số tiền không được rỗng");
+        if (rawAmount == null || rawAmount.trim().isEmpty()) {
+            throw new BusinessException(ErrorCode.ERR_FIN_001, "Số tiền không được rỗng");
+        }
         try {
-            return new Money(new BigDecimal(cleanAmount), DEFAULT_CURRENCY);
+            return new Money(new BigDecimal(rawAmount.trim()), DEFAULT_CURRENCY);
         } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException("Số tiền không đúng định dạng: " + rawAmount, ex);
+            throw new BusinessException(ErrorCode.ERR_FIN_001, "Số tiền không đúng định dạng: " + rawAmount);
         }
     }
 

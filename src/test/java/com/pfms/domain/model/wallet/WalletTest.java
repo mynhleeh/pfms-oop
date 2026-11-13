@@ -226,16 +226,22 @@ class WalletTest {
         }
 
         @Test
-        @DisplayName("credit() and debit() with zero or negative amount should throw IllegalArgumentException")
+        @DisplayName("credit() and debit() with zero or negative amount should throw BusinessException (ERR_FIN_001)")
         void testNonPositiveAmountsThrowException() {
             Wallet wallet = new Wallet("Ví");
             wallet.credit(Money.of(100_000));
 
-            assertThrows(IllegalArgumentException.class, () -> wallet.credit(Money.ZERO));
-            assertThrows(IllegalArgumentException.class, () -> wallet.credit(Money.of(-10_000)));
+            BusinessException ex1 = assertThrows(BusinessException.class, () -> wallet.credit(Money.ZERO));
+            assertEquals(ErrorCode.ERR_FIN_001, ex1.getErrorCode());
 
-            assertThrows(IllegalArgumentException.class, () -> wallet.debit(Money.ZERO));
-            assertThrows(IllegalArgumentException.class, () -> wallet.debit(Money.of(-5_000)));
+            BusinessException ex2 = assertThrows(BusinessException.class, () -> wallet.credit(Money.of(-10_000)));
+            assertEquals(ErrorCode.ERR_FIN_001, ex2.getErrorCode());
+
+            BusinessException ex3 = assertThrows(BusinessException.class, () -> wallet.debit(Money.ZERO));
+            assertEquals(ErrorCode.ERR_FIN_001, ex3.getErrorCode());
+
+            BusinessException ex4 = assertThrows(BusinessException.class, () -> wallet.debit(Money.of(-5_000)));
+            assertEquals(ErrorCode.ERR_FIN_001, ex4.getErrorCode());
         }
 
         @Test
@@ -483,6 +489,66 @@ class WalletTest {
             assertEquals(regularWallet.getId(), regularWallet.getWalletId());
             assertFalse(regularWallet.isDefault());
             assertEquals(regularWallet.isDefaultWallet(), regularWallet.isDefault());
+        }
+    }
+
+    @Nested
+    @DisplayName("Group 6: Snapshot Copy Operations")
+    class CopyTests {
+
+        @Test
+        @DisplayName("copy should preserve all fields including balance, default flag, createdAt and state")
+        void testCopyPreservesAllFields() {
+            UUID walletId = UUID.randomUUID();
+            LocalDateTime createdAt = LocalDateTime.of(2025, 1, 15, 10, 30);
+            Wallet original = new Wallet(
+                    walletId, "Ví Tiết Kiệm", "Ghi chú gốc", true,
+                    createdAt, new ActiveWalletState(), Money.of("250000.00"));
+
+            Wallet snapshot = original.copy();
+
+            assertNotSame(original, snapshot);
+            assertEquals(walletId, snapshot.getId());
+            assertEquals("Ví Tiết Kiệm", snapshot.getName());
+            assertEquals("Ghi chú gốc", snapshot.getNote());
+            assertTrue(snapshot.isDefaultWallet());
+            assertEquals(createdAt, snapshot.getCreatedAt());
+            assertEquals(EntityStatus.ACTIVE, snapshot.getStatus());
+            assertEquals(Money.of("250000.00"), snapshot.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("copy should remain independent when original or snapshot is mutated")
+        void testCopyRemainsIndependentOnMutation() {
+            Wallet original = new Wallet("Ví Phụ", "Ban đầu", false);
+            original.credit(Money.of("500000.00"));
+            Wallet snapshot = original.copy();
+
+            original.debit(Money.of("200000.00"));
+            original.updateInfo("Ví Đã Đổi Tên", "Ghi chú mới");
+            original.archive();
+
+            assertEquals(Money.of("300000.00"), original.getCurrentBalance());
+            assertEquals(EntityStatus.ARCHIVED, original.getStatus());
+            assertEquals(Money.of("500000.00"), snapshot.getCurrentBalance());
+            assertEquals("Ví Phụ", snapshot.getName());
+            assertEquals("Ban đầu", snapshot.getNote());
+            assertEquals(EntityStatus.ACTIVE, snapshot.getStatus());
+        }
+
+        @Test
+        @DisplayName("copy should preserve archived state independently of original reactivation")
+        void testCopyPreservesArchivedState() {
+            Wallet archivedWallet = new Wallet("Ví Lưu Trữ", "", false);
+            archivedWallet.credit(Money.of("100000.00"));
+            archivedWallet.archive();
+
+            Wallet snapshot = archivedWallet.copy();
+            archivedWallet.activate();
+
+            assertEquals(EntityStatus.ACTIVE, archivedWallet.getStatus());
+            assertEquals(EntityStatus.ARCHIVED, snapshot.getStatus());
+            assertEquals(Money.of("100000.00"), snapshot.getCurrentBalance());
         }
     }
 }

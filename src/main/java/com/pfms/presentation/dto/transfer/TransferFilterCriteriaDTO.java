@@ -1,6 +1,6 @@
 package com.pfms.presentation.dto.transfer;
 
-import com.pfms.common.util.Preconditions;
+import com.pfms.common.util.PaginationUtils;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -22,7 +22,7 @@ public final class TransferFilterCriteriaDTO {
 
     // region Constructors
     public TransferFilterCriteriaDTO() {
-        this(null, null, null, null, 1, 50);
+        this(null, null, null, null, PaginationUtils.DEFAULT_PAGE_NUMBER, PaginationUtils.DEFAULT_PAGE_SIZE);
     }
 
     public TransferFilterCriteriaDTO(
@@ -31,7 +31,8 @@ public final class TransferFilterCriteriaDTO {
             UUID sourceWalletId,
             UUID destinationWalletId) {
 
-        this(startDate, endDate, sourceWalletId, destinationWalletId, 1, 50);
+        this(startDate, endDate, sourceWalletId, destinationWalletId,
+                PaginationUtils.DEFAULT_PAGE_NUMBER, PaginationUtils.DEFAULT_PAGE_SIZE);
     }
 
     public TransferFilterCriteriaDTO(
@@ -41,19 +42,6 @@ public final class TransferFilterCriteriaDTO {
             UUID destinationWalletId,
             int pageNumber,
             int pageSize) {
-
-        if (startDate != null && endDate != null) {
-            Preconditions.checkArgument(
-                    !startDate.isAfter(endDate),
-                    "Ngày bắt đầu không được sau ngày kết thúc: " + startDate + " > " + endDate);
-        }
-
-        Preconditions.checkArgument(
-                pageNumber >= 1,
-                "Chỉ số trang phải lớn hơn hoặc bằng 1: " + pageNumber);
-        Preconditions.checkArgument(
-                pageSize >= 10 && pageSize <= 100,
-                "Kích thước trang phải nằm trong khoảng từ 10 đến 100 bản ghi: " + pageSize);
 
         this.startDate = startDate;
         this.endDate = endDate;

@@ -77,9 +77,9 @@ class MemoryGenericRepositoryTest {
 
         @Test
         @DisplayName("Khởi tạo thất bại khi idExtractor là null")
-        void shouldThrowIllegalArgumentExceptionWhenIdExtractorIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        void shouldThrowNullPointerExceptionWhenIdExtractorIsNull() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> new DummyMemoryRepository(null)
             );
             assertTrue(ex.getMessage().contains("must not be null"));

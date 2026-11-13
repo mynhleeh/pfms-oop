@@ -133,13 +133,12 @@ class WalletsSummaryDTOTest {
 
         @ParameterizedTest
         @ValueSource(strings = { "-0.01", "-100000" })
-        @DisplayName("Ném IllegalArgumentException khi tổng số dư totalBalance mang giá trị âm")
-        void shouldThrowExceptionWhenTotalBalanceIsNegative(String negativeAmount) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new WalletsSummaryDTO(Collections.emptyList(), new BigDecimal(negativeAmount), "VND",
-                            Collections.emptyMap()));
-            assertTrue(ex.getMessage().contains("không được âm"));
+        @DisplayName("Chấp nhận tổng số dư totalBalance âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeTotalBalanceAsPureDataCarrier(String negativeAmount) {
+            BigDecimal negative = new BigDecimal(negativeAmount);
+            WalletsSummaryDTO dto = new WalletsSummaryDTO(
+                    Collections.emptyList(), negative, "VND", Collections.emptyMap());
+            assertEquals(0, negative.compareTo(dto.getTotalBalance()));
         }
     }
 

@@ -1,7 +1,5 @@
 package com.pfms.presentation.dto.transfer;
 
-import com.pfms.common.util.Preconditions;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,21 +67,20 @@ public final class TransferResponseDTO {
         this.transferId = Objects.requireNonNull(transferId, "Mã giao dịch chuyển tiền không được để null");
         this.sourceWalletId = Objects.requireNonNull(sourceWalletId, "Mã ví nguồn không được để null");
         this.destinationWalletId = Objects.requireNonNull(destinationWalletId, "Mã ví đích không được để null");
-        Preconditions.checkArgument(
-                !this.sourceWalletId.equals(this.destinationWalletId),
-                "Ví nguồn và ví đích phải khác nhau: " + this.sourceWalletId);
+        this.sourceWalletName = (sourceWalletName == null) ? null : sourceWalletName.trim();
+        this.destinationWalletName = (destinationWalletName == null) ? null : destinationWalletName.trim();
+        this.amount = Objects.requireNonNull(amount, "Số tiền chuyển không được để null");
+        this.sourceBalanceAfter = Objects.requireNonNull(
+                sourceBalanceAfter, "Số dư ví nguồn sau chuyển không được để null");
+        this.destinationBalanceAfter = Objects.requireNonNull(
+                destinationBalanceAfter, "Số dư ví đích sau chuyển không được để null");
 
-        this.sourceWalletName = Preconditions.requireNonBlank(
-                sourceWalletName, "Tên ví nguồn không được để trống hoặc chỉ chứa khoảng trắng");
-        this.destinationWalletName = Preconditions.requireNonBlank(
-                destinationWalletName, "Tên ví đích không được để trống hoặc chỉ chứa khoảng trắng");
-        this.amount = validateTransferAmount(amount);
-        this.sourceBalanceAfter = validateBalanceAfter(sourceBalanceAfter, "Số dư ví nguồn sau chuyển");
-        this.destinationBalanceAfter = validateBalanceAfter(destinationBalanceAfter, "Số dư ví đích sau chuyển");
-
-        this.feeAmount = normalizeAndValidateFee(feeAmount);
-        this.feeCategoryId = resolveFeeCategoryId(this.feeAmount, feeCategoryId);
-        this.feeCategoryName = resolveFeeCategoryName(this.feeAmount, feeCategoryName);
+        this.feeAmount = (feeAmount == null || feeAmount.compareTo(BigDecimal.ZERO) < 0)
+                ? BigDecimal.ZERO
+                : feeAmount;
+        boolean hasFee = this.feeAmount.compareTo(BigDecimal.ZERO) > 0;
+        this.feeCategoryId = hasFee ? feeCategoryId : null;
+        this.feeCategoryName = hasFee ? ((feeCategoryName == null) ? "" : feeCategoryName.trim()) : "";
         this.transferDate = (transferDate == null) ? LocalDate.now() : transferDate;
         this.note = (note == null) ? "" : note.trim();
         this.createdAt = (createdAt == null) ? LocalDateTime.now() : createdAt;
@@ -157,37 +154,6 @@ public final class TransferResponseDTO {
 
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
-    }
-    // endregion
-
-    // region Helpers
-    private static BigDecimal validateTransferAmount(BigDecimal amount) {
-        Objects.requireNonNull(amount, "Số tiền chuyển không được để null");
-        return Preconditions.requirePositive(amount, "Số tiền chuyển phải lớn hơn 0: " + amount);
-    }
-
-    private static BigDecimal validateBalanceAfter(BigDecimal balance, String label) {
-        Objects.requireNonNull(balance, label + " không được để null");
-        return Preconditions.requireNonNegative(balance, label + " không được âm: " + balance);
-    }
-
-    private static BigDecimal normalizeAndValidateFee(BigDecimal feeAmount) {
-        BigDecimal normalized = (feeAmount == null) ? BigDecimal.ZERO : feeAmount;
-        return Preconditions.requireNonNegative(normalized, "Mức phí chuyển tiền không được âm: " + normalized);
-    }
-
-    private static UUID resolveFeeCategoryId(BigDecimal normalizedFee, UUID feeCategoryId) {
-        if (normalizedFee.compareTo(BigDecimal.ZERO) > 0) {
-            return Objects.requireNonNull(feeCategoryId, "Mã danh mục phí không được để null khi có phí");
-        }
-        return null;
-    }
-
-    private static String resolveFeeCategoryName(BigDecimal normalizedFee, String feeCategoryName) {
-        if (normalizedFee.compareTo(BigDecimal.ZERO) > 0) {
-            return Preconditions.requireNonBlank(feeCategoryName, "Tên danh mục phí không được để trống khi có phí");
-        }
-        return "";
     }
     // endregion
 

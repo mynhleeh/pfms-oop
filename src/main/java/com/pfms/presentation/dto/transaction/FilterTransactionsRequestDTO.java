@@ -1,6 +1,6 @@
 package com.pfms.presentation.dto.transaction;
 
-import com.pfms.common.util.Preconditions;
+import com.pfms.common.util.PaginationUtils;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -24,11 +24,13 @@ public final class FilterTransactionsRequestDTO {
 
     // region Constructors
     public FilterTransactionsRequestDTO() {
-        this(null, null, null, null, null, "", 1, 50);
+        this(null, null, null, null, null, "",
+                PaginationUtils.DEFAULT_PAGE_NUMBER, PaginationUtils.DEFAULT_PAGE_SIZE);
     }
 
     public FilterTransactionsRequestDTO(LocalDate startDate, LocalDate endDate, Set<UUID> walletIds) {
-        this(startDate, endDate, walletIds, null, null, "", 1, 50);
+        this(startDate, endDate, walletIds, null, null, "",
+                PaginationUtils.DEFAULT_PAGE_NUMBER, PaginationUtils.DEFAULT_PAGE_SIZE);
     }
 
     public FilterTransactionsRequestDTO(
@@ -39,7 +41,8 @@ public final class FilterTransactionsRequestDTO {
             Set<UUID> categoryIds,
             String keyword) {
 
-        this(startDate, endDate, walletIds, transactionType, categoryIds, keyword, 1, 50);
+        this(startDate, endDate, walletIds, transactionType, categoryIds, keyword,
+                PaginationUtils.DEFAULT_PAGE_NUMBER, PaginationUtils.DEFAULT_PAGE_SIZE);
     }
 
     public FilterTransactionsRequestDTO(
@@ -52,25 +55,11 @@ public final class FilterTransactionsRequestDTO {
             int pageNumber,
             int pageSize) {
 
-        if (startDate != null && endDate != null) {
-            Preconditions.checkArgument(!startDate.isAfter(endDate),
-                    "Ngày bắt đầu không được sau ngày kết thúc: " + startDate + " > " + endDate);
-        }
-
         if (transactionType != null && !transactionType.trim().isEmpty()) {
-            String normalizedType = transactionType.trim().toUpperCase();
-            if (!"INCOME".equals(normalizedType) && !"EXPENSE".equals(normalizedType)) {
-                throw new IllegalArgumentException("Loại giao dịch không hợp lệ: " + transactionType);
-            }
-            this.transactionType = normalizedType;
+            this.transactionType = transactionType.trim().toUpperCase();
         } else {
             this.transactionType = null;
         }
-
-        Preconditions.checkArgument(pageNumber >= 1,
-                "Chỉ số trang phải lớn hơn hoặc bằng 1: " + pageNumber);
-        Preconditions.checkArgument(pageSize >= 10 && pageSize <= 100,
-                "Kích thước trang phải nằm trong khoảng từ 10 đến 100 bản ghi: " + pageSize);
 
         this.startDate = startDate;
         this.endDate = endDate;

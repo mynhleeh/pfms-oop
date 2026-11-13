@@ -3,8 +3,6 @@ package com.pfms.presentation.dto.wallet;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.pfms.common.util.Preconditions;
-
 /**
  * DTO đóng gói dữ liệu yêu cầu cập nhật thông tin ví tài chính từ giao diện gửi
  * xuống tầng dịch vụ.
@@ -24,7 +22,7 @@ public final class UpdateWalletRequestDTO {
 
     public UpdateWalletRequestDTO(UUID walletId, String name, String note) {
         this.walletId = Objects.requireNonNull(walletId, "Mã ví cần cập nhật không được để null");
-        this.name = Preconditions.requireNonBlank(name, "Tên ví không được để trống hoặc chỉ chứa khoảng trắng");
+        this.name = (name == null) ? null : name.trim();
         this.note = (note == null) ? "" : note.trim();
     }
     // endregion

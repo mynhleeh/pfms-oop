@@ -147,55 +147,48 @@ class TransferHistoryResponseDTOTest {
     }
 
     @Nested
-    @DisplayName("Nhóm 3: Negative & Zero Values - Kiểm soát các giá trị tổng hợp âm")
+    @DisplayName("Nhóm 3: Negative & Zero Values - Chấp nhận các giá trị biên làm pure data carrier")
     class NegativeAndZeroValueTests {
 
-        @ParameterizedTest(name = "Tổng tiền chuyển âm ({0}) phải bị từ chối")
+        @ParameterizedTest(name = "Chấp nhận tổng tiền chuyển âm ({0}) làm pure data carrier")
         @ValueSource(strings = {"-0.01", "-1", "-5000000.00"})
-        @DisplayName("Ném IllegalArgumentException khi totalTransferredAmount âm")
-        void shouldThrowWhenTotalTransferredAmountIsNegative(String negativeAmount) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransferHistoryResponseDTO(
-                            Collections.emptyList(),
-                            new BigDecimal(negativeAmount),
-                            BigDecimal.ZERO,
-                            0
-                    )
+        @DisplayName("Chấp nhận totalTransferredAmount âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeTotalTransferredAmountAsPureDataCarrier(String negativeAmount) {
+            BigDecimal amount = new BigDecimal(negativeAmount);
+            TransferHistoryResponseDTO dto = new TransferHistoryResponseDTO(
+                    Collections.emptyList(),
+                    amount,
+                    BigDecimal.ZERO,
+                    0
             );
-            assertTrue(ex.getMessage().contains("Tổng số tiền chuyển không được âm"));
+            assertEquals(0, amount.compareTo(dto.getTotalTransferredAmount()));
         }
 
-        @ParameterizedTest(name = "Tổng phụ phí âm ({0}) phải bị từ chối")
+        @ParameterizedTest(name = "Chấp nhận tổng phụ phí âm ({0}) làm pure data carrier")
         @ValueSource(strings = {"-0.01", "-100", "-3300.00"})
-        @DisplayName("Ném IllegalArgumentException khi totalFees âm")
-        void shouldThrowWhenTotalFeesIsNegative(String negativeFee) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransferHistoryResponseDTO(
-                            Collections.emptyList(),
-                            BigDecimal.ZERO,
-                            new BigDecimal(negativeFee),
-                            0
-                    )
+        @DisplayName("Chấp nhận totalFees âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeTotalFeesAsPureDataCarrier(String negativeFee) {
+            BigDecimal fee = new BigDecimal(negativeFee);
+            TransferHistoryResponseDTO dto = new TransferHistoryResponseDTO(
+                    Collections.emptyList(),
+                    BigDecimal.ZERO,
+                    fee,
+                    0
             );
-            assertTrue(ex.getMessage().contains("Tổng chi phí phát sinh không được âm"));
+            assertEquals(0, fee.compareTo(dto.getTotalFees()));
         }
 
-        @ParameterizedTest(name = "Tổng số bản ghi âm ({0}) phải bị từ chối")
+        @ParameterizedTest(name = "Chấp nhận tổng số bản ghi âm ({0}) làm pure data carrier")
         @ValueSource(ints = {-100, -1})
-        @DisplayName("Ném IllegalArgumentException khi totalRecords âm")
-        void shouldThrowWhenTotalRecordsIsNegative(int negativeRecords) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransferHistoryResponseDTO(
-                            Collections.emptyList(),
-                            BigDecimal.ZERO,
-                            BigDecimal.ZERO,
-                            negativeRecords
-                    )
+        @DisplayName("Chấp nhận totalRecords âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeTotalRecordsAsPureDataCarrier(int negativeRecords) {
+            TransferHistoryResponseDTO dto = new TransferHistoryResponseDTO(
+                    Collections.emptyList(),
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
+                    negativeRecords
             );
-            assertTrue(ex.getMessage().contains("Tổng số bản ghi không được âm"));
+            assertEquals(negativeRecords, dto.getTotalRecords());
         }
     }
 

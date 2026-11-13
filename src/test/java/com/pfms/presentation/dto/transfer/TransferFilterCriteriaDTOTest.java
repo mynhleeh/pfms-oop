@@ -131,53 +131,64 @@ class TransferFilterCriteriaDTOTest {
     }
 
     @Nested
-    @DisplayName("Nhóm 3: Negative & Zero Values - Kiểm soát số trang âm, bằng 0 và ngoài biên")
+    @DisplayName("Nhóm 3: Passthrough Phân trang Ngoài Biên tới Service")
     class NegativeAndZeroValueTests {
 
-        @ParameterizedTest(name = "Chỉ số trang không hợp lệ: {0}")
+        @ParameterizedTest(name = "Chỉ số trang ngoài biên {0} đi qua DTO để Service xử lý")
         @ValueSource(ints = {-100, -1, 0})
-        @DisplayName("Ném IllegalArgumentException khi chỉ số trang pageNumber nhỏ hơn 1")
-        void shouldThrowWhenPageNumberIsLessThanOne(int invalidPageNumber) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép pageNumber < 1 đi qua DTO")
+        void shouldAllowOutOfRangePageNumberPassthrough(int invalidPageNumber) {
+            TransferFilterCriteriaDTO dto = assertDoesNotThrow(
                     () -> new TransferFilterCriteriaDTO(
                             startDate, endDate, null, null, invalidPageNumber, 50
                     )
             );
-            assertTrue(ex.getMessage().contains("Chỉ số trang phải lớn hơn hoặc bằng 1"));
+            assertEquals(invalidPageNumber, dto.getPageNumber());
         }
 
-        @ParameterizedTest(name = "Kích thước trang ngoài biên: {0}")
+        @ParameterizedTest(name = "Kích thước trang ngoài biên {0} đi qua DTO để Service xử lý")
         @ValueSource(ints = {-10, 0, 9, 101, 500})
-        @DisplayName("Ném IllegalArgumentException khi pageSize ngoài đoạn [10, 100]")
-        void shouldThrowWhenPageSizeIsOutOfRange(int invalidPageSize) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép pageSize ngoài đoạn [10, 100] đi qua DTO")
+        void shouldAllowOutOfRangePageSizePassthrough(int invalidPageSize) {
+            TransferFilterCriteriaDTO dto = assertDoesNotThrow(
                     () -> new TransferFilterCriteriaDTO(
                             startDate, endDate, null, null, 1, invalidPageSize
                     )
             );
-            assertTrue(ex.getMessage().contains("Kích thước trang phải nằm trong khoảng từ 10 đến 100"));
+            assertEquals(invalidPageSize, dto.getPageSize());
         }
     }
 
     @Nested
-    @DisplayName("Nhóm 4: Temporal Invariants - Bất biến thời gian và lịch pháp")
+    @DisplayName("Nhóm 4: Temporal Invariants - Bất biến thời gian và Passthrough Khoảng Ngày")
     class TemporalInvariantTests {
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi ngày bắt đầu đứng sau ngày kết thúc")
-        void shouldThrowWhenStartDateIsAfterEndDate() {
+        @DisplayName("Cho phép khoảng ngày đảo ngược (startDate > endDate) đi qua DTO để Service/Domain ném ERR_FIN_001")
+        void shouldAllowInvertedDateRangePassthroughForServiceValidation() {
             LocalDate invalidStart = LocalDate.of(2026, 11, 25);
             LocalDate invalidEnd = LocalDate.of(2026, 11, 10);
 
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            TransferFilterCriteriaDTO dto = assertDoesNotThrow(
                     () -> new TransferFilterCriteriaDTO(
                             invalidStart, invalidEnd, sampleSourceWalletId, sampleDestinationWalletId, 1, 50
                     )
             );
-            assertTrue(ex.getMessage().contains("Ngày bắt đầu không được sau ngày kết thúc"));
+            assertEquals(invalidStart, dto.getStartDate());
+            assertEquals(invalidEnd, dto.getEndDate());
+            assertTrue(dto.hasDateFilter());
+        }
+
+        @Test
+        @DisplayName("Cho phép mốc ngày tương lai đi qua DTO để Service/Domain xử lý ERR_FIN_001")
+        void shouldAllowFutureDatesPassthroughForServiceValidation() {
+            LocalDate futureDate = LocalDate.now().plusDays(1);
+
+            TransferFilterCriteriaDTO dto = assertDoesNotThrow(
+                    () -> new TransferFilterCriteriaDTO(futureDate, futureDate, null, null)
+            );
+            assertEquals(futureDate, dto.getStartDate());
+            assertEquals(futureDate, dto.getEndDate());
         }
 
         @Test

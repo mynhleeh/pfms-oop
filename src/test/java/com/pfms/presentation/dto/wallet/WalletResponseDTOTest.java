@@ -87,13 +87,16 @@ class WalletResponseDTOTest {
                 @ParameterizedTest
                 @NullAndEmptySource
                 @ValueSource(strings = { "   ", "\t", "\n" })
-                @DisplayName("Ném IllegalArgumentException khi tên ví null hoặc chỉ chứa khoảng trắng")
-                void shouldThrowExceptionWhenNameIsInvalid(String invalidName) {
-                        IllegalArgumentException ex = assertThrows(
-                                        IllegalArgumentException.class,
-                                        () -> new WalletResponseDTO(sampleId, invalidName, BigDecimal.ZERO, "VND",
-                                                        false, "ACTIVE", "", sampleTime));
-                        assertTrue(ex.getMessage().contains("Tên ví"));
+                @DisplayName("Chấp nhận tên ví null hoặc toàn khoảng trắng để giữ DTO là pure data carrier")
+                void shouldAllowNullOrBlankNameAsPureDataCarrier(String rawName) {
+                        WalletResponseDTO dto = new WalletResponseDTO(
+                                        sampleId, rawName, BigDecimal.ZERO, "VND",
+                                        false, "ACTIVE", "", sampleTime);
+                        if (rawName == null) {
+                                assertNull(dto.getName());
+                        } else {
+                                assertEquals("", dto.getName());
+                        }
                 }
 
                 @Test
@@ -142,6 +145,19 @@ class WalletResponseDTOTest {
                         assertNotEquals(dto1, dtoDiffStatus);
                         assertNotEquals(null, dto1);
                         assertNotEquals(dto1, "NotAWalletResponseDTO");
+                }
+
+                @Test
+                @DisplayName("Hợp đồng equals, hashCode và toString an toàn khi name bằng null")
+                void shouldHandleNullNameSafelyInIdentityMethods() {
+                        WalletResponseDTO dto1 = new WalletResponseDTO(
+                                        sampleId, null, BigDecimal.TEN, "VND", false, "ACTIVE", "", sampleTime);
+                        WalletResponseDTO dto2 = new WalletResponseDTO(
+                                        sampleId, null, new BigDecimal("10.00"), "VND", false, "ACTIVE", "", sampleTime);
+
+                        assertEquals(dto1, dto2);
+                        assertEquals(dto1.hashCode(), dto2.hashCode());
+                        assertTrue(dto1.toString().contains("name='null'"));
                 }
 
                 @Test

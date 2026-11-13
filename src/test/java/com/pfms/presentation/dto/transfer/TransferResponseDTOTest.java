@@ -202,94 +202,89 @@ class TransferResponseDTOTest {
     }
 
     @Nested
-    @DisplayName("Nhóm 3: Negative & Zero Values - Kiểm soát số âm và số không")
+    @DisplayName("Nhóm 3: Negative & Zero Values - Chấp nhận giá trị biên như pure data carrier")
     class NegativeAndZeroValueTests {
 
-        @ParameterizedTest(name = "Số tiền chuyển không dương ({0}) phải bị từ chối")
+        @ParameterizedTest(name = "Chấp nhận số tiền chuyển không dương ({0}) làm pure data carrier")
         @ValueSource(strings = {"0", "0.00", "-0.01", "-500000.00"})
-        @DisplayName("Ném IllegalArgumentException khi số tiền chuyển nhỏ hơn hoặc bằng 0")
-        void shouldThrowWhenAmountIsNonPositive(String invalidAmount) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransferResponseDTO(
-                            sampleTransferId,
-                            sampleSourceWalletId,
-                            "Ví A",
-                            sampleDestinationWalletId,
-                            "Ví B",
-                            new BigDecimal(invalidAmount),
-                            sampleDate,
-                            "",
-                            new BigDecimal("500000"),
-                            new BigDecimal("500000"),
-                            sampleCreatedAt
-                    )
+        @DisplayName("Chấp nhận số tiền chuyển nhỏ hơn hoặc bằng 0 để giữ DTO là pure data carrier")
+        void shouldAllowNonPositiveAmountAsPureDataCarrier(String rawAmount) {
+            BigDecimal amount = new BigDecimal(rawAmount);
+            TransferResponseDTO dto = new TransferResponseDTO(
+                    sampleTransferId,
+                    sampleSourceWalletId,
+                    "Ví A",
+                    sampleDestinationWalletId,
+                    "Ví B",
+                    amount,
+                    sampleDate,
+                    "",
+                    new BigDecimal("500000"),
+                    new BigDecimal("500000"),
+                    sampleCreatedAt
             );
-            assertTrue(ex.getMessage().contains("Số tiền chuyển phải lớn hơn 0"));
+            assertEquals(0, amount.compareTo(dto.getAmount()));
         }
 
-        @ParameterizedTest(name = "Mức phí âm ({0}) phải bị từ chối")
+        @ParameterizedTest(name = "Chuẩn hóa mức phí âm ({0}) về 0 để giữ DTO là pure data carrier")
         @ValueSource(strings = {"-0.01", "-1000.00"})
-        @DisplayName("Ném IllegalArgumentException khi mức phí chuyển tiền âm")
-        void shouldThrowWhenFeeAmountIsNegative(String invalidFee) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransferResponseDTO(
-                            sampleTransferId,
-                            sampleSourceWalletId,
-                            "Ví A",
-                            sampleDestinationWalletId,
-                            "Ví B",
-                            new BigDecimal("100000"),
-                            sampleDate,
-                            "",
-                            new BigDecimal(invalidFee),
-                            sampleFeeCategoryId,
-                            "Phí",
-                            new BigDecimal("500000"),
-                            new BigDecimal("500000"),
-                            sampleCreatedAt
-                    )
+        @DisplayName("Chuẩn hóa mức phí âm về 0 khi giữ DTO là pure data carrier")
+        void shouldNormalizeNegativeFeeToZeroAsPureDataCarrier(String rawFee) {
+            TransferResponseDTO dto = new TransferResponseDTO(
+                    sampleTransferId,
+                    sampleSourceWalletId,
+                    "Ví A",
+                    sampleDestinationWalletId,
+                    "Ví B",
+                    new BigDecimal("100000"),
+                    sampleDate,
+                    "",
+                    new BigDecimal(rawFee),
+                    sampleFeeCategoryId,
+                    "Phí",
+                    new BigDecimal("500000"),
+                    new BigDecimal("500000"),
+                    sampleCreatedAt
             );
-            assertTrue(ex.getMessage().contains("Mức phí chuyển tiền không được âm"));
+            assertFalse(dto.hasFee());
+            assertEquals(BigDecimal.ZERO, dto.getFeeAmount());
+            assertNull(dto.getFeeCategoryId());
+            assertEquals("", dto.getFeeCategoryName());
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi số dư sau giao dịch của ví nguồn hoặc ví đích bị âm")
-        void shouldThrowWhenBalancesAfterAreNegative() {
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransferResponseDTO(
-                            sampleTransferId,
-                            sampleSourceWalletId,
-                            "Ví A",
-                            sampleDestinationWalletId,
-                            "Ví B",
-                            new BigDecimal("100000"),
-                            sampleDate,
-                            "",
-                            new BigDecimal("-1.00"),
-                            new BigDecimal("500000"),
-                            sampleCreatedAt
-                    )
+        @DisplayName("Chấp nhận số dư sau giao dịch của ví nguồn hoặc ví đích âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeBalancesAfterAsPureDataCarrier() {
+            TransferResponseDTO negSource = new TransferResponseDTO(
+                    sampleTransferId,
+                    sampleSourceWalletId,
+                    "Ví A",
+                    sampleDestinationWalletId,
+                    "Ví B",
+                    new BigDecimal("100000"),
+                    sampleDate,
+                    "",
+                    new BigDecimal("-1.00"),
+                    new BigDecimal("500000"),
+                    sampleCreatedAt
             );
 
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransferResponseDTO(
-                            sampleTransferId,
-                            sampleSourceWalletId,
-                            "Ví A",
-                            sampleDestinationWalletId,
-                            "Ví B",
-                            new BigDecimal("100000"),
-                            sampleDate,
-                            "",
-                            new BigDecimal("500000"),
-                            new BigDecimal("-1.00"),
-                            sampleCreatedAt
-                    )
+            TransferResponseDTO negDest = new TransferResponseDTO(
+                    sampleTransferId,
+                    sampleSourceWalletId,
+                    "Ví A",
+                    sampleDestinationWalletId,
+                    "Ví B",
+                    new BigDecimal("100000"),
+                    sampleDate,
+                    "",
+                    new BigDecimal("500000"),
+                    new BigDecimal("-1.00"),
+                    sampleCreatedAt
             );
+
+            assertEquals(0, new BigDecimal("-1.00").compareTo(negSource.getSourceBalanceAfter()));
+            assertEquals(0, new BigDecimal("-1.00").compareTo(negDest.getDestinationBalanceAfter()));
         }
     }
 
@@ -355,35 +350,52 @@ class TransferResponseDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi ví nguồn trùng ví đích hoặc tên ví rỗng")
-        void shouldThrowWhenWalletsAreSameOrNamesBlank() {
-            assertThrows(IllegalArgumentException.class, () -> new TransferResponseDTO(
-                    sampleTransferId, sampleSourceWalletId, "Ví A", sampleSourceWalletId, "Ví A",
-                    new BigDecimal("100000"), sampleDate, "", BigDecimal.ZERO, BigDecimal.ZERO, sampleCreatedAt));
+        @DisplayName("Chấp nhận ví nguồn trùng ví đích và tên ví rỗng hoặc null để giữ DTO là pure data carrier")
+        void shouldAllowSameWalletsAndNullOrBlankNamesAsPureDataCarrier() {
+            TransferResponseDTO sameWalletDto = new TransferResponseDTO(
+                    sampleTransferId, sampleSourceWalletId, "   ", sampleSourceWalletId, null,
+                    new BigDecimal("100000"), sampleDate, "", BigDecimal.ZERO, BigDecimal.ZERO, sampleCreatedAt);
 
-            assertThrows(IllegalArgumentException.class, () -> new TransferResponseDTO(
-                    sampleTransferId, sampleSourceWalletId, "   ", sampleDestinationWalletId, "Ví B",
-                    new BigDecimal("100000"), sampleDate, "", BigDecimal.ZERO, BigDecimal.ZERO, sampleCreatedAt));
-
-            assertThrows(IllegalArgumentException.class, () -> new TransferResponseDTO(
-                    sampleTransferId, sampleSourceWalletId, "Ví A", sampleDestinationWalletId, "   ",
-                    new BigDecimal("100000"), sampleDate, "", BigDecimal.ZERO, BigDecimal.ZERO, sampleCreatedAt));
+            assertEquals(sampleSourceWalletId, sameWalletDto.getSourceWalletId());
+            assertEquals(sampleSourceWalletId, sameWalletDto.getDestinationWalletId());
+            assertEquals("", sameWalletDto.getSourceWalletName());
+            assertNull(sameWalletDto.getDestinationWalletName());
         }
 
         @Test
-        @DisplayName("Ném ngoại lệ khi mức phí dương nhưng thiếu mã hoặc tên danh mục phí")
-        void shouldThrowWhenFeeIsPositiveButFeeCategoryMissing() {
-            assertThrows(NullPointerException.class, () -> new TransferResponseDTO(
+        @DisplayName("Chấp nhận mức phí dương thiếu mã hoặc tên danh mục phí để giữ DTO là pure data carrier")
+        void shouldAllowPositiveFeeWithoutFeeCategoryAsPureDataCarrier() {
+            TransferResponseDTO dto = new TransferResponseDTO(
                     sampleTransferId, sampleSourceWalletId, "Ví A", sampleDestinationWalletId, "Ví B",
                     new BigDecimal("100000"), sampleDate, "",
-                    new BigDecimal("3300"), null, "Phí ngân hàng",
-                    BigDecimal.ZERO, BigDecimal.ZERO, sampleCreatedAt));
+                    new BigDecimal("3300"), null, "   ",
+                    BigDecimal.ZERO, BigDecimal.ZERO, sampleCreatedAt);
 
-            assertThrows(IllegalArgumentException.class, () -> new TransferResponseDTO(
-                    sampleTransferId, sampleSourceWalletId, "Ví A", sampleDestinationWalletId, "Ví B",
-                    new BigDecimal("100000"), sampleDate, "",
-                    new BigDecimal("3300"), sampleFeeCategoryId, "   ",
-                    BigDecimal.ZERO, BigDecimal.ZERO, sampleCreatedAt));
+            assertTrue(dto.hasFee());
+            assertEquals(new BigDecimal("3300"), dto.getFeeAmount());
+            assertNull(dto.getFeeCategoryId());
+            assertEquals("", dto.getFeeCategoryName());
+        }
+
+        @Test
+        @DisplayName("Hợp đồng equals, hashCode và toString an toàn khi tên ví nguồn/đích và feeCategoryId bằng null")
+        void shouldHandleNullableFieldsSafelyInIdentityMethods() {
+            TransferResponseDTO dto1 = new TransferResponseDTO(
+                    sampleTransferId, sampleSourceWalletId, null, sampleDestinationWalletId, null,
+                    new BigDecimal("250000.0"), sampleDate, null,
+                    new BigDecimal("3300.0"), null, null,
+                    new BigDecimal("750000.0"), new BigDecimal("1250000.0"), sampleCreatedAt
+            );
+            TransferResponseDTO dto2 = new TransferResponseDTO(
+                    sampleTransferId, sampleSourceWalletId, null, sampleDestinationWalletId, null,
+                    new BigDecimal("250000.00"), sampleDate, null,
+                    new BigDecimal("3300.00"), null, null,
+                    new BigDecimal("750000.00"), new BigDecimal("1250000.00"), sampleCreatedAt
+            );
+
+            assertEquals(dto1, dto2);
+            assertEquals(dto1.hashCode(), dto2.hashCode());
+            assertTrue(dto1.toString().contains("sourceWalletName='null'"));
         }
 
         @Test

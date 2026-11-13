@@ -1,6 +1,5 @@
 package com.pfms.infrastructure.memory;
 
-import com.pfms.common.util.Preconditions;
 import com.pfms.domain.repository.GenericRepository;
 
 import java.util.ArrayList;
@@ -25,8 +24,7 @@ public abstract class MemoryGenericRepository<E, ID> implements GenericRepositor
 
     // region Constructors
     protected MemoryGenericRepository(Function<E, ID> idExtractor) {
-        Preconditions.checkArgument(idExtractor != null, "idExtractor must not be null");
-        this.idExtractor = idExtractor;
+        this.idExtractor = Objects.requireNonNull(idExtractor, "idExtractor must not be null");
     }
     // endregion
 

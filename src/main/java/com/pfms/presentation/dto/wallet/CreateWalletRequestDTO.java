@@ -2,8 +2,6 @@ package com.pfms.presentation.dto.wallet;
 
 import java.util.Objects;
 
-import com.pfms.common.util.Preconditions;
-
 /**
  * DTO đóng gói dữ liệu yêu cầu tạo ví mới từ giao diện gửi xuống tầng dịch vụ.
  */
@@ -20,7 +18,7 @@ public final class CreateWalletRequestDTO {
     }
 
     public CreateWalletRequestDTO(String name, String note) {
-        this.name = Preconditions.requireNonBlank(name, "Tên ví không được để trống hoặc chỉ chứa khoảng trắng");
+        this.name = (name == null) ? null : name.trim();
         this.note = (note == null) ? "" : note.trim();
     }
     // endregion

@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Kiểm thử TransactionListResponseDTO")
 class TransactionListResponseDTOTest {
 
-    private final UUID sampleTxnId = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private final UUID sampleWalletId = UUID.fromString("00000000-0000-0000-0000-000000000002");
     private final UUID sampleCategoryId = UUID.fromString("00000000-0000-0000-0000-000000000003");
     private final LocalDate sampleDate = LocalDate.of(2026, 11, 10);
@@ -169,14 +168,11 @@ class TransactionListResponseDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi totalIncome âm")
-        void shouldThrowWhenTotalIncomeIsNegative() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionListResponseDTO(
-                            null, new BigDecimal("-100"), BigDecimal.ZERO, BigDecimal.ZERO, 1, 50, 0, 0)
-            );
-            assertTrue(ex.getMessage().contains("Tổng thu nhập không được âm"));
+        @DisplayName("Chấp nhận totalIncome âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeTotalIncomeAsPureDataCarrier() {
+            TransactionListResponseDTO dto = new TransactionListResponseDTO(
+                    null, new BigDecimal("-100"), BigDecimal.ZERO, BigDecimal.ZERO, 1, 50, 0, 0);
+            assertEquals(0, new BigDecimal("-100").compareTo(dto.getTotalIncome()));
         }
 
         @Test
@@ -191,14 +187,11 @@ class TransactionListResponseDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi totalExpense âm")
-        void shouldThrowWhenTotalExpenseIsNegative() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionListResponseDTO(
-                            null, BigDecimal.ZERO, new BigDecimal("-50"), BigDecimal.ZERO, 1, 50, 0, 0)
-            );
-            assertTrue(ex.getMessage().contains("Tổng chi tiêu không được âm"));
+        @DisplayName("Chấp nhận totalExpense âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeTotalExpenseAsPureDataCarrier() {
+            TransactionListResponseDTO dto = new TransactionListResponseDTO(
+                    null, BigDecimal.ZERO, new BigDecimal("-50"), BigDecimal.ZERO, 1, 50, 0, 0);
+            assertEquals(0, new BigDecimal("-50").compareTo(dto.getTotalExpense()));
         }
 
         @Test
@@ -213,48 +206,36 @@ class TransactionListResponseDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi pageNumber < 1")
-        void shouldThrowWhenPageNumberIsLessThanOne() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionListResponseDTO(
-                            null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 0, 50, 0, 0)
-            );
-            assertTrue(ex.getMessage().contains("Chỉ số trang"));
+        @DisplayName("Chấp nhận pageNumber < 1 để giữ DTO là pure data carrier")
+        void shouldAllowPageNumberLessThanOneAsPureDataCarrier() {
+            TransactionListResponseDTO dto = new TransactionListResponseDTO(
+                    null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 0, 50, 0, 0);
+            assertEquals(0, dto.getPageNumber());
         }
 
-        @ParameterizedTest(name = "Kích thước trang không hợp lệ: {0}")
+        @ParameterizedTest(name = "Kích thước trang biên: {0}")
         @ValueSource(ints = { -1, 0, 9, 101, 200 })
-        @DisplayName("Ném IllegalArgumentException khi pageSize ngoài khoảng 10 đến 100")
-        void shouldThrowWhenPageSizeIsOutOfRange(int invalidSize) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionListResponseDTO(
-                            null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 1, invalidSize, 0, 0)
-            );
-            assertTrue(ex.getMessage().contains("Kích thước trang"));
+        @DisplayName("Chấp nhận pageSize ngoài khoảng 10 đến 100 để giữ DTO là pure data carrier")
+        void shouldAllowPageSizeOutOfRangeAsPureDataCarrier(int pageSize) {
+            TransactionListResponseDTO dto = new TransactionListResponseDTO(
+                    null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 1, pageSize, 0, 0);
+            assertEquals(pageSize, dto.getPageSize());
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi totalRecords âm")
-        void shouldThrowWhenTotalRecordsIsNegative() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionListResponseDTO(
-                            null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 1, 50, -1, 0)
-            );
-            assertTrue(ex.getMessage().contains("Tổng số bản ghi"));
+        @DisplayName("Chấp nhận totalRecords âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeTotalRecordsAsPureDataCarrier() {
+            TransactionListResponseDTO dto = new TransactionListResponseDTO(
+                    null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 1, 50, -1, 0);
+            assertEquals(-1, dto.getTotalRecords());
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi totalPages âm")
-        void shouldThrowWhenTotalPagesIsNegative() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionListResponseDTO(
-                            null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 1, 50, 0, -1)
-            );
-            assertTrue(ex.getMessage().contains("Tổng số trang"));
+        @DisplayName("Chấp nhận totalPages âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeTotalPagesAsPureDataCarrier() {
+            TransactionListResponseDTO dto = new TransactionListResponseDTO(
+                    null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 1, 50, 0, -1);
+            assertEquals(-1, dto.getTotalPages());
         }
     }
 

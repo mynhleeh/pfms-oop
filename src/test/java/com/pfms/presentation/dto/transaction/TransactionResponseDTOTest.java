@@ -162,17 +162,20 @@ class TransactionResponseDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi walletName bị rỗng hoặc khoảng trắng")
-        void shouldThrowWhenWalletNameIsBlank() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionResponseDTO(
-                            sampleTxnId, sampleWalletId, "   ", sampleCategoryId, "Danh mục A",
-                            new BigDecimal("100000"), "INCOME", sampleDate, "",
-                            new BigDecimal("500000"), sampleCreatedAt
-                    )
+        @DisplayName("Chấp nhận walletName rỗng hoặc null để giữ DTO là pure data carrier")
+        void shouldAllowNullOrBlankWalletNameAsPureDataCarrier() {
+            TransactionResponseDTO blankDto = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, "   ", sampleCategoryId, "Danh mục A",
+                    new BigDecimal("100000"), "INCOME", sampleDate, "",
+                    new BigDecimal("500000"), sampleCreatedAt
             );
-            assertTrue(ex.getMessage().contains("Tên ví"));
+            TransactionResponseDTO nullDto = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, null, sampleCategoryId, "Danh mục A",
+                    new BigDecimal("100000"), "INCOME", sampleDate, "",
+                    new BigDecimal("500000"), sampleCreatedAt
+            );
+            assertEquals("", blankDto.getWalletName());
+            assertNull(nullDto.getWalletName());
         }
 
         @Test
@@ -190,17 +193,20 @@ class TransactionResponseDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi categoryName bị rỗng hoặc khoảng trắng")
-        void shouldThrowWhenCategoryNameIsBlank() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionResponseDTO(
-                            sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "",
-                            new BigDecimal("100000"), "INCOME", sampleDate, "",
-                            new BigDecimal("500000"), sampleCreatedAt
-                    )
+        @DisplayName("Chấp nhận categoryName rỗng hoặc null để giữ DTO là pure data carrier")
+        void shouldAllowNullOrBlankCategoryNameAsPureDataCarrier() {
+            TransactionResponseDTO blankDto = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "",
+                    new BigDecimal("100000"), "INCOME", sampleDate, "",
+                    new BigDecimal("500000"), sampleCreatedAt
             );
-            assertTrue(ex.getMessage().contains("Tên danh mục"));
+            TransactionResponseDTO nullDto = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, null,
+                    new BigDecimal("100000"), "INCOME", sampleDate, "",
+                    new BigDecimal("500000"), sampleCreatedAt
+            );
+            assertEquals("", blankDto.getCategoryName());
+            assertNull(nullDto.getCategoryName());
         }
 
         @Test
@@ -217,32 +223,38 @@ class TransactionResponseDTOTest {
             assertTrue(ex.getMessage().contains("Số tiền"));
         }
 
-        @Test
-        @DisplayName("Ném IllegalArgumentException khi số tiền amount nhỏ hơn hoặc bằng 0")
-        void shouldThrowWhenAmountIsNonPositive() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionResponseDTO(
-                            sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "Danh mục A",
-                            BigDecimal.ZERO, "INCOME", sampleDate, "",
-                            new BigDecimal("500000"), sampleCreatedAt
-                    )
+        @ParameterizedTest
+        @ValueSource(strings = {"0", "-50000"})
+        @DisplayName("Chấp nhận amount <= 0 để giữ DTO là pure data carrier")
+        void shouldAllowNonPositiveAmountAsPureDataCarrier(String rawAmount) {
+            BigDecimal amount = new BigDecimal(rawAmount);
+            TransactionResponseDTO dto = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "Danh mục A",
+                    amount, "INCOME", sampleDate, "",
+                    new BigDecimal("500000"), sampleCreatedAt
             );
-            assertTrue(ex.getMessage().contains("Số tiền giao dịch phải lớn hơn 0"));
+            assertEquals(0, amount.compareTo(dto.getAmount()));
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi loại thu chi không phải INCOME hoặc EXPENSE")
-        void shouldThrowWhenTransactionTypeIsInvalid() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Ném NullPointerException khi transactionType bị null và chấp nhận chuỗi loại tùy ý khi không null")
+        void shouldRequireNonNullTransactionTypeAndAllowAnyValueAsPureDataCarrier() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> new TransactionResponseDTO(
                             sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "Danh mục A",
-                            new BigDecimal("100000"), "TRANSFER", sampleDate, "",
+                            new BigDecimal("100000"), null, sampleDate, "",
                             new BigDecimal("500000"), sampleCreatedAt
                     )
             );
-            assertTrue(ex.getMessage().contains("Loại giao dịch không hợp lệ"));
+            assertTrue(ex.getMessage().contains("Loại giao dịch"));
+
+            TransactionResponseDTO dto = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "Danh mục A",
+                    new BigDecimal("100000"), " transfer ", sampleDate, "",
+                    new BigDecimal("500000"), sampleCreatedAt
+            );
+            assertEquals("TRANSFER", dto.getTransactionType());
         }
 
         @Test
@@ -260,27 +272,29 @@ class TransactionResponseDTOTest {
         }
 
         @Test
-        @DisplayName("Ném NullPointerException hoặc IllegalArgumentException khi phí > 0 mà thiếu mã hoặc tên danh mục phí")
-        void shouldThrowWhenFeeIsPositiveButFeeCategoryMissing() {
-            assertThrows(
-                    NullPointerException.class,
-                    () -> new TransactionResponseDTO(
-                            sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "Danh mục A",
-                            new BigDecimal("100000"), "EXPENSE", sampleDate, "",
-                            true, new BigDecimal("5000"), null, "Phí",
-                            new BigDecimal("500000"), sampleCreatedAt
-                    )
+        @DisplayName("Chấp nhận phí âm hoặc phí > 0 thiếu danh mục phí để giữ DTO là pure data carrier")
+        void shouldAllowPositiveFeeWithoutFeeCategoryAndNegativeFeeAsPureDataCarrier() {
+            TransactionResponseDTO missingFeeCatDto = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "Danh mục A",
+                    new BigDecimal("100000"), "EXPENSE", sampleDate, "",
+                    true, new BigDecimal("5000"), null, "   ",
+                    new BigDecimal("500000"), sampleCreatedAt
             );
+            assertTrue(missingFeeCatDto.hasFee());
+            assertEquals(new BigDecimal("5000"), missingFeeCatDto.getFeeAmount());
+            assertNull(missingFeeCatDto.getFeeCategoryId());
+            assertEquals("", missingFeeCatDto.getFeeCategoryName());
 
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new TransactionResponseDTO(
-                            sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "Danh mục A",
-                            new BigDecimal("100000"), "EXPENSE", sampleDate, "",
-                            true, new BigDecimal("5000"), sampleFeeCategoryId, "   ",
-                            new BigDecimal("500000"), sampleCreatedAt
-                    )
+            TransactionResponseDTO negativeFeeDto = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, "Ví A", sampleCategoryId, "Danh mục A",
+                    new BigDecimal("100000"), "EXPENSE", sampleDate, "",
+                    false, new BigDecimal("-100"), null, null,
+                    new BigDecimal("500000"), sampleCreatedAt
             );
+            assertFalse(negativeFeeDto.hasFee());
+            assertEquals(BigDecimal.ZERO, negativeFeeDto.getFeeAmount());
+            assertNull(negativeFeeDto.getFeeCategoryId());
+            assertEquals("", negativeFeeDto.getFeeCategoryName());
         }
     }
 
@@ -327,6 +341,27 @@ class TransactionResponseDTOTest {
             assertNotEquals(base, diffId);
             assertNotEquals(base, null);
             assertNotEquals(base, "string");
+        }
+
+        @Test
+        @DisplayName("Hợp đồng equals, hashCode và toString an toàn khi tên ví, tên danh mục và feeCategoryId bằng null")
+        void shouldHandleNullableFieldsSafelyInIdentityMethods() {
+            TransactionResponseDTO dto1 = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, null, sampleCategoryId, null,
+                    new BigDecimal("100000.0"), "EXPENSE", sampleDate, null,
+                    true, new BigDecimal("5000.0"), null, null,
+                    new BigDecimal("400000.0"), sampleCreatedAt
+            );
+            TransactionResponseDTO dto2 = new TransactionResponseDTO(
+                    sampleTxnId, sampleWalletId, null, sampleCategoryId, null,
+                    new BigDecimal("100000.00"), "EXPENSE", sampleDate, null,
+                    true, new BigDecimal("5000.00"), null, null,
+                    new BigDecimal("400000.00"), sampleCreatedAt
+            );
+
+            assertEquals(dto1, dto2);
+            assertEquals(dto1.hashCode(), dto2.hashCode());
+            assertTrue(dto1.toString().contains("walletName='null'"));
         }
 
         @Test

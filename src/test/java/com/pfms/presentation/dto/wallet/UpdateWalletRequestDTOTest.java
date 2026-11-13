@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.UUID;
@@ -50,19 +49,22 @@ class UpdateWalletRequestDTOTest {
         }
 
         @Test
-        @DisplayName("Tự động cắt tỉa khoảng trắng ghi chú nếu có nội dung")
+        @DisplayName("Tự động cắt tỉa khoảng trắng ghi chú nếu có nội dung và chuẩn hóa ghi chú toàn khoảng trắng thành rỗng")
         void shouldTrimNoteWhenProvided() {
             UpdateWalletRequestDTO dto = new UpdateWalletRequestDTO(sampleId, "Ví Tiết Kiệm",
                     "   Quỹ đầu tư dài hạn   ");
+            UpdateWalletRequestDTO dtoWhitespaceNote = new UpdateWalletRequestDTO(sampleId, "Ví Tiết Kiệm",
+                    "   \t  ");
 
             assertEquals("Ví Tiết Kiệm", dto.getName());
             assertEquals("Quỹ đầu tư dài hạn", dto.getNote());
+            assertEquals("", dtoWhitespaceNote.getNote());
         }
     }
 
     @Nested
-    @DisplayName("Kiểm soát Tiền điều kiện và Dữ liệu biên không hợp lệ")
-    class InvalidInputTests {
+    @DisplayName("Tiền điều kiện khóa kỹ thuật & Chuyển tiếp dữ liệu sang Domain (Thin DTO)")
+    class PreconditionAndPassthroughTests {
 
         @Test
         @DisplayName("Ném NullPointerException khi mã ví walletId bị null")
@@ -73,15 +75,47 @@ class UpdateWalletRequestDTOTest {
             assertTrue(ex.getMessage().contains("Mã ví"));
         }
 
+        @Test
+        @DisplayName("Giữ nguyên giá trị null của tên ví để Domain ném ERR_NAM_001 thay vì ném tại DTO")
+        void shouldPreserveNullNameForDomainValidation() {
+            UpdateWalletRequestDTO dto3Args = assertDoesNotThrow(
+                    () -> new UpdateWalletRequestDTO(sampleId, null, "Ghi chú hợp lệ"));
+            UpdateWalletRequestDTO dto2Args = assertDoesNotThrow(
+                    () -> new UpdateWalletRequestDTO(sampleId, null));
+
+            assertEquals(sampleId, dto3Args.getWalletId());
+            assertNull(dto3Args.getName());
+            assertEquals("Ghi chú hợp lệ", dto3Args.getNote());
+
+            assertEquals(sampleId, dto2Args.getWalletId());
+            assertNull(dto2Args.getName());
+            assertEquals("", dto2Args.getNote());
+        }
+
         @ParameterizedTest
-        @NullAndEmptySource
-        @ValueSource(strings = { "   ", "\t", "\n" })
-        @DisplayName("Ném IllegalArgumentException khi tên ví null, rỗng hoặc chỉ toàn khoảng trắng")
-        void shouldThrowExceptionWhenNameIsInvalid(String invalidName) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new UpdateWalletRequestDTO(sampleId, invalidName, "Ghi chú"));
-            assertTrue(ex.getMessage().contains("Tên ví"));
+        @ValueSource(strings = { "", "   ", "\t", "\n" })
+        @DisplayName("Cắt tỉa chuỗi rỗng/khoảng trắng thành chuỗi rỗng và không chặn nghiệp vụ tại DTO")
+        void shouldTrimBlankNameToEmptyWithoutThrowingAtDto(String blankName) {
+            UpdateWalletRequestDTO dto3Args = assertDoesNotThrow(
+                    () -> new UpdateWalletRequestDTO(sampleId, blankName, "Ghi chú hợp lệ"));
+            UpdateWalletRequestDTO dto2Args = assertDoesNotThrow(
+                    () -> new UpdateWalletRequestDTO(sampleId, blankName));
+
+            assertEquals("", dto3Args.getName());
+            assertEquals("Ghi chú hợp lệ", dto3Args.getNote());
+            assertEquals("", dto2Args.getName());
+            assertEquals("", dto2Args.getNote());
+        }
+
+        @Test
+        @DisplayName("Truyền thẳng tên ví vượt quá 50 ký tự để Domain xử lý giới hạn độ dài")
+        void shouldPreserveOversizedNameForDomainValidation() {
+            String oversizedName = "V".repeat(51);
+            UpdateWalletRequestDTO dto = assertDoesNotThrow(
+                    () -> new UpdateWalletRequestDTO(sampleId, oversizedName, "Ghi chú hợp lệ"));
+
+            assertEquals(oversizedName, dto.getName());
+            assertEquals(51, dto.getName().length());
         }
     }
 
@@ -99,13 +133,30 @@ class UpdateWalletRequestDTOTest {
             UpdateWalletRequestDTO dtoDiffName = new UpdateWalletRequestDTO(sampleId, "Ví VP", "Ghi chú");
             UpdateWalletRequestDTO dtoDiffNote = new UpdateWalletRequestDTO(sampleId, "Ví MB", "Khác");
 
+            assertEquals(dto1, dto1);
             assertEquals(dto1, dto2);
             assertEquals(dto1.hashCode(), dto2.hashCode());
             assertNotEquals(dto1, dtoDiffId);
             assertNotEquals(dto1, dtoDiffName);
             assertNotEquals(dto1, dtoDiffNote);
-            assertNotEquals(null, dto1);
+            assertNotEquals(dto1, null);
             assertNotEquals(dto1, "DifferentType");
+        }
+
+        @Test
+        @DisplayName("Hợp đồng equals, hashCode và toString vẫn an toàn khi tên ví là null")
+        void shouldHandleNullNameSafelyInEqualsHashCodeAndToString() {
+            UpdateWalletRequestDTO dtoNull1 = new UpdateWalletRequestDTO(sampleId, null, "Ghi chú");
+            UpdateWalletRequestDTO dtoNull2 = new UpdateWalletRequestDTO(sampleId, null, "Ghi chú");
+            UpdateWalletRequestDTO dtoNamed = new UpdateWalletRequestDTO(sampleId, "Ví MB", "Ghi chú");
+
+            assertEquals(dtoNull1, dtoNull2);
+            assertEquals(dtoNull1.hashCode(), dtoNull2.hashCode());
+            assertNotEquals(dtoNull1, dtoNamed);
+
+            String text = dtoNull1.toString();
+            assertTrue(text.contains("UpdateWalletRequestDTO"));
+            assertTrue(text.contains("null"));
         }
 
         @Test

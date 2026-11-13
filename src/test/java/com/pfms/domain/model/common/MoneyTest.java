@@ -1,5 +1,7 @@
 package com.pfms.domain.model.common;
 
+import com.pfms.domain.exception.BusinessException;
+import com.pfms.domain.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,12 +27,20 @@ class MoneyTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when creation string is invalid or null")
+    @DisplayName("Should throw BusinessException (ERR_FIN_001) when creation string is invalid or null")
     void testInvalidCreation() {
-        assertThrows(IllegalArgumentException.class, () -> Money.of((String) null));
-        assertThrows(IllegalArgumentException.class, () -> Money.of(""));
-        assertThrows(IllegalArgumentException.class, () -> Money.of("   "));
-        assertThrows(IllegalArgumentException.class, () -> Money.of("invalid_number"));
+        BusinessException nullEx = assertThrows(BusinessException.class, () -> Money.of((String) null));
+        assertEquals(ErrorCode.ERR_FIN_001, nullEx.getErrorCode());
+
+        BusinessException emptyEx = assertThrows(BusinessException.class, () -> Money.of(""));
+        assertEquals(ErrorCode.ERR_FIN_001, emptyEx.getErrorCode());
+
+        BusinessException blankEx = assertThrows(BusinessException.class, () -> Money.of("   "));
+        assertEquals(ErrorCode.ERR_FIN_001, blankEx.getErrorCode());
+
+        BusinessException formatEx = assertThrows(BusinessException.class, () -> Money.of("invalid_number"));
+        assertEquals(ErrorCode.ERR_FIN_001, formatEx.getErrorCode());
+
         assertThrows(NullPointerException.class, () -> Money.of((BigDecimal) null));
     }
 

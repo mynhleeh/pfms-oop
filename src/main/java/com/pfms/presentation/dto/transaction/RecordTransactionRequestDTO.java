@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.pfms.common.util.Preconditions;
-
 /**
  * DTO đóng gói dữ liệu đầu vào ghi nhận giao dịch thu nhập hoặc chi tiêu từ
  * giao diện gửi xuống tầng dịch vụ.
@@ -51,16 +49,9 @@ public final class RecordTransactionRequestDTO {
 
         this.walletId = Objects.requireNonNull(walletId, "Mã ví không được để null");
         this.categoryId = Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
-        Objects.requireNonNull(amount, "Số tiền giao dịch không được để null");
-        this.amount = Preconditions.requirePositive(amount, "Số tiền giao dịch phải lớn hơn 0: " + amount);
+        this.amount = Objects.requireNonNull(amount, "Số tiền giao dịch không được để null");
 
-        BigDecimal normalizedFee = (feeAmount == null) ? BigDecimal.ZERO : feeAmount;
-        this.feeAmount = Preconditions.requireNonNegative(normalizedFee,
-                "Mức phí giao dịch không được âm: " + normalizedFee);
-        Preconditions.checkArgument(
-                !(this.feeAmount.compareTo(BigDecimal.ZERO) > 0 && feeCategoryId == null),
-                "Khi phát sinh phí giao dịch, danh mục phí không được để trống");
-
+        this.feeAmount = (feeAmount == null) ? BigDecimal.ZERO : feeAmount;
         this.transactionDate = (transactionDate == null) ? LocalDate.now() : transactionDate;
         this.note = (note == null) ? "" : note.trim();
         this.feeCategoryId = (this.feeAmount.compareTo(BigDecimal.ZERO) > 0) ? feeCategoryId : null;

@@ -163,56 +163,58 @@ class TransferRequestDTOTest {
     }
 
     @Nested
-    @DisplayName("Nhóm 3: Negative & Zero Values - Kiểm soát số không và số âm")
+    @DisplayName("Nhóm 3: Passthrough Giá trị Biên Số học (Không và Âm) tới Domain/Service")
     class NegativeAndZeroValueTests {
 
-        @ParameterizedTest(name = "Số tiền bằng 0 ({0}) phải bị từ chối")
+        @ParameterizedTest(name = "Số tiền bằng 0 ({0}) đi qua DTO để Service/Domain ném ERR_TRF_002")
         @ValueSource(strings = {"0", "0.0", "0.00"})
-        @DisplayName("Ném IllegalArgumentException khi số tiền chuyển bằng 0")
-        void shouldThrowWhenAmountIsZero(String zeroAmount) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép số tiền chuyển bằng 0 đi qua DTO")
+        void shouldAllowZeroAmountPassthroughForDomainValidation(String zeroAmount) {
+            BigDecimal expected = new BigDecimal(zeroAmount);
+            TransferRequestDTO dto = assertDoesNotThrow(
                     () -> new TransferRequestDTO(
                             sampleSourceWalletId,
                             sampleDestinationWalletId,
-                            new BigDecimal(zeroAmount)
+                            expected
                     )
             );
-            assertTrue(ex.getMessage().contains("Số tiền chuyển phải lớn hơn 0"));
+            assertEquals(0, expected.compareTo(dto.getAmount()));
         }
 
-        @ParameterizedTest(name = "Số tiền âm ({0}) phải bị từ chối")
+        @ParameterizedTest(name = "Số tiền âm ({0}) đi qua DTO để Service/Domain ném ERR_TRF_002")
         @ValueSource(strings = {"-0.01", "-1", "-500000.00"})
-        @DisplayName("Ném IllegalArgumentException khi số tiền chuyển âm")
-        void shouldThrowWhenAmountIsNegative(String negativeAmount) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép số tiền chuyển âm đi qua DTO")
+        void shouldAllowNegativeAmountPassthroughForDomainValidation(String negativeAmount) {
+            BigDecimal expected = new BigDecimal(negativeAmount);
+            TransferRequestDTO dto = assertDoesNotThrow(
                     () -> new TransferRequestDTO(
                             sampleSourceWalletId,
                             sampleDestinationWalletId,
-                            new BigDecimal(negativeAmount)
+                            expected
                     )
             );
-            assertTrue(ex.getMessage().contains("Số tiền chuyển phải lớn hơn 0"));
+            assertEquals(0, expected.compareTo(dto.getAmount()));
         }
 
-        @ParameterizedTest(name = "Mức phí âm ({0}) phải bị từ chối")
+        @ParameterizedTest(name = "Mức phí âm ({0}) đi qua DTO và tự đưa feeCategoryId về null")
         @ValueSource(strings = {"-0.01", "-100", "-3300.00"})
-        @DisplayName("Ném IllegalArgumentException khi mức phí chuyển tiền âm")
-        void shouldThrowWhenFeeAmountIsNegative(String negativeFee) {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép mức phí chuyển tiền âm đi qua DTO để Service/Domain ném ERR_FEE_001")
+        void shouldAllowNegativeFeeAmountPassthroughForDomainValidation(String negativeFee) {
+            BigDecimal expectedFee = new BigDecimal(negativeFee);
+            TransferRequestDTO dto = assertDoesNotThrow(
                     () -> new TransferRequestDTO(
                             sampleSourceWalletId,
                             sampleDestinationWalletId,
                             new BigDecimal("100000.00"),
                             sampleDate,
                             "Chuyển khoản",
-                            new BigDecimal(negativeFee),
+                            expectedFee,
                             sampleFeeCategoryId
                     )
             );
-            assertTrue(ex.getMessage().contains("Mức phí chuyển tiền không được âm"));
+            assertEquals(0, expectedFee.compareTo(dto.getFeeAmount()));
+            assertNull(dto.getFeeCategoryId());
+            assertFalse(dto.hasFee());
         }
     }
 
@@ -290,13 +292,13 @@ class TransferRequestDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi ví nguồn trùng với ví đích (UC-TRF-01 8a)")
-        void shouldThrowWhenSourceAndDestinationWalletsAreSame() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép ví nguồn trùng ví đích đi qua DTO để Service/Domain ném ERR_TRF_001")
+        void shouldAllowSameSourceAndDestinationWalletsPassthroughForDomainValidation() {
+            TransferRequestDTO dto = assertDoesNotThrow(
                     () -> new TransferRequestDTO(sampleSourceWalletId, sampleSourceWalletId, new BigDecimal("100000"))
             );
-            assertTrue(ex.getMessage().contains("Ví nguồn và ví đích phải khác nhau"));
+            assertEquals(sampleSourceWalletId, dto.getSourceWalletId());
+            assertEquals(sampleSourceWalletId, dto.getDestinationWalletId());
         }
 
         @Test
@@ -310,10 +312,9 @@ class TransferRequestDTOTest {
         }
 
         @Test
-        @DisplayName("Ném IllegalArgumentException khi mức phí dương nhưng mã danh mục phí bị null (UC-TRF-01 8d)")
-        void shouldThrowWhenFeeIsPositiveButFeeCategoryIdIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        @DisplayName("Cho phép mức phí dương nhưng feeCategoryId null đi qua DTO để Service/Domain ném ERR_FEE_002")
+        void shouldAllowPositiveFeeWithNullFeeCategoryIdPassthrough() {
+            TransferRequestDTO dto = assertDoesNotThrow(
                     () -> new TransferRequestDTO(
                             sampleSourceWalletId,
                             sampleDestinationWalletId,
@@ -324,7 +325,57 @@ class TransferRequestDTOTest {
                             null
                     )
             );
-            assertTrue(ex.getMessage().contains("danh mục phí không được để trống"));
+            assertEquals(0, new BigDecimal("2200.00").compareTo(dto.getFeeAmount()));
+            assertNull(dto.getFeeCategoryId());
+            assertTrue(dto.hasFee());
+        }
+
+        @Test
+        @DisplayName("Cho phép ngày chuyển tương lai và ghi chú vượt 255 ký tự đi qua DTO")
+        void shouldAllowFutureDateAndOversizedNotePassthrough() {
+            LocalDate futureDate = LocalDate.now().plusDays(1);
+            String oversizedNote = "t".repeat(256);
+
+            TransferRequestDTO dto = assertDoesNotThrow(
+                    () -> new TransferRequestDTO(
+                            sampleSourceWalletId,
+                            sampleDestinationWalletId,
+                            new BigDecimal("100000"),
+                            futureDate,
+                            oversizedNote
+                    )
+            );
+
+            assertEquals(futureDate, dto.getTransferDate());
+            assertEquals(oversizedNote, dto.getNote());
+        }
+
+        @Test
+        @DisplayName("Bình đẳng scale với số âm và an toàn identity khi feeCategoryId null")
+        void shouldSupportNegativeScaleEqualityAndNullFeeCategoryInIdentityContract() {
+            TransferRequestDTO neg1 = new TransferRequestDTO(
+                    sampleSourceWalletId,
+                    sampleDestinationWalletId,
+                    new BigDecimal("-100"),
+                    sampleDate,
+                    "Phí thiếu danh mục",
+                    new BigDecimal("2200"),
+                    null
+            );
+            TransferRequestDTO neg2 = new TransferRequestDTO(
+                    sampleSourceWalletId,
+                    sampleDestinationWalletId,
+                    new BigDecimal("-100.00"),
+                    sampleDate,
+                    "Phí thiếu danh mục",
+                    new BigDecimal("2200.00"),
+                    null
+            );
+
+            assertEquals(neg1, neg1);
+            assertEquals(neg1, neg2);
+            assertEquals(neg1.hashCode(), neg2.hashCode());
+            assertTrue(neg1.toString().contains("feeCategoryId=null"));
         }
 
         @Test

@@ -1,10 +1,13 @@
 package com.pfms.presentation.dto.wallet;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-
-import com.pfms.common.util.Preconditions;
+import java.util.UUID;
 
 /**
  * DTO đóng gói dữ liệu tổng hợp danh sách ví, tổng tài sản và cơ cấu phân bổ
@@ -26,9 +29,7 @@ public final class WalletsSummaryDTO {
             String currency,
             Map<UUID, BigDecimal> walletShares) {
 
-        Objects.requireNonNull(totalBalance, "Tổng số dư hệ thống không được để null");
-        this.totalBalance = Preconditions.requireNonNegative(totalBalance,
-                "Tổng số dư hệ thống không được âm: " + totalBalance);
+        this.totalBalance = Objects.requireNonNull(totalBalance, "Tổng số dư hệ thống không được để null");
 
         this.wallets = (wallets == null)
                 ? Collections.emptyList()

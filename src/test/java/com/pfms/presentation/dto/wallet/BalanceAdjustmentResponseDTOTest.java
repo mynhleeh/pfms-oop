@@ -163,20 +163,19 @@ class BalanceAdjustmentResponseDTOTest {
 
         @ParameterizedTest
         @ValueSource(strings = { "-0.01", "-100000" })
-        @DisplayName("Ném IllegalArgumentException khi previousBalance hoặc actualBalance mang giá trị âm")
-        void shouldThrowExceptionWhenBalancesAreNegative(String negativeAmount) {
+        @DisplayName("Chấp nhận previousBalance hoặc actualBalance âm để giữ DTO là pure data carrier")
+        void shouldAllowNegativeBalancesAsPureDataCarrier(String negativeAmount) {
             BigDecimal neg = new BigDecimal(negativeAmount);
 
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new BalanceAdjustmentResponseDTO(
-                            recordId, walletId, neg, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate,
-                            createdTime));
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> new BalanceAdjustmentResponseDTO(
-                            recordId, walletId, BigDecimal.ZERO, neg, BigDecimal.ZERO, "VND", "", adjustedDate,
-                            createdTime));
+            BalanceAdjustmentResponseDTO negPrevDto = new BalanceAdjustmentResponseDTO(
+                    recordId, walletId, neg, BigDecimal.ZERO, BigDecimal.ZERO, "VND", "", adjustedDate,
+                    createdTime);
+            BalanceAdjustmentResponseDTO negActualDto = new BalanceAdjustmentResponseDTO(
+                    recordId, walletId, BigDecimal.ZERO, neg, BigDecimal.ZERO, "VND", "", adjustedDate,
+                    createdTime);
+
+            assertEquals(0, neg.compareTo(negPrevDto.getPreviousBalance()));
+            assertEquals(0, neg.compareTo(negActualDto.getActualBalance()));
         }
     }
 

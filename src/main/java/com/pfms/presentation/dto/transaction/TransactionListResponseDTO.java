@@ -1,6 +1,6 @@
 package com.pfms.presentation.dto.transaction;
 
-import com.pfms.common.util.Preconditions;
+import com.pfms.common.util.PaginationUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,7 +27,8 @@ public final class TransactionListResponseDTO {
 
     // region Constructors
     public TransactionListResponseDTO() {
-        this(Collections.emptyList(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 1, 50, 0, 0);
+        this(Collections.emptyList(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
+                PaginationUtils.DEFAULT_PAGE_NUMBER, PaginationUtils.DEFAULT_PAGE_SIZE, 0, 0);
     }
 
     public TransactionListResponseDTO(
@@ -40,24 +41,9 @@ public final class TransactionListResponseDTO {
             long totalRecords,
             int totalPages) {
 
-        Objects.requireNonNull(totalIncome, "Tổng thu nhập không được để null");
-        this.totalIncome = Preconditions.requireNonNegative(totalIncome,
-                "Tổng thu nhập không được âm: " + totalIncome);
-
-        Objects.requireNonNull(totalExpense, "Tổng chi tiêu không được để null");
-        this.totalExpense = Preconditions.requireNonNegative(totalExpense,
-                "Tổng chi tiêu không được âm: " + totalExpense);
-
+        this.totalIncome = Objects.requireNonNull(totalIncome, "Tổng thu nhập không được để null");
+        this.totalExpense = Objects.requireNonNull(totalExpense, "Tổng chi tiêu không được để null");
         this.netCashFlow = Objects.requireNonNull(netCashFlow, "Dòng tiền thuần không được để null");
-
-        Preconditions.checkArgument(pageNumber >= 1,
-                "Chỉ số trang phải lớn hơn hoặc bằng 1: " + pageNumber);
-        Preconditions.checkArgument(pageSize >= 10 && pageSize <= 100,
-                "Kích thước trang phải nằm trong khoảng từ 10 đến 100: " + pageSize);
-        Preconditions.checkArgument(totalRecords >= 0,
-                "Tổng số bản ghi không được âm: " + totalRecords);
-        Preconditions.checkArgument(totalPages >= 0,
-                "Tổng số trang không được âm: " + totalPages);
 
         this.items = (items == null)
                 ? Collections.emptyList()

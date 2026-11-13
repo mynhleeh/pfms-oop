@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.pfms.common.util.Preconditions;
-
 /**
  * DTO đóng gói dữ liệu chi tiết ví tài chính trả về từ tầng dịch vụ lên giao
  * diện.
@@ -36,7 +34,7 @@ public final class WalletResponseDTO {
             LocalDateTime createdAt) {
 
         this.id = Objects.requireNonNull(id, "Mã ví không được để null");
-        this.name = Preconditions.requireNonBlank(name, "Tên ví không được để trống hoặc chỉ chứa khoảng trắng");
+        this.name = (name == null) ? null : name.trim();
         this.balance = Objects.requireNonNull(balance, "Số dư ví không được để null");
         this.currency = (currency == null || currency.trim().isEmpty()) ? "VND" : currency.trim();
         this.defaultWallet = defaultWallet;

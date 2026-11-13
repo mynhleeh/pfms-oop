@@ -1,7 +1,5 @@
 package com.pfms.presentation.dto.transaction;
 
-import com.pfms.common.util.Preconditions;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -49,22 +47,11 @@ public final class UpdateTransactionRequestDTO {
             UUID newFeeCategoryId) {
 
         this.transactionId = Objects.requireNonNull(transactionId, "Mã giao dịch không được để null");
-        Objects.requireNonNull(newAmount, "Số tiền giao dịch mới không được để null");
-        this.newAmount = Preconditions.requirePositive(newAmount,
-                "Số tiền giao dịch mới phải lớn hơn 0: " + newAmount);
+        this.newAmount = Objects.requireNonNull(newAmount, "Số tiền giao dịch mới không được để null");
         this.newCategoryId = Objects.requireNonNull(newCategoryId, "Mã danh mục mới không được để null");
 
-        BigDecimal normalizedFee = (newFeeAmount == null) ? BigDecimal.ZERO : newFeeAmount;
-        this.newFeeAmount = Preconditions.requireNonNegative(normalizedFee,
-                "Mức phí giao dịch mới không được âm: " + normalizedFee);
-
-        if (this.newFeeAmount.compareTo(BigDecimal.ZERO) > 0) {
-            this.newFeeCategoryId = Objects.requireNonNull(newFeeCategoryId,
-                    "Khi phát sinh phí giao dịch, danh mục phí mới không được để trống");
-        } else {
-            this.newFeeCategoryId = null;
-        }
-
+        this.newFeeAmount = (newFeeAmount == null) ? BigDecimal.ZERO : newFeeAmount;
+        this.newFeeCategoryId = (this.newFeeAmount.compareTo(BigDecimal.ZERO) > 0) ? newFeeCategoryId : null;
         this.newDate = (newDate == null) ? LocalDate.now() : newDate;
         this.newNote = (newNote == null) ? "" : newNote.trim();
     }

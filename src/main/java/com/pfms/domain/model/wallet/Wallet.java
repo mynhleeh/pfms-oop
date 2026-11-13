@@ -1,6 +1,5 @@
 package com.pfms.domain.model.wallet;
 
-import com.pfms.common.util.Preconditions;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
@@ -207,6 +206,17 @@ public class Wallet {
         Objects.requireNonNull(amount, "Số tiền kiểm tra không được để null");
         return this.currentBalance.isGreaterThanOrEqual(amount);
     }
+
+    public Wallet copy() {
+        return new Wallet(
+                this.id,
+                this.name.getValue(),
+                this.note.getValue(),
+                this.defaultWallet,
+                this.createdAt,
+                this.state,
+                this.currentBalance);
+    }
     // endregion
 
     // region Helpers
@@ -229,7 +239,9 @@ public class Wallet {
 
     private static void validatePositiveAmount(Money amount) {
         Objects.requireNonNull(amount, "Số tiền không được để null");
-        Preconditions.checkArgument(amount.isPositive(), "Số tiền giao dịch phải là số dương lớn hơn 0.");
+        if (!amount.isPositive()) {
+            throw new BusinessException(ErrorCode.ERR_FIN_001, "Số tiền giao dịch phải là số dương lớn hơn 0.");
+        }
     }
 
     private static UUID parseId(String id) {
