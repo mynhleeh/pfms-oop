@@ -162,6 +162,44 @@ class WalletServiceImplTest {
         }
 
         @Test
+        @DisplayName("Chấp nhận tên ví tại cận biên 1 ký tự và 50 ký tự (Boundary)")
+        void shouldAcceptBoundaryWalletNamesOf1And50Chars() {
+            WalletResponseDTO minWallet = walletService.createWallet(new CreateWalletRequestDTO("A", "Biên dưới"));
+            assertEquals("A", minWallet.getName());
+
+            String exact50 = "V".repeat(50);
+            WalletResponseDTO maxWallet = walletService.createWallet(new CreateWalletRequestDTO(exact50, "Biên trên"));
+            assertEquals(exact50, maxWallet.getName());
+        }
+
+        @Test
+        @DisplayName("Kiểm tra định dạng tên ví (ERR_NAM_001) và ghi chú trước khi truy vấn existsByName")
+        void shouldValidateNameAndNoteFormatBeforeQueryingRepositoryOnCreate() {
+            MemoryWalletRepository guardWalletRepo = new MemoryWalletRepository() {
+                @Override
+                public boolean existsByName(String name) {
+                    fail("Không được phép truy vấn existsByName khi tên hoặc ghi chú chưa qua bước xác thực định dạng");
+                    return false;
+                }
+            };
+            WalletServiceImpl guardedService = new WalletServiceImpl(
+                    guardWalletRepo, balanceAdjustmentRepository, transactionRepository);
+
+            String name51Chars = "A".repeat(51);
+            com.pfms.domain.exception.BusinessException nameEx = assertThrows(
+                    com.pfms.domain.exception.BusinessException.class,
+                    () -> guardedService.createWallet(new CreateWalletRequestDTO(name51Chars, "Ghi chú hợp lệ"))
+            );
+            assertEquals(com.pfms.domain.exception.ErrorCode.ERR_NAM_001, nameEx.getErrorCode());
+
+            String note256Chars = "N".repeat(256);
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> guardedService.createWallet(new CreateWalletRequestDTO("Ví Hợp Lệ", note256Chars))
+            );
+        }
+
+        @Test
         @DisplayName("Ném NullPointerException khi request null")
         void shouldThrowExceptionWhenRequestIsNull() {
             assertThrows(NullPointerException.class, () -> walletService.createWallet(null));
@@ -272,6 +310,26 @@ class WalletServiceImplTest {
             WalletsSummaryDTO all = walletService.getWalletsSummary(null);
             assertEquals(2, all.getWalletCount());
         }
+
+        @Test
+        @DisplayName("Tính chính xác tỷ trọng với quy mô tài sản lớn (hàng trăm tỷ VNĐ) không tràn số")
+        void shouldHandleLargeBalancesWithBankersRounding() {
+            Wallet w1 = new Wallet(UUID.randomUUID(), "Quỹ Đầu Tư A", "", false,
+                    java.time.LocalDateTime.now(), new com.pfms.domain.model.wallet.ActiveWalletState(),
+                    Money.of("100000000000.00"));
+            Wallet w2 = new Wallet(UUID.randomUUID(), "Quỹ Đầu Tư B", "", false,
+                    java.time.LocalDateTime.now(), new com.pfms.domain.model.wallet.ActiveWalletState(),
+                    Money.of("700000000000.00"));
+
+            walletRepository.save(w1);
+            walletRepository.save(w2);
+
+            WalletsSummaryDTO summary = walletService.getWalletsSummary(EntityStatus.ACTIVE);
+            assertEquals(0, new java.math.BigDecimal("800000000000.00").compareTo(summary.getTotalBalance()));
+            // 100 / 800 = 12.50%, 700 / 800 = 87.50%
+            assertEquals(new java.math.BigDecimal("87.50"), summary.getWalletShare(w2.getId()));
+            assertEquals(new java.math.BigDecimal("12.50"), summary.getWalletShare(w1.getId()));
+        }
     }
 
     @Nested
@@ -344,6 +402,36 @@ class WalletServiceImplTest {
                     () -> walletService.updateWallet(request)
             );
             assertEquals(com.pfms.domain.exception.ErrorCode.ERR_NOT_FOUND, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Xác thực định dạng tên mới (ERR_NAM_001) và ghi chú mới trước khi kiểm tra existsByName")
+        void shouldValidateNewNameAndNoteFormatBeforeCheckingDuplicateOnUpdate() {
+            Wallet existing = new Wallet(UUID.randomUUID(), "Ví Gốc", "Ghi chú gốc", false);
+            MemoryWalletRepository guardWalletRepo = new MemoryWalletRepository() {
+                @Override
+                public boolean existsByName(String name) {
+                    fail("Không được phép gọi existsByName khi tên mới hoặc ghi chú mới sai định dạng");
+                    return false;
+                }
+            };
+            guardWalletRepo.save(existing);
+
+            WalletServiceImpl guardedService = new WalletServiceImpl(
+                    guardWalletRepo, balanceAdjustmentRepository, transactionRepository);
+
+            String invalidName51 = "B".repeat(51);
+            com.pfms.domain.exception.BusinessException nameEx = assertThrows(
+                    com.pfms.domain.exception.BusinessException.class,
+                    () -> guardedService.updateWallet(new UpdateWalletRequestDTO(existing.getId(), invalidName51, "Hợp lệ"))
+            );
+            assertEquals(com.pfms.domain.exception.ErrorCode.ERR_NAM_001, nameEx.getErrorCode());
+
+            String invalidNote256 = "C".repeat(256);
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> guardedService.updateWallet(new UpdateWalletRequestDTO(existing.getId(), "Tên Mới Hợp Lệ", invalidNote256))
+            );
         }
 
         @Test
@@ -614,6 +702,67 @@ class WalletServiceImplTest {
         @DisplayName("Ném NullPointerException khi request null")
         void shouldThrowExceptionWhenRequestIsNull() {
             assertThrows(NullPointerException.class, () -> walletService.adjustBalance(null));
+        }
+
+        @Test
+        @DisplayName("Chấp nhận ngày kiểm kê năm nhuận (29/02/2024) và từ chối ngày kiểm kê tương lai (Temporal Invariants)")
+        void shouldHandleLeapYearDateAndRejectFutureAdjustmentDate() {
+            Wallet wallet = new Wallet(UUID.randomUUID(), "Ví Lịch Pháp", "", false,
+                    java.time.LocalDateTime.now(), new com.pfms.domain.model.wallet.ActiveWalletState(), Money.of("100000.00"));
+            walletRepository.save(wallet);
+
+            java.time.LocalDate leapDay = java.time.LocalDate.of(2024, 2, 29);
+            AdjustBalanceRequestDTO leapRequest = new AdjustBalanceRequestDTO(
+                    wallet.getId(), new java.math.BigDecimal("150000.00"), "Kiểm kê ngày nhuận", leapDay);
+            BalanceAdjustmentResponseDTO response = walletService.adjustBalance(leapRequest);
+            assertEquals(leapDay, response.getAdjustedAt());
+
+            java.time.LocalDate futureDay = java.time.LocalDate.now().plusDays(1);
+            AdjustBalanceRequestDTO futureRequest = new AdjustBalanceRequestDTO(
+                    wallet.getId(), new java.math.BigDecimal("200000.00"), "Ngày tương lai", futureDay);
+            assertThrows(com.pfms.domain.exception.BusinessException.class,
+                    () -> walletService.adjustBalance(futureRequest));
+        }
+
+        @Test
+        @DisplayName("Hoàn nguyên trạng thái số dư ví về trước kiểm kê nếu lưu bản ghi kiểm kê phát sinh StorageException")
+        void shouldRollbackWalletBalanceWhenSavingAdjustmentRecordThrowsStorageException() {
+            Wallet wallet = new Wallet(UUID.randomUUID(), "Ví Kiểm Toán Nguyên Tử", "Ghi chú ban đầu", false,
+                    java.time.LocalDateTime.now(), new com.pfms.domain.model.wallet.ActiveWalletState(), Money.of("500000.00"));
+            walletRepository.save(wallet);
+
+            MemoryBalanceAdjustmentRepository failingAdjustmentRepo = new MemoryBalanceAdjustmentRepository() {
+                @Override
+                public BalanceAdjustmentRecord save(BalanceAdjustmentRecord entity) {
+                    throw new com.pfms.domain.exception.StorageException(
+                            com.pfms.domain.exception.ErrorCode.ERR_SYS_001,
+                            "Lỗi ghi tệp bản ghi kiểm kê",
+                            new java.io.IOException("Simulated disk write failure")
+                    );
+                }
+            };
+
+            WalletServiceImpl atomicWalletService = new WalletServiceImpl(
+                    walletRepository, failingAdjustmentRepo, transactionRepository);
+
+            AdjustBalanceRequestDTO request = new AdjustBalanceRequestDTO(
+                    wallet.getId(),
+                    new java.math.BigDecimal("350000.00"),
+                    "Kiểm kê lỗi đĩa"
+            );
+
+            assertThrows(
+                    com.pfms.domain.exception.StorageException.class,
+                    () -> atomicWalletService.adjustBalance(request)
+            );
+
+            Wallet persistedWallet = walletRepository.findById(wallet.getId()).orElseThrow();
+            assertEquals(
+                    Money.of("500000.00"),
+                    persistedWallet.getCurrentBalance(),
+                    "Số dư ví trong kho lưu trữ phải được hoàn nguyên về 500,000.00 VNĐ khi lưu vết kiểm toán thất bại"
+            );
+            assertTrue(failingAdjustmentRepo.findByWalletId(wallet.getId()).isEmpty());
         }
     }
 }
