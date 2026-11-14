@@ -431,6 +431,24 @@ class MemoryBalanceAdjustmentRepositoryTest {
             assertDoesNotThrow(() -> repository.save(record1Wallet1));
             assertEquals(1, repository.findAll().size());
         }
+
+        @Test
+        @DisplayName("Should clear storage and reset insertion sequence via deleteAll()")
+        void shouldClearStorageAndResetSequenceViaDeleteAll() {
+            repository.save(record1Wallet1);
+            repository.save(record2Wallet1);
+
+            assertEquals(2, repository.findAll().size());
+
+            repository.deleteAll();
+
+            assertTrue(repository.findAll().isEmpty());
+            assertFalse(repository.existsById(record1Wallet1.getRecordId()));
+            assertFalse(repository.existsById(record2Wallet1.getRecordId()));
+
+            assertDoesNotThrow(() -> repository.save(record1Wallet1));
+            assertEquals(1, repository.findAll().size());
+        }
     }
     // endregion
 

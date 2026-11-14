@@ -348,5 +348,42 @@ class MemoryGenericRepositoryTest {
             assertEquals(totalExpected, repository.findAll().size(), "Số lượng bản ghi trong kho phải chính xác bằng tổng số đã lưu");
         }
     }
+
+    @Nested
+    @DisplayName("Batch Operations Tests (saveAll, deleteAll)")
+    class BatchOperationsTests {
+
+        @Test
+        @DisplayName("saveAll should persist all entities and return unmodifiable list")
+        void shouldSaveAllEntitiesSuccessfully() {
+            List<DummyEntity> entities = List.of(entity1, entity2);
+            List<DummyEntity> saved = repository.saveAll(entities);
+
+            assertEquals(2, saved.size());
+            assertEquals(2, repository.findAll().size());
+            assertTrue(repository.existsById(entity1.getId()));
+            assertTrue(repository.existsById(entity2.getId()));
+            assertThrows(UnsupportedOperationException.class, () -> saved.add(new DummyEntity(UUID.randomUUID(), "X")));
+        }
+
+        @Test
+        @DisplayName("saveAll with null should throw NullPointerException")
+        void shouldThrowWhenSaveAllReceivesNull() {
+            assertThrows(NullPointerException.class, () -> repository.saveAll(null));
+        }
+
+        @Test
+        @DisplayName("deleteAll should remove all entries from repository")
+        void shouldDeleteAllEntitiesSuccessfully() {
+            repository.save(entity1);
+            repository.save(entity2);
+            assertEquals(2, repository.findAll().size());
+
+            repository.deleteAll();
+            assertTrue(repository.findAll().isEmpty());
+            assertFalse(repository.existsById(entity1.getId()));
+            assertFalse(repository.existsById(entity2.getId()));
+        }
+    }
 }
 

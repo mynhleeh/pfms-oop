@@ -42,6 +42,11 @@ public abstract class MemoryGenericRepository<E, ID> implements GenericRepositor
         Objects.requireNonNull(id, "ID must not be null");
         return storage.remove(id) != null;
     }
+
+    @Override
+    public void deleteAll() {
+        storage.clear();
+    }
     // endregion
 
     // region Queries
@@ -65,7 +70,7 @@ public abstract class MemoryGenericRepository<E, ID> implements GenericRepositor
 
     // region Testing Support
     public void clear() {
-        storage.clear();
+        deleteAll();
     }
     // endregion
 

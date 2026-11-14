@@ -48,10 +48,15 @@ public class MemoryBalanceAdjustmentRepository
     }
 
     @Override
-    public void clear() {
-        super.clear();
+    public void deleteAll() {
+        super.deleteAll();
         insertionSequence.clear();
         sequenceGenerator.set(0);
+    }
+
+    @Override
+    public void clear() {
+        deleteAll();
     }
     // endregion
 
