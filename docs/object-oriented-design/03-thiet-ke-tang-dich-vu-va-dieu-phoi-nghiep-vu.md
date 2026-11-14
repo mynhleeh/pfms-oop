@@ -34,13 +34,13 @@ Giao diện `com.pfms.service.WalletService` cung cấp các phương thức sau
 | Phương thức | Tham số đầu vào | Kiểu dữ liệu trả về | Ngoại lệ ném ra | Mô tả ca sử dụng điều phối |
 | :--- | :--- | :--- | :--- | :--- |
 | `initializeDefaultWallet` | `Không có` | `void` | `StorageException` | Kiểm tra khi khởi động ứng dụng; nếu chưa có ví mặc định thì tạo sẵn ví `"Tiền mặt"` ở trạng thái hoạt động với số dư bằng không. |
-| `createWallet` | `CreateWalletRequestDto request` | `WalletResponseDto` | `BusinessException`, `DuplicateEntityException`, `StorageException` | Kiểm tra hợp lệ tên ví, kiểm tra trùng tên và khởi tạo ví mới ở trạng thái hoạt động với số dư bằng không. |
-| `getWalletsSummary` | `EntityStatus statusFilter` | `WalletsSummaryDto` | `StorageException` | Truy xuất danh sách ví theo bộ lọc trạng thái, tính tổng số dư hệ thống và tỷ trọng phân bổ của từng ví ở chế độ chỉ đọc. |
-| `updateWallet` | `UpdateWalletRequestDto request` | `WalletResponseDto` | `EntityNotFoundException`, `BusinessException`, `DuplicateEntityException`, `StorageException` | Nạp ví cần sửa, xác thực tên mới không trùng với ví khác và cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
-| `archiveWallet` | `UUID walletId` | `WalletResponseDto` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Chuyển một ví đang hoạt động không phải ví mặc định sang trạng thái lưu trữ để ngừng phát sinh giao dịch mới. |
-| `activateWallet` | `UUID walletId` | `WalletResponseDto` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Mở lại một ví đang ở trạng thái lưu trữ về trạng thái hoạt động bình thường. |
+| `createWallet` | `CreateWalletRequestDTO request` | `WalletResponseDTO` | `BusinessException`, `DuplicateEntityException`, `StorageException` | Kiểm tra hợp lệ tên ví, kiểm tra trùng tên và khởi tạo ví mới ở trạng thái hoạt động với số dư bằng không. |
+| `getWalletsSummary` | `EntityStatus statusFilter` | `WalletsSummaryResponseDTO` | `StorageException` | Truy xuất danh sách ví theo bộ lọc trạng thái, tính tổng số dư hệ thống và tỷ trọng phân bổ của từng ví ở chế độ chỉ đọc. |
+| `updateWallet` | `UpdateWalletRequestDTO request` | `WalletResponseDTO` | `EntityNotFoundException`, `BusinessException`, `DuplicateEntityException`, `StorageException` | Nạp ví cần sửa, xác thực tên mới không trùng với ví khác và cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
+| `archiveWallet` | `UUID walletId` | `WalletResponseDTO` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Chuyển một ví đang hoạt động không phải ví mặc định sang trạng thái lưu trữ để ngừng phát sinh giao dịch mới. |
+| `activateWallet` | `UUID walletId` | `WalletResponseDTO` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Mở lại một ví đang ở trạng thái lưu trữ về trạng thái hoạt động bình thường. |
 | `deleteWallet` | `UUID walletId` | `void` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Xóa vĩnh viễn ví không phải mặc định khi ví chưa từng phát sinh giao dịch thu chi, chuyển tiền hay kiểm kê số dư. |
-| `adjustBalance` | `AdjustBalanceRequestDto request` | `BalanceAdjustmentResponseDto` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Đối chiếu số dư thực tế quan sát được, cập nhật lại số dư ví và lập bản ghi điều chỉnh bất biến để lưu vết kiểm toán. |
+| `adjustBalance` | `AdjustBalanceRequestDTO request` | `BalanceAdjustmentResponseDTO` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Đối chiếu số dư thực tế quan sát được, cập nhật lại số dư ví và lập bản ghi điều chỉnh bất biến để lưu vết kiểm toán. |
 
 **Cài đặt dịch vụ:**
 
@@ -58,28 +58,28 @@ Lớp cài đặt `com.pfms.service.impl.WalletServiceImpl` có phạm vi truy c
 - Cắt khoảng trắng hai đầu tên ví và ghi chú; từ chối nếu tên rỗng, dài quá 50 ký tự hoặc ghi chú vượt quá 255 ký tự, sau đó truy vấn `WalletRepository` để chặn trường hợp trùng tên không phân biệt hoa thường trên cả ví đang hoạt động lẫn ví đã lưu trữ.
 - Sinh mã định danh `UUID` và khởi tạo thực thể `Wallet` với cờ `isDefault` mang giá trị `false`, trạng thái `ACTIVE` và số dư khởi điểm `Money.ZERO`.
 - Ghi nhận thực thể mới vào `WalletRepository` và bảo đảm giữ nguyên trạng thái dữ liệu nếu thao tác lưu phát sinh `StorageException`.
-- Ánh xạ thông tin ví vừa tạo sang `WalletResponseDto` để trả về Tầng Trình diễn.
+- Ánh xạ thông tin ví vừa tạo sang `WalletResponseDTO` để trả về Tầng Trình diễn.
 
 **Phương thức `getWalletsSummary`:**
 
 - Tiếp nhận bộ lọc trạng thái (mặc định là `ACTIVE` từ Tầng Trình diễn hoặc `null` khi cần xem toàn bộ) và nạp danh sách ví từ `WalletRepository`.
 - Tính tổng số dư toàn hệ thống bằng `Money` trên tất cả ví `ACTIVE` cùng các ví `ARCHIVED` có số dư dương; giữ nguyên cơ chế chỉ đọc, không thay đổi trạng thái bất kỳ thực thể nào.
 - Tính tỷ trọng phần trăm từng ví với tối thiểu 4 chữ số thập phân trung gian rồi làm tròn nửa chẵn về 2 chữ số; gán `0.00%` cho mọi ví khi tổng tài sản bằng không, loại các ví `ARCHIVED` có số dư bằng không khỏi bảng cơ cấu và sắp xếp bảng cơ cấu theo tỷ trọng giảm dần.
-- Đóng gói danh sách ví đã lọc, tổng số dư toàn hệ thống và bảng cơ cấu vào `WalletsSummaryDto`.
+- Đóng gói danh sách ví đã lọc, tổng số dư toàn hệ thống và bảng cơ cấu vào `WalletsSummaryResponseDTO`.
 
 **Phương thức `updateWallet`:**
 
 - Nạp ví theo mã định danh từ `WalletRepository`, ném `EntityNotFoundException` nếu không tồn tại; chuẩn hóa và kiểm tra định dạng tên mới cùng ghi chú mới.
 - Chỉ kiểm tra trùng tên không phân biệt hoa thường khi tên mới sau chuẩn hóa khác tên hiện tại nhằm cho phép giữ nguyên tên cũ khi chỉ sửa ghi chú.
 - Ủy quyền phương thức `updateInfo` của `Wallet` để cập nhật tên và ghi chú trong khi bảo toàn mã định danh và số dư hiện có, sau đó lưu lại qua `WalletRepository`.
-- Chuyển thực thể sau cập nhật sang `WalletResponseDto`.
+- Chuyển thực thể sau cập nhật sang `WalletResponseDTO`.
 
 **Phương thức `archiveWallet` và `activateWallet`:**
 
 - Nạp thực thể `Wallet` từ `WalletRepository` theo mã định danh và xác nhận ví tồn tại.
 - Ủy quyền `wallet.archive()` hoặc `wallet.activate()` kiểm tra điều kiện chuyển trạng thái, trong đó `archive()` tự động từ chối nếu đối tượng là ví `"Tiền mặt"` mặc định hoặc đang không ở trạng thái `ACTIVE`.
 - Lưu trạng thái vòng đời mới xuống `WalletRepository` và giữ nguyên số dư hiện hành của ví.
-- Trả về `WalletResponseDto` phản ánh trạng thái mới để Tầng Trình diễn cập nhật hiển thị.
+- Trả về `WalletResponseDTO` phản ánh trạng thái mới để Tầng Trình diễn cập nhật hiển thị.
 
 **Phương thức `deleteWallet`:**
 
@@ -93,7 +93,7 @@ Lớp cài đặt `com.pfms.service.impl.WalletServiceImpl` có phạm vi truy c
 - Chuyển đổi số dư thực tế sang `Money` (yêu cầu đúng 2 chữ số thập phân và không âm), chuyển đổi ngày kiểm kê sang `TransactionDate` (mặc định là ngày hiện tại nếu chưa nhập và không vượt quá hiện tại), đồng thời chuẩn hóa lý do điều chỉnh dài tối đa 255 ký tự.
 - Nạp ví từ `WalletRepository`, xác nhận ví đang ở trạng thái `ACTIVE`, rồi gọi `wallet.adjustBalance(...)` để kiểm tra độ lệch phải khác không, cập nhật số dư ví và sinh bản ghi `BalanceAdjustmentRecord` bất biến.
 - Lưu đồng thời `Wallet` qua `WalletRepository` và bản ghi kiểm kê qua `BalanceAdjustmentRepository`; nếu thao tác lưu sau phát sinh `StorageException`, khôi phục lại trạng thái ví trước kiểm kê nhằm giữ đồng bộ giữa số dư và vết kiểm toán.
-- Đóng gói số dư trước kiểm kê, số dư sau kiểm kê và phần chênh lệch vào `BalanceAdjustmentResponseDto`.
+- Đóng gói số dư trước kiểm kê, số dư sau kiểm kê và phần chênh lệch vào `BalanceAdjustmentResponseDTO`.
 
 ## 3.3 Dịch vụ Ghi nhận Thu Chi
 
@@ -105,9 +105,9 @@ Giao diện `com.pfms.service.TransactionService` cung cấp các phương thứ
 
 | Phương thức | Tham số đầu vào | Kiểu dữ liệu trả về | Ngoại lệ ném ra | Mô tả ca sử dụng điều phối |
 | :--- | :--- | :--- | :--- | :--- |
-| `recordIncomeExpense` | `RecordTransactionRequestDto request` | `TransactionResponseDto` | `EntityNotFoundException`, `BusinessException`, `InsufficientBalanceException`, `StorageException` | Xác thực ví hoạt động và danh mục hợp lệ, tạo giao dịch thu chi kèm phí phát sinh nếu có và cập nhật số dư ví. |
-| `filterTransactions` | `FilterTransactionsRequestDto request` | `TransactionListResponseDto` | `BusinessException`, `StorageException` | Truy vấn, lọc và phân trang danh sách giao dịch thu chi kèm dòng phí liên kết, đồng thời tổng hợp dòng tiền ở chế độ chỉ đọc. |
-| `updateTransaction` | `UpdateTransactionRequestDto request` | `TransactionResponseDto` | `EntityNotFoundException`, `BusinessException`, `InsufficientBalanceException`, `StorageException` | Hoàn nguyên tác động cũ, kiểm tra điều kiện áp dụng thông tin mới trên ví nguồn mới và cập nhật giao dịch cùng phí liên kết. |
+| `recordIncomeExpense` | `RecordTransactionRequestDTO request` | `TransactionResponseDTO` | `EntityNotFoundException`, `BusinessException`, `InsufficientBalanceException`, `StorageException` | Xác thực ví hoạt động và danh mục hợp lệ, tạo giao dịch thu chi kèm phí phát sinh nếu có và cập nhật số dư ví. |
+| `filterTransactions` | `FilterTransactionsRequestDTO request` | `TransactionListResponseDTO` | `BusinessException`, `StorageException` | Truy vấn, lọc và phân trang danh sách giao dịch thu chi kèm dòng phí liên kết, đồng thời tổng hợp dòng tiền ở chế độ chỉ đọc. |
+| `updateTransaction` | `UpdateTransactionRequestDTO request` | `TransactionResponseDTO` | `EntityNotFoundException`, `BusinessException`, `InsufficientBalanceException`, `StorageException` | Hoàn nguyên tác động cũ, kiểm tra điều kiện áp dụng thông tin mới trên ví nguồn mới và cập nhật giao dịch cùng phí liên kết. |
 | `deleteTransaction` | `UUID transactionId` | `void` | `EntityNotFoundException`, `BusinessException`, `InsufficientBalanceException`, `StorageException` | Kiểm tra khả năng hoàn nguyên số dư ví mà không bị âm, khôi phục số dư ví và xóa vĩnh viễn giao dịch cùng khoản phí phụ thuộc. |
 
 **Cài đặt dịch vụ:**
@@ -119,21 +119,21 @@ Lớp cài đặt `com.pfms.service.impl.TransactionServiceImpl` có phạm vi t
 - Chuyển đổi số tiền và mức phí sang `Money` (yêu cầu số tiền lớn hơn `0.00 VNĐ` và mức phí không âm), chuyển đổi ngày phát sinh sang `TransactionDate` (không vượt quá hiện tại) và chuẩn hóa ghi chú tối đa 255 ký tự; nếu mức phí dương thì bắt buộc có mã danh mục phí.
 - Nạp ví từ `WalletRepository` bảo đảm đang `ACTIVE`; nạp danh mục cấp 3 từ `CategoryRepository` bảo đảm đang `ACTIVE` (và danh mục chi tiêu cấp 3 đang `ACTIVE` cho phí nếu phát sinh); gọi `TransactionFactory` tạo `IncomeExpenseTransaction` kèm `TransactionFee` hợp thành rồi thực thi `applyToWallet()` sau khi xác nhận số dư ví sau hạch toán không bị âm.
 - Lưu bản ghi giao dịch vào `TransactionRepository` và lưu ví đã đổi số dư vào `WalletRepository`; nếu bước lưu thứ hai ném `StorageException`, thực hiện xóa bù trừ giao dịch vừa lưu và hoàn tác trạng thái ví trước khi chuyển tiếp ngoại lệ.
-- Chuyển thực thể giao dịch cùng số dư ví mới sang `TransactionResponseDto`.
+- Chuyển thực thể giao dịch cùng số dư ví mới sang `TransactionResponseDTO`.
 
 **Phương thức `filterTransactions`:**
 
 - Chuyển đổi mốc ngày bắt đầu và ngày kết thúc (nếu có) sang `TransactionDate` để kiểm tra ngày bắt đầu không đứng sau ngày kết thúc; kiểm tra chỉ số trang tối thiểu bằng 1 và kích thước trang trong đoạn từ 10 đến 100 bản ghi (mặc định 50 nếu chưa chỉ định).
 - Nạp toàn bộ bản ghi thuộc kiểu `IncomeExpenseTransaction` từ `TransactionRepository`, áp dụng bộ lọc theo tập ví, loại giao dịch, danh mục hoặc nhóm nhu cầu (bao gồm các danh mục đã xóa mềm) và từ khóa tìm kiếm không phân biệt hoa thường trên ghi chú; tách phần `TransactionFee` hợp thành của từng giao dịch thành dòng hiển thị phụ thuộc và sắp xếp theo ngày giao dịch giảm dần rồi đến mốc tạo giảm dần.
 - Thực thi phân trang trên tập kết quả và dùng `Money` tính tổng thu nhập, tổng chi tiêu (bao gồm cả các khoản phí giao dịch liên kết) cùng dòng tiền thuần hoàn toàn ở chế độ chỉ đọc.
-- Đóng gói dữ liệu trang hiện tại, thông số phân trang và ba chỉ số dòng tiền vào `TransactionListResponseDto`.
+- Đóng gói dữ liệu trang hiện tại, thông số phân trang và ba chỉ số dòng tiền vào `TransactionListResponseDTO`.
 
 **Phương thức `updateTransaction`:**
 
 - Nạp bản ghi theo mã định danh và xác nhận đây là `IncomeExpenseTransaction`, từ chối mọi yêu cầu sửa trực tiếp đối với `TransactionFee`; chuyển đổi số tiền mới, phí mới sang `Money` (số tiền dương, phí không âm), chuyển đổi ngày mới sang `TransactionDate` và chuẩn hóa ghi chú tối đa 255 ký tự.
 - Nạp ví mới đang `ACTIVE`; kiểm tra danh mục mới tương thích với `transactionType` bất biến của giao dịch (cho phép giữ danh mục cũ đã xóa mềm nếu không thay đổi, nhưng bắt buộc danh mục mới phải đang `ACTIVE` nếu có đổi), đồng thời kiểm tra danh mục phí mới thuộc nhánh chi tiêu khi phí mới dương; mô phỏng hai pha hoàn nguyên ví cũ rồi áp dụng dữ liệu mới để bảo đảm cả hai ví đều không âm trước khi gọi `updateDetails(...)` (tự động tạo, sửa hoặc gỡ `TransactionFee` tương ứng).
 - Lưu giao dịch vào `TransactionRepository` cùng ví cũ và ví mới (nếu đổi ví) vào `WalletRepository`; nếu phát sinh `StorageException` giữa quá trình lưu nhiều thực thể, khôi phục lại ảnh chụp trạng thái trước thao tác cho giao dịch và các ví liên quan.
-- Ánh xạ kết quả sau cập nhật sang `TransactionResponseDto`.
+- Ánh xạ kết quả sau cập nhật sang `TransactionResponseDTO`.
 
 **Phương thức `deleteTransaction`:**
 
@@ -152,8 +152,8 @@ Giao diện `com.pfms.service.TransferService` cung cấp các phương thức s
 
 | Phương thức | Tham số đầu vào | Kiểu dữ liệu trả về | Ngoại lệ ném ra | Mô tả ca sử dụng điều phối |
 | :--- | :--- | :--- | :--- | :--- |
-| `transferFunds` | `TransferRequestDto request` | `TransferResponseDto` | `EntityNotFoundException`, `BusinessException`, `InsufficientBalanceException`, `StorageException` | Kiểm tra hai ví hoạt động phân biệt, đủ số dư chi trả tiền chuyển và phí, thực hiện chuyển khoản nguyên tử và lưu giao dịch. |
-| `filterTransfers` | `TransferFilterCriteriaDto request` | `TransferHistoryResponseDto` | `BusinessException`, `StorageException` | Tra cứu và lọc danh sách giao dịch chuyển tiền theo khoảng ngày hoặc cặp ví nguồn, ví đích ở chế độ chỉ đọc. |
+| `transferFunds` | `TransferFundsRequestDTO request` | `TransferResponseDTO` | `EntityNotFoundException`, `BusinessException`, `InsufficientBalanceException`, `StorageException` | Kiểm tra hai ví hoạt động phân biệt, đủ số dư chi trả tiền chuyển và phí, thực hiện chuyển khoản nguyên tử và lưu giao dịch. |
+| `filterTransfers` | `FilterTransfersRequestDTO request` | `TransferListResponseDTO` | `BusinessException`, `StorageException` | Tra cứu, lọc và phân trang danh sách giao dịch chuyển tiền theo khoảng ngày hoặc cặp ví nguồn, ví đích ở chế độ chỉ đọc. |
 | `deleteTransfer` | `UUID transferId` | `void` | `EntityNotFoundException`, `BusinessException`, `InsufficientBalanceException`, `StorageException` | Kiểm tra ví đích đủ số dư để thu hồi, hoàn nguyên hai chiều số dư cả hai ví và xóa bản ghi chuyển tiền cùng phí liên kết. |
 
 **Cài đặt dịch vụ:**
@@ -165,14 +165,14 @@ Lớp cài đặt `com.pfms.service.impl.TransferServiceImpl` có phạm vi truy
 - Kiểm tra mã ví nguồn khác mã ví đích, chuyển đổi số tiền chuyển và phí sang `Money` (số tiền lớn hơn `0.00 VNĐ`, phí không âm), chuyển đổi ngày chuyển sang `TransactionDate` (không vượt quá hiện tại) và chuẩn hóa ghi chú tối đa 255 ký tự; nếu mức phí dương thì bắt buộc kèm mã danh mục chi tiêu cấp 3.
 - Nạp cả hai thực thể `Wallet` bảo đảm đều ở trạng thái `ACTIVE`, xác nhận ví nguồn đủ chi trả tổng tiền chuyển cộng phí thông qua `Money` và `hasSufficientBalance`, sau đó dùng `TransactionFactory` khởi tạo `TransferTransaction` (kèm `TransactionFee` nếu phí dương, với danh mục chi tiêu cấp 3 đang `ACTIVE`) và gọi `applyToWallet()` để trừ ví nguồn và cộng ví đích.
 - Lưu đồng thời ví nguồn, ví đích qua `WalletRepository` và giao dịch mới qua `TransactionRepository`; nếu xảy ra `StorageException` tại bất kỳ lệnh lưu nào, thực hiện khôi phục ngay trạng thái trước giao dịch của cả hai ví và xóa bỏ bản ghi chưa hoàn tất để giữ nguyên tổng tài sản.
-- Đóng gói thông tin giao dịch chuyển tiền và số dư mới của hai ví vào `TransferResponseDto`.
+- Đóng gói thông tin giao dịch chuyển tiền và số dư mới của hai ví vào `TransferResponseDTO`.
 
 **Phương thức `filterTransfers`:**
 
-- Chuyển đổi mốc ngày bắt đầu và ngày kết thúc (nếu có) sang `TransactionDate` và kiểm tra ngày bắt đầu không đứng sau ngày kết thúc.
+- Chuyển đổi mốc ngày bắt đầu và ngày kết thúc (nếu có) sang `TransactionDate` để kiểm tra ngày bắt đầu không đứng sau ngày kết thúc; kiểm tra chỉ số trang tối thiểu bằng 1 và kích thước trang trong đoạn từ 10 đến 100 bản ghi (mặc định 50 nếu chưa chỉ định).
 - Nạp các thực thể thuộc kiểu `TransferTransaction` từ `TransactionRepository`, lọc theo khoảng ngày, mã ví nguồn và mã ví đích; sắp xếp kết quả theo ngày chuyển tiền giảm dần rồi đến mốc tạo giảm dần, đồng thời tra cứu tên ví nguồn và ví đích qua `WalletRepository` ở chế độ chỉ đọc.
-- Ủy quyền đối tượng giá trị `Money` tính tổng số tiền đã chuyển và tổng chi phí phát sinh trên tập kết quả thỏa mãn điều kiện lọc.
-- Đóng gói danh sách giao dịch chuyển tiền cùng hai chỉ số tổng hợp vào `TransferHistoryResponseDto`.
+- Thực thi phân trang trên tập kết quả và ủy quyền đối tượng giá trị `Money` tính tổng số tiền đã chuyển cùng tổng chi phí phát sinh trên toàn bộ tập kết quả thỏa mãn điều kiện lọc.
+- Đóng gói danh sách giao dịch chuyển tiền của trang hiện tại, thông số phân trang và hai chỉ số tổng hợp vào `TransferListResponseDTO`.
 
 **Phương thức `deleteTransfer`:**
 
@@ -197,8 +197,8 @@ Giao diện `com.pfms.service.CategoryService` cung cấp các phương thức c
 
 | Phương thức | Tham số đầu vào | Kiểu dữ liệu trả về | Ngoại lệ ném ra | Mô tả ca sử dụng điều phối |
 | :--- | :--- | :--- | :--- | :--- |
-| `createCategory` | `CreateCategoryRequestDTO requestDto` | `CategoryResponseDTO` | `ValidationException`<br/>`EntityNotFoundException`<br/>`DuplicateEntityException`<br/>`BusinessException` | Điều phối bổ sung danh mục mới vào nhóm nhu cầu cha: Tiếp nhận yêu cầu tạo danh mục; kiểm tra định dạng tên theo quy tắc đặt tên; kiểm tra nhóm cha tồn tại và đang hoạt động; kiểm tra tính duy nhất của tên trong cùng nhóm cha; khởi tạo thực thể `Category` hoạt động (`ACTIVE`), kế thừa loại thu chi (`INCOME`/`EXPENSE`) từ nhóm cha và lưu trữ vào kho dữ liệu. |
-| `renameCategory` | `RenameCategoryRequestDTO requestDto` | `CategoryResponseDTO` | `ValidationException`<br/>`EntityNotFoundException`<br/>`DuplicateEntityException`<br/>`BusinessException` | Điều phối đổi tên hiển thị của danh mục: Tiếp nhận yêu cầu cập nhật tên; kiểm tra độ dài từ 1 đến 50 ký tự sau khi cắt khoảng trắng theo quy tắc đặt tên; xác thực danh mục tồn tại; kiểm tra tên mới không trùng với các danh mục khác đang hoạt động trong cùng nhóm cha; cập nhật tên và lưu trữ, bảo toàn nguyên vẹn mã định danh và toàn bộ lịch sử giao dịch. |
+| `createCategory` | `CreateCategoryRequestDTO request` | `CategoryResponseDTO` | `ValidationException`<br/>`EntityNotFoundException`<br/>`DuplicateEntityException`<br/>`BusinessException` | Điều phối bổ sung danh mục mới vào nhóm nhu cầu cha: Tiếp nhận yêu cầu tạo danh mục; kiểm tra định dạng tên theo quy tắc đặt tên; kiểm tra nhóm cha tồn tại và đang hoạt động; kiểm tra tính duy nhất của tên trong cùng nhóm cha; khởi tạo thực thể `Category` hoạt động (`ACTIVE`), kế thừa loại thu chi (`INCOME`/`EXPENSE`) từ nhóm cha và lưu trữ vào kho dữ liệu. |
+| `renameCategory` | `RenameCategoryRequestDTO request` | `CategoryResponseDTO` | `ValidationException`<br/>`EntityNotFoundException`<br/>`DuplicateEntityException`<br/>`BusinessException` | Điều phối đổi tên hiển thị của danh mục: Tiếp nhận yêu cầu cập nhật tên; kiểm tra độ dài từ 1 đến 50 ký tự sau khi cắt khoảng trắng theo quy tắc đặt tên; xác thực danh mục tồn tại; kiểm tra tên mới không trùng với các danh mục khác đang hoạt động trong cùng nhóm cha; cập nhật tên và lưu trữ, bảo toàn nguyên vẹn mã định danh và toàn bộ lịch sử giao dịch. |
 | `restoreCategory` | `UUID categoryId` | `CategoryResponseDTO` | `EntityNotFoundException`<br/>`DuplicateEntityException`<br/>`BusinessException` | Điều phối khôi phục danh mục đã xóa mềm: Tiếp nhận mã danh mục cần khôi phục; kiểm tra danh mục tồn tại và đang ở trạng thái `DELETED`; kiểm tra nhóm nhu cầu cha trực thuộc bắt buộc phải đang hoạt động; kiểm tra tên khôi phục không trùng với danh mục đang hoạt động trong cùng nhóm; chuyển trạng thái sang `ACTIVE` và đưa danh mục trở lại danh sách lựa chọn thu chi. |
 | `deleteCategory` | `UUID categoryId` | `void` | `EntityNotFoundException`<br/>`BusinessException` | Điều phối xóa danh mục: Tiếp nhận mã danh mục cần xóa; xác thực danh mục tồn tại; kiểm tra không phải nhóm nhu cầu hoạt động cuối cùng của loại thu chi; kiểm tra lịch sử giao dịch qua `TransactionRepository`: nếu chưa từng có giao dịch thì xóa vĩnh viễn (xóa cứng), nếu đã phát sinh giao dịch thì chuyển trạng thái sang `DELETED` (xóa mềm) theo quy tắc bảo toàn dữ liệu lịch sử. |
 | `getCategoryHierarchy` | Không có | `List<CategoryHierarchyResponseDTO>` | Không có | Điều phối truy xuất cây danh mục phân loại: Nạp toàn bộ cấu trúc phân loại 3 cấp (Loại thu chi -> Nhóm nhu cầu -> Danh mục chi tiết) ở cả trạng thái `ACTIVE` và `DELETED` để hiển thị trên giao diện hoặc cung cấp danh sách lựa chọn cho luồng ghi nhận giao dịch. |
@@ -207,14 +207,14 @@ Giao diện `com.pfms.service.CategoryService` cung cấp các phương thức c
 
 Lớp cài đặt `com.pfms.service.impl.CategoryServiceImpl` nhận `CategoryRepository`, `NeedGroupRepository` và `TransactionRepository` qua hàm khởi tạo để xử lý logic:
 
-- **Quy trình thực thi phương thức `createCategory(CreateCategoryRequestDTO requestDto)`:**
-  1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Làm sạch và xác thực tên danh mục theo quy tắc đặt tên (loại bỏ khoảng trắng hai đầu, kiểm tra độ dài từ 1 đến 50 ký tự, ném `ValidationException` nếu để trống hoặc vượt ngưỡng). Nạp nhóm nhu cầu cha qua `NeedGroupRepository.findById(requestDto.getParentGroupId())`; nếu không tìm thấy ném `EntityNotFoundException`, nếu nhóm cha đang ở trạng thái `DELETED` thì từ chối tiếp nhận và ném `BusinessException` theo quy tắc cấu trúc danh mục ba cấp. Kiểm tra trùng lặp tên trong cùng nhóm cha qua `CategoryRepository.existsByNameAndNeedGroupId(...)`; nếu tên đã tồn tại ở trạng thái hoạt động thì ném `DuplicateEntityException`.
+- **Quy trình thực thi phương thức `createCategory(CreateCategoryRequestDTO request)`:**
+  1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Làm sạch và xác thực tên danh mục theo quy tắc đặt tên (loại bỏ khoảng trắng hai đầu, kiểm tra độ dài từ 1 đến 50 ký tự, ném `ValidationException` nếu để trống hoặc vượt ngưỡng). Nạp nhóm nhu cầu cha qua `NeedGroupRepository.findById(request.getParentGroupId())`; nếu không tìm thấy ném `EntityNotFoundException`, nếu nhóm cha đang ở trạng thái `DELETED` thì từ chối tiếp nhận và ném `BusinessException` theo quy tắc cấu trúc danh mục ba cấp. Kiểm tra trùng lặp tên trong cùng nhóm cha qua `CategoryRepository.existsByNameAndNeedGroupId(...)`; nếu tên đã tồn tại ở trạng thái hoạt động thì ném `DuplicateEntityException`.
   2. *Bước 2 - Nạp thực thể và ủy quyền tính toán cho Thực thể miền:* Khởi tạo thực thể `Category` mới ở trạng thái hoạt động `ACTIVE` (`isDeleted = false`), thiết lập liên kết phân cấp ngữ nghĩa tới nhóm nhu cầu cha và kế thừa thuộc tính loại thu chi (`INCOME` hoặc `EXPENSE`) cố định từ nhóm cha theo cấu trúc phân cấp 3 cấp.
   3. *Bước 3 - Kiểm soát lưu trữ nguyên tử qua kho lưu trữ kèm ghi nhật ký:* Gọi `CategoryRepository.save(newCategory)` để lưu trữ bền vững bản ghi danh mục mới vào tệp dữ liệu, bảo đảm tính nhất quán của cây danh mục và ghi nhật ký kiểm toán hệ thống.
   4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Ánh xạ dữ liệu của thực thể `Category` vừa lưu trữ sang `CategoryResponseDTO` (chứa `categoryId`, `name`, `parentGroupId`, `transactionType`, `status`, `createdAt`) và trả về cho Tầng Trình diễn.
 
-- **Quy trình thực thi phương thức `renameCategory(RenameCategoryRequestDTO requestDto)`:**
-  1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Kiểm tra tên mới theo quy tắc đặt tên (cắt khoảng trắng hai đầu, độ dài 1 đến 50 ký tự, ném `ValidationException` nếu vi phạm). Nạp danh mục từ `CategoryRepository.findById(requestDto.getCategoryId())`, ném `EntityNotFoundException` nếu không tồn tại. Nếu có yêu cầu chuyển nhóm cha mới: kiểm tra nhóm đích phải tồn tại và đang `ACTIVE` (nếu nhóm đích bị `DELETED` ném `BusinessException`), đồng thời nhóm đích phải cùng Loại thu chi với nhóm cũ (nếu khác Loại thu chi ném `BusinessException` theo quy tắc cấu trúc danh mục ba cấp). Kiểm tra tên mới không bị trùng với các danh mục khác trong nhóm đích qua `CategoryRepository.existsByNameAndNeedGroupIdAndIdNot(...)`, ném `DuplicateEntityException` nếu bị trùng.
+- **Quy trình thực thi phương thức `renameCategory(RenameCategoryRequestDTO request)`:**
+  1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Kiểm tra tên mới theo quy tắc đặt tên (cắt khoảng trắng hai đầu, độ dài 1 đến 50 ký tự, ném `ValidationException` nếu vi phạm). Nạp danh mục từ `CategoryRepository.findById(request.getCategoryId())`, ném `EntityNotFoundException` nếu không tồn tại. Nếu có yêu cầu chuyển nhóm cha mới: kiểm tra nhóm đích phải tồn tại và đang `ACTIVE` (nếu nhóm đích bị `DELETED` ném `BusinessException`), đồng thời nhóm đích phải cùng Loại thu chi với nhóm cũ (nếu khác Loại thu chi ném `BusinessException` theo quy tắc cấu trúc danh mục ba cấp). Kiểm tra tên mới không bị trùng với các danh mục khác trong nhóm đích qua `CategoryRepository.existsByNameAndNeedGroupIdAndIdNot(...)`, ném `DuplicateEntityException` nếu bị trùng.
   2. *Bước 2 - Nạp thực thể và ủy quyền tính toán cho Thực thể miền:* Ủy quyền thực thể `Category` cập nhật thuộc tính tên hiển thị mới (và cập nhật liên kết nhóm cha nếu có), giữ nguyên tuyệt đối mã định danh `categoryId` và toàn bộ các liên kết giao dịch lịch sử trong quá khứ.
   3. *Bước 3 - Kiểm soát lưu trữ nguyên tử qua kho lưu trữ kèm ghi nhật ký:* Gọi `CategoryRepository.save(category)` để lưu trữ cập nhật vào tệp dữ liệu và ghi nhật ký thay đổi thông tin danh mục.
   4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Đóng gói thông tin thực thể `Category` đã cập nhật vào `CategoryResponseDTO` và trả về cho Tầng Trình diễn.
@@ -255,8 +255,8 @@ Giao diện `com.pfms.service.ReportService` cung cấp các phương thức cho
 
 | Phương thức | Tham số đầu vào | Kiểu dữ liệu trả về | Ngoại lệ ném ra | Mô tả ca sử dụng điều phối |
 | :--- | :--- | :--- | :--- | :--- |
-| `generateCashFlowReport` | `CashFlowReportRequestDTO request` (và phương thức tiện ích `int endMonth, int endYear`) | `CashFlowReportResponseDTO` | `BusinessException` | Điều phối thống kê dòng tiền: Kiểm tra `request` hợp lệ (`endMonth` từ 1 đến 12, `endYear` từ năm 2000 trở đi); truy vấn sổ giao dịch ở chế độ chỉ đọc; tổng hợp thu nhập và chi tiêu (gồm phí giao dịch liên kết trên cả giao dịch thu chi và chuyển tiền nội bộ, loại trừ tiền gốc chuyển ví); ủy quyền `NetCashFlow` và `SavingsRate` tính dòng tiền thuần cùng tỷ lệ tiết kiệm (gán 0.00% khi tổng thu không dương); tính các chỉ số bình quân cả năm chia đều cho 12. |
-| `generateSpendingStructureReport` | `SpendingStructureRequestDTO request` | `SpendingStructureReportResponseDTO` | `BusinessException` | Điều phối phân tích cơ cấu thu chi: Tiếp nhận khoảng ngày thống kê và loại luồng tiền (`EXPENSE` hoặc `INCOME`); kiểm tra khoảng ngày không rỗng, ngày bắt đầu không vượt ngày kết thúc và loại luồng tiền hợp lệ; truy vấn giao dịch (gồm phí liên kết khi phân tích `EXPENSE`) và toàn bộ danh mục (kể cả mục xóa mềm có phát sinh); gom cụm 2 cấp, chỉ giữ mục có số tiền lớn hơn 0, tính `SpendingStructureShare` theo tổng kỳ (và theo nhóm cha cho danh mục), sắp xếp giảm dần và so sánh kỳ liền kề. |
+| `generateCashFlowReport` | `CashFlowReportRequestDTO request` | `CashFlowReportResponseDTO` | `BusinessException` | Điều phối thống kê dòng tiền: Kiểm tra `request` hợp lệ (`endMonth` từ 1 đến 12, `endYear` từ năm 2000 trở đi); truy vấn sổ giao dịch ở chế độ chỉ đọc; tổng hợp thu nhập và chi tiêu (gồm phí giao dịch liên kết trên cả giao dịch thu chi và chuyển tiền nội bộ, loại trừ tiền gốc chuyển ví); ủy quyền `NetCashFlow` và `SavingsRate` tính dòng tiền thuần cùng tỷ lệ tiết kiệm (gán 0.00% khi tổng thu không dương); tính các chỉ số bình quân cả năm chia đều cho 12. |
+| `generateSpendingStructureReport` | `SpendingStructureReportRequestDTO request` | `SpendingStructureReportResponseDTO` | `BusinessException` | Điều phối phân tích cơ cấu thu chi: Tiếp nhận khoảng ngày thống kê và loại luồng tiền (`EXPENSE` hoặc `INCOME`); kiểm tra khoảng ngày không rỗng, ngày bắt đầu không vượt ngày kết thúc và loại luồng tiền hợp lệ; truy vấn giao dịch (gồm phí liên kết khi phân tích `EXPENSE`) và toàn bộ danh mục (kể cả mục xóa mềm có phát sinh); gom cụm 2 cấp, chỉ giữ mục có số tiền lớn hơn 0, tính `SpendingStructureShare` theo tổng kỳ (và theo nhóm cha cho danh mục), sắp xếp giảm dần và so sánh kỳ liền kề. |
 
 **Cài đặt dịch vụ:**
 
@@ -264,7 +264,7 @@ Lớp cài đặt công khai `public class ReportServiceImpl implements ReportSe
 
 Dịch vụ vận hành hoàn toàn ở chế độ chỉ đọc (Read-only), tuyệt đối không làm thay đổi số dư ví, không chỉnh sửa bản ghi tài chính và không thực hiện thao tác ghi hay sửa đổi dữ liệu lưu trữ. Quy trình 4 bước được chuẩn hóa phù hợp với bản chất trích xuất số liệu thống kê như sau:
 
-- **Quy trình thực thi phương thức `generateCashFlowReport(CashFlowReportRequestDTO request)` (cùng phương thức tiện ích `generateCashFlowReport(int endMonth, int endYear)`):**
+- **Quy trình thực thi phương thức `generateCashFlowReport(CashFlowReportRequestDTO request)`:**
   1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Kiểm tra `request` khác rỗng cùng tính hợp lệ của mốc thời gian kết thúc (`endMonth` nằm trong đoạn từ 1 đến 12, `endYear` từ năm 2000 trở đi; ở tầng Trình diễn có thể dùng constructor mặc định của `CashFlowReportRequestDTO` lấy tháng và năm hiện tại). Nếu không hợp lệ, ném `BusinessException` mang mã lỗi `ERR-REP-001`. Cho phép truy vấn tháng và năm tương lai ở chế độ chỉ đọc (trả về số liệu `0.00 VNĐ` và tỷ lệ `0.00%`). Xác định khung thời gian thống kê gồm đúng 12 tháng liên tục lùi tính đến mốc `endMonth/endYear`.
   2. *Bước 2 - Nạp dữ liệu chỉ đọc từ kho lưu trữ:* Gọi `TransactionRepository.findByDateRange(startDate, endDate)` để nạp toàn bộ các giao dịch thuộc lớp cha `Transaction` trong khung 12 tháng gồm giao dịch thu chi (`IncomeExpenseTransaction`) và giao dịch chuyển tiền nội bộ (`TransferTransaction`) mà không làm biến đổi dữ liệu nguồn. Tiền gốc chuyển ví nội bộ bị loại trừ khỏi dòng thu và chi (`BR-FIN-03`), trong khi mọi khoản `TransactionFee` liên kết từ cả hai lớp con được thu nhận theo ngày của giao dịch gốc.
   3. *Bước 3 - Tổng hợp số liệu và ủy quyền tính toán số học tài chính:*
@@ -275,8 +275,8 @@ Dịch vụ vận hành hoàn toàn ở chế độ chỉ đọc (Read-only), tu
      - Tính các chỉ số bình quân cả năm: lấy tổng thu nhập, tổng chi tiêu và tổng dòng tiền thuần của cả 12 tháng chia đều cho mẫu số cố định là 12 theo quy tắc làm tròn ngân hàng hai chữ số thập phân, trong đó các tháng không phát sinh giao dịch được tính bằng 0.00 VNĐ.
   4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Đóng gói bảng số liệu 12 tháng (`MonthlyCashFlowResponseDTO`) cùng các chỉ số bình quân vào đối tượng `CashFlowReportResponseDTO` bất biến và chuyển giao cho Tầng Trình diễn kết xuất bảng và biểu đồ trên giao diện đồ họa.
 
-- **Quy trình thực thi phương thức `generateSpendingStructureReport(SpendingStructureRequestDTO request)`:**
-  1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Kiểm tra `request` khác rỗng, ngày bắt đầu và ngày kết thúc khác rỗng, ngày bắt đầu không vượt quá ngày kết thúc, và `transactionType` thuộc tập `EXPENSE` hoặc `INCOME` (constructor của `SpendingStructureRequestDTO` ở tầng Trình diễn mặc định quy chuẩn giá trị null/rỗng thành `EXPENSE`, còn chuỗi khác lạ bị từ chối tại dịch vụ). Nếu vi phạm bất kỳ điều kiện nào, ném `BusinessException` mang mã lỗi `ERR-REP-001`. Cho phép truy vấn khoảng ngày tương lai ở chế độ chỉ đọc.
+- **Quy trình thực thi phương thức `generateSpendingStructureReport(SpendingStructureReportRequestDTO request)`:**
+  1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Kiểm tra `request` khác rỗng, ngày bắt đầu và ngày kết thúc khác rỗng, ngày bắt đầu không vượt quá ngày kết thúc, và `transactionType` thuộc tập `EXPENSE` hoặc `INCOME` (constructor của `SpendingStructureReportRequestDTO` ở tầng Trình diễn mặc định quy chuẩn giá trị null/rỗng thành `EXPENSE`, còn chuỗi khác lạ bị từ chối tại dịch vụ). Nếu vi phạm bất kỳ điều kiện nào, ném `BusinessException` mang mã lỗi `ERR-REP-001`. Cho phép truy vấn khoảng ngày tương lai ở chế độ chỉ đọc.
   2. *Bước 2 - Nạp dữ liệu chỉ đọc từ kho lưu trữ:* Gọi `TransactionRepository.findByDateRange(startDate, endDate)` ở chế độ chỉ đọc để không bỏ sót khoản phí giao dịch gắn trên giao dịch `INCOME` hoặc `TransferTransaction` khi phân tích `EXPENSE`; đồng thời nạp đầy đủ danh sách nhóm nhu cầu từ `NeedGroupRepository.findAll()` và danh mục từ `CategoryRepository.findAll()`, bao gồm cả các nhóm nhu cầu và danh mục chi tiết đã bị xóa mềm (`DELETED`).
   3. *Bước 3 - Phân tích cơ cấu và ủy quyền tính toán số học tài chính:*
      - Lọc các giao dịch phù hợp (nếu `EXPENSE` lấy các `IncomeExpenseTransaction` loại `EXPENSE` cộng dồn mọi `TransactionFee` tồn tại; nếu `INCOME` chỉ lấy `IncomeExpenseTransaction` loại `INCOME`) rồi gom cụm theo danh mục cấp 3 (`Category`) và nhóm nhu cầu cha hiện tại cấp 2 (`NeedGroup`). Chỉ đưa vào danh sách kết quả các nhóm và danh mục có tổng số tiền kỳ hiện tại lớn hơn 0; với mục đã xóa mềm, giữ nguyên tên gốc và truyền trạng thái `"DELETED"` qua DTO để Tầng Trình diễn gắn nhãn `"(đã xóa)"`.
@@ -301,25 +301,25 @@ Giao diện `com.pfms.service.DataManagementService` cung cấp các phương th
 
 | Phương thức | Tham số đầu vào | Kiểu dữ liệu trả về | Ngoại lệ ném ra | Mô tả ca sử dụng điều phối |
 | :--- | :--- | :--- | :--- | :--- |
-| `exportBackupData` | `ExportBackupRequestDTO requestDto` | `BackupResponseDTO` | `StorageException`<br/>`BusinessException` | Điều phối xuất dữ liệu tài chính: Trích xuất ảnh chụp trạng thái dữ liệu nhất quán tại một thời điểm theo phạm vi chỉ định (`FULL` hoặc `TRANSACTIONS`) ở chế độ chỉ đọc; định dạng các trường số tiền thành chuỗi số học chuẩn xác 2 chữ số thập phân; chuyển đổi cấu trúc JSON mã hóa UTF-8 không BOM và ghi an toàn xuống tệp đĩa cục bộ. |
-| `restoreBackupData` | `RestoreBackupRequestDTO requestDto` | `RestoreResultDTO` | `StorageException`<br/>`DataCorruptionException`<br/>`InsufficientBalanceException`<br/>`BusinessException` | Điều phối phục hồi dữ liệu từ bản sao lưu: Tiếp nhận đường dẫn tệp sao lưu JSON; kiểm tra cú pháp và thực thi quy trình kiểm định toàn vẹn 4 bước nghiêm ngặt (định dạng số liệu, cấu trúc danh mục 3 cấp, liên kết chuyển tiền và phí, bảo toàn số dư ví không âm); hủy bỏ toàn bộ nếu phát hiện sai lệch; chỉ thay thế dữ liệu hệ thống khi bản sao lưu hợp lệ 100%. |
-| `reconcileSystemData` | Không có | `ReconciliationReportDTO` | Không có | Điều phối đối soát toàn vẹn dữ liệu hệ thống: Quét đối soát độc lập 4 điều kiện toàn vẹn ở chế độ chỉ đọc: (1) tính lại số dư từng ví từ lịch sử dòng tiền và so khớp số dư ghi nhận hiện hành; (2) kiểm tra cân bằng số tiền chuyển giữa ví nguồn và ví đích; (3) kiểm tra liên kết danh mục và tính toàn vẹn loại thu chi; (4) kiểm tra phí giao dịch mồ côi; phân loại mức độ cảnh báo và đề xuất xử lý. |
+| `exportBackupData` | `ExportBackupRequestDTO request` | `ExportBackupResponseDTO` | `StorageException`<br/>`BusinessException` | Điều phối xuất dữ liệu tài chính: Trích xuất ảnh chụp trạng thái dữ liệu nhất quán tại một thời điểm theo phạm vi chỉ định (`FULL` hoặc `TRANSACTIONS`) ở chế độ chỉ đọc; định dạng các trường số tiền thành chuỗi số học chuẩn xác 2 chữ số thập phân; chuyển đổi cấu trúc JSON mã hóa UTF-8 không BOM và ghi an toàn xuống tệp đĩa cục bộ. |
+| `restoreBackupData` | `RestoreBackupRequestDTO request` | `RestoreBackupResponseDTO` | `StorageException`<br/>`DataCorruptionException`<br/>`InsufficientBalanceException`<br/>`BusinessException` | Điều phối phục hồi dữ liệu từ bản sao lưu: Tiếp nhận đường dẫn tệp sao lưu JSON; kiểm tra cú pháp và thực thi quy trình kiểm định toàn vẹn 4 bước nghiêm ngặt (định dạng số liệu, cấu trúc danh mục 3 cấp, liên kết chuyển tiền và phí, bảo toàn số dư ví không âm); hủy bỏ toàn bộ nếu phát hiện sai lệch; chỉ thay thế dữ liệu hệ thống khi bản sao lưu hợp lệ 100%. |
+| `reconcileSystemData` | Không có | `ReconciliationReportResponseDTO` | Không có | Điều phối đối soát toàn vẹn dữ liệu hệ thống: Quét đối soát độc lập 4 điều kiện toàn vẹn ở chế độ chỉ đọc: (1) tính lại số dư từng ví từ lịch sử dòng tiền và so khớp số dư ghi nhận hiện hành; (2) kiểm tra cân bằng số tiền chuyển giữa ví nguồn và ví đích; (3) kiểm tra liên kết danh mục và tính toàn vẹn loại thu chi; (4) kiểm tra phí giao dịch mồ côi; phân loại mức độ cảnh báo và đề xuất xử lý. |
 
 **Cài đặt dịch vụ:**
 
 Lớp cài đặt `com.pfms.service.impl.DataManagementServiceImpl` có phạm vi truy cập nội bộ gói, nhận `WalletRepository`, `TransactionRepository`, `CategoryRepository`, `NeedGroupRepository` và `BalanceAdjustmentRepository` qua hàm khởi tạo để xử lý logic (trong đó `TransactionRepository` lưu trữ đa hình cả giao dịch thu chi `IncomeExpenseTransaction` và chuyển tiền nội bộ `TransferTransaction`):
 
-- **Quy trình thực thi phương thức `exportBackupData(ExportBackupRequestDTO requestDto)`:**
+- **Quy trình thực thi phương thức `exportBackupData(ExportBackupRequestDTO request)`:**
   1. *Bước 1 - Kiểm tra tiền điều kiện định dạng và quy tắc nghiệp vụ:* Kiểm tra tính hợp lệ của đường dẫn lưu trữ đích `destinationPath` và quyền ghi trên hệ thống tệp cục bộ, ném `StorageException` nếu đường dẫn không hợp lệ hoặc không có quyền truy cập; xác thực phạm vi xuất dữ liệu hợp lệ (`FULL` cho toàn bộ hệ thống hoặc `TRANSACTIONS` cho riêng sổ giao dịch theo yêu cầu sao lưu).
   2. *Bước 2 - Nạp dữ liệu ảnh chụp nhất quán ở chế độ chỉ đọc:* Lần lượt gọi phương thức `findAll()` trên toàn bộ các kho lưu trữ (`WalletRepository`, `TransactionRepository`, `CategoryRepository`, `NeedGroupRepository`, `BalanceAdjustmentRepository`) để nạp ảnh chụp dữ liệu đồng bộ tại cùng một mốc thời gian, bảo đảm không làm biến đổi bất kỳ giá trị nào trong hệ thống.
   3. *Bước 3 - Chuẩn hóa dữ liệu, tuần tự hóa JSON và lưu trữ an toàn:*
-     - Chuyển đổi trạng thái thực thể sang cấu trúc đối tượng sao lưu (`BackupPayloadDTO`).
+     - Chuyển đổi trạng thái thực thể sang cấu trúc đóng gói nội bộ tầng dịch vụ (`BackupPayload` thuộc gói `com.pfms.service.impl.data`, cô lập khỏi tầng trình diễn).
      - Định dạng mọi trường số tiền sang dạng chuỗi số học chuẩn xác cố định 2 chữ số thập phân theo quy tắc độ chính xác số học tài chính, tuyệt đối không sử dụng số thực dấu phẩy động nhị phân.
      - Tuần tự hóa cấu trúc dữ liệu sang định dạng JSON với bộ mã ký tự UTF-8 không BOM.
      - Thực hiện cơ chế ghi tệp an toàn (ghi vào tệp tạm trước khi đổi tên thay thế) để tránh tạo tệp hỏng nếu quá trình ghi bị ngắt quãng giữa chừng.
-  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Đóng gói thông tin kết quả xuất sao lưu (đường dẫn tệp, kích thước tệp, mốc thời gian xuất và số lượng bản ghi của từng thực thể) vào `BackupResponseDTO` và trả về cho Tầng Trình diễn.
+  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Đóng gói thông tin kết quả xuất sao lưu (đường dẫn tệp, kích thước tệp, mốc thời gian xuất và số lượng bản ghi của từng thực thể) vào `ExportBackupResponseDTO` và trả về cho Tầng Trình diễn.
 
-- **Quy trình thực thi phương thức `restoreBackupData(RestoreBackupRequestDTO requestDto)`:**
+- **Quy trình thực thi phương thức `restoreBackupData(RestoreBackupRequestDTO request)`:**
   1. *Bước 1 - Kiểm tra tiền điều kiện định dạng tệp và quyền truy cập:* Kiểm tra tệp sao lưu tại đường dẫn `backupFilePath` bắt buộc phải tồn tại và ứng dụng có quyền đọc (`READ permission`). Phân tích cú pháp tệp JSON với mã hóa UTF-8; nếu tệp bị hỏng hoặc sai cấu trúc cú pháp JSON, ném `StorageException` hoặc `DataCorruptionException`.
   2. *Bước 2 - Thực thi quy trình kiểm định toàn vẹn 4 bước nghiêm ngặt (All-or-Nothing):*
      - *Kiểm tra Bước 1 (Định dạng và số liệu theo quy tắc độ chính xác tài chính):* Xác thực toàn bộ các trường bắt buộc của các thực thể phải hiện diện đầy đủ, ngày tháng đúng chuẩn `YYYY-MM-DD` và số tiền đúng định dạng số học chuẩn xác (ném `DataCorruptionException` nếu vi phạm).
@@ -328,7 +328,7 @@ Lớp cài đặt `com.pfms.service.impl.DataManagementServiceImpl` có phạm v
      - *Kiểm tra Bước 4 (Bảo toàn số dư không âm theo quy tắc bảo toàn số dư ví):* Tái tính toán số dư độc lập cho toàn bộ các ví từ số dư ban đầu kết hợp toàn bộ lịch sử dòng tiền và các bản ghi kiểm kê điều chỉnh trong tệp sao lưu; bảo đảm không có bất kỳ ví nào bị âm số dư tại bất kỳ thời điểm nào (ném `InsufficientBalanceException` hoặc `DataCorruptionException` nếu phát hiện số dư âm).
      - *Cơ chế hủy bỏ bảo vệ:* Nếu phát hiện bất kỳ sai lệch nào tại bất kỳ bước kiểm tra nào, hệ thống lập tức hủy bỏ toàn bộ quá trình phục hồi, giữ nguyên vẹn 100% dữ liệu hiện tại của hệ thống.
   3. *Bước 3 - Thay thế dữ liệu nguyên tử trên toàn bộ kho lưu trữ:* Khi và chỉ khi tệp sao lưu vượt qua đầy đủ cả 4 bước kiểm tra toàn vẹn, hệ thống tiến hành xóa toàn bộ dữ liệu hiện tại trong bộ nhớ và ghi nạp đồng bộ toàn bộ các thực thể tái tạo từ tệp sao lưu vào các kho lưu trữ tương ứng (`WalletRepository`, `CategoryRepository`, `NeedGroupRepository`, `TransactionRepository`, `BalanceAdjustmentRepository`), cập nhật lại số dư ví và cấu trúc danh mục.
-  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Đóng gói thông báo phục hồi thành công kèm số lượng thực thể đã phục hồi vào `RestoreResultDTO` và chuyển giao cho Tầng Trình diễn.
+  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Đóng gói thông báo phục hồi thành công kèm số lượng thực thể đã phục hồi vào `RestoreBackupResponseDTO` và chuyển giao cho Tầng Trình diễn.
 
 - **Quy trình thực thi phương thức `reconcileSystemData()`:**
   1. *Bước 1 - Khởi tạo tiến trình đối soát chỉ đọc:* Tiếp nhận yêu cầu đối soát toàn vẹn dữ liệu từ người dùng hoặc theo lịch định kỳ; thiết lập phiên làm việc thuần túy ở chế độ chỉ đọc, không làm biến đổi bất kỳ bản ghi tài chính nào.
@@ -339,4 +339,4 @@ Lớp cài đặt `com.pfms.service.impl.DataManagementServiceImpl` có phạm v
      - *Điều kiện 3 (Tính toàn vẹn danh mục theo quy tắc cấu trúc danh mục ba cấp):* Quét toàn bộ sổ giao dịch thu chi, bảo đảm mọi giao dịch đều gắn với danh mục chi tiết hợp lệ cấp 3 (bao gồm cả danh mục đã xóa mềm) và không có giao dịch nào bị sai lệch Loại thu chi (`INCOME`/`EXPENSE`).
      - *Điều kiện 4 (Toàn vẹn liên kết phí giao dịch):* Quét toàn bộ các khoản chi phí phát sinh gắn kèm giao dịch thu chi và chuyển tiền, bảo đảm mọi bản ghi phí đều thuộc về một giao dịch hợp lệ đang tồn tại, không có phí mồ côi.
      - Phân loại kết quả kiểm tra theo các mức độ nghiêm trọng (`INFO`, `WARNING`, `ERROR`) và tổng hợp đề xuất hành động khắc phục cụ thể (như tự động tính lại số dư hoặc khuyến nghị phục hồi từ bản sao lưu).
-  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Tổng hợp trạng thái kiểm tra của cả 4 điều kiện (Đạt hoặc Không đạt), số lượng bản ghi đã quét, danh sách chi tiết các sai lệch phát hiện và hành động đề xuất vào đối tượng `ReconciliationReportDTO` và trả về Tầng Trình diễn để kết xuất báo cáo đối soát.
+  4. *Bước 4 - Đóng gói kết quả sang DTO phản hồi:* Tổng hợp trạng thái kiểm tra của cả 4 điều kiện (Đạt hoặc Không đạt), số lượng bản ghi đã quét, danh sách chi tiết các sai lệch phát hiện và hành động đề xuất vào đối tượng `ReconciliationReportResponseDTO` và trả về Tầng Trình diễn để kết xuất báo cáo đối soát.

@@ -41,14 +41,14 @@ sequenceDiagram
     participant Repo as Tầng Hạ tầng
 
     User->>+GUI: 1. Nhập lệnh thao tác nghiệp vụ
-    GUI->>+Service: 2. executeUseCase(requestDto)
+    GUI->>+Service: 2. executeUseCase(request)
     Service->>+Repo: 3. findById(id)
     Repo-->>-Service: 4. Optional<Entity>
     Service->>+Domain: 5. businessOperation(parameters)
     Domain-->>-Service: 6. result
     Service->>+Repo: 7. save(entity)
     Repo-->>-Service: 8. entity
-    Service-->>-GUI: 9. responseDto
+    Service-->>-GUI: 9. ResponseDTO
     GUI-->>-User: 10. Kết xuất bảng kết quả hiển thị
 ```
 
@@ -85,7 +85,7 @@ sequenceDiagram
     participant Wallet as Wallet
 
     User->>+GUI: 1. Nhập tên ví, ghi chú và bấm "Lưu ví"
-    GUI->>+WalletService: 2. createWallet(requestDto)
+    GUI->>+WalletService: 2. createWallet(CreateWalletRequestDTO)
     alt Tên ví để trống hoặc vượt quá 50 ký tự
         WalletService-->>GUI: 3. ném ValidationException
         GUI-->>User: 4. Hiển thị thông báo tên ví không hợp lệ
@@ -100,7 +100,7 @@ sequenceDiagram
             Wallet-->>-WalletService: 10. newWallet
             WalletService->>+WalletRepo: 11. save(newWallet)
             WalletRepo-->>-WalletService: 12. savedWallet
-            WalletService-->>-GUI: 13. WalletResponseDto
+            WalletService-->>-GUI: 13. WalletResponseDTO
             GUI-->>-User: 14. Hiển thị thông báo tạo ví thành công và làm mới danh sách
         end
     end
@@ -135,7 +135,7 @@ sequenceDiagram
     WalletService->>+WalletRepo: 3. findAll()
     WalletRepo-->>-WalletService: 4. List<Wallet>
     alt Tổng số dư bằng 0
-        WalletService-->>GUI: 5. WalletsSummaryDto (Tỷ trọng 0.00%)
+        WalletService-->>GUI: 5. WalletsSummaryResponseDTO (Tỷ trọng 0.00%)
         GUI-->>User: 6. Hiển thị tổng số dư 0.00 VNĐ và cơ cấu phân bổ 0%
     else Tổng số dư lớn hơn 0
         loop Duyệt qua từng ví trong danh sách
@@ -143,7 +143,7 @@ sequenceDiagram
             Wallet-->>-WalletService: 8. currentBalance
         end
         Note over WalletService: Tính tỷ trọng % theo làm tròn nửa chẵn (HALF_EVEN)
-        WalletService-->>-GUI: 9. WalletsSummaryDto (Kèm tỷ trọng phân bổ)
+        WalletService-->>-GUI: 9. WalletsSummaryResponseDTO (Kèm tỷ trọng phân bổ)
         GUI-->>-User: 10. Cập nhật bảng dữ liệu ví, tổng tài sản và biểu đồ cơ cấu
     end
 ```
@@ -173,7 +173,7 @@ sequenceDiagram
     participant Wallet as Wallet
 
     User->>+GUI: 1. Nhập tên mới, ghi chú mới và bấm "Cập nhật"
-    GUI->>+WalletService: 2. updateWallet(requestDto)
+    GUI->>+WalletService: 2. updateWallet(UpdateWalletRequestDTO)
     WalletService->>+WalletRepo: 3. findById(walletId)
     WalletRepo-->>-WalletService: 4. Optional<Wallet> walletOpt
     alt Không tìm thấy ví
@@ -197,7 +197,7 @@ sequenceDiagram
             Wallet-->>-WalletService: 16. void
             WalletService->>+WalletRepo: 17. save(wallet)
             WalletRepo-->>-WalletService: 18. updatedWallet
-            WalletService-->>-GUI: 19. WalletResponseDto
+            WalletService-->>-GUI: 19. WalletResponseDTO
             GUI-->>-User: 20. Đóng hộp thoại và làm mới danh sách ví
         end
     end
@@ -229,7 +229,7 @@ sequenceDiagram
     participant Wallet as Wallet
 
     User->>+GUI: 1. Nhập số dư thực tế, lý do kiểm kê và bấm "Xác nhận kiểm kê"
-    GUI->>+WalletService: 2. adjustBalance(requestDto)
+    GUI->>+WalletService: 2. adjustBalance(AdjustBalanceRequestDTO)
     alt Số dư thực tế âm (< 0)
         WalletService-->>GUI: 3. ném ValidationException
         GUI-->>User: 4. Hiển thị thông báo số dư thực tế không được âm
@@ -250,7 +250,7 @@ sequenceDiagram
                 WalletRepo-->>-WalletService: 14. savedWallet
                 WalletService->>+AdjustRepo: 15. save(record)
                 AdjustRepo-->>-WalletService: 16. savedRecord
-                WalletService-->>-GUI: 17. BalanceAdjustmentResponseDto
+                WalletService-->>-GUI: 17. BalanceAdjustmentResponseDTO
                 GUI-->>-User: 18. Đóng hộp thoại, cập nhật số dư ví và hiển thị thông báo thành công
             end
         end
@@ -291,7 +291,7 @@ sequenceDiagram
     participant Wallet as Wallet
 
     User->>+GUI: 1. Nhập thông tin giao dịch (ví, danh mục, số tiền, ngày, phí) và bấm "Lưu"
-    GUI->>+TransactionService: 2. recordIncomeExpense(requestDto)
+    GUI->>+TransactionService: 2. recordIncomeExpense(RecordTransactionRequestDTO)
     alt Số tiền <= 0 hoặc phí < 0
         TransactionService-->>GUI: 3. ném ValidationException
         GUI-->>User: 4. Hiển thị thông báo số tiền hoặc chi phí không hợp lệ
@@ -327,7 +327,7 @@ sequenceDiagram
                     TxnRepo-->>-TransactionService: 24. savedTransaction
                     TransactionService->>+WalletRepo: 25. save(wallet)
                     WalletRepo-->>-TransactionService: 26. savedWallet
-                    TransactionService-->>-GUI: 27. TransactionResponseDto
+                    TransactionService-->>-GUI: 27. TransactionResponseDTO
                     GUI-->>-User: 28. Đóng hộp thoại, làm mới sổ giao dịch và cập nhật số dư ví
                 end
             end
@@ -359,7 +359,7 @@ sequenceDiagram
     participant TxnRepo as TransactionRepository
 
     User->>+GUI: 1. Chọn tiêu chí lọc (khoảng ngày, ví, danh mục) và bấm "Tìm kiếm"
-    GUI->>+TransactionService: 2. filterTransactions(filterCriteriaDto)
+    GUI->>+TransactionService: 2. filterTransactions(FilterTransactionsRequestDTO)
     alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
         TransactionService-->>GUI: 3. ném ValidationException
         GUI-->>User: 4. Hiển thị thông báo khoảng thời gian lọc không hợp lệ
@@ -367,7 +367,7 @@ sequenceDiagram
         TransactionService->>+TxnRepo: 5. findByDateRange(...) hoặc findByWalletId / findByCategoryId
         TxnRepo-->>-TransactionService: 6. List<Transaction> rawTransactions
         Note over TransactionService: Lọc theo tiêu chí, sắp xếp theo ngày giảm dần, tính tổng thu, tổng chi và dòng tiền thuần
-        TransactionService-->>-GUI: 7. TransactionListResponseDto
+        TransactionService-->>-GUI: 7. TransactionListResponseDTO
         GUI-->>-User: 8. Cập nhật bảng danh sách giao dịch và bảng chỉ số tổng hợp
     end
 ```
@@ -400,7 +400,7 @@ sequenceDiagram
     participant Transaction as IncomeExpenseTransaction
 
     User->>+GUI: 1. Nhập thông tin chỉnh sửa giao dịch và bấm "Cập nhật"
-    GUI->>+TransactionService: 2. updateTransaction(requestDto)
+    GUI->>+TransactionService: 2. updateTransaction(UpdateTransactionRequestDTO)
     TransactionService->>+TxnRepo: 3. findById(transactionId)
     TxnRepo-->>-TransactionService: 4. Optional<Transaction> oldTxnOpt
     alt Không tìm thấy giao dịch
@@ -429,7 +429,7 @@ sequenceDiagram
                 TxnRepo-->>-TransactionService: 22. updatedTxn
                 TransactionService->>+WalletRepo: 23. save(wallet)
                 WalletRepo-->>-TransactionService: 24. updatedWallet
-                TransactionService-->>-GUI: 25. TransactionResponseDto
+                TransactionService-->>-GUI: 25. TransactionResponseDTO
                 GUI-->>-User: 26. Đóng hộp thoại, làm mới sổ giao dịch và cập nhật số dư ví
             end
         end
@@ -523,7 +523,7 @@ sequenceDiagram
     participant DestWallet as DestWallet
 
     User->>+GUI: 1. Nhập thông tin chuyển tiền (ví nguồn, ví đích, số tiền, ngày, phí) và bấm "Chuyển tiền"
-    GUI->>+TransferService: 2. transferFunds(requestDto)
+    GUI->>+TransferService: 2. transferFunds(TransferFundsRequestDTO)
     alt Ví nguồn trùng với ví đích
         TransferService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo ví chuyển và nhận phải khác nhau
@@ -560,7 +560,7 @@ sequenceDiagram
                     TransferService->>+TxnRepo: 27. save(newTransferInstance)
                     TxnRepo-->>-TransferService: 28. savedTransfer
                 end
-                TransferService-->>-GUI: 29. TransferResponseDto
+                TransferService-->>-GUI: 29. TransferResponseDTO
                 GUI-->>-User: 30. Đóng hộp thoại, làm mới lịch sử và cập nhật số dư hai ví
             end
         end
@@ -592,19 +592,19 @@ sequenceDiagram
     participant WalletRepo as WalletRepository
 
     User->>+GUI: 1. Chọn tiêu chí lọc (khoảng ngày, ví nguồn, ví đích) và bấm "Tìm kiếm"
-    GUI->>+TransferService: 2. filterTransfers(criteriaDto)
+    GUI->>+TransferService: 2. filterTransfers(FilterTransfersRequestDTO)
     alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
         TransferService-->>GUI: 3. ném ValidationException
         GUI-->>User: 4. Hiển thị thông báo khoảng thời gian lọc không hợp lệ
     else Khoảng thời gian lọc hợp lệ
         TransferService->>+TxnRepo: 5. findByDateRange(startDate, endDate)
         TxnRepo-->>-TransferService: 6. List<Transaction> allTransactions
-        Note over TransferService: Lọc giao dịch TransferTransaction, tính tổng tiền chuyển và phí
+        Note over TransferService: Lọc giao dịch TransferTransaction, phân trang kết quả, tính tổng tiền chuyển và phí
         loop Với mỗi giao dịch chuyển tiền trong danh sách
             TransferService->>+WalletRepo: 7. findById(sourceId), findById(destId)
             WalletRepo-->>-TransferService: 8. Optional<Wallet> (Lấy tên ví hiển thị)
         end
-        TransferService-->>-GUI: 9. TransferHistoryResponseDto
+        TransferService-->>-GUI: 9. TransferListResponseDTO
         GUI-->>-User: 10. Cập nhật bảng dữ liệu lịch sử chuyển tiền và bảng tổng hợp
     end
 ```
@@ -699,7 +699,7 @@ sequenceDiagram
     participant Category as Category
 
     User->>+GUI: 1. Nhập thông tin danh mục mới (categoryName, parentCategoryId)
-    GUI->>+CategoryService: 2. createCategory(CreateCategoryRequestDto)
+    GUI->>+CategoryService: 2. createCategory(CreateCategoryRequestDTO)
     alt Tên danh mục rỗng hoặc vượt quá 50 ký tự
         CategoryService-->>GUI: 3. ném ValidationException
         GUI-->>User: 4. Hiển thị thông báo tên danh mục không hợp lệ
@@ -723,7 +723,7 @@ sequenceDiagram
                 Category-->>-CategoryService: 16. newCategory
                 CategoryService->>+CategoryRepo: 17. save(newCategory)
                 CategoryRepo-->>-CategoryService: 18. savedCategory
-                CategoryService-->>-GUI: 19. CategoryResponseDto
+                CategoryService-->>-GUI: 19. CategoryResponseDTO
                 GUI-->>-User: 20. Kết xuất thông tin danh mục mới khởi tạo
             end
         end
@@ -755,7 +755,7 @@ sequenceDiagram
     participant Category as Category
 
     User->>+GUI: 1. Nhập yêu cầu đổi tên (categoryId, newName)
-    GUI->>+CategoryService: 2. renameCategory(RenameCategoryRequestDto)
+    GUI->>+CategoryService: 2. renameCategory(RenameCategoryRequestDTO)
     alt Tên mới rỗng hoặc vượt quá 50 ký tự
         CategoryService-->>GUI: 3. ném ValidationException
         GUI-->>User: 4. Hiển thị thông báo tên mới không hợp lệ
@@ -776,7 +776,7 @@ sequenceDiagram
                 Category-->>-CategoryService: 14. void
                 CategoryService->>+CategoryRepo: 15. save(category)
                 CategoryRepo-->>-CategoryService: 16. updatedCategory
-                CategoryService-->>-GUI: 17. CategoryResponseDto
+                CategoryService-->>-GUI: 17. CategoryResponseDTO
                 GUI-->>-User: 18. Kết xuất thông tin danh mục sau khi đổi tên
             end
         end
@@ -831,7 +831,7 @@ sequenceDiagram
                 Category-->>-CategoryService: 16. void (chuyển trạng thái sang ACTIVE)
                 CategoryService->>+CategoryRepo: 17. save(category)
                 CategoryRepo-->>-CategoryService: 18. restoredCategory
-                CategoryService-->>-GUI: 19. CategoryResponseDto
+                CategoryService-->>-GUI: 19. CategoryResponseDTO
                 GUI-->>-User: 20. Kết xuất thông báo khôi phục danh mục thành công
             end
         end
@@ -910,7 +910,7 @@ Luồng tương tác mô tả quy trình truy vấn và tổng hợp dòng tiề
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-01`
-- Thao tác hệ thống: `generateCashFlowReport(CashFlowReportRequestDTO)` (và tiện ích `generateCashFlowReport(endMonth, endYear)`)
+- Thao tác hệ thống: `generateCashFlowReport(CashFlowReportRequestDTO)`
 - Yêu cầu chức năng: `FR-REP-01`
 - Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`
 - Mã lỗi xử lý: `ERR-REP-001`, `ERR-FIN-001`
@@ -956,7 +956,7 @@ Luồng tương tác mô tả quy trình trích xuất và phân tích cơ cấu
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-02`
-- Thao tác hệ thống: `generateSpendingStructureReport(SpendingStructureRequestDTO)`
+- Thao tác hệ thống: `generateSpendingStructureReport(SpendingStructureReportRequestDTO)`
 - Yêu cầu chức năng: `FR-REP-02`
 - Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
 - Mã lỗi xử lý: `ERR-REP-001`, `ERR-FIN-002`
@@ -975,7 +975,7 @@ sequenceDiagram
     participant ShareVO as SpendingStructureShare
 
     User->>+GUI: 1. Nhập tiêu chí báo cáo (startDate, endDate, transactionType)
-    GUI->>+ReportService: 2. generateSpendingStructureReport(SpendingStructureRequestDTO)
+    GUI->>+ReportService: 2. generateSpendingStructureReport(SpendingStructureReportRequestDTO)
     alt Tham số không hợp lệ (request null, thiếu ngày, startDate sau endDate hoặc loại ngoài EXPENSE/INCOME)
         ReportService-->>GUI: 3. ném BusinessException (ERR-REP-001)
         GUI-->>User: 4. Hiển thị thông báo tham số báo cáo không hợp lệ
@@ -1043,15 +1043,15 @@ sequenceDiagram
     NeedGroupRepo-->>-DataService: 10. List<NeedGroup>
     DataService->>+AdjRepo: 11. findAll()
     AdjRepo-->>-DataService: 12. List<BalanceAdjustmentRecord>
-    DataService->>DataService: 13. tổng hợp dữ liệu vào BackupPayloadDTO
-    DataService->>+StorageAdapter: 14. writeBackupFile(destinationPath, backupPayloadDTO)
+    DataService->>DataService: 13. tổng hợp dữ liệu vào BackupPayload (nội bộ service.impl.data)
+    DataService->>+StorageAdapter: 14. writeBackupFile(destinationPath, backupPayload)
     alt Sự cố I/O, lỗi quyền ghi hoặc không đủ dung lượng đĩa
         StorageAdapter-->>DataService: 15. ném StorageException
         DataService-->>GUI: 16. ném StorageException
         GUI-->>User: 17. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
     else Ghi tệp sao lưu an toàn thành công
         StorageAdapter-->>-DataService: 18. BackupFileMetadata
-        DataService-->>-GUI: 19. phản hồi xuất sao lưu thành công kèm đường dẫn tệp
+        DataService-->>-GUI: 19. ExportBackupResponseDTO
         GUI-->>-User: 20. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
     end
 ```
@@ -1092,7 +1092,7 @@ sequenceDiagram
         DataService-->>GUI: 5. ném StorageException
         GUI-->>User: 6. Hiển thị thông báo không thể đọc tệp sao lưu
     else Đọc tệp thành công
-        StorageAdapter-->>-DataService: 7. BackupPayloadDTO
+        StorageAdapter-->>-DataService: 7. BackupPayload
         Note over DataService: Bước 1: Kiểm tra cấu trúc cú pháp JSON và schema bắt buộc
         alt Sai cú pháp JSON hoặc thiếu các khóa thực thể bắt buộc
             DataService-->>GUI: 8. ném DataCorruptionException
@@ -1123,7 +1123,7 @@ sequenceDiagram
                         TxnRepo-->>-DataService: 23. void
                         DataService->>+AdjRepo: 24. deleteAll(), saveAll(adjustments)
                         AdjRepo-->>-DataService: 25. void
-                        DataService-->>-GUI: 26. phản hồi phục hồi thành công
+                        DataService-->>-GUI: 26. RestoreBackupResponseDTO
                         GUI-->>-User: 27. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
                     end
                 end
@@ -1175,7 +1175,7 @@ sequenceDiagram
     else Phát hiện sai lệch dữ liệu
         DataService->>DataService: 11. đóng gói danh sách chi tiết bất thường kèm khuyến nghị (WARNING/ERROR)
     end
-    DataService-->>-GUI: 12. ReconciliationReportDTO
+    DataService-->>-GUI: 12. ReconciliationReportResponseDTO
     GUI-->>-User: 13. Kết xuất Báo cáo đối soát toàn vẹn dữ liệu tài chính chi tiết
 ```
 

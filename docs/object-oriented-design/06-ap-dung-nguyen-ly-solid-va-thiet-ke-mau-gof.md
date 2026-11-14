@@ -61,11 +61,11 @@ classDiagram
     direction TB
 
     class TransactionServiceImpl {
-        +recordIncomeExpense(TransactionRequestDTO)
+        +recordIncomeExpense(RecordTransactionRequestDTO)
     }
 
     class TransferServiceImpl {
-        +transferFunds(TransferRequestDTO)
+        +transferFunds(TransferFundsRequestDTO)
     }
 
     class TransactionFactory {
@@ -140,7 +140,7 @@ classDiagram
     class ReportService {
         <<interface>>
         +generateCashFlowReport(CashFlowReportRequestDTO) CashFlowReportResponseDTO*
-        +generateSpendingStructureReport(SpendingStructureRequestDTO) SpendingStructureReportResponseDTO*
+        +generateSpendingStructureReport(SpendingStructureReportRequestDTO) SpendingStructureReportResponseDTO*
     }
 
     class ReportServiceImpl {
@@ -148,7 +148,7 @@ classDiagram
         -CategoryRepository categoryRepository
         -NeedGroupRepository needGroupRepository
         +generateCashFlowReport(CashFlowReportRequestDTO) CashFlowReportResponseDTO
-        +generateSpendingStructureReport(SpendingStructureRequestDTO) SpendingStructureReportResponseDTO
+        +generateSpendingStructureReport(SpendingStructureReportRequestDTO) SpendingStructureReportResponseDTO
     }
 
     class ReportExporter {
@@ -303,8 +303,8 @@ classDiagram
 
     class TransactionServiceImpl {
         -TransactionEventPublisher eventPublisher
-        +recordIncomeExpense(TransactionRequestDTO)
-        +transferFunds(TransferRequestDTO)
+        +recordIncomeExpense(RecordTransactionRequestDTO)
+        +transferFunds(TransferFundsRequestDTO)
     }
 
     class TransactionEventPublisher {
