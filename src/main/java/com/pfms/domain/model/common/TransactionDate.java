@@ -61,6 +61,19 @@ public final class TransactionDate implements Comparable<TransactionDate> {
         return new TransactionDate(LocalDate.now());
     }
 
+    public static TransactionDate ofOrToday(LocalDate rawDate) {
+        return (rawDate == null) ? now() : of(rawDate);
+    }
+
+    public static void validateRange(LocalDate startDate, LocalDate endDate) {
+        TransactionDate start = (startDate != null) ? of(startDate) : null;
+        TransactionDate end = (endDate != null) ? of(endDate) : null;
+        if (start != null && end != null && start.isAfter(end)) {
+            throw new BusinessException(
+                    ErrorCode.ERR_FIN_001, "Ngày bắt đầu không được lớn hơn ngày kết thúc.");
+        }
+    }
+
     public static TransactionDate parse(String rawDate) {
         if (rawDate == null || rawDate.trim().isEmpty()) {
             throw new BusinessException(ErrorCode.ERR_FIN_001, "Chuỗi ngày giao dịch không được để trống.");

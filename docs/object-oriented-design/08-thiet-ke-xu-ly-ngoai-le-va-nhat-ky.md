@@ -125,6 +125,7 @@ Bảng phân nhóm tiền tố mã lỗi chuẩn hóa hệ thống:
 | **`TRF`** | Chuyển khoản nội bộ | Lỗi ví nguồn trùng ví đích, số tiền chuyển không hợp lệ. |
 | **`FEE`** | Chi phí giao dịch | Lỗi chi phí âm, giao dịch có chi phí nhưng chưa chọn danh mục chi tiêu cho phí. |
 | **`CAT`** | Cây danh mục ba cấp | Lỗi đổi loại khi đã có giao dịch, xóa nhóm cuối cùng, thao tác trên nhóm đã xóa. |
+| **`REP`** | Báo cáo và thống kê | Lỗi thiếu tham số yêu cầu, mốc tháng hoặc năm ngoài miền hợp lệ, ngày bắt đầu sau ngày kết thúc hoặc loại luồng tiền ngoài `EXPENSE` và `INCOME`. |
 | **`DAT`** | Quản trị và sao lưu tệp | Lỗi cấu trúc tệp sao lưu JSON, vi phạm liên kết chuyển tiền hoặc phí mồ côi khi phục hồi. |
 | **`SYS`** | Hạ tầng hệ thống | Lỗi I/O đọc ghi tệp cục bộ trên đĩa cứng hệ thống. |
 
@@ -149,6 +150,7 @@ Bảng dưới đây xác lập từ điển mã lỗi chuẩn hóa của hệ t
 | **`ERR_CAT_003`** | `BusinessException` | Chuyển danh mục chi tiết sang một nhóm nhu cầu đã bị xóa. | Không thể chuyển danh mục sang nhóm đã xóa. |
 | **`ERR_CAT_004`** | `BusinessException` | Khôi phục danh mục khi nhóm nhu cầu của nó còn ở trạng thái đã xóa. | Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước. |
 | **`ERR_CAT_005`** | `BusinessException` | Tạo danh mục mới vào một nhóm nhu cầu đang ở trạng thái đã xóa. | Không thể tạo danh mục trong nhóm đã xóa. Hãy chọn nhóm đang dùng. |
+| **`ERR_REP_001`** | `BusinessException` | Thiếu tham số bắt buộc, `endMonth` ngoài `[1, 12]`, `endYear < 2000`, `startDate > endDate` hoặc `transactionType` khác `EXPENSE` và `INCOME`. | Tham số thời gian hoặc loại báo cáo không hợp lệ. |
 | **`ERR_DAT_001`** | `DataCorruptionException` | Tệp sao lưu JSON sai cấu trúc schema hoặc vi phạm phân cấp 3 cấp. | Tệp sao lưu không hợp lệ hoặc cấu trúc dữ liệu JSON bị hỏng. |
 | **`ERR_DAT_002`** | `DataCorruptionException` | Tệp sao lưu JSON vi phạm liên kết chuyển tiền hoặc làm âm số dư ví. | Dữ liệu sao lưu vi phạm ràng buộc toàn vẹn số dư ví hoặc dòng tiền. |
 | **`ERR_SYS_001`** | `StorageException` | Lỗi I/O đọc ghi tệp cục bộ trên đĩa cứng hệ thống. | Lỗi hệ thống: Không thể truy xuất hoặc lưu trữ tệp dữ liệu cục bộ. |

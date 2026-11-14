@@ -18,7 +18,7 @@ Hệ thống cung cấp các nhóm năng lực nghiệp vụ sau đây, với qu
 | 2 | Ghi nhận thu chi | `TXN` | Ghi nhận các giao dịch thu nhập (`INCOME`) và chi tiêu (`EXPENSE`). Liên kết với ví thanh toán và danh mục. Ghi riêng chi phí (nếu có) thành phí giao dịch liên kết. Cập nhật số dư ví cùng lúc với việc ghi nhận giao dịch. |
 | 3 | Chuyển tiền nội bộ | `TRF` | Chuyển tiền giữa hai ví nội bộ theo cơ chế ghi nhận đồng thời (trừ ví nguồn, cộng ví đích). Giữ cho tổng số dư trong các ví không đổi, ngoại trừ chi phí chuyển tiền. |
 | 4 | Danh mục phân loại | `CAT` | Giữ cấu trúc danh mục 3 cấp gồm Loại thu chi -> Nhóm nhu cầu -> Danh mục chi tiết; bảo đảm liên kết hợp lệ tới nhóm cha khi gắn nhãn giao dịch. |
-| 5 | Thống kê và báo cáo | `REP` | Trích xuất chuỗi dữ liệu 12 tháng liên tục kết thúc tại tháng người dùng chọn, mặc định là tháng hiện tại. Phân tích tỷ lệ cơ cấu chi tiêu theo nhóm danh mục, dòng tiền thuần và tỷ lệ tiết kiệm định kỳ. |
+| 5 | Thống kê và báo cáo | `REP` | Trích xuất chuỗi dữ liệu 12 tháng liên tục kết thúc tại tháng người dùng chọn, mặc định là tháng hiện tại. Phân tích tỷ lệ cơ cấu thu chi theo nhóm nhu cầu và danh mục, dòng tiền thuần và tỷ lệ tiết kiệm định kỳ. |
 | 6 | Lưu trữ và sao lưu dữ liệu | `DAT` | Lưu dữ liệu lâu dài trên tệp JSON cục bộ bằng cách ghi tệp an toàn, tệp chính không bị hỏng khi mất điện giữa chừng. Hỗ trợ xuất và nhập tệp sao lưu độc lập để phục vụ kiểm tra lại dữ liệu. |
 
 #### 1.2.2 Ranh giới ngoài hệ thống và căn cứ loại trừ
@@ -135,4 +135,3 @@ Tài liệu dùng từ chỉ mức, viết thường, để xác định mức �
 | Không được | Cấm hoàn toàn | Hành vi hoặc trạng thái hệ thống hoàn toàn không được phép xảy ra hoặc phải từ chối tiếp nhận. |
 | Nên | Khuyến cáo | Quy cách được ưu tiên áp dụng, chỉ bỏ qua khi có lý do kỹ thuật xác đáng. |
 | Có thể, được phép | Tùy chọn | Chức năng hoặc lựa chọn mà người dùng có thể dùng hoặc bỏ qua. |
-

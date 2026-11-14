@@ -431,5 +431,155 @@ class TransferTransactionTest {
             assertTrue(result.contains("100.000"));
         }
     }
+
+    @Nested
+    @DisplayName("Live Wallet Revert Operations (UC-TRF-03)")
+    class LiveWalletRevertTests {
+
+        @Test
+        @DisplayName("revertFromWallet(liveSource, liveDest) không phí cập nhật đúng hai thực thể live tách biệt")
+        void testRevertFromLiveWalletsWithoutFee() {
+            UUID transferId = UUID.randomUUID();
+            TransferTransaction transaction = new TransferTransaction(
+                    transferId, sourceWallet, destinationWallet, Money.of(1_000_000), validDate, "Hoàn tác", null);
+            transaction.applyToWallet();
+
+            Wallet liveSource = sourceWallet.copy();
+            Wallet liveDestination = destinationWallet.copy();
+
+            transaction.revertFromWallet(liveSource, liveDestination);
+
+            assertEquals(Money.of(5_000_000), liveSource.getCurrentBalance());
+            assertEquals(Money.of(2_000_000), liveDestination.getCurrentBalance());
+            assertEquals(Money.of(4_000_000), transaction.getSourceWallet().getCurrentBalance());
+            assertEquals(Money.of(3_000_000), transaction.getDestinationWallet().getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("revertFromWallet(liveSource, liveDest) có phí hoàn trả cả gốc lẫn phí về ví nguồn live")
+        void testRevertFromLiveWalletsWithFeeRefundsFeeToLiveSource() {
+            UUID transferId = UUID.randomUUID();
+            Money transferAmount = Money.of(1_000_000);
+            Money feeAmount = Money.of(15_000);
+            TransactionFee transactionFee = new TransactionFee(
+                    UUID.randomUUID(), transferId, feeAmount, sourceWallet, feeCategory);
+            TransferTransaction transaction = new TransferTransaction(
+                    transferId, sourceWallet, destinationWallet, transferAmount, validDate, "Có phí", transactionFee);
+            transaction.applyToWallet();
+
+            Wallet liveSource = sourceWallet.copy();
+            Wallet liveDestination = destinationWallet.copy();
+
+            transaction.revertFromWallet(liveSource, liveDestination);
+
+            assertEquals(Money.of(5_000_000), liveSource.getCurrentBalance());
+            assertEquals(Money.of(2_000_000), liveDestination.getCurrentBalance());
+            assertEquals(Money.of(3_985_000), transaction.getSourceWallet().getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("revertFromWallet(liveSource, liveDest) từ chối khi ví đích không đủ tiền và giữ nguyên số dư")
+        void testRevertFromLiveWalletsRejectsInsufficientDestinationBalance() {
+            UUID transferId = UUID.randomUUID();
+            TransactionFee transactionFee = new TransactionFee(
+                    UUID.randomUUID(), transferId, Money.of(15_000), sourceWallet, feeCategory);
+            TransferTransaction transaction = new TransferTransaction(
+                    transferId, sourceWallet, destinationWallet, Money.of(1_000_000), validDate, "Thiếu hoàn", transactionFee);
+            transaction.applyToWallet();
+
+            Wallet liveSource = sourceWallet.copy();
+            Wallet liveDestination = destinationWallet.copy();
+            liveDestination.debit(Money.of(2_500_000));
+
+            InsufficientBalanceException exception = assertThrows(
+                    InsufficientBalanceException.class,
+                    () -> transaction.revertFromWallet(liveSource, liveDestination));
+
+            assertEquals(ErrorCode.ERR_WAL_001, exception.getErrorCode());
+            assertEquals(Money.of(3_985_000), liveSource.getCurrentBalance());
+            assertEquals(Money.of(500_000), liveDestination.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("revertFromWallet(liveSource, liveDest) từ chối ví live đang lưu trữ hoặc đã xóa với ERR_WAL_001")
+        void testRevertFromLiveWalletsRejectsInactiveLiveWallets() {
+            TransferTransaction transaction = new TransferTransaction(
+                    UUID.randomUUID(), sourceWallet, destinationWallet, Money.of(100_000), validDate, "Trạng thái", null);
+            transaction.applyToWallet();
+
+            Wallet archivedSource = sourceWallet.copy();
+            archivedSource.archive();
+            Wallet liveDestination = destinationWallet.copy();
+
+            BusinessException archivedException = assertThrows(
+                    BusinessException.class,
+                    () -> transaction.revertFromWallet(archivedSource, liveDestination));
+            assertEquals(ErrorCode.ERR_WAL_001, archivedException.getErrorCode());
+            assertEquals(Money.of(4_900_000), archivedSource.getCurrentBalance());
+            assertEquals(Money.of(2_100_000), liveDestination.getCurrentBalance());
+
+            Wallet liveSource = sourceWallet.copy();
+            Wallet deletedDestination = destinationWallet.copy();
+            deletedDestination.delete();
+
+            BusinessException deletedException = assertThrows(
+                    BusinessException.class,
+                    () -> transaction.revertFromWallet(liveSource, deletedDestination));
+            assertEquals(ErrorCode.ERR_WAL_001, deletedException.getErrorCode());
+            assertEquals(Money.of(4_900_000), liveSource.getCurrentBalance());
+            assertEquals(Money.of(2_100_000), deletedDestination.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("revertFromWallet(liveSource, liveDest) từ chối tham số null hoặc ví không khớp định danh")
+        void testRevertFromLiveWalletsRejectsNullAndMismatchedIds() {
+            TransferTransaction transaction = new TransferTransaction(
+                    UUID.randomUUID(), sourceWallet, destinationWallet, Money.of(100_000), validDate, "Kiểm ID", null);
+            Wallet liveSource = sourceWallet.copy();
+            Wallet liveDestination = destinationWallet.copy();
+            Wallet unrelatedWallet = new Wallet("Ví Lạ");
+            Money initialUnrelatedBalance = unrelatedWallet.getCurrentBalance();
+
+            assertThrows(NullPointerException.class, () -> transaction.revertFromWallet(null, liveDestination));
+            assertThrows(NullPointerException.class, () -> transaction.revertFromWallet(liveSource, null));
+            assertThrows(IllegalArgumentException.class,
+                    () -> transaction.revertFromWallet(liveDestination, liveSource));
+            assertThrows(IllegalArgumentException.class,
+                    () -> transaction.revertFromWallet(unrelatedWallet, liveDestination));
+            assertThrows(IllegalArgumentException.class,
+                    () -> transaction.revertFromWallet(liveSource, unrelatedWallet));
+            assertEquals(Money.of(5_000_000), liveSource.getCurrentBalance());
+            assertEquals(Money.of(2_000_000), liveDestination.getCurrentBalance());
+            assertEquals(initialUnrelatedBalance, unrelatedWallet.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("applyToWallet() và revertFromWallet(live, live) trừ/hoàn phí nhất quán trên sourceWallet và chặn lệch ví phí")
+        void testFeeWalletConsistencyBetweenApplyAndLiveRevert() {
+            UUID txId = UUID.randomUUID();
+            TransactionFee copiedFee = new TransactionFee(
+                    UUID.randomUUID(), txId, Money.of(5_000), sourceWallet.copy(), feeCategory);
+            TransferTransaction transaction = new TransferTransaction(
+                    txId, sourceWallet, destinationWallet, Money.of(100_000), validDate, "Đồng nhất phí", copiedFee);
+            transaction.applyToWallet();
+            assertEquals(Money.of(4_895_000), sourceWallet.getCurrentBalance());
+            assertEquals(Money.of(2_100_000), destinationWallet.getCurrentBalance());
+            Wallet preDriftSource = sourceWallet.copy();
+            Wallet preDriftDestination = destinationWallet.copy();
+            transaction.revertFromWallet(preDriftSource, preDriftDestination);
+            assertEquals(Money.of(5_000_000), preDriftSource.getCurrentBalance());
+            assertEquals(Money.of(2_000_000), preDriftDestination.getCurrentBalance());
+            copiedFee.updateFee(Money.of(5_000), feeCategory, new Wallet("Ví Khác"));
+            Wallet liveSource = sourceWallet.copy();
+            Wallet liveDestination = destinationWallet.copy();
+            assertEquals(ErrorCode.ERR_FEE_001, assertThrows(BusinessException.class, transaction::applyToWallet).getErrorCode());
+            assertEquals(ErrorCode.ERR_FEE_001, assertThrows(BusinessException.class,
+                    () -> transaction.revertFromWallet(liveSource, liveDestination)).getErrorCode());
+            assertEquals(Money.of(4_895_000), sourceWallet.getCurrentBalance());
+            assertEquals(Money.of(2_100_000), destinationWallet.getCurrentBalance());
+            assertEquals(Money.of(4_895_000), liveSource.getCurrentBalance());
+            assertEquals(Money.of(2_100_000), liveDestination.getCurrentBalance());
+        }
+    }
 }
 

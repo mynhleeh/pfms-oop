@@ -900,7 +900,7 @@ Cơ chế xóa mềm bảo toàn tuyệt đối tính toàn vẹn tham chiếu l
 
 ## 5.6 Sơ đồ Tuần tự Nhóm Báo cáo và Quản trị Dữ liệu
 
-Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ kết xuất báo cáo phân tích tài chính và quản trị dữ liệu an toàn của hệ thống. Chuỗi tương tác mô tả quy trình tổng hợp dòng tiền đa chiều, đo lường cơ cấu chi tiêu, trích xuất tệp sao lưu định dạng chuẩn, phục hồi dữ liệu có kiểm định bốn bước và đối soát độc lập các điều kiện cân bằng tài chính.
+Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ kết xuất báo cáo phân tích tài chính và quản trị dữ liệu an toàn của hệ thống. Chuỗi tương tác mô tả quy trình tổng hợp dòng tiền đa chiều, đo lường cơ cấu thu chi, trích xuất tệp sao lưu định dạng chuẩn, phục hồi dữ liệu có kiểm định bốn bước và đối soát độc lập các điều kiện cân bằng tài chính.
 
 Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối báo cáo và quản trị dữ liệu với toàn bộ các kho lưu trữ thực thể trong hệ thống, bảo đảm nguyên tắc vận hành chỉ đọc đối với các luồng thống kê đối soát, kiểm soát tính toàn vẹn của tệp JSON sao lưu và duy trì tính nhất quán tuyệt đối của sổ cái tài chính.
 
@@ -910,10 +910,10 @@ Luồng tương tác mô tả quy trình truy vấn và tổng hợp dòng tiề
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-01`
-- Thao tác hệ thống: `generateCashFlowReport(endMonth, endYear)`
+- Thao tác hệ thống: `generateCashFlowReport(CashFlowReportRequestDTO)` (và tiện ích `generateCashFlowReport(endMonth, endYear)`)
 - Yêu cầu chức năng: `FR-REP-01`
-- Quy tắc nghiệp vụ: `BR-FIN-01`
-- Mã lỗi xử lý: `ERR-FIN-002`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`
+- Mã lỗi xử lý: `ERR-REP-001`, `ERR-FIN-001`
 
 **Sơ đồ tuần tự tương tác:**
 
@@ -924,39 +924,42 @@ sequenceDiagram
     participant GUI as Tầng Trình diễn
     participant ReportService as ReportServiceImpl
     participant TxnRepo as TransactionRepository
-    participant Money as Money
+    participant NetCashFlow as NetCashFlow
+    participant SavingsRate as SavingsRate
 
     User->>+GUI: 1. Yêu cầu lập báo cáo dòng tiền (endMonth, endYear)
-    GUI->>+ReportService: 2. generateCashFlowReport(endMonth, endYear)
-    ReportService->>+TxnRepo: 3. findByDateRange(startDate, endDate)
-    TxnRepo-->>-ReportService: 4. List<Transaction> transactions
-    loop Xử lý tổng hợp 12 tháng liên tục
-        ReportService->>+Money: 5. calculateNetCashFlow(monthIncome, monthExpense)
-        Money-->>-ReportService: 6. NetCashFlow netFlow
-        alt Tổng thu nhập của tháng bằng 0 (totalIncome == 0)
-            ReportService->>ReportService: 7. gán SavingsRate mặc định 0.00% (tránh lỗi chia cho không)
-        else Tổng thu nhập của tháng lớn hơn 0 (totalIncome > 0)
-            ReportService->>+Money: 8. calculateSavingsRate(netFlow, monthIncome)
-            Money-->>-ReportService: 9. SavingsRate savingsRate (làm tròn ngân hàng 2 chữ số)
+    GUI->>+ReportService: 2. generateCashFlowReport(CashFlowReportRequestDTO)
+    alt Tham số không hợp lệ (request null, endMonth ngoài [1, 12] hoặc endYear nhỏ hơn 2000)
+        ReportService-->>GUI: 3. ném BusinessException (ERR-REP-001)
+        GUI-->>User: 4. Hiển thị thông báo tham số báo cáo không hợp lệ
+    else Tham số hợp lệ
+        ReportService->>+TxnRepo: 5. findByDateRange(startDate, endDate)
+        TxnRepo-->>-ReportService: 6. List<Transaction> (IncomeExpenseTransaction và TransferTransaction)
+        loop Xử lý tổng hợp 12 tháng liên tục
+            ReportService->>ReportService: 7. tách thu nhập, chi tiêu và mọi TransactionFee (bỏ tiền gốc chuyển ví)
+            ReportService->>+NetCashFlow: 8. NetCashFlow.of(monthIncome, monthExpense)
+            NetCashFlow-->>-ReportService: 9. NetCashFlow netFlow
+            ReportService->>+SavingsRate: 10. SavingsRate.of(netFlow, monthIncome)
+            SavingsRate-->>-ReportService: 11. SavingsRate (0.00% nếu tổng thu không dương)
         end
+        ReportService->>ReportService: 12. tính bình quân chia 12 và đóng gói CashFlowReportResponseDTO
+        ReportService-->>-GUI: 13. CashFlowReportResponseDTO
+        GUI-->>-User: 14. Kết xuất bảng báo cáo dòng tiền 12 tháng kèm biểu đồ
     end
-    ReportService->>ReportService: 10. tính bình quân tháng và đóng gói CashFlowReportDto
-    ReportService-->>-GUI: 11. CashFlowReportDto
-    GUI-->>-User: 12. Kết xuất bảng báo cáo dòng tiền 12 tháng kèm biểu đồ
 ```
 
 Thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể hay số dư tài chính nào trong hệ thống.
 
-### 5.6.2 Sơ đồ Lập Báo cáo Cơ cấu Chi tiêu
+### 5.6.2 Sơ đồ Lập Báo cáo Cơ cấu Thu chi
 
-Luồng tương tác mô tả quy trình trích xuất và phân tích cơ cấu chi tiêu theo nhóm nhu cầu và danh mục chi tiết trong khoảng thời gian xác định ở chế độ chỉ đọc. Dịch vụ ứng dụng kiểm tra tính hợp lệ của mốc thời gian, truy vấn giao dịch và thông tin phân cấp danh mục, gom cụm số liệu và tính toán tỷ trọng phân bổ chính xác.
+Luồng tương tác mô tả quy trình trích xuất và phân tích cơ cấu thu chi theo nhóm nhu cầu và danh mục chi tiết trong khoảng thời gian xác định ở chế độ chỉ đọc. Dịch vụ ứng dụng kiểm tra tính hợp lệ của tham số thời gian cùng loại luồng tiền, truy vấn giao dịch (gồm cả phí giao dịch liên kết khi phân tích chi tiêu) và thông tin phân cấp danh mục, gom cụm số liệu, tính toán tỷ trọng phân bổ chính xác và đối chiếu biến động với kỳ liền kề cùng độ dài.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-02`
-- Thao tác hệ thống: `generateSpendingStructureReport(startDate, endDate, transactionType)`
+- Thao tác hệ thống: `generateSpendingStructureReport(SpendingStructureRequestDTO)`
 - Yêu cầu chức năng: `FR-REP-02`
-- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-04`
-- Mã lỗi xử lý: `ERR-FIN-001`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`
+- Mã lỗi xử lý: `ERR-REP-001`, `ERR-FIN-002`
 
 **Sơ đồ tuần tự tương tác:**
 
@@ -967,31 +970,40 @@ sequenceDiagram
     participant GUI as Tầng Trình diễn
     participant ReportService as ReportServiceImpl
     participant TxnRepo as TransactionRepository
+    participant NeedGroupRepo as NeedGroupRepository
     participant CategoryRepo as CategoryRepository
-    participant Money as Money
+    participant ShareVO as SpendingStructureShare
 
     User->>+GUI: 1. Nhập tiêu chí báo cáo (startDate, endDate, transactionType)
-    GUI->>+ReportService: 2. generateSpendingStructureReport(SpendingReportCriteriaDto)
-    alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
-        ReportService-->>GUI: 3. ném ValidationException
-        GUI-->>User: 4. Hiển thị thông báo khoảng thời gian không hợp lệ
-    else Khoảng thời gian hợp lệ
-        ReportService->>+TxnRepo: 5. findByDateRangeAndType(startDate, endDate, transactionType)
-        TxnRepo-->>-ReportService: 6. List<Transaction> transactions
-        ReportService->>+CategoryRepo: 7. findAll()
-        CategoryRepo-->>-ReportService: 8. List<Category> allCategories (bao gồm mục đã xóa mềm)
-        ReportService->>ReportService: 9. gom cụm số liệu theo NeedGroup và Category
-        loop Tính toán tỷ trọng từng nhóm và danh mục
-            ReportService->>+Money: 10. calculatePercentageShare(itemAmount, totalAmount)
-            Money-->>-ReportService: 11. SpendingStructureShare (làm tròn ngân hàng 2 chữ số)
+    GUI->>+ReportService: 2. generateSpendingStructureReport(SpendingStructureRequestDTO)
+    alt Tham số không hợp lệ (request null, thiếu ngày, startDate sau endDate hoặc loại ngoài EXPENSE/INCOME)
+        ReportService-->>GUI: 3. ném BusinessException (ERR-REP-001)
+        GUI-->>User: 4. Hiển thị thông báo tham số báo cáo không hợp lệ
+    else Tham số hợp lệ
+        ReportService->>+TxnRepo: 5. findByDateRange(prevStartDate, endDate)
+        TxnRepo-->>-ReportService: 6. List<Transaction> dải ngày liền kề và hiện tại
+        ReportService->>+NeedGroupRepo: 7. findAll()
+        NeedGroupRepo-->>-ReportService: 8. List<NeedGroup> (gồm ACTIVE và DELETED)
+        ReportService->>+CategoryRepo: 9. findAll()
+        CategoryRepo-->>-ReportService: 10. List<Category> (gồm ACTIVE và DELETED)
+        ReportService->>ReportService: 11. phân tách hai kỳ, lọc theo luồng (cộng TransactionFee nếu EXPENSE), giữ mục lớn hơn 0 và status DELETED
+        alt Tổng tiền kỳ hiện tại bằng 0.00 VNĐ
+            ReportService->>ReportService: 12. gán danh sách rỗng và tỷ lệ 0.00%
+        else Tổng tiền kỳ hiện tại lớn hơn 0.00 VNĐ
+            loop Tính tỷ trọng cơ cấu 2 cấp
+                ReportService->>+ShareVO: 13. SpendingStructureShare.of(groupAmount, totalAmount, "NeedGroup")
+                ShareVO-->>-ReportService: 14. tỷ trọng nhóm (share)
+                ReportService->>+ShareVO: 15. SpendingStructureShare.of(catAmount, totalAmount, "Category") và theo nhóm cha
+                ShareVO-->>-ReportService: 16. tỷ trọng danh mục (share và shareInGroup)
+            end
         end
-        ReportService->>ReportService: 12. đóng gói SpendingStructureReportDto
-        ReportService-->>-GUI: 13. SpendingStructureReportDto
-        GUI-->>-User: 14. Kết xuất báo cáo cơ cấu chi tiêu theo phân cấp hai tầng
+        ReportService->>ReportService: 17. sắp xếp giảm dần, tính biến động kỳ liền kề (cờ mới hoặc 0.00%) và đóng gói DTO
+        ReportService-->>-GUI: 18. SpendingStructureReportResponseDTO
+        GUI-->>-User: 19. Kết xuất báo cáo cơ cấu thu chi theo phân cấp hai tầng
     end
 ```
 
-Thao tác trích xuất và tính toán tỷ trọng phân bổ chi tiêu ở chế độ chỉ đọc, bảo toàn tính toàn vẹn của dữ liệu danh mục và số liệu lịch sử.
+Thao tác trích xuất và tính toán tỷ trọng phân bổ thu chi ở chế độ chỉ đọc, bảo toàn tính toàn vẹn của dữ liệu danh mục và số liệu lịch sử.
 
 ### 5.6.3 Sơ đồ Xuất Dữ liệu Sao lưu Hệ thống
 

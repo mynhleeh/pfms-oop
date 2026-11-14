@@ -1199,7 +1199,7 @@ Không có.
 2. Người dùng chỉ thấy một thao tác "Xóa"; xóa hẳn hay ẩn do hệ thống quyết định theo số giao dịch.
 3. Yêu cầu chức năng liên quan: `FR-CAT-03`.
 
-###  UC-REP-01: Thống kê dòng tiền 12 tháng gần nhất
+### 6.16 UC-REP-01: Thống kê dòng tiền 12 tháng gần nhất
 
 Bảng thuộc tính đặc tả chu kỳ tổng hợp dòng tiền 12 tháng của ca sử dụng Thống kê dòng tiền 12 tháng gần nhất (`UC-REP-01`):
 
@@ -1226,14 +1226,14 @@ Hệ thống chỉ đọc, không thay đổi giao dịch hay số dư ví.
 #### Luồng sự kiện chính
 
 1. Người dùng chọn "Thống kê dòng tiền 12 tháng gần nhất", có thể tùy chọn mốc tháng và năm kết thúc (mặc định tháng và năm hiện tại).
-2. Hệ thống xác định mốc tháng kết thúc (mặc định lấy từ đồng hồ hệ thống).
+2. Hệ thống xác định mốc tháng kết thúc (mặc định tháng và năm hiện tại từ đồng hồ hệ thống; cho phép truy vấn mốc tương lai ở chế độ chỉ đọc).
 3. Hệ thống tạo danh sách 12 tháng liên tục từ 11 tháng trước mốc đến chính mốc, sắp xếp thời gian tăng dần (tháng kết thúc ở dòng cuối).
-4. Với mỗi tháng, hệ thống lọc giao dịch có ngày trong tháng và tính tổng thu nhập, tổng chi tiêu (trên các giao dịch đang tồn tại).
+4. Với mỗi tháng, hệ thống lọc các giao dịch thu chi đang tồn tại có ngày trong tháng cùng mọi khoản phí giao dịch liên kết đang tồn tại theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`) để tính tổng thu nhập và tổng chi tiêu.
 5. Hệ thống tính các chỉ số phái sinh theo `FR-REP-01`: dòng tiền thuần bằng tổng thu trừ tổng chi; tỷ lệ tiết kiệm (`NetCashFlow_m` là dòng tiền thuần, `Income_m` là tổng thu nhập của tháng m):
    $$
    SavingsRate_m = \begin{cases} \left(\frac{NetCashFlow_m}{Income_m}\right) \times 100\%, & Income_m > 0 \\ 0.00\%, & Income_m \le 0 \end{cases}
    $$
-   Làm tròn ngân hàng, hiển thị 2 chữ số thập phân.
+   Tỷ lệ phần trăm giữ tối thiểu 4 chữ số thập phân ở bước trung gian và hiển thị 2 chữ số thập phân; tiền tệ tính toán làm tròn ngân hàng 2 chữ số thập phân và hiển thị VNĐ theo Quy tắc độ chính xác tài chính (`BR-FIN-01`).
 6. Hệ thống tính thu nhập, chi tiêu và dòng tiền thuần bình quân của chuỗi (`FR-REP-01`); mẫu số luôn là 12 kể cả các tháng chưa có giao dịch, và hệ thống hiển thị ghi chú nêu điều này.
 7. Hệ thống hiển thị bảng 12 dòng tháng; chân bảng có ba mức bình quân kèm ghi chú; giao diện hiển thị biểu đồ kết hợp cột thu chi và đường dòng tiền thuần.
 
@@ -1243,27 +1243,32 @@ Không có.
 
 #### Các luồng ngoại lệ
 
+##### Luồng ngoại lệ 2a: Tham số mốc thời gian không hợp lệ
+
+1. Tại bước 2, thiếu tham số yêu cầu, tháng kết thúc nằm ngoài đoạn 1 đến 12 hoặc năm kết thúc nhỏ hơn 2000.
+2. Hệ thống từ chối truy vấn (`ERR-REP-001`) và yêu cầu Người dùng nhập lại mốc tháng và năm hợp lệ.
+
 ##### Luồng ngoại lệ 4a: Tháng hoàn toàn không có giao dịch
 
-1. Tại bước 4, một tháng không có giao dịch thu chi.
+1. Tại bước 4, một tháng không có giao dịch thu chi hay phí giao dịch liên kết nào.
 2. Hệ thống hiển thị "0.00 VNĐ", không để trống ô dữ liệu.
 3. Hệ thống gán dòng tiền thuần 0.00 và tỷ lệ tiết kiệm 0.00%, bảo đảm bảng 12 tháng liên tục và không gây lỗi giao diện.
 
 ##### Luồng ngoại lệ 5a: Tháng có thu nhập không dương nhưng có chi tiêu
 
 1. Tại bước 5, tổng thu nhập của tháng nhỏ hơn hoặc bằng 0 nhưng tổng chi tiêu lớn hơn 0.
-2. Chia trực tiếp sẽ gây lỗi chia cho 0 (`ERR-FIN-002`), nên hệ thống áp dụng hàm từng nhánh và gán tỷ lệ tiết kiệm 0.00%.
+2. Hệ thống áp dụng hàm từng nhánh để tránh phép chia cho 0 và gán tỷ lệ tiết kiệm 0.00%.
 3. Hệ thống hiển thị dòng tiền thuần âm (bằng âm của tổng chi tiêu) và chỉ báo thâm hụt ngân sách.
 
 #### Quy tắc nghiệp vụ đặc thù
 
 1. `FR-REP-01`: bảng luôn gồm đúng 12 tháng liên tục lùi từ tháng kết thúc (mặc định tháng hiện tại).
-2. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi chỉ số tính bằng số thập phân chính xác, làm tròn ngân hàng 2 chữ số, không có sai số dấu phẩy động.
+2. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi chỉ số tính bằng số thập phân chính xác, làm tròn ngân hàng; tiền tệ hiển thị 2 chữ số thập phân, tỷ lệ phần trăm giữ tối thiểu 4 chữ số thập phân ở bước trung gian và hiển thị 2 chữ số, không có sai số dấu phẩy động.
 3. Yêu cầu chức năng liên quan: `FR-REP-01`.
 
 ### 6.17 UC-REP-02: Phân tích cơ cấu thu chi theo nhóm và danh mục
 
-Bảng thuộc tính đặc tả cơ cấu tỷ lệ chi tiêu theo nhóm và danh mục của ca sử dụng Phân tích cơ cấu thu chi theo nhóm và danh mục (`UC-REP-02`):
+Bảng thuộc tính đặc tả cơ cấu tỷ lệ thu chi theo nhóm và danh mục của ca sử dụng Phân tích cơ cấu thu chi theo nhóm và danh mục (`UC-REP-02`):
 
 | Trường | Nội dung |
 | --- | --- |
@@ -1287,13 +1292,13 @@ Báo cáo cơ cấu 2 tầng (Nhóm nhu cầu, Danh mục) phản ánh đúng t�
 #### Luồng sự kiện chính
 
 1. Người dùng chọn tab "Cơ cấu thu chi", khoảng thời gian (mặc định tháng hiện tại) và loại luồng tiền (`EXPENSE` hoặc `INCOME`).
-2. Hệ thống quét các giao dịch đang tồn tại trong khoảng thời gian, thuộc loại luồng tiền đã chọn.
-3. Hệ thống tổng hợp theo 2 tầng (`FR-REP-02`; `Amount_group`, `Amount_cat` là tổng tiền của nhóm và danh mục; `TotalPeriod` là tổng thu hoặc chi của kỳ):
+2. Hệ thống quét các giao dịch đang tồn tại trong khoảng thời gian thuộc loại luồng tiền đã chọn; khi phân tích loại `EXPENSE`, hệ thống tính thêm mọi khoản phí giao dịch liên kết đang tồn tại theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`).
+3. Hệ thống tổng hợp theo 2 tầng khi `TotalPeriod > 0` (`FR-REP-02`; `Amount_group`, `Amount_cat` là tổng tiền phát sinh dương của nhóm và danh mục; `TotalPeriod` là tổng thu hoặc chi của kỳ; nếu `TotalPeriod = 0.00 VNĐ` thì xử lý theo Luồng ngoại lệ 3a):
    - Cấp nhóm nhu cầu:
      $$Share_{group} = \left(\frac{Amount_{group}}{TotalPeriod}\right) \times 100\%$$
    - Cấp danh mục chi tiết (tỷ lệ trên nhóm cha và trên toàn kỳ):
      $$Share_{cat/group} = \left(\frac{Amount_{cat}}{Amount_{group}}\right) \times 100\%, \quad Share_{cat/period} = \left(\frac{Amount_{cat}}{TotalPeriod}\right) \times 100\%$$
-4. Hệ thống truy vấn kỳ liền trước cùng độ dài để so sánh: chênh lệch tuyệt đối bằng số tiền kỳ này trừ kỳ trước; tỷ lệ biến động bằng chênh lệch chia số tiền kỳ trước nhân 100 khi kỳ trước lớn hơn 0; nếu kỳ trước bằng 0 thì hiển thị nhãn "Mới".
+4. Hệ thống truy vấn kỳ liền trước cùng độ dài để so sánh biến động cho tổng toàn kỳ cùng từng nhóm và danh mục có phát sinh trong kỳ hiện tại: chênh lệch tuyệt đối bằng số tiền kỳ này trừ kỳ trước; tỷ lệ biến động bằng chênh lệch chia số tiền kỳ trước nhân 100 khi kỳ trước lớn hơn 0; nếu số tiền kỳ này lớn hơn 0 và kỳ trước bằng 0 thì hiển thị nhãn "Mới"; nếu cả tổng toàn kỳ hiện tại và kỳ trước đều bằng 0.00 VNĐ thì tỷ lệ biến động bằng 0.00%.
 5. Hệ thống sắp xếp nhóm và danh mục theo số tiền giảm dần.
 6. Hệ thống hiển thị bảng tổng hợp phân cấp kèm biểu đồ tròn cơ cấu. Nhóm và danh mục đã xóa vẫn hiển thị kèm nhãn "(đã xóa)" (`FR-REP-02`).
 
@@ -1303,15 +1308,25 @@ Không có.
 
 #### Các luồng ngoại lệ
 
-##### Luồng ngoại lệ 4a: Kỳ trước không có giao dịch khi so sánh biến động
+##### Luồng ngoại lệ 1a: Khoảng ngày hoặc loại luồng tiền không hợp lệ
 
-1. Tại bước 4, kỳ trước không có giao dịch trong danh mục nhưng kỳ này có.
-2. Hệ thống hiển thị chênh lệch tuyệt đối bằng số tiền kỳ này và tỷ lệ biến động "Mới", tránh phép chia cho 0 (`ERR-FIN-002`).
+1. Tại bước 1 hoặc bước 2, hệ thống phát hiện thiếu ngày bắt đầu hoặc ngày kết thúc, ngày bắt đầu lớn hơn ngày kết thúc, hoặc loại luồng tiền khác `EXPENSE` và `INCOME`.
+2. Hệ thống từ chối truy vấn (`ERR-REP-001`) và yêu cầu Người dùng chọn lại khoảng ngày hoặc loại luồng tiền hợp lệ.
+
+##### Luồng ngoại lệ 3a: Kỳ phân tích không có giao dịch nào
+
+1. Tại bước 3, kỳ hiện tại hoặc kỳ tương lai có `TotalPeriod = 0.00 VNĐ`.
+2. Hệ thống gán tổng tiền `0.00 VNĐ`, bỏ qua phép chia cơ cấu, gán tỷ lệ `0.00%` và trả về danh sách nhóm và danh mục rỗng (`AC-REP-02.2`).
+
+##### Luồng ngoại lệ 4a: Kỳ trước bằng 0 khi so sánh biến động
+
+1. Tại bước 4, kỳ trước có giá trị bằng `0.00 VNĐ` ở tổng toàn kỳ, nhóm nhu cầu hoặc danh mục.
+2. Nếu giá trị kỳ này lớn hơn `0.00 VNĐ`, hệ thống gán chênh lệch tuyệt đối bằng số tiền kỳ này và hiển thị nhãn "Mới" cho tỷ lệ biến động; nếu tổng toàn kỳ hiện tại và kỳ trước đều bằng `0.00 VNĐ`, hệ thống gán chênh lệch `0.00 VNĐ` và tỷ lệ biến động `0.00%`, tránh thực hiện phép chia cho 0.
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi phép tổng hợp và tỷ lệ dùng số thập phân chính xác, làm tròn ngân hàng; tiền làm tròn 2 chữ số; tỷ lệ phần trăm giữ tối thiểu 4 chữ số thập phân ở bước trung gian và hiển thị 2 chữ số (`FR-REP-02`).
-2. Nhóm và danh mục đã xóa giữ tên gốc kèm nhãn "(đã xóa)", không gộp vào dòng "Khác". Dòng số 0 chỉ hiện cho các kỳ quá khứ từ kỳ chứa ngày mục được tạo; kỳ trước ngày tạo và kỳ tương lai ẩn dòng.
+1. Quy tắc độ chính xác tài chính (`BR-FIN-01`): mọi phép tổng hợp và tỷ lệ dùng số thập phân chính xác, làm tròn ngân hàng; tiền làm tròn 2 chữ số; tỷ lệ phần trăm giữ tối thiểu 4 chữ số thập phân ở bước trung gian và hiển thị 2 chữ số (`BR-FIN-01`, `FR-REP-02`).
+2. Nhóm và danh mục đã xóa giữ nguyên tên gốc kèm trạng thái đã xóa để hiển thị nhãn "(đã xóa)", không gộp vào dòng "Khác". Danh sách cơ cấu chỉ hiển thị các nhóm và danh mục có số tiền phát sinh lớn hơn 0 trong kỳ phân tích; nếu toàn kỳ hoặc kỳ tương lai không có giao dịch, hệ thống trả về danh sách rỗng (`FR-REP-02`).
 3. Yêu cầu chức năng liên quan: `FR-REP-02`.
 
 ### 6.18 UC-DAT-01: Xuất dữ liệu tài chính
@@ -1486,5 +1501,5 @@ Không có luồng ngoại lệ nghiệp vụ bổ sung ngoài việc phân lo�
 
 #### Quy tắc nghiệp vụ đặc thù
 
-1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp  (`BR-FIN-04`) và liên kết phí chuyển tiền.
+1. `FR-DAT-03`: công cụ kiểm tra độc lập tự động kiểm tra 4 điều kiện toàn vẹn: số dư ví, cân bằng nguồn - đích khi chuyển tiền, liên kết danh mục theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) và liên kết phí chuyển tiền.
 2. Yêu cầu chức năng liên quan: `FR-DAT-03`.

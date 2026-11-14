@@ -140,9 +140,9 @@ class MemoryWalletRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when name is null")
+        @DisplayName("Should throw NullPointerException when name is null")
         void shouldThrowExceptionWhenNameIsNull() {
-            assertThrows(IllegalArgumentException.class, () -> repository.findByName(null));
+            assertThrows(NullPointerException.class, () -> repository.findByName(null));
         }
     }
     // endregion
@@ -186,9 +186,9 @@ class MemoryWalletRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when name is null")
+        @DisplayName("Should throw NullPointerException when name is null")
         void shouldThrowExceptionWhenNameIsNull() {
-            assertThrows(IllegalArgumentException.class, () -> repository.existsByName(null));
+            assertThrows(NullPointerException.class, () -> repository.existsByName(null));
         }
     }
     // endregion
@@ -237,9 +237,9 @@ class MemoryWalletRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when status is null")
+        @DisplayName("Should throw NullPointerException when status is null")
         void shouldThrowExceptionWhenStatusIsNull() {
-            assertThrows(IllegalArgumentException.class, () -> repository.findByStatus(null));
+            assertThrows(NullPointerException.class, () -> repository.findByStatus(null));
         }
     }
     // endregion
@@ -269,9 +269,9 @@ class MemoryWalletRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when status is null")
+        @DisplayName("Should throw NullPointerException when status is null")
         void shouldThrowExceptionWhenStatusIsNull() {
-            assertThrows(IllegalArgumentException.class, () -> repository.countByStatus(null));
+            assertThrows(NullPointerException.class, () -> repository.countByStatus(null));
         }
     }
     // endregion

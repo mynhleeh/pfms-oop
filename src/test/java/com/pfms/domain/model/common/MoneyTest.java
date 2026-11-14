@@ -1,5 +1,7 @@
 package com.pfms.domain.model.common;
 
+import com.pfms.domain.exception.BusinessException;
+import com.pfms.domain.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,13 +27,21 @@ class MoneyTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when creation string is invalid or null")
+    @DisplayName("Should throw BusinessException (ERR_FIN_001) when creation string is invalid or null")
     void testInvalidCreation() {
-        assertThrows(IllegalArgumentException.class, () -> Money.of((String) null));
-        assertThrows(IllegalArgumentException.class, () -> Money.of(""));
-        assertThrows(IllegalArgumentException.class, () -> Money.of("   "));
-        assertThrows(IllegalArgumentException.class, () -> Money.of("invalid_number"));
-        assertThrows(IllegalArgumentException.class, () -> Money.of((BigDecimal) null));
+        BusinessException nullEx = assertThrows(BusinessException.class, () -> Money.of((String) null));
+        assertEquals(ErrorCode.ERR_FIN_001, nullEx.getErrorCode());
+
+        BusinessException emptyEx = assertThrows(BusinessException.class, () -> Money.of(""));
+        assertEquals(ErrorCode.ERR_FIN_001, emptyEx.getErrorCode());
+
+        BusinessException blankEx = assertThrows(BusinessException.class, () -> Money.of("   "));
+        assertEquals(ErrorCode.ERR_FIN_001, blankEx.getErrorCode());
+
+        BusinessException formatEx = assertThrows(BusinessException.class, () -> Money.of("invalid_number"));
+        assertEquals(ErrorCode.ERR_FIN_001, formatEx.getErrorCode());
+
+        assertThrows(NullPointerException.class, () -> Money.of((BigDecimal) null));
     }
 
     @Test
@@ -47,8 +57,8 @@ class MoneyTest {
         assertEquals(Money.of("100000.25"), diff);
         assertEquals(Money.of("150000.50"), initial, "Original instance must remain immutable");
 
-        assertThrows(IllegalArgumentException.class, () -> initial.add(null));
-        assertThrows(IllegalArgumentException.class, () -> initial.subtract(null));
+        assertThrows(NullPointerException.class, () -> initial.add(null));
+        assertThrows(NullPointerException.class, () -> initial.subtract(null));
     }
 
     @Test
@@ -57,7 +67,7 @@ class MoneyTest {
         Money m = Money.of("50000.00");
         assertEquals(Money.of("150000.00"), m.multiply(3L));
         assertEquals(Money.of("75000.00"), m.multiply(new BigDecimal("1.5")));
-        assertThrows(IllegalArgumentException.class, () -> m.multiply((BigDecimal) null));
+        assertThrows(NullPointerException.class, () -> m.multiply((BigDecimal) null));
     }
 
     @Test
@@ -72,7 +82,7 @@ class MoneyTest {
 
         assertThrows(ArithmeticException.class, () -> m.divide(0L));
         assertThrows(ArithmeticException.class, () -> m.divide(BigDecimal.ZERO));
-        assertThrows(IllegalArgumentException.class, () -> m.divide((BigDecimal) null));
+        assertThrows(NullPointerException.class, () -> m.divide((BigDecimal) null));
     }
 
     @Test

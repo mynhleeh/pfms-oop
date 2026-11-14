@@ -141,12 +141,12 @@ class MemoryTransactionRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when null passed to CRUD methods")
+        @DisplayName("Should throw NullPointerException when null passed to CRUD methods")
         void shouldThrowExceptionWhenNullPassedToCrud() {
-            assertThrows(IllegalArgumentException.class, () -> repository.save(null));
-            assertThrows(IllegalArgumentException.class, () -> repository.findById(null));
-            assertThrows(IllegalArgumentException.class, () -> repository.existsById(null));
-            assertThrows(IllegalArgumentException.class, () -> repository.deleteById(null));
+            assertThrows(NullPointerException.class, () -> repository.save(null));
+            assertThrows(NullPointerException.class, () -> repository.findById(null));
+            assertThrows(NullPointerException.class, () -> repository.existsById(null));
+            assertThrows(NullPointerException.class, () -> repository.deleteById(null));
         }
 
         @Test
@@ -288,9 +288,9 @@ class MemoryTransactionRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException on null or blank walletId")
+        @DisplayName("Should throw NullPointerException or IllegalArgumentException on null or blank walletId")
         void shouldThrowOnNullOrBlankWalletId() {
-            assertThrows(IllegalArgumentException.class, () -> repository.findByWalletId((UUID) null));
+            assertThrows(NullPointerException.class, () -> repository.findByWalletId((UUID) null));
             assertThrows(IllegalArgumentException.class, () -> repository.findByWalletId((String) null));
             assertThrows(IllegalArgumentException.class, () -> repository.findByWalletId("   "));
         }
@@ -432,9 +432,9 @@ class MemoryTransactionRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when type is null or dates invalid")
+        @DisplayName("Should throw NullPointerException when type is null or IllegalArgumentException when dates invalid")
         void shouldThrowWhenParametersAreInvalid() {
-            assertThrows(IllegalArgumentException.class, () ->
+            assertThrows(NullPointerException.class, () ->
                     repository.findByDateRangeAndType(
                             LocalDate.of(2026, 3, 1),
                             LocalDate.of(2026, 3, 10),
@@ -483,10 +483,10 @@ class MemoryTransactionRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when categoryId is null")
+        @DisplayName("Should throw NullPointerException when categoryId is null")
         void shouldThrowWhenCategoryIdIsNull() {
-            assertThrows(IllegalArgumentException.class, () -> repository.findByCategoryId(null));
-            assertThrows(IllegalArgumentException.class, () -> repository.existsByCategoryId(null));
+            assertThrows(NullPointerException.class, () -> repository.findByCategoryId(null));
+            assertThrows(NullPointerException.class, () -> repository.existsByCategoryId(null));
         }
 
         @Test
@@ -591,13 +591,13 @@ class MemoryTransactionRepositoryTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when parameters for sumAmountByFilter are invalid")
+        @DisplayName("Should throw exception when parameters for sumAmountByFilter are invalid")
         void shouldThrowOnInvalidParametersForSumAmount() {
             assertThrows(IllegalArgumentException.class, () ->
                     repository.sumAmountByFilter(null, LocalDate.of(2026, 3, 10), TransactionType.INCOME));
             assertThrows(IllegalArgumentException.class, () ->
                     repository.sumAmountByFilter(LocalDate.of(2026, 3, 1), null, TransactionType.INCOME));
-            assertThrows(IllegalArgumentException.class, () ->
+            assertThrows(NullPointerException.class, () ->
                     repository.sumAmountByFilter(LocalDate.of(2026, 3, 1), LocalDate.of(2026, 3, 10), null));
             assertThrows(IllegalArgumentException.class, () ->
                     repository.sumAmountByFilter(LocalDate.of(2026, 3, 10), LocalDate.of(2026, 3, 1), TransactionType.INCOME));

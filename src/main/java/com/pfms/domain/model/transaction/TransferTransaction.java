@@ -1,5 +1,6 @@
 package com.pfms.domain.model.transaction;
 
+import com.pfms.common.util.Preconditions;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
@@ -41,6 +42,7 @@ public class TransferTransaction extends Transaction {
     public void applyToWallet() {
         validateWalletActive(this.sourceWallet);
         validateWalletActive(this.destinationWallet);
+        validateFeeWallet(this.fee, this.sourceWallet);
 
         Money totalDebit = getTotalSourceDeduction();
         if (!this.sourceWallet.hasSufficientBalance(totalDebit)) {
@@ -50,28 +52,30 @@ public class TransferTransaction extends Transaction {
                     totalDebit);
         }
 
-        this.sourceWallet.debit(this.amount);
-        if (this.fee != null) {
-            this.fee.applyFee();
-        }
+        this.sourceWallet.debit(totalDebit);
         this.destinationWallet.credit(this.amount);
     }
 
     @Override
     public void revertFromWallet() {
-        validateWalletActive(this.sourceWallet);
-        validateWalletActive(this.destinationWallet);
+        revertFromWallet(this.sourceWallet, this.destinationWallet);
+    }
 
-        if (!this.destinationWallet.hasSufficientBalance(this.amount)) {
-            throw new InsufficientBalanceException(this.destinationWallet.getId(),
-                    this.destinationWallet.getCurrentBalance(), this.amount);
+    public void revertFromWallet(Wallet sourceWallet, Wallet destinationWallet) {
+        validateLiveWalletsForRevert(sourceWallet, destinationWallet);
+
+        if (!destinationWallet.hasSufficientBalance(this.amount)) {
+            throw new InsufficientBalanceException(
+                    destinationWallet.getId(),
+                    destinationWallet.getCurrentBalance(),
+                    this.amount);
         }
 
-        this.destinationWallet.debit(this.amount);
+        destinationWallet.debit(this.amount);
+        sourceWallet.credit(this.amount);
         if (this.fee != null) {
-            this.fee.revertFee();
+            sourceWallet.credit(this.fee.getAmount());
         }
-        this.sourceWallet.credit(this.amount);
     }
     // endregion
 
@@ -121,6 +125,20 @@ public class TransferTransaction extends Transaction {
             throw new BusinessException(ErrorCode.ERR_FEE_001,
                     "Ví của chi phí phải trùng với ví nguồn chuyển tiền.");
         }
+    }
+
+    private void validateLiveWalletsForRevert(Wallet sourceWallet, Wallet destinationWallet) {
+        Objects.requireNonNull(sourceWallet, "Ví nguồn không được để null");
+        Objects.requireNonNull(destinationWallet, "Ví đích không được để null");
+        Preconditions.checkArgument(
+                Objects.equals(this.sourceWallet.getId(), sourceWallet.getId()),
+                "Ví nguồn không khớp với giao dịch chuyển tiền.");
+        Preconditions.checkArgument(
+                Objects.equals(this.destinationWallet.getId(), destinationWallet.getId()),
+                "Ví đích không khớp với giao dịch chuyển tiền.");
+        validateWalletActive(sourceWallet);
+        validateWalletActive(destinationWallet);
+        validateFeeWallet(this.fee, sourceWallet);
     }
     // endregion
 

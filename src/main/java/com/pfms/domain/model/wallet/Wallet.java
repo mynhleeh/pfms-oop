@@ -203,10 +203,19 @@ public class Wallet {
     }
 
     public boolean hasSufficientBalance(Money amount) {
-        if (amount == null) {
-            throw new IllegalArgumentException("Số tiền kiểm tra không được để null");
-        }
+        Objects.requireNonNull(amount, "Số tiền kiểm tra không được để null");
         return this.currentBalance.isGreaterThanOrEqual(amount);
+    }
+
+    public Wallet copy() {
+        return new Wallet(
+                this.id,
+                this.name.getValue(),
+                this.note.getValue(),
+                this.defaultWallet,
+                this.createdAt,
+                this.state,
+                this.currentBalance);
     }
     // endregion
 
@@ -231,7 +240,7 @@ public class Wallet {
     private static void validatePositiveAmount(Money amount) {
         Objects.requireNonNull(amount, "Số tiền không được để null");
         if (!amount.isPositive()) {
-            throw new IllegalArgumentException("Số tiền giao dịch phải là số dương lớn hơn 0.");
+            throw new BusinessException(ErrorCode.ERR_FIN_001, "Số tiền giao dịch phải là số dương lớn hơn 0.");
         }
     }
 

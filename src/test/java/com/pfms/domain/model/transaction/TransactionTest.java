@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,10 +48,22 @@ class TransactionTest {
     static class ConcreteTestTransaction extends Transaction {
         private boolean applied = false;
         private boolean reverted = false;
+        private final LocalDateTime customCreatedAt;
 
         public ConcreteTestTransaction(UUID transactionId, Money amount, TransactionDate transactionDate,
                 String note, TransactionFee fee) {
+            this(transactionId, amount, transactionDate, note, fee, null);
+        }
+
+        public ConcreteTestTransaction(UUID transactionId, Money amount, TransactionDate transactionDate,
+                String note, TransactionFee fee, LocalDateTime customCreatedAt) {
             super(transactionId, amount, transactionDate, note, fee);
+            this.customCreatedAt = customCreatedAt;
+        }
+
+        @Override
+        public LocalDateTime getCreatedAt() {
+            return (this.customCreatedAt != null) ? this.customCreatedAt : super.getCreatedAt();
         }
 
         @Override
@@ -479,6 +492,67 @@ class TransactionTest {
 
             BusinessException ex = assertThrows(BusinessException.class, () -> txn.updateBaseFee(mismatchedFee));
             assertEquals(ErrorCode.ERR_FEE_001, ex.getErrorCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("Group 5: Shared Descending Order Comparator")
+    class DescendingOrderComparatorTests {
+
+        private Transaction createSampleTransaction(TransactionDate date, LocalDateTime createdAt) {
+            return new ConcreteTestTransaction(
+                    UUID.randomUUID(),
+                    defaultAmount,
+                    date,
+                    "Sample",
+                    null,
+                    createdAt);
+        }
+
+        @Test
+        @DisplayName("DESCENDING_ORDER should place newer transactionDate before older dates")
+        void testOrdersByTransactionDateDescending() {
+            Transaction older = createSampleTransaction(
+                    TransactionDate.of(LocalDate.now().minusDays(5)),
+                    LocalDateTime.of(2025, 1, 10, 23, 59));
+            Transaction middle = createSampleTransaction(
+                    TransactionDate.of(LocalDate.now().minusDays(2)),
+                    LocalDateTime.of(2025, 1, 10, 8, 0));
+            Transaction newest = createSampleTransaction(
+                    TransactionDate.now(),
+                    LocalDateTime.of(2025, 1, 10, 6, 0));
+
+            List<Transaction> sorted = List.of(older, newest, middle).stream()
+                    .sorted(Transaction.DESCENDING_ORDER)
+                    .toList();
+
+            assertEquals(List.of(newest, middle, older), sorted);
+        }
+
+        @Test
+        @DisplayName("DESCENDING_ORDER should break same-date ties by createdAt descending")
+        void testBreaksSameDateTiesByCreatedAtDescending() {
+            TransactionDate sameDay = TransactionDate.of(LocalDate.now().minusDays(1));
+            Transaction morning = createSampleTransaction(sameDay, LocalDateTime.of(2025, 3, 1, 8, 15, 0));
+            Transaction noon = createSampleTransaction(sameDay, LocalDateTime.of(2025, 3, 1, 12, 30, 0));
+            Transaction evening = createSampleTransaction(sameDay, LocalDateTime.of(2025, 3, 1, 19, 45, 0));
+
+            List<Transaction> sorted = List.of(morning, evening, noon).stream()
+                    .sorted(Transaction.DESCENDING_ORDER)
+                    .toList();
+
+            assertEquals(List.of(evening, noon, morning), sorted);
+        }
+
+        @Test
+        @DisplayName("DESCENDING_ORDER should return zero when date and createdAt match")
+        void testReturnsZeroForEqualDateAndCreatedAt() {
+            TransactionDate sameDay = TransactionDate.of(LocalDate.now().minusDays(1));
+            LocalDateTime sameTimestamp = LocalDateTime.of(2025, 3, 1, 14, 0, 0);
+            Transaction firstTransaction = createSampleTransaction(sameDay, sameTimestamp);
+            Transaction secondTransaction = createSampleTransaction(sameDay, sameTimestamp);
+
+            assertEquals(0, Transaction.DESCENDING_ORDER.compare(firstTransaction, secondTransaction));
         }
     }
 }

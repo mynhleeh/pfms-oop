@@ -2,27 +2,35 @@ package com.pfms.service.impl;
 
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.DuplicateEntityException;
-import com.pfms.domain.exception.EntityNotFoundException;
 import com.pfms.domain.exception.ErrorCode;
+import com.pfms.domain.exception.StorageException;
+import com.pfms.domain.model.common.EntityName;
 import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
+import com.pfms.domain.model.common.Note;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.repository.BalanceAdjustmentRepository;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
-import com.pfms.presentation.dto.AdjustBalanceRequestDTO;
-import com.pfms.presentation.dto.BalanceAdjustmentResponseDTO;
-import com.pfms.presentation.dto.CreateWalletRequestDTO;
-import com.pfms.presentation.dto.UpdateWalletRequestDTO;
-import com.pfms.presentation.dto.WalletResponseDTO;
-import com.pfms.presentation.dto.WalletsSummaryDTO;
+import com.pfms.presentation.dto.wallet.AdjustBalanceRequestDTO;
+import com.pfms.presentation.dto.wallet.BalanceAdjustmentResponseDTO;
+import com.pfms.presentation.dto.wallet.CreateWalletRequestDTO;
+import com.pfms.presentation.dto.wallet.UpdateWalletRequestDTO;
+import com.pfms.presentation.dto.wallet.WalletResponseDTO;
+import com.pfms.presentation.dto.wallet.WalletsSummaryDTO;
 import com.pfms.service.WalletService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -71,107 +79,76 @@ public class WalletServiceImpl implements WalletService {
     public WalletResponseDTO createWallet(CreateWalletRequestDTO request) {
         Objects.requireNonNull(request, "Yêu cầu tạo ví không được để null");
 
-        String name = request.getName();
-        if (walletRepository.existsByName(name)) {
-            throw new DuplicateEntityException(ErrorCode.ERR_NAM_002, "Ví", name);
-        }
-
         Wallet wallet = new Wallet(
                 UUID.randomUUID(),
-                name,
+                request.getName(),
                 request.getNote(),
                 false);
 
+        if (walletRepository.existsByName(wallet.getName())) {
+            throw new DuplicateEntityException(ErrorCode.ERR_NAM_002, "Ví", wallet.getName());
+        }
+
         Wallet saved = walletRepository.save(wallet);
 
-        return new WalletResponseDTO(
-                saved.getId(),
-                saved.getName(),
-                saved.getCurrentBalance().getAmount(),
-                saved.getCurrentBalance().getCurrency(),
-                saved.isDefaultWallet(),
-                saved.getStatus().name(),
-                saved.getNote(),
-                saved.getCreatedAt());
+        return toResponseDTO(saved);
     }
 
     @Override
     public WalletResponseDTO updateWallet(UpdateWalletRequestDTO request) {
         Objects.requireNonNull(request, "Yêu cầu cập nhật ví không được để null");
+        Objects.requireNonNull(request.getWalletId(), "Mã ví không được để null");
 
-        UUID walletId = request.getWalletId();
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Ví", walletId.toString()));
+        String validName = EntityName.of(request.getName(), "Tên ví").getValue();
+        Note.of(request.getNote(), "Ghi chú ví");
 
-        String newName = request.getName().trim();
-        if (!wallet.getName().equalsIgnoreCase(newName)) {
-            if (walletRepository.existsByName(newName)) {
-                throw new DuplicateEntityException(ErrorCode.ERR_NAM_002, "Ví", newName);
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, request.getWalletId(), EntityLookupSupport.LABEL_WALLET);
+
+        if (!wallet.getName().equalsIgnoreCase(validName)) {
+            if (walletRepository.existsByName(validName)) {
+                throw new DuplicateEntityException(ErrorCode.ERR_NAM_002, "Ví", validName);
             }
         }
 
-        wallet.updateInfo(newName, request.getNote());
+        wallet.updateInfo(validName, request.getNote());
         Wallet saved = walletRepository.save(wallet);
 
-        return new WalletResponseDTO(
-                saved.getId(),
-                saved.getName(),
-                saved.getCurrentBalance().getAmount(),
-                saved.getCurrentBalance().getCurrency(),
-                saved.isDefaultWallet(),
-                saved.getStatus().name(),
-                saved.getNote(),
-                saved.getCreatedAt());
+        return toResponseDTO(saved);
     }
 
     @Override
     public WalletResponseDTO archiveWallet(UUID walletId) {
         Objects.requireNonNull(walletId, "Mã ví không được để null");
 
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Ví", walletId.toString()));
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, walletId, EntityLookupSupport.LABEL_WALLET);
 
         wallet.archive();
         Wallet saved = walletRepository.save(wallet);
 
-        return new WalletResponseDTO(
-                saved.getId(),
-                saved.getName(),
-                saved.getCurrentBalance().getAmount(),
-                saved.getCurrentBalance().getCurrency(),
-                saved.isDefaultWallet(),
-                saved.getStatus().name(),
-                saved.getNote(),
-                saved.getCreatedAt());
+        return toResponseDTO(saved);
     }
 
     @Override
     public WalletResponseDTO activateWallet(UUID walletId) {
         Objects.requireNonNull(walletId, "Mã ví không được để null");
 
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Ví", walletId.toString()));
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, walletId, EntityLookupSupport.LABEL_WALLET);
 
         wallet.activate();
         Wallet saved = walletRepository.save(wallet);
 
-        return new WalletResponseDTO(
-                saved.getId(),
-                saved.getName(),
-                saved.getCurrentBalance().getAmount(),
-                saved.getCurrentBalance().getCurrency(),
-                saved.isDefaultWallet(),
-                saved.getStatus().name(),
-                saved.getNote(),
-                saved.getCreatedAt());
+        return toResponseDTO(saved);
     }
 
     @Override
     public void deleteWallet(UUID walletId) {
         Objects.requireNonNull(walletId, "Mã ví không được để null");
 
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Ví", walletId.toString()));
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, walletId, EntityLookupSupport.LABEL_WALLET);
 
         if (wallet.isDefaultWallet()) {
             throw new BusinessException(ErrorCode.ERR_WAL_001, "Không thể xóa ví mặc định của hệ thống.");
@@ -191,31 +168,25 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public BalanceAdjustmentResponseDTO adjustBalance(AdjustBalanceRequestDTO request) {
         Objects.requireNonNull(request, "Yêu cầu điều chỉnh số dư không được để null");
-
-        UUID walletId = request.getWalletId();
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Ví", walletId.toString()));
+        Objects.requireNonNull(request.getWalletId(), "Mã ví không được để null");
 
         Money actualBalance = Money.of(request.getActualBalance());
-        TransactionDate adjustedAt = (request.getAdjustedAt() == null)
-                ? TransactionDate.now()
-                : TransactionDate.of(request.getAdjustedAt());
+        TransactionDate adjustedAt = TransactionDate.ofOrToday(request.getAdjustedAt());
 
+        Wallet wallet = EntityLookupSupport.findEntityOrThrow(
+                walletRepository, request.getWalletId(), EntityLookupSupport.LABEL_WALLET);
+        Wallet previousSnapshot = wallet.copy();
         BalanceAdjustmentRecord record = wallet.adjustBalance(actualBalance, adjustedAt, request.getReason());
 
         walletRepository.save(wallet);
-        balanceAdjustmentRepository.save(record);
+        try {
+            balanceAdjustmentRepository.save(record);
+        } catch (StorageException storageException) {
+            RollbackSupport.runRollbackStep(() -> walletRepository.save(previousSnapshot), storageException);
+            throw storageException;
+        }
 
-        return new BalanceAdjustmentResponseDTO(
-                record.getRecordId(),
-                record.getWalletId(),
-                record.getPreviousBalance().getAmount(),
-                record.getActualBalance().getAmount(),
-                record.getDifference().getAmount(),
-                record.getActualBalance().getCurrency(),
-                record.getReason(),
-                record.getAdjustedAt().getDate(),
-                java.time.LocalDateTime.now());
+        return toAdjustmentResponseDTO(record);
     }
     // endregion
 
@@ -226,59 +197,81 @@ public class WalletServiceImpl implements WalletService {
                 ? walletRepository.findAll()
                 : walletRepository.findByStatus(statusFilter);
 
-        List<Wallet> allWallets = walletRepository.findAll();
-        Money totalSystemMoney = Money.ZERO;
-        for (Wallet w : allWallets) {
-            if (w.getStatus() == EntityStatus.ACTIVE ||
-                    (w.getStatus() == EntityStatus.ARCHIVED && w.getCurrentBalance().isPositive())) {
-                totalSystemMoney = totalSystemMoney.add(w.getCurrentBalance());
-            }
-        }
+        Money totalSystemMoney = walletRepository.findAll().stream()
+                .filter(this::isIncludedInSystemTotal)
+                .map(Wallet::getCurrentBalance)
+                .reduce(Money.ZERO, Money::add);
+
         BigDecimal totalBalance = totalSystemMoney.getAmount();
+        List<WalletResponseDTO> walletDtos = filteredWallets.stream()
+                .map(this::toResponseDTO)
+                .toList();
 
-        List<WalletResponseDTO> walletDtos = new ArrayList<>(filteredWallets.size());
-        for (Wallet w : filteredWallets) {
-            walletDtos.add(new WalletResponseDTO(
-                    w.getId(),
-                    w.getName(),
-                    w.getCurrentBalance().getAmount(),
-                    w.getCurrentBalance().getCurrency(),
-                    w.isDefaultWallet(),
-                    w.getStatus().name(),
-                    w.getNote(),
-                    w.getCreatedAt()
-            ));
-        }
+        Map<UUID, BigDecimal> sortedShares = calculateWalletShares(filteredWallets, totalBalance);
 
-        Map<UUID, BigDecimal> rawShares = new HashMap<>();
+        return new WalletsSummaryDTO(walletDtos, totalBalance, totalSystemMoney.getCurrency(), sortedShares);
+    }
+    // endregion
+
+    // region Helpers
+    private WalletResponseDTO toResponseDTO(Wallet wallet) {
+        return new WalletResponseDTO(
+                wallet.getId(),
+                wallet.getName(),
+                wallet.getCurrentBalance().getAmount(),
+                wallet.getCurrentBalance().getCurrency(),
+                wallet.isDefaultWallet(),
+                wallet.getStatus().name(),
+                wallet.getNote(),
+                wallet.getCreatedAt());
+    }
+
+    private BalanceAdjustmentResponseDTO toAdjustmentResponseDTO(BalanceAdjustmentRecord record) {
+        return new BalanceAdjustmentResponseDTO(
+                record.getRecordId(),
+                record.getWalletId(),
+                record.getPreviousBalance().getAmount(),
+                record.getActualBalance().getAmount(),
+                record.getDifference().getAmount(),
+                record.getActualBalance().getCurrency(),
+                record.getReason(),
+                record.getAdjustedAt().getDate(),
+                LocalDateTime.now());
+    }
+
+    private boolean isIncludedInSystemTotal(Wallet wallet) {
+        return wallet.getStatus() == EntityStatus.ACTIVE
+                || (wallet.getStatus() == EntityStatus.ARCHIVED && wallet.getCurrentBalance().isPositive());
+    }
+
+    private Map<UUID, BigDecimal> calculateWalletShares(List<Wallet> wallets, BigDecimal totalBalance) {
         boolean isTotalZero = totalBalance.compareTo(BigDecimal.ZERO) == 0;
+        Map<UUID, BigDecimal> rawShares = new HashMap<>();
 
-        for (Wallet w : filteredWallets) {
-            if (w.getStatus() == EntityStatus.ARCHIVED && w.getCurrentBalance().isZero()) {
+        for (Wallet wallet : wallets) {
+            if (wallet.getStatus() == EntityStatus.ARCHIVED && wallet.getCurrentBalance().isZero()) {
                 continue;
             }
-
-            if (isTotalZero) {
-                rawShares.put(w.getId(), BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN));
-            } else {
-                BigDecimal intermediate = w.getCurrentBalance().getAmount()
-                        .multiply(BigDecimal.valueOf(100))
-                        .divide(totalBalance, 4, RoundingMode.HALF_EVEN);
-                BigDecimal finalShare = intermediate.setScale(2, RoundingMode.HALF_EVEN);
-                rawShares.put(w.getId(), finalShare);
-            }
+            rawShares.put(wallet.getId(), calculateShare(wallet, totalBalance, isTotalZero));
         }
 
-        Map<UUID, BigDecimal> sortedShares = rawShares.entrySet().stream()
+        return rawShares.entrySet().stream()
                 .sorted(Map.Entry.<UUID, BigDecimal>comparingByValue().reversed())
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new));
+    }
 
-        return new WalletsSummaryDTO(walletDtos, totalBalance, totalSystemMoney.getCurrency(), sortedShares);
+    private BigDecimal calculateShare(Wallet wallet, BigDecimal totalBalance, boolean isTotalZero) {
+        if (isTotalZero) {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN);
+        }
+        return wallet.getCurrentBalance().getAmount()
+                .multiply(BigDecimal.valueOf(100))
+                .divide(totalBalance, 4, RoundingMode.HALF_EVEN)
+                .setScale(2, RoundingMode.HALF_EVEN);
     }
     // endregion
 }

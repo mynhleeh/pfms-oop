@@ -7,6 +7,7 @@ import com.pfms.domain.model.common.Note;
 import com.pfms.domain.model.common.TransactionDate;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +19,13 @@ import java.util.UUID;
  * applyToWallet/revertFromWallet.
  */
 public abstract class Transaction {
+
+    // region Constants
+    public static final Comparator<Transaction> DESCENDING_ORDER = Comparator
+            .comparing((Transaction transaction) -> transaction.getTransactionDate().getDate())
+            .reversed()
+            .thenComparing(Comparator.comparing(Transaction::getCreatedAt).reversed());
+    // endregion
 
     // region State
     protected final UUID transactionId;

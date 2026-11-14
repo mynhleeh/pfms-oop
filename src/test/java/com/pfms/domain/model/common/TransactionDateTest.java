@@ -314,5 +314,74 @@ class TransactionDateTest {
             assertThrows(NullPointerException.class, () -> date.isAfter(null));
         }
     }
+
+    @Nested
+    @DisplayName("Group 4: ofOrToday and validateRange Factory/Guard Methods")
+    class OfOrTodayAndValidateRangeTests {
+
+        @Test
+        @DisplayName("ofOrToday(null) should return today's TransactionDate")
+        void testOfOrTodayWithNullReturnsToday() {
+            TransactionDate resolved = TransactionDate.ofOrToday(null);
+
+            assertEquals(TransactionDate.now(), resolved);
+            assertEquals(LocalDate.now(), resolved.getDate());
+        }
+
+        @Test
+        @DisplayName("ofOrToday(validPastDate) should wrap that exact date and reject future dates")
+        void testOfOrTodayWithExplicitAndFutureDates() {
+            LocalDate pastDate = LocalDate.of(2024, 2, 29);
+            assertEquals(TransactionDate.of(pastDate), TransactionDate.ofOrToday(pastDate));
+
+            LocalDate tomorrow = LocalDate.now().plusDays(1);
+            BusinessException exception = assertThrows(
+                    BusinessException.class,
+                    () -> TransactionDate.ofOrToday(tomorrow));
+            assertEquals(ErrorCode.ERR_FIN_001, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("validateRange should accept null bounds, open-ended bounds, same day and leap day")
+        void testValidateRangeAcceptsValidBounds() {
+            LocalDate today = LocalDate.now();
+            LocalDate leapDay = LocalDate.of(2024, 2, 29);
+
+            assertDoesNotThrow(() -> TransactionDate.validateRange(null, null));
+            assertDoesNotThrow(() -> TransactionDate.validateRange(leapDay, null));
+            assertDoesNotThrow(() -> TransactionDate.validateRange(null, today));
+            assertDoesNotThrow(() -> TransactionDate.validateRange(leapDay, leapDay));
+            assertDoesNotThrow(() -> TransactionDate.validateRange(leapDay, today));
+        }
+
+        @Test
+        @DisplayName("validateRange should reject future startDate or future endDate with ERR_FIN_001")
+        void testValidateRangeRejectsFutureBounds() {
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+            BusinessException futureStartException = assertThrows(
+                    BusinessException.class,
+                    () -> TransactionDate.validateRange(tomorrow, null));
+            assertEquals(ErrorCode.ERR_FIN_001, futureStartException.getErrorCode());
+
+            BusinessException futureEndException = assertThrows(
+                    BusinessException.class,
+                    () -> TransactionDate.validateRange(yesterday, tomorrow));
+            assertEquals(ErrorCode.ERR_FIN_001, futureEndException.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("validateRange should throw BusinessException ERR_FIN_001 when startDate is after endDate")
+        void testValidateRangeRejectsInvertedBounds() {
+            LocalDate startDate = LocalDate.now().minusDays(1);
+            LocalDate endDate = LocalDate.now().minusDays(5);
+
+            BusinessException exception = assertThrows(
+                    BusinessException.class,
+                    () -> TransactionDate.validateRange(startDate, endDate));
+            assertEquals(ErrorCode.ERR_FIN_001, exception.getErrorCode());
+        }
+    }
 }
 

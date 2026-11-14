@@ -77,9 +77,9 @@ class MemoryGenericRepositoryTest {
 
         @Test
         @DisplayName("Khởi tạo thất bại khi idExtractor là null")
-        void shouldThrowIllegalArgumentExceptionWhenIdExtractorIsNull() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        void shouldThrowNullPointerExceptionWhenIdExtractorIsNull() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> new DummyMemoryRepository(null)
             );
             assertTrue(ex.getMessage().contains("must not be null"));
@@ -115,9 +115,9 @@ class MemoryGenericRepositoryTest {
 
         @Test
         @DisplayName("Từ chối lưu thực thể null")
-        void shouldThrowIllegalArgumentExceptionWhenSavingNullEntity() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        void shouldThrowNullPointerExceptionWhenSavingNullEntity() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.save(null)
             );
             assertTrue(ex.getMessage().contains("must not be null"));
@@ -125,11 +125,11 @@ class MemoryGenericRepositoryTest {
 
         @Test
         @DisplayName("Từ chối lưu thực thể có ID là null")
-        void shouldThrowIllegalArgumentExceptionWhenEntityIdIsNull() {
+        void shouldThrowNullPointerExceptionWhenEntityIdIsNull() {
             DummyEntity invalidEntity = new DummyEntity(null, "Không có ID");
 
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.save(invalidEntity)
             );
             assertTrue(ex.getMessage().contains("must not be null"));
@@ -161,9 +161,9 @@ class MemoryGenericRepositoryTest {
 
         @Test
         @DisplayName("Từ chối tìm kiếm với mã định danh null")
-        void shouldThrowIllegalArgumentExceptionWhenFindByIdWithNullId() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        void shouldThrowNullPointerExceptionWhenFindByIdWithNullId() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.findById(null)
             );
             assertTrue(ex.getMessage().contains("must not be null"));
@@ -241,9 +241,9 @@ class MemoryGenericRepositoryTest {
 
         @Test
         @DisplayName("Từ chối kiểm tra tồn tại với mã định danh null")
-        void shouldThrowIllegalArgumentExceptionWhenExistsByIdWithNullId() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        void shouldThrowNullPointerExceptionWhenExistsByIdWithNullId() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.existsById(null)
             );
             assertTrue(ex.getMessage().contains("must not be null"));
@@ -276,9 +276,9 @@ class MemoryGenericRepositoryTest {
 
         @Test
         @DisplayName("Từ chối xóa với mã định danh null")
-        void shouldThrowIllegalArgumentExceptionWhenDeleteByIdWithNullId() {
-            IllegalArgumentException ex = assertThrows(
-                    IllegalArgumentException.class,
+        void shouldThrowNullPointerExceptionWhenDeleteByIdWithNullId() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
                     () -> repository.deleteById(null)
             );
             assertTrue(ex.getMessage().contains("must not be null"));

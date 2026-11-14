@@ -1,12 +1,12 @@
 # 01. Kiến trúc Hệ thống và Phân tầng Mã nguồn
 
-Tài liệu này xác lập cấu trúc kiến trúc tổng thể cho Hệ thống Quản lý Tài chính Cá nhân PFMS vận hành trên môi trường giao diện đồ họa người dùng. Văn bản định hình mô hình tổ chức phần mềm thành bốn tầng chức năng độc lập gồm tầng trình diễn đồ họa, tầng dịch vụ điều phối, tầng nghiệp vụ cốt lõi và tầng hạ tầng lưu trữ.
+Tài liệu này xác lập cấu trúc kiến trúc tổng thể cho Hệ thống Quản lý Tài chính Cá nhân PFMS vận hành trên môi trường giao diện đồ họa người dùng. Văn bản định hình mô hình tổ chức phần mềm gồm bốn tầng chức năng độc lập cùng tầng nền tảng kỹ thuật dùng chung (`com.pfms.common`).
 
 Kiến trúc giải quyết ba yêu cầu kỹ thuật cốt lõi: bảo vệ tính toàn vẹn của các quy tắc tài chính trước sự thay đổi của giao diện và lưu trữ thông qua nguyên lý Nghịch đảo Phụ thuộc; chuẩn hóa cấu trúc phân cấp gói mã nguồn `com.pfms` theo nguyên tắc không chu trình phụ thuộc; và xác lập luồng xử lý và biến đổi dữ liệu hai chiều khép kín từ thao tác trên biểu mẫu đồ họa đến bản ghi lưu trữ bền vững trên hệ thống tệp cục bộ.
 
 ## 1.1 Tổng quan Kiến trúc Phân tầng
 
-Mục này xác lập cơ sở lý thuyết và mô hình hóa trực quan cấu trúc phân tầng của hệ thống. Nội dung tập trung vào việc so sánh định lượng giữa kiến trúc phân tầng với mô hình kịch bản giao dịch, đồng thời đặc tả sơ đồ bốn tầng thể hiện chiều phụ thuộc thời gian biên dịch và luồng gọi hàm thời gian chạy.
+Mục này xác lập cơ sở lý thuyết và mô hình hóa trực quan cấu trúc phân tầng của hệ thống. Nội dung tập trung vào việc so sánh định lượng giữa kiến trúc phân tầng với mô hình kịch bản giao dịch, đồng thời đặc tả sơ đồ phân tầng hệ thống thể hiện chiều phụ thuộc thời gian biên dịch và luồng gọi hàm thời gian chạy.
 
 ### 1.1.1 Lý do Lựa chọn Kiến trúc Phân tầng
 
@@ -26,90 +26,51 @@ Hệ thống Quản lý Tài chính Cá nhân PFMS vận hành trên môi trư�
 
 Việc áp dụng kiến trúc phân tầng chấp nhận đánh đổi kỹ thuật về việc gia tăng số lượng lớp trung gian và chi phí ánh xạ dữ liệu qua các tầng. Đổi lại, hệ thống đạt được tính độc lập hoàn toàn của các quy tắc tài chính và năng lực kiểm thử tự động toàn diện. Ranh giới giữa các tầng được thiết lập theo nguyên tắc đóng kín nghiêm ngặt, ngăn chặn việc giao tiếp vượt cấp giữa tầng trình diễn và tầng lưu trữ.
 
-### 1.1.2 Sơ đồ Kiến trúc Bốn Tầng
+### 1.1.2 Sơ đồ Kiến trúc Phân tầng
 
-Hệ thống được tổ chức thành bốn tầng chức năng độc lập theo nguyên tắc đóng kín và hướng tâm:
+Hệ thống được tổ chức thành bốn tầng chức năng độc lập theo nguyên tắc đóng kín và hướng tâm, cùng một tầng nền tảng dùng chung:
+0. Tầng Nền tảng Dùng chung (Common Layer): Cung cấp các tiện ích tiền điều kiện kỹ thuật và hàm bổ trợ dùng chung, hoàn toàn phi nghiệp vụ và không phụ thuộc vào bất kỳ tầng nào khác.
 1. Tầng Trình diễn (Presentation Layer): Tiếp nhận sự kiện tương tác từ người dùng, điều hướng các màn hình chức năng và biểu mẫu đồ họa, đóng gói dữ liệu vào các đối tượng DTO và kết xuất bảng dữ liệu hiển thị ra màn hình.
 2. Tầng Dịch vụ (Application Layer): Quản lý vòng đời thực thi các ca sử dụng, điều phối giao dịch tài chính, nạp dữ liệu từ kho lưu trữ và ủy quyền xử lý tính toán cho tầng miền.
 3. Tầng Nghiệp vụ cốt lõi (Domain Layer): Trung tâm của toàn bộ hệ thống, chứa các thực thể tài chính, đối tượng giá trị bất biến, quy tắc nghiệp vụ bất biến và các giao diện kho lưu trữ trừu tượng.
 4. Tầng Hạ tầng (Infrastructure Layer): Nằm ở rìa ngoài hệ thống, cài đặt cụ thể các giao diện kho lưu trữ bằng cơ chế đọc ghi tệp tin cục bộ hoặc cơ chế lưu trữ bộ nhớ phục vụ kiểm thử tự động.
 
-Sơ đồ khối dưới đây mô tả cấu trúc bốn tầng cùng ranh giới phụ thuộc mã nguồn và luồng gọi hàm thời gian chạy:
+Sơ đồ khối dưới đây mô tả cấu trúc phân tầng cùng ranh giới phụ thuộc mã nguồn và luồng gọi hàm thời gian chạy:
 
-```plantuml
-@startuml
-title Sơ đồ Kiến trúc Bốn Tầng - Personal Finance Management System
-
-top to bottom direction
-skinparam packageStyle rectangle
-skinparam componentStyle uml2
-skinparam shadowing false
-skinparam roundcorner 6
-skinparam defaultFontName Arial
-skinparam defaultFontSize 12
-
-package "Tầng 1: Trình diễn (Presentation Layer)\ncom.pfms.presentation" as L1 #F0F7FF {
-    [Bộ Điều hướng Khung nhìn Đồ họa] as GUI
-    [Đối tượng Truyền Dữ liệu DTO] as DTO
-    GUI -down-> DTO
-}
-
-package "Tầng 2: Dịch vụ (Application Layer)\ncom.pfms.service" as L2 #F6FFED {
-    [Dịch vụ Điều phối Ca sử dụng] as Service
-}
-
-package "Tầng 3: Nghiệp vụ Cốt lõi (Domain Layer)\ncom.pfms.domain" as L3 #FFFBE6 {
-    [Thực thể & Đối tượng Giá trị] as Domain
-    interface "Giao diện Kho Lưu trữ" as RepoInterface
-}
-
-package "Tầng 4: Hạ tầng (Infrastructure Layer)\ncom.pfms.infrastructure" as L4 #FFF0F6 {
-    [Bộ Điều hợp Lưu trữ Tệp Cục bộ] as FileRepo
-    [Bộ Điều hợp Lưu trữ Bộ nhớ Kiểm thử] as MemoryRepo
-}
-
-GUI -down-> Service : 1. Truyền DTO
-Service -down-> Domain : 2. Ủy quyền tính toán
-Service -down-> RepoInterface : 3. Thao tác dữ liệu
-
-FileRepo .up.|> RepoInterface : Hiện thực hóa (implements)
-MemoryRepo .up.|> RepoInterface : Hiện thực hóa (implements)
-
-@enduml
-```
+![Sơ đồ Kiến trúc Phân tầng Hệ thống](01-so-do-kien-truc-bon-tang.drawio)
 
 Nguyên tắc phụ thuộc và luồng thực thi:
-- Phụ thuộc mã nguồn: Mọi chiều phụ thuộc đều hướng tâm về Tầng Nghiệp vụ cốt lõi. Tầng Hạ tầng phụ thuộc ngược vào các giao diện kho lưu trữ được định nghĩa trong Tầng Nghiệp vụ, bảo đảm nghiệp vụ tài chính độc lập hoàn toàn khỏi hệ thống tệp.
+- Phụ thuộc mã nguồn: Mọi chiều phụ thuộc nghiệp vụ đều hướng tâm về Tầng Nghiệp vụ cốt lõi. Tầng Hạ tầng phụ thuộc ngược vào các giao diện kho lưu trữ được định nghĩa trong Tầng Nghiệp vụ, bảo đảm nghiệp vụ tài chính độc lập hoàn toàn khỏi hệ thống tệp. Tầng Nền tảng Dùng chung (`com.pfms.common`) là tầng kỹ thuật độc lập tuyệt đối (zero internal dependency), cho phép cả bốn tầng chức năng sử dụng để chuẩn hóa việc kiểm tra tiền điều kiện mà không tạo chu trình phụ thuộc vòng.
 - Luồng thực thi thời gian chạy: Lệnh điều khiển đi từ giao diện đồ họa xuống Tầng Dịch vụ, ủy quyền tính toán cho Tầng Nghiệp vụ và thực thi lưu trữ dữ liệu thông qua bộ điều hợp của Tầng Hạ tầng.
-
-> [!NOTE]
-> **Tệp sơ đồ nguồn đính kèm:** [`01-so-do-kien-truc-bon-tang.drawio`](01-so-do-kien-truc-bon-tang.drawio)
-> Đây là bản vẽ phác thảo sơ bộ phục vụ định hình bố cục không gian ban đầu, mang tính chất tham khảo nội bộ và **chưa phải bản vẽ chốt chính thức (baseline)**. Các thành viên dự án và các hệ thống hỗ trợ tự động tuyệt đối không sử dụng các chi tiết đồ họa trong tệp này làm nguồn đối chiếu chân lý. Toàn bộ sơ đồ đồ họa sẽ được rà soát và chuẩn hóa đồng bộ sau khi nội dung kỹ thuật của hồ sơ được đóng khóa hoàn toàn.
 
 ## 1.2 Trách nhiệm và Ranh giới của các Tầng
 
-Để bảo đảm tính gắn kết cao và ngăn chặn hiện tượng rò rỉ logic giữa các thành phần, hệ thống xác lập bảng phân định trách nhiệm và ràng buộc ranh giới cho bốn tầng kiến trúc:
+Để bảo đảm tính gắn kết cao và ngăn chặn hiện tượng rò rỉ logic giữa các thành phần, hệ thống xác lập bảng phân định trách nhiệm và ràng buộc ranh giới cho các tầng kiến trúc:
 
 | Tầng kiến trúc | Trách nhiệm chính | Ràng buộc ranh giới |
 | :--- | :--- | :--- |
 | **Tầng Trình diễn** | Tiếp nhận sự kiện tương tác từ người dùng và biểu mẫu nhập liệu, phân phối sự kiện điều hướng màn hình, đóng gói dữ liệu vào DTO và kết xuất bảng dữ liệu đồ họa. | Không chứa logic tính toán tài chính; không truy xuất trực tiếp kho lưu trữ; không tham chiếu trực tiếp thực thể nghiệp vụ. |
 | **Tầng Dịch vụ** | Quản lý vòng đời thực thi ca sử dụng, điều phối giao dịch, nạp thực thể từ kho lưu trữ và ủy quyền xử lý tính toán cho tầng nghiệp vụ. | Không chứa quy tắc kiểm tra logic tài chính chuyên sâu; không phụ thuộc vào cơ chế lưu trữ tệp cụ thể. |
-| **Tầng Nghiệp vụ** | Thực thi các quy tắc bất biến tài chính, tính toán số học chính xác, kiểm soát số dư không âm và khai báo giao diện kho lưu trữ trừu tượng. | Không phụ thuộc vào bất kỳ thành phần nào bên ngoài; không tham chiếu đến mã nguồn giao diện đồ họa hay cơ chế đọc ghi tệp. |
+| **Tầng Nghiệp vụ** | Thực thi các quy tắc bất biến tài chính, tính toán số học chính xác, kiểm soát số dư không âm và khai báo giao diện kho lưu trữ trừu tượng. | Độc lập hoàn toàn với ba tầng chức năng còn lại (Trình diễn, Dịch vụ, Hạ tầng); không tham chiếu đến giao diện đồ họa hay cơ chế đọc ghi tệp; chỉ sử dụng thư viện Java chuẩn và tầng nền tảng dùng chung `com.pfms.common`. |
 | **Tầng Hạ tầng** | Hiện thực hóa các giao diện kho lưu trữ bằng cơ chế đọc ghi tệp tin cục bộ; cung cấp bộ điều hợp lưu trữ bộ nhớ phục vụ kiểm thử tự động. | Không can thiệp hoặc thay đổi quy tắc tính toán tài chính; chỉ thực hiện chuyển đổi giữa dữ liệu thô và đối tượng nghiệp vụ. |
+| **Tầng Nền tảng Dùng chung** | Cung cấp tiện ích tiền điều kiện kỹ thuật (`Preconditions`), phương thức kiểm tra đối số cơ bản và tiện ích dùng chung phi nghiệp vụ. | Tuyệt đối không chứa logic tài chính hoặc quy tắc nghiệp vụ; không import hay tham chiếu đến bất kỳ lớp nào thuộc bốn tầng chức năng trên. |
 
 ## 1.3 Cấu trúc Gói Mã nguồn
 
-Cấu trúc gói định hình không gian tên vật lý trong mã nguồn Java, ánh xạ trực tiếp từ bốn tầng kiến trúc sang hệ thống thư mục và bảo đảm nguyên tắc không tồn tại chu trình phụ thuộc vòng giữa các gói. Toàn bộ mã nguồn hệ thống được đặt dưới gói gốc `com.pfms` gồm đúng bốn gói con tương ứng với bốn tầng logic.
+Cấu trúc gói định hình không gian tên vật lý trong mã nguồn Java, ánh xạ trực tiếp từ các tầng kiến trúc sang hệ thống thư mục và bảo đảm nguyên tắc không tồn tại chu trình phụ thuộc vòng giữa các gói. Toàn bộ mã nguồn hệ thống được đặt dưới gói gốc `com.pfms` gồm bốn gói chức năng chính và một gói nền tảng dùng chung.
 
 **Phân cấp gói mã nguồn:**
 
 ```text
 com.pfms
+├── common                  # Tầng Nền tảng Dùng chung: Tiện ích kỹ thuật phi nghiệp vụ
+│   └── util                # Kiểm tra tiền điều kiện kỹ thuật (Preconditions)
 ├── presentation            # Tầng Trình diễn: Giao diện đồ họa
 │   ├── controller          # Điều phối luồng màn hình và xử lý sự kiện giao diện
 │   ├── view                # Cửa sổ chính, biểu mẫu và bảng hiển thị
 │   └── dto                 # Đối tượng truyền dữ liệu giữa giao diện và dịch vụ
-├── service                 # Tầng Dịch vụ: Điều phối ca sử dụng nghiệp vụ
+├── service                 # Tầng Dịch vụ: Giao diện điều phối ca sử dụng nghiệp vụ
+│   └── impl                # Lớp cài đặt dịch vụ công khai và tiện ích điều phối nội bộ
 ├── domain                  # Tầng Nghiệp vụ: Thực thể, quy tắc và hợp đồng kho lưu trữ
 │   ├── model               # Thực thể và đối tượng giá trị bất biến
 │   ├── repository          # Giao diện kho lưu trữ trừu tượng được đặt trong miền nghiệp vụ
@@ -126,16 +87,18 @@ Bảng ma trận xác lập các gói được phép tham chiếu và phạm vi 
 
 | Gói nguồn | Gói đích được phép import | Phạm vi truy cập | Thành phần được phép sử dụng |
 | :--- | :--- | :--- | :--- |
-| `presentation` | `service`, `presentation.dto` | `public` | Chỉ gọi các phương thức công khai trên giao diện dịch vụ; không import trực tiếp gói `domain` hoặc `infrastructure`. |
-| `service` | `domain`, `presentation.dto` | `public` | Thao tác trên thực thể, đối tượng giá trị và gọi các giao diện thuộc `domain.repository`; không import gói `presentation` hoặc `infrastructure`. |
-| `domain` | Thư viện Java chuẩn | `public` | Độc lập tuyệt đối; chỉ sử dụng `java.time`, `java.math`, `java.util`; không import bất kỳ gói nào khác trong hệ thống. |
-| `infrastructure` | `domain` | `public` | Hiện thực hóa các giao diện từ gói `domain.repository`; không import ngược lên gói `service` hoặc `presentation`. |
+| `presentation` | `service`, `presentation.dto`, `common.util` | `public` | Chỉ gọi các phương thức công khai trên giao diện dịch vụ và tiện ích kiểm tra tiền điều kiện; không import trực tiếp gói `domain` hoặc `infrastructure`. |
+| `service` | `domain`, `presentation.dto`, `common.util` | `public` | Thao tác trên thực thể, đối tượng giá trị, gọi các giao diện thuộc `domain.repository` và tiện ích tiền điều kiện; không import gói `presentation` hoặc `infrastructure`. |
+| `domain` | `common.util`, Thư viện Java chuẩn | `public` | Độc lập khỏi các tầng chức năng bên ngoài; chỉ sử dụng `common.util` cho tiền điều kiện kỹ thuật và các thư viện chuẩn (`java.time`, `java.math`, `java.util`). |
+| `infrastructure` | `domain`, `common.util` | `public` | Hiện thực hóa các giao diện từ gói `domain.repository` và sử dụng tiện ích kỹ thuật; không import ngược lên gói `service` hoặc `presentation`. |
+| `common` | Thư viện Java chuẩn | `public` | Hoàn toàn độc lập (zero internal dependency); chỉ sử dụng thư viện Java chuẩn; tuyệt đối không import bất kỳ gói nào khác trong `com.pfms`. |
 
 **Quy tắc kiểm soát phạm vi lớp nội bộ:**
 
 Nhằm tối thiểu hóa khả năng tiếp cận của các lớp theo nguyên lý đóng gói hướng đối tượng:
-1. Các giao diện dịch vụ, giao diện kho lưu trữ, đối tượng truyền dữ liệu DTO và thực thể nghiệp vụ được khai báo ở mức `public` để phục vụ tương tác liên tầng.
-2. Các lớp cài đặt dịch vụ cụ thể, lớp điều phối tệp tin và các phương thức trợ giúp kỹ thuật được giới hạn ở phạm vi nội bộ gói (`package-private`), ngăn chặn việc các gói bên ngoài tự ý khởi tạo hoặc phụ thuộc trực tiếp vào chi tiết cài đặt.
+1. Các giao diện dịch vụ, lớp cài đặt dịch vụ trong gói `service.impl` (phục vụ khởi tạo và tiêm phụ thuộc từ điểm khởi chạy ứng dụng), giao diện kho lưu trữ, đối tượng truyền dữ liệu DTO và thực thể nghiệp vụ được khai báo ở mức `public` để phục vụ tương tác liên tầng.
+2. Các lớp hỗ trợ điều phối nội bộ trong tầng dịch vụ (`EntityLookupSupport`, `RollbackSupport`), lớp điều phối tệp tin nội bộ và các phương thức trợ giúp kỹ thuật được giới hạn ở phạm vi nội bộ gói (`package-private`), ngăn chặn việc các gói bên ngoài phụ thuộc trực tiếp vào chi tiết hỗ trợ nội bộ.
+3. Các lớp tiện ích thuộc `common.util` được thiết kế theo chuẩn Utility Class (hằng số, phương thức tĩnh `public static`, constructor `private` ném ngoại lệ ngăn chặn hành vi khởi tạo đối tượng).
 
 ## 1.4 Luồng Xử lý và Biến đổi Dữ liệu
 

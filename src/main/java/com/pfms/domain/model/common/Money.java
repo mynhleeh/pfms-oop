@@ -7,6 +7,9 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Objects;
 
+import com.pfms.domain.exception.BusinessException;
+import com.pfms.domain.exception.ErrorCode;
+
 /**
  * Đối tượng giá trị bất biến đại diện cho số tiền và xử lý các phép toán tài
  * chính.
@@ -39,19 +42,17 @@ public final class Money implements Comparable<Money> {
     // region Factories
     public static Money of(String rawAmount) {
         if (rawAmount == null || rawAmount.trim().isEmpty()) {
-            throw new IllegalArgumentException("Số tiền không được rỗng");
+            throw new BusinessException(ErrorCode.ERR_FIN_001, "Số tiền không được rỗng");
         }
         try {
             return new Money(new BigDecimal(rawAmount.trim()), DEFAULT_CURRENCY);
         } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException("Số tiền không đúng định dạng: " + rawAmount, ex);
+            throw new BusinessException(ErrorCode.ERR_FIN_001, "Số tiền không đúng định dạng: " + rawAmount);
         }
     }
 
     public static Money of(BigDecimal value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Số tiền không được null");
-        }
+        Objects.requireNonNull(value, "Số tiền không được null");
         return new Money(value, DEFAULT_CURRENCY);
     }
 
@@ -66,16 +67,12 @@ public final class Money implements Comparable<Money> {
 
     // region Arithmetic
     public Money add(Money other) {
-        if (other == null) {
-            throw new IllegalArgumentException("Số tiền cộng thêm không được null");
-        }
+        Objects.requireNonNull(other, "Số tiền cộng thêm không được null");
         return new Money(this.amount.add(other.amount), this.currency);
     }
 
     public Money subtract(Money other) {
-        if (other == null) {
-            throw new IllegalArgumentException("Số tiền trừ không được null");
-        }
+        Objects.requireNonNull(other, "Số tiền trừ không được null");
         return new Money(this.amount.subtract(other.amount), this.currency);
     }
 
@@ -88,9 +85,7 @@ public final class Money implements Comparable<Money> {
     }
 
     public Money multiply(BigDecimal factor) {
-        if (factor == null) {
-            throw new IllegalArgumentException("Hệ số nhân không được null");
-        }
+        Objects.requireNonNull(factor, "Hệ số nhân không được null");
         return new Money(this.amount.multiply(factor), this.currency);
     }
 
@@ -103,9 +98,7 @@ public final class Money implements Comparable<Money> {
     }
 
     public Money divide(BigDecimal divisor) {
-        if (divisor == null) {
-            throw new IllegalArgumentException("Số chia không được null");
-        }
+        Objects.requireNonNull(divisor, "Số chia không được null");
         if (divisor.compareTo(BigDecimal.ZERO) == 0) {
             throw new ArithmeticException("Không thể chia cho số không");
         }

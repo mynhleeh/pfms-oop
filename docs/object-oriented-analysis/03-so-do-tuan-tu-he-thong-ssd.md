@@ -607,26 +607,26 @@ sequenceDiagram
 
 ## 3.7 Nhóm Chức năng Thống kê và Báo cáo (REP)
 
-Nhóm chức năng Thống kê và Báo cáo cung cấp các công cụ truy vấn và phân tích số liệu tài chính định kỳ cho người dùng. Các thao tác trong nhóm thực hiện trích xuất chuỗi dữ liệu 12 tháng liên tục, tính toán dòng tiền thuần và cơ cấu chi tiêu theo nhóm nhu cầu theo quy tắc `BR-FIN-01` và `BR-FIN-04` mà không làm thay đổi trạng thái dữ liệu hệ thống.
+Nhóm chức năng Thống kê và Báo cáo cung cấp các công cụ truy vấn và phân tích số liệu tài chính định kỳ cho người dùng. Các thao tác trong nhóm thực hiện trích xuất chuỗi dữ liệu 12 tháng liên tục, tính toán dòng tiền thuần và cơ cấu thu chi (`EXPENSE` gồm cả phí giao dịch, hoặc `INCOME`) theo nhóm nhu cầu và danh mục theo các quy tắc `BR-FIN-01`, `BR-FIN-02` và `BR-FIN-04` mà không làm thay đổi trạng thái dữ liệu hệ thống.
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
 | :---: | :--- | :--- | :--- | :--- |
 | `UC-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | `generateCashFlowReport` | Trích xuất chuỗi dữ liệu 12 tháng liên tục, tính dòng tiền thuần và tỷ lệ tiết kiệm | Truy vấn |
-| `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | `generateSpendingStructureReport` | Phân tích cơ cấu chi tiêu theo từng nhóm nhu cầu và danh mục chi tiết trong kỳ | Truy vấn |
+| `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | `generateSpendingStructureReport` | Phân tích cơ cấu thu chi theo từng nhóm nhu cầu, danh mục chi tiết và biến động kỳ liền kề | Truy vấn |
 
 ### 3.7.1 Báo cáo dòng tiền 12 tháng gần nhất
 
 Người dùng yêu cầu Hệ thống tổng hợp và phân tích chuỗi dữ liệu dòng tiền liên tục trong vòng 12 tháng tính lùi từ một mốc tháng chỉ định nhằm đánh giá xu hướng thu nhập, chi tiêu và năng lực tích lũy tài chính định kỳ.
 
 - Thao tác hệ thống: `generateCashFlowReport(endMonth, endYear)`
-- Kết quả phản hồi: Hệ thống tổng hợp và trả về bảng thống kê tài chính gồm đúng 12 dòng tháng liên tục sắp xếp theo trình tự thời gian tăng dần (gồm tổng thu nhập, tổng chi tiêu, dòng tiền thuần và tỷ lệ tiết kiệm từng tháng) kèm 3 chỉ số bình quân tháng trên toàn bộ chuỗi 12 tháng; thao tác hoạt động ở chế độ thuần đọc (read-only), không làm thay đổi trạng thái hay số dư tài chính của hệ thống.
+- Kết quả phản hồi: Hệ thống tổng hợp và trả về bảng thống kê tài chính gồm đúng 12 dòng tháng liên tục sắp xếp theo trình tự thời gian tăng dần (gồm tổng thu nhập, tổng chi tiêu kèm phí giao dịch, dòng tiền thuần và tỷ lệ tiết kiệm từng tháng) kèm 3 chỉ số bình quân tháng trên toàn bộ chuỗi 12 tháng; thao tác hoạt động ở chế độ thuần đọc, hỗ trợ mốc thời gian tương lai mà không làm thay đổi trạng thái hay số dư tài chính của hệ thống.
 
 **Danh sách tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `endMonth` | Tháng kết thúc của chuỗi 12 tháng thống kê dòng tiền | Số nguyên dương từ 1 đến 12. Tham số tùy chọn, nếu không truyền hệ thống mặc định lấy tháng hiện tại từ đồng hồ hệ thống (`FR-REP-01`). |
-| `endYear` | Năm kết thúc của chuỗi 12 tháng thống kê dòng tiền | Số nguyên dương hợp lệ từ năm 2000 trở đi. Tham số tùy chọn, nếu không truyền hệ thống mặc định lấy năm hiện tại (`FR-REP-01`). |
+| `endMonth` | Tháng kết thúc của chuỗi 12 tháng thống kê dòng tiền | Số nguyên dương từ 1 đến 12; giao diện mặc định tháng hiện tại từ đồng hồ hệ thống (`FR-REP-01`), từ chối (`ERR-REP-001`) nếu thiếu yêu cầu hoặc ngoài đoạn. |
+| `endYear` | Năm kết thúc của chuỗi 12 tháng thống kê dòng tiền | Số nguyên dương hợp lệ từ năm 2000 trở đi; giao diện mặc định năm hiện tại từ đồng hồ hệ thống (`FR-REP-01`), từ chối (`ERR-REP-001`) nếu thiếu yêu cầu hoặc nhỏ hơn 2000. |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -637,27 +637,28 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: generateCashFlowReport(endMonth, endYear)
-    alt Tham số mốc thời gian không hợp lệ (tháng ngoài 1-12 hoặc năm < 2000)
-        System-->>User: Thông báo lỗi mốc thời gian báo cáo không hợp lệ
-    else Mốc thời gian hợp lệ
-        Note over System: Xác định 12 mốc tháng liên tục lùi từ (endMonth, endYear)<br/>Duyệt giao dịch, tính Thu nhập và Chi tiêu từng tháng<br/>Tính NetCashFlow = Income - Expense<br/>Tính SavingsRate = (Net / Income) * 100% nếu Income > 0, ngược lại 0.00%<br/>Tính 3 mức bình quân tháng chia cho 12 (kể cả tháng 0.00 VNĐ)
+    alt Thiếu tham số hoặc mốc thời gian không hợp lệ (tháng ngoài 1-12 hoặc năm < 2000)
+        System-->>User: Từ chối truy vấn và trả mã lỗi ERR-REP-001
+    else Mốc thời gian hợp lệ (bao gồm mốc tương lai ở chế độ chỉ đọc)
+        Note over System: Xác định 12 mốc tháng liên tục lùi từ (endMonth, endYear)<br/>Duyệt giao dịch và phí liên kết (BR-FIN-02), tính Thu nhập và Chi tiêu từng tháng<br/>Tính NetCashFlow = Income - Expense<br/>Tính SavingsRate = (Net / Income) * 100% nếu Income > 0, ngược lại 0.00%<br/>Tính 3 mức bình quân tháng chia cho 12 (kể cả tháng 0.00 VNĐ)
         System-->>User: Phản hồi Báo cáo dòng tiền 12 tháng (Bảng dữ liệu 12 dòng + Dòng bình quân + Biểu đồ)
     end
 ```
 
 ### 3.7.2 Phân tích cơ cấu thu chi theo nhóm
 
-Người dùng yêu cầu Hệ thống phân tích tỷ trọng và cơ cấu phân bổ dòng tiền chi tiết theo từng nhóm nhu cầu và danh mục con trong một khoảng thời gian xác định nhằm nhận diện thói quen chi tiêu hoặc nguồn thu nhập chính.
+Người dùng yêu cầu Hệ thống phân tích tỷ trọng và cơ cấu phân bổ dòng tiền chi tiết theo từng nhóm nhu cầu và danh mục con trong một khoảng thời gian xác định, kèm đối chiếu biến động với kỳ liền trước, nhằm nhận diện thói quen chi tiêu hoặc nguồn thu nhập chính.
 
-- Thao tác hệ thống: `generateSpendingStructureReport(timeRange, transactionType)`
-- Kết quả phản hồi: Hệ thống trích xuất và trả về báo cáo cơ cấu phân cấp đa tầng gồm tổng giá trị phát sinh của loại thu chi trong kỳ, danh sách phân bổ theo nhóm nhu cầu (cấp 2) và danh mục chi tiết (cấp 3) kèm tỷ trọng phần trăm chính xác (bảo đảm tổng tỷ trọng đạt 100.00% theo `BR-FIN-01`, `BR-FIN-04`); trường hợp khoảng thời gian lọc không hợp lệ, hệ thống phản hồi thông báo từ chối.
+- Thao tác hệ thống: `generateSpendingStructureReport(startDate, endDate, transactionType)`
+- Kết quả phản hồi: Hệ thống trích xuất và trả về báo cáo cơ cấu phân cấp đa tầng gồm tổng giá trị phát sinh của loại thu chi trong kỳ, biến động so với kỳ liền kề, danh sách phân bổ cho các nhóm nhu cầu (cấp 2) và danh mục chi tiết (cấp 3) có phát sinh dương kèm tỷ trọng phần trăm chính xác (theo `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`; khi tổng kỳ bằng `0.00 VNĐ` thì tỷ trọng bằng `0.00%` và trả về danh sách rỗng); trường hợp tham số không hợp lệ, hệ thống từ chối (`ERR-REP-001`). Cho phép truy vấn khoảng thời gian tương lai ở chế độ chỉ đọc.
 
 **Danh sách tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `timeRange` | Khoảng thời gian phân tích (từ ngày bắt đầu đến ngày kết thúc) | Đối tượng chứa `fromDate` và `toDate` theo chuẩn `yyyy-MM-dd`. Bắt buộc `fromDate <= toDate` và không vượt quá giới hạn ngày hợp lệ (`FR-REP-02`). |
-| `transactionType` | Loại giao dịch tài chính cần lập báo cáo cơ cấu | Nhận một trong hai giá trị cố định: `INCOME` (Thu nhập) hoặc `EXPENSE` (Chi tiêu) theo chuẩn phân cấp (`BR-FIN-04`). |
+| `startDate` | Ngày bắt đầu khoảng thời gian phân tích | Ngày hợp lệ theo chuẩn `YYYY-MM-DD`, bắt buộc khác rỗng và thỏa mãn `startDate <= endDate` (`FR-REP-02`). |
+| `endDate` | Ngày kết thúc khoảng thời gian phân tích | Ngày hợp lệ theo chuẩn `YYYY-MM-DD`, bắt buộc khác rỗng và thỏa mãn `startDate <= endDate` (`FR-REP-02`). |
+| `transactionType` | Loại giao dịch tài chính cần lập báo cáo cơ cấu | Bắt buộc khác rỗng và nhận một trong hai giá trị cố định: `INCOME` (Thu nhập) hoặc `EXPENSE` (Chi tiêu, mặc định ở giao diện) theo chuẩn phân cấp (`BR-FIN-04`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -667,14 +668,12 @@ sequenceDiagram
     actor User as Người dùng
     participant System as Hệ thống
 
-    User->>System: generateSpendingStructureReport(timeRange, transactionType)
-    alt Khoảng thời gian không hợp lệ (fromDate > toDate)
-        System-->>User: Thông báo lỗi khoảng thời gian phân tích không hợp lệ
-    else Loại giao dịch không thuộc INCOME hoặc EXPENSE
-        System-->>User: Thông báo lỗi loại thu chi không hợp lệ
-    else Dữ liệu hợp lệ
-        Note over System: Quét sổ giao dịch trong khoảng thời gian theo transactionType<br/>Gom cụm số liệu theo NeedGroup (Cấp 2) và Category (Cấp 3)<br/>Bảo lưu danh mục đã xóa với nhãn (đã xóa) nếu có giao dịch trong kỳ<br/>Tính tỷ trọng % làm tròn ngân hàng 2 chữ số (tổng tỷ trọng ≈ 100.00%)
-        System-->>User: Phản hồi Báo cáo cơ cấu thu chi (Cây tỷ trọng cấp 2 - cấp 3 + Biểu đồ phân bổ)
+    User->>System: generateSpendingStructureReport(startDate, endDate, transactionType)
+    alt Thiếu ngày hoặc transactionType, khoảng ngày không hợp lệ (startDate > endDate) hoặc transactionType ngoài INCOME/EXPENSE
+        System-->>User: Từ chối truy vấn và trả mã lỗi ERR-REP-001
+    else Tham số hợp lệ (bao gồm khoảng thời gian tương lai ở chế độ chỉ đọc)
+        Note over System: Quét giao dịch trong [startDate, endDate], với EXPENSE cộng thêm TransactionFee (BR-FIN-02)<br/>Nếu tổng kỳ = 0.00 VNĐ thì tỷ trọng 0.00% và trả danh sách rỗng<br/>Gom cụm số liệu phát sinh dương theo NeedGroup (Cấp 2) và Category (Cấp 3)<br/>Giữ tên gốc và trạng thái DELETED cho mục đã xóa để giao diện hiển thị (đã xóa)<br/>So sánh kỳ liền trước cùng độ dài (Mới nếu kỳ này > 0 và kỳ trước = 0, và 0.00% nếu cả hai kỳ = 0)<br/>Tính tỷ trọng % trung gian >= 4 chữ số thập phân, làm tròn ngân hàng 2 chữ số
+        System-->>User: Phản hồi Báo cáo cơ cấu thu chi (Cây tỷ trọng cấp 2 - cấp 3 + So sánh kỳ trước + Biểu đồ)
     end
 ```
 

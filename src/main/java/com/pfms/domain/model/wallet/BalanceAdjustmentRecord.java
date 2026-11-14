@@ -1,5 +1,6 @@
 package com.pfms.domain.model.wallet;
 
+import com.pfms.common.util.Preconditions;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.common.Money;
@@ -87,10 +88,7 @@ public class BalanceAdjustmentRecord {
     // region Helpers
     private static UUID parseWalletId(String walletId) {
         Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
-        String trimmed = walletId.trim();
-        if (trimmed.isEmpty()) {
-            throw new IllegalArgumentException("Mã ví kiểm kê không được để trống");
-        }
+        String trimmed = Preconditions.requireNonBlank(walletId, "Mã ví kiểm kê không được để trống");
         try {
             return UUID.fromString(trimmed);
         } catch (IllegalArgumentException ex) {
@@ -130,9 +128,7 @@ public class BalanceAdjustmentRecord {
             return "";
         }
         String trimmed = rawReason.trim();
-        if (trimmed.length() > 255) {
-            throw new IllegalArgumentException("Lý do điều chỉnh không được vượt quá 255 ký tự.");
-        }
+        Preconditions.checkArgument(trimmed.length() <= 255, "Lý do điều chỉnh không được vượt quá 255 ký tự.");
         return trimmed;
     }
     // endregion

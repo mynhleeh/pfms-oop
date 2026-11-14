@@ -23,5 +23,6 @@
             ]
         }
     ],
-    "latex-workshop.view.pdf.viewer": "tab"
+    "latex-workshop.view.pdf.viewer": "tab",
+    "terminal.integrated.suggest.suggestOnTriggerCharacters": false
 }

@@ -16,7 +16,7 @@ Hệ thống tuân thủ trọn vẹn năm nguyên lý thiết kế thông qua v
 | :--- | :--- | :--- |
 | **Đơn trách nhiệm**<br/>(Single Responsibility Principle - SRP) | Mỗi lớp chỉ đảm nhiệm một lý do duy nhất để thay đổi; tách biệt giữa quy tắc nghiệp vụ, điều phối ca sử dụng và lưu trữ tệp. | Bộ ba lớp: thực thể `Wallet` (gói `domain.model`), dịch vụ `WalletServiceImpl` (gói `service.impl`) và kho lưu trữ `WalletRepository` (gói `domain.repository`). Mỗi lớp có một lý do duy nhất để thay đổi: `Wallet` chỉ sửa khi quy tắc tính số dư thay đổi; `WalletServiceImpl` chỉ sửa khi luồng phối hợp ca sử dụng đổi khác; `WalletRepository` chỉ sửa khi cấu trúc đọc ghi tệp thay đổi. Thay đổi ở lớp này không làm ảnh hưởng sang lớp khác. |
 | **Đóng mở**<br/>(Open/Closed Principle - OCP) | Thực thể phần mềm mở rộng cho việc phát triển thêm hành vi mới nhưng đóng kín trước việc sửa đổi mã nguồn sẵn có. | Lớp cơ sở trừu tượng `Transaction` và hai lớp con kế thừa `IncomeExpenseTransaction`, `TransferTransaction` (gói `domain.model`). Khi hệ thống cần bổ sung một loại giao dịch mới trong tương lai, lập trình viên chỉ cần tạo thêm lớp con kế thừa từ `Transaction` mà không phải sửa đổi mã nguồn lớp cha, đồng thời không phải viết thêm các lệnh rẽ nhánh `switch-case` trong các lớp dịch vụ. |
-| **Thay thế Liskov**<br/>(Liskov Substitution Principle - LSP) | Các đối tượng của lớp con có thể thay thế hoàn toàn cho đối tượng của lớp cha mà không làm thay đổi tính đúng đắn của chương trình. | Lớp cha `Transaction` và hai lớp con cụ thể. Các phương thức trong `TransactionRepository` (như `save(Transaction)`) và phương thức tính toán trong `ReportServiceImpl` đều nhận tham số kiểu lớp cha `Transaction`. Mọi thể hiện của `IncomeExpenseTransaction` hay `TransferTransaction` đều có thể truyền vào thay thế hoàn hảo mà không làm sai lệch kết quả, không cần ép kiểu thủ công (`cast`) và không ném ngoại lệ ngoài hợp đồng của lớp cha. |
+| **Thay thế Liskov**<br/>(Liskov Substitution Principle - LSP) | Các đối tượng của lớp con có thể thay thế hoàn toàn cho đối tượng của lớp cha mà không làm thay đổi tính đúng đắn của chương trình. | Lớp cha `Transaction` và hai lớp con cụ thể. Giao diện `TransactionRepository` (như `save(Transaction)`) và luồng trích xuất ngày giao dịch cùng phí liên kết (`getTransactionDate()`, `getFee()`) trong `ReportServiceImpl` đều làm việc đồng nhất qua hợp đồng lớp cha `Transaction`. Mọi thể hiện của `IncomeExpenseTransaction` hay `TransferTransaction` đều cung cấp đầy đủ ngày và phí qua lớp cha mà không làm sai lệch kết quả hay vi phạm hợp đồng, chỉ phân biệt theo kiểu thực thể khi cộng tiền gốc thu chi để loại trừ khoản chuyển nội bộ. |
 | **Phân tách Giao diện**<br/>(Interface Segregation Principle - ISP) | Không ép buộc các thành phần phụ thuộc vào các giao diện chứa phương thức mà chúng không có nhu cầu sử dụng. | Thay vì tạo một giao diện khổng lồ cho toàn bộ hệ thống, hệ thống chia nhỏ thành 6 giao diện dịch vụ độc lập: `WalletService`, `TransactionService`, `TransferService`, `CategoryService`, `ReportService`, `DataManagementService`. Mỗi bộ điều khiển giao diện người dùng (Controller) chỉ phụ thuộc vào đúng giao diện dịch vụ mà nó cần dùng. Ví dụ: `WalletGUIController` chỉ gọi `WalletService`, hoàn toàn không bị ảnh hưởng hay phải biên dịch lại khi `ReportService` thay đổi. |
 | **Nghịch đảo Phụ thuộc**<br/>(Dependency Inversion Principle - DIP) | Mô đun cấp cao không phụ thuộc mô đun cấp thấp; cả hai phụ thuộc vào sự trừu tượng hóa; trừu tượng hóa không phụ thuộc chi tiết cài đặt. | Tầng Dịch vụ (`WalletServiceImpl`) không phụ thuộc trực tiếp vào lớp lưu tệp cụ thể (`JsonFileWalletRepository`), mà phụ thuộc vào giao diện trừu tượng `WalletRepository` nằm trong Tầng Nghiệp vụ. Lớp cài đặt cụ thể được tiêm từ bên ngoài vào qua hàm khởi tạo (Constructor Injection). Nhờ đó, hệ thống có thể dễ dàng tráo đổi sang kho lưu trữ trên bộ nhớ tạm (`MemoryWalletRepository`) để chạy kiểm thử đơn vị tự động tốc độ cao mà không phải sửa một dòng mã nghiệp vụ nào. |
 
@@ -32,7 +32,7 @@ Việc tuân thủ nghiêm ngặt năm nguyên lý thiết kế giúp mã nguồ
 **Điểm cân bằng thực tế trong PFMS nhằm tránh thiết kế quá mức:**
 - Tiêm phụ thuộc thủ công qua hàm khởi tạo: Hệ thống sử dụng cơ chế Dependency Injection thuần Java tại điểm khởi động chương trình (`Main`), không đưa các khung công nghệ nặng như Spring Framework hay Google Guice vào ứng dụng.
 - Tái sử dụng giao diện kho lưu trữ cơ sở: Áp dụng `GenericRepository<E, ID>` với 5 phương thức CRUD chuẩn để loại bỏ trùng lặp mã nguồn, chỉ khai báo thêm các phương thức truy vấn thực sự cần thiết theo ca sử dụng.
-- Đóng gói phạm vi lớp cài đặt nội bộ: Khai báo các lớp cài đặt dịch vụ ở phạm vi `package-private`, chỉ công khai giao diện trừu tượng ra ngoài gói nhằm bảo vệ tính toàn vẹn và giữ cho không gian tên của hệ thống luôn tinh gọn.
+- Tách biệt giao diện và cài đặt theo gói con: Đặt các lớp cài đặt dịch vụ công khai trong gói tách biệt `com.pfms.service.impl` để hỗ trợ tiêm phụ thuộc rõ ràng, đồng thời giữ các lớp trợ giúp nội bộ (`EntityLookupSupport`, `RollbackSupport`) ở phạm vi `package-private` nhằm bảo vệ tính đóng gói.
 
 ## 6.2 Áp dụng các Mẫu Thiết kế trong Hệ thống
 
@@ -119,66 +119,82 @@ Lớp `TransactionFactory` cung cấp các phương thức tĩnh nhằm chuẩn 
 
 **Bài toán thực tế và Động lực áp dụng:**
 
-Phân hệ Báo cáo (`REP`) chịu trách nhiệm tổng hợp dữ liệu thu chi theo kỳ quan sát (`UC-REP-01`) và phân tích cơ cấu chi tiêu theo nhóm danh mục (`UC-REP-02`). Dữ liệu tài chính sau khi được tính toán cần được kết xuất ra bên ngoài theo hai nhu cầu hoàn toàn khác biệt của người dùng:
+Phân hệ Báo cáo (`REP`) chịu trách nhiệm tổng hợp dữ liệu thu chi theo kỳ quan sát (`UC-REP-01`) và phân tích cơ cấu thu chi theo nhóm nhu cầu và danh mục (`UC-REP-02`). Sau khi tầng dịch vụ tính toán xong số liệu và trả về các DTO phản hồi chuẩn (`CashFlowReportResponseDTO`, `SpendingStructureReportResponseDTO`), tầng trình diễn cần kết xuất kết quả theo nhiều định dạng khác nhau cho người dùng:
 - Hiển thị trực quan trên giao diện đồ họa: Dữ liệu được định dạng thành bảng đồ họa `JTable`, có căn lề chuẩn và hiển thị dấu phân cách hàng nghìn.
-- Kết xuất tệp phẳng bền vững: Dữ liệu được chuyển đổi thành cấu trúc JSON lưu xuống đĩa cục bộ phục vụ việc lưu trữ lâu dài hoặc tái sử dụng cho các công cụ phân tích khác.
+- Kết xuất tệp phẳng bền vững: Dữ liệu được chuyển đổi thành cấu trúc JSON lưu xuống đĩa cục bộ phục vụ lưu trữ lâu dài hoặc tái sử dụng cho các công cụ phân tích khác.
 
-Nếu `ReportServiceImpl` tự đảm nhiệm toàn bộ việc vẽ bảng và xuất tệp:
-- Tầng Dịch vụ bị phình to do trộn lẫn giữa logic tính toán số học tài chính với logic xử lý chuỗi ký tự và định dạng tệp tin.
-- Mỗi khi cần thay đổi bố cục bảng hiển thị hoặc bổ sung thêm định dạng xuất mới (như định dạng CSV cho bảng tính), lập trình viên buộc phải sửa đổi trực tiếp mã nguồn của `ReportServiceImpl`.
+Nếu bộ điều khiển giao diện (`ReportGUIController`) hoặc dịch vụ nghiệp vụ tự ôm toàn bộ logic định dạng cho từng đầu ra:
+- Tầng Dịch vụ (`ReportServiceImpl`) bị vi phạm nguyên lý Đơn trách nhiệm nếu phải trộn lẫn logic tổng hợp tài chính với định dạng bảng hay xuất JSON, đồng thời làm rò rỉ chi tiết trình bày vào tầng ứng dụng.
+- Mỗi khi cần bổ sung định dạng kết xuất mới (như định dạng CSV cho bảng tính) hoặc thay đổi bố cục hiển thị, lập trình viên buộc phải sửa mã điều khiển hoặc mã dịch vụ đang ổn định.
 
-Giải pháp là áp dụng mẫu Strategy bằng cách trừu tượng hóa hành vi kết xuất thành giao diện `ReportExportStrategy`. Các thuật toán định dạng được đóng gói thành các lớp chiến lược độc lập, cho phép `ReportServiceImpl` ủy quyền việc kết xuất và tráo đổi định dạng linh hoạt tại thời điểm chạy.
+Giải pháp là tách hẳn trách nhiệm định dạng ra khỏi `ReportService` và áp dụng mẫu Strategy tại thành phần kết xuất thuộc tầng Trình diễn (`ReportExporter`). Giao diện chiến lược `ReportExportStrategy` đóng gói các thuật toán định dạng độc lập dựa trên dữ liệu DTO mà `ReportService` trả về, cho phép tầng Trình diễn tráo đổi định dạng kết xuất linh hoạt tại thời điểm chạy.
 
 **Cấu trúc lớp và Sơ đồ thiết kế:**
 
-Sơ đồ lớp dưới đây mô tả cấu trúc mẫu Strategy trong phân hệ Báo cáo:
+Sơ đồ lớp dưới đây mô tả cấu trúc tách biệt giữa `ReportServiceImpl` (tổng hợp số liệu thuần) và mẫu Strategy tại `ReportExporter` (kết xuất định dạng):
 
 ```mermaid
 classDiagram
     direction TB
 
+    class ReportService {
+        <<interface>>
+        +generateCashFlowReport(CashFlowReportRequestDTO) CashFlowReportResponseDTO*
+        +generateSpendingStructureReport(SpendingStructureRequestDTO) SpendingStructureReportResponseDTO*
+    }
+
     class ReportServiceImpl {
-        -TransactionRepository transactionRepo
-        -CategoryRepository categoryRepo
-        +generateFinancialReport(LocalDate, LocalDate, ReportExportStrategy) String
+        -TransactionRepository transactionRepository
+        -CategoryRepository categoryRepository
+        -NeedGroupRepository needGroupRepository
+        +generateCashFlowReport(CashFlowReportRequestDTO) CashFlowReportResponseDTO
+        +generateSpendingStructureReport(SpendingStructureRequestDTO) SpendingStructureReportResponseDTO
+    }
+
+    class ReportExporter {
+        -ReportExportStrategy strategy
+        +setStrategy(ReportExportStrategy) void
+        +exportCashFlow(CashFlowReportResponseDTO) String
+        +exportSpendingStructure(SpendingStructureReportResponseDTO) String
     }
 
     class ReportExportStrategy {
         <<interface>>
-        +export(FinancialReportDTO) String*
+        +exportCashFlow(CashFlowReportResponseDTO) String*
+        +exportSpendingStructure(SpendingStructureReportResponseDTO) String*
     }
 
     class TableViewReportStrategy {
-        +export(FinancialReportDTO) String
+        +exportCashFlow(CashFlowReportResponseDTO) String
+        +exportSpendingStructure(SpendingStructureReportResponseDTO) String
     }
 
     class JsonReportStrategy {
-        +export(FinancialReportDTO) String
+        +exportCashFlow(CashFlowReportResponseDTO) String
+        +exportSpendingStructure(SpendingStructureReportResponseDTO) String
     }
 
-    class FinancialReportDTO {
-        -LocalDate startDate
-        -LocalDate endDate
-        -Money totalIncome
-        -Money totalExpense
-        -Money netCashFlow
-        -BigDecimal savingsRate
-    }
+    class CashFlowReportResponseDTO
+    class SpendingStructureReportResponseDTO
 
-    ReportServiceImpl ..> ReportExportStrategy : ủy quyền kết xuất
+    ReportService <|.. ReportServiceImpl : cài đặt
+    ReportServiceImpl ..> CashFlowReportResponseDTO : trả kết quả
+    ReportServiceImpl ..> SpendingStructureReportResponseDTO : trả kết quả
+    ReportExporter o-- ReportExportStrategy : sử dụng chiến lược
     ReportExportStrategy <|.. TableViewReportStrategy : cài đặt
     ReportExportStrategy <|.. JsonReportStrategy : cài đặt
-    ReportExportStrategy ..> FinancialReportDTO : nhận dữ liệu
+    ReportExportStrategy ..> CashFlowReportResponseDTO : nhận dữ liệu
+    ReportExportStrategy ..> SpendingStructureReportResponseDTO : nhận dữ liệu
 ```
 
 **Cơ chế chuyển đổi và Giá trị kỹ thuật:**
 
-Mẫu Strategy mang lại cơ chế vận hành linh hoạt và các giá trị kỹ thuật thực tế cho hệ thống:
+Mẫu Strategy kết hợp với ranh giới tách biệt khỏi `ReportService` mang lại các giá trị kỹ thuật trực tiếp:
 
-- Tráo đổi định dạng tại thời điểm chạy: Khi người dùng lựa chọn xem trên màn hình đồ họa hoặc xuất tệp trên Menu chức năng, Tầng Trình diễn (`presentation.controller`) sẽ truyền lớp chiến lược tương ứng (`TableViewReportStrategy` hoặc `JsonReportStrategy`) vào phương thức của `ReportServiceImpl`. Dịch vụ thực hiện tính toán số liệu và chuyển giao đối tượng `FinancialReportDTO` cho chiến lược được chọn tự kết xuất kết quả.
-- Tách biệt tính toán và định dạng trình bày: `ReportServiceImpl` chỉ tập trung thực hiện các phép tính số học tài chính chính xác (`NetCashFlow`, `SavingsRate`). Toàn bộ việc xử lý căn lề chuỗi, vẽ khung viền hay tuần tự hóa JSON được chuyển giao trọn vẹn cho các lớp chiến lược.
-- Khả năng mở rộng không xâm lấn: Khi hệ thống cần bổ sung định dạng xuất mới trong tương lai (như `CsvReportStrategy` để mở trên Excel), lập trình viên chỉ cần tạo thêm một lớp mới cài đặt giao diện `ReportExportStrategy` mà không phải chỉnh sửa bất kỳ dòng mã nào trong `ReportServiceImpl`.
-- Năng lực kiểm thử độc lập: Thuật toán tính toán số liệu của dịch vụ có thể được kiểm thử độc lập bằng cách truyền vào một chiến lược giả lập (Mock Strategy), đồng thời quy tắc vẽ bảng hiển thị cũng được kiểm thử riêng biệt mà không phụ thuộc vào kho lưu trữ dữ liệu.
+- Bảo toàn ranh giới sạch cho `ReportService`: `ReportServiceImpl` chỉ phụ thuộc ba kho lưu trữ (`TransactionRepository`, `CategoryRepository`, `NeedGroupRepository`) và trả về DTO phản hồi bất biến, không phụ thuộc vào giao diện hay chiến lược kết xuất.
+- Tráo đổi định dạng tại thời điểm chạy: Bộ điều khiển tại tầng Trình diễn (`presentation.controller`) nhận DTO từ `ReportService`, chọn chiến lược tương ứng (`TableViewReportStrategy` hoặc `JsonReportStrategy`) cho `ReportExporter` để định dạng hiển thị hoặc xuất dữ liệu.
+- Khả năng mở rộng không xâm lấn: Khi bổ sung định dạng xuất mới trong tương lai (như `CsvReportStrategy`), lập trình viên chỉ cần thêm một lớp cài đặt `ReportExportStrategy` mà không phải sửa bất kỳ dòng mã nào trong `ReportServiceImpl` hay `ReportExporter`.
+- Năng lực kiểm thử độc lập: Quy trình tính toán tài chính trong `ReportServiceImpl` được kiểm thử độc lập trên DTO thuần, còn từng chiến lược kết xuất được kiểm thử chuỗi đầu ra riêng biệt theo đúng DTO đầu vào.
 
 ### 6.2.3 Mẫu State Quản lý Vòng đời Ví Tiền
 
