@@ -10,8 +10,8 @@ import com.pfms.presentation.dto.transaction.UpdateTransactionRequestDTO;
 import java.util.UUID;
 
 /**
- * Giao diện dịch vụ ứng dụng điều phối các ca sử dụng ghi nhận, tra cứu, chỉnh sửa và xóa giao dịch thu chi.
- * Quản lý vòng đời giao dịch thu chi, hạch toán biến động số dư ví tức thời và xử lý phụ phí đi kèm.
+ * Dịch vụ quản lý giao dịch thu chi phát sinh trên ví.
+ * Điều phối ghi nhận, chỉnh sửa, xóa và truy vấn/lọc lịch sử giao dịch kèm phụ phí.
  */
 public interface TransactionService {
 

@@ -1,4 +1,4 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.common;
 
 import com.pfms.common.util.Preconditions;
 import com.pfms.domain.exception.BusinessException;
@@ -22,16 +22,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Tiện ích tra cứu và xác thực thực thể miền dùng chung cho các lớp cài đặt
- * dịch vụ
+ * Tiện ích tra cứu và kiểm tra trạng thái thực thể miền dùng chung cho toàn bộ tầng dịch vụ.
+ * Cung cấp các thao tác tìm kiếm ném ngoại lệ chuẩn, xác thực trạng thái hoạt động và lập chỉ mục nhanh.
  */
-final class EntityLookupSupport {
+public final class EntityLookupSupport {
 
     // region Constants
-    static final String LABEL_WALLET = "Ví";
-    static final String LABEL_CATEGORY = "Danh mục";
-    static final String LABEL_NEED_GROUP = "Nhóm nhu cầu";
-    static final String LABEL_FEE_CATEGORY = "Danh mục phí";
+    public static final String LABEL_WALLET = "Ví";
+    public static final String LABEL_CATEGORY = "Danh mục";
+    public static final String LABEL_NEED_GROUP = "Nhóm nhu cầu";
+    public static final String LABEL_FEE_CATEGORY = "Danh mục phí";
     // endregion
 
     // region Constructors
@@ -41,7 +41,7 @@ final class EntityLookupSupport {
     // endregion
 
     // region Operations
-    static <T, ID> T findEntityOrThrow(
+    public static <T, ID> T findEntityOrThrow(
             GenericRepository<T, ID> repository,
             ID id,
             String entityLabel) {
@@ -55,7 +55,7 @@ final class EntityLookupSupport {
                         ErrorCode.ERR_NOT_FOUND, resolvedLabel, id.toString()));
     }
 
-    static <T, ID> T loadActiveEntity(
+    public static <T, ID> T loadActiveEntity(
             GenericRepository<T, ID> repository,
             ID id,
             String entityLabel,
@@ -71,7 +71,7 @@ final class EntityLookupSupport {
         return entity;
     }
 
-    static Wallet loadActiveWallet(WalletRepository walletRepository, UUID walletId) {
+    public static Wallet loadActiveWallet(WalletRepository walletRepository, UUID walletId) {
         return loadActiveEntity(
                 walletRepository,
                 walletId,
@@ -81,7 +81,7 @@ final class EntityLookupSupport {
                 "Ví thanh toán không ở trạng thái hoạt động.");
     }
 
-    static Category loadActiveCategory(CategoryRepository categoryRepository, UUID categoryId) {
+    public static Category loadActiveCategory(CategoryRepository categoryRepository, UUID categoryId) {
         return loadActiveEntity(
                 categoryRepository,
                 categoryId,
@@ -91,7 +91,7 @@ final class EntityLookupSupport {
                 "Danh mục không ở trạng thái hoạt động.");
     }
 
-    static Category resolveActiveExpenseFeeCategory(
+    public static Category resolveActiveExpenseFeeCategory(
             CategoryRepository categoryRepository, Money feeAmount, UUID feeCategoryId) {
 
         if (feeAmount == null || !feeAmount.isPositive()) {
@@ -107,14 +107,14 @@ final class EntityLookupSupport {
         return feeCategory;
     }
 
-    static <T, ID> T resolveForDisplay(GenericRepository<T, ID> repository, ID id, T fallback) {
+    public static <T, ID> T resolveForDisplay(GenericRepository<T, ID> repository, ID id, T fallback) {
         if (repository == null || id == null) {
             return fallback;
         }
         return repository.findById(id).orElse(fallback);
     }
 
-    static <T, ID> Map<ID, T> indexById(Collection<T> entities, Function<T, ID> idExtractor) {
+    public static <T, ID> Map<ID, T> indexById(Collection<T> entities, Function<T, ID> idExtractor) {
         Objects.requireNonNull(idExtractor, "Hàm trích xuất mã định danh không được để null");
         if (entities == null || entities.isEmpty()) {
             return Collections.emptyMap();
@@ -133,3 +133,4 @@ final class EntityLookupSupport {
     }
     // endregion
 }
+

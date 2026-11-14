@@ -1,4 +1,4 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.common;
 
 import com.pfms.domain.exception.StorageException;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,7 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.wallet;
+
+import com.pfms.service.impl.common.EntityLookupSupport;
+import com.pfms.service.impl.common.RollbackSupport;
 
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.DuplicateEntityException;
@@ -34,8 +37,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Lớp cài đặt nội bộ của dịch vụ quản lý Ví tiền (WalletService).
- * Điều phối luồng nghiệp vụ giữa Tầng Trình diễn và Tầng Nghiệp vụ cốt lõi.
+ * Cài đặt dịch vụ quản lý ví tiền ({@link WalletService}).
+ * Điều phối vòng đời ví, duy trì ví mặc định hệ thống và ghi nhận kiểm kê điều chỉnh số dư.
  */
 public class WalletServiceImpl implements WalletService {
 

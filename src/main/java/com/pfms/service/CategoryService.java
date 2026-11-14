@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Dịch vụ điều phối nghiệp vụ Danh mục thu chi.
- * Quản lý cây danh mục 3 cấp, kiểm soát tính duy nhất của tên và xóa mềm bảo toàn lịch sử giao dịch.
+ * Dịch vụ quản lý danh mục thu chi của hệ thống PFMS.
+ * Điều phối các nghiệp vụ: tạo mới, đổi tên, xóa mềm và khôi phục danh mục 3 cấp.
  */
 public interface CategoryService {
 

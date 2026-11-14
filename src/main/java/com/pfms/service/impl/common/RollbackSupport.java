@@ -1,12 +1,12 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.common;
 
 import com.pfms.domain.exception.StorageException;
 
 /**
- * Tiện ích hỗ trợ thực thi các bước hoàn nguyên dùng chung cho các lớp cài đặt
- * dịch vụ trong gói {@code com.pfms.service.impl}.
+ * Tiện ích thực thi bước hoàn nguyên an toàn khi xảy ra lỗi lưu trữ dữ liệu.
+ * Đảm bảo không nuốt ngoại lệ gốc và gắn kết các ngoại lệ phát sinh vào danh sách suppressed.
  */
-final class RollbackSupport {
+public final class RollbackSupport {
 
     // region Constructors
     private RollbackSupport() {
@@ -15,8 +15,7 @@ final class RollbackSupport {
     // endregion
 
     // region Operations
-
-    static void runRollbackStep(Runnable compensatingStep, StorageException primaryException) {
+    public static void runRollbackStep(Runnable compensatingStep, StorageException primaryException) {
         if (compensatingStep == null) {
             return;
         }
@@ -30,3 +29,4 @@ final class RollbackSupport {
     }
     // endregion
 }
+

@@ -6,8 +6,8 @@ import com.pfms.presentation.dto.report.SpendingStructureRequestDTO;
 import com.pfms.presentation.dto.report.SpendingStructureReportResponseDTO;
 
 /**
- * Dịch vụ báo cáo tài chính. Cung cấp chức năng tổng hợp dòng tiền 12 tháng
- * liên tục và phân tích cơ cấu thu chi 2 cấp theo nhóm nhu cầu và danh mục
+ * Dịch vụ báo cáo và thống kê tài chính cá nhân.
+ * Cung cấp dữ liệu dòng tiền 12 tháng liên tục và phân tích cơ cấu thu chi theo nhóm nhu cầu.
  */
 public interface ReportService {
 

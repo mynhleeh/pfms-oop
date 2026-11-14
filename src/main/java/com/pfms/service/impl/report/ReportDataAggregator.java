@@ -1,7 +1,5 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.report;
 
-import com.pfms.domain.exception.BusinessException;
-import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
 import com.pfms.domain.model.category.NetCashFlow;
@@ -12,22 +10,15 @@ import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.Transaction;
 import com.pfms.domain.model.transaction.TransactionType;
-import com.pfms.domain.repository.CategoryRepository;
-import com.pfms.domain.repository.NeedGroupRepository;
-import com.pfms.domain.repository.TransactionRepository;
-import com.pfms.presentation.dto.report.CashFlowReportRequestDTO;
 import com.pfms.presentation.dto.report.CashFlowReportResponseDTO;
 import com.pfms.presentation.dto.report.CategoryShareResponseDTO;
 import com.pfms.presentation.dto.report.MonthlyCashFlowResponseDTO;
 import com.pfms.presentation.dto.report.NeedGroupShareResponseDTO;
 import com.pfms.presentation.dto.report.SpendingStructureReportResponseDTO;
-import com.pfms.presentation.dto.report.SpendingStructureRequestDTO;
-import com.pfms.service.ReportService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,19 +26,17 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Lớp cài đặt dịch vụ thống kê và báo cáo tài chính cá nhân ({@link ReportService}).
- * Hỗ trợ báo cáo dòng tiền 12 tháng gần nhất và phân tích cơ cấu thu chi kèm so sánh kỳ trước ở chế độ chỉ đọc.
+ * Bộ xử lý nội bộ tính toán và tổng hợp số liệu báo cáo tài chính.
+ * Thực thi thuật toán gom dòng tiền 12 tháng, đo lường tỷ trọng chi tiêu và so sánh biến động kỳ trước.
  */
-public class ReportServiceImpl implements ReportService {
+final class ReportDataAggregator {
 
     // region Constants
     private static final int CASH_FLOW_MONTH_WINDOW = 12;
-    private static final int MIN_REPORT_YEAR = 2000;
     private static final int INTERMEDIATE_SCALE = 6;
 
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
@@ -65,36 +54,15 @@ public class ReportServiceImpl implements ReportService {
             .thenComparing(CategoryShareResponseDTO::getCategoryId);
     // endregion
 
-    // region State
-    private final TransactionRepository transactionRepository;
-    private final CategoryRepository categoryRepository;
-    private final NeedGroupRepository needGroupRepository;
-    // endregion
-
     // region Constructors
-    public ReportServiceImpl(
-            TransactionRepository transactionRepository,
-            CategoryRepository categoryRepository,
-            NeedGroupRepository needGroupRepository) {
-
-        this.transactionRepository = Objects.requireNonNull(
-                transactionRepository, "TransactionRepository không được để null");
-        this.categoryRepository = Objects.requireNonNull(
-                categoryRepository, "CategoryRepository không được để null");
-        this.needGroupRepository = Objects.requireNonNull(
-                needGroupRepository, "NeedGroupRepository không được để null");
+    private ReportDataAggregator() {
+        throw new AssertionError("Utility class cannot be instantiated");
     }
     // endregion
 
-    // region Queries
-    @Override
-    public CashFlowReportResponseDTO generateCashFlowReport(CashFlowReportRequestDTO request) {
-        YearMonth endYm = validateCashFlowRequest(request);
-        YearMonth startYm = endYm.minusMonths(CASH_FLOW_MONTH_WINDOW - 1L);
-
+    // region Operations
+    static CashFlowReportResponseDTO aggregateCashFlow(YearMonth startYm, List<Transaction> transactions) {
         Map<YearMonth, MonthlyBucket> buckets = initMonthBuckets(startYm);
-        List<Transaction> transactions = this.transactionRepository.findByDateRange(
-                startYm.atDay(1), endYm.atEndOfMonth());
         if (transactions != null) {
             for (Transaction tx : transactions) {
                 accumulateCashFlowTransaction(tx, buckets);
@@ -103,24 +71,19 @@ public class ReportServiceImpl implements ReportService {
         return buildCashFlowResponse(buckets);
     }
 
-    @Override
-    public SpendingStructureReportResponseDTO generateSpendingStructureReport(
-            SpendingStructureRequestDTO request) {
-
-        TransactionType targetType = validateStructureRequest(request);
-        LocalDate startDate = request.getStartDate();
-        LocalDate endDate = request.getEndDate();
-        LocalDate priorStartDate = startDate.minusDays(ChronoUnit.DAYS.between(startDate, endDate) + 1L);
-
-        Map<UUID, Category> liveCategoriesById = EntityLookupSupport.indexById(
-                this.categoryRepository.findAll(), Category::getCategoryId);
-        Map<UUID, NeedGroup> liveNeedGroupsById = EntityLookupSupport.indexById(
-                this.needGroupRepository.findAll(), NeedGroup::getNeedGroupId);
+    static SpendingStructureReportResponseDTO calculateSpendingStructure(
+            TransactionType targetType,
+            LocalDate startDate,
+            LocalDate endDate,
+            LocalDate priorStartDate,
+            List<Transaction> transactions,
+            Map<UUID, Category> liveCategoriesById,
+            Map<UUID, NeedGroup> liveNeedGroupsById) {
 
         PeriodTotals current = new PeriodTotals(true);
         PeriodTotals prior = new PeriodTotals(false);
         accumulateStructurePeriods(
-                priorStartDate, startDate, endDate, targetType, current, prior, liveCategoriesById);
+                priorStartDate, startDate, endDate, targetType, current, prior, liveCategoriesById, transactions);
 
         BigDecimal currentTotal = current.totalAmount.getAmount();
         BigDecimal priorTotal = prior.totalAmount.getAmount();
@@ -143,28 +106,6 @@ public class ReportServiceImpl implements ReportService {
     // endregion
 
     // region Helpers
-    private static YearMonth validateCashFlowRequest(CashFlowReportRequestDTO request) {
-        if (request == null
-                || request.getEndMonth() < 1
-                || request.getEndMonth() > 12
-                || request.getEndYear() < MIN_REPORT_YEAR) {
-            throw new BusinessException(ErrorCode.ERR_REP_001);
-        }
-        return YearMonth.of(request.getEndYear(), request.getEndMonth());
-    }
-
-    private static TransactionType validateStructureRequest(SpendingStructureRequestDTO request) {
-        if (request == null || request.getStartDate() == null || request.getEndDate() == null
-                || request.getStartDate().isAfter(request.getEndDate())) {
-            throw new BusinessException(ErrorCode.ERR_REP_001);
-        }
-        try {
-            return TransactionType.fromString(request.getTransactionType());
-        } catch (IllegalArgumentException ex) {
-            throw new BusinessException(ErrorCode.ERR_REP_001);
-        }
-    }
-
     private static Map<YearMonth, MonthlyBucket> initMonthBuckets(YearMonth startYm) {
         Map<YearMonth, MonthlyBucket> buckets = new LinkedHashMap<>(CASH_FLOW_MONTH_WINDOW);
         for (int i = 0; i < CASH_FLOW_MONTH_WINDOW; i++) {
@@ -219,16 +160,16 @@ public class ReportServiceImpl implements ReportService {
                 sumNetCashFlow.divide(CASH_FLOW_MONTH_WINDOW).getAmount());
     }
 
-    private void accumulateStructurePeriods(
+    private static void accumulateStructurePeriods(
             LocalDate priorStartDate,
             LocalDate startDate,
             LocalDate endDate,
             TransactionType targetType,
             PeriodTotals current,
             PeriodTotals prior,
-            Map<UUID, Category> liveCategoriesById) {
+            Map<UUID, Category> liveCategoriesById,
+            List<Transaction> transactions) {
 
-        List<Transaction> transactions = this.transactionRepository.findByDateRange(priorStartDate, endDate);
         if (transactions == null) {
             return;
         }
@@ -387,3 +328,4 @@ public class ReportServiceImpl implements ReportService {
     }
     // endregion
 }
+

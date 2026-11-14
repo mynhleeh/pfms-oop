@@ -1,4 +1,4 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.common;
 
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.EntityNotFoundException;

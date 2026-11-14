@@ -8,8 +8,8 @@ import com.pfms.presentation.dto.transfer.TransferResponseDTO;
 import java.util.UUID;
 
 /**
- * Giao diện dịch vụ điều phối nghiệp vụ chuyển tiền nội bộ giữa các ví.
- * Đảm bảo tính nguyên tử hai chiều, bảo toàn tổng tài sản và xử lý phụ phí đi kèm.
+ * Dịch vụ chuyển tiền nội bộ giữa hai ví thanh toán.
+ * Đảm bảo tính nguyên tử hai chiều, bảo toàn tổng tài sản và hạch toán phụ phí chuyển tiền.
  */
 public interface TransferService {
 

@@ -11,7 +11,8 @@ import com.pfms.presentation.dto.wallet.WalletsSummaryDTO;
 import java.util.UUID;
 
 /**
- * Giao diện dịch vụ ứng dụng điều phối các ca sử dụng quản lý Ví tiền.
+ * Dịch vụ quản lý ví thanh toán và số dư tài chính.
+ * Điều phối tạo ví, cập nhật thông tin, chuyển đổi trạng thái và kiểm kê điều chỉnh số dư.
  */
 public interface WalletService {
 

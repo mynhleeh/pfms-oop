@@ -1,11 +1,12 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.transaction;
+
+import com.pfms.service.impl.common.EntityLookupSupport;
 
 import com.pfms.common.util.PaginationUtils;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.EntityNotFoundException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
-import com.pfms.domain.exception.StorageException;
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.Note;
@@ -27,14 +28,12 @@ import com.pfms.presentation.dto.transaction.UpdateTransactionRequestDTO;
 import com.pfms.service.TransactionService;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Lớp cài đặt dịch vụ điều phối nghiệp vụ ghi nhận và quản lý giao dịch thu chi (TransactionService).
- * Quản lý vòng đời giao dịch thu chi, cập nhật số dư ví tức thời và thực hiện quy trình hoàn nguyên an toàn khi sửa hoặc xóa.
+ * Cài đặt dịch vụ giao dịch thu chi ({@link TransactionService}).
+ * Quản lý vòng đời giao dịch, cập nhật số dư ví và phối hợp các bộ phận hỗ trợ lưu trữ 2 pha và truy vấn.
  */
 public class TransactionServiceImpl implements TransactionService {
 
@@ -84,9 +83,10 @@ public class TransactionServiceImpl implements TransactionService {
                 feeAmount,
                 feeCategory);
 
-        persistTransactionWithRollback(wallet, transaction);
+        TransactionPersistenceCoordinator.persistTransactionWithRollback(
+                transactionRepository, walletRepository, wallet, transaction);
 
-        return toResponseDTO(transaction, wallet, category);
+        return TransactionQuerySupport.toResponseDTO(transaction, wallet, category, categoryRepository);
     }
 
     @Override
@@ -125,10 +125,11 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.updateDetails(wallet, newCategory, newAmount, newDate, newNote, newFee);
 
-        persistUpdateWithRollback(
-                wallet, walletSnapshot, transaction, oldCategory, oldAmount, oldDate, oldNote, oldFee);
+        TransactionPersistenceCoordinator.persistUpdateWithRollback(
+                transactionRepository, walletRepository, wallet, walletSnapshot,
+                transaction, oldCategory, oldAmount, oldDate, oldNote, oldFee);
 
-        return toResponseDTO(transaction, wallet, newCategory);
+        return TransactionQuerySupport.toResponseDTO(transaction, wallet, newCategory, categoryRepository);
     }
 
     @Override
@@ -150,9 +151,24 @@ public class TransactionServiceImpl implements TransactionService {
         Wallet walletSnapshot = wallet.copy();
         revertTransactionBalance(transaction, wallet);
 
-        persistDeletionWithRollback(transaction, wallet, walletSnapshot);
+        TransactionPersistenceCoordinator.persistDeletionWithRollback(
+                transactionRepository, walletRepository, transaction, wallet, walletSnapshot);
     }
+    // endregion
 
+    // region Queries
+    @Override
+    public TransactionListResponseDTO filterTransactions(FilterTransactionsRequestDTO request) {
+        Objects.requireNonNull(request, "Tiêu chí lọc giao dịch không được để null");
+        TransactionDate.validateRange(request.getStartDate(), request.getEndDate());
+        PaginationUtils.validate(request.getPageNumber(), request.getPageSize());
+
+        return TransactionQuerySupport.filterTransactions(
+                transactionRepository, walletRepository, categoryRepository, request);
+    }
+    // endregion
+
+    // region Helpers
     private void revertTransactionBalance(IncomeExpenseTransaction transaction, Wallet wallet) {
         transaction.revertFromWallet();
         if (transaction.getWallet() != wallet) {
@@ -167,52 +183,7 @@ public class TransactionServiceImpl implements TransactionService {
             }
         }
     }
-    // endregion
 
-    // region Queries
-    @Override
-    public TransactionListResponseDTO filterTransactions(FilterTransactionsRequestDTO request) {
-        Objects.requireNonNull(request, "Tiêu chí lọc giao dịch không được để null");
-        TransactionDate.validateRange(request.getStartDate(), request.getEndDate());
-        PaginationUtils.validate(request.getPageNumber(), request.getPageSize());
-
-        List<IncomeExpenseTransaction> matchedTransactions = queryMatchingTransactions(request);
-
-        Money totalIncome = Money.ZERO;
-        Money totalExpense = Money.ZERO;
-
-        for (IncomeExpenseTransaction transaction : matchedTransactions) {
-            if (transaction.getTransactionType() == TransactionType.INCOME) {
-                totalIncome = totalIncome.add(transaction.getAmount());
-            } else if (transaction.getTransactionType() == TransactionType.EXPENSE) {
-                totalExpense = totalExpense.add(transaction.getAmount());
-            }
-            if (transaction.getFee().isPresent()) {
-                totalExpense = totalExpense.add(transaction.getFee().get().getAmount());
-            }
-        }
-
-        Money netCashFlow = totalIncome.subtract(totalExpense);
-        List<TransactionResponseDTO> pageItems = toPageItems(matchedTransactions, request);
-
-        int totalRecords = matchedTransactions.size();
-        int totalPages = (totalRecords == 0)
-                ? 0
-                : (int) Math.ceil((double) totalRecords / request.getPageSize());
-
-        return new TransactionListResponseDTO(
-                pageItems,
-                totalIncome.getAmount(),
-                totalExpense.getAmount(),
-                netCashFlow.getAmount(),
-                request.getPageNumber(),
-                request.getPageSize(),
-                totalRecords,
-                totalPages);
-    }
-    // endregion
-
-    // region Helpers
     private void validateRecordRequest(RecordTransactionRequestDTO request) {
         Objects.requireNonNull(request, "Yêu cầu ghi nhận giao dịch không được để null");
         Objects.requireNonNull(request.getWalletId(), "Mã ví không được để null");
@@ -249,156 +220,6 @@ public class TransactionServiceImpl implements TransactionService {
                     ErrorCode.ERR_NOT_FOUND, "Bản ghi giao dịch không phải thu chi hợp lệ.");
         }
         return incomeExpenseTxn;
-    }
-
-    private void executeTwoPhasePersistence(
-            Runnable primaryStorageAction,
-            Runnable inMemoryRollback,
-            Runnable primaryRollbackStep,
-            Wallet wallet,
-            Wallet walletSnapshot) {
-
-        boolean primaryCompleted = false;
-        try {
-            primaryStorageAction.run();
-            primaryCompleted = true;
-            walletRepository.save(wallet);
-        } catch (StorageException storageException) {
-            if (inMemoryRollback != null) {
-                try {
-                    inMemoryRollback.run();
-                } catch (RuntimeException ignore) {
-                }
-            }
-            if (primaryCompleted && primaryRollbackStep != null) {
-                RollbackSupport.runRollbackStep(primaryRollbackStep, storageException);
-            }
-            RollbackSupport.runRollbackStep(() -> walletRepository.save(walletSnapshot), storageException);
-            throw storageException;
-        }
-    }
-
-    private void persistTransactionWithRollback(Wallet wallet, IncomeExpenseTransaction transaction) {
-        Wallet walletSnapshot = wallet.copy();
-        transaction.applyToWallet();
-        executeTwoPhasePersistence(
-                () -> transactionRepository.save(transaction),
-                transaction::revertFromWallet,
-                () -> transactionRepository.deleteById(transaction.getTransactionId()),
-                wallet,
-                walletSnapshot);
-    }
-
-    private void persistUpdateWithRollback(
-            Wallet wallet,
-            Wallet walletSnapshot,
-            IncomeExpenseTransaction transaction,
-            Category oldCategory,
-            Money oldAmount,
-            TransactionDate oldDate,
-            String oldNote,
-            TransactionFee oldFee) {
-
-        executeTwoPhasePersistence(
-                () -> transactionRepository.save(transaction),
-                () -> transaction.updateDetails(wallet, oldCategory, oldAmount, oldDate, oldNote, oldFee),
-                () -> transactionRepository.save(transaction),
-                wallet,
-                walletSnapshot);
-    }
-
-    private void persistDeletionWithRollback(
-            IncomeExpenseTransaction transaction, Wallet wallet, Wallet walletSnapshot) {
-
-        executeTwoPhasePersistence(
-                () -> transactionRepository.deleteById(transaction.getTransactionId()),
-                transaction::applyToWallet,
-                () -> transactionRepository.save(transaction),
-                wallet,
-                walletSnapshot);
-    }
-
-    private List<IncomeExpenseTransaction> queryMatchingTransactions(FilterTransactionsRequestDTO request) {
-        List<Transaction> candidates = (request.getStartDate() != null && request.getEndDate() != null)
-                ? transactionRepository.findByDateRange(request.getStartDate(), request.getEndDate())
-                : transactionRepository.findAll();
-
-        return candidates.stream()
-                .filter(IncomeExpenseTransaction.class::isInstance)
-                .map(IncomeExpenseTransaction.class::cast)
-                .filter(transaction -> matchesFilterCriteria(transaction, request))
-                .sorted(Transaction.DESCENDING_ORDER)
-                .toList();
-    }
-
-    private boolean matchesFilterCriteria(
-            IncomeExpenseTransaction transaction, FilterTransactionsRequestDTO request) {
-
-        LocalDate txnDate = transaction.getTransactionDate().getDate();
-        if (request.getStartDate() != null && txnDate.isBefore(request.getStartDate())) {
-            return false;
-        }
-        if (request.getEndDate() != null && txnDate.isAfter(request.getEndDate())) {
-            return false;
-        }
-        if (!request.getWalletIds().isEmpty()
-                && !request.getWalletIds().contains(transaction.getWallet().getId())) {
-            return false;
-        }
-        if (request.getTransactionType() != null && !request.getTransactionType().isEmpty()
-                && !transaction.getTransactionType().name().equalsIgnoreCase(request.getTransactionType())) {
-            return false;
-        }
-        if (!request.getCategoryIds().isEmpty()
-                && !request.getCategoryIds().contains(transaction.getCategory().getCategoryId())) {
-            return false;
-        }
-        return request.getKeyword() == null || request.getKeyword().isEmpty()
-                || (transaction.getNote() != null
-                && transaction.getNote().toLowerCase().contains(request.getKeyword().toLowerCase()));
-    }
-
-    private List<TransactionResponseDTO> toPageItems(
-            List<IncomeExpenseTransaction> matchedTransactions, FilterTransactionsRequestDTO request) {
-
-        return PaginationUtils.slice(
-                matchedTransactions, request.getPageNumber(), request.getPageSize())
-                .stream()
-                .map(txn -> toResponseDTO(
-                        txn,
-                        EntityLookupSupport.resolveForDisplay(walletRepository, txn.getWallet().getId(), txn.getWallet()),
-                        EntityLookupSupport.resolveForDisplay(categoryRepository, txn.getCategory().getCategoryId(), txn.getCategory())))
-                .toList();
-    }
-
-    private TransactionResponseDTO toResponseDTO(
-            IncomeExpenseTransaction transaction, Wallet wallet, Category category) {
-
-        TransactionFee fee = transaction.getFee().orElse(null);
-        boolean hasFee = (fee != null);
-        BigDecimal feeAmount = hasFee ? fee.getAmount().getAmount() : BigDecimal.ZERO;
-        UUID feeCategoryId = hasFee ? fee.getCategory().getCategoryId() : null;
-        String feeCategoryName = hasFee
-                ? EntityLookupSupport.resolveForDisplay(categoryRepository, feeCategoryId, fee.getCategory()).getName()
-                : "";
-
-        return new TransactionResponseDTO(
-                transaction.getTransactionId(),
-                wallet.getId(),
-                wallet.getName(),
-                category.getCategoryId(),
-                category.getName(),
-                transaction.getAmount().getAmount(),
-                transaction.getTransactionType().name(),
-                transaction.getTransactionDate().getDate(),
-                transaction.getNote(),
-                hasFee,
-                feeAmount,
-                feeCategoryId,
-                feeCategoryName,
-                wallet.getCurrentBalance().getAmount(),
-                transaction.getCreatedAt()
-        );
     }
     // endregion
 }

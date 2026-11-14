@@ -1,4 +1,7 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.transfer;
+
+import com.pfms.service.impl.common.EntityLookupSupport;
+import com.pfms.service.impl.common.RollbackSupport;
 
 import com.pfms.common.util.PaginationUtils;
 import com.pfms.domain.exception.BusinessException;
@@ -30,9 +33,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Lớp cài đặt dịch vụ điều phối nghiệp vụ chuyển tiền nội bộ (TransferService).
- * Đảm bảo tính nguyên tử hai chiều, bảo toàn tổng tài sản và xử lý phụ phí đi
- * kèm.
+ * Cài đặt dịch vụ chuyển tiền nội bộ ({@link TransferService}).
+ * Đảm bảo biến động số dư nguyên tử hai chiều, bảo toàn tổng tài sản và rollback an toàn khi lỗi đĩa.
  */
 public class TransferServiceImpl implements TransferService {
 

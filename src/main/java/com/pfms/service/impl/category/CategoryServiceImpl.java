@@ -1,4 +1,6 @@
-package com.pfms.service.impl;
+package com.pfms.service.impl.category;
+
+import com.pfms.service.impl.common.EntityLookupSupport;
 
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.DuplicateEntityException;
@@ -26,8 +28,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Cài đặt dịch vụ điều phối nghiệp vụ Danh mục thu chi (CategoryService).
- * Quản lý cây danh mục 3 cấp, kiểm soát tính duy nhất của tên và xóa mềm bảo toàn lịch sử giao dịch.
+ * Cài đặt dịch vụ quản lý danh mục thu chi ({@link CategoryService}).
+ * Đảm bảo tính duy nhất của tên theo nhóm cha và thực thi xóa mềm bảo toàn lịch sử giao dịch.
  */
 public class CategoryServiceImpl implements CategoryService {
 
