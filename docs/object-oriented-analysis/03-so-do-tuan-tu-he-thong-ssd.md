@@ -145,7 +145,7 @@ Người dùng đối chiếu tiền thực tế với phần mềm và yêu c�
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
 | `walletId` | Mã ví cần điều chỉnh | Tồn tại và đang ở trạng thái `ACTIVE` (`FR-WAL-05`). |
-| `actualBalance` | Số dư thực tế | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`) và khác số dư hiện tại của ví (`FR-WAL-05`). |
+| `actualBalance` | Số dư thực tế | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`) và khác số dư hiện tại của ví (`FR-WAL-05`). |
 | `reason` | Lý do chênh lệch | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-WAL-05`). |
 
 **Sơ đồ tuần tự hệ thống**
@@ -187,18 +187,18 @@ Nhóm chức năng Ghi nhận thu chi hạch toán các khoản thu nhập, chi 
 Người dùng gửi thông tin khoản thu/chi kèm ví thanh toán, danh mục và phí phát sinh (nếu có). Hệ thống kiểm tra danh mục cấp 3 (`BR-FIN-04`), số dư ví (`BR-FIN-02`) và ghi nhận đồng thời giao dịch gốc cùng bản ghi phí liên kết.
 
 - **Thao tác hệ thống**: `recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
-- **Kết quả phản hồi**: Tạo `IncomeExpenseTransaction`, tạo `TransactionFee` liên kết nếu `feeAmount > 0.00 VNĐ`, cập nhật số dư ví (`BR-FIN-02`) và trả về giao dịch vừa lưu; từ chối nếu số tiền sai định dạng hoặc $\le 0$ (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại/đã xóa (`ERR-FEE-003`), ví không đủ số dư (`ERR-WAL-001`), hoặc ví/danh mục không hợp lệ (`BR-FIN-04`).
+- **Kết quả phản hồi**: Tạo `IncomeExpenseTransaction`, tạo `TransactionFee` liên kết nếu `feeAmount > 0.00 VNĐ`, cập nhật số dư ví (`BR-FIN-02`) và trả về giao dịch vừa lưu; từ chối nếu số tiền sai định dạng hoặc ≤ 0 (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại/đã xóa (`ERR-FEE-003`), ví không đủ số dư (`ERR-WAL-001`), hoặc ví/danh mục không hợp lệ (`BR-FIN-04`).
 
 **Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `walletId` | Mã ví thanh toán | Tồn tại và đang `ACTIVE` (`FR-TXN-01`, `FR-TXN-02`). Số dư sau giao dịch và phí phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `walletId` | Mã ví thanh toán | Tồn tại và đang `ACTIVE` (`FR-TXN-01`, `FR-TXN-02`). Số dư sau giao dịch và phí phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
 | `categoryId` | Mã danh mục cấp 3 | Đang `ACTIVE`, thuộc nhánh `INCOME` hoặc `EXPENSE` (`BR-FIN-04`). |
-| `amount` | Số tiền giao dịch | Số thập phân 2 chữ số, $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
+| `amount` | Số tiền giao dịch | Số thập phân 2 chữ số, > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
 | `transactionDate` | Ngày giao dịch | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-01`, `FR-TXN-02`). |
 | `note` | Ghi chú | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TXN-01`, `FR-TXN-02`). |
-| `feeAmount` | Số tiền phí | Số thập phân 2 chữ số (`BR-FIN-01`), $\ge 0.00$ VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-02`, `ERR-FEE-001`). |
+| `feeAmount` | Số tiền phí | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-02`, `ERR-FEE-001`). |
 | `feeCategoryId` | Mã danh mục phí | Tùy chọn khi `feeAmount = 0.00 VNĐ`, bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); phải là danh mục cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
@@ -235,8 +235,8 @@ Người dùng gửi tiêu chí lọc theo khoảng thời gian, ví và danh m�
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu | Định dạng `YYYY-MM-DD`, $\le endDate$ (`FR-TXN-03`). |
-| `endDate` | Ngày kết thúc | Định dạng `YYYY-MM-DD`, $\ge startDate$ (`FR-TXN-03`). |
+| `startDate` | Ngày bắt đầu | Định dạng `YYYY-MM-DD`, `≤ endDate` (`FR-TXN-03`). |
+| `endDate` | Ngày kết thúc | Định dạng `YYYY-MM-DD`, `≥ startDate` (`FR-TXN-03`). |
 | `walletId` | Mã ví cần lọc | Tùy chọn; để trống để lấy toàn bộ ví (`FR-TXN-03`). |
 | `categoryId` | Mã nhóm hoặc danh mục | Tùy chọn; nhận mã `NeedGroup` hoặc `Category` (kể cả mục đã `DELETED`) (`BR-FIN-04`, `FR-TXN-03`). |
 
@@ -273,12 +273,12 @@ Người dùng yêu cầu sửa thông tin một giao dịch thu chi đã lưu. 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
 | `transactionId` | Mã giao dịch cần sửa | Giao dịch gốc tồn tại trong sổ thu chi (`FR-TXN-04`), không phải bản ghi phí độc lập (`BR-FIN-02`). |
-| `walletId` | Mã ví thanh toán mới | Tồn tại và đang `ACTIVE`. Số dư ví cũ sau hoàn nguyên và ví mới sau cập nhật phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `walletId` | Mã ví thanh toán mới | Tồn tại và đang `ACTIVE`. Số dư ví cũ sau hoàn nguyên và ví mới sau cập nhật phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
 | `categoryId` | Mã danh mục cấp 3 mới | Cùng nhánh `TransactionType` với giao dịch gốc (`BR-FIN-04`). Phải đang `ACTIVE` nếu chọn mới, hoặc giữ nguyên danh mục cũ đã xóa mềm (`FR-TXN-04`). |
-| `amount` | Số tiền mới | Số thập phân 2 chữ số, $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
+| `amount` | Số tiền mới | Số thập phân 2 chữ số, > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
 | `transactionDate` | Ngày giao dịch mới | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-04`). |
 | `note` | Ghi chú mới | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TXN-04`). |
-| `feeAmount` | Số tiền phí mới | Số thập phân 2 chữ số (`BR-FIN-01`), $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-FEE-001`). |
+| `feeAmount` | Số tiền phí mới | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-FEE-001`). |
 | `feeCategoryId` | Mã danh mục phí mới | Bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); thuộc nhánh `EXPENSE` và đang `ACTIVE` (hoặc giữ nguyên danh mục phí cũ đã xóa mềm) (`FR-TXN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
@@ -313,7 +313,7 @@ Người dùng yêu cầu xóa một giao dịch thu chi. Hệ thống kiểm tr
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transactionId` | Mã giao dịch cần xóa | Giao dịch gốc tồn tại (`FR-TXN-05`), không phải bản ghi phí độc lập. Nếu xóa giao dịch `INCOME`, số dư ví sau khi trừ khoản thu và hoàn phí phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `transactionId` | Mã giao dịch cần xóa | Giao dịch gốc tồn tại (`FR-TXN-05`), không phải bản ghi phí độc lập. Nếu xóa giao dịch `INCOME`, số dư ví sau khi trừ khoản thu và hoàn phí phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -349,18 +349,18 @@ Nhóm chức năng Chuyển tiền nội bộ điều chuyển tiền giữa cá
 Người dùng yêu cầu chuyển tiền từ ví nguồn sang ví đích kèm phí chuyển tiền (nếu có). Hệ thống kiểm tra hai ví phân biệt (`BR-FIN-03`) và số dư ví nguồn (`BR-FIN-02`), sau đó trừ ví nguồn, cộng ví đích đồng thời và tạo bản ghi phí liên kết.
 
 - **Thao tác hệ thống**: `transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)`
-- **Kết quả phản hồi**: Tạo `TransferTransaction`, trừ đồng thời `amount + feeAmount` ở ví nguồn, cộng `amount` vào ví đích (`BR-FIN-03`), tạo `TransactionFee` (loại `EXPENSE`) nếu `feeAmount > 0.00 VNĐ` và trả về số dư mới của hai ví; từ chối nếu trùng ví nguồn và đích (`ERR-TRF-001`), số tiền chuyển $\le 0$ (`ERR-TRF-002`), sai định dạng số (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu/sai danh mục phí (`ERR-FEE-002`, `ERR-FEE-003`) hoặc ví nguồn không đủ số dư (`ERR-WAL-001`).
+- **Kết quả phản hồi**: Tạo `TransferTransaction`, trừ đồng thời `amount + feeAmount` ở ví nguồn, cộng `amount` vào ví đích (`BR-FIN-03`), tạo `TransactionFee` (loại `EXPENSE`) nếu `feeAmount > 0.00 VNĐ` và trả về số dư mới của hai ví; từ chối nếu trùng ví nguồn và đích (`ERR-TRF-001`), số tiền chuyển ≤ 0 (`ERR-TRF-002`), sai định dạng số (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu/sai danh mục phí (`ERR-FEE-002`, `ERR-FEE-003`) hoặc ví nguồn không đủ số dư (`ERR-WAL-001`).
 
 **Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `sourceWalletId` | Mã ví nguồn | Tồn tại, đang `ACTIVE` (`BR-FIN-03`) và có số dư $\ge amount + feeAmount$ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `sourceWalletId` | Mã ví nguồn | Tồn tại, đang `ACTIVE` (`BR-FIN-03`) và có số dư `≥ amount + feeAmount` (`BR-FIN-02`, `ERR-WAL-001`). |
 | `destinationWalletId` | Mã ví đích | Tồn tại, đang `ACTIVE` và khác `sourceWalletId` (`BR-FIN-03`, `ERR-TRF-001`). |
-| `amount` | Số tiền chuyển | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), $> 0.00$ VNĐ (`BR-FIN-03`, `ERR-TRF-002`). |
+| `amount` | Số tiền chuyển | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), > 0.00 VNĐ (`BR-FIN-03`, `ERR-TRF-002`). |
 | `transferDate` | Ngày chuyển tiền | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TRF-01`). |
 | `note` | Ghi chú | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TRF-01`). |
-| `feeAmount` | Số tiền phí chuyển | Số thập phân 2 chữ số (`BR-FIN-01`), $\ge 0.00$ VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-03`, `ERR-FEE-001`). |
+| `feeAmount` | Số tiền phí chuyển | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-03`, `ERR-FEE-001`). |
 | `feeCategoryId` | Mã danh mục phí | Tùy chọn khi `feeAmount = 0.00 VNĐ`, bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); phải là danh mục cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
@@ -395,8 +395,8 @@ Người dùng truy vấn lịch sử chuyển tiền nội bộ theo khoảng t
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu | Tùy chọn, định dạng `YYYY-MM-DD`, $\le endDate$ (`FR-TRF-02`). |
-| `endDate` | Ngày kết thúc | Tùy chọn, định dạng `YYYY-MM-DD`, $\ge startDate$ (`FR-TRF-02`). |
+| `startDate` | Ngày bắt đầu | Tùy chọn, định dạng `YYYY-MM-DD`, `≤ endDate` (`FR-TRF-02`). |
+| `endDate` | Ngày kết thúc | Tùy chọn, định dạng `YYYY-MM-DD`, `≥ startDate` (`FR-TRF-02`). |
 | `sourceWalletId` | Mã ví nguồn | Tùy chọn; để trống để lấy toàn bộ ví nguồn (`FR-TRF-02`). |
 | `destinationWalletId` | Mã ví đích | Tùy chọn; để trống để lấy toàn bộ ví đích (`FR-TRF-02`). |
 
@@ -432,7 +432,7 @@ Người dùng yêu cầu xóa một giao dịch chuyển tiền để khôi ph�
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transferId` | Mã chuyển tiền cần xóa | Tồn tại trong hệ thống (`FR-TRF-02`). Số dư hiện tại của ví đích phải $\ge amount$ để không làm âm ví đích khi thu hồi (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). |
+| `transferId` | Mã chuyển tiền cần xóa | Tồn tại trong hệ thống (`FR-TRF-02`). Số dư hiện tại của ví đích phải `≥ amount` để không làm âm ví đích khi thu hồi (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -622,7 +622,7 @@ Người dùng yêu cầu tổng hợp chuỗi dòng tiền trong 12 tháng liê
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
 | `endMonth` | Tháng kết thúc kỳ 12 tháng | Số nguyên từ 1 đến 12 (mặc định là tháng hiện tại, `FR-REP-01`, `ERR-REP-001`). |
-| `endYear` | Năm kết thúc kỳ 12 tháng | Số nguyên $\ge 2000$ (mặc định là năm hiện tại, `FR-REP-01`, `ERR-REP-001`). |
+| `endYear` | Năm kết thúc kỳ 12 tháng | Số nguyên ≥ 2000 (mặc định là năm hiện tại, `FR-REP-01`, `ERR-REP-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -652,8 +652,8 @@ Người dùng yêu cầu phân tích tỷ trọng dòng tiền theo nhóm nhu c
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và $\le endDate$ (`FR-REP-02`). |
-| `endDate` | Ngày kết thúc kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và $\ge startDate$ (`FR-REP-02`). |
+| `startDate` | Ngày bắt đầu kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và `≤ endDate` (`FR-REP-02`). |
+| `endDate` | Ngày kết thúc kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và `≥ startDate` (`FR-REP-02`). |
 | `transactionType` | Loại thu chi cần phân tích | Khác rỗng, nhận giá trị `INCOME` hoặc `EXPENSE` (mặc định là `EXPENSE`, `BR-FIN-04`). |
 
 **Sơ đồ tuần tự hệ thống**

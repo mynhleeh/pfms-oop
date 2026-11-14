@@ -66,7 +66,7 @@ Người dùng ghi nhận khoản thu nhập hoặc chi tiêu kèm chi phí giao
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
 | Giao diện | `TransactionRecordingView` | Thu thập thông tin thu chi và chi phí đi kèm; hiển thị kết quả ghi nhận cùng số dư ví mới hoặc thông báo mã lỗi tương ứng (`ERR-FIN-001`, `ERR-FEE-001`–`003`, `ERR-WAL-001`). |
-| Điều khiển | `CashFlowCoordinator` | Kiểm tra `amount > 0.00 VNĐ` (`BR-FIN-01`, `ERR-FIN-001`), trạng thái `ACTIVE` của ví cùng danh mục giao dịch và danh mục phí cấp 3 nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`), phí $\ge 0.00$ VNĐ (`ERR-FEE-001`) và số dư khả dụng của ví (`BR-FIN-02`, `ERR-WAL-001`); điều phối lưu giao dịch, phí và cập nhật số dư ví. |
+| Điều khiển | `CashFlowCoordinator` | Kiểm tra `amount > 0.00 VNĐ` (`BR-FIN-01`, `ERR-FIN-001`), trạng thái `ACTIVE` của ví cùng danh mục giao dịch và danh mục phí cấp 3 nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`), phí ≥ 0.00 VNĐ (`ERR-FEE-001`) và số dư khả dụng của ví (`BR-FIN-02`, `ERR-WAL-001`); điều phối lưu giao dịch, phí và cập nhật số dư ví. |
 | Thực thể | `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransactionFee` | `Category` xác nhận danh mục cấp 3 `ACTIVE` (`BR-FIN-04`); `Wallet` kiểm tra số dư và cập nhật `currentBalance` tức thời (`BR-FIN-02`); `IncomeExpenseTransaction` lưu khoản thu/chi (`FR-TXN-01`, `FR-TXN-02`); `TransactionFee` lưu khoản phí `EXPENSE` khi `feeAmount > 0.00 VNĐ` (`BR-FIN-02`). |
 
 **Sơ đồ Robustness**
@@ -109,7 +109,7 @@ Người dùng điều chuyển tiền giữa hai ví nội bộ đang hoạt đ
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
 | Giao diện | `FundTransferView` | Thu thập ví nguồn, ví đích, số tiền chuyển và chi phí; hiển thị kết quả cùng số dư mới của hai ví hoặc báo lỗi tương ứng (`ERR-TRF-001`, `ERR-TRF-002`, `ERR-FIN-001`, `ERR-FEE-001`–`003`, `ERR-WAL-001`). |
-| Điều khiển | `CashFlowCoordinator` | Kiểm tra hai ví `ACTIVE` phân biệt (`BR-FIN-03`, `ERR-TRF-001`), `amount > 0.00 VNĐ` (`BR-FIN-01`, `ERR-FIN-001`, `ERR-TRF-002`), danh mục phí cấp 3 nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-001`–`003`) và số dư ví nguồn $\ge amount + feeAmount$ (`BR-FIN-02`, `ERR-WAL-001`); điều phối hạch toán đồng thời hai ví và tách bản ghi phí (`BR-FIN-03`). |
+| Điều khiển | `CashFlowCoordinator` | Kiểm tra hai ví `ACTIVE` phân biệt (`BR-FIN-03`, `ERR-TRF-001`), `amount > 0.00 VNĐ` (`BR-FIN-01`, `ERR-FIN-001`, `ERR-TRF-002`), danh mục phí cấp 3 nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-001`–`003`) và số dư ví nguồn `≥ amount + feeAmount` (`BR-FIN-02`, `ERR-WAL-001`); điều phối hạch toán đồng thời hai ví và tách bản ghi phí (`BR-FIN-03`). |
 | Thực thể | `Wallet`, `Category`, `TransferTransaction`, `TransactionFee` | `Wallet` nguồn và đích xác nhận trạng thái `ACTIVE`, trừ `amount + feeAmount` tại ví nguồn và cộng `amount` tại ví đích đồng thời (`BR-FIN-02`, `BR-FIN-03`); `Category` xác nhận danh mục phí cấp 3 `EXPENSE` (`BR-FIN-04`); `TransferTransaction` lưu giao dịch chuyển tiền (`FR-TRF-01`); `TransactionFee` lưu phí gắn với ví nguồn khi `feeAmount > 0.00 VNĐ`. |
 
 **Sơ đồ Robustness**
@@ -193,7 +193,7 @@ Người dùng yêu cầu trích xuất chuỗi số liệu dòng tiền 12 thá
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
 | Giao diện | `ReportUI` | Nhận mốc kết thúc (`endMonth`, `endYear`), gửi yêu cầu tạo báo cáo; hiển thị bảng 12 tháng liên tục, dòng 3 mức bình quân tháng và biểu đồ kết hợp cột - đường, hoặc hiển thị lỗi `ERR-REP-001` khi tham số không hợp lệ. |
-| Điều khiển | `ReportController` | Kiểm tra `endMonth` thuộc `[1, 12]` và `endYear >= 2000` (`ERR-REP-001`); sinh chuỗi 12 tháng liên tục; truy vấn chỉ đọc `IncomeExpenseTransaction`, `TransactionFee` và `TransferTransaction` (chỉ đọc ngày của phí chuyển khoản); tổng hợp thu chi (`BR-FIN-02`), tính `NetCashFlow`, `SavingsRate` (trung gian $\ge 4$ chữ số thập phân, làm tròn ngân hàng 2 chữ số, `0.00%` khi thu nhập $\le 0$ theo `BR-FIN-01`) và 3 mức bình quân tháng chia cho 12. |
+| Điều khiển | `ReportController` | Kiểm tra `endMonth` thuộc `[1, 12]` và `endYear >= 2000` (`ERR-REP-001`); sinh chuỗi 12 tháng liên tục; truy vấn chỉ đọc `IncomeExpenseTransaction`, `TransactionFee` và `TransferTransaction` (chỉ đọc ngày của phí chuyển khoản); tổng hợp thu chi (`BR-FIN-02`), tính `NetCashFlow`, `SavingsRate` (trung gian ≥ 4 chữ số thập phân, làm tròn ngân hàng 2 chữ số, `0.00%` khi thu nhập ≤ 0 theo `BR-FIN-01`) và 3 mức bình quân tháng chia cho 12. |
 | Thực thể | `IncomeExpenseTransaction`, `TransactionFee`, `TransferTransaction` | Cung cấp lịch sử giao dịch thu chi, chi phí liên kết (`EXPENSE`) và ngày giao dịch gốc của phí chuyển tiền phục vụ lọc theo tháng; bảo toàn nguyên vẹn trạng thái và số dư dữ liệu (bất biến chỉ đọc). |
 
 **Sơ đồ Robustness**

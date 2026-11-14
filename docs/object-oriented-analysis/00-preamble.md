@@ -10,80 +10,111 @@
 | **Nhóm** | 3 |
 | **Thành viên** | Lê Anh Minh (B24DCCE180)<br/>Ứng Trọng Trình (B24DCCE271)<br/>Nguyễn Đình Tiến (B24DCCE264)<br/>Nguyễn Đinh Anh Quân (B24DCCE222) |
 
-# Mục lục Tổng quan Hồ sơ Phân tích Hướng đối tượng
+## Mục lục Tổng quan
 
-## Danh mục Tài liệu Thành phần
-
-- [00-preamble.md](00-preamble.md): Thông tin định danh học phần, giảng viên hướng dẫn và nhóm tác giả
-- [01-gioi-thieu-va-ngu-canh-he-thong.md](01-gioi-thieu-va-ngu-canh-he-thong.md): Mục đích tài liệu OOA, ranh giới và ngữ cảnh hệ thống, bảng đối chiếu khái niệm miền
-- [02-mo-hinh-mien-khai-niem.md](02-mo-hinh-mien-khai-niem.md): Mô hình miền khái niệm, phân loại thực thể và đối tượng giá trị, các quy tắc nghiệp vụ
-- [03-so-do-tuan-tu-he-thong-ssd.md](03-so-do-tuan-tu-he-thong-ssd.md): Sơ đồ tuần tự hệ thống cho 20 ca sử dụng và bảng thao tác hệ thống
-- [04-dac-ta-bien-doi-du-lieu-thao-tac-he-thong.md](04-dac-ta-bien-doi-du-lieu-thao-tac-he-thong.md): Đặc tả biến đổi dữ liệu của các thao tác hệ thống
-- [05-mo-hinh-trang-thai-thuc-the.md](05-mo-hinh-trang-thai-thuc-the.md): Biểu đồ máy trạng thái cho vòng đời thực thể
-- [06-so-do-robustness-va-the-crc.md](06-so-do-robustness-va-the-crc.md): Sơ đồ Robustness và bộ thẻ CRC phân bổ trách nhiệm sơ bộ
-- [07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md](07-ma-tran-truy-vet-yeu-cau-sang-thuc-the.md): Ma trận truy vết hai chiều giữa yêu cầu và mô hình phân tích
-- [08-tong-ket.md](08-tong-ket.md): Tổng kết hồ sơ phân tích hướng đối tượng
-- [09-tai-lieu-trich-dan.md](09-tai-lieu-trich-dan.md): Danh mục tài liệu tham khảo kỹ thuật chuẩn APA
-
-## Phân cấp Cấu trúc Chi tiết các Phần
-
-### Phần 1: Giới thiệu và Ngữ cảnh Hệ thống
-
-- 1.1 Mục đích và Phạm vi Tài liệu OOA
-- 1.2 Ranh giới và Ngữ cảnh Hệ thống
-- 1.3 Bảng Đối chiếu Khái niệm Miền theo Nhóm Chức năng
-
-### Phần 2: Mô hình Miền Khái niệm
-
-- 2.1 Phương pháp luận Xác định Lớp Khái niệm
-- 2.2 Bảng Phân loại Thực thể và Đối tượng Giá trị
-- 2.3 Đặc tả Chi tiết các Lớp Thực thể
-- 2.4 Đặc tả Chi tiết các Đối tượng Giá trị
-- 2.5 Các Mối Quan hệ Ngữ nghĩa và Bất biến Miền
-
-### Phần 3: Sơ đồ Tuần tự Hệ thống
-
-- 3.1 Nguyên tắc Mô hình hóa và Ranh giới Tương tác Hệ thống
-- 3.2 Tổng hợp Thao tác Hệ thống theo Nhóm Chức năng
-- 3.3 Nhóm Chức năng Quản lý Ví (WAL)
-- 3.4 Nhóm Chức năng Ghi nhận Thu chi (TXN)
-- 3.5 Nhóm Chức năng Chuyển tiền Nội bộ (TRF)
-- 3.6 Nhóm Chức năng Danh mục Phân loại (CAT)
-- 3.7 Nhóm Chức năng Thống kê và Báo cáo (REP)
-- 3.8 Nhóm Chức năng Lưu trữ và Sao lưu Dữ liệu (DAT)
-
-### Phần 4: Đặc tả Biến đổi Dữ liệu Thao tác Hệ thống
-
-- 4.1 Cấu trúc Đặc tả Thao tác
-- 4.2 Các thao tác Quản lý Ví
-- 4.3 Các thao tác Ghi nhận Thu chi
-- 4.4 Các thao tác Chuyển tiền Nội bộ
-- 4.5 Các thao tác Danh mục Phân loại
-- 4.6 Thao tác Lưu trữ và Phục hồi Dữ liệu
-- 4.7 Thống kê và Báo cáo
-
-### Phần 5: Mô hình Trạng thái Thực thể
-
-- 5.1 Quy chuẩn Mô hình Trạng thái
-- 5.2 Vòng đời Thực thể Ví
-- 5.3 Vòng đời Giao dịch Thu chi
-- 5.4 Vòng đời Giao dịch Chuyển tiền
-- 5.5 Vòng đời Thực thể Danh mục
-
-### Phần 6: Sơ đồ Robustness và Thẻ CRC
-
-- 6.1 Sơ đồ Robustness
-- 6.2 Thẻ CRC
-
-### Phần 7: Ma trận Truy vết
-
-- 7.1 Truy vết Yêu cầu Chức năng
-- 7.2 Kiểm soát Quy tắc Nghiệp vụ
-
-### Phần 8: Tổng kết
-
-- Tổng kết kết quả phân tích và đóng khóa đường cơ sở nghiệp vụ
-
-### Phần 9: Tài liệu Trích dẫn
-
-- Danh mục giáo trình và chuẩn mực kỹ thuật quốc tế
+- [1. Giới thiệu và ngữ cảnh hệ thống](#1-giới-thiệu-và-ngữ-cảnh-hệ-thống)
+  - [1.1 Mục đích và phạm vi tài liệu OOA](#11-mục-đích-và-phạm-vi-tài-liệu-ooa)
+  - [1.2 Ranh giới và ngữ cảnh hệ thống](#12-ranh-giới-và-ngữ-cảnh-hệ-thống)
+  - [1.3 Bảng đối chiếu khái niệm miền theo nhóm chức năng](#13-bảng-đối-chiếu-khái-niệm-miền-theo-nhóm-chức-năng)
+- [2. Mô hình miền khái niệm](#2-mô-hình-miền-khái-niệm)
+  - [2.1 Phương pháp luận xác định lớp khái niệm](#21-phương-pháp-luận-xác-định-lớp-khái-niệm)
+  - [2.2 Bảng phân loại thực thể và đối tượng giá trị](#22-bảng-phân-loại-thực-thể-và-đối-tượng-giá-trị)
+    - [2.2.1 Danh mục thực thể miền](#221-danh-mục-thực-thể-miền)
+    - [2.2.2 Danh mục đối tượng giá trị](#222-danh-mục-đối-tượng-giá-trị)
+  - [2.3 Đặc tả chi tiết các lớp thực thể](#23-đặc-tả-chi-tiết-các-lớp-thực-thể)
+    - [2.3.1 Thực thể Ví - Wallet](#231-thực-thể-ví---wallet)
+    - [2.3.2 Thực thể Giao dịch thu chi - IncomeExpenseTransaction](#232-thực-thể-giao-dịch-thu-chi---incomeexpensetransaction)
+    - [2.3.3 Thực thể Giao dịch chuyển tiền - TransferTransaction](#233-thực-thể-giao-dịch-chuyển-tiền---transfertransaction)
+    - [2.3.4 Thực thể Chi phí giao dịch - TransactionFee](#234-thực-thể-chi-phí-giao-dịch---transactionfee)
+    - [2.3.5 Thực thể Danh mục phân loại - Category](#235-thực-thể-danh-mục-phân-loại---category)
+    - [2.3.6 Thực thể Nhóm nhu cầu - NeedGroup](#236-thực-thể-nhóm-nhu-cầu---needgroup)
+    - [2.3.7 Thực thể Bản ghi điều chỉnh số dư - BalanceAdjustmentRecord](#237-thực-thể-bản-ghi-điều-chỉnh-số-dư---balanceadjustmentrecord)
+  - [2.4 Đặc tả chi tiết các đối tượng giá trị](#24-đặc-tả-chi-tiết-các-đối-tượng-giá-trị)
+    - [2.4.1 Tiền tệ và độ chính xác số học - Money](#241-tiền-tệ-và-độ-chính-xác-số-học---money)
+    - [2.4.2 Ngày giao dịch và mốc thời gian - TransactionDate](#242-ngày-giao-dịch-và-mốc-thời-gian---transactiondate)
+    - [2.4.3 Loại giao dịch - TransactionType](#243-loại-giao-dịch---transactiontype)
+    - [2.4.4 Dòng tiền thuần - NetCashFlow](#244-dòng-tiền-thuần---netcashflow)
+    - [2.4.5 Tỷ lệ tiết kiệm - SavingsRate](#245-tỷ-lệ-tiết-kiệm---savingsrate)
+    - [2.4.6 Tỷ trọng cơ cấu thu chi - SpendingStructureShare](#246-tỷ-trọng-cơ-cấu-thu-chi---spendingstructureshare)
+  - [2.5 Các mối quan hệ ngữ nghĩa và bất biến miền](#25-các-mối-quan-hệ-ngữ-nghĩa-và-bất-biến-miền)
+    - [2.5.1 Quan hệ sở hữu ví và bảo toàn số dư](#251-quan-hệ-sở-hữu-ví-và-bảo-toàn-số-dư)
+    - [2.5.2 Quan hệ phân cấp danh mục 3 cấp](#252-quan-hệ-phân-cấp-danh-mục-3-cấp)
+    - [2.5.3 Quan hệ phụ thuộc sinh tử giữa giao dịch gốc và phí](#253-quan-hệ-phụ-thuộc-sinh-tử-giữa-giao-dịch-gốc-và-phí)
+- [3. Sơ đồ tuần tự hệ thống](#3-sơ-đồ-tuần-tự-hệ-thống)
+  - [3.1 Nguyên tắc mô hình hóa và ranh giới tương tác hệ thống](#31-nguyên-tắc-mô-hình-hóa-và-ranh-giới-tương-tác-hệ-thống)
+  - [3.2 Tổng hợp thao tác hệ thống theo nhóm chức năng](#32-tổng-hợp-thao-tác-hệ-thống-theo-nhóm-chức-năng)
+  - [3.3 Nhóm chức năng Quản lý ví (WAL)](#33-nhóm-chức-năng-quản-lý-ví-wal)
+    - [3.3.1 Tạo ví mới](#331-tạo-ví-mới)
+    - [3.3.2 Xem tổng hợp số dư và cơ cấu ví](#332-xem-tổng-hợp-số-dư-và-cơ-cấu-ví)
+    - [3.3.3 Cập nhật thông tin ví](#333-cập-nhật-thông-tin-ví)
+    - [3.3.4 Điều chỉnh số dư ví thực tế](#334-điều-chỉnh-số-dư-ví-thực-tế)
+  - [3.4 Nhóm chức năng Ghi nhận thu chi (TXN)](#34-nhóm-chức-năng-ghi-nhận-thu-chi-txn)
+    - [3.4.1 Ghi nhận giao dịch thu chi](#341-ghi-nhận-giao-dịch-thu-chi)
+    - [3.4.2 Tra cứu và lọc lịch sử giao dịch](#342-tra-cứu-và-lọc-lịch-sử-giao-dịch)
+    - [3.4.3 Chỉnh sửa giao dịch thu chi](#343-chỉnh-sửa-giao-dịch-thu-chi)
+    - [3.4.4 Xóa giao dịch thu chi](#344-xóa-giao-dịch-thu-chi)
+  - [3.5 Nhóm chức năng Chuyển tiền nội bộ (TRF)](#35-nhóm-chức-năng-chuyển-tiền-nội-bộ-trf)
+    - [3.5.1 Chuyển tiền giữa hai ví](#351-chuyển-tiền-giữa-hai-ví)
+    - [3.5.2 Tra cứu lịch sử chuyển tiền](#352-tra-cứu-lịch-sử-chuyển-tiền)
+    - [3.5.3 Xóa giao dịch chuyển tiền](#353-xóa-giao-dịch-chuyển-tiền)
+  - [3.6 Nhóm chức năng Danh mục phân loại (CAT)](#36-nhóm-chức-năng-danh-mục-phân-loại-cat)
+    - [3.6.1 Thêm danh mục phân loại mới](#361-thêm-danh-mục-phân-loại-mới)
+    - [3.6.2 Đổi tên danh mục](#362-đổi-tên-danh-mục)
+    - [3.6.3 Khôi phục danh mục đã xóa](#363-khôi-phục-danh-mục-đã-xóa)
+    - [3.6.4 Xóa danh mục phân loại](#364-xóa-danh-mục-phân-loại)
+  - [3.7 Nhóm chức năng Thống kê và báo cáo (REP)](#37-nhóm-chức-năng-thống-kê-và-báo-cáo-rep)
+    - [3.7.1 Báo cáo dòng tiền 12 tháng gần nhất](#371-báo-cáo-dòng-tiền-12-tháng-gần-nhất)
+    - [3.7.2 Phân tích cơ cấu thu chi theo nhóm](#372-phân-tích-cơ-cấu-thu-chi-theo-nhóm)
+  - [3.8 Nhóm chức năng Lưu trữ và sao lưu dữ liệu (DAT)](#38-nhóm-chức-năng-lưu-trữ-và-sao-lưu-dữ-liệu-dat)
+    - [3.8.1 Xuất dữ liệu sao lưu](#381-xuất-dữ-liệu-sao-lưu)
+    - [3.8.2 Phục hồi dữ liệu từ bản sao lưu](#382-phục-hồi-dữ-liệu-từ-bản-sao-lưu)
+    - [3.8.3 Đối soát toàn vẹn dữ liệu hệ thống](#383-đối-soát-toàn-vẹn-dữ-liệu-hệ-thống)
+- [4. Đặc tả biến đổi dữ liệu thao tác hệ thống](#4-đặc-tả-biến-đổi-dữ-liệu-thao-tác-hệ-thống)
+  - [4.1 Cấu trúc đặc tả thao tác](#41-cấu-trúc-đặc-tả-thao-tác)
+  - [4.2 Các thao tác Quản lý ví](#42-các-thao-tác-quản-lý-ví)
+    - [4.2.1 Thao tác tạo ví mới](#421-thao-tác-tạo-ví-mới)
+    - [4.2.2 Thao tác cập nhật thông tin ví](#422-thao-tác-cập-nhật-thông-tin-ví)
+    - [4.2.3 Thao tác điều chỉnh số dư ví thực tế](#423-thao-tác-điều-chỉnh-số-dư-ví-thực-tế)
+  - [4.3 Các thao tác Ghi nhận thu chi](#43-các-thao-tác-ghi-nhận-thu-chi)
+    - [4.3.1 Thao tác ghi nhận giao dịch thu chi](#431-thao-tác-ghi-nhận-giao-dịch-thu-chi)
+    - [4.3.2 Thao tác chỉnh sửa giao dịch thu chi](#432-thao-tác-chỉnh-sửa-giao-dịch-thu-chi)
+    - [4.3.3 Thao tác xóa giao dịch thu chi](#433-thao-tác-xóa-giao-dịch-thu-chi)
+  - [4.4 Các thao tác Chuyển tiền nội bộ](#44-các-thao-tác-chuyển-tiền-nội-bộ)
+    - [4.4.1 Thao tác chuyển tiền giữa hai ví](#441-thao-tác-chuyển-tiền-giữa-hai-ví)
+    - [4.4.2 Thao tác xóa giao dịch chuyển tiền](#442-thao-tác-xóa-giao-dịch-chuyển-tiền)
+  - [4.5 Các thao tác Danh mục phân loại](#45-các-thao-tác-danh-mục-phân-loại)
+    - [4.5.1 Thao tác thêm danh mục phân loại mới](#451-thao-tác-thêm-danh-mục-phân-loại-mới)
+    - [4.5.2 Thao tác đổi tên danh mục](#452-thao-tác-đổi-tên-danh-mục)
+    - [4.5.3 Thao tác khôi phục danh mục đã xóa](#453-thao-tác-khôi-phục-danh-mục-đã-xóa)
+    - [4.5.4 Thao tác xóa danh mục phân loại](#454-thao-tác-xóa-danh-mục-phân-loại)
+  - [4.6 Thao tác Lưu trữ và phục hồi dữ liệu](#46-thao-tác-lưu-trữ-và-phục-hồi-dữ-liệu)
+    - [4.6.1 Thao tác phục hồi dữ liệu từ bản sao lưu](#461-thao-tác-phục-hồi-dữ-liệu-từ-bản-sao-lưu)
+  - [4.7 Thống kê và báo cáo](#47-thống-kê-và-báo-cáo)
+- [5. Mô hình trạng thái thực thể](#5-mô-hình-trạng-thái-thực-thể)
+  - [5.1 Quy chuẩn mô hình trạng thái](#51-quy-chuẩn-mô-hình-trạng-thái)
+  - [5.2 Vòng đời thực thể Ví](#52-vòng-đời-thực-thể-ví)
+  - [5.3 Vòng đời Giao dịch thu chi](#53-vòng-đời-giao-dịch-thu-chi)
+  - [5.4 Vòng đời Giao dịch chuyển tiền](#54-vòng-đời-giao-dịch-chuyển-tiền)
+  - [5.5 Vòng đời thực thể Danh mục](#55-vòng-đời-thực-thể-danh-mục)
+- [6. Sơ đồ Robustness và thẻ CRC](#6-sơ-đồ-robustness-và-thẻ-crc)
+  - [6.1 Sơ đồ Robustness](#61-sơ-đồ-robustness)
+    - [6.1.1 Quản lý ví](#611-quản-lý-ví)
+    - [6.1.2 Ghi nhận thu chi](#612-ghi-nhận-thu-chi)
+    - [6.1.3 Chuyển tiền nội bộ](#613-chuyển-tiền-nội-bộ)
+    - [6.1.4 Danh mục phân loại](#614-danh-mục-phân-loại)
+    - [6.1.5 Thống kê và báo cáo](#615-thống-kê-và-báo-cáo)
+    - [6.1.6 Lưu trữ và sao lưu](#616-lưu-trữ-và-sao-lưu)
+  - [6.2 Thẻ CRC](#62-thẻ-crc)
+    - [6.2.1 Lớp Ví - Wallet](#621-lớp-ví---wallet)
+    - [6.2.2 Lớp Bản ghi điều chỉnh số dư - BalanceAdjustmentRecord](#622-lớp-bản-ghi-điều-chỉnh-số-dư---balanceadjustmentrecord)
+    - [6.2.3 Lớp Giao dịch thu chi - IncomeExpenseTransaction](#623-lớp-giao-dịch-thu-chi---incomeexpensetransaction)
+    - [6.2.4 Lớp Chi phí giao dịch - TransactionFee](#624-lớp-chi-phí-giao-dịch---transactionfee)
+    - [6.2.5 Lớp Giao dịch chuyển tiền - TransferTransaction](#625-lớp-giao-dịch-chuyển-tiền---transfertransaction)
+    - [6.2.6 Lớp Danh mục phân loại - Category](#626-lớp-danh-mục-phân-loại---category)
+    - [6.2.7 Lớp Nhóm nhu cầu - NeedGroup](#627-lớp-nhóm-nhu-cầu---needgroup)
+    - [6.2.8 Lớp Điều phối dòng tiền - CashFlowCoordinator](#628-lớp-điều-phối-dòng-tiền---cashflowcoordinator)
+- [7. Ma trận truy vết](#7-ma-trận-truy-vết)
+  - [7.1 Truy vết yêu cầu chức năng](#71-truy-vết-yêu-cầu-chức-năng)
+  - [7.2 Kiểm soát quy tắc nghiệp vụ](#72-kiểm-soát-quy-tắc-nghiệp-vụ)
+- [8. Tổng kết](#8-tổng-kết)
+- [9. Tài liệu Trích dẫn](#9-tài-liệu-trích-dẫn)

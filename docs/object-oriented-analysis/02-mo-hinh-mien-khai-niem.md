@@ -36,8 +36,8 @@ Hệ thống gồm 7 thực thể quản lý dữ liệu tài chính và 6 đố
 | `TransactionDate` | Ngày, tháng, năm | Ngày phát sinh giao dịch hợp lệ theo lịch thực tế. |
 | `TransactionType` | Giá trị cố định: Thu nhập hoặc Chi tiêu | Gồm hai giá trị cố định, quyết định chiều cộng/trừ tiền vào ví (`BR-FIN-04`). |
 | `NetCashFlow` | Số tiền | Tổng thu nhập trừ tổng chi tiêu trong kỳ (`BR-FIN-01`). |
-| `SavingsRate` | Tỷ lệ phần trăm | Bằng dòng tiền thuần chia tổng thu nhập, giữ tối thiểu 4 chữ số thập phân trung gian và làm tròn ngân hàng 2 chữ số (`0.00%` khi tổng thu nhập $\le 0$ theo `BR-FIN-01`). |
-| `SpendingStructureShare` | Tỷ lệ phần trăm | Tỷ trọng thu/chi (gồm phí theo `BR-FIN-02`) của nhóm hoặc danh mục trên tổng kỳ/nhóm cha, làm tròn ngân hàng 2 chữ số (`0.00%` khi mẫu số $\le 0$ theo `BR-FIN-01`). |
+| `SavingsRate` | Tỷ lệ phần trăm | Bằng dòng tiền thuần chia tổng thu nhập, giữ tối thiểu 4 chữ số thập phân trung gian và làm tròn ngân hàng 2 chữ số (`0.00%` khi tổng thu nhập ≤ 0 theo `BR-FIN-01`). |
+| `SpendingStructureShare` | Tỷ lệ phần trăm | Tỷ trọng thu/chi (gồm phí theo `BR-FIN-02`) của nhóm hoặc danh mục trên tổng kỳ/nhóm cha, làm tròn ngân hàng 2 chữ số (`0.00%` khi mẫu số ≤ 0 theo `BR-FIN-01`). |
 
 ## 2.3 Đặc tả chi tiết các lớp thực thể
 
@@ -56,20 +56,26 @@ Ví (`Wallet`) đại diện cho nguồn tiền hoặc tài khoản thanh toán 
 | `status` | Trạng thái hoạt động | Nhận giá trị `ACTIVE` (mặc định) hoặc `ARCHIVED` (`FR-WAL-01`, `FR-WAL-03`). Cấm xóa hoặc lưu trữ ví "Tiền mặt" (`AC-WAL-03.2`). Ví khác chỉ xóa vĩnh viễn khi chưa có giao dịch, nếu đã có chỉ được chuyển sang `ARCHIVED` (`AC-WAL-03.3`). |
 | `note` | Ghi chú | Mô tả tùy chọn, tối đa 255 ký tự sau khi `trim` (`CON-05`, `FR-WAL-01`, `FR-WAL-03`). |
 | `createdAt` | Thời điểm tạo | Mốc thời gian từ `DE-01`, bất biến, dùng để sắp xếp và đối soát (`FR-WAL-01`, `FR-WAL-02`). |
-| `currentBalance` | Số dư khả dụng (dẫn xuất) | Kiểu `Money`, tính từ lịch sử dòng tiền (`BR-FIN-02`), không gán trực tiếp. Khởi điểm `0.00 VNĐ` (`FR-WAL-01`), luôn $\ge 0.00$ VNĐ (`ERR-WAL-001`). |
+| `currentBalance` | Số dư khả dụng (dẫn xuất) | Kiểu `Money`, tính từ lịch sử dòng tiền (`BR-FIN-02`), không gán trực tiếp. Khởi điểm `0.00 VNĐ` (`FR-WAL-01`), luôn ≥ 0.00 VNĐ (`ERR-WAL-001`). |
 
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**:
-  - Số dư khả dụng luôn không âm ($WalletBalance_w(t) \ge 0.00$ VNĐ) và chỉ biến động qua các giao dịch thu chi, chuyển tiền hoặc điều chỉnh số dư hợp lệ (`BR-FIN-02`, `ERR-WAL-001`).
+  - Số dư khả dụng luôn không âm (`WalletBalance(w, t) ≥ 0.00 VNĐ`) và chỉ biến động qua các giao dịch thu chi, chuyển tiền hoặc điều chỉnh số dư hợp lệ (`BR-FIN-02`, `ERR-WAL-001`).
   - Tên ví duy nhất toàn hệ thống giữa cả ví `ACTIVE` và `ARCHIVED` (`BR-NAM-01`, `ERR-NAM-002`).
   - Ví "Tiền mặt" mặc định tồn tại vĩnh viễn, cấm xóa hoặc lưu trữ (`FR-WAL-03`, `AC-WAL-03.2`).
 - **Quy tắc vận hành**:
-  - Tính số dư thời gian thực (`BR-FIN-02`):
-    $$WalletBalance_w(T) = \sum_{t \le T} \text{Inflow}_w(t) - \sum_{t \le T} \text{Outflow}_w(t)$$
-    với $\text{Inflow}_w(t) = Income_w(t) + TransferIn_w(t) + \max(0, Adjustment_w(t))$ và $\text{Outflow}_w(t) = Expense_w(t) + TransferOut_w(t) + \max(0, -Adjustment_w(t))$.
   - Kiểm tra khả năng chi trả: Mọi thao tác giảm số dư (`FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`, `FR-TRF-01`, `FR-WAL-05`) phải kiểm tra đủ số dư khả dụng, nếu thiếu từ chối theo `ERR-WAL-001`.
-  - Tỷ lệ phân bổ ví: Bằng $(\text{Số dư ví} / \text{Tổng số dư}) \times 100\%$ (`FR-WAL-04`), làm tròn ngân hàng (`BR-FIN-01`); gán `0.00%` nếu tổng số dư bằng 0 (`ERR-FIN-002`). Ví `ARCHIVED` có số dư $> 0$ hiển thị kèm nhãn "(đã lưu trữ)" (`AC-WAL-04.3`).
+  - Tỷ lệ phân bổ ví: Bằng `(currentBalance / totalBalance) × 100%` (`FR-WAL-04`), làm tròn ngân hàng (`BR-FIN-01`); gán `0.00%` nếu tổng số dư bằng 0 (`ERR-FIN-002`). Ví `ARCHIVED` có số dư > 0 hiển thị kèm nhãn "(đã lưu trữ)" (`AC-WAL-04.3`).
+  - Tính số dư thời gian thực (`BR-FIN-02`) theo công thức:
+
+$$
+\begin{aligned}
+\text{WalletBalance}_w(T) &= \sum_{t \le T} \text{Inflow}_w(t) - \sum_{t \le T} \text{Outflow}_w(t) \\
+\text{Inflow}_w(t) &= \text{Income}_w(t) + \text{TransferIn}_w(t) + \max(0, \text{Adjustment}_w(t)) \\
+\text{Outflow}_w(t) &= \text{Expense}_w(t) + \text{TransferOut}_w(t) + \max(0, -\text{Adjustment}_w(t))
+\end{aligned}
+$$
 
 ### 2.3.2 Thực thể Giao dịch thu chi - IncomeExpenseTransaction
 
@@ -80,7 +86,7 @@ Giao dịch thu chi (`IncomeExpenseTransaction`) ghi nhận dòng tiền vào (`
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
 | `transactionId` | Mã định danh giao dịch | Chuỗi ID sinh tự động, bất biến và không tái sử dụng (`FR-TXN-01`, `FR-TXN-02`). |
-| `amount` | Số tiền giao dịch | Kiểu `Money`, bắt buộc $> 0.00$ VNĐ (`BR-FIN-01`, `FR-TXN-01`, `FR-TXN-02`, `ERR-FIN-001`). |
+| `amount` | Số tiền giao dịch | Kiểu `Money`, bắt buộc > 0.00 VNĐ (`BR-FIN-01`, `FR-TXN-01`, `FR-TXN-02`, `ERR-FIN-001`). |
 | `transactionDate` | Ngày giao dịch | Kiểu `TransactionDate` (`YYYY-MM-DD`), không vượt quá ngày hiện tại từ `DE-01` (`FR-TXN-01`, `FR-TXN-02`); mặc định là ngày hiện tại. |
 | `transactionType` | Loại giao dịch | Kiểu `TransactionType` (`INCOME` hoặc `EXPENSE`, `BR-FIN-04`). Bất biến sau khi tạo (`FR-TXN-04`). |
 | `walletId` | Mã ví liên kết | Tham chiếu `Wallet` đang `ACTIVE` (`FR-TXN-01`, `FR-TXN-02`). |
@@ -91,11 +97,11 @@ Giao dịch thu chi (`IncomeExpenseTransaction`) ghi nhận dòng tiền vào (`
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**:
-  - Số tiền bắt buộc $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `transactionType` bất biến sau khi tạo (`FR-TXN-04`).
+  - Số tiền bắt buộc > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `transactionType` bất biến sau khi tạo (`FR-TXN-04`).
   - Liên kết với một ví `ACTIVE` và một danh mục cấp 3 `ACTIVE` cùng loại thu chi (`BR-FIN-04`); cấm liên kết lên cấp 1 hoặc cấp 2 (`AC-CAT-01.2`).
-  - Khả năng chi trả: Giao dịch `EXPENSE` phải thỏa $WalletBalance_w \ge amount + feeAmount$ (`BR-FIN-02`, `ERR-WAL-001`).
+  - Khả năng chi trả: Giao dịch `EXPENSE` phải thỏa `currentBalance ≥ amount + feeAmount` (`BR-FIN-02`, `ERR-WAL-001`).
 - **Quy tắc vận hành**:
-  - Cập nhật số dư và phí: Cộng $amount$ vào ví nếu `INCOME`, trừ $amount$ nếu `EXPENSE` (`BR-FIN-02`). Khi $feeAmount > 0$, tự động tạo `TransactionFee` đi kèm trong cùng một thao tác nguyên tử (`FR-TXN-01`, `FR-TXN-02`).
+  - Cập nhật số dư và phí: Cộng `amount` vào ví nếu `INCOME`, trừ `amount` nếu `EXPENSE` (`BR-FIN-02`). Khi `feeAmount > 0`, tự động tạo `TransactionFee` đi kèm trong cùng một thao tác nguyên tử (`FR-TXN-01`, `FR-TXN-02`).
   - Chỉnh sửa hai pha (`FR-TXN-04`): Hoàn nguyên số dư trên ví cũ (kiểm tra không âm `ERR-WAL-001` nếu hoàn nguyên khoản thu), áp dụng số dư mới lên ví mới (kiểm tra đủ chi trả nếu là khoản chi) và đồng bộ phí liên kết.
   - Xóa giao dịch (`FR-TXN-05`): Hoàn nguyên số dư ví (kiểm tra `ERR-WAL-001` nếu xóa khoản thu) và xóa đồng thời `TransactionFee` đi kèm (`AC-TXN-05.3`).
 
@@ -110,7 +116,7 @@ Giao dịch chuyển tiền (`TransferTransaction`) ghi nhận việc điều ch
 | `transferId` | Mã định danh chuyển tiền | Chuỗi ID sinh tự động, bất biến và không tái sử dụng (`FR-TRF-01`). |
 | `sourceWalletId` | Mã ví nguồn | Tham chiếu ví trích tiền đang `ACTIVE`, bắt buộc khác ví đích (`BR-FIN-03`, `ERR-TRF-001`). |
 | `destinationWalletId` | Mã ví đích | Tham chiếu ví nhận tiền đang `ACTIVE`, bắt buộc khác ví nguồn (`BR-FIN-03`, `ERR-TRF-001`). |
-| `amount` | Số tiền chuyển | Kiểu `Money`, bắt buộc $> 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-03`, `FR-TRF-01`, `ERR-TRF-002`). |
+| `amount` | Số tiền chuyển | Kiểu `Money`, bắt buộc > 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-03`, `FR-TRF-01`, `ERR-TRF-002`). |
 | `transactionDate` | Ngày chuyển tiền | Kiểu `TransactionDate` (`YYYY-MM-DD`), không vượt quá ngày hiện tại từ `DE-01` (`FR-TRF-01`). |
 | `note` | Ghi chú | Mô tả tùy chọn, tối đa 255 ký tự sau khi `trim` (`CON-05`, `FR-TRF-01`, `FR-TRF-02`). |
 | `createdAt` | Thời điểm tạo | Mốc thời gian từ `DE-01`, bất biến, phục vụ sắp xếp và kiểm toán (`FR-TRF-02`). |
@@ -118,12 +124,12 @@ Giao dịch chuyển tiền (`TransferTransaction`) ghi nhận việc điều ch
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**:
-  - Ví nguồn và ví đích phải khác nhau ($sourceWalletId \ne destinationWalletId$, `BR-FIN-03`, `ERR-TRF-001`); số tiền chuyển $> 0.00$ VNĐ (`ERR-TRF-002`).
-  - Bảo toàn tổng số dư hệ thống trước phí: $\sum WalletBalance_w(\text{sau}) = \sum WalletBalance_w(\text{trước})$ (`BR-FIN-03`); nếu có phí $Fee$, tổng số dư giảm đúng bằng $Fee$.
-  - Ví nguồn phải đủ số dư thanh toán cả tiền chuyển và phí ($WalletBalance_{w_{src}} \ge amount + feeAmount$, `BR-FIN-02`, `ERR-WAL-001`).
+  - Ví nguồn và ví đích phải khác nhau (`sourceWalletId ≠ destinationWalletId`, `BR-FIN-03`, `ERR-TRF-001`); số tiền chuyển > 0.00 VNĐ (`ERR-TRF-002`).
+  - Bảo toàn tổng số dư hệ thống trước phí: $\sum \text{WalletBalance}(\text{after}) = \sum \text{WalletBalance}(\text{before})$ (`BR-FIN-03`); nếu có phí `feeAmount`, tổng số dư giảm đúng bằng `feeAmount`.
+  - Ví nguồn phải đủ số dư thanh toán cả tiền chuyển và phí (`sourceWallet.currentBalance ≥ amount + feeAmount`, `BR-FIN-02`, `ERR-WAL-001`).
 - **Quy tắc vận hành**:
-  - Ghi nhận đồng thời (`Atomic Execution`): Trừ ví nguồn $(amount + feeAmount)$ và cộng ví đích $amount$ trong cùng một giao dịch nguyên tử (`BR-FIN-03`). Nếu $feeAmount > 0$, tự động tạo `TransactionFee` (loại `EXPENSE`) trích từ ví nguồn (`FR-TRF-01`).
-  - Hoàn tác khi xóa (`FR-TRF-02`): Kiểm tra ví đích đủ số dư $\ge amount$ (`ERR-WAL-001`), trừ $amount$ ở ví đích, hoàn $(amount + feeAmount)$ về ví nguồn và xóa `TransactionFee` liên kết (`BR-FIN-03`, `AC-TRF-02.1`).
+  - Ghi nhận đồng thời (`Atomic Execution`): Trừ ví nguồn `amount + feeAmount` và cộng ví đích `amount` trong cùng một giao dịch nguyên tử (`BR-FIN-03`). Nếu `feeAmount > 0`, tự động tạo `TransactionFee` (loại `EXPENSE`) trích từ ví nguồn (`FR-TRF-01`).
+  - Hoàn tác khi xóa (`FR-TRF-02`): Kiểm tra ví đích đủ số dư `≥ amount` (`ERR-WAL-001`), trừ `amount` ở ví đích, hoàn `amount + feeAmount` về ví nguồn và xóa `TransactionFee` liên kết (`BR-FIN-03`, `AC-TRF-02.1`).
 
 ### 2.3.4 Thực thể Chi phí giao dịch - TransactionFee
 
@@ -134,7 +140,7 @@ Chi phí giao dịch (`TransactionFee`) là khoản phí phụ do bên thứ ba 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
 | `feeId` | Mã định danh chi phí | Chuỗi ID sinh tự động, bất biến và không tái sử dụng (`BR-FIN-02`, `FR-TXN-01`, `FR-TRF-01`). |
-| `amount` | Số tiền phí | Kiểu `Money`, $\ge 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). Không tạo bản ghi khi phí bằng `0.00 VNĐ`. |
+| `amount` | Số tiền phí | Kiểu `Money`, ≥ 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). Không tạo bản ghi khi phí bằng `0.00 VNĐ`. |
 | `walletId` | Mã ví chịu phí | Tham chiếu ví phát sinh thu chi hoặc ví chuyển tiền nguồn đang `ACTIVE` (`BR-FIN-02`). |
 | `categoryId` | Mã danh mục phí | Tham chiếu `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`). |
 | `parentTransactionId` | Mã giao dịch gốc | Tham chiếu `transactionId` hoặc `transferId`, bất biến, loại trừ phí mồ côi (`BR-FIN-02`). |
@@ -143,7 +149,7 @@ Chi phí giao dịch (`TransactionFee`) là khoản phí phụ do bên thứ ba 
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**:
-  - Số tiền phí không âm ($amount \ge 0.00$ VNĐ, `ERR-FEE-001`); khi $amount > 0.00$ VNĐ bắt buộc gắn danh mục cấp 3 `ACTIVE` thuộc nhánh `EXPENSE` (`ERR-FEE-002`, `ERR-FEE-003`).
+  - Số tiền phí không âm (`amount ≥ 0.00 VNĐ`, `ERR-FEE-001`); khi `amount > 0.00 VNĐ` bắt buộc gắn danh mục cấp 3 `ACTIVE` thuộc nhánh `EXPENSE` (`ERR-FEE-002`, `ERR-FEE-003`).
   - Không tồn tại phí mồ côi (`No Orphan Fee`): Phí luôn gắn với `parentTransactionId`; cấm người dùng tạo, sửa hoặc xóa trực tiếp độc lập với giao dịch gốc (`BR-FIN-02`, `FR-TXN-04`, `FR-TXN-05`).
 - **Quy tắc vận hành**:
   - Hạch toán và hiển thị: Ghi nhận như một khoản `EXPENSE` trừ vào ví chịu phí, tính vào tổng chi tiêu và dòng tiền thuần (`FR-REP-01`, `AC-TXN-03.3`), hiển thị dòng riêng kèm nhãn liên kết tới giao dịch gốc trên sổ thu chi (`FR-TXN-03`).
@@ -209,9 +215,9 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 | :--- | :--- | :--- |
 | `recordId` | Mã định danh bản ghi | Chuỗi ID sinh tự động, bất biến và không tái sử dụng (`BR-FIN-02`, `FR-WAL-05`). |
 | `walletId` | Mã ví điều chỉnh | Tham chiếu `Wallet` đang `ACTIVE`; từ chối ví `ARCHIVED` (`FR-WAL-05`, `AC-WAL-05.3`). |
-| `actualBalance` | Số dư thực tế | Kiểu `Money`, bắt buộc $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`, `ERR-FIN-001`). |
+| `actualBalance` | Số dư thực tế | Kiểu `Money`, bắt buộc ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`, `ERR-FIN-001`). |
 | `previousBalance` | Số dư trước điều chỉnh | Kiểu `Money`, tính từ lịch sử dòng tiền ngay trước thời điểm kiểm kê (`BR-FIN-02`, `FR-WAL-05`). |
-| `difference` | Chênh lệch điều chỉnh | Kiểu `Money` có dấu ($\text{actualBalance} - \text{previousBalance}$), bắt buộc $\ne 0.00$ VNĐ (`BR-FIN-01`, `AC-WAL-05.3`). |
+| `difference` | Chênh lệch điều chỉnh | Kiểu `Money` có dấu (`actualBalance - previousBalance`), bắt buộc ≠ 0.00 VNĐ (`BR-FIN-01`, `AC-WAL-05.3`). |
 | `reason` | Lý do điều chỉnh | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`CON-05`, `FR-WAL-05`, `AC-WAL-05.4`). |
 | `adjustedAt` | Ngày điều chỉnh | Kiểu `TransactionDate` (`YYYY-MM-DD`), không vượt quá ngày hiện tại từ `DE-01` (`FR-WAL-05`). |
 
@@ -219,7 +225,7 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 
 - **Quy tắc bất biến**:
   - Bất biến tuyệt đối (`Immutability`): Không được sửa hoặc xóa sau khi tạo (`BR-FIN-02`, `FR-WAL-05`).
-  - Chỉ áp dụng cho ví `ACTIVE`, với $\text{actualBalance} \ge 0.00$ VNĐ (`ERR-WAL-001`) và $\text{difference} \ne 0.00$ VNĐ (`AC-WAL-05.3`).
+  - Chỉ áp dụng cho ví `ACTIVE`, với `actualBalance ≥ 0.00 VNĐ` (`ERR-WAL-001`) và `difference ≠ 0.00 VNĐ` (`AC-WAL-05.3`).
 - **Quy tắc vận hành**:
   - Đồng bộ số dư ví tức thời về đúng `actualBalance`, làm tổng tài sản hệ thống biến động đúng bằng `difference` mà không tính vào thu nhập, chi phí hay dòng tiền thuần (`BR-FIN-02`, `FR-WAL-05`, `FR-REP-01`).
 
@@ -242,7 +248,7 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 
 - **Quy tắc bất biến**:
   - Mọi phép toán số học trả về một thể hiện `Money` mới với quy mô cố định 2 chữ số thập phân (`Scale = 2`, `BR-FIN-01`, `CON-02`).
-  - Hai đối tượng `Money` bằng nhau khi cùng đơn vị tiền tệ và cùng giá trị đại số (ví dụ `100.00 VNĐ` = `100.0 VNĐ`). Giá trị `Money` của số dư ví luôn $\ge 0.00$ VNĐ (`ERR-WAL-001`).
+  - Hai đối tượng `Money` bằng nhau khi cùng đơn vị tiền tệ và cùng giá trị đại số (ví dụ `100.00 VNĐ` = `100.0 VNĐ`). Giá trị `Money` của số dư ví luôn ≥ 0.00 VNĐ (`ERR-WAL-001`).
 - **Quy tắc vận hành**:
   - Làm tròn ngân hàng (`Banker's Rounding` - làm tròn nửa chẵn) cho mọi phép chia không hết (`BR-FIN-01`, `ERR-FIN-002`).
   - Hiển thị số nguyên đồng trên giao diện nhưng lưu trữ và tính toán nội bộ đúng 2 chữ số thập phân (`CON-04`, `BR-FIN-01`).
@@ -263,7 +269,7 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**: Tuân thủ lịch Gregory và không vượt quá ngày hiện tại từ `DE-01` khi ghi nhận (`FR-TXN-01`, `FR-TXN-02`, `FR-TRF-01`).
-- **Quy tắc vận hành**: Hỗ trợ so sánh thứ tự thời gian để lọc khoảng ngày ($startDate \le endDate$, `FR-TXN-03`), gom cụm theo tháng (`YYYY-MM`) cho báo cáo 12 tháng (`FR-REP-01`) hoặc đoạn ngày cho báo cáo cơ cấu (`FR-REP-02`). Các giao dịch cùng `TransactionDate` được sắp xếp thứ cấp theo `createdAt`.
+- **Quy tắc vận hành**: Hỗ trợ so sánh thứ tự thời gian để lọc khoảng ngày (`startDate ≤ endDate`, `FR-TXN-03`), gom cụm theo tháng (`YYYY-MM`) cho báo cáo 12 tháng (`FR-REP-01`) hoặc đoạn ngày cho báo cáo cơ cấu (`FR-REP-02`). Các giao dịch cùng `TransactionDate` được sắp xếp thứ cấp theo `createdAt`.
 
 ### 2.4.3 Loại giao dịch - TransactionType
 
@@ -284,7 +290,7 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 
 ### 2.4.4 Dòng tiền thuần - NetCashFlow
 
-`NetCashFlow` là đối tượng giá trị tiền tệ tổng hợp bất biến, phản ánh thặng dư hoặc thâm hụt tài chính ròng trong một kỳ quan sát $M$.
+`NetCashFlow` là đối tượng giá trị tiền tệ tổng hợp bất biến, phản ánh thặng dư hoặc thâm hụt tài chính ròng trong một kỳ quan sát `M`.
 
 **Cấu trúc thuộc tính**
 
@@ -295,10 +301,12 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 
 **Công thức và quy tắc**
 
-$$\text{NetCashFlow}(M) = \sum_{t \in M} \text{Income}(t) - \sum_{t \in M} \text{Expense}(t)$$
+$$
+\text{NetCashFlow}(M) = \sum_{t \in M} \text{Income}(t) - \sum_{t \in M} \text{Expense}(t)
+$$
 
 - $\sum_{t \in M} \text{Expense}(t)$ bao gồm cả các khoản phí giao dịch liên kết (`TransactionFee`) phát sinh trong kỳ.
-- Ngữ nghĩa: $> 0$ là thặng dư, $< 0$ là thâm hụt (chi vượt thu), $= 0$ là cân bằng thu chi. Hiển thị số nguyên đồng trên giao diện hoặc 2 chữ số thập phân trên báo cáo chi tiết.
+- Ngữ nghĩa: `> 0` là thặng dư, `< 0` là thâm hụt (chi vượt thu), `= 0` là cân bằng thu chi. Hiển thị số nguyên đồng trên giao diện hoặc 2 chữ số thập phân trên báo cáo chi tiết.
 
 ### 2.4.5 Tỷ lệ tiết kiệm - SavingsRate
 
@@ -313,9 +321,14 @@ $$\text{NetCashFlow}(M) = \sum_{t \in M} \text{Income}(t) - \sum_{t \in M} \text
 
 **Công thức và quy tắc**
 
-$$\text{SavingsRate} = \begin{cases} \left(\dfrac{\text{NetCashFlow}}{\text{TotalIncome}}\right) \times 100\% & \text{khi } \text{TotalIncome} > 0 \\ 0.00\% & \text{khi } \text{TotalIncome} \le 0 \end{cases}$$
+$$
+\text{SavingsRate} = \begin{cases}
+\left(\dfrac{\text{NetCashFlow}}{\text{TotalIncome}}\right) \times 100\% & \text{if } \text{TotalIncome} > 0 \\
+0.00\% & \text{if } \text{TotalIncome} \le 0
+\end{cases}
+$$
 
-- Khi $\text{TotalIncome} \le 0$, mặc định bằng `0.00%` để tránh lỗi chia cho 0 (`BR-FIN-01`). Khi $\text{TotalIncome} > 0$ và $\text{NetCashFlow} < 0$, tỷ lệ mang giá trị âm phản ánh mức thâm hụt.
+- Khi `TotalIncome ≤ 0`, mặc định bằng `0.00%` để tránh lỗi chia cho 0 (`BR-FIN-01`). Khi `TotalIncome > 0` và `NetCashFlow < 0`, tỷ lệ mang giá trị âm phản ánh mức thâm hụt.
 
 ### 2.4.6 Tỷ trọng cơ cấu thu chi - SpendingStructureShare
 
@@ -325,17 +338,22 @@ $$\text{SavingsRate} = \begin{cases} \left(\dfrac{\text{NetCashFlow}}{\text{Tota
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| `share` | Giá trị tỷ trọng | Số thập phân chính xác trong đoạn $[0.00, 100.00]$, giữ tối thiểu 4 chữ số thập phân trung gian và làm tròn ngân hàng về 2 chữ số. |
+| `share` | Giá trị tỷ trọng | Số thập phân chính xác trong đoạn `[0.00, 100.00]`, giữ tối thiểu 4 chữ số thập phân trung gian và làm tròn ngân hàng về 2 chữ số. |
 | `unit` | Đơn vị đo | Cố định là ký hiệu `%`. |
 | `scope` | Phạm vi phân tích | Cấp nhóm nhu cầu (`NeedGroup`), danh mục trên nhóm cha, hoặc danh mục trên toàn kỳ (`Category`). |
 
 **Công thức và quy tắc**
 
-$$\text{SpendingStructureShare}_i = \begin{cases} \left(\dfrac{\text{ItemAmount}_i}{\text{TotalAmount}}\right) \times 100\% & \text{khi } \text{TotalAmount} > 0 \\ 0.00\% & \text{khi } \text{TotalAmount} = 0.00\text{ VNĐ} \end{cases}$$
+$$
+\text{SpendingStructureShare}_i = \begin{cases}
+\left(\dfrac{\text{ItemAmount}_i}{\text{TotalAmount}}\right) \times 100\% & \text{if } \text{TotalAmount} > 0 \\
+0.00\% & \text{if } \text{TotalAmount} \le 0
+\end{cases}
+$$
 
-- Khi $\text{TotalAmount} = 0.00\text{ VNĐ}$, gán tỷ trọng `0.00%` và trả về danh sách rỗng.
-- Chỉ hiển thị các mục có $\text{ItemAmount}_i > 0.00\text{ VNĐ}$ (`FR-REP-02`); mục đã xóa mềm vẫn giữ tên gốc kèm nhãn "(đã xóa)".
-- Khi $\text{TotalAmount} > 0$, tổng tỷ trọng các thành phần cùng cấp xấp xỉ $100.00\%$ ($\sum_{i=1}^{n} \text{SpendingStructureShare}_i \approx 100.00\%$, sai số tối đa $\pm 0.005\% \times n$ do làm tròn ngân hàng độc lập từng phần tử theo `BR-FIN-01`).
+- Khi `TotalAmount = 0.00 VNĐ`, gán tỷ trọng `0.00%` và trả về danh sách rỗng.
+- Chỉ hiển thị các mục có `ItemAmount > 0.00 VNĐ` (`FR-REP-02`); mục đã xóa mềm vẫn giữ tên gốc kèm nhãn "(đã xóa)".
+- Khi `TotalAmount > 0`, tổng tỷ trọng các thành phần cùng cấp xấp xỉ `100.00%` ($\sum_{i=1}^{n} \text{SpendingStructureShare}(i) \approx 100.00\%$, sai số tối đa `± 0.005% × n` do làm tròn ngân hàng độc lập từng phần tử theo `BR-FIN-01`).
 
 ## 2.5 Các mối quan hệ ngữ nghĩa và bất biến miền
 
@@ -349,12 +367,12 @@ Thiết lập liên kết một-nhiều (1:N) giữa một `Wallet` với các d
 
 ### 2.5.2 Quan hệ phân cấp danh mục 3 cấp
 
-Thiết lập quan hệ hợp thành 3 tầng nghiêm ngặt: `TransactionType` (cấp 1, cố định) $\rightarrow$ `NeedGroup` (cấp 2, nhóm nhu cầu) $\rightarrow$ `Category` (cấp 3, danh mục chi tiết) (`BR-FIN-04`, `FR-CAT-01`–`FR-CAT-03`):
+Thiết lập quan hệ hợp thành 3 tầng nghiêm ngặt: `TransactionType` (cấp 1, cố định) → `NeedGroup` (cấp 2, nhóm nhu cầu) → `Category` (cấp 3, danh mục chi tiết) (`BR-FIN-04`, `FR-CAT-01`–`FR-CAT-03`):
 - **Toàn vẹn cấu trúc và liên kết**: Giao dịch thu chi và phí chỉ được liên kết vào cấp 3 (`Category`, `AC-CAT-01.2`). Không tồn tại danh mục mồ côi (`ERR-CAT-004`, `ERR-CAT-005`); mỗi nhánh `TransactionType` cố định và luôn phải duy trì tối thiểu một `NeedGroup` đang hoạt động (`ERR-CAT-001`, `ERR-CAT-002`).
 - **Đồng bộ xóa và chuyển nhóm**: Xóa `NeedGroup` sẽ tự động xóa kéo theo các `Category` con (xóa mềm nếu đã có giao dịch để giữ nguyên dữ liệu lịch sử kèm nhãn "(đã xóa)", hoặc xóa vĩnh viễn nếu chưa có giao dịch theo `AC-REP-02.3`). Chuyển nhóm cha chỉ hợp lệ trong cùng `TransactionType` và tới nhóm đang `ACTIVE` (`ERR-CAT-003`, chi tiết tại mục **2.3.5** và **2.3.6**).
 
 ### 2.5.3 Quan hệ phụ thuộc sinh tử giữa giao dịch gốc và phí
 
 Thiết lập quan hệ phụ thuộc sinh tử (`Composition`) giữa giao dịch gốc (`IncomeExpenseTransaction` hoặc `TransferTransaction`) và khoản phí đi kèm (`TransactionFee`), tách bạch chi phí bên thứ ba khỏi dòng tiền cốt lõi (`BR-FIN-02`, `BR-FIN-03`, `FR-TXN-01`, `FR-TXN-02`, `FR-TRF-01`):
-- **Loại trừ phí mồ côi**: `TransactionFee` luôn gắn với `parentTransactionId`, chỉ được tạo khi phí $> 0.00$ VNĐ kèm một `Category` cấp 3 thuộc nhánh `EXPENSE` (`ERR-FEE-001`–`ERR-FEE-003`), và hạch toán như một khoản chi tiêu độc lập trên báo cáo (`FR-REP-01`, `AC-TXN-03.3`).
+- **Loại trừ phí mồ côi**: `TransactionFee` luôn gắn với `parentTransactionId`, chỉ được tạo khi phí > 0.00 VNĐ kèm một `Category` cấp 3 thuộc nhánh `EXPENSE` (`ERR-FEE-001`–`ERR-FEE-003`), và hạch toán như một khoản chi tiêu độc lập trên báo cáo (`FR-REP-01`, `AC-TXN-03.3`).
 - **Đồng bộ vòng đời nguyên tử**: Bản ghi phí được tự động khởi tạo, cập nhật (hoặc xóa khi phí về 0) và xóa kèm hoàn tiền về ví đồng thời với thao tác tạo, sửa, xóa giao dịch gốc (`FR-TXN-04`, `AC-TXN-05.3`, `AC-TRF-02.1`, chi tiết tại mục **2.3.3** và **2.3.4**).

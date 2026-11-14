@@ -70,7 +70,7 @@ Người dùng ghi nhận mốc kiểm kê khi tiền thực tế chênh lệch 
 **Tiền điều kiện**
 
 - Thể hiện `Wallet` ứng với `walletId` tồn tại và có `status = ACTIVE` (`FR-WAL-05`).
-- `actualBalance` là số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), không âm ($\ge 0.00$ VNĐ, `BR-FIN-02`, `ERR-WAL-001`) và khác `Wallet.currentBalance` hiện tại (`FR-WAL-05`).
+- `actualBalance` là số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), không âm (≥ 0.00 VNĐ, `BR-FIN-02`, `ERR-WAL-001`) và khác `Wallet.currentBalance` hiện tại (`FR-WAL-05`).
 - `reason` (nếu có) dài tối đa 255 ký tự sau khi `trim` (`FR-WAL-05`).
 
 **Hậu điều kiện**
@@ -95,9 +95,9 @@ Người dùng ghi nhận một khoản thu nhập hoặc chi tiêu kèm phí gi
 
 - Thể hiện `Wallet` ứng với `walletId` tồn tại và có `status = ACTIVE` (`FR-TXN-01`, `FR-TXN-02`).
 - Thể hiện `Category` ứng với `categoryId` tồn tại ở cấp 3, có `status = ACTIVE` và thuộc nhánh `INCOME` hoặc `EXPENSE` hợp lệ (`BR-FIN-04`).
-- `amount` là số thập phân chính xác $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `transactionDate` không vượt quá ngày hiện tại; `note` dài tối đa 255 ký tự sau khi `trim` (`FR-TXN-01`, `FR-TXN-02`).
-- `feeAmount` là số thập phân chính xác $\ge 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). Nếu `feeAmount > 0.00 VNĐ`, bắt buộc có `feeCategoryId` (`ERR-FEE-002`) trỏ tới một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`).
-- Số dư `Wallet.currentBalance` sau khi áp dụng `amount` và trừ `feeAmount` phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
+- `amount` là số thập phân chính xác > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `transactionDate` không vượt quá ngày hiện tại; `note` dài tối đa 255 ký tự sau khi `trim` (`FR-TXN-01`, `FR-TXN-02`).
+- `feeAmount` là số thập phân chính xác ≥ 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). Nếu `feeAmount > 0.00 VNĐ`, bắt buộc có `feeCategoryId` (`ERR-FEE-002`) trỏ tới một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`).
+- Số dư `Wallet.currentBalance` sau khi áp dụng `amount` và trừ `feeAmount` phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
 
@@ -118,14 +118,14 @@ Người dùng hiệu chỉnh thông tin một giao dịch thu chi đã lưu. H�
 - Thể hiện `IncomeExpenseTransaction` ứng với `transactionId` tồn tại (`FR-TXN-04`), không phải bản ghi `TransactionFee` độc lập (`BR-FIN-02`).
 - `Wallet` mới ứng với `walletId` tồn tại và có `status = ACTIVE` (`FR-TXN-04`).
 - `Category` mới ứng với `categoryId` cùng `transactionType` với giao dịch gốc (`BR-FIN-04`); phải có `status = ACTIVE` nếu chọn mới, hoặc cho phép giữ nguyên danh mục cũ đã `DELETED` (`FR-TXN-04`).
-- `amount` mới $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `feeAmount` mới $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-FEE-001`) và nếu `feeAmount > 0.00 VNĐ` phải có `feeCategoryId` hợp lệ thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`).
-- Số dư `currentBalance` của ví cũ sau hoàn nguyên và ví mới sau cập nhật đều $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
+- `amount` mới > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `feeAmount` mới ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-FEE-001`) và nếu `feeAmount > 0.00 VNĐ` phải có `feeCategoryId` hợp lệ thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`).
+- Số dư `currentBalance` của ví cũ sau hoàn nguyên và ví mới sau cập nhật đều ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
 
 - **Tạo mới thể hiện**: Khởi tạo một `TransactionFee` mới nếu trước khi sửa chưa có phí và sau sửa `feeAmount > 0.00 VNĐ` (`BR-FIN-02`, `FR-TXN-04`); ngược lại không có.
 - **Xóa thể hiện**: Xóa vĩnh viễn `TransactionFee` liên kết nếu trước đó có phí và sau sửa `feeAmount = 0.00 VNĐ` (`BR-FIN-02`, `FR-TXN-04`); ngược lại không có.
-- **Biến đổi thuộc tính**: Cập nhật `amount`, `transactionDate`, `note`, `walletId`, `categoryId` trên `IncomeExpenseTransaction` (giữ nguyên `transactionId`, `transactionType`); cập nhật `amount = feeAmount`, `categoryId = feeCategoryId` trên `TransactionFee` (nếu phí cũ và mới đều $> 0.00$ VNĐ); tính lại `currentBalance` trên `Wallet` cũ và `Wallet` mới (`BR-FIN-01`, `BR-FIN-02`).
+- **Biến đổi thuộc tính**: Cập nhật `amount`, `transactionDate`, `note`, `walletId`, `categoryId` trên `IncomeExpenseTransaction` (giữ nguyên `transactionId`, `transactionType`); cập nhật `amount = feeAmount`, `categoryId = feeCategoryId` trên `TransactionFee` (nếu phí cũ và mới đều > 0.00 VNĐ); tính lại `currentBalance` trên `Wallet` cũ và `Wallet` mới (`BR-FIN-01`, `BR-FIN-02`).
 - **Hình thành hoặc phá vỡ liên kết**: Chuyển liên kết từ `Wallet`/`Category` cũ sang `Wallet`/`Category` mới (`BR-FIN-04`) và đồng bộ liên kết giữa `IncomeExpenseTransaction`, `TransactionFee`, `Wallet` mới cùng `Category` phí (`BR-FIN-02`).
 
 ### 4.3.3 Thao tác xóa giao dịch thu chi
@@ -138,7 +138,7 @@ Người dùng xóa một giao dịch thu chi khỏi sổ theo dõi. Hệ thốn
 **Tiền điều kiện**
 
 - Thể hiện `IncomeExpenseTransaction` ứng với `transactionId` tồn tại (`FR-TXN-05`), không phải bản ghi `TransactionFee` độc lập (`BR-FIN-02`).
-- Nếu xóa giao dịch `INCOME`, số dư `Wallet.currentBalance` sau khi trừ `amount` và cộng hoàn lại `TransactionFee.amount` (nếu có) phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
+- Nếu xóa giao dịch `INCOME`, số dư `Wallet.currentBalance` sau khi trừ `amount` và cộng hoàn lại `TransactionFee.amount` (nếu có) phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
 
@@ -161,8 +161,8 @@ Người dùng điều chuyển tiền giữa hai ví nội bộ kèm phí chuy�
 **Tiền điều kiện**
 
 - Hai thể hiện `Wallet` ứng với `sourceWalletId` và `destinationWalletId` cùng tồn tại, có `status = ACTIVE` và phân biệt nhau (`sourceWalletId != destinationWalletId`, `BR-FIN-03`, `ERR-TRF-001`).
-- `amount` là số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`) và $> 0.00$ VNĐ (`BR-FIN-03`, `ERR-TRF-002`); `transferDate` không vượt quá ngày hiện tại; `note` dài tối đa 255 ký tự sau khi `trim` (`FR-TRF-01`).
-- `feeAmount` là số thập phân chính xác $\ge 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-03`, `ERR-FEE-001`). Nếu `feeAmount > 0.00 VNĐ`, bắt buộc có `feeCategoryId` (`ERR-FEE-002`) trỏ tới một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-003`).
+- `amount` là số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`) và > 0.00 VNĐ (`BR-FIN-03`, `ERR-TRF-002`); `transferDate` không vượt quá ngày hiện tại; `note` dài tối đa 255 ký tự sau khi `trim` (`FR-TRF-01`).
+- `feeAmount` là số thập phân chính xác ≥ 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-03`, `ERR-FEE-001`). Nếu `feeAmount > 0.00 VNĐ`, bắt buộc có `feeCategoryId` (`ERR-FEE-002`) trỏ tới một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-003`).
 - Số dư ví nguồn `sourceWallet.currentBalance >= amount + feeAmount` (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
@@ -288,9 +288,9 @@ Người dùng khôi phục toàn bộ trạng thái dữ liệu tài chính t�
 - Tệp tại `backupFilePath` tồn tại, có quyền đọc (`READ permission`) và đúng cú pháp JSON mã hóa UTF-8 (`FR-DAT-02`; vi phạm báo lỗi `ERR-DAT-001`).
 - Dữ liệu trong tệp vượt qua đủ 4 bước kiểm định độc lập theo cơ chế `All-or-Nothing` (vi phạm bất kỳ bước nào báo lỗi `ERR-DAT-002`):
   1. Đầy đủ các khóa thực thể dữ liệu bắt buộc theo schema JSON.
-  2. Tuân thủ cây phân cấp danh mục 3 cấp (`TransactionType` $\rightarrow$ `NeedGroup` $\rightarrow$ `Category`), không có danh mục mồ côi (`BR-FIN-04`).
+  2. Tuân thủ cây phân cấp danh mục 3 cấp (`TransactionType` → `NeedGroup` → `Category`), không có danh mục mồ côi (`BR-FIN-04`).
   3. Toàn vẹn liên kết chuyển tiền hai chiều và không có chi phí giao dịch mồ côi (`BR-FIN-02`, `BR-FIN-03`).
-  4. Số dư tái tính toán của mọi ví từ lịch sử giao dịch luôn không âm ($\ge 0.00\text{ VNĐ}$, `BR-FIN-02`).
+  4. Số dư tái tính toán của mọi ví từ lịch sử giao dịch luôn không âm (≥ 0.00 VNĐ, `BR-FIN-02`).
 
 **Hậu điều kiện**
 
