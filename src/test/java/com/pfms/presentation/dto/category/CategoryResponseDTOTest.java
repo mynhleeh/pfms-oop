@@ -34,16 +34,16 @@ class CategoryResponseDTOTest {
             );
 
             assertEquals(sampleCategoryId, dto.getCategoryId());
-            assertEquals(sampleCategoryId, dto.getId());
             assertEquals("Cà phê & Trà sữa", dto.getName());
             assertEquals(sampleParentGroupId, dto.getParentGroupId());
-            assertEquals(sampleParentGroupId, dto.getNeedGroupId());
             assertEquals("Ăn uống thiết yếu", dto.getParentGroupName());
             assertEquals("EXPENSE", dto.getTransactionType());
             assertEquals("ACTIVE", dto.getStatus());
             assertEquals(sampleTime, dto.getCreatedAt());
             assertTrue(dto.isActive());
             assertFalse(dto.isDeleted());
+            assertThrows(NoSuchMethodException.class, () -> CategoryResponseDTO.class.getMethod("getId"));
+            assertThrows(NoSuchMethodException.class, () -> CategoryResponseDTO.class.getMethod("getNeedGroupId"));
         }
 
         @Test

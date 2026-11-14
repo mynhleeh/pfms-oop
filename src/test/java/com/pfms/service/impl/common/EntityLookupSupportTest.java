@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -434,6 +435,40 @@ class EntityLookupSupportTest {
             assertEquals(2, indexed.size());
             assertSame(expenseCategory, indexed.get(expenseCategory.getCategoryId()));
             assertSame(secondCategory, indexed.get(secondCategory.getCategoryId()));
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 7: Kiểm tra số tiền và phụ phí dùng chung (validateAmountAndFee)")
+    class ValidateAmountAndFeeTests {
+
+        @Test
+        @DisplayName("validateAmountAndFee ném BusinessException với mã lỗi tương ứng khi số tiền null hoặc không dương")
+        void shouldRejectNullOrNonPositiveAmount() {
+            BusinessException nullEx = assertThrows(BusinessException.class,
+                    () -> EntityLookupSupport.validateAmountAndFee(null, ErrorCode.ERR_FIN_001, null, null));
+            assertEquals(ErrorCode.ERR_FIN_001, nullEx.getErrorCode());
+
+            BusinessException zeroEx = assertThrows(BusinessException.class,
+                    () -> EntityLookupSupport.validateAmountAndFee(BigDecimal.ZERO, ErrorCode.ERR_TRF_002, null, null));
+            assertEquals(ErrorCode.ERR_TRF_002, zeroEx.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("validateAmountAndFee ném ERR_FEE_001 khi phí âm và ERR_FEE_002 khi phí dương thiếu danh mục")
+        void shouldValidateFeeAmountAndCategory() {
+            BusinessException negFeeEx = assertThrows(BusinessException.class,
+                    () -> EntityLookupSupport.validateAmountAndFee(
+                            BigDecimal.TEN, ErrorCode.ERR_FIN_001, new BigDecimal("-1"), null));
+            assertEquals(ErrorCode.ERR_FEE_001, negFeeEx.getErrorCode());
+
+            BusinessException missingCatEx = assertThrows(BusinessException.class,
+                    () -> EntityLookupSupport.validateAmountAndFee(
+                            BigDecimal.TEN, ErrorCode.ERR_TRF_002, BigDecimal.ONE, null));
+            assertEquals(ErrorCode.ERR_FEE_002, missingCatEx.getErrorCode());
+
+            EntityLookupSupport.validateAmountAndFee(
+                    BigDecimal.TEN, ErrorCode.ERR_FIN_001, BigDecimal.ONE, UUID.randomUUID());
         }
     }
 }

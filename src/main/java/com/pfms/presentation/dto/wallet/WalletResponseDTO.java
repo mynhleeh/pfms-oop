@@ -12,7 +12,7 @@ import java.util.UUID;
 public final class WalletResponseDTO {
 
     // region State
-    private final UUID id;
+    private final UUID walletId;
     private final String name;
     private final BigDecimal balance;
     private final String currency;
@@ -24,7 +24,7 @@ public final class WalletResponseDTO {
 
     // region Constructors
     public WalletResponseDTO(
-            UUID id,
+            UUID walletId,
             String name,
             BigDecimal balance,
             String currency,
@@ -33,7 +33,7 @@ public final class WalletResponseDTO {
             String note,
             LocalDateTime createdAt) {
 
-        this.id = Objects.requireNonNull(id, "Mã ví không được để null");
+        this.walletId = Objects.requireNonNull(walletId, "Mã ví không được để null");
         this.name = (name == null) ? null : name.trim();
         this.balance = Objects.requireNonNull(balance, "Số dư ví không được để null");
         this.currency = (currency == null || currency.trim().isEmpty()) ? "VND" : currency.trim();
@@ -45,12 +45,8 @@ public final class WalletResponseDTO {
     // endregion
 
     // region Getters
-    public UUID getId() {
-        return this.id;
-    }
-
     public UUID getWalletId() {
-        return this.id;
+        return this.walletId;
     }
 
     public String getName() {
@@ -66,10 +62,6 @@ public final class WalletResponseDTO {
     }
 
     public boolean isDefaultWallet() {
-        return this.defaultWallet;
-    }
-
-    public boolean isDefault() {
         return this.defaultWallet;
     }
 
@@ -96,7 +88,7 @@ public final class WalletResponseDTO {
             return false;
         }
         return this.defaultWallet == that.defaultWallet
-                && Objects.equals(this.id, that.id)
+                && Objects.equals(this.walletId, that.walletId)
                 && Objects.equals(this.name, that.name)
                 && (this.balance.compareTo(that.balance) == 0)
                 && Objects.equals(this.currency, that.currency)
@@ -107,7 +99,7 @@ public final class WalletResponseDTO {
     @Override
     public int hashCode() {
         return Objects.hash(
-                this.id,
+                this.walletId,
                 this.name,
                 this.balance.stripTrailingZeros(),
                 this.currency,
@@ -119,7 +111,7 @@ public final class WalletResponseDTO {
     @Override
     public String toString() {
         return "WalletResponseDTO{" +
-                "id=" + this.id +
+                "walletId=" + this.walletId +
                 ", name='" + this.name + '\'' +
                 ", balance=" + this.balance +
                 ", currency='" + this.currency + '\'' +

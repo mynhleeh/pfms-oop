@@ -53,7 +53,6 @@ class TransactionResponseDTOTest {
             );
 
             assertEquals(sampleTxnId, dto.getTransactionId());
-            assertEquals(sampleTxnId, dto.getId());
             assertEquals(sampleWalletId, dto.getWalletId());
             assertEquals("Ví Tiền mặt", dto.getWalletName());
             assertEquals(sampleCategoryId, dto.getCategoryId());
@@ -68,6 +67,8 @@ class TransactionResponseDTOTest {
             assertEquals("Phí dịch vụ", dto.getFeeCategoryName());
             assertEquals(balanceAfter, dto.getWalletBalanceAfter());
             assertEquals(sampleCreatedAt, dto.getCreatedAt());
+            assertThrows(NoSuchMethodException.class, () -> TransactionResponseDTO.class.getMethod("getId"));
+            assertThrows(NoSuchMethodException.class, () -> TransactionResponseDTO.class.getMethod("isHasFee"));
         }
 
         @Test

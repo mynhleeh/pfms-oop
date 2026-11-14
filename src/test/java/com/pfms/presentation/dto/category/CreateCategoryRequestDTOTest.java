@@ -23,8 +23,8 @@ class CreateCategoryRequestDTOTest {
             CreateCategoryRequestDTO dto = new CreateCategoryRequestDTO(sampleParentGroupId, "Ăn uống hàng ngày");
 
             assertEquals(sampleParentGroupId, dto.getParentGroupId());
-            assertEquals(sampleParentGroupId, dto.getNeedGroupId());
             assertEquals("Ăn uống hàng ngày", dto.getName());
+            assertThrows(NoSuchMethodException.class, () -> CreateCategoryRequestDTO.class.getMethod("getNeedGroupId"));
         }
 
         @Test

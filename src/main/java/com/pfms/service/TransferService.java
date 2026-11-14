@@ -1,8 +1,8 @@
 package com.pfms.service;
 
-import com.pfms.presentation.dto.transfer.TransferFilterCriteriaDTO;
-import com.pfms.presentation.dto.transfer.TransferHistoryResponseDTO;
-import com.pfms.presentation.dto.transfer.TransferRequestDTO;
+import com.pfms.presentation.dto.transfer.FilterTransfersRequestDTO;
+import com.pfms.presentation.dto.transfer.TransferFundsRequestDTO;
+import com.pfms.presentation.dto.transfer.TransferListResponseDTO;
 import com.pfms.presentation.dto.transfer.TransferResponseDTO;
 
 import java.util.UUID;
@@ -14,13 +14,13 @@ import java.util.UUID;
 public interface TransferService {
 
     // region Commands
-    TransferResponseDTO transferFunds(TransferRequestDTO request);
+    TransferResponseDTO transferFunds(TransferFundsRequestDTO request);
 
     void deleteTransfer(UUID transferId);
     // endregion
 
     // region Queries
-    TransferHistoryResponseDTO filterTransfers(TransferFilterCriteriaDTO request);
+    TransferListResponseDTO filterTransfers(FilterTransfersRequestDTO request);
     // endregion
 }
 

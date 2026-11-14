@@ -17,9 +17,7 @@ import com.pfms.infrastructure.memory.MemoryTransactionRepository;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.category.CreateCategoryRequestDTO;
-import com.pfms.presentation.dto.category.DeleteCategoryRequestDTO;
 import com.pfms.presentation.dto.category.RenameCategoryRequestDTO;
-import com.pfms.presentation.dto.category.RestoreCategoryRequestDTO;
 import com.pfms.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -561,23 +559,11 @@ class CategoryServiceImplTest {
         }
 
         @Test
-        @DisplayName("Khôi phục danh mục thành công qua overload nhận RestoreCategoryRequestDTO")
-        void shouldRestoreCategoryUsingRequestDTOOverload() {
-            RestoreCategoryRequestDTO request = new RestoreCategoryRequestDTO(deletedCategoryId);
-
-            CategoryResponseDTO response = categoryService.restoreCategory(request);
-
-            assertNotNull(response);
-            assertEquals(deletedCategoryId, response.getCategoryId());
-            assertEquals("ACTIVE", response.getStatus());
-        }
-
-        @Test
         @DisplayName("Ném NullPointerException khi categoryId là null")
         void shouldThrowExceptionWhenCategoryIdIsNull() {
             NullPointerException ex = assertThrows(
                     NullPointerException.class,
-                    () -> categoryService.restoreCategory((UUID) null)
+                    () -> categoryService.restoreCategory(null)
             );
             assertTrue(ex.getMessage().contains("Mã danh mục không được để null"));
         }
@@ -711,16 +697,6 @@ class CategoryServiceImplTest {
         }
 
         @Test
-        @DisplayName("Xóa vật lý thành công qua phương thức overload nhận DeleteCategoryRequestDTO")
-        void shouldHardDeleteCategoryUsingRequestDTOOverload() {
-            DeleteCategoryRequestDTO request = new DeleteCategoryRequestDTO(categoryWithNoTxId);
-
-            categoryService.deleteCategory(request);
-
-            assertTrue(categoryRepository.findById(categoryWithNoTxId).isEmpty());
-        }
-
-        @Test
         @DisplayName("Xóa mềm bảo toàn lịch sử khi danh mục đã từng phát sinh giao dịch")
         void shouldSoftDeleteCategoryWhenTransactionsExist() {
             categoryService.deleteCategory(categoryWithTxId);
@@ -742,7 +718,7 @@ class CategoryServiceImplTest {
         void shouldThrowExceptionWhenCategoryIdIsNull() {
             NullPointerException ex = assertThrows(
                     NullPointerException.class,
-                    () -> categoryService.deleteCategory((UUID) null)
+                    () -> categoryService.deleteCategory(null)
             );
             assertTrue(ex.getMessage().contains("Mã danh mục không được để null"));
         }

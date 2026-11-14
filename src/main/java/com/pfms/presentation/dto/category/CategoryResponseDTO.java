@@ -60,19 +60,11 @@ public final class CategoryResponseDTO {
         return this.categoryId;
     }
 
-    public UUID getId() {
-        return this.categoryId;
-    }
-
     public String getName() {
         return this.name;
     }
 
     public UUID getParentGroupId() {
-        return this.parentGroupId;
-    }
-
-    public UUID getNeedGroupId() {
         return this.parentGroupId;
     }
 

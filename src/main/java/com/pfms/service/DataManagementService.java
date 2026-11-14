@@ -1,10 +1,10 @@
 package com.pfms.service;
 
-import com.pfms.presentation.dto.data.BackupResponseDTO;
 import com.pfms.presentation.dto.data.ExportBackupRequestDTO;
-import com.pfms.presentation.dto.data.ReconciliationReportDTO;
+import com.pfms.presentation.dto.data.ExportBackupResponseDTO;
+import com.pfms.presentation.dto.data.ReconciliationReportResponseDTO;
 import com.pfms.presentation.dto.data.RestoreBackupRequestDTO;
-import com.pfms.presentation.dto.data.RestoreResultDTO;
+import com.pfms.presentation.dto.data.RestoreBackupResponseDTO;
 
 /**
  * Dịch vụ quản trị và an toàn dữ liệu hệ thống PFMS.
@@ -13,13 +13,13 @@ import com.pfms.presentation.dto.data.RestoreResultDTO;
 public interface DataManagementService {
 
     // region Commands
-    BackupResponseDTO exportBackupData(ExportBackupRequestDTO requestDto);
+    ExportBackupResponseDTO exportBackupData(ExportBackupRequestDTO request);
 
-    RestoreResultDTO restoreBackupData(RestoreBackupRequestDTO requestDto);
+    RestoreBackupResponseDTO restoreBackupData(RestoreBackupRequestDTO request);
     // endregion
 
     // region Queries
-    ReconciliationReportDTO reconcileSystemData();
+    ReconciliationReportResponseDTO reconcileSystemData();
     // endregion
 }
 

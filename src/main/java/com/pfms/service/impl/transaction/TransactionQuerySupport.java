@@ -62,9 +62,7 @@ final class TransactionQuerySupport {
                 matchedTransactions, request, walletRepository, categoryRepository);
 
         int totalRecords = matchedTransactions.size();
-        int totalPages = (totalRecords == 0)
-                ? 0
-                : (int) Math.ceil((double) totalRecords / request.getPageSize());
+        int totalPages = PaginationUtils.calculateTotalPages(totalRecords, request.getPageSize());
 
         return new TransactionListResponseDTO(
                 pageItems,

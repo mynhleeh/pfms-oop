@@ -1,34 +1,27 @@
 package com.pfms.service.impl.transfer;
 
-import com.pfms.service.impl.common.EntityLookupSupport;
-import com.pfms.service.impl.common.RollbackSupport;
-
 import com.pfms.common.util.PaginationUtils;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.EntityNotFoundException;
 import com.pfms.domain.exception.ErrorCode;
-import com.pfms.domain.exception.StorageException;
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.Note;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.transaction.Transaction;
 import com.pfms.domain.model.transaction.TransactionFactory;
-import com.pfms.domain.model.transaction.TransactionFee;
 import com.pfms.domain.model.transaction.TransferTransaction;
 import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.repository.CategoryRepository;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
-import com.pfms.presentation.dto.transfer.TransferFilterCriteriaDTO;
-import com.pfms.presentation.dto.transfer.TransferHistoryResponseDTO;
-import com.pfms.presentation.dto.transfer.TransferRequestDTO;
+import com.pfms.presentation.dto.transfer.FilterTransfersRequestDTO;
+import com.pfms.presentation.dto.transfer.TransferFundsRequestDTO;
+import com.pfms.presentation.dto.transfer.TransferListResponseDTO;
 import com.pfms.presentation.dto.transfer.TransferResponseDTO;
 import com.pfms.service.TransferService;
+import com.pfms.service.impl.common.EntityLookupSupport;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -61,7 +54,7 @@ public class TransferServiceImpl implements TransferService {
 
     // region Commands
     @Override
-    public TransferResponseDTO transferFunds(TransferRequestDTO request) {
+    public TransferResponseDTO transferFunds(TransferFundsRequestDTO request) {
         Objects.requireNonNull(request, "Yêu cầu chuyển tiền không được để null");
         validateTransferRequest(request);
 
@@ -73,17 +66,16 @@ public class TransferServiceImpl implements TransferService {
         Wallet sourceWallet = EntityLookupSupport.loadActiveWallet(walletRepository, request.getSourceWalletId());
         Wallet destinationWallet = EntityLookupSupport.loadActiveWallet(
                 walletRepository, request.getDestinationWalletId());
-        Category feeCategory = feeAmount.isPositive()
-                ? EntityLookupSupport.findEntityOrThrow(
-                        categoryRepository, request.getFeeCategoryId(), "Danh mục phí")
-                : null;
+        Category feeCategory = EntityLookupSupport.resolveActiveExpenseFeeCategory(
+                categoryRepository, feeAmount, request.getFeeCategoryId());
 
         TransferTransaction transfer = TransactionFactory.createTransfer(
                 sourceWallet, destinationWallet, transferAmount, transferDate, normalizedNote, feeAmount, feeCategory);
 
-        persistTransferWithRollback(sourceWallet, destinationWallet, transfer);
+        TransferPersistenceCoordinator.persistTransferWithRollback(
+                transactionRepository, walletRepository, sourceWallet, destinationWallet, transfer);
 
-        return toResponseDTO(transfer, sourceWallet, destinationWallet);
+        return TransferQuerySupport.toResponseDTO(transfer, sourceWallet, destinationWallet);
     }
 
     @Override
@@ -95,155 +87,31 @@ public class TransferServiceImpl implements TransferService {
         Wallet liveDestinationWallet = EntityLookupSupport.findEntityOrThrow(
                 walletRepository, transfer.getDestinationWallet().getId(), EntityLookupSupport.LABEL_WALLET);
 
-        Wallet destinationSnapshot = liveDestinationWallet.copy();
-        transfer.revertFromWallet(liveSourceWallet, liveDestinationWallet);
-
-        persistDeletionWithRollback(transfer, liveSourceWallet, liveDestinationWallet, destinationSnapshot);
+        TransferPersistenceCoordinator.persistDeletionWithRollback(
+                transactionRepository, walletRepository, transfer, liveSourceWallet, liveDestinationWallet);
     }
     // endregion
 
     // region Queries
     @Override
-    public TransferHistoryResponseDTO filterTransfers(TransferFilterCriteriaDTO request) {
+    public TransferListResponseDTO filterTransfers(FilterTransfersRequestDTO request) {
         Objects.requireNonNull(request, "Tiêu chí lọc chuyển tiền không được để null");
         TransactionDate.validateRange(request.getStartDate(), request.getEndDate());
         PaginationUtils.validate(request.getPageNumber(), request.getPageSize());
 
-        List<TransferTransaction> matchedTransfers = queryMatchingTransfers(request);
-        Money totalTransferred = matchedTransfers.stream()
-                .map(TransferTransaction::getAmount)
-                .reduce(Money.ZERO, Money::add);
-        Money totalFees = matchedTransfers.stream()
-                .map(transfer -> transfer.getFee().map(TransactionFee::getAmount).orElse(Money.ZERO))
-                .reduce(Money.ZERO, Money::add);
-
-        List<TransferResponseDTO> pageItems = toPageItems(matchedTransfers, request);
-
-        return new TransferHistoryResponseDTO(
-                pageItems,
-                totalTransferred.getAmount(),
-                totalFees.getAmount(),
-                matchedTransfers.size());
+        return TransferQuerySupport.filterTransfers(transactionRepository, walletRepository, request);
     }
     // endregion
 
     // region Helpers
-    private List<TransferResponseDTO> toPageItems(
-            List<TransferTransaction> matchedTransfers, TransferFilterCriteriaDTO request) {
-        return PaginationUtils.slice(
-                matchedTransfers, request.getPageNumber(), request.getPageSize())
-                .stream()
-                .map(transfer -> toResponseDTO(
-                        transfer,
-                        resolveWalletForDisplay(transfer.getSourceWallet()),
-                        resolveWalletForDisplay(transfer.getDestinationWallet())))
-                .toList();
-    }
-    private void validateTransferRequest(TransferRequestDTO request) {
+    private void validateTransferRequest(TransferFundsRequestDTO request) {
         Objects.requireNonNull(request.getSourceWalletId(), "Mã ví nguồn không được để null");
         Objects.requireNonNull(request.getDestinationWalletId(), "Mã ví đích không được để null");
         if (request.getSourceWalletId().equals(request.getDestinationWalletId())) {
             throw new BusinessException(ErrorCode.ERR_TRF_001);
         }
-        if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(ErrorCode.ERR_TRF_002);
-        }
-        if (request.getFeeAmount() != null && request.getFeeAmount().compareTo(BigDecimal.ZERO) < 0) {
-            throw new BusinessException(ErrorCode.ERR_FEE_001);
-        }
-        if (request.getFeeAmount() != null
-                && request.getFeeAmount().compareTo(BigDecimal.ZERO) > 0
-                && request.getFeeCategoryId() == null) {
-            throw new BusinessException(ErrorCode.ERR_FEE_002);
-        }
-    }
-
-    private void persistTransferWithRollback(
-            Wallet sourceWallet, Wallet destinationWallet, TransferTransaction transfer) {
-
-        Wallet sourceSnapshot = sourceWallet.copy();
-        Wallet destinationSnapshot = destinationWallet.copy();
-        transfer.applyToWallet();
-
-        boolean sourceSaved = false;
-        boolean destinationSaved = false;
-        try {
-            walletRepository.save(sourceWallet);
-            sourceSaved = true;
-            walletRepository.save(destinationWallet);
-            destinationSaved = true;
-            transactionRepository.save(transfer);
-        } catch (StorageException storageException) {
-            rollbackTransferAfterStorageFailure(
-                    sourceSaved, destinationSaved, sourceSnapshot, destinationSnapshot, transfer, storageException);
-            throw storageException;
-        }
-    }
-
-    private void rollbackTransferAfterStorageFailure(
-            boolean sourceSaved, boolean destinationSaved,
-            Wallet sourceSnapshot, Wallet destinationSnapshot,
-            TransferTransaction transfer, StorageException primaryException) {
-
-        transfer.revertFromWallet();
-        if (sourceSaved) {
-            RollbackSupport.runRollbackStep(() -> walletRepository.save(sourceSnapshot), primaryException);
-        }
-        if (destinationSaved) {
-            RollbackSupport.runRollbackStep(() -> walletRepository.save(destinationSnapshot), primaryException);
-            RollbackSupport.runRollbackStep(() -> transactionRepository.deleteById(transfer.getTransactionId()), primaryException);
-        }
-    }
-
-    private List<TransferTransaction> queryMatchingTransfers(TransferFilterCriteriaDTO request) {
-        List<Transaction> candidates = (request.getStartDate() != null && request.getEndDate() != null)
-                ? transactionRepository.findByDateRange(request.getStartDate(), request.getEndDate())
-                : transactionRepository.findAll();
-
-        return candidates.stream()
-                .filter(TransferTransaction.class::isInstance)
-                .map(TransferTransaction.class::cast)
-                .filter(transfer -> matchesFilterCriteria(transfer, request))
-                .sorted(Transaction.DESCENDING_ORDER)
-                .toList();
-    }
-
-    private boolean matchesFilterCriteria(TransferTransaction transfer, TransferFilterCriteriaDTO request) {
-        LocalDate transferDate = transfer.getTransactionDate().getDate();
-        if (request.getStartDate() != null && transferDate.isBefore(request.getStartDate())) {
-            return false;
-        }
-        if (request.getEndDate() != null && transferDate.isAfter(request.getEndDate())) {
-            return false;
-        }
-        if (request.getSourceWalletId() != null
-                && !transfer.getSourceWallet().getId().equals(request.getSourceWalletId())) {
-            return false;
-        }
-        return request.getDestinationWalletId() == null
-                || transfer.getDestinationWallet().getId().equals(request.getDestinationWalletId());
-    }
-
-    private TransferResponseDTO toResponseDTO(
-            TransferTransaction transfer, Wallet sourceWallet, Wallet destinationWallet) {
-
-        TransactionFee fee = transfer.getFee().orElse(null);
-        Money feeAmount = (fee != null) ? fee.getAmount() : Money.ZERO;
-        Category feeCategory = (fee != null) ? fee.getCategory() : null;
-        UUID feeCategoryId = (feeCategory != null) ? feeCategory.getCategoryId() : null;
-        String feeCategoryName = (feeCategory != null) ? feeCategory.getName() : "";
-
-        return new TransferResponseDTO(
-                transfer.getTransactionId(), sourceWallet.getId(), sourceWallet.getName(),
-                destinationWallet.getId(), destinationWallet.getName(),
-                transfer.getAmount().getAmount(), transfer.getTransactionDate().getDate(),
-                transfer.getNote(), feeAmount.getAmount(), feeCategoryId,
-                feeCategoryName, sourceWallet.getCurrentBalance().getAmount(),
-                destinationWallet.getCurrentBalance().getAmount(), transfer.getCreatedAt());
-    }
-
-    private Wallet resolveWalletForDisplay(Wallet embeddedWallet) {
-        return walletRepository.findById(embeddedWallet.getId()).orElse(embeddedWallet);
+        EntityLookupSupport.validateAmountAndFee(
+                request.getAmount(), ErrorCode.ERR_TRF_002, request.getFeeAmount(), request.getFeeCategoryId());
     }
 
     private TransferTransaction loadTransferOrThrow(UUID transferId) {
@@ -255,51 +123,6 @@ public class TransferServiceImpl implements TransferService {
                     ErrorCode.ERR_NOT_FOUND, "Giao dịch chuyển tiền", transferId.toString());
         }
         return transfer;
-    }
-
-    private void persistDeletionWithRollback(
-            TransferTransaction transfer, Wallet sourceWallet,
-            Wallet destinationWallet, Wallet destinationSnapshot) {
-
-        boolean transactionDeleted = false;
-        boolean destinationSaved = false;
-        try {
-            if (!transactionRepository.deleteById(transfer.getTransactionId())) {
-                restoreRevertedInMemoryWallets(transfer, sourceWallet, destinationWallet);
-                throw new EntityNotFoundException(
-                        ErrorCode.ERR_NOT_FOUND, "Giao dịch chuyển tiền", transfer.getTransactionId().toString());
-            }
-            transactionDeleted = true;
-            walletRepository.save(destinationWallet);
-            destinationSaved = true;
-            walletRepository.save(sourceWallet);
-        } catch (StorageException storageException) {
-            rollbackDeletionAfterStorageFailure(
-                    transactionDeleted, destinationSaved,
-                    transfer, sourceWallet, destinationWallet, destinationSnapshot, storageException);
-            throw storageException;
-        }
-    }
-
-    private void rollbackDeletionAfterStorageFailure(
-            boolean transactionDeleted, boolean destinationSaved,
-            TransferTransaction transfer, Wallet sourceWallet,
-            Wallet destinationWallet, Wallet destinationSnapshot,
-            StorageException primaryException) {
-
-        restoreRevertedInMemoryWallets(transfer, sourceWallet, destinationWallet);
-        if (destinationSaved) {
-            RollbackSupport.runRollbackStep(() -> walletRepository.save(destinationSnapshot), primaryException);
-        }
-        if (transactionDeleted) {
-            RollbackSupport.runRollbackStep(() -> transactionRepository.save(transfer), primaryException);
-        }
-    }
-
-    private void restoreRevertedInMemoryWallets(
-            TransferTransaction transfer, Wallet sourceWallet, Wallet destinationWallet) {
-        sourceWallet.debit(transfer.getTotalSourceDeduction());
-        destinationWallet.credit(transfer.getAmount());
     }
     // endregion
 }

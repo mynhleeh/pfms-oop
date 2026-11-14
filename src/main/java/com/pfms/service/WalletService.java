@@ -6,7 +6,7 @@ import com.pfms.presentation.dto.wallet.BalanceAdjustmentResponseDTO;
 import com.pfms.presentation.dto.wallet.CreateWalletRequestDTO;
 import com.pfms.presentation.dto.wallet.UpdateWalletRequestDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
-import com.pfms.presentation.dto.wallet.WalletsSummaryDTO;
+import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 
 import java.util.UUID;
 
@@ -33,6 +33,6 @@ public interface WalletService {
     // endregion
 
     // region Queries
-    WalletsSummaryDTO getWalletsSummary(EntityStatus statusFilter);
+    WalletsSummaryResponseDTO getWalletsSummary(EntityStatus statusFilter);
     // endregion
 }

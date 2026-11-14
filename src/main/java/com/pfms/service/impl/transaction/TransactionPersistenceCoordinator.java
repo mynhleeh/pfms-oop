@@ -1,16 +1,16 @@
 package com.pfms.service.impl.transaction;
 
-import com.pfms.service.impl.common.RollbackSupport;
-
 import com.pfms.domain.exception.StorageException;
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.TransactionFee;
+import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
+import com.pfms.service.impl.common.RollbackSupport;
 
 /**
  * Bộ điều phối nội bộ lưu trữ hai pha (Two-Phase Persistence) cho giao dịch thu chi.
@@ -46,13 +46,21 @@ final class TransactionPersistenceCoordinator {
             TransactionRepository transactionRepository,
             WalletRepository walletRepository,
             Wallet wallet,
-            Wallet walletSnapshot,
             IncomeExpenseTransaction transaction,
-            Category oldCategory,
-            Money oldAmount,
-            TransactionDate oldDate,
-            String oldNote,
-            TransactionFee oldFee) {
+            Category newCategory,
+            Money newAmount,
+            TransactionDate newDate,
+            String newNote,
+            TransactionFee newFee) {
+
+        Wallet walletSnapshot = wallet.copy();
+        Category oldCategory = transaction.getCategory();
+        Money oldAmount = transaction.getAmount();
+        TransactionDate oldDate = transaction.getTransactionDate();
+        String oldNote = transaction.getNote();
+        TransactionFee oldFee = transaction.getFee().orElse(null);
+
+        transaction.updateDetails(wallet, newCategory, newAmount, newDate, newNote, newFee);
 
         executeTwoPhasePersistence(
                 walletRepository,
@@ -67,8 +75,10 @@ final class TransactionPersistenceCoordinator {
             TransactionRepository transactionRepository,
             WalletRepository walletRepository,
             IncomeExpenseTransaction transaction,
-            Wallet wallet,
-            Wallet walletSnapshot) {
+            Wallet wallet) {
+
+        Wallet walletSnapshot = wallet.copy();
+        revertTransactionBalance(transaction, wallet);
 
         executeTwoPhasePersistence(
                 walletRepository,
@@ -81,6 +91,21 @@ final class TransactionPersistenceCoordinator {
     // endregion
 
     // region Helpers
+    private static void revertTransactionBalance(IncomeExpenseTransaction transaction, Wallet wallet) {
+        transaction.revertFromWallet();
+        if (transaction.getWallet() != wallet) {
+            Money fee = transaction.getFee().map(TransactionFee::getAmount).orElse(Money.ZERO);
+            if (fee.isPositive()) {
+                wallet.credit(fee);
+            }
+            if (transaction.getTransactionType() == TransactionType.INCOME) {
+                wallet.debit(transaction.getAmount());
+            } else if (transaction.getTransactionType() == TransactionType.EXPENSE) {
+                wallet.credit(transaction.getAmount());
+            }
+        }
+    }
+
     private static void executeTwoPhasePersistence(
             WalletRepository walletRepository,
             Runnable primaryStorageAction,
@@ -110,4 +135,3 @@ final class TransactionPersistenceCoordinator {
     }
     // endregion
 }
-

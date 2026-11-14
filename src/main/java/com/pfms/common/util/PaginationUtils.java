@@ -29,9 +29,18 @@ public final class PaginationUtils {
         Preconditions.checkArgument(
                 pageNumber >= DEFAULT_PAGE_NUMBER,
                 "Chỉ số trang phải lớn hơn hoặc bằng 1: " + pageNumber);
+        validatePageSize(pageSize);
+    }
+
+    public static int calculateTotalPages(int totalRecords, int pageSize) {
         Preconditions.checkArgument(
-                pageSize >= MIN_PAGE_SIZE && pageSize <= MAX_PAGE_SIZE,
-                "Kích thước trang phải nằm trong khoảng từ 10 đến 100 bản ghi: " + pageSize);
+                totalRecords >= 0,
+                "Tổng số bản ghi không được âm: " + totalRecords);
+        validatePageSize(pageSize);
+        if (totalRecords == 0) {
+            return 0;
+        }
+        return (int) (((long) totalRecords + pageSize - 1) / pageSize);
     }
 
     public static <T> List<T> slice(List<T> sourceItems, int pageNumber, int pageSize) {
@@ -45,6 +54,14 @@ public final class PaginationUtils {
         int fromIndex = (int) startOffset;
         int toIndex = (int) Math.min(startOffset + pageSize, sourceItems.size());
         return Collections.unmodifiableList(new ArrayList<>(sourceItems.subList(fromIndex, toIndex)));
+    }
+    // endregion
+
+    // region Helpers
+    private static void validatePageSize(int pageSize) {
+        Preconditions.checkArgument(
+                pageSize >= MIN_PAGE_SIZE && pageSize <= MAX_PAGE_SIZE,
+                "Kích thước trang phải nằm trong khoảng từ 10 đến 100 bản ghi: " + pageSize);
     }
     // endregion
 }

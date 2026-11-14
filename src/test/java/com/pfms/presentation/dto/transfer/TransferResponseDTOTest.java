@@ -53,7 +53,6 @@ class TransferResponseDTOTest {
             );
 
             assertEquals(sampleTransferId, dto.getTransferId());
-            assertEquals(sampleTransferId, dto.getId());
             assertEquals(sampleSourceWalletId, dto.getSourceWalletId());
             assertEquals("Tài khoản MB Bank", dto.getSourceWalletName());
             assertEquals(sampleDestinationWalletId, dto.getDestinationWalletId());
@@ -62,7 +61,6 @@ class TransferResponseDTOTest {
             assertEquals(sampleDate, dto.getTransferDate());
             assertEquals("Rút tiền chi tiêu tuần", dto.getNote());
             assertTrue(dto.hasFee());
-            assertTrue(dto.isHasFee());
             assertEquals(fee, dto.getFeeAmount());
             assertEquals(sampleFeeCategoryId, dto.getFeeCategoryId());
             assertEquals("Phí ngân hàng", dto.getFeeCategoryName());
@@ -95,7 +93,6 @@ class TransferResponseDTOTest {
             assertEquals(sampleTransferId, dto.getTransferId());
             assertEquals(amount, dto.getAmount());
             assertFalse(dto.hasFee());
-            assertFalse(dto.isHasFee());
             assertEquals(BigDecimal.ZERO, dto.getFeeAmount());
             assertNull(dto.getFeeCategoryId());
             assertEquals("", dto.getFeeCategoryName());
@@ -425,6 +422,13 @@ class TransferResponseDTOTest {
             assertTrue(str.contains("Ví Nguồn"));
             assertTrue(str.contains("Ví Đích"));
             assertTrue(str.contains("250000"));
+        }
+
+        @Test
+        @DisplayName("Không còn cung cấp các getter bí danh getId() và isHasFee()")
+        void shouldNotExposeLegacyAliasGetters() {
+            assertThrows(NoSuchMethodException.class, () -> TransferResponseDTO.class.getMethod("getId"));
+            assertThrows(NoSuchMethodException.class, () -> TransferResponseDTO.class.getMethod("isHasFee"));
         }
     }
 }

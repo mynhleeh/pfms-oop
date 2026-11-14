@@ -9,7 +9,7 @@ import com.pfms.domain.model.transaction.Transaction;
 import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.model.transaction.TransferTransaction;
 import com.pfms.domain.model.wallet.Wallet;
-import com.pfms.presentation.dto.data.ReconciliationReportDTO;
+import com.pfms.presentation.dto.data.ReconciliationReportResponseDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ class SystemDataReconcilerTest {
     @Test
     @DisplayName("reconcile should return perfect report when datasets are empty")
     void reconcileShouldReturnPerfectReportWhenEmpty() {
-        ReconciliationReportDTO report = SystemDataReconciler.reconcile(
+        ReconciliationReportResponseDTO report = SystemDataReconciler.reconcile(
                 Collections.emptyList(),
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -70,7 +70,7 @@ class SystemDataReconcilerTest {
                 UUID.randomUUID(), TransactionType.INCOME, wallet, category, Money.of("200000.00"),
                 TransactionDate.of(LocalDate.of(2026, 1, 15)), "Nhận lương", null);
 
-        ReconciliationReportDTO report = SystemDataReconciler.reconcile(
+        ReconciliationReportResponseDTO report = SystemDataReconciler.reconcile(
                 List.of(wallet),
                 List.of(incomeTxn),
                 List.of(category),
@@ -94,7 +94,7 @@ class SystemDataReconcilerTest {
                 TransactionDate.of(LocalDate.of(2026, 1, 10)), "Chuyển từ ví không tồn tại", null);
 
         // Chỉ đưa destWallet vào hệ thống, sourceWallet bị thiếu
-        ReconciliationReportDTO report = SystemDataReconciler.reconcile(
+        ReconciliationReportResponseDTO report = SystemDataReconciler.reconcile(
                 List.of(destWallet),
                 List.of(transfer),
                 Collections.emptyList(),

@@ -15,7 +15,7 @@ import com.pfms.presentation.dto.wallet.BalanceAdjustmentResponseDTO;
 import com.pfms.presentation.dto.wallet.CreateWalletRequestDTO;
 import com.pfms.presentation.dto.wallet.UpdateWalletRequestDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
-import com.pfms.presentation.dto.wallet.WalletsSummaryDTO;
+import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -128,7 +128,7 @@ class WalletServiceImplTest {
 
             // Assert
             assertNotNull(response);
-            assertNotNull(response.getId());
+            assertNotNull(response.getWalletId());
             assertEquals("Thẻ Vietcombank", response.getName());
             assertEquals("Tài khoản nhận lương", response.getNote());
             assertEquals(0, response.getBalance().compareTo(java.math.BigDecimal.ZERO));
@@ -138,7 +138,7 @@ class WalletServiceImplTest {
             assertNotNull(response.getCreatedAt());
 
             // Kiểm tra kho lưu trữ
-            Optional<Wallet> savedWallet = walletRepository.findById(response.getId());
+            Optional<Wallet> savedWallet = walletRepository.findById(response.getWalletId());
             assertTrue(savedWallet.isPresent());
             assertEquals("Thẻ Vietcombank", savedWallet.get().getName());
         }
@@ -218,14 +218,14 @@ class WalletServiceImplTest {
             walletService.createWallet(new CreateWalletRequestDTO("Ví MoMo"));
 
             // Act
-            WalletsSummaryDTO summary = walletService.getWalletsSummary(EntityStatus.ACTIVE);
+            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary(EntityStatus.ACTIVE);
 
             // Assert
             assertNotNull(summary);
             assertEquals(2, summary.getWalletCount());
             assertEquals(0, summary.getTotalBalance().compareTo(java.math.BigDecimal.ZERO));
             for (WalletResponseDTO w : summary.getWallets()) {
-                assertEquals(new java.math.BigDecimal("0.00"), summary.getWalletShare(w.getId()));
+                assertEquals(new java.math.BigDecimal("0.00"), summary.getWalletShare(w.getWalletId()));
             }
         }
 
@@ -245,7 +245,7 @@ class WalletServiceImplTest {
             walletRepository.save(w3);
 
             // Act
-            WalletsSummaryDTO summary = walletService.getWalletsSummary(null);
+            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary(null);
 
             // Assert
             assertEquals(3, summary.getWalletCount());
@@ -276,7 +276,7 @@ class WalletServiceImplTest {
             walletRepository.save(archivedZeroWallet);
 
             // Act
-            WalletsSummaryDTO summary = walletService.getWalletsSummary(null);
+            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary(null);
 
             // Assert
             assertEquals(2, summary.getWalletCount());
@@ -299,15 +299,15 @@ class WalletServiceImplTest {
             walletRepository.save(archivedWallet);
 
             // Act & Assert
-            WalletsSummaryDTO activeOnly = walletService.getWalletsSummary(EntityStatus.ACTIVE);
+            WalletsSummaryResponseDTO activeOnly = walletService.getWalletsSummary(EntityStatus.ACTIVE);
             assertEquals(1, activeOnly.getWalletCount());
             assertEquals("Ví Active", activeOnly.getWallets().get(0).getName());
 
-            WalletsSummaryDTO archivedOnly = walletService.getWalletsSummary(EntityStatus.ARCHIVED);
+            WalletsSummaryResponseDTO archivedOnly = walletService.getWalletsSummary(EntityStatus.ARCHIVED);
             assertEquals(1, archivedOnly.getWalletCount());
             assertEquals("Ví Archived", archivedOnly.getWallets().get(0).getName());
 
-            WalletsSummaryDTO all = walletService.getWalletsSummary(null);
+            WalletsSummaryResponseDTO all = walletService.getWalletsSummary(null);
             assertEquals(2, all.getWalletCount());
         }
 
@@ -324,7 +324,7 @@ class WalletServiceImplTest {
             walletRepository.save(w1);
             walletRepository.save(w2);
 
-            WalletsSummaryDTO summary = walletService.getWalletsSummary(EntityStatus.ACTIVE);
+            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary(EntityStatus.ACTIVE);
             assertEquals(0, new java.math.BigDecimal("800000000000.00").compareTo(summary.getTotalBalance()));
             // 100 / 800 = 12.50%, 700 / 800 = 87.50%
             assertEquals(new java.math.BigDecimal("87.50"), summary.getWalletShare(w2.getId()));
@@ -341,17 +341,17 @@ class WalletServiceImplTest {
         void shouldUpdateWalletSuccessfullyWhenDataIsValid() {
             // Arrange
             WalletResponseDTO created = walletService.createWallet(new CreateWalletRequestDTO("Ví Cũ", "Ghi chú cũ"));
-            UpdateWalletRequestDTO updateRequest = new UpdateWalletRequestDTO(created.getId(), "Ví Mới", "Ghi chú mới");
+            UpdateWalletRequestDTO updateRequest = new UpdateWalletRequestDTO(created.getWalletId(), "Ví Mới", "Ghi chú mới");
 
             // Act
             WalletResponseDTO updated = walletService.updateWallet(updateRequest);
 
             // Assert
-            assertEquals(created.getId(), updated.getId());
+            assertEquals(created.getWalletId(), updated.getWalletId());
             assertEquals("Ví Mới", updated.getName());
             assertEquals("Ghi chú mới", updated.getNote());
 
-            Wallet saved = walletRepository.findById(created.getId()).orElseThrow();
+            Wallet saved = walletRepository.findById(created.getWalletId()).orElseThrow();
             assertEquals("Ví Mới", saved.getName());
             assertEquals("Ghi chú mới", saved.getNote());
         }
@@ -361,13 +361,13 @@ class WalletServiceImplTest {
         void shouldAllowKeepingSameNameWhenOnlyUpdatingNote() {
             // Arrange
             WalletResponseDTO created = walletService.createWallet(new CreateWalletRequestDTO("Ví Tiết Kiệm", "Ghi chú ban đầu"));
-            UpdateWalletRequestDTO updateRequest = new UpdateWalletRequestDTO(created.getId(), "ví tiết kiệm", "Ghi chú cập nhật");
+            UpdateWalletRequestDTO updateRequest = new UpdateWalletRequestDTO(created.getWalletId(), "ví tiết kiệm", "Ghi chú cập nhật");
 
             // Act
             WalletResponseDTO updated = walletService.updateWallet(updateRequest);
 
             // Assert
-            assertEquals(created.getId(), updated.getId());
+            assertEquals(created.getWalletId(), updated.getWalletId());
             assertEquals("ví tiết kiệm", updated.getName());
             assertEquals("Ghi chú cập nhật", updated.getNote());
         }
@@ -379,7 +379,7 @@ class WalletServiceImplTest {
             walletService.createWallet(new CreateWalletRequestDTO("Ví Vietcombank"));
             WalletResponseDTO wallet2 = walletService.createWallet(new CreateWalletRequestDTO("Ví Techcombank"));
 
-            UpdateWalletRequestDTO duplicateRequest = new UpdateWalletRequestDTO(wallet2.getId(), "ví vietcombank", "Cố tình trùng");
+            UpdateWalletRequestDTO duplicateRequest = new UpdateWalletRequestDTO(wallet2.getWalletId(), "ví vietcombank", "Cố tình trùng");
 
             // Act & Assert
             com.pfms.domain.exception.DuplicateEntityException ex = assertThrows(
@@ -452,11 +452,11 @@ class WalletServiceImplTest {
             WalletResponseDTO created = walletService.createWallet(new CreateWalletRequestDTO("Ví Cần Lưu Trữ"));
 
             // Act
-            WalletResponseDTO archived = walletService.archiveWallet(created.getId());
+            WalletResponseDTO archived = walletService.archiveWallet(created.getWalletId());
 
             // Assert
             assertEquals("ARCHIVED", archived.getStatus());
-            Wallet saved = walletRepository.findById(created.getId()).orElseThrow();
+            Wallet saved = walletRepository.findById(created.getWalletId()).orElseThrow();
             assertEquals(EntityStatus.ARCHIVED, saved.getStatus());
         }
 
@@ -480,14 +480,14 @@ class WalletServiceImplTest {
         void shouldActivateWalletSuccessfully() {
             // Arrange
             WalletResponseDTO created = walletService.createWallet(new CreateWalletRequestDTO("Ví Tạm Dừng"));
-            walletService.archiveWallet(created.getId());
+            walletService.archiveWallet(created.getWalletId());
 
             // Act
-            WalletResponseDTO activated = walletService.activateWallet(created.getId());
+            WalletResponseDTO activated = walletService.activateWallet(created.getWalletId());
 
             // Assert
             assertEquals("ACTIVE", activated.getStatus());
-            Wallet saved = walletRepository.findById(created.getId()).orElseThrow();
+            Wallet saved = walletRepository.findById(created.getWalletId()).orElseThrow();
             assertEquals(EntityStatus.ACTIVE, saved.getStatus());
         }
 
@@ -518,7 +518,7 @@ class WalletServiceImplTest {
         void shouldDeleteEmptyWalletSuccessfully() {
             // Arrange
             WalletResponseDTO created = walletService.createWallet(new CreateWalletRequestDTO("Ví Tạm Xóa"));
-            UUID walletId = created.getId();
+            UUID walletId = created.getWalletId();
             assertTrue(walletRepository.findById(walletId).isPresent());
 
             // Act

@@ -19,9 +19,9 @@ import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.repository.CategoryRepository;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
-import com.pfms.presentation.dto.transfer.TransferFilterCriteriaDTO;
-import com.pfms.presentation.dto.transfer.TransferHistoryResponseDTO;
-import com.pfms.presentation.dto.transfer.TransferRequestDTO;
+import com.pfms.presentation.dto.transfer.FilterTransfersRequestDTO;
+import com.pfms.presentation.dto.transfer.TransferFundsRequestDTO;
+import com.pfms.presentation.dto.transfer.TransferListResponseDTO;
 import com.pfms.presentation.dto.transfer.TransferResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,6 +46,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -134,7 +135,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 1 (Happy Path): Should transfer funds without fee and preserve total system balance")
         void shouldTransferFundsWithoutFeeSuccessfully() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("300000.00"),
                     LocalDate.now(), "Chuyển tiền tiết kiệm");
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
@@ -157,7 +158,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 1 (Happy Path): Should transfer funds with positive fee deducted solely from source wallet")
         void shouldTransferFundsWithFeeSuccessfully() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("400000.00"),
                     LocalDate.now(), "Chuyển liên ngân hàng", new BigDecimal("5500.00"), feeCategoryId);
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
@@ -186,7 +187,7 @@ class TransferServiceImplTest {
             Wallet smallSource = new Wallet(
                     sourceWalletId, "Ví Lẻ", "", false,
                     LocalDateTime.now().minusDays(1), new ActiveWalletState(), Money.of("0.02"));
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("0.01"),
                     LocalDate.now(), "Chuyển mức tối thiểu", new BigDecimal("0.01"), feeCategoryId);
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(smallSource));
@@ -203,7 +204,7 @@ class TransferServiceImplTest {
         @DisplayName("Group 2 (Boundary & Precision): Should accept maximum 255-character note")
         void shouldAcceptMax255CharacterNote() {
             String maxNote = "N".repeat(255);
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("10000.00"),
                     LocalDate.now(), maxNote);
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
@@ -218,7 +219,7 @@ class TransferServiceImplTest {
         @DisplayName("Group 2 (Boundary & Precision): Should reject note exceeding 255 characters")
         void shouldRejectNoteExceeding255Characters() {
             String oversizedNote = "A".repeat(256);
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("10000.00"),
                     LocalDate.now(), oversizedNote);
 
@@ -230,7 +231,7 @@ class TransferServiceImplTest {
         @ValueSource(strings = {"0.00", "-100.00"})
         @DisplayName("Group 3 (Negative & Zero): Should reject non-positive transfer amount with ERR_TRF_002")
         void shouldRejectNonPositiveTransferAmount(String invalidAmountText) {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal(invalidAmountText));
 
             BusinessException exception = assertThrows(
@@ -242,7 +243,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 3 (Negative & Zero): Should reject negative fee amount with ERR_FEE_001")
         void shouldRejectNegativeFeeAmount() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("100000.00"),
                     LocalDate.now(), "", new BigDecimal("-1.00"), null);
 
@@ -255,7 +256,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 3 (Overdraft Denial): Should throw InsufficientBalanceException when amount + fee exceeds source balance")
         void shouldRejectWhenTotalDeductionExceedsSourceBalance() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("995000.00"),
                     LocalDate.now(), "Vượt số dư do phí", new BigDecimal("10000.00"), feeCategoryId);
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
@@ -274,7 +275,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 4 (Temporal Invariants): Should accept past leap-day date 2024-02-29")
         void shouldAcceptPastLeapDayTransferDate() {
-            TransferRequestDTO leapDayRequest = new TransferRequestDTO(
+            TransferFundsRequestDTO leapDayRequest = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("50000.00"),
                     LocalDate.of(2024, 2, 29), "Ngày nhuận");
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
@@ -288,7 +289,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 4 (Temporal Invariants): Should reject future transfer date with ERR_FIN_001")
         void shouldRejectFutureTransferDate() {
-            TransferRequestDTO futureRequest = new TransferRequestDTO(
+            TransferFundsRequestDTO futureRequest = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("50000.00"),
                     LocalDate.now().plusDays(1), "Ngày tương lai");
 
@@ -307,7 +308,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 5 (State & Robustness): Should reject identical source and destination wallet IDs with ERR_TRF_001")
         void shouldRejectSameSourceAndDestinationWalletIds() {
-            TransferRequestDTO sameWalletRequest = new TransferRequestDTO(
+            TransferFundsRequestDTO sameWalletRequest = new TransferFundsRequestDTO(
                     sourceWalletId, sourceWalletId, new BigDecimal("100000.00"));
 
             BusinessException exception = assertThrows(
@@ -319,7 +320,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 5 (State & Robustness): Should throw EntityNotFoundException when source or destination wallet is missing")
         void shouldThrowEntityNotFoundWhenWalletDoesNotExist() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("100000.00"));
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.empty());
 
@@ -335,7 +336,7 @@ class TransferServiceImplTest {
             Wallet archivedSource = new Wallet(
                     sourceWalletId, "Ví Lưu Trữ", "", false,
                     LocalDateTime.now().minusDays(5), new ArchivedWalletState(), Money.of("1000000.00"));
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("100000.00"));
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(archivedSource));
 
@@ -348,7 +349,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 5 (Fee Category Rules): Should reject positive fee when feeCategoryId is null with ERR_FEE_002")
         void shouldRejectPositiveFeeWithoutCategoryId() {
-            TransferRequestDTO missingCategoryRequest = new TransferRequestDTO(
+            TransferFundsRequestDTO missingCategoryRequest = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("100000.00"),
                     LocalDate.now(), "", new BigDecimal("1000.00"), null);
 
@@ -361,7 +362,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 5 (Fee Category Rules): Should throw EntityNotFoundException when fee category does not exist")
         void shouldThrowEntityNotFoundWhenFeeCategoryIsMissing() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("100000.00"),
                     LocalDate.now(), "", new BigDecimal("1000.00"), feeCategoryId);
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
@@ -377,7 +378,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 5 (Fee Category Rules): Should reject INCOME or DELETED fee category with ERR_FEE_003")
         void shouldRejectIncomeOrDeletedFeeCategory() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("100000.00"),
                     LocalDate.now(), "", new BigDecimal("1000.00"), feeCategoryId);
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
@@ -400,7 +401,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 5 (Compensating Rollback): Should restore source wallet when saving destination wallet fails")
         void shouldRollbackSourceWalletWhenDestinationWalletSaveThrowsStorageException() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("200000.00"));
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
             when(walletRepository.findById(destinationWalletId)).thenReturn(Optional.of(destinationWallet));
@@ -419,7 +420,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 5 (Compensating Rollback): Should restore both wallet snapshots and delete partial transfer on StorageException")
         void shouldRollbackWalletSnapshotsWhenTransactionSaveThrowsStorageException() {
-            TransferRequestDTO request = new TransferRequestDTO(
+            TransferFundsRequestDTO request = new TransferFundsRequestDTO(
                     sourceWalletId, destinationWalletId, new BigDecimal("200000.00"),
                     LocalDate.now(), "Lỗi lưu giao dịch", new BigDecimal("5000.00"), feeCategoryId);
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(sourceWallet));
@@ -476,7 +477,7 @@ class TransferServiceImplTest {
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.of(renamedSource));
             when(walletRepository.findById(destinationWalletId)).thenReturn(Optional.of(destinationWallet));
 
-            TransferHistoryResponseDTO history = transferService.filterTransfers(new TransferFilterCriteriaDTO());
+            TransferListResponseDTO history = transferService.filterTransfers(new FilterTransfersRequestDTO());
 
             assertEquals(2, history.getTotalRecords());
             assertEquals(new BigDecimal("450000.00"), history.getTotalTransferredAmount());
@@ -503,8 +504,8 @@ class TransferServiceImplTest {
             when(transactionRepository.findByDateRange(startDate, endDate))
                     .thenReturn(List.of(matched, wrongSource, wrongDest));
 
-            TransferHistoryResponseDTO history = transferService.filterTransfers(
-                    new TransferFilterCriteriaDTO(startDate, endDate, sourceWalletId, destinationWalletId));
+            TransferListResponseDTO history = transferService.filterTransfers(
+                    new FilterTransfersRequestDTO(startDate, endDate, sourceWalletId, destinationWalletId));
 
             verify(transactionRepository).findByDateRange(startDate, endDate);
             verify(transactionRepository, never()).findAll();
@@ -518,11 +519,26 @@ class TransferServiceImplTest {
         void shouldSumUltraLargeAndMinimalAmountsAcrossPages() {
             when(transactionRepository.findAll()).thenReturn(buildTwelvePaginationTransfers(LocalDate.now()));
 
-            TransferHistoryResponseDTO page2 = transferService.filterTransfers(
-                    new TransferFilterCriteriaDTO(null, null, null, null, 2, 10));
+            TransferListResponseDTO page1 = transferService.filterTransfers(
+                    new FilterTransfersRequestDTO(null, null, null, null, 1, 10));
+            TransferListResponseDTO page2 = transferService.filterTransfers(
+                    new FilterTransfersRequestDTO(null, null, null, null, 2, 10));
 
-            assertEquals(12, page2.getTotalRecords());
+            assertEquals(1, page1.getPageNumber());
+            assertEquals(10, page1.getPageSize());
+            assertEquals(12L, page1.getTotalRecords());
+            assertEquals(2, page1.getTotalPages());
+            assertEquals(10, page1.getItemCount());
+            assertTrue(page1.hasNextPage());
+            assertFalse(page1.hasPreviousPage());
+
+            assertEquals(2, page2.getPageNumber());
+            assertEquals(10, page2.getPageSize());
+            assertEquals(12L, page2.getTotalRecords());
+            assertEquals(2, page2.getTotalPages());
             assertEquals(2, page2.getItemCount());
+            assertFalse(page2.hasNextPage());
+            assertTrue(page2.hasPreviousPage());
             assertEquals(new BigDecimal("1000000000000.12"), page2.getTotalTransferredAmount());
             assertEquals(new BigDecimal("0.01"), page2.getTotalFees());
         }
@@ -532,11 +548,16 @@ class TransferServiceImplTest {
         void shouldReturnEmptyItemsWhenPageExceedsTotalRecords() {
             when(transactionRepository.findAll()).thenReturn(buildTwelvePaginationTransfers(LocalDate.now()));
 
-            TransferHistoryResponseDTO outOfRange = transferService.filterTransfers(
-                    new TransferFilterCriteriaDTO(null, null, null, null, 3, 10));
+            TransferListResponseDTO outOfRange = transferService.filterTransfers(
+                    new FilterTransfersRequestDTO(null, null, null, null, 3, 10));
 
             assertTrue(outOfRange.isEmpty());
-            assertEquals(12, outOfRange.getTotalRecords());
+            assertEquals(3, outOfRange.getPageNumber());
+            assertEquals(10, outOfRange.getPageSize());
+            assertEquals(12L, outOfRange.getTotalRecords());
+            assertEquals(2, outOfRange.getTotalPages());
+            assertFalse(outOfRange.hasNextPage());
+            assertTrue(outOfRange.hasPreviousPage());
             assertEquals(new BigDecimal("1000000000000.12"), outOfRange.getTotalTransferredAmount());
             assertEquals(new BigDecimal("0.01"), outOfRange.getTotalFees());
         }
@@ -546,11 +567,16 @@ class TransferServiceImplTest {
         void shouldReturnAllItemsWhenPageSizeAtUpperBound() {
             when(transactionRepository.findAll()).thenReturn(buildTwelvePaginationTransfers(LocalDate.now()));
 
-            TransferHistoryResponseDTO history = transferService.filterTransfers(
-                    new TransferFilterCriteriaDTO(null, null, null, null, 1, 100));
+            TransferListResponseDTO history = transferService.filterTransfers(
+                    new FilterTransfersRequestDTO(null, null, null, null, 1, 100));
 
-            assertEquals(12, history.getTotalRecords());
+            assertEquals(1, history.getPageNumber());
+            assertEquals(100, history.getPageSize());
+            assertEquals(12L, history.getTotalRecords());
+            assertEquals(1, history.getTotalPages());
             assertEquals(12, history.getItemCount());
+            assertFalse(history.hasNextPage());
+            assertFalse(history.hasPreviousPage());
             assertEquals(new BigDecimal("1000000000000.12"), history.getTotalTransferredAmount());
             assertEquals(new BigDecimal("0.01"), history.getTotalFees());
         }
@@ -564,10 +590,15 @@ class TransferServiceImplTest {
                     Money.of("500000.00"), TransactionDate.now(), "Thu nhập", Money.ZERO, null);
             when(transactionRepository.findAll()).thenReturn(List.of(incomeTxn));
 
-            TransferHistoryResponseDTO history = transferService.filterTransfers(new TransferFilterCriteriaDTO());
+            TransferListResponseDTO history = transferService.filterTransfers(new FilterTransfersRequestDTO());
 
             assertTrue(history.isEmpty());
-            assertEquals(0, history.getTotalRecords());
+            assertEquals(1, history.getPageNumber());
+            assertEquals(50, history.getPageSize());
+            assertEquals(0L, history.getTotalRecords());
+            assertEquals(0, history.getTotalPages());
+            assertFalse(history.hasNextPage());
+            assertFalse(history.hasPreviousPage());
             assertEquals(new BigDecimal("0.00"), history.getTotalTransferredAmount());
             assertEquals(new BigDecimal("0.00"), history.getTotalFees());
         }
@@ -576,7 +607,7 @@ class TransferServiceImplTest {
         @ValueSource(ints = {0, -1})
         @DisplayName("Group 3 (Negative & Zero Pagination): Should reject non-positive pageNumber")
         void shouldRejectNonPositivePageNumber(int invalidPageNumber) {
-            TransferFilterCriteriaDTO criteria = new TransferFilterCriteriaDTO(
+            FilterTransfersRequestDTO criteria = new FilterTransfersRequestDTO(
                     null, null, null, null, invalidPageNumber, 50);
 
             assertThrows(IllegalArgumentException.class, () -> transferService.filterTransfers(criteria));
@@ -586,7 +617,7 @@ class TransferServiceImplTest {
         @ValueSource(ints = {0, 9, 101})
         @DisplayName("Group 3 (Out-of-Bounds Pagination): Should reject pageSize outside 10..100")
         void shouldRejectOutOfRangePageSize(int invalidPageSize) {
-            TransferFilterCriteriaDTO criteria = new TransferFilterCriteriaDTO(
+            FilterTransfersRequestDTO criteria = new FilterTransfersRequestDTO(
                     null, null, null, null, 1, invalidPageSize);
 
             assertThrows(IllegalArgumentException.class, () -> transferService.filterTransfers(criteria));
@@ -606,8 +637,8 @@ class TransferServiceImplTest {
             when(newerSameDay.getCreatedAt()).thenReturn(LocalDateTime.of(2024, 2, 29, 17, 45));
             when(transactionRepository.findAll()).thenReturn(List.of(olderSameDay, beforeLeapDay, newerSameDay));
 
-            TransferHistoryResponseDTO history = transferService.filterTransfers(
-                    new TransferFilterCriteriaDTO(leapDay, null, null, null));
+            TransferListResponseDTO history = transferService.filterTransfers(
+                    new FilterTransfersRequestDTO(leapDay, null, null, null));
 
             verify(transactionRepository).findAll();
             assertEquals(2, history.getTotalRecords());
@@ -625,8 +656,8 @@ class TransferServiceImplTest {
                     cutoff.plusDays(1), "Vượt mốc cuối", Money.ZERO, null);
             when(transactionRepository.findAll()).thenReturn(List.of(onCutoff, afterCutoff));
 
-            TransferHistoryResponseDTO history = transferService.filterTransfers(
-                    new TransferFilterCriteriaDTO(null, cutoff, null, null));
+            TransferListResponseDTO history = transferService.filterTransfers(
+                    new FilterTransfersRequestDTO(null, cutoff, null, null));
 
             verify(transactionRepository).findAll();
             assertEquals(1, history.getTotalRecords());
@@ -639,7 +670,7 @@ class TransferServiceImplTest {
         void shouldRejectFutureFilterDates(int startOffsetDays, int endOffsetDays) {
             LocalDate futureStart = (startOffsetDays > 0) ? LocalDate.now().plusDays(startOffsetDays) : null;
             LocalDate futureEnd = (endOffsetDays > 0) ? LocalDate.now().plusDays(endOffsetDays) : null;
-            TransferFilterCriteriaDTO criteria = new TransferFilterCriteriaDTO(futureStart, futureEnd, null, null);
+            FilterTransfersRequestDTO criteria = new FilterTransfersRequestDTO(futureStart, futureEnd, null, null);
 
             BusinessException exception = assertThrows(
                     BusinessException.class, () -> transferService.filterTransfers(criteria));
@@ -650,7 +681,7 @@ class TransferServiceImplTest {
         @Test
         @DisplayName("Group 4 (Temporal Invariants): Should reject startDate after endDate with ERR_FIN_001")
         void shouldRejectStartDateAfterEndDate() {
-            TransferFilterCriteriaDTO invalidRange = new TransferFilterCriteriaDTO(
+            FilterTransfersRequestDTO invalidRange = new FilterTransfersRequestDTO(
                     LocalDate.now(), LocalDate.now().minusDays(1), null, null);
 
             BusinessException exception = assertThrows(
@@ -674,7 +705,7 @@ class TransferServiceImplTest {
             when(walletRepository.findById(sourceWalletId)).thenReturn(Optional.empty());
             when(walletRepository.findById(destinationWalletId)).thenReturn(Optional.empty());
 
-            TransferHistoryResponseDTO history = transferService.filterTransfers(new TransferFilterCriteriaDTO());
+            TransferListResponseDTO history = transferService.filterTransfers(new FilterTransfersRequestDTO());
 
             assertEquals(1, history.getTotalRecords());
             assertEquals("Ví Tiền Mặt", history.getItems().get(0).getSourceWalletName());
@@ -686,10 +717,15 @@ class TransferServiceImplTest {
         void shouldReturnEmptyHistoryWhenRepositoryIsEmpty() {
             when(transactionRepository.findAll()).thenReturn(List.of());
 
-            TransferHistoryResponseDTO history = transferService.filterTransfers(new TransferFilterCriteriaDTO());
+            TransferListResponseDTO history = transferService.filterTransfers(new FilterTransfersRequestDTO());
 
             assertTrue(history.isEmpty());
-            assertEquals(0, history.getTotalRecords());
+            assertEquals(1, history.getPageNumber());
+            assertEquals(50, history.getPageSize());
+            assertEquals(0L, history.getTotalRecords());
+            assertEquals(0, history.getTotalPages());
+            assertFalse(history.hasNextPage());
+            assertFalse(history.hasPreviousPage());
             assertEquals(new BigDecimal("0.00"), history.getTotalTransferredAmount());
             assertEquals(new BigDecimal("0.00"), history.getTotalFees());
             verify(walletRepository, never()).findById(any());
@@ -700,7 +736,7 @@ class TransferServiceImplTest {
         void shouldPropagateStorageExceptionWhenRepositoryFails() {
             when(transactionRepository.findAll()).thenThrow(new StorageException(new IOException("Read error")));
 
-            assertThrows(StorageException.class, () -> transferService.filterTransfers(new TransferFilterCriteriaDTO()));
+            assertThrows(StorageException.class, () -> transferService.filterTransfers(new FilterTransfersRequestDTO()));
         }
     }
 

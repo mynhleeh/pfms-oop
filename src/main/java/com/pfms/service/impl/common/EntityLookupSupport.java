@@ -12,6 +12,7 @@ import com.pfms.domain.repository.CategoryRepository;
 import com.pfms.domain.repository.GenericRepository;
 import com.pfms.domain.repository.WalletRepository;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -130,6 +131,24 @@ public final class EntityLookupSupport {
             }
         }
         return Collections.unmodifiableMap(indexed);
+    }
+
+    public static void validateAmountAndFee(
+            BigDecimal amount,
+            ErrorCode invalidAmountErrorCode,
+            BigDecimal feeAmount,
+            UUID feeCategoryId) {
+
+        Objects.requireNonNull(invalidAmountErrorCode, "Mã lỗi số tiền không hợp lệ không được để null");
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(invalidAmountErrorCode);
+        }
+        if (feeAmount != null && feeAmount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusinessException(ErrorCode.ERR_FEE_001);
+        }
+        if (feeAmount != null && feeAmount.compareTo(BigDecimal.ZERO) > 0 && feeCategoryId == null) {
+            throw new BusinessException(ErrorCode.ERR_FEE_002);
+        }
     }
     // endregion
 }

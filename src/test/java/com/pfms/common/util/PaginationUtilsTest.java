@@ -69,6 +69,15 @@ class PaginationUtilsTest {
             assertEquals("1", sliced.get(0));
             assertThrows(UnsupportedOperationException.class, () -> sliced.add("13"));
         }
+
+        @Test
+        @DisplayName("Tính đúng tổng số trang cho bản ghi rỗng, chia hết và chia lẻ")
+        void shouldCalculateTotalPagesAccurately() {
+            assertEquals(0, PaginationUtils.calculateTotalPages(0, 10));
+            assertEquals(1, PaginationUtils.calculateTotalPages(10, 10));
+            assertEquals(3, PaginationUtils.calculateTotalPages(25, 10));
+            assertEquals(214748365, PaginationUtils.calculateTotalPages(Integer.MAX_VALUE, 10));
+        }
     }
 
     @Nested
@@ -142,6 +151,13 @@ class PaginationUtilsTest {
         @DisplayName("Ném NullPointerException khi danh sách đầu vào là null")
         void shouldRejectNullSourceList() {
             assertThrows(NullPointerException.class, () -> PaginationUtils.slice(null, 1, 10));
+        }
+
+        @Test
+        @DisplayName("Ném IllegalArgumentException khi tổng số bản ghi âm trong calculateTotalPages")
+        void shouldRejectNegativeTotalRecords() {
+            assertThrows(IllegalArgumentException.class, () -> PaginationUtils.calculateTotalPages(-1, 10));
+            assertThrows(IllegalArgumentException.class, () -> PaginationUtils.calculateTotalPages(10, 9));
         }
     }
 }

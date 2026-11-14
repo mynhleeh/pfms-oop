@@ -31,27 +31,21 @@ class WalletResponseDTOTest {
                                         sampleId, "Ví Tiền Mặt", balance, "VND", true, "ACTIVE",
                                         "Ví chi tiêu hàng ngày", sampleTime);
 
-                        assertEquals(sampleId, dto.getId());
                         assertEquals(sampleId, dto.getWalletId());
                         assertEquals("Ví Tiền Mặt", dto.getName());
                         assertEquals(balance, dto.getBalance());
                         assertEquals("VND", dto.getCurrency());
                         assertTrue(dto.isDefaultWallet());
-                        assertTrue(dto.isDefault());
                         assertEquals("ACTIVE", dto.getStatus());
                         assertEquals("Ví chi tiêu hàng ngày", dto.getNote());
                         assertEquals(sampleTime, dto.getCreatedAt());
                 }
 
                 @Test
-                @DisplayName("Cung cấp getWalletId như phương thức alias song song của getId")
-                void shouldProvideWalletIdAsAliasOfId() {
-                        WalletResponseDTO dto = new WalletResponseDTO(
-                                        sampleId, "Ví Tiền Mặt", BigDecimal.ZERO, "VND", false, "ACTIVE", "",
-                                        sampleTime);
-
-                        assertEquals(sampleId, dto.getWalletId());
-                        assertEquals(dto.getId(), dto.getWalletId());
+                @DisplayName("Không còn cung cấp các phương thức bí danh getId và isDefault")
+                void shouldNotExposeLegacyAliasGetters() {
+                        assertThrows(NoSuchMethodException.class, () -> WalletResponseDTO.class.getMethod("getId"));
+                        assertThrows(NoSuchMethodException.class, () -> WalletResponseDTO.class.getMethod("isDefault"));
                 }
 
                 @Test

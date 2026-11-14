@@ -32,10 +32,6 @@ public final class RenameCategoryRequestDTO {
         return this.categoryId;
     }
 
-    public UUID getId() {
-        return this.categoryId;
-    }
-
     public String getName() {
         return this.name;
     }

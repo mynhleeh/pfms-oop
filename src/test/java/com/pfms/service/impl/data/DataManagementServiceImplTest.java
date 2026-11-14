@@ -24,12 +24,11 @@ import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.DataCorruptionException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.StorageException;
-import com.pfms.presentation.dto.data.BackupPayloadDTO;
-import com.pfms.presentation.dto.data.BackupResponseDTO;
 import com.pfms.presentation.dto.data.ExportBackupRequestDTO;
-import com.pfms.presentation.dto.data.ReconciliationReportDTO;
+import com.pfms.presentation.dto.data.ExportBackupResponseDTO;
+import com.pfms.presentation.dto.data.ReconciliationReportResponseDTO;
 import com.pfms.presentation.dto.data.RestoreBackupRequestDTO;
-import com.pfms.presentation.dto.data.RestoreResultDTO;
+import com.pfms.presentation.dto.data.RestoreBackupResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -215,7 +214,7 @@ class DataManagementServiceImplTest {
             Path targetFile = tempDir.resolve("full_backup.json");
             ExportBackupRequestDTO req = new ExportBackupRequestDTO(targetFile.toString(), "FULL");
 
-            BackupResponseDTO res = service.exportBackupData(req);
+            ExportBackupResponseDTO res = service.exportBackupData(req);
 
             assertNotNull(res);
             assertEquals(targetFile.toAbsolutePath().toString(), res.getFilePath());
@@ -258,7 +257,7 @@ class DataManagementServiceImplTest {
             Path targetFile = tempDir.resolve("txn_backup.json");
             ExportBackupRequestDTO req = new ExportBackupRequestDTO(targetFile.toString(), "TRANSACTIONS");
 
-            BackupResponseDTO res = service.exportBackupData(req);
+            ExportBackupResponseDTO res = service.exportBackupData(req);
 
             assertNotNull(res);
             assertTrue(res.isTransactionsScope());
@@ -280,7 +279,7 @@ class DataManagementServiceImplTest {
             Path nestedTarget = tempDir.resolve("nested/dir/sub/backup.json");
             ExportBackupRequestDTO req = new ExportBackupRequestDTO(nestedTarget.toString());
 
-            BackupResponseDTO res = service.exportBackupData(req);
+            ExportBackupResponseDTO res = service.exportBackupData(req);
 
             assertNotNull(res);
             assertTrue(Files.exists(nestedTarget));
@@ -308,7 +307,7 @@ class DataManagementServiceImplTest {
             Path targetFile = tempDir.resolve("transfer_fee_backup.json");
             ExportBackupRequestDTO req = new ExportBackupRequestDTO(targetFile.toString());
 
-            BackupResponseDTO res = service.exportBackupData(req);
+            ExportBackupResponseDTO res = service.exportBackupData(req);
 
             assertNotNull(res);
             String content = Files.readString(targetFile);
@@ -359,7 +358,7 @@ class DataManagementServiceImplTest {
             needGroupRepository.deleteAll();
             categoryRepository.deleteAll();
 
-            ReconciliationReportDTO report = service.reconcileSystemData();
+            ReconciliationReportResponseDTO report = service.reconcileSystemData();
 
             assertTrue(report.isFullyConsistent());
             assertEquals(0, report.getTotalIssues());
@@ -400,7 +399,7 @@ class DataManagementServiceImplTest {
             walletRepository.save(wallet1);
             balanceAdjustmentRepository.save(adj);
 
-            ReconciliationReportDTO report = service.reconcileSystemData();
+            ReconciliationReportResponseDTO report = service.reconcileSystemData();
 
             assertTrue(report.isFullyConsistent());
             assertTrue(report.isWalletBalanceConsistent());
@@ -420,7 +419,7 @@ class DataManagementServiceImplTest {
             wallet1.credit(Money.of("100000.00"));
             walletRepository.save(wallet1);
 
-            ReconciliationReportDTO report = service.reconcileSystemData();
+            ReconciliationReportResponseDTO report = service.reconcileSystemData();
 
             assertFalse(report.isFullyConsistent());
             assertFalse(report.isWalletBalanceConsistent());
@@ -437,7 +436,7 @@ class DataManagementServiceImplTest {
                     TransactionDate.of(LocalDate.now()), "Chuyển từ ví mồ côi", null);
             transactionRepository.save(invalidTransfer);
 
-            ReconciliationReportDTO report = service.reconcileSystemData();
+            ReconciliationReportResponseDTO report = service.reconcileSystemData();
 
             assertFalse(report.isTransferConsistent());
             assertTrue(report.getIssues().stream().anyMatch(i -> "TRANSFER_INCONSISTENCY".equals(i.getIssueType())));
@@ -450,7 +449,7 @@ class DataManagementServiceImplTest {
                     UUID.randomUUID(), "Danh mục mồ côi", UUID.randomUUID(), TransactionType.EXPENSE, "orphan", "#000");
             categoryRepository.save(orphanCategory);
 
-            ReconciliationReportDTO report = service.reconcileSystemData();
+            ReconciliationReportResponseDTO report = service.reconcileSystemData();
 
             assertFalse(report.isCategoryHierarchyConsistent());
             assertTrue(report.getIssues().stream().anyMatch(i -> "CATEGORY_INCONSISTENCY".equals(i.getIssueType())));
@@ -469,7 +468,7 @@ class DataManagementServiceImplTest {
 
             categoryRepository.deleteById(feeCat.getCategoryId());
 
-            ReconciliationReportDTO report = service.reconcileSystemData();
+            ReconciliationReportResponseDTO report = service.reconcileSystemData();
 
             assertFalse(report.isFeeConsistent());
             assertTrue(report.getIssues().stream().anyMatch(i -> "FEE_INCONSISTENCY".equals(i.getIssueType())));
@@ -527,7 +526,7 @@ class DataManagementServiceImplTest {
                     Money.of("50000.00"), TransactionDate.of(LocalDate.now()), "Tiền điện", null);
 
             // Reconciler will detect balance mismatch: initial balance 0 + txn (-50,000) != currentBalance (100,000)
-            BackupPayloadDTO payload = new BackupPayloadDTO(
+            BackupPayload payload = new BackupPayload(
                     List.of(wallet),
                     List.of(group),
                     List.of(category),
@@ -535,7 +534,7 @@ class DataManagementServiceImplTest {
                     List.of());
 
             Path backupFile = tempDir.resolve("integrity_error.json");
-            Files.writeString(backupFile, BackupJsonCodec.toJson(payload));
+            Files.writeString(backupFile, BackupJsonSerializer.toJson(payload));
 
             DataCorruptionException ex = assertThrows(
                     DataCorruptionException.class,
@@ -576,7 +575,7 @@ class DataManagementServiceImplTest {
             newWallet1.debit(Money.of("201000.00"));
             newWallet2.credit(Money.of("200000.00"));
 
-            BackupPayloadDTO payload = new BackupPayloadDTO(
+            BackupPayload payload = new BackupPayload(
                     List.of(newWallet1, newWallet2),
                     List.of(newGroup),
                     List.of(expenseCat, feeCat),
@@ -584,10 +583,10 @@ class DataManagementServiceImplTest {
                     List.of(adj));
 
             Path backupFile = tempDir.resolve("valid_backup.json");
-            Files.writeString(backupFile, BackupJsonCodec.toJson(payload));
+            Files.writeString(backupFile, BackupJsonSerializer.toJson(payload));
 
             // Execute restore
-            RestoreResultDTO result = service.restoreBackupData(new RestoreBackupRequestDTO(backupFile.toString()));
+            RestoreBackupResponseDTO result = service.restoreBackupData(new RestoreBackupRequestDTO(backupFile.toString()));
 
             assertNotNull(result);
             assertTrue(result.isSuccess());
@@ -610,7 +609,7 @@ class DataManagementServiceImplTest {
             assertEquals(1, balanceAdjustmentRepository.findAll().size());
 
             // System data reconciler report must be fully consistent
-            ReconciliationReportDTO report = service.reconcileSystemData();
+            ReconciliationReportResponseDTO report = service.reconcileSystemData();
             assertTrue(report.isFullyConsistent());
             assertTrue(report.getIssues().isEmpty());
         }

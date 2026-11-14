@@ -1,7 +1,5 @@
 package com.pfms.service.impl.category;
 
-import com.pfms.service.impl.common.EntityLookupSupport;
-
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.DuplicateEntityException;
 import com.pfms.domain.exception.EntityNotFoundException;
@@ -17,15 +15,11 @@ import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.category.CreateCategoryRequestDTO;
 import com.pfms.presentation.dto.category.RenameCategoryRequestDTO;
 import com.pfms.service.CategoryService;
+import com.pfms.service.impl.common.EntityLookupSupport;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Cài đặt dịch vụ quản lý danh mục thu chi ({@link CategoryService}).
@@ -47,7 +41,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         this.categoryRepository = Objects.requireNonNull(categoryRepository, "CategoryRepository không được để null");
         this.needGroupRepository = Objects.requireNonNull(needGroupRepository, "NeedGroupRepository không được để null");
-        this.transactionRepository = Objects.requireNonNull(transactionRepository, "TransactionRepository không được để null");
+        this.transactionRepository = Objects.requireNonNull(
+                transactionRepository, "TransactionRepository không được để null");
     }
     // endregion
 
@@ -64,22 +59,15 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BusinessException(ErrorCode.ERR_CAT_005,
                     "Không thể tạo danh mục trong nhóm đã xóa. Hãy chọn nhóm đang dùng.");
         }
-
         if (categoryRepository.existsByNameAndNeedGroupId(validName.getValue(), parentGroup.getNeedGroupId())) {
             throw new DuplicateEntityException(ErrorCode.ERR_NAM_002, "Danh mục", validName.getValue());
         }
 
         Category newCategory = new Category(
-                UUID.randomUUID(),
-                validName.getValue(),
-                parentGroup.getNeedGroupId(),
-                parentGroup.getTransactionType(),
-                "",
-                ""
-        );
+                UUID.randomUUID(), validName.getValue(), parentGroup.getNeedGroupId(),
+                parentGroup.getTransactionType(), "", "");
 
-        Category savedCategory = categoryRepository.save(newCategory);
-        return toResponseDTO(savedCategory, parentGroup);
+        return CategoryHierarchySupport.toResponseDTO(categoryRepository.save(newCategory), parentGroup);
     }
 
     @Override
@@ -88,50 +76,32 @@ public class CategoryServiceImpl implements CategoryService {
         Objects.requireNonNull(request.getCategoryId(), "Mã danh mục không được để null");
 
         EntityName validName = EntityName.of(request.getName(), "Tên danh mục");
-        Category category = EntityLookupSupport.findEntityOrThrow(
-                categoryRepository, request.getCategoryId(), EntityLookupSupport.LABEL_CATEGORY);
-
-        if (category.isDeleted()) {
-            throw new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Danh mục", request.getCategoryId().toString());
-        }
+        Category category = loadCategoryAndCheckDeleted(request.getCategoryId(), false);
 
         UUID targetGroupId = request.hasNewParentGroup() ? request.getNewParentGroupId() : category.getNeedGroupId();
         NeedGroup targetGroup = EntityLookupSupport.findEntityOrThrow(
                 needGroupRepository, targetGroupId, EntityLookupSupport.LABEL_NEED_GROUP);
 
-        if (request.hasNewParentGroup() && !request.getNewParentGroupId().equals(category.getNeedGroupId())) {
-            if (targetGroup.isDeleted()) {
-                throw new BusinessException(ErrorCode.ERR_CAT_003,
-                        "Không thể chuyển danh mục sang nhóm đã xóa.");
-            }
-            if (targetGroup.getTransactionType() != category.getTransactionType()) {
-                throw new BusinessException(ErrorCode.ERR_CAT_001,
-                        "Không được phép đổi loại thu chi hoặc chuyển danh mục sang nhóm khác loại.");
-            }
+        boolean movingGroup = request.hasNewParentGroup() && !targetGroupId.equals(category.getNeedGroupId());
+        if (movingGroup) {
+            validateGroupMove(category, targetGroup);
         }
-
-        if (categoryRepository.existsByNameAndNeedGroupIdAndIdNot(validName.getValue(), targetGroupId, category.getCategoryId())) {
+        if (categoryRepository.existsByNameAndNeedGroupIdAndIdNot(
+                validName.getValue(), targetGroupId, category.getCategoryId())) {
             throw new DuplicateEntityException(ErrorCode.ERR_NAM_002, "Danh mục", validName.getValue());
         }
-
-        if (request.hasNewParentGroup() && !request.getNewParentGroupId().equals(category.getNeedGroupId())) {
+        if (movingGroup) {
             category.changeNeedGroup(targetGroupId, targetGroup.getTransactionType());
         }
         category.rename(validName.getValue());
 
-        Category savedCategory = categoryRepository.save(category);
-        return toResponseDTO(savedCategory, targetGroup);
+        return CategoryHierarchySupport.toResponseDTO(categoryRepository.save(category), targetGroup);
     }
 
     @Override
     public CategoryResponseDTO restoreCategory(UUID categoryId) {
         Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
-
-        Category category = EntityLookupSupport.findEntityOrThrow(
-                categoryRepository, categoryId, EntityLookupSupport.LABEL_CATEGORY);
-        if (!category.isDeleted()) {
-            throw new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Danh mục", categoryId.toString());
-        }
+        Category category = loadCategoryAndCheckDeleted(categoryId, true);
 
         NeedGroup parentGroup = EntityLookupSupport.findEntityOrThrow(
                 needGroupRepository, category.getNeedGroupId(), EntityLookupSupport.LABEL_NEED_GROUP);
@@ -140,26 +110,18 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BusinessException(ErrorCode.ERR_CAT_004,
                     "Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước.");
         }
-
         if (categoryRepository.existsByNameAndNeedGroupId(category.getName(), category.getNeedGroupId())) {
             throw new DuplicateEntityException(ErrorCode.ERR_NAM_002, "Danh mục", category.getName());
         }
 
         category.restore(parentGroup.isActive());
-        Category savedCategory = categoryRepository.save(category);
-
-        return toResponseDTO(savedCategory, parentGroup);
+        return CategoryHierarchySupport.toResponseDTO(categoryRepository.save(category), parentGroup);
     }
 
     @Override
     public void deleteCategory(UUID categoryId) {
         Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
-
-        Category category = EntityLookupSupport.findEntityOrThrow(
-                categoryRepository, categoryId, EntityLookupSupport.LABEL_CATEGORY);
-        if (category.isDeleted()) {
-            throw new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Danh mục", categoryId.toString());
-        }
+        Category category = loadCategoryAndCheckDeleted(categoryId, false);
 
         long activeCount = categoryRepository.countActiveByNeedGroupId(category.getNeedGroupId());
         if (activeCount <= 1) {
@@ -179,49 +141,28 @@ public class CategoryServiceImpl implements CategoryService {
     // region Queries
     @Override
     public List<CategoryHierarchyResponseDTO> getCategoryHierarchy() {
-        List<NeedGroup> activeGroups = needGroupRepository.findActiveGroups();
-        if (activeGroups.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<Category> activeCategories = categoryRepository.findActiveCategories();
-        Map<UUID, List<Category>> categoriesByGroupId = activeCategories.stream()
-                .collect(Collectors.groupingBy(Category::getNeedGroupId));
-
-        return activeGroups.stream()
-                .sorted(Comparator.comparing((NeedGroup g) -> g.getTransactionType().name())
-                        .thenComparing(NeedGroup::getName, String.CASE_INSENSITIVE_ORDER))
-                .map(group -> {
-                    List<Category> children = categoriesByGroupId.getOrDefault(group.getNeedGroupId(), Collections.emptyList());
-                    List<CategoryResponseDTO> childDTOs = children.stream()
-                            .sorted(Comparator.comparing(Category::getName, String.CASE_INSENSITIVE_ORDER))
-                            .map(cat -> toResponseDTO(cat, group))
-                            .toList();
-
-                    return new CategoryHierarchyResponseDTO(
-                            group.getTransactionType().name(),
-                            group.getNeedGroupId(),
-                            group.getName(),
-                            group.getStatus().name(),
-                            childDTOs
-                    );
-                })
-                .toList();
+        return CategoryHierarchySupport.buildCategoryHierarchy(needGroupRepository, categoryRepository);
     }
     // endregion
 
     // region Helpers
-    private CategoryResponseDTO toResponseDTO(Category category, NeedGroup parentGroup) {
-        return new CategoryResponseDTO(
-                category.getCategoryId(),
-                category.getName(),
-                parentGroup.getNeedGroupId(),
-                parentGroup.getName(),
-                category.getTransactionType().name(),
-                category.getStatus().name(),
-                LocalDateTime.now()
-        );
+    private Category loadCategoryAndCheckDeleted(UUID categoryId, boolean expectedDeleted) {
+        Category category = EntityLookupSupport.findEntityOrThrow(
+                categoryRepository, categoryId, EntityLookupSupport.LABEL_CATEGORY);
+        if (category.isDeleted() != expectedDeleted) {
+            throw new EntityNotFoundException(ErrorCode.ERR_NOT_FOUND, "Danh mục", categoryId.toString());
+        }
+        return category;
+    }
+
+    private void validateGroupMove(Category category, NeedGroup targetGroup) {
+        if (targetGroup.isDeleted()) {
+            throw new BusinessException(ErrorCode.ERR_CAT_003, "Không thể chuyển danh mục sang nhóm đã xóa.");
+        }
+        if (targetGroup.getTransactionType() != category.getTransactionType()) {
+            throw new BusinessException(ErrorCode.ERR_CAT_001,
+                    "Không được phép đổi loại thu chi hoặc chuyển danh mục sang nhóm khác loại.");
+        }
     }
     // endregion
 }
-

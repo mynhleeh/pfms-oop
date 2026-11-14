@@ -1,7 +1,5 @@
 package com.pfms.service.impl.transaction;
 
-import com.pfms.service.impl.common.EntityLookupSupport;
-
 import com.pfms.common.util.PaginationUtils;
 import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.EntityNotFoundException;
@@ -26,8 +24,8 @@ import com.pfms.presentation.dto.transaction.TransactionListResponseDTO;
 import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
 import com.pfms.presentation.dto.transaction.UpdateTransactionRequestDTO;
 import com.pfms.service.TransactionService;
+import com.pfms.service.impl.common.EntityLookupSupport;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -74,14 +72,8 @@ public class TransactionServiceImpl implements TransactionService {
                 categoryRepository, feeAmount, request.getFeeCategoryId());
 
         IncomeExpenseTransaction transaction = TransactionFactory.createIncomeExpense(
-                category.getTransactionType(),
-                wallet,
-                category,
-                amount,
-                transactionDate,
-                normalizedNote,
-                feeAmount,
-                feeCategory);
+                category.getTransactionType(), wallet, category, amount,
+                transactionDate, normalizedNote, feeAmount, feeCategory);
 
         TransactionPersistenceCoordinator.persistTransactionWithRollback(
                 transactionRepository, walletRepository, wallet, transaction);
@@ -96,38 +88,24 @@ public class TransactionServiceImpl implements TransactionService {
         IncomeExpenseTransaction transaction = loadIncomeExpenseOrThrow(request.getTransactionId());
         Wallet wallet = EntityLookupSupport.loadActiveWallet(walletRepository, transaction.getWallet().getId());
         Category newCategory = EntityLookupSupport.loadActiveCategory(categoryRepository, request.getNewCategoryId());
-
         if (newCategory.getTransactionType() != transaction.getTransactionType()) {
             throw new BusinessException(
                     ErrorCode.ERR_CAT_001, "Loại danh mục mới không tương thích với loại giao dịch.");
         }
 
         Money newAmount = Money.of(request.getNewAmount());
-        Money newFeeAmount = (request.getNewFeeAmount() != null)
-                ? Money.of(request.getNewFeeAmount())
-                : Money.ZERO;
+        Money newFeeAmount = (request.getNewFeeAmount() != null) ? Money.of(request.getNewFeeAmount()) : Money.ZERO;
         TransactionDate newDate = TransactionDate.ofOrToday(request.getNewDate());
         String newNote = Note.of(request.getNewNote(), "Ghi chú giao dịch").getValue();
         Category newFeeCategory = EntityLookupSupport.resolveActiveExpenseFeeCategory(
                 categoryRepository, newFeeAmount, request.getNewFeeCategoryId());
-
         TransactionFee newFee = newFeeAmount.isPositive()
-                ? TransactionFactory.createFee(
-                        transaction.getTransactionId(), newFeeAmount, wallet, newFeeCategory)
+                ? TransactionFactory.createFee(transaction.getTransactionId(), newFeeAmount, wallet, newFeeCategory)
                 : null;
 
-        Wallet walletSnapshot = wallet.copy();
-        Money oldAmount = transaction.getAmount();
-        TransactionDate oldDate = transaction.getTransactionDate();
-        String oldNote = transaction.getNote();
-        Category oldCategory = transaction.getCategory();
-        TransactionFee oldFee = transaction.getFee().orElse(null);
-
-        transaction.updateDetails(wallet, newCategory, newAmount, newDate, newNote, newFee);
-
         TransactionPersistenceCoordinator.persistUpdateWithRollback(
-                transactionRepository, walletRepository, wallet, walletSnapshot,
-                transaction, oldCategory, oldAmount, oldDate, oldNote, oldFee);
+                transactionRepository, walletRepository, wallet, transaction,
+                newCategory, newAmount, newDate, newNote, newFee);
 
         return TransactionQuerySupport.toResponseDTO(transaction, wallet, newCategory, categoryRepository);
     }
@@ -148,11 +126,8 @@ public class TransactionServiceImpl implements TransactionService {
             }
         }
 
-        Wallet walletSnapshot = wallet.copy();
-        revertTransactionBalance(transaction, wallet);
-
         TransactionPersistenceCoordinator.persistDeletionWithRollback(
-                transactionRepository, walletRepository, transaction, wallet, walletSnapshot);
+                transactionRepository, walletRepository, transaction, wallet);
     }
     // endregion
 
@@ -169,45 +144,20 @@ public class TransactionServiceImpl implements TransactionService {
     // endregion
 
     // region Helpers
-    private void revertTransactionBalance(IncomeExpenseTransaction transaction, Wallet wallet) {
-        transaction.revertFromWallet();
-        if (transaction.getWallet() != wallet) {
-            Money fee = transaction.getFee().map(TransactionFee::getAmount).orElse(Money.ZERO);
-            if (fee.isPositive()) {
-                wallet.credit(fee);
-            }
-            if (transaction.getTransactionType() == TransactionType.INCOME) {
-                wallet.debit(transaction.getAmount());
-            } else if (transaction.getTransactionType() == TransactionType.EXPENSE) {
-                wallet.credit(transaction.getAmount());
-            }
-        }
-    }
-
     private void validateRecordRequest(RecordTransactionRequestDTO request) {
         Objects.requireNonNull(request, "Yêu cầu ghi nhận giao dịch không được để null");
         Objects.requireNonNull(request.getWalletId(), "Mã ví không được để null");
         Objects.requireNonNull(request.getCategoryId(), "Mã danh mục không được để null");
-        validateAmountAndFee(request.getAmount(), request.getFeeAmount(), request.getFeeCategoryId());
+        EntityLookupSupport.validateAmountAndFee(
+                request.getAmount(), ErrorCode.ERR_FIN_001, request.getFeeAmount(), request.getFeeCategoryId());
     }
 
     private void validateUpdateRequest(UpdateTransactionRequestDTO request) {
         Objects.requireNonNull(request, "Yêu cầu cập nhật giao dịch không được để null");
         Objects.requireNonNull(request.getTransactionId(), "Mã giao dịch không được để null");
         Objects.requireNonNull(request.getNewCategoryId(), "Mã danh mục mới không được để null");
-        validateAmountAndFee(request.getNewAmount(), request.getNewFeeAmount(), request.getNewFeeCategoryId());
-    }
-
-    private void validateAmountAndFee(BigDecimal amount, BigDecimal feeAmount, UUID feeCategoryId) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(ErrorCode.ERR_FIN_001);
-        }
-        if (feeAmount != null && feeAmount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new BusinessException(ErrorCode.ERR_FEE_001);
-        }
-        if (feeAmount != null && feeAmount.compareTo(BigDecimal.ZERO) > 0 && feeCategoryId == null) {
-            throw new BusinessException(ErrorCode.ERR_FEE_002);
-        }
+        EntityLookupSupport.validateAmountAndFee(
+                request.getNewAmount(), ErrorCode.ERR_FIN_001, request.getNewFeeAmount(), request.getNewFeeCategoryId());
     }
 
     private IncomeExpenseTransaction loadIncomeExpenseOrThrow(UUID transactionId) {

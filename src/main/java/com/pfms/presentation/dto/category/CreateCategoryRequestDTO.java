@@ -26,10 +26,6 @@ public final class CreateCategoryRequestDTO {
         return this.parentGroupId;
     }
 
-    public UUID getNeedGroupId() {
-        return this.parentGroupId;
-    }
-
     public String getName() {
         return this.name;
     }

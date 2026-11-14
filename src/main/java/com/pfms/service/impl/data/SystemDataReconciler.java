@@ -5,13 +5,12 @@ import com.pfms.domain.model.category.NeedGroup;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.Transaction;
-import com.pfms.domain.model.transaction.TransactionFee;
 import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.model.transaction.TransferTransaction;
 import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 import com.pfms.domain.model.wallet.Wallet;
-import com.pfms.presentation.dto.data.ReconciliationIssueDTO;
-import com.pfms.presentation.dto.data.ReconciliationReportDTO;
+import com.pfms.presentation.dto.data.ReconciliationIssueResponseDTO;
+import com.pfms.presentation.dto.data.ReconciliationReportResponseDTO;
 import com.pfms.service.impl.common.EntityLookupSupport;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.UUID;
 
 /**
  * Bộ đối soát nội bộ kiểm tra tính toàn vẹn dữ liệu hệ thống.
- * Quét độc lập 4 điều kiện: số dư ví, giao dịch chuyển tiền, phân cấp danh mục và tính hợp lệ của phụ phí.
+ * Kiểm định số dư ví, phân cấp danh mục và điều phối kiểm tra giao dịch chuyển tiền, phụ phí.
  */
 final class SystemDataReconciler {
 
@@ -33,7 +32,7 @@ final class SystemDataReconciler {
     // endregion
 
     // region Operations
-    static ReconciliationReportDTO reconcile(
+    static ReconciliationReportResponseDTO reconcile(
             List<Wallet> wallets,
             List<Transaction> transactions,
             List<Category> categories,
@@ -44,33 +43,24 @@ final class SystemDataReconciler {
         Map<UUID, Category> categoryMap = EntityLookupSupport.indexById(categories, Category::getCategoryId);
         Map<UUID, NeedGroup> groupMap = EntityLookupSupport.indexById(needGroups, NeedGroup::getNeedGroupId);
 
-        List<ReconciliationIssueDTO> issues = new ArrayList<>();
+        List<ReconciliationIssueResponseDTO> issues = new ArrayList<>();
 
         boolean walletBalanceConsistent = checkWalletBalances(wallets, transactions, adjustments, issues);
-        boolean transferConsistent = checkTransfers(walletMap, transactions, categoryMap, issues);
-        boolean categoryHierarchyConsistent = checkCategoryHierarchy(categories, groupMap, transactions, categoryMap, issues);
-        boolean feeConsistent = checkFees(transactions, categoryMap, issues);
-
-        int scannedWallets = wallets.size();
-        int scannedTransactions = transactions.size();
-        int scannedCategories = categories.size();
-        int scannedAdjustments = adjustments.size();
+        boolean transferConsistent = TransactionIntegrityChecker.checkTransfers(
+                walletMap, transactions, categoryMap, issues);
+        boolean categoryHierarchyConsistent = checkCategoryHierarchy(
+                categories, groupMap, transactions, categoryMap, issues);
+        boolean feeConsistent = TransactionIntegrityChecker.checkFees(
+                transactions, categoryMap, issues);
 
         if (walletBalanceConsistent && transferConsistent && categoryHierarchyConsistent && feeConsistent) {
-            return ReconciliationReportDTO.perfect(
-                    scannedWallets, scannedTransactions, scannedCategories, scannedAdjustments);
+            return ReconciliationReportResponseDTO.perfect(
+                    wallets.size(), transactions.size(), categories.size(), adjustments.size());
         }
 
-        return new ReconciliationReportDTO(
-                walletBalanceConsistent,
-                transferConsistent,
-                categoryHierarchyConsistent,
-                feeConsistent,
-                scannedWallets,
-                scannedTransactions,
-                scannedCategories,
-                scannedAdjustments,
-                issues);
+        return new ReconciliationReportResponseDTO(
+                walletBalanceConsistent, transferConsistent, categoryHierarchyConsistent, feeConsistent,
+                wallets.size(), transactions.size(), categories.size(), adjustments.size(), issues);
     }
     // endregion
 
@@ -79,7 +69,7 @@ final class SystemDataReconciler {
             List<Wallet> wallets,
             List<Transaction> transactions,
             List<BalanceAdjustmentRecord> adjustments,
-            List<ReconciliationIssueDTO> issues) {
+            List<ReconciliationIssueResponseDTO> issues) {
 
         Map<UUID, Money> calculatedBalances = computeNetBalances(transactions, adjustments);
         boolean consistent = true;
@@ -89,7 +79,8 @@ final class SystemDataReconciler {
                 consistent = recordIssue(issues, "BR-FIN-02", "BALANCE_MISMATCH",
                         String.format("Ví [%s] có số dư ghi nhận (%s) không khớp với dòng tiền tính toán (%s), chênh lệch: %s",
                                 wallet.getName(), wallet.getCurrentBalance().formatDisplay(),
-                                calculated.formatDisplay(), wallet.getCurrentBalance().subtract(calculated).formatDisplay()),
+                                calculated.formatDisplay(),
+                                wallet.getCurrentBalance().subtract(calculated).formatDisplay()),
                         wallet.getId().toString(),
                         "Thực hiện kiểm kê đối soát số dư ví hoặc phục hồi dữ liệu từ bản sao lưu gần nhất");
             }
@@ -114,7 +105,8 @@ final class SystemDataReconciler {
             } else if (txn instanceof TransferTransaction trf) {
                 map.merge(trf.getSourceWallet().getId(), Money.ZERO.subtract(trf.getAmount()), Money::add);
                 if (trf.getFee().isPresent()) {
-                    map.merge(trf.getSourceWallet().getId(), Money.ZERO.subtract(trf.getFee().get().getAmount()), Money::add);
+                    map.merge(trf.getSourceWallet().getId(),
+                            Money.ZERO.subtract(trf.getFee().get().getAmount()), Money::add);
                 }
                 map.merge(trf.getDestinationWallet().getId(), trf.getAmount(), Money::add);
             }
@@ -125,60 +117,12 @@ final class SystemDataReconciler {
         return map;
     }
 
-    private static boolean checkTransfers(
-            Map<UUID, Wallet> walletMap,
-            List<Transaction> transactions,
-            Map<UUID, Category> categoryMap,
-            List<ReconciliationIssueDTO> issues) {
-
-        boolean consistent = true;
-        for (Transaction txn : transactions) {
-            if (!(txn instanceof TransferTransaction trf)) {
-                continue;
-            }
-            UUID srcId = trf.getSourceWallet().getId();
-            UUID dstId = trf.getDestinationWallet().getId();
-            String txnIdStr = trf.getTransactionId().toString();
-
-            if (srcId.equals(dstId)) {
-                consistent = recordIssue(issues, "BR-FIN-03", "TRANSFER_INCONSISTENCY",
-                        String.format("Giao dịch chuyển tiền [%s] có ví nguồn trùng với ví đích", trf.getTransactionId()),
-                        txnIdStr, "Hủy bỏ giao dịch chuyển tiền trùng ví hoặc cập nhật lại ví đích");
-            }
-            if (!walletMap.containsKey(srcId)) {
-                consistent = recordIssue(issues, "BR-FIN-03", "TRANSFER_INCONSISTENCY",
-                        String.format("Giao dịch chuyển tiền [%s] trỏ tới ví nguồn [%s] không tồn tại", trf.getTransactionId(), srcId),
-                        txnIdStr, "Kiểm tra lại tính hợp lệ của ví nguồn");
-            }
-            if (!walletMap.containsKey(dstId)) {
-                consistent = recordIssue(issues, "BR-FIN-03", "TRANSFER_INCONSISTENCY",
-                        String.format("Giao dịch chuyển tiền [%s] trỏ tới ví đích [%s] không tồn tại", trf.getTransactionId(), dstId),
-                        txnIdStr, "Kiểm tra lại tính hợp lệ của ví đích");
-            }
-            if (trf.getFee().isPresent()) {
-                TransactionFee fee = trf.getFee().get();
-                if (!fee.getWallet().getId().equals(srcId)) {
-                    consistent = recordIssue(issues, "BR-FIN-02", "TRANSFER_INCONSISTENCY",
-                            String.format("Phí của giao dịch chuyển tiền [%s] không ghi nhận vào ví nguồn", trf.getTransactionId()),
-                            txnIdStr, "Gán lại mã ví của phụ phí chuyển tiền khớp với ví nguồn");
-                }
-                Category feeCat = categoryMap.get(fee.getCategory().getCategoryId());
-                if (feeCat == null || feeCat.getTransactionType() != TransactionType.EXPENSE) {
-                    consistent = recordIssue(issues, "BR-FIN-04", "TRANSFER_INCONSISTENCY",
-                            String.format("Phụ phí của chuyển tiền [%s] gắn với danh mục không hợp lệ hoặc không phải chi phí", trf.getTransactionId()),
-                            txnIdStr, "Gán lại danh mục chi phí hợp lệ cho phụ phí chuyển tiền");
-                }
-            }
-        }
-        return consistent;
-    }
-
     private static boolean checkCategoryHierarchy(
             List<Category> categories,
             Map<UUID, NeedGroup> groupMap,
             List<Transaction> transactions,
             Map<UUID, Category> categoryMap,
-            List<ReconciliationIssueDTO> issues) {
+            List<ReconciliationIssueResponseDTO> issues) {
 
         boolean consistent = true;
         for (Category cat : categories) {
@@ -204,7 +148,8 @@ final class SystemDataReconciler {
             Category cat = categoryMap.get(ie.getCategory().getCategoryId());
             if (cat == null) {
                 consistent = recordIssue(issues, "BR-FIN-04", "CATEGORY_INCONSISTENCY",
-                        String.format("Giao dịch [%s] trỏ tới danh mục [%s] không tồn tại", ie.getTransactionId(), ie.getCategory().getCategoryId()),
+                        String.format("Giao dịch [%s] trỏ tới danh mục [%s] không tồn tại",
+                                ie.getTransactionId(), ie.getCategory().getCategoryId()),
                         txnIdStr, "Gán lại danh mục phân loại hợp lệ cho giao dịch");
             } else if (cat.getTransactionType() != ie.getTransactionType()) {
                 consistent = recordIssue(issues, "BR-FIN-04", "CATEGORY_INCONSISTENCY",
@@ -216,46 +161,15 @@ final class SystemDataReconciler {
         return consistent;
     }
 
-    private static boolean checkFees(
-            List<Transaction> transactions,
-            Map<UUID, Category> categoryMap,
-            List<ReconciliationIssueDTO> issues) {
-
-        boolean consistent = true;
-        for (Transaction txn : transactions) {
-            if (txn.getFee().isEmpty()) {
-                continue;
-            }
-            TransactionFee fee = txn.getFee().get();
-            String feeIdStr = fee.getFeeId().toString();
-            if (!fee.getParentTransactionId().equals(txn.getTransactionId())) {
-                consistent = recordIssue(issues, "BR-FIN-02", "FEE_INCONSISTENCY",
-                        String.format("Phụ phí [%s] có mã giao dịch cha không khớp với giao dịch [%s]", fee.getFeeId(), txn.getTransactionId()),
-                        feeIdStr, "Cập nhật lại mã giao dịch cha cho phụ phí");
-            }
-            Category feeCat = categoryMap.get(fee.getCategory().getCategoryId());
-            if (feeCat == null) {
-                consistent = recordIssue(issues, "BR-FIN-04", "FEE_INCONSISTENCY",
-                        String.format("Phụ phí [%s] trỏ tới danh mục không tồn tại", fee.getFeeId()),
-                        feeIdStr, "Gán danh mục chi phí hợp lệ cho phụ phí");
-            } else if (feeCat.getTransactionType() != TransactionType.EXPENSE) {
-                consistent = recordIssue(issues, "BR-FIN-04", "FEE_INCONSISTENCY",
-                        String.format("Danh mục của phụ phí [%s] phải thuộc loại EXPENSE", fee.getFeeId()),
-                        feeIdStr, "Chuyển danh mục phụ phí sang danh mục loại chi phí");
-            }
-        }
-        return consistent;
-    }
-
     private static boolean recordIssue(
-            List<ReconciliationIssueDTO> issues,
+            List<ReconciliationIssueResponseDTO> issues,
             String ruleCode,
             String issueType,
             String message,
             String entityId,
             String suggestion) {
 
-        issues.add(new ReconciliationIssueDTO("ERROR", ruleCode, issueType, message, entityId, suggestion));
+        issues.add(new ReconciliationIssueResponseDTO("ERROR", ruleCode, issueType, message, entityId, suggestion));
         return false;
     }
     // endregion

@@ -25,10 +25,10 @@ class RenameCategoryRequestDTOTest {
                     sampleCategoryId, "Ăn nhà hàng", sampleNewParentGroupId);
 
             assertEquals(sampleCategoryId, dto.getCategoryId());
-            assertEquals(sampleCategoryId, dto.getId());
             assertEquals("Ăn nhà hàng", dto.getName());
             assertEquals(sampleNewParentGroupId, dto.getNewParentGroupId());
             assertTrue(dto.hasNewParentGroup());
+            assertThrows(NoSuchMethodException.class, () -> RenameCategoryRequestDTO.class.getMethod("getId"));
         }
 
         @Test

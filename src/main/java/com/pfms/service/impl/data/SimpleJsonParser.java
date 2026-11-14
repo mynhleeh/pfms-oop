@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Bộ phân tích cú pháp chuỗi JSON thuần túy sang cây cấu trúc Map, List và kiểu nguyên thủy.
- * Hoạt động theo cơ chế recursive descent lexer/parser độc lập không phụ thuộc thư viện ngoài.
+ * Hoạt động theo cơ chế recursive descent parser độc lập không phụ thuộc thư viện ngoài.
  */
 final class SimpleJsonParser {
 
@@ -45,77 +45,69 @@ final class SimpleJsonParser {
             throw new IllegalArgumentException("Kết thúc dữ liệu JSON bất thường");
         }
         char c = src.charAt(pos);
-        if (c == '{') {
-            return parseObject();
-        } else if (c == '[') {
-            return parseArray();
-        } else if (c == '"') {
-            return parseString();
-        } else if (c == 't' || c == 'f') {
-            return parseBoolean();
-        } else if (c == 'n') {
-            return parseNull();
-        } else if (c == '-' || Character.isDigit(c)) {
-            return parseNumber();
-        }
-        throw new IllegalArgumentException("Ký tự không hợp lệ tại vị trí " + pos + ": " + c);
+        return switch (c) {
+            case '{' -> parseObject();
+            case '[' -> parseArray();
+            case '"' -> parseString();
+            case 't' -> parseLiteral("true", Boolean.TRUE);
+            case 'f' -> parseLiteral("false", Boolean.FALSE);
+            case 'n' -> parseLiteral("null", null);
+            default -> {
+                if (c == '-' || Character.isDigit(c)) {
+                    yield parseNumber();
+                }
+                throw new IllegalArgumentException("Ký tự không hợp lệ tại vị trí " + pos + ": " + c);
+            }
+        };
     }
 
     private Map<String, Object> parseObject() {
         Map<String, Object> map = new LinkedHashMap<>();
         expect('{');
-        skipWhitespace();
-        if (peek() == '}') {
-            pos++;
+        if (consumeIf('}')) {
             return map;
         }
-        while (true) {
+        do {
             skipWhitespace();
             if (peek() != '"') {
                 throw new IllegalArgumentException("Mong đợi khóa chuỗi tại vị trí " + pos);
             }
             String key = parseString();
-            skipWhitespace();
             expect(':');
-            Object val = parseValue();
-            map.put(key, val);
-            skipWhitespace();
-            char next = peek();
-            if (next == '}') {
-                pos++;
-                break;
-            } else if (next == ',') {
-                pos++;
-            } else {
-                throw new IllegalArgumentException("Mong đợi ',' hoặc '}' tại vị trí " + pos);
-            }
-        }
+            map.put(key, parseValue());
+        } while (consumeCommaOrClose('}'));
         return map;
     }
 
     private List<Object> parseArray() {
         List<Object> list = new ArrayList<>();
         expect('[');
-        skipWhitespace();
-        if (peek() == ']') {
-            pos++;
+        if (consumeIf(']')) {
             return list;
         }
-        while (true) {
-            Object val = parseValue();
-            list.add(val);
-            skipWhitespace();
-            char next = peek();
-            if (next == ']') {
-                pos++;
-                break;
-            } else if (next == ',') {
-                pos++;
-            } else {
-                throw new IllegalArgumentException("Mong đợi ',' hoặc ']' tại vị trí " + pos);
-            }
-        }
+        do {
+            list.add(parseValue());
+        } while (consumeCommaOrClose(']'));
         return list;
+    }
+
+    private boolean consumeIf(char target) {
+        skipWhitespace();
+        if (peek() == target) {
+            pos++;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean consumeCommaOrClose(char closeChar) {
+        if (consumeIf(closeChar)) {
+            return false;
+        }
+        if (consumeIf(',')) {
+            return true;
+        }
+        throw new IllegalArgumentException("Mong đợi ',' hoặc '" + closeChar + "' tại vị trí " + pos);
     }
 
     private String parseString() {
@@ -126,54 +118,41 @@ final class SimpleJsonParser {
             if (c == '"') {
                 return sb.toString();
             }
-            if (c == '\\') {
-                if (pos >= src.length()) {
-                    throw new IllegalArgumentException("Ký tự thoát không hợp lệ cuối chuỗi");
-                }
-                char esc = src.charAt(pos++);
-                switch (esc) {
-                    case '"' -> sb.append('"');
-                    case '\\' -> sb.append('\\');
-                    case '/' -> sb.append('/');
-                    case 'b' -> sb.append('\b');
-                    case 'f' -> sb.append('\f');
-                    case 'n' -> sb.append('\n');
-                    case 'r' -> sb.append('\r');
-                    case 't' -> sb.append('\t');
-                    case 'u' -> {
-                        if (pos + 4 > src.length()) {
-                            throw new IllegalArgumentException("Ký tự unicode không đủ 4 chữ số");
-                        }
-                        String hex = src.substring(pos, pos + 4);
-                        sb.append((char) Integer.parseInt(hex, 16));
-                        pos += 4;
-                    }
-                    default -> throw new IllegalArgumentException("Ký tự thoát không hợp lệ: \\" + esc);
-                }
-            } else {
-                sb.append(c);
-            }
+            sb.append(c == '\\' ? readEscapedChar() : c);
         }
         throw new IllegalArgumentException("Chuỗi ký tự không đóng dấu nháy kép");
     }
 
-    private Boolean parseBoolean() {
-        if (src.startsWith("true", pos)) {
-            pos += 4;
-            return Boolean.TRUE;
-        } else if (src.startsWith("false", pos)) {
-            pos += 5;
-            return Boolean.FALSE;
+    private char readEscapedChar() {
+        if (pos >= src.length()) {
+            throw new IllegalArgumentException("Ký tự thoát không hợp lệ cuối chuỗi");
         }
-        throw new IllegalArgumentException("Giá trị boolean không hợp lệ tại vị trí " + pos);
+        char esc = src.charAt(pos++);
+        return switch (esc) {
+            case '"', '\\', '/' -> esc;
+            case 'b' -> '\b';
+            case 'f' -> '\f';
+            case 'n' -> '\n';
+            case 'r' -> '\r';
+            case 't' -> '\t';
+            case 'u' -> {
+                if (pos + 4 > src.length()) {
+                    throw new IllegalArgumentException("Ký tự unicode không đủ 4 chữ số");
+                }
+                char unicodeChar = (char) Integer.parseInt(src.substring(pos, pos + 4), 16);
+                pos += 4;
+                yield unicodeChar;
+            }
+            default -> throw new IllegalArgumentException("Ký tự thoát không hợp lệ: \\" + esc);
+        };
     }
 
-    private Object parseNull() {
-        if (src.startsWith("null", pos)) {
-            pos += 4;
-            return null;
+    private Object parseLiteral(String literal, Object value) {
+        if (src.startsWith(literal, pos)) {
+            pos += literal.length();
+            return value;
         }
-        throw new IllegalArgumentException("Giá trị null không hợp lệ tại vị trí " + pos);
+        throw new IllegalArgumentException("Giá trị JSON không hợp lệ tại vị trí " + pos);
     }
 
     private String parseNumber() {
@@ -181,16 +160,18 @@ final class SimpleJsonParser {
         if (src.charAt(pos) == '-') {
             pos++;
         }
+        consumeDigits();
+        if (pos < src.length() && src.charAt(pos) == '.') {
+            pos++;
+            consumeDigits();
+        }
+        return src.substring(start, pos);
+    }
+
+    private void consumeDigits() {
         while (pos < src.length() && Character.isDigit(src.charAt(pos))) {
             pos++;
         }
-        if (pos < src.length() && src.charAt(pos) == '.') {
-            pos++;
-            while (pos < src.length() && Character.isDigit(src.charAt(pos))) {
-                pos++;
-            }
-        }
-        return src.substring(start, pos);
     }
 
     private void skipWhitespace() {

@@ -3,9 +3,7 @@ package com.pfms.service;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.category.CreateCategoryRequestDTO;
-import com.pfms.presentation.dto.category.DeleteCategoryRequestDTO;
 import com.pfms.presentation.dto.category.RenameCategoryRequestDTO;
-import com.pfms.presentation.dto.category.RestoreCategoryRequestDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,15 +21,7 @@ public interface CategoryService {
 
     CategoryResponseDTO restoreCategory(UUID categoryId);
 
-    default CategoryResponseDTO restoreCategory(RestoreCategoryRequestDTO request) {
-        return restoreCategory(request != null ? request.getCategoryId() : null);
-    }
-
     void deleteCategory(UUID categoryId);
-
-    default void deleteCategory(DeleteCategoryRequestDTO request) {
-        deleteCategory(request != null ? request.getCategoryId() : null);
-    }
     // endregion
 
     // region Queries

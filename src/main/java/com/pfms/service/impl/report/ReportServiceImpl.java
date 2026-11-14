@@ -13,8 +13,8 @@ import com.pfms.domain.repository.NeedGroupRepository;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.presentation.dto.report.CashFlowReportRequestDTO;
 import com.pfms.presentation.dto.report.CashFlowReportResponseDTO;
+import com.pfms.presentation.dto.report.SpendingStructureReportRequestDTO;
 import com.pfms.presentation.dto.report.SpendingStructureReportResponseDTO;
-import com.pfms.presentation.dto.report.SpendingStructureRequestDTO;
 import com.pfms.service.ReportService;
 
 import java.time.LocalDate;
@@ -27,7 +27,8 @@ import java.util.UUID;
 
 /**
  * Cài đặt dịch vụ báo cáo thống kê ({@link ReportService}).
- * Trích xuất dữ liệu giao dịch ở chế độ chỉ đọc và ủy quyền tính toán số liệu cho {@link ReportDataAggregator}.
+ * Trích xuất dữ liệu giao dịch ở chế độ chỉ đọc và ủy quyền tính toán cho
+ * {@link CashFlowAggregator} và {@link SpendingStructureAggregator}.
  */
 public class ReportServiceImpl implements ReportService {
 
@@ -66,12 +67,12 @@ public class ReportServiceImpl implements ReportService {
         List<Transaction> transactions = this.transactionRepository.findByDateRange(
                 startYm.atDay(1), endYm.atEndOfMonth());
 
-        return ReportDataAggregator.aggregateCashFlow(startYm, transactions);
+        return CashFlowAggregator.aggregateCashFlow(startYm, transactions);
     }
 
     @Override
     public SpendingStructureReportResponseDTO generateSpendingStructureReport(
-            SpendingStructureRequestDTO request) {
+            SpendingStructureReportRequestDTO request) {
 
         TransactionType targetType = validateStructureRequest(request);
         LocalDate startDate = request.getStartDate();
@@ -85,7 +86,7 @@ public class ReportServiceImpl implements ReportService {
 
         List<Transaction> transactions = this.transactionRepository.findByDateRange(priorStartDate, endDate);
 
-        return ReportDataAggregator.calculateSpendingStructure(
+        return SpendingStructureAggregator.calculateSpendingStructure(
                 targetType, startDate, endDate, priorStartDate, transactions, liveCategoriesById, liveNeedGroupsById);
     }
     // endregion
@@ -101,7 +102,7 @@ public class ReportServiceImpl implements ReportService {
         return YearMonth.of(request.getEndYear(), request.getEndMonth());
     }
 
-    private static TransactionType validateStructureRequest(SpendingStructureRequestDTO request) {
+    private static TransactionType validateStructureRequest(SpendingStructureReportRequestDTO request) {
         if (request == null || request.getStartDate() == null || request.getEndDate() == null
                 || request.getStartDate().isAfter(request.getEndDate())) {
             throw new BusinessException(ErrorCode.ERR_REP_001);

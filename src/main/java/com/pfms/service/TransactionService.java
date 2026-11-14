@@ -1,6 +1,5 @@
 package com.pfms.service;
 
-import com.pfms.presentation.dto.transaction.DeleteTransactionRequestDTO;
 import com.pfms.presentation.dto.transaction.FilterTransactionsRequestDTO;
 import com.pfms.presentation.dto.transaction.RecordTransactionRequestDTO;
 import com.pfms.presentation.dto.transaction.TransactionListResponseDTO;
@@ -21,10 +20,6 @@ public interface TransactionService {
     TransactionResponseDTO updateTransaction(UpdateTransactionRequestDTO request);
 
     void deleteTransaction(UUID transactionId);
-
-    default void deleteTransaction(DeleteTransactionRequestDTO request) {
-        deleteTransaction(request != null ? request.getTransactionId() : null);
-    }
     // endregion
 
     // region Queries

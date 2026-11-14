@@ -101,10 +101,6 @@ public final class TransactionResponseDTO {
         return this.transactionId;
     }
 
-    public UUID getId() {
-        return this.transactionId;
-    }
-
     public UUID getWalletId() {
         return this.walletId;
     }
@@ -138,10 +134,6 @@ public final class TransactionResponseDTO {
     }
 
     public boolean hasFee() {
-        return this.hasFee;
-    }
-
-    public boolean isHasFee() {
         return this.hasFee;
     }
 

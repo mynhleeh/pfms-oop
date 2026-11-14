@@ -18,7 +18,6 @@ import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.repository.CategoryRepository;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
-import com.pfms.presentation.dto.transaction.DeleteTransactionRequestDTO;
 import com.pfms.presentation.dto.transaction.FilterTransactionsRequestDTO;
 import com.pfms.presentation.dto.transaction.RecordTransactionRequestDTO;
 import com.pfms.presentation.dto.transaction.TransactionListResponseDTO;
@@ -324,7 +323,7 @@ class TransactionServiceImplTest {
             assertEquals("INCOME", response.getTransactionType());
             assertEquals("Tiền lương thưởng", response.getNote());
             assertEquals(new BigDecimal("1500000.00"), response.getWalletBalanceAfter());
-            assertFalse(response.isHasFee());
+            assertFalse(response.hasFee());
             assertEquals(BigDecimal.ZERO, response.getFeeAmount());
             assertNull(response.getFeeCategoryId());
 
@@ -355,7 +354,7 @@ class TransactionServiceImplTest {
             assertEquals("EXPENSE", response.getTransactionType());
             assertEquals("Đi siêu thị", response.getNote());
             assertEquals(new BigDecimal("795000.00"), response.getWalletBalanceAfter());
-            assertTrue(response.isHasFee());
+            assertTrue(response.hasFee());
             assertEquals(new BigDecimal("5000.00"), response.getFeeAmount());
             assertEquals(feeCategoryId, response.getFeeCategoryId());
             assertEquals("Phí dịch vụ", response.getFeeCategoryName());
@@ -731,7 +730,7 @@ class TransactionServiceImplTest {
             assertEquals(newCategoryId, response.getCategoryId());
             assertEquals("Mua sắm", response.getCategoryName());
             assertEquals("Ăn tối buffet hải sản", response.getNote());
-            assertTrue(response.isHasFee());
+            assertTrue(response.hasFee());
             assertEquals(new BigDecimal("10000.00"), response.getFeeAmount());
             assertEquals(feeCategoryId, response.getFeeCategoryId());
             assertEquals("Phí dịch vụ", response.getFeeCategoryName());
@@ -767,7 +766,7 @@ class TransactionServiceImplTest {
             TransactionResponseDTO response = transactionService.updateTransaction(req);
 
             assertNotNull(response);
-            assertFalse(response.isHasFee());
+            assertFalse(response.hasFee());
             assertEquals(BigDecimal.ZERO, response.getFeeAmount());
             assertNull(response.getFeeCategoryId());
             assertEquals(new BigDecimal("900000.00"), response.getWalletBalanceAfter());
@@ -858,7 +857,7 @@ class TransactionServiceImplTest {
         @Test
         @DisplayName("Ném NullPointerException khi transactionId là null")
         void shouldThrowWhenTransactionIdIsNull() {
-            assertThrows(NullPointerException.class, () -> transactionService.deleteTransaction((UUID) null));
+            assertThrows(NullPointerException.class, () -> transactionService.deleteTransaction(null));
         }
 
         @Test
@@ -924,14 +923,13 @@ class TransactionServiceImplTest {
         }
 
         @Test
-        @DisplayName("Xóa giao dịch thành công qua overload DeleteTransactionRequestDTO")
-        void shouldDeleteTransactionViaDtoOverloadSuccessfully() {
+        @DisplayName("Xóa giao dịch chi tiêu không có phụ phí thành công, hoàn trả số tiền về ví")
+        void shouldDeleteExpenseWithoutFeeSuccessfully() {
             when(transactionRepository.findById(liveExpenseTxn.getTransactionId()))
                     .thenReturn(Optional.of(liveExpenseTxn));
             when(walletRepository.findById(activeWallet.getId())).thenReturn(Optional.of(activeWallet));
 
-            DeleteTransactionRequestDTO request = new DeleteTransactionRequestDTO(liveExpenseTxn.getTransactionId());
-            transactionService.deleteTransaction(request);
+            transactionService.deleteTransaction(liveExpenseTxn.getTransactionId());
 
             verify(transactionRepository).deleteById(liveExpenseTxn.getTransactionId());
             verify(walletRepository).save(activeWallet);

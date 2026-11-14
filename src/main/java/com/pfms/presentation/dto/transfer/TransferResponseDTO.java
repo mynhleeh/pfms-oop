@@ -92,10 +92,6 @@ public final class TransferResponseDTO {
         return this.transferId;
     }
 
-    public UUID getId() {
-        return this.transferId;
-    }
-
     public UUID getSourceWalletId() {
         return this.sourceWalletId;
     }
@@ -126,10 +122,6 @@ public final class TransferResponseDTO {
 
     public boolean hasFee() {
         return this.feeAmount.compareTo(BigDecimal.ZERO) > 0;
-    }
-
-    public boolean isHasFee() {
-        return this.hasFee();
     }
 
     public BigDecimal getFeeAmount() {

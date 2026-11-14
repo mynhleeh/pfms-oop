@@ -19,8 +19,8 @@ import com.pfms.presentation.dto.report.CashFlowReportResponseDTO;
 import com.pfms.presentation.dto.report.CategoryShareResponseDTO;
 import com.pfms.presentation.dto.report.MonthlyCashFlowResponseDTO;
 import com.pfms.presentation.dto.report.NeedGroupShareResponseDTO;
+import com.pfms.presentation.dto.report.SpendingStructureReportRequestDTO;
 import com.pfms.presentation.dto.report.SpendingStructureReportResponseDTO;
-import com.pfms.presentation.dto.report.SpendingStructureRequestDTO;
 import com.pfms.service.ReportService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -190,7 +190,7 @@ class ReportServiceImplTest {
             assertEquals(new BigDecimal("250000.00"), report.getAvgIncome());
             assertEquals(new BigDecimal("103333.33"), report.getAvgExpense());
             assertEquals(new BigDecimal("146666.67"), report.getAvgNetCashFlow());
-            assertEquals(report, reportService.generateCashFlowReport(3, 2025));
+            assertEquals(report, reportService.generateCashFlowReport(new CashFlowReportRequestDTO(3, 2025)));
         }
 
         @Test
@@ -199,7 +199,7 @@ class ReportServiceImplTest {
             recordTx(TransactionType.INCOME, primaryWallet, salaryCategory, "0.06", LocalDate.of(2025, 1, 15), null);
             recordTx(TransactionType.EXPENSE, primaryWallet, foodCategory, "0.18", LocalDate.of(2025, 1, 16), null);
 
-            CashFlowReportResponseDTO report = reportService.generateCashFlowReport(6, 2025);
+            CashFlowReportResponseDTO report = reportService.generateCashFlowReport(new CashFlowReportRequestDTO(6, 2025));
 
             assertEquals(12, report.getMonthCount());
             assertEquals(new BigDecimal("0.00"), report.getAvgIncome());
@@ -259,7 +259,7 @@ class ReportServiceImplTest {
             recordTx(TransactionType.INCOME, primaryWallet, salaryCategory, "5000000.00", LocalDate.of(2025, 5, 15), "40000.00");
 
             SpendingStructureReportResponseDTO report = reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(start, end, null));
+                    new SpendingStructureReportRequestDTO(start, end, null));
 
             assertEquals("EXPENSE", report.getTransactionType());
             assertEquals(start, report.getStartDate());
@@ -316,7 +316,7 @@ class ReportServiceImplTest {
             recordTransfer(primaryWallet, secondaryWallet, "2000000.00", LocalDate.of(2025, 6, 11), "10000.00");
 
             SpendingStructureReportResponseDTO report = reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(start, end, "  income  "));
+                    new SpendingStructureReportRequestDTO(start, end, "  income  "));
 
             assertEquals("INCOME", report.getTransactionType());
             assertEquals(new BigDecimal("10000000.00"), report.getTotalAmount());
@@ -363,7 +363,7 @@ class ReportServiceImplTest {
             needGroupRepository.save(leisureGroup);
 
             SpendingStructureReportResponseDTO report = reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(start, end, "EXPENSE"));
+                    new SpendingStructureReportRequestDTO(start, end, "EXPENSE"));
 
             assertEquals(new BigDecimal("650000.00"), report.getTotalAmount());
             assertEquals(3, report.getGroupCount());
@@ -421,7 +421,7 @@ class ReportServiceImplTest {
             recordTx(TransactionType.EXPENSE, primaryWallet, shoppingCategory, "100000.00", LocalDate.of(2025, 6, 25), null);
 
             SpendingStructureReportResponseDTO report = reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(start, end, "EXPENSE"));
+                    new SpendingStructureReportRequestDTO(start, end, "EXPENSE"));
 
             // Root totals: current = 300,000, prior = 400,000, diff = -100,000, pct = -25.00%
             assertEquals(new BigDecimal("300000.00"), report.getTotalAmount());
@@ -458,7 +458,7 @@ class ReportServiceImplTest {
         void shouldHandleZeroCurrentVsZeroAndPositivePrior() {
             // Case 1: 0 / 0
             SpendingStructureReportResponseDTO zeroBoth = reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(LocalDate.of(2025, 8, 1), LocalDate.of(2025, 8, 5), "EXPENSE"));
+                    new SpendingStructureReportRequestDTO(LocalDate.of(2025, 8, 1), LocalDate.of(2025, 8, 5), "EXPENSE"));
             assertEquals(new BigDecimal("0.00"), zeroBoth.getTotalAmount());
             assertEquals(new BigDecimal("0.00"), zeroBoth.getPreviousTotalAmount());
             assertEquals(new BigDecimal("0.00"), zeroBoth.getDifferenceAmount());
@@ -470,7 +470,7 @@ class ReportServiceImplTest {
             recordTx(TransactionType.EXPENSE, primaryWallet, foodCategory, "250000.00", LocalDate.of(2025, 8, 3), null);
 
             SpendingStructureReportResponseDTO droppedToZero = reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(LocalDate.of(2025, 8, 6), LocalDate.of(2025, 8, 10), "EXPENSE"));
+                    new SpendingStructureReportRequestDTO(LocalDate.of(2025, 8, 6), LocalDate.of(2025, 8, 10), "EXPENSE"));
             assertEquals(new BigDecimal("0.00"), droppedToZero.getTotalAmount());
             assertEquals(new BigDecimal("250000.00"), droppedToZero.getPreviousTotalAmount());
             assertEquals(new BigDecimal("-250000.00"), droppedToZero.getDifferenceAmount());
@@ -492,7 +492,7 @@ class ReportServiceImplTest {
 
             reportService.generateCashFlowReport(new CashFlowReportRequestDTO(9, 2025));
             SpendingStructureReportResponseDTO futureStructure = reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20), "EXPENSE"));
+                    new SpendingStructureReportRequestDTO(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20), "EXPENSE"));
 
             assertEquals(new BigDecimal("0.00"), futureStructure.getTotalAmount());
             assertTrue(futureStructure.getGroups().isEmpty());
@@ -535,7 +535,7 @@ class ReportServiceImplTest {
                     countingRepo, categoryRepository, needGroupRepository);
 
             SpendingStructureReportResponseDTO report = optimizedService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(start, end, "EXPENSE"));
+                    new SpendingStructureReportRequestDTO(start, end, "EXPENSE"));
 
             assertEquals(1, queryCount.get());
             assertEquals(expectedPriorStart, capturedRange[0]);
@@ -568,25 +568,24 @@ class ReportServiceImplTest {
             assertErrRep001(() -> reportService.generateCashFlowReport(new CashFlowReportRequestDTO(0, 2025)));
             assertErrRep001(() -> reportService.generateCashFlowReport(new CashFlowReportRequestDTO(13, 2025)));
             assertErrRep001(() -> reportService.generateCashFlowReport(new CashFlowReportRequestDTO(5, 1999)));
-            assertErrRep001(() -> reportService.generateCashFlowReport(0, 2025));
         }
 
         @Test
-        @DisplayName("Throws BusinessException ERR_REP_001 for invalid SpendingStructureRequestDTO inputs")
+        @DisplayName("Throws BusinessException ERR_REP_001 for invalid SpendingStructureReportRequestDTO inputs")
         void shouldThrowErrRep001ForInvalidSpendingStructureRequests() {
             LocalDate today = LocalDate.of(2025, 5, 10);
 
             assertErrRep001(() -> reportService.generateSpendingStructureReport(null));
             assertErrRep001(() -> reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(null, today, "EXPENSE")));
+                    new SpendingStructureReportRequestDTO(null, today, "EXPENSE")));
             assertErrRep001(() -> reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(today, null, "EXPENSE")));
+                    new SpendingStructureReportRequestDTO(today, null, "EXPENSE")));
             assertErrRep001(() -> reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(today, today.minusDays(1), "EXPENSE")));
+                    new SpendingStructureReportRequestDTO(today, today.minusDays(1), "EXPENSE")));
             assertErrRep001(() -> reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(today.minusDays(5), today, "TRANSFER")));
+                    new SpendingStructureReportRequestDTO(today.minusDays(5), today, "TRANSFER")));
             assertErrRep001(() -> reportService.generateSpendingStructureReport(
-                    new SpendingStructureRequestDTO(today.minusDays(5), today, "UNKNOWN")));
+                    new SpendingStructureReportRequestDTO(today.minusDays(5), today, "UNKNOWN")));
         }
 
         private void assertErrRep001(org.junit.jupiter.api.function.Executable action) {
