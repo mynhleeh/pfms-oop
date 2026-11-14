@@ -1026,36 +1026,33 @@ sequenceDiagram
     participant DataService as DataManagementServiceImpl
     participant WalletRepo as WalletRepository
     participant TxnRepo as TransactionRepository
-    participant TransferRepo as TransferRepository
     participant CategoryRepo as CategoryRepository
     participant NeedGroupRepo as NeedGroupRepository
     participant AdjRepo as BalanceAdjustmentRepository
-    participant StorageAdapter as JsonStorageAdapter
+    participant StorageAdapter as JsonDataStore
 
     User->>+GUI: 1. Nhập lệnh xuất sao lưu (destinationPath, scope)
-    GUI->>+DataService: 2. exportBackupData(ExportBackupRequestDto)
+    GUI->>+DataService: 2. exportBackupData(ExportBackupRequestDTO)
     DataService->>+WalletRepo: 3. findAll()
     WalletRepo-->>-DataService: 4. List<Wallet>
     DataService->>+TxnRepo: 5. findAll()
-    TxnRepo-->>-DataService: 6. List<IncomeExpenseTransaction>
-    DataService->>+TransferRepo: 7. findAll()
-    TransferRepo-->>-DataService: 8. List<TransferTransaction>
-    DataService->>+CategoryRepo: 9. findAll()
-    CategoryRepo-->>-DataService: 10. List<Category>
-    DataService->>+NeedGroupRepo: 11. findAll()
-    NeedGroupRepo-->>-DataService: 12. List<NeedGroup>
-    DataService->>+AdjRepo: 13. findAll()
-    AdjRepo-->>-DataService: 14. List<BalanceAdjustmentRecord>
-    DataService->>DataService: 15. tổng hợp dữ liệu vào BackupPayloadDto
-    DataService->>+StorageAdapter: 16. writeBackupFile(destinationPath, backupPayloadDto)
+    TxnRepo-->>-DataService: 6. List<Transaction>
+    DataService->>+CategoryRepo: 7. findAll()
+    CategoryRepo-->>-DataService: 8. List<Category>
+    DataService->>+NeedGroupRepo: 9. findAll()
+    NeedGroupRepo-->>-DataService: 10. List<NeedGroup>
+    DataService->>+AdjRepo: 11. findAll()
+    AdjRepo-->>-DataService: 12. List<BalanceAdjustmentRecord>
+    DataService->>DataService: 13. tổng hợp dữ liệu vào BackupPayloadDTO
+    DataService->>+StorageAdapter: 14. writeBackupFile(destinationPath, backupPayloadDTO)
     alt Sự cố I/O, lỗi quyền ghi hoặc không đủ dung lượng đĩa
-        StorageAdapter-->>DataService: 17. ném StorageException
-        DataService-->>GUI: 18. ném StorageException
-        GUI-->>User: 19. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
+        StorageAdapter-->>DataService: 15. ném StorageException
+        DataService-->>GUI: 16. ném StorageException
+        GUI-->>User: 17. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
     else Ghi tệp sao lưu an toàn thành công
-        StorageAdapter-->>-DataService: 20. BackupFileMetadata
-        DataService-->>-GUI: 21. phản hồi xuất sao lưu thành công kèm đường dẫn tệp
-        GUI-->>-User: 22. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
+        StorageAdapter-->>-DataService: 18. BackupFileMetadata
+        DataService-->>-GUI: 19. phản hồi xuất sao lưu thành công kèm đường dẫn tệp
+        GUI-->>-User: 20. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
     end
 ```
 
@@ -1080,23 +1077,22 @@ sequenceDiagram
     actor User as Người dùng
     participant GUI as Tầng Trình diễn
     participant DataService as DataManagementServiceImpl
-    participant StorageAdapter as JsonStorageAdapter
+    participant StorageAdapter as JsonDataStore
     participant WalletRepo as WalletRepository
     participant TxnRepo as TransactionRepository
-    participant TransferRepo as TransferRepository
     participant CategoryRepo as CategoryRepository
     participant NeedGroupRepo as NeedGroupRepository
     participant AdjRepo as BalanceAdjustmentRepository
 
     User->>+GUI: 1. Nhập đường dẫn tệp sao lưu (backupFilePath)
-    GUI->>+DataService: 2. restoreBackupData(RestoreBackupRequestDto)
+    GUI->>+DataService: 2. restoreBackupData(RestoreBackupRequestDTO)
     DataService->>+StorageAdapter: 3. readBackupFile(backupFilePath)
     alt Tệp không tồn tại hoặc lỗi đọc I/O
         StorageAdapter-->>DataService: 4. ném StorageException
         DataService-->>GUI: 5. ném StorageException
         GUI-->>User: 6. Hiển thị thông báo không thể đọc tệp sao lưu
     else Đọc tệp thành công
-        StorageAdapter-->>-DataService: 7. BackupPayloadDto
+        StorageAdapter-->>-DataService: 7. BackupPayloadDTO
         Note over DataService: Bước 1: Kiểm tra cấu trúc cú pháp JSON và schema bắt buộc
         alt Sai cú pháp JSON hoặc thiếu các khóa thực thể bắt buộc
             DataService-->>GUI: 8. ném DataCorruptionException
@@ -1125,12 +1121,10 @@ sequenceDiagram
                         CategoryRepo-->>-DataService: 21. void
                         DataService->>+TxnRepo: 22. deleteAll(), saveAll(transactions)
                         TxnRepo-->>-DataService: 23. void
-                        DataService->>+TransferRepo: 24. deleteAll(), saveAll(transfers)
-                        TransferRepo-->>-DataService: 25. void
-                        DataService->>+AdjRepo: 26. deleteAll(), saveAll(adjustments)
-                        AdjRepo-->>-DataService: 27. void
-                        DataService-->>-GUI: 28. phản hồi phục hồi thành công
-                        GUI-->>-User: 29. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
+                        DataService->>+AdjRepo: 24. deleteAll(), saveAll(adjustments)
+                        AdjRepo-->>-DataService: 25. void
+                        DataService-->>-GUI: 26. phản hồi phục hồi thành công
+                        GUI-->>-User: 27. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
                     end
                 end
             end
@@ -1161,7 +1155,6 @@ sequenceDiagram
     participant DataService as DataManagementServiceImpl
     participant WalletRepo as WalletRepository
     participant TxnRepo as TransactionRepository
-    participant TransferRepo as TransferRepository
     participant CategoryRepo as CategoryRepository
 
     User->>+GUI: 1. Yêu cầu đối soát dữ liệu hệ thống
@@ -1169,23 +1162,21 @@ sequenceDiagram
     DataService->>+WalletRepo: 3. findAll()
     WalletRepo-->>-DataService: 4. List<Wallet>
     DataService->>+TxnRepo: 5. findAll()
-    TxnRepo-->>-DataService: 6. List<IncomeExpenseTransaction>
-    DataService->>+TransferRepo: 7. findAll()
-    TransferRepo-->>-DataService: 8. List<TransferTransaction>
-    DataService->>+CategoryRepo: 9. findAll()
-    CategoryRepo-->>-DataService: 10. List<Category>
+    TxnRepo-->>-DataService: 6. List<Transaction>
+    DataService->>+CategoryRepo: 7. findAll()
+    CategoryRepo-->>-DataService: 8. List<Category>
     Note over DataService: Điều kiện 1: Tái tính số dư ví từ lịch sử dòng tiền và so khớp số dư hiện hành
     Note over DataService: Điều kiện 2: Kiểm tra cân bằng nguồn - đích và chi phí chuyển tiền
     Note over DataService: Điều kiện 3: Kiểm tra liên kết phân cấp danh mục 3 cấp và loại thu chi
     Note over DataService: Điều kiện 4: Kiểm tra chi phí phát sinh (TransactionFee) gắn kèm các giao dịch thu chi và chuyển tiền, bảo đảm không có phí mồ côi
-    DataService->>DataService: 11. tổng hợp sai lệch và phân loại mức độ nghiêm trọng (INFO, WARNING, ERROR)
+    DataService->>DataService: 9. tổng hợp sai lệch và phân loại mức độ nghiêm trọng (INFO, WARNING, ERROR)
     alt Tất cả 4 điều kiện đều thỏa mãn 100%
-        DataService->>DataService: 12. đánh dấu trạng thái dữ liệu nhất quán hoàn hảo (INFO)
+        DataService->>DataService: 10. đánh dấu trạng thái dữ liệu nhất quán hoàn hảo (INFO)
     else Phát hiện sai lệch dữ liệu
-        DataService->>DataService: 13. đóng gói danh sách chi tiết bất thường kèm khuyến nghị (WARNING/ERROR)
+        DataService->>DataService: 11. đóng gói danh sách chi tiết bất thường kèm khuyến nghị (WARNING/ERROR)
     end
-    DataService-->>-GUI: 14. ReconciliationReportDto
-    GUI-->>-User: 15. Kết xuất Báo cáo đối soát toàn vẹn dữ liệu tài chính chi tiết
+    DataService-->>-GUI: 12. ReconciliationReportDTO
+    GUI-->>-User: 13. Kết xuất Báo cáo đối soát toàn vẹn dữ liệu tài chính chi tiết
 ```
 
 Thao tác đối soát vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi bất kỳ bản ghi tài chính nào và cung cấp báo cáo minh bạch về mức độ nhất quán của sổ cái.

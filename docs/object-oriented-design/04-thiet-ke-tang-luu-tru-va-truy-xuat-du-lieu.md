@@ -19,10 +19,12 @@ Giao diện `GenericRepository<E, ID>` định nghĩa tập hợp các thao tác
 | Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
 | :--- | :--- | :--- | :--- |
 | `save` | `E entity` | `E` | Lưu thực thể vào kho lưu trữ; cập nhật trạng thái nếu mã định danh đã tồn tại hoặc tạo mới nếu chưa có, trả về thực thể sau khi lưu. |
+| `saveAll` | `Iterable<E> entities` | `List<E>` | Lưu tập hợp thực thể vào kho lưu trữ; trả về danh sách các thực thể sau khi lưu (sử dụng phương thức mặc định lặp qua từng phần tử). |
 | `findById` | `ID id` | `Optional<E>` | Truy vấn thực thể theo mã định danh duy nhất; trả về đối tượng bọc nếu tìm thấy hoặc đối tượng rỗng nếu không tồn tại. |
 | `findAll` | Không | `List<E>` | Lấy toàn bộ danh sách thực thể trong kho lưu trữ; trả về danh sách rỗng nếu chưa có dữ liệu, không bao giờ trả về giá trị rỗng. |
 | `existsById` | `ID id` | `boolean` | Kiểm tra sự tồn tại của thực thể theo mã định danh mà không cần nạp toàn bộ thuộc tính của đối tượng vào bộ nhớ máy ảo. |
 | `deleteById` | `ID id` | `boolean` | Xóa bản ghi tương ứng với mã định danh khỏi kho lưu trữ; trả về kết quả đúng nếu xóa thành công, trả về sai nếu không tìm thấy. |
+| `deleteAll` | Không | `void` | Xóa toàn bộ các bản ghi khỏi kho lưu trữ phục vụ việc phục hồi dữ liệu hệ thống từ bản sao lưu hoặc thiết lập lại trạng thái. |
 
 **Quy tắc thiết kế giao diện**
 

@@ -240,7 +240,6 @@ Bảng Danh mục các Lớp DTO Yêu cầu:
 | **Phân hệ Quản trị Dữ liệu (DAT)** |  |  |
 | `ExportBackupRequestDTO` | `destinationPath: String, scope: String` | Đóng gói đường dẫn tệp xuất và phạm vi sao lưu (`FULL` toàn hệ thống hoặc `TRANSACTIONS` riêng sổ giao dịch) để trích xuất dữ liệu an toàn. |
 | `RestoreBackupRequestDTO` | `backupFilePath: String` | Đóng gói đường dẫn tệp sao lưu JSON cần nạp để phục hồi dữ liệu qua quy trình kiểm định toàn vẹn 4 bước. |
-| `ReconcileDataRequestDTO` | `triggerMode: String` | Đóng gói chế độ kích hoạt đối soát độc lập 4 điều kiện toàn vẹn sổ cái. |
 
 Bảng Danh mục các Lớp DTO Phản hồi:
 
@@ -267,5 +266,6 @@ Bảng Danh mục các Lớp DTO Phản hồi:
 | `SpendingStructureReportResponseDTO` | `transactionType: String, startDate: LocalDate, endDate: LocalDate, totalAmount: BigDecimal, previousTotalAmount: BigDecimal, differenceAmount: BigDecimal, percentageChange: BigDecimal, isNew: boolean, groups: List<NeedGroupShareResponseDTO>` | Báo cáo phân tích cơ cấu thu chi 2 cấp hoàn chỉnh gồm tổng kỳ hiện tại, đối chiếu biến động tổng kỳ so với kỳ liền kề (tổng kỳ trước, chênh lệch, tỷ lệ biến động, `isNew`) và danh sách nhóm nhu cầu phục vụ hiển thị bảng và biểu đồ cơ cấu thu chi. |
 | **Phân hệ Quản trị Dữ liệu (DAT)** |  |  |
 | `BackupResponseDTO` | `backupPath: String, fileSize: long, recordCount: int, exportedAt: LocalDateTime` | Kết quả xuất tệp sao lưu JSON gồm đường dẫn lưu trữ, kích thước tệp, số lượng bản ghi và mốc thời gian thực hiện. |
-| `RestoreResultResponseDTO` | `success: boolean, recordCount: int, message: String, restoredAt: LocalDateTime` | Kết quả phục hồi dữ liệu hệ thống từ bản sao lưu gồm trạng thái thành công, tổng số thực thể tái tạo và thời điểm hoàn tất. |
-| `ReconciliationReportResponseDTO` | `allPassed: boolean, balancePassed: boolean, transferPassed: boolean, categoryPassed: boolean, feePassed: boolean, details: List<String>, checkedAt: LocalDateTime` | Báo cáo chi tiết kết quả đối soát độc lập 4 điều kiện toàn vẹn tài chính kèm danh sách cảnh báo sai lệch phục vụ hiển thị bảng kết quả. |
+| `RestoreResultDTO` | `success: boolean, recordCount: int, message: String, restoredAt: LocalDateTime` | Kết quả phục hồi dữ liệu hệ thống từ bản sao lưu gồm trạng thái thành công, tổng số thực thể tái tạo và thời điểm hoàn tất. |
+| `ReconciliationIssueDTO` | `severity: String, ruleCode: String, issueType: String, message: String, affectedEntityId: String, recommendation: String` | Đóng gói chi tiết từng sai lệch hoặc bất thường phát hiện trong quá trình đối soát toàn vẹn dữ liệu hệ thống. |
+| `ReconciliationReportDTO` | `walletBalanceConsistent: boolean, transferConsistent: boolean, categoryHierarchyConsistent: boolean, feeConsistent: boolean, scannedWallets: int, scannedTransactions: int, scannedCategories: int, scannedAdjustments: int, issues: List<ReconciliationIssueDTO>` | Báo cáo chi tiết kết quả đối soát độc lập 4 điều kiện toàn vẹn tài chính, số lượng bản ghi quét qua và danh sách cảnh báo sai lệch. |

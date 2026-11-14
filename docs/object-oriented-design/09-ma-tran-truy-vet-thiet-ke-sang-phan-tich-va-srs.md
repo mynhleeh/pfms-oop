@@ -25,9 +25,9 @@ Bảng ma trận dưới đây phân định trách nhiệm hiện thực hóa c
 | `UC-TXN-03` | Chỉnh sửa giao dịch thu chi | `TransactionController` | `TransactionService` | `Transaction`, `Wallet` | `TransactionRepository`, `WalletRepository` | `Observer` |
 | `UC-TXN-04` | Xóa giao dịch thu chi | `TransactionController` | `TransactionService` | `Transaction`, `Wallet` | `TransactionRepository`, `WalletRepository` | `Observer` |
 | **Nhóm Chuyển tiền Nội bộ** |  |  |  |  |  |  |
-| `UC-TRF-01` | Chuyển tiền nội bộ giữa hai ví | `TransferController` | `TransferService` | `TransferTransaction`, `Wallet` | `TransferRepository`, `WalletRepository` | `Observer` |
-| `UC-TRF-02` | Tra cứu lịch sử chuyển tiền | `TransferController` | `TransferService` | `TransferTransaction` | `TransferRepository` | Không áp dụng |
-| `UC-TRF-03` | Xóa giao dịch chuyển tiền | `TransferController` | `TransferService` | `TransferTransaction`, `Wallet` | `TransferRepository`, `WalletRepository` | `Observer` |
+| `UC-TRF-01` | Chuyển tiền nội bộ giữa hai ví | `TransferController` | `TransferService` | `TransferTransaction`, `Wallet` | `TransactionRepository`, `WalletRepository`, `CategoryRepository` | `Observer` |
+| `UC-TRF-02` | Tra cứu lịch sử chuyển tiền | `TransferController` | `TransferService` | `TransferTransaction` | `TransactionRepository`, `WalletRepository` | Không áp dụng |
+| `UC-TRF-03` | Xóa giao dịch chuyển tiền | `TransferController` | `TransferService` | `TransferTransaction`, `Wallet` | `TransactionRepository`, `WalletRepository` | `Observer` |
 | **Nhóm Quản lý Danh mục** |  |  |  |  |  |  |
 | `UC-CAT-01` | Bổ sung danh mục phân loại mới | `CategoryController` | `CategoryService` | `Category`, `NeedGroup` | `CategoryRepository`, `NeedGroupRepository` | Không áp dụng |
 | `UC-CAT-02` | Đổi tên danh mục | `CategoryController` | `CategoryService` | `Category` | `CategoryRepository` | Không áp dụng |
@@ -37,7 +37,7 @@ Bảng ma trận dưới đây phân định trách nhiệm hiện thực hóa c
 | `UC-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | `ReportController` | `ReportService` | `Transaction`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `NetCashFlow`, `SavingsRate` | `TransactionRepository` | `Strategy (ReportExporter tại Tầng Trình diễn)` |
 | `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | `ReportController` | `ReportService` | `Transaction`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `Category`, `NeedGroup`, `SpendingStructureShare` | `TransactionRepository`, `NeedGroupRepository`, `CategoryRepository` | `Strategy (ReportExporter tại Tầng Trình diễn)` |
 | **Nhóm Quản trị Dữ liệu** |  |  |  |  |  |  |
-| `UC-DAT-01` | Xuất dữ liệu tài chính | `DataManagementController` | `DataManagementService` | Toàn bộ thực thể hệ thống | Toàn bộ kho lưu trữ | `Strategy` |
+| `UC-DAT-01` | Xuất dữ liệu tài chính | `DataManagementController` | `DataManagementService` | Toàn bộ thực thể hệ thống | Toàn bộ kho lưu trữ | Không áp dụng |
 | `UC-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu | `DataManagementController` | `DataManagementService` | Toàn bộ thực thể hệ thống | Toàn bộ kho lưu trữ | Không áp dụng |
 | `UC-DAT-03` | Kiểm tra lại dữ liệu hệ thống | `DataManagementController` | `DataManagementService` | `Wallet`, `Transaction`, `TransferTransaction` | Toàn bộ kho lưu trữ | Không áp dụng |
 
