@@ -34,8 +34,8 @@ Bảng ma trận dưới đây phân định trách nhiệm hiện thực hóa c
 | `UC-CAT-03` | Khôi phục hoặc tạo lại mục đã xóa | `CategoryController` | `CategoryService` | `Category` | `CategoryRepository` | Không áp dụng |
 | `UC-CAT-04` | Xóa danh mục hoặc nhóm | `CategoryController` | `CategoryService` | `Category`, `Transaction` | `CategoryRepository`, `TransactionRepository` | Không áp dụng |
 | **Nhóm Báo cáo và Thống kê** |  |  |  |  |  |  |
-| `UC-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | `ReportController` | `ReportService` | `Transaction`, `Wallet` | `TransactionRepository`, `WalletRepository` | `Strategy` |
-| `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | `ReportController` | `ReportService` | `Transaction`, `Category`, `NeedGroup` | `TransactionRepository`, `CategoryRepository` | `Strategy` |
+| `UC-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | `ReportController` | `ReportService` | `Transaction`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `NetCashFlow`, `SavingsRate` | `TransactionRepository` | `Strategy (ReportExporter tại Tầng Trình diễn)` |
+| `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | `ReportController` | `ReportService` | `Transaction`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `Category`, `NeedGroup`, `SpendingStructureShare` | `TransactionRepository`, `NeedGroupRepository`, `CategoryRepository` | `Strategy (ReportExporter tại Tầng Trình diễn)` |
 | **Nhóm Quản trị Dữ liệu** |  |  |  |  |  |  |
 | `UC-DAT-01` | Xuất dữ liệu tài chính | `DataManagementController` | `DataManagementService` | Toàn bộ thực thể hệ thống | Toàn bộ kho lưu trữ | `Strategy` |
 | `UC-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu | `DataManagementController` | `DataManagementService` | Toàn bộ thực thể hệ thống | Toàn bộ kho lưu trữ | Không áp dụng |
@@ -47,7 +47,7 @@ Mục này xác lập ma trận đối chiếu việc cài đặt các quy tắc
 
 | Mã quy tắc | Tên quy tắc nghiệp vụ | Lớp thiết kế chịu trách nhiệm | Phương thức thực thi chính | Cơ chế kiểm soát kỹ thuật |
 | :--- | :--- | :--- | :--- | :--- |
-| `BR-FIN-01` | Độ chính xác tài chính | `Money` | `of`, `plus`, `minus`, `multiply`, `divide` | Sử dụng số thập phân chính xác với quy tắc làm tròn ngân hàng, từ chối số tiền âm hoặc bằng 0. |
+| `BR-FIN-01` | Độ chính xác tài chính | `Money`, `NetCashFlow`, `SavingsRate`, `SpendingStructureShare` | `of`, `plus`, `minus`, `multiply`, `divide` | Sử dụng `BigDecimal` quy tắc làm tròn ngân hàng (`HALF_EVEN`), tiền làm tròn 2 chữ số, tỷ lệ giữ tối thiểu 4 chữ số thập phân trung gian và bảo vệ mẫu số bằng không. |
 | `BR-FIN-02` | Bảo toàn số dư ví | `Wallet`, `WalletServiceImpl` | `validateSufficientBalance`, `recalculateBalance`, `adjustBalance` | Kiểm soát số dư khả dụng không âm đối với ví tiền mặt, tính toán lại số dư từ dòng tiền và ghi vết kiểm kê. |
 | `BR-FIN-03` | Ghi nhận đồng thời khi chuyển tiền | `TransferTransaction`, `TransferServiceImpl` | `transferFunds`, `deleteTransfer` | Cập nhật nguyên tử đồng thời hai ví nguồn và ví đích, hoàn nguyên cả hai ví và kiểm tra số dư ví đích khi xóa. |
 | `BR-FIN-04` | Phân cấp danh mục thu chi ba cấp | `Category`, `NeedGroup`, `CategoryServiceImpl` | `addCategory`, `deleteCategory`, `validateHierarchy` | Duy trì cây phân cấp ba cấp, cấm đổi loại khi đã có giao dịch, thực thi xóa mềm để bảo toàn lịch sử dữ liệu. |

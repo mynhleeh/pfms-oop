@@ -213,16 +213,16 @@ ctrl ..> view : ! ERR-CAT-005 / ERR-NAM-001 / ERR-NAM-002
 Cho phép người dùng yêu cầu hệ thống trích xuất và tổng hợp chuỗi số liệu dòng tiền 12 tháng liên tục lùi từ mốc thời gian chỉ định (hoặc thời điểm hiện tại), tính toán thu nhập, chi tiêu, dòng tiền thuần và tỷ lệ tiết kiệm từng tháng theo chuẩn làm tròn ngân hàng, đồng thời xác định 3 giá trị bình quân tháng trong chế độ thuần đọc mà không làm biến đổi bất kỳ trạng thái dữ liệu nào.
 
 - Ca sử dụng đại diện: `UC-REP-01` (Thống kê dòng tiền 12 tháng gần nhất)
-- Thao tác hệ thống: `generateMonthlyCashFlowReport(endMonth, endYear)`
-- Quy chiếu chéo: `UC-REP-01`, `FR-REP-01`, `BR-FIN-01`, `ERR-FIN-002`
+- Thao tác hệ thống: `generateCashFlowReport(endMonth, endYear)`
+- Quy chiếu chéo: `UC-REP-01`, `FR-REP-01`, `BR-FIN-01`, `BR-FIN-02`, `ERR-REP-001`
 
 **Thành phần tham gia phân tích**
 
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
-| Giao diện | ReportUI | Tiếp nhận tham số mốc thời gian kết thúc (`endMonth`, `endYear`) từ người dùng;<br/>Gửi yêu cầu tạo báo cáo tới bộ điều khiển;<br/>Hiển thị bảng số liệu 12 tháng liên tục gồm Thu nhập, Chi tiêu, Dòng tiền thuần và Tỷ lệ tiết kiệm;<br/>Hiển thị dòng tổng kết 3 mức bình quân tháng kèm ghi chú giải thích;<br/>Biểu diễn trực quan bằng biểu đồ kết hợp cột và đường;<br/>Hiển thị thông báo lỗi hoặc cảnh báo khi tham số đầu vào không hợp lệ. Hoạt động thuần túy ở chế độ chỉ đọc. |
-| Điều khiển | ReportController | Tiếp nhận yêu cầu trích xuất báo cáo từ `ReportUI`;<br/>Kiểm tra tính hợp lệ của mốc thời gian kết thúc;<br/>Sinh chuỗi 12 mốc tháng liên tục lùi từ mốc chỉ định;<br/>Truy vấn dữ liệu từ thực thể `IncomeExpenseTransaction`;<br/>Thực hiện phân loại, tổng hợp doanh số thu chi từng tháng;<br/>Tính toán dòng tiền thuần (`NetCashFlow`);<br/>Tính tỷ lệ tiết kiệm (`SavingsRate`) tuân thủ quy tắc làm tròn ngân hàng (`BR-FIN-01`), xử lý trường hợp biên khi tổng thu nhập không dương;<br/>Trường hợp phát sinh: Tổng thu nhập nhỏ hơn hoặc bằng 0 dẫn đến lỗi chia cho không (`ERR-FIN-002`);<br/>Tính 3 mức bình quân tháng chia đều cho 12;<br/>Đóng gói toàn bộ dữ liệu kết quả chuyển giao cho `ReportUI`. |
-| Thực thể | IncomeExpenseTransaction | Lưu giữ thông tin lịch sử giao dịch thu chi (`transactionId`, `amount`, `transactionDate`, `transactionType`, `categoryId`, `walletId`);<br/>Cung cấp tập dữ liệu giao dịch phục vụ lọc theo mốc thời gian tháng;<br/>Bảo toàn nguyên vẹn trạng thái và số dư dữ liệu trong suốt quá trình xử lý báo cáo (nguyên tắc bất biến chỉ đọc). |
+| Giao diện | ReportUI | Tiếp nhận tham số mốc thời gian kết thúc (`endMonth`, `endYear`) từ người dùng (điền mặc định tháng, năm hiện tại);<br/>Gửi yêu cầu tạo báo cáo tới bộ điều khiển;<br/>Hiển thị bảng số liệu 12 tháng liên tục gồm Thu nhập, Chi tiêu, Dòng tiền thuần và Tỷ lệ tiết kiệm;<br/>Hiển thị dòng tổng kết 3 mức bình quân tháng kèm ghi chú giải thích;<br/>Biểu diễn trực quan bằng biểu đồ kết hợp cột và đường;<br/>Hiển thị thông báo lỗi `ERR-REP-001` khi tham số đầu vào không hợp lệ. Hoạt động thuần túy ở chế độ chỉ đọc (bao gồm mốc tương lai). |
+| Điều khiển | ReportController | Tiếp nhận yêu cầu trích xuất báo cáo từ `ReportUI`;<br/>Kiểm tra tính hợp lệ của mốc thời gian kết thúc (`endMonth` trong đoạn `[1, 12]`, `endYear >= 2000`; từ chối bằng `ERR-REP-001` nếu thiếu yêu cầu hoặc ngoài đoạn);<br/>Sinh chuỗi 12 mốc tháng liên tục lùi từ mốc chỉ định;<br/>Truy vấn dữ liệu từ `IncomeExpenseTransaction`, `TransactionFee` và `TransferTransaction` (chỉ đọc `TransferTransaction` để tra cứu ngày của `TransactionFee` liên kết, không cộng số tiền chuyển gốc);<br/>Thực hiện phân loại, tổng hợp doanh số thu nhập và chi tiêu (gồm phí giao dịch theo `BR-FIN-02`) từng tháng;<br/>Tính toán dòng tiền thuần (`NetCashFlow`);<br/>Tính tỷ lệ tiết kiệm (`SavingsRate`) giữ tối thiểu 4 chữ số thập phân ở bước trung gian, làm tròn ngân hàng 2 chữ số (`BR-FIN-01`), gán `0.00%` khi tổng thu nhập không dương để tránh phép chia cho 0;<br/>Tính 3 mức bình quân tháng chia đều cho 12;<br/>Đóng gói toàn bộ dữ liệu kết quả chuyển giao cho `ReportUI`. |
+| Thực thể | IncomeExpenseTransaction, TransactionFee, TransferTransaction | Lưu giữ thông tin lịch sử giao dịch thu chi (`transactionId`, `amount`, `transactionDate`, `transactionType`, `categoryId`, `walletId`) và phí giao dịch liên kết (`TransactionFee` là chi tiêu `EXPENSE` gắn ngày từ giao dịch gốc);<br/>Chỉ đọc `TransferTransaction` để tra cứu ngày của `TransactionFee` gắn với chuyển khoản (không cộng số tiền chuyển gốc theo `BR-FIN-03`);<br/>Cung cấp tập dữ liệu giao dịch và phí phục vụ lọc theo mốc thời gian tháng;<br/>Bảo toàn nguyên vẹn trạng thái và số dư dữ liệu trong suốt quá trình xử lý báo cáo (nguyên tắc bất biến chỉ đọc). |
 
 **Sơ đồ Robustness**
 
@@ -239,16 +239,22 @@ actor "Người dùng" as user
 boundary "ReportUI" as view
 control "ReportController" as ctrl
 entity "IncomeExpenseTransaction\n(Giao dịch thu chi)" as txEnt
+entity "TransactionFee\n(Phí giao dịch)" as feeEnt
+entity "TransferTransaction\n(Tra cứu ngày phí)" as trfEnt
 
 user --> view : Chọn kỳ báo cáo
 view --> ctrl : Gửi yêu cầu
 ctrl --> txEnt : Truy vấn giao dịch
-txEnt --> ctrl : Trả dữ liệu
-ctrl --> ctrl : Xử lý báo cáo
+ctrl --> feeEnt : Truy vấn phí liên kết
+ctrl --> trfEnt : Tra cứu ngày phí chuyển
+txEnt --> ctrl : Trả giao dịch
+feeEnt --> ctrl : Trả phí giao dịch
+trfEnt --> ctrl : Trả ngày giao dịch
+ctrl --> ctrl : Kiểm tra và xử lý báo cáo
 ctrl --> view : Trả báo cáo
 view --> user : Hiển thị báo cáo
 
-ctrl ..> view : ! ERR-FIN-002
+ctrl ..> view : ! ERR-REP-001
 @enduml
 ```
 
@@ -257,15 +263,15 @@ ctrl ..> view : ! ERR-FIN-002
 | Số | Mô tả |
 | :---: | :--- |
 | 1 | Người dùng chọn mốc thời gian kết thúc (`endMonth`, `endYear`) để lấy báo cáo 12 tháng gần nhất. |
-| 2 | `ReportUI` gửi lệnh `generateMonthlyCashFlowReport(endMonth, endYear)` tới `ReportController`. |
-| 3 | `ReportController` kiểm tra tính hợp lệ của mốc thời gian kết thúc và sinh chuỗi 12 mốc tháng liên tục lùi. |
-| 4 | `ReportController` truy vấn `IncomeExpenseTransaction` để lấy tập hợp giao dịch trong chuỗi 12 tháng. |
-| 5 | `IncomeExpenseTransaction` cung cấp dữ liệu lịch sử giao dịch ở chế độ chỉ đọc; trạng thái dữ liệu gốc không thay đổi. |
-| 6 | `ReportController` lọc, phân loại và tổng hợp thu nhập, chi tiêu từng tháng. |
-| 7 | `ReportController` tính `NetCashFlow` và `SavingsRate` theo quy tắc làm tròn ngân hàng (`BR-FIN-01`), xử lý trường hợp biên khi tổng thu nhập không dương.<br/>Trường hợp phát sinh: Tổng thu nhập nhỏ hơn hoặc bằng 0 dẫn đến lỗi chia cho không (`ERR-FIN-002`). |
+| 2 | `ReportUI` gửi lệnh `generateCashFlowReport(endMonth, endYear)` tới `ReportController`. |
+| 3 | `ReportController` kiểm tra tính hợp lệ của `endMonth`, `endYear` (từ chối bằng `ERR-REP-001` nếu thiếu yêu cầu hoặc ngoài đoạn hợp lệ) và sinh chuỗi 12 mốc tháng liên tục lùi. |
+| 4 | `ReportController` truy vấn `IncomeExpenseTransaction`, `TransactionFee` và chỉ đọc `TransferTransaction` để tra cứu ngày phát sinh của phí chuyển tiền liên kết trong chuỗi 12 tháng. |
+| 5 | `IncomeExpenseTransaction`, `TransactionFee` và `TransferTransaction` cung cấp dữ liệu lịch sử ở chế độ chỉ đọc; trạng thái dữ liệu gốc không thay đổi. |
+| 6 | `ReportController` lọc, phân loại và tổng hợp thu nhập, chi tiêu (gồm phí theo `BR-FIN-02`) từng tháng. |
+| 7 | `ReportController` tính `NetCashFlow` và `SavingsRate` (trung gian tối thiểu 4 chữ số thập phân, làm tròn ngân hàng 2 chữ số theo `BR-FIN-01`), gán `0.00%` khi tổng thu nhập không dương để tránh phép chia cho 0. |
 | 8 | `ReportController` tính 3 mức bình quân tháng (chia đều cho 12) và đóng gói toàn bộ dữ liệu báo cáo. |
 | 9 | `ReportController` trả về mô hình dữ liệu báo cáo 12 tháng hoàn chỉnh cho `ReportUI`. |
-| 10 | `ReportUI` hiển thị bảng số liệu 12 tháng, dòng bình quân và biểu đồ kết hợp cột–đường. |
+| 10 | `ReportUI` hiển thị bảng số liệu 12 tháng, dòng bình quân và biểu đồ kết hợp cột và đường. |
 
 ### 6.1.6 Lưu trữ và Sao lưu
 
@@ -320,14 +326,13 @@ ctrl ..> view : ! ERR-DAT-001
 | 2 | `BackupUI` gửi lệnh `exportFinancialData(scope, format, targetDirectory)` tới `BackupController`. |
 | 3 | `BackupController` kiểm tra quyền ghi vào thư mục đích và dung lượng lưu trữ còn lại. |
 | 4 | `BackupController` truy vấn `FinancialDataStore` để trích xuất dữ liệu nghiệp vụ theo phạm vi đã chọn ở chế độ chỉ đọc. |
-| 5 | `FinancialDataStore` trả về tập hợp dữ liệu thực thể tài chính (`Wallet`, `Category`, `NeedGroup`, `Transaction`, `Transfer`, `BalanceAdjustment`) ở chế độ chỉ đọc; trạng thái dữ liệu gốc không bị thay đổi. |
+| 5 | `FinancialDataStore` trả về tập hợp dữ liệu thực thể tài chính (`Wallet`, `Category`, `NeedGroup`, `IncomeExpenseTransaction`, `TransferTransaction`, `BalanceAdjustmentRecord`) ở chế độ chỉ đọc; trạng thái dữ liệu gốc không bị thay đổi. |
 | 6 | `BackupController` chuẩn hóa giá trị số học sang chuỗi chính xác (không làm tròn số mũ theo `CON-02`, `FR-DAT-01`) và định dạng toàn bộ cấu trúc sang JSON. |
 | 7 | `BackupController` sinh tên tệp tự động theo mẫu `pfms_export_{scope}_{timestamp}.json`. |
 | 8 | `BackupController` ghi tệp JSON xuống đĩa cứng cục bộ với mã hóa UTF-8 không BOM. |
 | 9 | `BackupController` kiểm tra độ nguyên vẹn tệp đã ghi và đóng gói kết quả kiểm toán. |
 | 10 | `BackupController` trả về cho `BackupUI` đường dẫn tệp, dung lượng và số lượng bản ghi đã xuất. |
 | 11 | `BackupUI` hiển thị thông báo xuất dữ liệu thành công kèm đường dẫn tệp, dung lượng và số bản ghi. |
-
 
 ## 6.2 Thẻ CRC
 
@@ -375,9 +380,9 @@ Lớp `BalanceAdjustment` lưu vết các lần kiểm kê thực tế để câ
 
 ### 6.2.3 Lớp Giao dịch Thu chi
 
-Lớp `Transaction` ghi nhận sự kiện thu nhập (`INCOME`) hoặc chi tiêu (`EXPENSE`) tại một ví gắn với danh mục cấp 3 (`BR-FIN-04`). Thực thể cập nhật tức thời số dư ví (`BR-FIN-02`) và cung cấp dữ liệu gốc cho báo cáo thống kê.
+Lớp `IncomeExpenseTransaction` ghi nhận sự kiện thu nhập (`INCOME`) hoặc chi tiêu (`EXPENSE`) tại một ví gắn với danh mục cấp 3 (`BR-FIN-04`). Thực thể cập nhật tức thời số dư ví (`BR-FIN-02`) và cung cấp dữ liệu gốc cho báo cáo thống kê.
 
-- Tên lớp phân tích: `Transaction`
+- Tên lớp phân tích: `IncomeExpenseTransaction`
 - Phân loại đối tượng: Lớp Thực thể
 - Ca sử dụng liên quan: `UC-TXN-01`, `UC-TXN-02`, `UC-TXN-03`, `UC-TXN-04`, `UC-CAT-04`, `UC-REP-01`, `UC-REP-02`, `UC-DAT-01`, `UC-DAT-02`, `UC-DAT-03`
 
@@ -394,22 +399,22 @@ Lớp `TransactionFee` quản lý khoản phí phụ đi kèm giao dịch thu ch
 
 - Tên lớp phân tích: `TransactionFee`
 - Phân loại đối tượng: Lớp Thực thể
-- Ca sử dụng liên quan: `UC-TXN-01`, `UC-TXN-02`, `UC-TXN-03`, `UC-TXN-04`, `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`, `UC-REP-01`, `UC-DAT-01`, `UC-DAT-02`, `UC-DAT-03`
+- Ca sử dụng liên quan: `UC-TXN-01`, `UC-TXN-02`, `UC-TXN-03`, `UC-TXN-04`, `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`, `UC-REP-01`, `UC-REP-02`, `UC-DAT-01`, `UC-DAT-02`, `UC-DAT-03`
 
 **Thẻ trách nhiệm và cộng tác**
 
 | Nhóm trách nhiệm | Nội dung trách nhiệm cụ thể | Cộng tác viên |
 | :--- | :--- | :--- |
-| Thông tin | Lưu `feeId`, số tiền phí thập phân chính xác (`BR-FIN-01`) và không âm `amount >= 0.00 VNĐ` (`BR-FIN-02`), mã ví chịu phí `walletId`, danh mục cấp 3 `categoryId` nhánh `EXPENSE` (`BR-FIN-04`), mã giao dịch gốc `parentTransactionId` và loại giao dịch gốc `parentTransactionType` (`INCOME_EXPENSE`, `TRANSFER`). | `Wallet`, `Category`, `Transaction`, `Transfer` |
-| Hành vi | Kiểm tra điều kiện phí và bắt buộc gắn danh mục cấp 3 `EXPENSE` đang `ACTIVE` khi `amount > 0.00 VNĐ` (`BR-FIN-04`), báo lỗi chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`); chặn tạo, sửa hoặc xóa độc lập ngoài giao dịch gốc (`BR-FIN-02`) và hạch toán vào tổng chi tiêu (`FR-REP-01`). | `CashFlowCoordinator`, `Wallet`, `Category`, `Transaction`, `Transfer` |
+| Thông tin | Lưu `feeId`, số tiền phí thập phân chính xác (`BR-FIN-01`) và không âm `amount >= 0.00 VNĐ` (`BR-FIN-02`), mã ví chịu phí `walletId`, danh mục cấp 3 `categoryId` nhánh `EXPENSE` (`BR-FIN-04`), mã giao dịch gốc `parentTransactionId` và loại giao dịch gốc `parentTransactionType` (`INCOME_EXPENSE`, `TRANSFER`). | `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction` |
+| Hành vi | Kiểm tra điều kiện phí và bắt buộc gắn danh mục cấp 3 `EXPENSE` đang `ACTIVE` khi `amount > 0.00 VNĐ` (`BR-FIN-04`), báo lỗi chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`); chặn tạo, sửa hoặc xóa độc lập ngoài giao dịch gốc (`BR-FIN-02`) và hạch toán vào tổng chi tiêu (`FR-REP-01`) cũng như cơ cấu chi tiêu (`FR-REP-02`, nhánh `EXPENSE`). | `CashFlowCoordinator`, `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction` |
 
 ### 6.2.5 Lớp Giao dịch Chuyển tiền
 
-Lớp `Transfer` ghi nhận sự kiện điều chuyển tiền nội bộ giữa hai ví theo cơ chế hạch toán đồng thời hai đầu ví. Thực thể bảo toàn tổng số dư hệ thống trước phí và loại trừ khoản tiền chuyển khỏi báo cáo thu chi (`BR-FIN-03`).
+Lớp `TransferTransaction` ghi nhận sự kiện điều chuyển tiền nội bộ giữa hai ví theo cơ chế hạch toán đồng thời hai đầu ví. Thực thể bảo toàn tổng số dư hệ thống trước phí, loại trừ khoản tiền chuyển gốc khỏi báo cáo thu chi (`BR-FIN-03`), và chỉ hỗ trợ tra cứu ngày của `TransactionFee` liên kết khi lập báo cáo chi tiêu (`BR-FIN-02`).
 
-- Tên lớp phân tích: `Transfer`
+- Tên lớp phân tích: `TransferTransaction`
 - Phân loại đối tượng: Lớp Thực thể
-- Ca sử dụng liên quan: `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`, `UC-REP-01`, `UC-DAT-01`, `UC-DAT-02`, `UC-DAT-03`
+- Ca sử dụng liên quan: `UC-TRF-01`, `UC-TRF-02`, `UC-TRF-03`, `UC-REP-01`, `UC-REP-02`, `UC-DAT-01`, `UC-DAT-02`, `UC-DAT-03`
 
 **Thẻ trách nhiệm và cộng tác**
 
@@ -431,11 +436,11 @@ Lớp Thực thể đại diện cho đơn vị phân loại chi tiết ở cấ
 | Nhóm trách nhiệm | Nội dung trách nhiệm cụ thể | Cộng tác viên |
 | :--- | :--- | :--- |
 | Thông tin | - Lưu giữ mã định danh duy nhất của danh mục (`categoryId`).<br/>- Lưu giữ tên gọi danh mục chi tiết (`name`), ràng buộc từ 1 đến 50 ký tự (`BR-NAM-01`).<br/>- Lưu giữ liên kết tham chiếu tới nhóm nhu cầu cha cấp 2 (`needGroupId`).<br/>- Lưu giữ trạng thái hoạt động của danh mục (`status`: `ACTIVE` hoặc `DELETED`).<br/>- Lưu giữ biểu tượng nhận diện (`icon`) và mã màu hiển thị trực quan (`color`).<br/>- Kế thừa và xác định loại thu chi (`transactionType`: `INCOME` hoặc `EXPENSE`) thông qua nhóm nhu cầu cha (`BR-FIN-04`). | `CategoryGroup` |
-| Hành vi | - Kiểm tra định dạng tên danh mục không được để trống và có từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng ở hai đầu (`BR-NAM-01`).<br/>Trường hợp phát sinh: Tên danh mục để trống hoặc không đạt độ dài hợp lệ (`ERR-NAM-001`).<br/>- Cung cấp tên danh mục và nhóm cha để kiểm tra tính duy nhất trong phạm vi nhóm cha (`BR-NAM-01`).<br/>Trường hợp phát sinh: Tên danh mục trùng trong cùng nhóm cha (`ERR-NAM-002`).<br/>- Cập nhật tên hiển thị mới khi người dùng đổi tên mà không làm ảnh hưởng đến các giao dịch lịch sử (`UC-CAT-02`).<br/>- Cập nhật nhóm nhu cầu cha mới khi chuyển nhóm theo cấu trúc phân cấp (yêu cầu nhóm đích cùng loại thu chi và đang hoạt động, `BR-FIN-04`).<br/>Trường hợp phát sinh: Nhóm đích không tồn tại, đã bị xóa hoặc không cùng loại thu chi khi chuyển nhóm (`ERR-CAT-001`).<br/>- Cập nhật trạng thái xóa mềm (`DELETED`) nếu danh mục đã từng có giao dịch lịch sử, hoặc cho phép xóa vĩnh viễn nếu chưa phát sinh giao dịch (`UC-CAT-04`, `BR-FIN-04`).<br/>- Khôi phục trạng thái hoạt động (`ACTIVE`) khi nhóm cha đang hoạt động và không trùng tên (`UC-CAT-03`).<br/>Trường hợp phát sinh: Nhóm nhu cầu cha trực thuộc còn ở trạng thái đã xóa khi thực hiện khôi phục danh mục (`ERR-CAT-004`).<br/>- Cung cấp thông tin phân loại cho các giao dịch thu chi và hỗ trợ kết xuất báo cáo cơ cấu chi tiêu (`UC-REP-02`). | `CategoryGroup`, `Transaction`, `TransactionFee`, `CategoryController` |
+| Hành vi | - Kiểm tra định dạng tên danh mục không được để trống và có từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng ở hai đầu (`BR-NAM-01`).<br/>Trường hợp phát sinh: Tên danh mục để trống hoặc không đạt độ dài hợp lệ (`ERR-NAM-001`).<br/>- Cung cấp tên danh mục và nhóm cha để kiểm tra tính duy nhất trong phạm vi nhóm cha (`BR-NAM-01`).<br/>Trường hợp phát sinh: Tên danh mục trùng trong cùng nhóm cha (`ERR-NAM-002`).<br/>- Cập nhật tên hiển thị mới khi người dùng đổi tên mà không làm ảnh hưởng đến các giao dịch lịch sử (`UC-CAT-02`).<br/>- Cập nhật nhóm nhu cầu cha mới khi chuyển nhóm theo cấu trúc phân cấp (yêu cầu nhóm đích cùng loại thu chi và đang hoạt động, `BR-FIN-04`).<br/>Trường hợp phát sinh: Nhóm đích không tồn tại, đã bị xóa hoặc không cùng loại thu chi khi chuyển nhóm (`ERR-CAT-001`).<br/>- Cập nhật trạng thái xóa mềm (`DELETED`) nếu danh mục đã từng có giao dịch lịch sử, hoặc cho phép xóa vĩnh viễn nếu chưa phát sinh giao dịch (`UC-CAT-04`, `BR-FIN-04`).<br/>- Khôi phục trạng thái hoạt động (`ACTIVE`) khi nhóm cha đang hoạt động và không trùng tên (`UC-CAT-03`).<br/>Trường hợp phát sinh: Nhóm nhu cầu cha trực thuộc còn ở trạng thái đã xóa khi thực hiện khôi phục danh mục (`ERR-CAT-004`).<br/>- Cung cấp thông tin phân loại cho các giao dịch thu chi và hỗ trợ kết xuất báo cáo cơ cấu thu chi (`UC-REP-02`). | `CategoryGroup`, `IncomeExpenseTransaction`, `TransactionFee`, `CategoryController` |
 
 ### 6.2.7 Lớp Nhóm Nhu cầu
 
-Lớp Thực thể đại diện cho đơn vị phân loại trung gian ở cấp 2 trực thuộc Loại thu chi gốc (cấp 1), chịu trách nhiệm gom cụm các danh mục chi tiết cùng mục đích tài chính và quản lý phân cấp danh mục con phục vụ phân tích cơ cấu chi tiêu.
+Lớp Thực thể đại diện cho đơn vị phân loại trung gian ở cấp 2 trực thuộc Loại thu chi gốc (cấp 1), chịu trách nhiệm gom cụm các danh mục chi tiết cùng mục đích tài chính và quản lý phân cấp danh mục con phục vụ phân tích cơ cấu thu chi.
 
 - Tên lớp phân tích: `CategoryGroup` (NeedGroup)
 - Phân loại đối tượng: Lớp Thực thể (Entity)

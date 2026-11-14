@@ -2,7 +2,6 @@
 
 Ma trận truy vết hai chiều và phương pháp kiểm chứng bảo đảm tính nhất quán giữa mục tiêu, yêu cầu chức năng, ca sử dụng, thực thể dữ liệu và quy tắc nghiệp vụ, làm cơ sở nghiệm thu hệ thống.
 
-
 Bảng tổng hợp cấu trúc danh mục 5 ma trận truy vết và kiểm chứng yêu cầu của hệ thống:
 
 | STT | Mục | Tên ma trận | Chiều đối chiếu | Ý nghĩa |
@@ -39,7 +38,7 @@ Bảng ma trận truy vết đối chiếu giữa 20 yêu cầu chức năng và
 | `FR-CAT-02` | Tùy biến danh mục người dùng | X |  |  |
 | `FR-CAT-03` | Kiểm soát toàn vẹn khi cập nhật và xóa danh mục | X |  |  |
 | `FR-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | X |  | X |
-| `FR-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | X |  |  |
+| `FR-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | X |  | X |
 | `FR-DAT-01` | Xuất dữ liệu tài chính |  | X | X |
 | `FR-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu |  | X | X |
 | `FR-DAT-03` | Kiểm tra lại dữ liệu hệ thống |  |  | X |
@@ -85,8 +84,8 @@ Bảng ma trận xác định phạm vi các thực thể dữ liệu miền bà
 | `FR-TRF-02` | Giao dịch chuyển tiền, Giao dịch thu chi, Ví |
 | `FR-CAT-01`, `FR-CAT-02` | Danh mục |
 | `FR-CAT-03` | Danh mục, Giao dịch thu chi |
-| `FR-REP-01` | Thống kê tháng, Giao dịch thu chi |
-| `FR-REP-02` | Thống kê tháng, Danh mục, Giao dịch thu chi |
+| `FR-REP-01` | Thống kê tháng, Giao dịch thu chi, Phí giao dịch, Giao dịch chuyển tiền (chỉ tra cứu ngày của phí liên kết) |
+| `FR-REP-02` | Thống kê tháng, Nhóm nhu cầu, Danh mục, Giao dịch thu chi, Phí giao dịch, Giao dịch chuyển tiền (chỉ tra cứu ngày của phí liên kết) |
 | `FR-DAT-01`, `FR-DAT-02`, `FR-DAT-03` | Dữ liệu tài chính |
 
 #### 8.1.4 Ma trận quy tắc nghiệp vụ theo yêu cầu chức năng
@@ -96,7 +95,7 @@ Bảng ma trận truy vết mức độ bao phủ của 5 quy tắc nghiệp v�
 | Mã quy tắc | Tên quy tắc | Yêu cầu chức năng áp dụng |
 | --- | --- | --- |
 | `BR-FIN-01` | Quy tắc độ chính xác tài chính | `FR-WAL-02`, `FR-WAL-04`, `FR-WAL-05`<br/>`FR-TXN-01`, `FR-TXN-02`, `FR-TXN-03`, `FR-TXN-04`<br/>`FR-TRF-01`<br/>`FR-REP-01`, `FR-REP-02`<br/>`FR-DAT-01`, `FR-DAT-03` |
-| `BR-FIN-02` | Quy tắc bảo toàn số dư ví | `FR-WAL-01`, `FR-WAL-02`, `FR-WAL-03`, `FR-WAL-05`<br/>`FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`<br/>`FR-TRF-01`, `FR-TRF-02`<br/>`FR-DAT-02`, `FR-DAT-03` |
+| `BR-FIN-02` | Quy tắc bảo toàn số dư ví | `FR-WAL-01`, `FR-WAL-02`, `FR-WAL-03`, `FR-WAL-05`<br/>`FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`<br/>`FR-TRF-01`, `FR-TRF-02`<br/>`FR-REP-01`, `FR-REP-02`<br/>`FR-DAT-02`, `FR-DAT-03` |
 | `BR-FIN-03` | Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ | `FR-TRF-01`, `FR-TRF-02`<br/>`FR-DAT-03` |
 | `BR-FIN-04` | Quy tắc phân cấp danh mục thu chi 3 cấp | `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`<br/>`FR-CAT-01`, `FR-CAT-02`, `FR-CAT-03`<br/>`FR-REP-02`<br/>`FR-DAT-02`, `FR-DAT-03` |
 | `BR-NAM-01` | Quy tắc tên của ví, nhóm nhu cầu và danh mục | `FR-WAL-01`, `FR-WAL-03`<br/>`FR-CAT-02`, `FR-CAT-03` |
@@ -133,8 +132,8 @@ Bảng ma trận phương pháp kiểm chứng và tiêu chí nghiệm thu kỹ 
 | `FR-CAT-01` | Tạo cấu trúc danh mục 3 cấp | T, I | Cấu trúc danh mục 3 cấp (loại -> nhóm -> danh mục) đúng Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) |
 | `FR-CAT-02` | Tùy biến danh mục người dùng | T, D | Thêm danh mục con thành công; tên danh mục không trùng trong cùng một nhóm |
 | `FR-CAT-03` | Kiểm soát toàn vẹn khi cập nhật và xóa danh mục | T, D | Ẩn thay vì xóa vật lý danh mục đã có giao dịch liên kết; cho phép chuyển danh mục sang nhóm khác cùng loại thu chi theo Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) |
-| `FR-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | T, A | Lấy đúng 12 tháng liên tục gần nhất; tổng hợp đúng tổng thu nhập, tổng chi tiêu, dòng tiền thuần và tỷ lệ tiết kiệm. Ba mức bình quân chia cho 12, kèm ghi chú nêu các tháng chưa có giao dịch |
-| `FR-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | T, D | Tính đúng tổng tiền và tỷ lệ phần trăm chi tiêu của từng nhóm nhu cầu và danh mục |
+| `FR-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | T, A | Lấy đúng 12 tháng liên tục gần nhất (gồm mốc tương lai chỉ đọc); cộng phí giao dịch liên kết vào tổng chi; tổng hợp đúng thu nhập, chi tiêu, dòng tiền thuần và tỷ lệ tiết kiệm (`0.00%` khi thu không dương); ba mức bình quân chia cho 12 kèm ghi chú tháng không giao dịch; chặn tham số sai bằng `ERR-REP-001` |
+| `FR-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | T, D | Tính đúng tổng tiền và tỷ lệ phần trăm cho `EXPENSE` (gồm phí giao dịch liên kết) hoặc `INCOME` theo nhóm nhu cầu và danh mục; so sánh kỳ liền kề (nhãn `"Mới"` hoặc `0.00%`); giữ nhãn `"(đã xóa)"`; trả rỗng khi không có giao dịch và chặn tham số sai bằng `ERR-REP-001` |
 | `FR-DAT-01` | Xuất dữ liệu tài chính | T, I | Xuất JSON đúng cấu trúc và giữ nguyên độ chính xác số học (`CON-02`) |
 | `FR-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu | T, D | Kiểm tra hợp lệ 4 bước trước khi nhập vào hệ thống; khôi phục đầy đủ trạng thái hệ thống |
 | `FR-DAT-03` | Kiểm tra lại dữ liệu hệ thống | T, A | Thuật toán quét toàn bộ dữ liệu tiền; phát hiện sai lệch ở 4 điều kiện toàn vẹn nếu có |

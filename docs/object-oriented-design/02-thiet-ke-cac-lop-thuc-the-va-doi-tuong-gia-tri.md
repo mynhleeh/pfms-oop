@@ -86,7 +86,7 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | `TransactionDate` | Đối tượng giá trị | Bọc mốc ngày phát sinh giao dịch, kiểm soát tính hợp lệ lịch pháp và ràng buộc thời gian không vượt quá hiện tại. |
 | `NetCashFlow` | Đối tượng giá trị | Đo lường dòng tiền thuần ròng bằng tổng thu nhập trừ tổng chi tiêu trong một kỳ quan sát định kỳ. |
 | `SavingsRate` | Đối tượng giá trị | Đo lường tỷ lệ phần trăm tiền tiết kiệm tích lũy được so với tổng thu nhập tạo ra trong kỳ phân tích. |
-| `SpendingStructureShare` | Đối tượng giá trị | Đo lường tỷ trọng phần trăm đóng góp của từng nhóm nhu cầu hoặc danh mục chi tiết trên tổng quy mô chi tiêu. |
+| `SpendingStructureShare` | Đối tượng giá trị | Đo lường tỷ trọng phần trăm đóng góp của từng nhóm nhu cầu trên tổng kỳ hoặc của từng danh mục chi tiết trên tổng kỳ và tổng nhóm cha (`EXPENSE` gồm phí liên kết hoặc `INCOME`). |
 
 > [!NOTE]
 > **Nhóm Lưu trữ và Quản trị Dữ liệu (DAT):** Các chức năng sao lưu dữ liệu, khôi phục và nạp dữ liệu mẫu được hiện thực hóa thông qua các dịch vụ thuộc Tầng Dịch vụ (`com.pfms.service`) và các bộ điều hợp tệp thuộc Tầng Hạ tầng (`com.pfms.infrastructure`). Tầng Nghiệp vụ cốt lõi không định nghĩa lớp thực thể riêng cho nhóm này nhằm bảo đảm tính độc lập hoàn toàn khỏi hệ thống tệp cục bộ theo nguyên lý Nghịch đảo Phụ thuộc.
@@ -333,7 +333,7 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 
 ### 2.2.6 Lớp Nhóm Nhu cầu
 
-Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp 2 trong cấu trúc phân cấp danh mục của hệ thống, quản lý việc gom cụm các danh mục chi tiết cấp 3 có cùng tính chất tài chính. Lớp này đóng vai trò điều phối tập hợp danh mục con, làm căn cứ tổng hợp cơ cấu chi tiêu trên báo cáo và bảo toàn ranh giới phân loại theo nhánh thu chi gốc.
+Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp 2 trong cấu trúc phân cấp danh mục của hệ thống, quản lý việc gom cụm các danh mục chi tiết cấp 3 có cùng tính chất tài chính. Lớp này đóng vai trò điều phối tập hợp danh mục con, làm căn cứ tổng hợp cơ cấu thu chi trên báo cáo và bảo toàn ranh giới phân loại theo nhánh thu chi gốc.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-CAT-01`, `UC-CAT-02`, `UC-CAT-03`, `UC-CAT-04`
@@ -350,7 +350,7 @@ Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp
 | `transactionType` | `TransactionType` | `private final` | Nhánh loại thu chi gốc cấp 1 (`INCOME` hoặc `EXPENSE`); bất biến tuyệt đối sau khi khởi tạo, nghiêm cấm đổi loại thu chi theo quy tắc cấu trúc danh mục ba cấp. |
 | `status` | `GroupStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
 | `icon` | `String` | `private` | Ký hiệu hoặc biểu tượng đồ họa đại diện của nhóm trên giao diện; tùy chọn, độ dài tối đa 50 ký tự. |
-| `color` | `String` | `private` | Chuỗi mã màu định dạng Hex (tối đa 10 ký tự) dùng để phân biệt các nhóm trên biểu đồ tròn cơ cấu thu chi phục vụ hiển thị và phân tích cơ cấu chi tiêu. |
+| `color` | `String` | `private` | Chuỗi mã màu định dạng Hex (tối đa 10 ký tự) dùng để phân biệt các nhóm trên biểu đồ tròn cơ cấu thu chi phục vụ hiển thị và phân tích cơ cấu thu chi. |
 | `categories` | `List<Category>` | `private final` | Tập hợp các danh mục chi tiết cấp 3 trực thuộc trong quan hệ kết tập (`aggregation`); khởi tạo danh sách rỗng, bảo vệ đóng gói không mở setter tự do theo quy tắc cấu trúc danh mục ba cấp. |
 
 **Phương thức nghiệp vụ**
@@ -548,7 +548,7 @@ Kiểu liệt kê `TransactionType` xác lập tập giá trị đóng gồm đ�
 
 ### 2.3.4 Dòng Tiền Thuần
 
-Lớp `NetCashFlow` là đối tượng giá trị tiền tệ bất biến đại diện cho dòng tiền ròng có dấu đại số, đo lường mức thặng dư hoặc thâm hụt tài chính thuần của người dùng trong một kỳ quan sát xác định bằng công thức tổng thu nhập trừ tổng chi tiêu.
+Lớp `NetCashFlow` là đối tượng giá trị tiền tệ bất biến đại diện cho dòng tiền ròng có dấu đại số, đo lường mức thặng dư hoặc thâm hụt tài chính thuần của người dùng trong một kỳ quan sát xác định bằng công thức tổng thu nhập trừ tổng chi tiêu (gồm phí giao dịch liên kết theo quy tắc bảo toàn số dư ví BR-FIN-02).
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-01`
@@ -593,7 +593,7 @@ Lớp `SavingsRate` là đối tượng giá trị tỷ lệ phần trăm bất 
 - Ca sử dụng: `UC-REP-01`
 - Yêu cầu chức năng: `FR-REP-01`
 - Quy tắc nghiệp vụ: `BR-FIN-01`
-- Mã lỗi: `ERR-FIN-002`
+- Mã lỗi: `ERR-FIN-001`
 
 **Cấu trúc thuộc tính**
 
@@ -622,9 +622,9 @@ Lớp `SavingsRate` là đối tượng giá trị tỷ lệ phần trăm bất 
 - Cơ chế so sánh bằng nhau: Phương thức `equals` được ghi đè để so sánh hai đối tượng `SavingsRate` dựa trên giá trị đại số của `rate` (`BigDecimal.compareTo` = 0); phương thức `hashCode` được ghi đè nhất quán với `equals` để đảm bảo an toàn khi lưu trữ trong cấu trúc dữ liệu bảng băm.
 - Cài đặt `Comparable` để so sánh hiệu quả tiết kiệm giữa các kỳ: Lớp cài đặt giao diện `Comparable<SavingsRate>`; phương thức `compareTo` ủy quyền so sánh giá trị cho `BigDecimal.compareTo` trên thuộc tính `rate`; phục vụ phân tích biến động và so sánh tỷ lệ tiết kiệm tháng-trên-tháng trong chuỗi 12 tháng của báo cáo dòng tiền.
 
-### 2.3.6 Tỷ trọng Cơ cấu Chi tiêu
+### 2.3.6 Tỷ trọng Cơ cấu Thu chi
 
-Lớp `SpendingStructureShare` là đối tượng giá trị tỷ trọng bất biến đo lường phần trăm đóng góp của từng nhóm nhu cầu (cấp 2) hoặc danh mục chi tiết (cấp 3) trên tổng dòng tiền trong kỳ phân tích, với ràng buộc giá trị trong khoảng [0.00, 100.00] và cơ chế xử lý biên an toàn trả về 0.00% khi tổng dòng tiền bằng không.
+Lớp `SpendingStructureShare` là đối tượng giá trị tỷ trọng bất biến đo lường phần trăm đóng góp của từng nhóm nhu cầu (cấp 2, phạm vi `"NeedGroup"`) trên tổng kỳ, hoặc từng danh mục chi tiết (cấp 3, phạm vi `"Category"`) trên tổng kỳ và tổng nhóm cha cho cả luồng `EXPENSE` (bao gồm phí giao dịch liên kết) lẫn `INCOME`, với ràng buộc giá trị trong đoạn [0.00, 100.00] và cơ chế bảo vệ mẫu số bằng không trả về 0.00%.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-REP-02`
@@ -646,20 +646,20 @@ Lớp `SpendingStructureShare` là đối tượng giá trị tỷ trọng bất
 | :--- | :--- | :--- | :--- | :--- |
 | `SpendingStructureShare` *(Constructor)* | `BigDecimal share, String scope` | Không có | `BusinessException` | Khởi tạo đối tượng giá trị tỷ trọng cơ cấu; kiểm tra `share` không được `null`, phải nằm trong đoạn [0.00, 100.00]; kiểm tra `scope` hợp lệ; thiết lập làm tròn ngân hàng 2 chữ số thập phân. |
 | `of` *(Factory method)* | `BigDecimal itemAmount, BigDecimal totalAmount, String scope` | `SpendingStructureShare` | `BusinessException` | Tính và khởi tạo tỷ trọng cơ cấu: khi `totalAmount > 0` áp dụng $\text{Share} = (\text{ItemAmount} / \text{TotalAmount}) \times 100\%$; khi `totalAmount = 0` gán mặc định `0.00%` tránh lỗi chia cho 0; tính toán duy trì tối thiểu 4 chữ số thập phân trung gian rồi làm tròn ngân hàng về 2 chữ số thập phân. |
-| `getShare` | Không có | `BigDecimal` | Không có | Trả về giá trị tỷ trọng phần trăm phục vụ hiển thị bảng phân tích cơ cấu chi tiêu. |
+| `getShare` | Không có | `BigDecimal` | Không có | Trả về giá trị tỷ trọng phần trăm phục vụ hiển thị bảng phân tích cơ cấu thu chi. |
 | `getUnit` | Không có | `String` | Không có | Trả về ký hiệu đơn vị phần trăm (`"%"`) phục vụ định dạng kết xuất. |
 | `getScope` | Không có | `String` | Không có | Trả về phạm vi phân loại cấp 2 (`"NeedGroup"`) hoặc cấp 3 (`"Category"`). |
-| `isZero` | Không có | `boolean` | Không có | Kiểm tra tỷ trọng có bằng 0.00% hay không (khoản mục không phát sinh chi tiêu trong kỳ). |
+| `isZero` | Không có | `boolean` | Không có | Kiểm tra tỷ trọng có bằng 0.00% hay không (khoản mục không phát sinh giao dịch trong kỳ). |
 | `format` | Không có | `String` | Không có | Định dạng kết xuất chuỗi tỷ trọng dạng `"40.00%"` hoặc `"0.00%"` với đúng 2 chữ số thập phân và ký hiệu `%` theo chuẩn hiển thị độ chính xác tài chính. |
-| `compareTo` | `SpendingStructureShare other` | `int` | Không có | So sánh thứ tự giữa hai tỷ trọng theo chiều giảm dần (tỷ trọng lớn hơn đứng trước); phục vụ yêu cầu sắp xếp danh sách cơ cấu chi tiêu giảm dần. |
+| `compareTo` | `SpendingStructureShare other` | `int` | Không có | So sánh thứ tự giữa hai tỷ trọng theo chiều giảm dần (tỷ trọng lớn hơn đứng trước); phục vụ yêu cầu sắp xếp danh sách cơ cấu thu chi giảm dần. |
 | `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên giá trị đại số của `share` (`compareTo` = 0) và thuộc tính `scope` theo ngữ nghĩa đối tượng giá trị. |
 | `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên `share` và `scope`. |
 
 **Tính bất biến và cơ chế so sánh**
 
-- Tính bất biến và ràng buộc giá trị tỷ trọng nằm trong khoảng từ không đến một trăm phần trăm: Tất cả thuộc tính được khai báo `private final`; không cung cấp phương thức thay đổi trạng thái. Ràng buộc bất biến $0.00 \le \text{share} \le 100.00$ được kiểm tra nghiêm ngặt ngay tại constructor và factory method. Khi tổng số tiền phân tích bằng 0, phương thức factory gán mặc định $0.00\%$ nhằm loại trừ lỗi chia cho số không. Sai số tổng tỷ trọng các thành phần cho phép độ lệch $\pm 0.01\%$ do hiệu ứng tích lũy làm tròn ngân hàng độc lập.
+- Tính bất biến và ràng buộc giá trị tỷ trọng nằm trong khoảng từ không đến một trăm phần trăm: Tất cả thuộc tính được khai báo `private final`; không cung cấp phương thức thay đổi trạng thái. Ràng buộc bất biến $0.00 \le \text{share} \le 100.00$ được kiểm tra nghiêm ngặt ngay tại constructor và factory method. Khi tổng số tiền phân tích bằng 0, phương thức factory gán mặc định $0.00\%$ nhằm loại trừ lỗi chia cho số không. Tổng tỷ trọng của n thành phần trong cùng cấp phân loại có thể lệch tối đa trong khoảng $\pm 0.005\% \times n$ do mỗi thành phần được làm tròn ngân hàng độc lập theo quy tắc độ chính xác tài chính.
 - Cơ chế so sánh bằng nhau qua equals và hashCode: Phương thức `equals` được ghi đè để so sánh hai đối tượng `SpendingStructureShare` dựa trên giá trị tỷ trọng `share` (so sánh bằng `compareTo` trên `BigDecimal` để bỏ qua khác biệt về scale hiển thị) kết hợp với phạm vi phân cấp `scope`; phương thức `hashCode` được sinh nhất quán từ các trường tương ứng.
-- Cài đặt Comparable để sắp xếp tỷ trọng chi tiêu giảm dần: Lớp cài đặt giao diện `Comparable<SpendingStructureShare>`; phương thức `compareTo` thực hiện so sánh đảo ngược (`other.share.compareTo(this.share)`) để tự động sắp xếp danh sách nhóm nhu cầu và danh mục theo thứ tự tỷ trọng giảm dần từ cao xuống thấp khi kết xuất bảng báo cáo cơ cấu chi tiêu.
+- Cài đặt Comparable để sắp xếp tỷ trọng thu chi giảm dần: Lớp cài đặt giao diện `Comparable<SpendingStructureShare>`; phương thức `compareTo` thực hiện so sánh đảo ngược (`other.share.compareTo(this.share)`) để tự động sắp xếp danh sách nhóm nhu cầu và danh mục theo thứ tự tỷ trọng giảm dần từ cao xuống thấp khi kết xuất bảng báo cáo cơ cấu thu chi.
 
 ### 2.3.7 Tên Định danh Thực thể
 

@@ -69,7 +69,7 @@ Mô tả yêu cầu: với quy mô dữ liệu cá nhân thông thường (tối
 
 1. Ghi nhận giao dịch (thu chi hoặc chuyển tiền): cập nhật bộ nhớ và đồng bộ số dư các thực thể liên quan ngay lập tức.
 2. Truy vấn dữ liệu: lọc theo khoảng thời gian, danh mục hoặc ví, tìm kiếm từ khóa và phân trang dữ liệu.
-3. Tổng hợp báo cáo: thống kê dòng tiền 12 tháng gần nhất và cơ cấu chi tiêu 2 cấp danh mục.
+3. Tổng hợp báo cáo: thống kê dòng tiền 12 tháng gần nhất và cơ cấu thu chi 2 cấp danh mục.
 4. Khởi động ứng dụng: thời gian từ lúc kích hoạt ứng dụng đến khi màn hình làm việc chính sẵn sàng tương tác đủ ngắn, không gián đoạn công việc của người dùng.
 5. Quản lý bộ nhớ: duy trì mức tiêu thụ bộ nhớ ổn định, không xảy ra rò rỉ bộ nhớ khi làm việc liên tục trong phiên làm việc kéo dài.
 

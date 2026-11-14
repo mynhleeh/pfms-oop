@@ -66,7 +66,7 @@ Bảng phân loại chi tiết 20 ca sử dụng theo mục tiêu tương tác c
 |  | `UC-TXN-01` đến `04` | Ghi nhận thu nhập, chi tiêu hằng ngày và phân loại theo danh mục | Quy tắc độ chính xác tài chính (`BR-FIN-01`), Quy tắc bảo toàn số dư ví (`BR-FIN-02`), Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) |
 |  | `UC-TRF-01` đến `03` | Chuyển tiền giữa hai ví, tự động trừ ví nguồn và cộng ví đích | Quy tắc độ chính xác tài chính (`BR-FIN-01`), Quy tắc bảo toàn số dư ví (`BR-FIN-02`), Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ (`BR-FIN-03`) |
 |  | `UC-CAT-01` đến `04` | Thiết lập cấu trúc danh mục 3 cấp phục vụ thống kê | Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`), Quy tắc tên của ví, nhóm nhu cầu và danh mục (`BR-NAM-01`) |
-| **Gói 2:** Thống kê, báo cáo và quản trị dữ liệu | `UC-REP-01` đến `02` | Theo dõi dòng tiền 12 tháng gần nhất và phân tích cơ cấu chi tiêu | Quy tắc độ chính xác tài chính (`BR-FIN-01`), Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) |
+| **Gói 2:** Thống kê, báo cáo và quản trị dữ liệu | `UC-REP-01` đến `02` | Theo dõi dòng tiền 12 tháng gần nhất và phân tích cơ cấu thu chi | Quy tắc độ chính xác tài chính (`BR-FIN-01`), Quy tắc bảo toàn số dư ví (`BR-FIN-02`), Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) |
 |  | `UC-DAT-01` đến `03` | Xuất dữ liệu, phục hồi bản sao lưu và kiểm tra tính toàn vẹn hệ thống | Quy tắc độ chính xác tài chính (`BR-FIN-01`) đến Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) |
 
 ### 7.2 Sơ đồ Ca sử dụng chi tiết theo 2 nhóm chức năng nghiệp vụ
@@ -278,11 +278,11 @@ Owner -- UC_REP_02
 - `UC-REP-01`: Thống kê xu hướng dòng tiền 12 tháng liên tục gần nhất.
 - `UC-REP-02`: Phân tích tỷ lệ cơ cấu thu chi theo nhóm nhu cầu và danh mục chi tiết.
 
-Quy tắc nghiệp vụ chi phối: Quy tắc độ chính xác tài chính (`BR-FIN-01`) chi phối cả hai ca sử dụng; Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) chi phối `UC-REP-02`.
+Quy tắc nghiệp vụ chi phối: Quy tắc độ chính xác tài chính (`BR-FIN-01`) và Quy tắc bảo toàn số dư ví (`BR-FIN-02`) chi phối cả hai ca sử dụng; Quy tắc phân cấp danh mục thu chi 3 cấp (`BR-FIN-04`) chi phối `UC-REP-02`.
 
 Yêu cầu chức năng liên quan:
-- `FR-REP-01`: thống kê chuỗi 12 tháng liên tục từ mốc chỉ định; tỷ lệ tiết kiệm bằng 0.00% khi tổng thu nhập không dương.
-- `FR-REP-02`: phân tích cơ cấu chi tiêu theo nhóm và danh mục; danh mục đã xóa vẫn hiển thị đầy đủ kèm nhãn trạng thái.
+- `FR-REP-01`: thống kê chuỗi 12 tháng liên tục từ mốc chỉ định (gồm mốc tương lai chỉ đọc), cộng phí giao dịch liên kết vào chi tiêu; tỷ lệ tiết kiệm bằng 0.00% khi tổng thu nhập không dương; chặn tham số sai bằng `ERR-REP-001`.
+- `FR-REP-02`: phân tích cơ cấu thu chi (`EXPENSE` gồm phí liên kết, hoặc `INCOME`) theo nhóm và danh mục có phát sinh dương, so sánh kỳ liền kề (`"Mới"` khi kỳ này > 0 và kỳ trước = 0; `0.00%` khi cả hai kỳ = 0); danh mục và nhóm đã xóa giữ tên gốc kèm nhãn `"(đã xóa)"`; chặn tham số sai bằng `ERR-REP-001`.
 
 ##### 7.2.2b Nhóm Lưu trữ và sao lưu dữ liệu (DAT)
 

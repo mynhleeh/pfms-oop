@@ -6,7 +6,7 @@ Với mỗi thao tác làm thay đổi dữ liệu (như tạo ví, ghi nhận t
 - Điều kiện hợp lệ để hệ thống chấp nhận thực hiện thao tác.
 - Kết quả biến đổi của các đối tượng dữ liệu sau khi thực hiện xong, bao gồm: đối tượng nào được tạo mới hoặc bị xóa bỏ, những thông tin nào bị thay đổi giá trị, và các mối liên kết nào giữa các đối tượng được thiết lập hoặc gỡ bỏ.
 
-Các thao tác chỉ đọc dữ liệu để hiển thị hoặc xuất báo cáo không làm thay đổi trạng thái dữ liệu trong hệ thống, do đó không nằm trong phạm vi mô tả của tài liệu này.
+Các thao tác chỉ đọc dữ liệu để hiển thị hoặc xuất báo cáo nhìn chung không làm thay đổi trạng thái dữ liệu nên nằm ngoài phạm vi biến đổi thực thể; riêng nhóm Thống kê và Báo cáo có hợp đồng kiểm tra tham số và bất biến chỉ đọc được đặc tả bổ sung tại mục 4.7.
 
 ## 4.1 Cấu trúc Đặc tả Thao tác
 
@@ -323,28 +323,28 @@ Người dùng khôi phục toàn bộ trạng thái dữ liệu tài chính c�
 - Xóa thể hiện: Toàn bộ các thể hiện dữ liệu hiện tại trong bộ nhớ hệ thống bị hủy bỏ hoàn toàn trước khi tiếp nhận và nạp dữ liệu mới từ bản sao lưu.
 - Biến đổi thuộc tính:
   - Toàn bộ các thuộc tính định danh, thông tin định lượng, thời gian và trạng thái của các thực thể được đồng bộ hóa chuẩn xác theo mốc thời gian lưu trữ trong tệp sao lưu.
-  - Thuộc tính số dư của từng ví (`Wallet.balance`) được tính toán và cập nhật lại một cách nhất quán từ số dư ban đầu kết hợp tổng hợp toàn bộ các giao dịch thu, chi, chuyển tiền, chi phí và các mốc kiểm kê đối soát có trong bản sao lưu theo quy tắc bảo toàn số dư (`BR-FIN-02`), bảo đảm số dư hệ thống sau phục hồi khớp đúng tuyệt đối với số liệu lịch sử.
+  - Thuộc tính số dư của từng ví (`Wallet.currentBalance`) được tính toán và cập nhật lại một cách nhất quán từ số dư ban đầu kết hợp tổng hợp toàn bộ các giao dịch thu, chi, chuyển tiền, chi phí và các mốc kiểm kê đối soát có trong bản sao lưu theo quy tắc bảo toàn số dư (`BR-FIN-02`), bảo đảm số dư hệ thống sau phục hồi khớp đúng tuyệt đối với số liệu lịch sử.
 - Hình thành hoặc phá vỡ liên kết:
   - Phá vỡ hoàn toàn toàn bộ mạng lưới liên kết giữa các đối tượng dữ liệu hiện tại cũ trước khi phục hồi.
   - Tái lập chính xác toàn bộ mạng lưới liên kết ngữ nghĩa giữa các thể hiện thực thể mới được tạo ra theo đúng cấu trúc trong tệp sao lưu: liên kết giữa ví với các giao dịch và bản ghi kiểm kê; liên kết chuyển tiền giữa ví nguồn và ví đích; liên kết phân cấp 3 cấp giữa loại thu chi, nhóm nhu cầu và danh mục; liên kết giữa giao dịch với danh mục phân loại và chi phí giao dịch tương ứng.
 
-### 4.7 Thống kê và Báo cáo
+## 4.7 Thống kê và Báo cáo
 
-Người dùng yêu cầu hệ thống trích xuất và hiển thị các báo cáo phân tích tài chính định kỳ, bao gồm dòng tiền thu chi theo chuỗi thời gian hoặc cơ cấu phân bổ chi tiêu theo nhóm danh mục nhằm theo dõi diễn biến tài chính.
+Người dùng yêu cầu hệ thống trích xuất và hiển thị các báo cáo phân tích tài chính định kỳ, bao gồm dòng tiền thu chi theo chuỗi 12 tháng hoặc cơ cấu phân bổ thu chi theo nhóm nhu cầu và danh mục nhằm theo dõi diễn biến tài chính.
 
-- Thao tác hệ thống: `generateReport(reportType, startDate, endDate, filters)`
-- Quy chiếu chéo: `UC-REP-01`, `FR-REP-01`, `BR-REP-01`, `ERR-REP-001`
+- Thao tác hệ thống: `generateCashFlowReport(endMonth, endYear)` và `generateSpendingStructureReport(startDate, endDate, transactionType)`
+- Quy chiếu chéo: `UC-REP-01`, `UC-REP-02`, `FR-REP-01`, `FR-REP-02`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-REP-001`
 
 **Tiền điều kiện**
 
-- Loại báo cáo chỉ định (`reportType`) phải tồn tại và hợp lệ trong danh mục các loại báo cáo được hệ thống hỗ trợ (báo cáo dòng tiền 12 tháng hoặc báo cáo cơ cấu thu chi).
-- Khoảng thời gian thống kê (`startDate`, `endDate`) phải đúng định dạng ngày tháng hợp lệ và thỏa mãn điều kiện logic thời gian bắt đầu không vượt quá thời gian kết thúc (`startDate <= endDate`).
-- Trường hợp phát sinh (`ERR-REP-001`): Khoảng thời gian thống kê không đúng định dạng ngày tháng hợp lệ hoặc ngày bắt đầu được chọn lớn hơn ngày kết thúc (`startDate > endDate`).
-- Các tiêu chí lọc trong `filters` (nếu có, như ví hoặc nhóm danh mục) phải tham chiếu đến các thực thể hợp lệ đang tồn tại trong hệ thống.
+- Đối với báo cáo dòng tiền 12 tháng: tham số `endMonth` phải nằm trong đoạn `[1, 12]` và `endYear` phải từ `2000` trở lên (giao diện có thể điền mặc định tháng và năm hiện tại nếu người dùng không chọn, nhưng đối tượng yêu cầu truyền xuống hệ thống phải khác rỗng).
+- Đối với báo cáo cơ cấu thu chi: `startDate` và `endDate` bắt buộc khác rỗng và thỏa mãn `startDate <= endDate`; loại luồng tiền `transactionType` bắt buộc thuộc `{EXPENSE, INCOME}` (giao diện điền mặc định `EXPENSE`, nhưng đối tượng yêu cầu truyền xuống hệ thống phải khác rỗng).
+- Mốc và khoảng thời gian tương lai: các mốc `(endMonth, endYear)` hoặc khoảng ngày `[startDate, endDate]` thuộc tương lai đều được phép truy vấn ở chế độ chỉ đọc.
+- Trường hợp phát sinh (`ERR-REP-001`): thiếu tham số yêu cầu, `endMonth` ngoài `[1, 12]`, `endYear < 2000`, `startDate > endDate`, hoặc `transactionType` không thuộc `{EXPENSE, INCOME}`.
 
 **Hậu điều kiện**
 
-- Tạo mới thể hiện: Không có. (Thao tác thuần truy vấn dữ liệu chỉ đọc, chỉ khởi tạo đối tượng cấu trúc dữ liệu báo cáo tạm thời trên bộ nhớ giao diện để hiển thị kết quả cho người dùng, không tạo mới bất kỳ thể hiện thực thể lưu trữ nào trong hệ thống).
+- Tạo mới thể hiện: Không có. (Thao tác thuần truy vấn dữ liệu chỉ đọc, chỉ khởi tạo cấu trúc dữ liệu kết quả tạm thời để truyền lên giao diện hiển thị, không tạo mới bất kỳ thực thể lưu trữ nào trong hệ thống).
 - Xóa thể hiện: Không có.
 - Biến đổi thuộc tính: Không có. (Thao tác chỉ đọc, tuyệt đối không làm thay đổi số dư ví, trạng thái hay bất kỳ giá trị thuộc tính nào của các thực thể trong hệ thống).
 - Hình thành hoặc phá vỡ liên kết: Không có.

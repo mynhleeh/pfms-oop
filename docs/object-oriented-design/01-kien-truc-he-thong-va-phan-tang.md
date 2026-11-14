@@ -69,7 +69,8 @@ com.pfms
 │   ├── controller          # Điều phối luồng màn hình và xử lý sự kiện giao diện
 │   ├── view                # Cửa sổ chính, biểu mẫu và bảng hiển thị
 │   └── dto                 # Đối tượng truyền dữ liệu giữa giao diện và dịch vụ
-├── service                 # Tầng Dịch vụ: Điều phối ca sử dụng nghiệp vụ
+├── service                 # Tầng Dịch vụ: Giao diện điều phối ca sử dụng nghiệp vụ
+│   └── impl                # Lớp cài đặt dịch vụ công khai và tiện ích điều phối nội bộ
 ├── domain                  # Tầng Nghiệp vụ: Thực thể, quy tắc và hợp đồng kho lưu trữ
 │   ├── model               # Thực thể và đối tượng giá trị bất biến
 │   ├── repository          # Giao diện kho lưu trữ trừu tượng được đặt trong miền nghiệp vụ
@@ -95,8 +96,8 @@ Bảng ma trận xác lập các gói được phép tham chiếu và phạm vi 
 **Quy tắc kiểm soát phạm vi lớp nội bộ:**
 
 Nhằm tối thiểu hóa khả năng tiếp cận của các lớp theo nguyên lý đóng gói hướng đối tượng:
-1. Các giao diện dịch vụ, giao diện kho lưu trữ, đối tượng truyền dữ liệu DTO và thực thể nghiệp vụ được khai báo ở mức `public` để phục vụ tương tác liên tầng.
-2. Các lớp cài đặt dịch vụ cụ thể, lớp điều phối tệp tin và các phương thức trợ giúp kỹ thuật được giới hạn ở phạm vi nội bộ gói (`package-private`), ngăn chặn việc các gói bên ngoài tự ý khởi tạo hoặc phụ thuộc trực tiếp vào chi tiết cài đặt.
+1. Các giao diện dịch vụ, lớp cài đặt dịch vụ trong gói `service.impl` (phục vụ khởi tạo và tiêm phụ thuộc từ điểm khởi chạy ứng dụng), giao diện kho lưu trữ, đối tượng truyền dữ liệu DTO và thực thể nghiệp vụ được khai báo ở mức `public` để phục vụ tương tác liên tầng.
+2. Các lớp hỗ trợ điều phối nội bộ trong tầng dịch vụ (`EntityLookupSupport`, `RollbackSupport`), lớp điều phối tệp tin nội bộ và các phương thức trợ giúp kỹ thuật được giới hạn ở phạm vi nội bộ gói (`package-private`), ngăn chặn việc các gói bên ngoài phụ thuộc trực tiếp vào chi tiết hỗ trợ nội bộ.
 3. Các lớp tiện ích thuộc `common.util` được thiết kế theo chuẩn Utility Class (hằng số, phương thức tĩnh `public static`, constructor `private` ném ngoại lệ ngăn chặn hành vi khởi tạo đối tượng).
 
 ## 1.4 Luồng Xử lý và Biến đổi Dữ liệu
