@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * DTO đóng gói toàn bộ trạng thái dữ liệu các thực thể trong hệ thống phục vụ
- * xuất bản sao lưu hoặc phục hồi dữ liệu (UC-DAT-01, UC-DAT-02, FR-DAT-01, FR-DAT-02).
+ * DTO đóng gói toàn bộ dữ liệu tài chính phục vụ xuất sao lưu hoặc phục hồi hệ thống.
  */
 public final class BackupPayloadDTO {
 
