@@ -174,5 +174,63 @@ class CategoryShareResponseDTOTest {
             assertTrue(str.contains("CategoryShareResponseDTO"));
         }
     }
+
+    @Nested
+    @DisplayName("Trường mở rộng shareInGroup và So sánh Kỳ liền kề")
+    class ExtendedComparisonFieldsTests {
+
+        @Test
+        @DisplayName("Khởi tạo với constructor 6 và 10 tham số giữ nguyên đầy đủ tỷ trọng và biến động")
+        void shouldCreateWithExtendedConstructors() {
+            UUID id = UUID.randomUUID();
+            CategoryShareResponseDTO sixArgs = new CategoryShareResponseDTO(
+                    id, "Ăn uống", "ACTIVE", new BigDecimal("500000"),
+                    new BigDecimal("25.00"), new BigDecimal("50.00"));
+
+            assertEquals(new BigDecimal("50.00"), sixArgs.getShareInGroup());
+            assertEquals(0, BigDecimal.ZERO.compareTo(sixArgs.getPreviousTotalAmount()));
+            assertEquals(0, BigDecimal.ZERO.compareTo(sixArgs.getDifferenceAmount()));
+            assertEquals(0, BigDecimal.ZERO.compareTo(sixArgs.getPercentageChange()));
+            assertFalse(sixArgs.isNew());
+
+            CategoryShareResponseDTO tenArgs = new CategoryShareResponseDTO(
+                    id, "Ăn uống", "ACTIVE",
+                    new BigDecimal("500000.00"), new BigDecimal("25.00"), new BigDecimal("50.00"),
+                    new BigDecimal("400000.00"), new BigDecimal("100000.00"), new BigDecimal("25.00"), true);
+
+            assertEquals(new BigDecimal("50.00"), tenArgs.getShareInGroup());
+            assertEquals(new BigDecimal("400000.00"), tenArgs.getPreviousTotalAmount());
+            assertEquals(new BigDecimal("100000.00"), tenArgs.getDifferenceAmount());
+            assertEquals(new BigDecimal("25.00"), tenArgs.getPercentageChange());
+            assertTrue(tenArgs.isNew());
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa null về ZERO và bảo đảm bất biến thang số thập phân trong equals/hashCode")
+        void shouldDefaultNullExtendedFieldsAndPreserveScaleInvariance() {
+            UUID id = UUID.randomUUID();
+            CategoryShareResponseDTO defaulted = new CategoryShareResponseDTO(
+                    id, "Ăn uống", "ACTIVE", new BigDecimal("100"), new BigDecimal("20.00"),
+                    null, null, null, null, false);
+            assertEquals(BigDecimal.ZERO, defaulted.getShareInGroup());
+            assertEquals(BigDecimal.ZERO, defaulted.getPreviousTotalAmount());
+            assertEquals(BigDecimal.ZERO, defaulted.getDifferenceAmount());
+            assertEquals(BigDecimal.ZERO, defaulted.getPercentageChange());
+
+            CategoryShareResponseDTO a = new CategoryShareResponseDTO(
+                    id, "Ăn uống", "ACTIVE", new BigDecimal("100"), new BigDecimal("20.0"), new BigDecimal("50.0"),
+                    new BigDecimal("80"), new BigDecimal("20"), new BigDecimal("25.0"), false);
+            CategoryShareResponseDTO b = new CategoryShareResponseDTO(
+                    id, "Ăn uống", "ACTIVE", new BigDecimal("100.00"), new BigDecimal("20.00"), new BigDecimal("50.00"),
+                    new BigDecimal("80.00"), new BigDecimal("20.00"), new BigDecimal("25.00"), false);
+            CategoryShareResponseDTO c = new CategoryShareResponseDTO(
+                    id, "Ăn uống", "ACTIVE", new BigDecimal("100.00"), new BigDecimal("20.00"), new BigDecimal("50.00"),
+                    new BigDecimal("80.00"), new BigDecimal("20.00"), new BigDecimal("25.00"), true);
+
+            assertEquals(a, b);
+            assertEquals(a.hashCode(), b.hashCode());
+            assertNotEquals(a, c);
+        }
+    }
 }
 

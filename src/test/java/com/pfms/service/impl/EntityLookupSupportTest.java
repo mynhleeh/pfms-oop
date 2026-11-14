@@ -25,6 +25,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -394,6 +399,41 @@ class EntityLookupSupportTest {
             Category result = EntityLookupSupport.resolveForDisplay(categoryRepository, categoryId, fallback);
 
             assertSame(fallback, result);
+        }
+    }
+
+    @Nested
+    @DisplayName("Nhóm 6: Lập chỉ mục Thực thể theo Mã (indexById)")
+    class IndexByIdTests {
+
+        @Test
+        @DisplayName("indexById trả về map rỗng khi danh sách null hoặc rỗng")
+        void shouldReturnEmptyMapWhenInputNullOrEmpty() {
+            assertTrue(EntityLookupSupport.indexById(null, Category::getCategoryId).isEmpty());
+            assertTrue(EntityLookupSupport.indexById(Collections.emptyList(), Category::getCategoryId).isEmpty());
+        }
+
+        @Test
+        @DisplayName("indexById ném NullPointerException khi hàm trích xuất mã là null")
+        void shouldRejectNullIdExtractor() {
+            assertThrows(NullPointerException.class,
+                    () -> EntityLookupSupport.indexById(List.of(expenseCategory), null));
+        }
+
+        @Test
+        @DisplayName("indexById lập chỉ mục chính xác và bỏ qua phần tử hoặc mã null")
+        void shouldIndexEntitiesAndSkipNullEntries() {
+            Category secondCategory = new Category(
+                    UUID.randomUUID(), "Di chuyển", UUID.randomUUID(),
+                    TransactionType.EXPENSE, "car", "#2196F3");
+
+            Map<UUID, Category> indexed = EntityLookupSupport.indexById(
+                    Arrays.asList(expenseCategory, null, secondCategory),
+                    Category::getCategoryId);
+
+            assertEquals(2, indexed.size());
+            assertSame(expenseCategory, indexed.get(expenseCategory.getCategoryId()));
+            assertSame(secondCategory, indexed.get(secondCategory.getCategoryId()));
         }
     }
 }

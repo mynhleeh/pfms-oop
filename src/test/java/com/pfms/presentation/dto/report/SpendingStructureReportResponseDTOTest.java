@@ -198,5 +198,56 @@ class SpendingStructureReportResponseDTOTest {
             assertTrue(str.contains("SpendingStructureReportResponseDTO"));
         }
     }
+
+    @Nested
+    @DisplayName("Trường So sánh Tổng Kỳ liền kề")
+    class ComparisonFieldsTests {
+
+        @Test
+        @DisplayName("Khởi tạo với constructor 9 tham số và chuẩn hóa null an toàn")
+        void shouldCreateWithComparisonFieldsAndDefaultNulls() {
+            LocalDate start = LocalDate.of(2026, 2, 1);
+            LocalDate end = LocalDate.of(2026, 2, 28);
+
+            SpendingStructureReportResponseDTO full = new SpendingStructureReportResponseDTO(
+                    "EXPENSE", start, end,
+                    new BigDecimal("1500000"), new BigDecimal("1000000"),
+                    new BigDecimal("500000"), new BigDecimal("50.00"), true, List.of());
+
+            assertEquals(new BigDecimal("1000000"), full.getPreviousTotalAmount());
+            assertEquals(new BigDecimal("500000"), full.getDifferenceAmount());
+            assertEquals(new BigDecimal("50.00"), full.getPercentageChange());
+            assertTrue(full.isNew());
+
+            SpendingStructureReportResponseDTO defaulted = new SpendingStructureReportResponseDTO(
+                    "INCOME", start, end,
+                    new BigDecimal("1500000"), null, null, null, false, List.of());
+            assertEquals(BigDecimal.ZERO, defaulted.getPreviousTotalAmount());
+            assertEquals(BigDecimal.ZERO, defaulted.getDifferenceAmount());
+            assertEquals(BigDecimal.ZERO, defaulted.getPercentageChange());
+            assertFalse(defaulted.isNew());
+        }
+
+        @Test
+        @DisplayName("Bảo đảm bất biến thang số thập phân trong equals và hashCode cho trường so sánh")
+        void shouldPreserveScaleInvarianceForComparisonFields() {
+            LocalDate start = LocalDate.of(2026, 2, 1);
+            LocalDate end = LocalDate.of(2026, 2, 28);
+
+            SpendingStructureReportResponseDTO a = new SpendingStructureReportResponseDTO(
+                    "EXPENSE", start, end, new BigDecimal("100"),
+                    new BigDecimal("80"), new BigDecimal("20.0"), new BigDecimal("25"), false, List.of());
+            SpendingStructureReportResponseDTO b = new SpendingStructureReportResponseDTO(
+                    "EXPENSE", start, end, new BigDecimal("100.00"),
+                    new BigDecimal("80.00"), new BigDecimal("20.00"), new BigDecimal("25.00"), false, List.of());
+            SpendingStructureReportResponseDTO c = new SpendingStructureReportResponseDTO(
+                    "EXPENSE", start, end, new BigDecimal("100.00"),
+                    new BigDecimal("80.00"), new BigDecimal("20.00"), new BigDecimal("25.00"), true, List.of());
+
+            assertEquals(a, b);
+            assertEquals(a.hashCode(), b.hashCode());
+            assertNotEquals(a, c);
+        }
+    }
 }
 

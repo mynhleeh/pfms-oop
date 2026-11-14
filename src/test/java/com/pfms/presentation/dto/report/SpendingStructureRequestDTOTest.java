@@ -105,7 +105,7 @@ class SpendingStructureRequestDTOTest {
     class ValidationPassthroughTests {
 
         @Test
-        @DisplayName("Truyền thẳng khoảng ngày đảo ngược để Service kiểm tra và ném ValidationException")
+        @DisplayName("Truyền thẳng khoảng ngày đảo ngược để Service kiểm tra và ném BusinessException (ERR-REP-001)")
         void shouldPreserveInvalidDateRangeForServiceValidation() {
             LocalDate start = LocalDate.of(2026, 2, 1);
             LocalDate end = LocalDate.of(2026, 1, 1);

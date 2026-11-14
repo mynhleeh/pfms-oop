@@ -27,6 +27,8 @@ public enum ErrorCode {
     ERR_CAT_004("ERR-CAT-004", "Nhóm chứa danh mục này đang ở trạng thái đã xóa. Hãy khôi phục nhóm trước."),
     ERR_CAT_005("ERR-CAT-005", "Không thể tạo danh mục trong nhóm đã xóa. Hãy chọn nhóm đang dùng."),
 
+    ERR_REP_001("ERR-REP-001", "Tham số thời gian hoặc loại báo cáo không hợp lệ."),
+
     ERR_DAT_001("ERR-DAT-001", "Tệp sao lưu không hợp lệ hoặc cấu trúc dữ liệu JSON bị hỏng."),
     ERR_DAT_002("ERR-DAT-002", "Dữ liệu sao lưu vi phạm ràng buộc toàn vẹn số dư ví hoặc dòng tiền."),
 

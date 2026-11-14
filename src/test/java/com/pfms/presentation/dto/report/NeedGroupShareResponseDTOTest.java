@@ -206,5 +206,54 @@ class NeedGroupShareResponseDTOTest {
             assertTrue(str.contains("NeedGroupShareResponseDTO"));
         }
     }
+
+    @Nested
+    @DisplayName("Trường So sánh Kỳ liền kề")
+    class ComparisonFieldsTests {
+
+        @Test
+        @DisplayName("Khởi tạo với constructor 10 tham số và chuẩn hóa null an toàn")
+        void shouldCreateWithComparisonFieldsAndDefaultNulls() {
+            UUID groupId = UUID.randomUUID();
+            NeedGroupShareResponseDTO full = new NeedGroupShareResponseDTO(
+                    groupId, "Thiết yếu", "ACTIVE",
+                    new BigDecimal("1000000"), new BigDecimal("60.00"),
+                    new BigDecimal("800000"), new BigDecimal("200000"), new BigDecimal("25.00"), true,
+                    List.of());
+
+            assertEquals(new BigDecimal("800000"), full.getPreviousTotalAmount());
+            assertEquals(new BigDecimal("200000"), full.getDifferenceAmount());
+            assertEquals(new BigDecimal("25.00"), full.getPercentageChange());
+            assertTrue(full.isNew());
+
+            NeedGroupShareResponseDTO defaulted = new NeedGroupShareResponseDTO(
+                    groupId, "Thiết yếu", "ACTIVE",
+                    new BigDecimal("1000000"), new BigDecimal("60.00"),
+                    null, null, null, false, List.of());
+            assertEquals(BigDecimal.ZERO, defaulted.getPreviousTotalAmount());
+            assertEquals(BigDecimal.ZERO, defaulted.getDifferenceAmount());
+            assertEquals(BigDecimal.ZERO, defaulted.getPercentageChange());
+            assertFalse(defaulted.isNew());
+        }
+
+        @Test
+        @DisplayName("Bảo đảm bất biến thang số thập phân trong equals và hashCode cho trường so sánh")
+        void shouldPreserveScaleInvarianceForComparisonFields() {
+            UUID groupId = UUID.randomUUID();
+            NeedGroupShareResponseDTO a = new NeedGroupShareResponseDTO(
+                    groupId, "Thiết yếu", "ACTIVE", new BigDecimal("100"), new BigDecimal("20.0"),
+                    new BigDecimal("50"), new BigDecimal("50.0"), new BigDecimal("100"), false, List.of());
+            NeedGroupShareResponseDTO b = new NeedGroupShareResponseDTO(
+                    groupId, "Thiết yếu", "ACTIVE", new BigDecimal("100.00"), new BigDecimal("20.00"),
+                    new BigDecimal("50.00"), new BigDecimal("50.00"), new BigDecimal("100.00"), false, List.of());
+            NeedGroupShareResponseDTO c = new NeedGroupShareResponseDTO(
+                    groupId, "Thiết yếu", "ACTIVE", new BigDecimal("100.00"), new BigDecimal("20.00"),
+                    new BigDecimal("50.00"), new BigDecimal("50.00"), new BigDecimal("100.00"), true, List.of());
+
+            assertEquals(a, b);
+            assertEquals(a.hashCode(), b.hashCode());
+            assertNotEquals(a, c);
+        }
+    }
 }
 

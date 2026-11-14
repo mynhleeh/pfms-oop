@@ -19,6 +19,10 @@ public final class SpendingStructureReportResponseDTO {
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final BigDecimal totalAmount;
+    private final BigDecimal previousTotalAmount;
+    private final BigDecimal differenceAmount;
+    private final BigDecimal percentageChange;
+    private final boolean isNew;
     private final List<NeedGroupShareResponseDTO> groups;
     // endregion
 
@@ -30,6 +34,21 @@ public final class SpendingStructureReportResponseDTO {
             BigDecimal totalAmount,
             List<NeedGroupShareResponseDTO> groups) {
 
+        this(transactionType, startDate, endDate, totalAmount,
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, false, groups);
+    }
+
+    public SpendingStructureReportResponseDTO(
+            String transactionType,
+            LocalDate startDate,
+            LocalDate endDate,
+            BigDecimal totalAmount,
+            BigDecimal previousTotalAmount,
+            BigDecimal differenceAmount,
+            BigDecimal percentageChange,
+            boolean isNew,
+            List<NeedGroupShareResponseDTO> groups) {
+
         this.transactionType = (transactionType == null || transactionType.trim().isEmpty())
                 ? "EXPENSE"
                 : transactionType.trim().toUpperCase();
@@ -38,6 +57,10 @@ public final class SpendingStructureReportResponseDTO {
         this.startDate = (startDate == null) ? now.withDayOfMonth(1) : startDate;
         this.endDate = (endDate == null) ? now : endDate;
         this.totalAmount = (totalAmount != null) ? totalAmount : BigDecimal.ZERO;
+        this.previousTotalAmount = (previousTotalAmount != null) ? previousTotalAmount : BigDecimal.ZERO;
+        this.differenceAmount = (differenceAmount != null) ? differenceAmount : BigDecimal.ZERO;
+        this.percentageChange = (percentageChange != null) ? percentageChange : BigDecimal.ZERO;
+        this.isNew = isNew;
         this.groups = (groups == null)
                 ? Collections.emptyList()
                 : Collections.unmodifiableList(new ArrayList<>(groups));
@@ -76,6 +99,22 @@ public final class SpendingStructureReportResponseDTO {
         return this.totalAmount;
     }
 
+    public BigDecimal getPreviousTotalAmount() {
+        return this.previousTotalAmount;
+    }
+
+    public BigDecimal getDifferenceAmount() {
+        return this.differenceAmount;
+    }
+
+    public BigDecimal getPercentageChange() {
+        return this.percentageChange;
+    }
+
+    public boolean isNew() {
+        return this.isNew;
+    }
+
     public List<NeedGroupShareResponseDTO> getGroups() {
         return this.groups;
     }
@@ -108,6 +147,10 @@ public final class SpendingStructureReportResponseDTO {
                 && Objects.equals(this.startDate, that.startDate)
                 && Objects.equals(this.endDate, that.endDate)
                 && (this.totalAmount.compareTo(that.totalAmount) == 0)
+                && (this.previousTotalAmount.compareTo(that.previousTotalAmount) == 0)
+                && (this.differenceAmount.compareTo(that.differenceAmount) == 0)
+                && (this.percentageChange.compareTo(that.percentageChange) == 0)
+                && (this.isNew == that.isNew)
                 && Objects.equals(this.groups, that.groups);
     }
 
@@ -118,6 +161,10 @@ public final class SpendingStructureReportResponseDTO {
                 this.startDate,
                 this.endDate,
                 this.totalAmount.stripTrailingZeros(),
+                this.previousTotalAmount.stripTrailingZeros(),
+                this.differenceAmount.stripTrailingZeros(),
+                this.percentageChange.stripTrailingZeros(),
+                this.isNew,
                 this.groups);
     }
 
@@ -128,6 +175,7 @@ public final class SpendingStructureReportResponseDTO {
                 ", startDate=" + this.startDate +
                 ", endDate=" + this.endDate +
                 ", totalAmount=" + this.totalAmount +
+                ", isNew=" + this.isNew +
                 ", groupCount=" + this.groups.size() +
                 '}';
     }

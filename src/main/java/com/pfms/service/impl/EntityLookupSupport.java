@@ -12,14 +12,18 @@ import com.pfms.domain.repository.CategoryRepository;
 import com.pfms.domain.repository.GenericRepository;
 import com.pfms.domain.repository.WalletRepository;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Tiện ích tra cứu và xác thực thực thể miền (Ví, Danh mục, Nhóm nhu cầu) dùng
- * chung cho
- * các lớp cài đặt dịch vụ trong gói {@code com.pfms.service.impl}.
+ * Tiện ích tra cứu và xác thực thực thể miền dùng chung cho các lớp cài đặt
+ * dịch vụ
  */
 final class EntityLookupSupport {
 
@@ -108,6 +112,24 @@ final class EntityLookupSupport {
             return fallback;
         }
         return repository.findById(id).orElse(fallback);
+    }
+
+    static <T, ID> Map<ID, T> indexById(Collection<T> entities, Function<T, ID> idExtractor) {
+        Objects.requireNonNull(idExtractor, "Hàm trích xuất mã định danh không được để null");
+        if (entities == null || entities.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<ID, T> indexed = new HashMap<>(entities.size());
+        for (T entity : entities) {
+            if (entity == null) {
+                continue;
+            }
+            ID id = idExtractor.apply(entity);
+            if (id != null) {
+                indexed.put(id, entity);
+            }
+        }
+        return Collections.unmodifiableMap(indexed);
     }
     // endregion
 }

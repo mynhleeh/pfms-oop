@@ -21,6 +21,10 @@ public final class NeedGroupShareResponseDTO {
     private final String status;
     private final BigDecimal totalAmount;
     private final BigDecimal share;
+    private final BigDecimal previousTotalAmount;
+    private final BigDecimal differenceAmount;
+    private final BigDecimal percentageChange;
+    private final boolean isNew;
     private final List<CategoryShareResponseDTO> categories;
     // endregion
 
@@ -43,6 +47,22 @@ public final class NeedGroupShareResponseDTO {
             BigDecimal share,
             List<CategoryShareResponseDTO> categories) {
 
+        this(needGroupId, name, status, totalAmount, share,
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, false, categories);
+    }
+
+    public NeedGroupShareResponseDTO(
+            UUID needGroupId,
+            String name,
+            String status,
+            BigDecimal totalAmount,
+            BigDecimal share,
+            BigDecimal previousTotalAmount,
+            BigDecimal differenceAmount,
+            BigDecimal percentageChange,
+            boolean isNew,
+            List<CategoryShareResponseDTO> categories) {
+
         this.needGroupId = Objects.requireNonNull(needGroupId, "Mã nhóm nhu cầu không được để null");
         this.name = (name == null) ? "" : name.trim();
         this.status = (status == null || status.trim().isEmpty())
@@ -50,6 +70,10 @@ public final class NeedGroupShareResponseDTO {
                 : status.trim().toUpperCase();
         this.totalAmount = (totalAmount != null) ? totalAmount : BigDecimal.ZERO;
         this.share = (share != null) ? share : BigDecimal.ZERO;
+        this.previousTotalAmount = (previousTotalAmount != null) ? previousTotalAmount : BigDecimal.ZERO;
+        this.differenceAmount = (differenceAmount != null) ? differenceAmount : BigDecimal.ZERO;
+        this.percentageChange = (percentageChange != null) ? percentageChange : BigDecimal.ZERO;
+        this.isNew = isNew;
         this.categories = (categories == null)
                 ? Collections.emptyList()
                 : Collections.unmodifiableList(new ArrayList<>(categories));
@@ -75,6 +99,22 @@ public final class NeedGroupShareResponseDTO {
 
     public BigDecimal getShare() {
         return this.share;
+    }
+
+    public BigDecimal getPreviousTotalAmount() {
+        return this.previousTotalAmount;
+    }
+
+    public BigDecimal getDifferenceAmount() {
+        return this.differenceAmount;
+    }
+
+    public BigDecimal getPercentageChange() {
+        return this.percentageChange;
+    }
+
+    public boolean isNew() {
+        return this.isNew;
     }
 
     public List<CategoryShareResponseDTO> getCategories() {
@@ -110,6 +150,10 @@ public final class NeedGroupShareResponseDTO {
                 && Objects.equals(this.status, that.status)
                 && (this.totalAmount.compareTo(that.totalAmount) == 0)
                 && (this.share.compareTo(that.share) == 0)
+                && (this.previousTotalAmount.compareTo(that.previousTotalAmount) == 0)
+                && (this.differenceAmount.compareTo(that.differenceAmount) == 0)
+                && (this.percentageChange.compareTo(that.percentageChange) == 0)
+                && (this.isNew == that.isNew)
                 && Objects.equals(this.categories, that.categories);
     }
 
@@ -121,6 +165,10 @@ public final class NeedGroupShareResponseDTO {
                 this.status,
                 this.totalAmount.stripTrailingZeros(),
                 this.share.stripTrailingZeros(),
+                this.previousTotalAmount.stripTrailingZeros(),
+                this.differenceAmount.stripTrailingZeros(),
+                this.percentageChange.stripTrailingZeros(),
+                this.isNew,
                 this.categories);
     }
 
@@ -132,6 +180,7 @@ public final class NeedGroupShareResponseDTO {
                 ", status='" + this.status + '\'' +
                 ", totalAmount=" + this.totalAmount +
                 ", share=" + this.share +
+                ", isNew=" + this.isNew +
                 ", categoryCount=" + this.categories.size() +
                 '}';
     }

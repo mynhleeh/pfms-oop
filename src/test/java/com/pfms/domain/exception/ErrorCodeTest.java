@@ -15,13 +15,20 @@ import static org.junit.jupiter.api.Assertions.*;
 class ErrorCodeTest {
 
     private static final Pattern CODE_PATTERN = Pattern.compile("^ERR-[A-Z]{3}-\\d{3}$");
-    private static final int EXPECTED_TOTAL_CODES = 19;
+    private static final int EXPECTED_TOTAL_CODES = 20;
 
     @Test
-    @DisplayName("Should contain exactly 19 standardized system error codes")
+    @DisplayName("Should contain exactly 20 standardized system error codes")
     void testTotalErrorCodeCount() {
         assertEquals(EXPECTED_TOTAL_CODES, ErrorCode.values().length,
-                "Hệ thống phải có chính xác 19 mã lỗi theo đặc tả OOD Mục 8.3.2");
+                "Hệ thống phải có chính xác 20 mã lỗi theo đặc tả OOD Mục 8.3.2");
+    }
+
+    @Test
+    @DisplayName("Should define ERR_REP_001 with expected code and message")
+    void testReportErrorCodeMetadata() {
+        assertEquals("ERR-REP-001", ErrorCode.ERR_REP_001.getCode());
+        assertEquals("Tham số thời gian hoặc loại báo cáo không hợp lệ.", ErrorCode.ERR_REP_001.getDefaultMessage());
     }
 
     @ParameterizedTest(name = "ErrorCode {0} should match naming pattern and have valid messages")
