@@ -8,25 +8,34 @@ Mục này trình bày cấu trúc phân rã các gói nội bộ của Tầng T
 
 ### 7.1.1 Nguyên lý Phân tách Giao diện và Xử lý Sự kiện
 
-Tầng Trình diễn tuân thủ nguyên lý phân tách trách nhiệm: các thành phần giao diện chỉ tương tác với người dùng qua chuột, bàn phím và màn hình đồ họa, hoàn toàn không chứa quy tắc tính toán số dư hay logic lưu trữ dữ liệu.
+Tầng Trình diễn tuân thủ nguyên lý phân tách trách nhiệm và mô hình Model-View-Presenter (Passive View) kết hợp Bộ điều khiển biểu mẫu: các thành phần giao diện chỉ tương tác với người dùng qua chuột, bàn phím và màn hình đồ họa, hoàn toàn không chứa quy tắc tính toán số dư hay logic lưu trữ dữ liệu.
 
-Mã nguồn tầng trình diễn nằm trong không gian tên `com.pfms.presentation`, gồm ba gói:
+Mã nguồn tầng trình diễn nằm trong không gian tên `com.pfms.presentation`, được tổ chức theo kiến trúc Phân chia theo Nhóm chức năng (Package-by-Feature) với nguyên tắc "Cốt lõi ở ngoài - Vệ tinh gom vào trong" (Core at Root, Satellites in Sub-packages):
 
-- Gói Khung nhìn (`com.pfms.presentation.view`): Chứa cửa sổ chính (`MainFrame`), thanh điều hướng bên (`SidebarPanel`), các bảng điều khiển phân hệ (`DashboardPanel`, `WalletPanel`, `TransactionPanel`, `TransferPanel`, `CategoryPanel`, `ReportPanel`, `DataManagementPanel`) và các hộp thoại nhập liệu chuyên biệt (`JDialog`).
-- Gói Điều phối (`com.pfms.presentation.controller`): Chứa các bộ điều khiển giao diện (`MainController`, `WalletGUIController`, `TransactionGUIController`, `TransferGUIController`, `CategoryGUIController`, `ReportGUIController`, `DataManagementGUIController`). Các lớp này đăng ký lắng nghe sự kiện (`ActionListener`, `DocumentListener`), thực hiện kiểm tra sơ bộ dữ liệu biểu mẫu qua lớp tiện ích, đóng gói dữ liệu vào DTO yêu cầu và gọi phương thức tương ứng trên Tầng Dịch vụ qua giao diện trừu tượng.
-- Gói Truyền Dữ liệu (`com.pfms.presentation.dto`): Chứa các đối tượng dữ liệu thô bất biến (`RequestDTO` và `ResponseDTO`) dùng để trao đổi dữ liệu hai chiều giữa Tầng Trình diễn và Tầng Dịch vụ.
+- Gói Dùng chung & Vỏ Ứng dụng (`com.pfms.presentation.common`): Chứa khung cửa sổ chính (`MainFrame`), thanh điều hướng (`SidebarPanel`), thanh trạng thái (`StatusBarPanel`), các thẻ bo góc (`RoundedCardPanel`), bộ điều phối điều hướng trung tâm (`MainController`), hợp đồng thông báo cơ sở (`BaseView`), bảng quy chuẩn màu sắc và phông chữ (`ViewConstants`), tiện ích định dạng và dựng hiển thị (`ViewUtils`), tiện ích kiểm thực biểu mẫu (`InputValidator`), cùng các chiến lược xuất báo cáo đa định dạng theo mẫu Strategy (`export/`).
+- Gói Truyền Dữ liệu (`com.pfms.presentation.dto`): Chứa các đối tượng dữ liệu thô bất biến (`RequestDTO` và `ResponseDTO`) phân theo từng phân hệ nghiệp vụ (`wallet`, `category`, `transaction`, `transfer`, `report`, `data`), đóng vai trò hợp đồng dữ liệu biên hai chiều kết nối an toàn giữa Tầng Trình diễn và Tầng Dịch vụ.
+- 7 Gói Chức năng Phân hệ (`com.pfms.presentation.{feature}`): Gồm `dashboard`, `wallet`, `category`, `transaction`, `transfer`, `report`, và `data`. Mỗi gói chức năng áp dụng cấu trúc nhất quán:
+  - **Gốc của gói (Core at Root):** Chỉ chứa 4 thành phần trụ cột của phân hệ: `*Panel` (Khung nhìn Swing), `*View` (Hợp đồng hiển thị thuần Java 0% Swing), `*Presenter` (Bộ điều phối hiển thị chuyển đổi DTO sang ViewModel và ra lệnh cập nhật View), và `*GUIController` (Bộ điều khiển tiếp nhận sự kiện biểu mẫu, kiểm thực đầu vào và ủy quyền cho Service).
+  - **Gói vệ tinh nội bộ (Satellites in Sub-packages):** Gom các lớp chuyên biệt nhằm tối ưu hóa phạm vi truy cập:
+    - `dialog/`: Chứa các hộp thoại nhập liệu modal (`JDialog`) chuyên biệt của phân hệ.
+    - `model/`: Chứa các bộ nạp dữ liệu bảng (`AbstractTableModel`) phục vụ kết xuất `JTable`.
+    - `viewmodel/`: Chứa các bản ghi (`Record`) dữ liệu sạch đã được format chuỗi phục vụ hiển thị.
+    - `component/`: Chứa các thành phần giao diện hoặc thanh công cụ đặc thù của phân hệ (`TransactionFilterToolbar`, `KpiCardsPanel`, `CategoryTreeCellRenderer`).
 
 Bảng phân định trách nhiệm nội bộ Tầng Trình diễn:
 
 | Thành phần | Trách nhiệm cho phép | Ranh giới cấm đoán |
 | :--- | :--- | :--- |
-| **Gói Khung nhìn**<br/>(`presentation.view`) | Xây dựng bố cục giao diện đồ họa, hiển thị bảng dữ liệu `JTable`, thu thập dữ liệu thô từ các ô nhập liệu, kích hoạt hộp thoại xác nhận hoặc thông báo kết quả. | Không tính toán số dư, không kiểm tra quy tắc nghiệp vụ tài chính, không gọi trực tiếp Tầng Dịch vụ, Tầng Miền hay Kho lưu trữ dữ liệu. |
-| **Gói Điều phối**<br/>(`presentation.controller`) | Nhận sự kiện từ giao diện người dùng, điều hướng màn hình hiển thị qua `CardLayout`, đóng gói tham số vào DTO yêu cầu, gọi Giao diện Tầng Dịch vụ, nhận DTO phản hồi và cập nhật lại mô hình dữ liệu (`TableModel`) của Khung nhìn. | Không tính toán tài chính, không sửa đổi số liệu nghiệp vụ, không trực tiếp thao tác các thành phần đồ họa cấp thấp, không phụ thuộc vào lớp cài đặt cụ thể của dịch vụ hay kho lưu trữ. |
+| **Gói Dùng chung & Vỏ**<br/>(`presentation.common`) | Quản lý khung cửa sổ `MainFrame`, điều hướng chuyển đổi thẻ màn hình `CardLayout`, quản lý bảng màu giao diện, tiện ích định dạng chuỗi và tiền kiểm tra dữ liệu biểu mẫu. | Không chứa logic tính toán tài chính chuyên sâu; không can thiệp vào dữ liệu nội bộ của từng phân hệ nghiệp vụ cụ thể. |
+| **Hợp đồng & Khung nhìn**<br/>(`*View`, `*Panel`, `dialog/*`) | Xây dựng bố cục giao diện đồ họa, bắt sự kiện chuột/bàn phím, hiển thị dữ liệu bảng và hộp thoại từ Presenter/ViewModel; hiện thực hóa giao diện `*View`. | Không tính toán số dư, không kiểm tra quy tắc nghiệp vụ tài chính, không gọi trực tiếp Tầng Dịch vụ, Tầng Miền hay Kho lưu trữ dữ liệu. |
+| **Bộ Điều phối Hiển thị**<br/>(`*Presenter`) | Nhận DTO từ Service/Controller, chuyển đổi sang ViewModel, ra lệnh cập nhật trạng thái hiển thị trên View qua giao diện `*View` thuần Java (0% Swing). | Tuyệt đối không import thư viện đồ họa Swing/AWT; không trực tiếp can thiệp vào các thành phần đồ họa cấp thấp; bảo đảm kiểm thử tự động headless. |
+| **Bộ Điều khiển Biểu mẫu**<br/>(`*GUIController`) | Tiếp nhận sự kiện người dùng từ View/Dialog, xác thực sơ bộ dữ liệu qua `InputValidator`, đóng gói `RequestDTO`, gọi Giao diện Tầng Dịch vụ và kích hoạt Presenter làm mới giao diện. | Không tính toán tài chính, không sửa đổi số liệu nghiệp vụ, không phụ thuộc vào lớp cài đặt cụ thể của dịch vụ hay kho lưu trữ. |
 | **Gói Truyền Dữ liệu**<br/>(`presentation.dto`) | Đóng gói tham số nhập thành `RequestDTO`, nhận kết quả ca sử dụng thành `ResponseDTO`, bảo đảm tính bất biến của dữ liệu trung chuyển giữa GUI và Service. | Không chứa logic tính toán tài chính hoặc quy tắc nghiệp vụ, không tham chiếu thực thể miền (`Domain Entity`), không sửa đổi dữ liệu sau khi khởi tạo. |
 
-Lợi ích kỹ thuật của kiến trúc phân tách:
-1. Độc lập công nghệ hiển thị: Tầng Dịch vụ và Tầng Nghiệp vụ phía sau hoàn toàn không phụ thuộc vào công nghệ giao diện đồ họa cụ thể, cho phép kiểm thử tự động 100% bằng JUnit 5 qua các đối tượng DTO.
-2. Dễ bảo trì và nâng cấp: Việc thay đổi bố cục màu sắc, phông chữ hoặc cấu trúc màn hình đồ họa chỉ giới hạn trong gói `view` và `controller`, không gây ảnh hưởng dây chuyền đến các tầng còn lại.
+Lợi ích kỹ thuật của kiến trúc Package-by-Feature và Presenter:
+1. Độ gắn kết tính năng tối đa (High Feature Cohesion): Toàn bộ mã nguồn liên quan đến một phân hệ nghiệp vụ (từ View, Presenter, Controller đến Dialog, TableModel, ViewModel) nằm trọn trong một gói duy nhất, giúp dễ dàng định vị, bảo trì và phát triển tính năng độc lập.
+2. Kiểm soát phạm vi truy cập chặt chẽ: Các lớp vệ tinh (`*TableModel`, `*Dialog`) được thu gọn trong nội bộ phân hệ với phạm vi `package-private`, ngăn chặn việc truy cập lén chéo giữa các phân hệ.
+3. Kiểm thử giao diện độc lập 100%: Bộ điều phối `*Presenter` và hợp đồng `*View` hoàn toàn không phụ thuộc vào Swing (`0% Swing`), cho phép kiểm thử tự động toàn diện logic hiển thị trên môi trường CI/CD không có màn hình đồ họa.
 
 ### 7.1.2 Vòng đời Ứng dụng Đồ họa và Luồng Bắt Sự kiện
 
@@ -166,7 +175,7 @@ Mục này đặc tả lớp tiện ích kiểm tra tính hợp lệ của dữ 
 
 ### 7.3.1 Xác thực Biểu mẫu Đồ họa
 
-Toàn bộ dữ liệu nhập từ các trường `JTextField`, `JComboBox` và `JTextArea` ban đầu đều ở dạng chuỗi ký tự thô. Để bảo vệ Tầng Dịch vụ khỏi dữ liệu rác, hệ thống thiết kế lớp tiện ích `InputValidator` đặt trong gói `com.pfms.presentation.util`.
+Toàn bộ dữ liệu nhập từ các trường `JTextField`, `JComboBox` và `JTextArea` ban đầu đều ở dạng chuỗi ký tự thô. Để bảo vệ Tầng Dịch vụ khỏi dữ liệu rác, hệ thống thiết kế lớp tiện ích `InputValidator` đặt trong gói `com.pfms.presentation.common`.
 
 Lớp `InputValidator` thực hiện kiểm tra dữ liệu trước khi bộ điều khiển tạo DTO:
 - Kiểm tra chuỗi bắt buộc: Kiểm tra độ dài và loại bỏ khoảng trắng thừa hai đầu chuỗi, bảo đảm các trường tên ví, tên giao dịch không bị để trống.

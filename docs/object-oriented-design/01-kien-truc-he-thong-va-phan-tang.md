@@ -65,10 +65,16 @@ Cấu trúc gói định hình không gian tên vật lý trong mã nguồn Java
 com.pfms
 ├── common                  # Tầng Nền tảng Dùng chung: Tiện ích kỹ thuật phi nghiệp vụ
 │   └── util                # Kiểm tra tiền điều kiện kỹ thuật (Preconditions)
-├── presentation            # Tầng Trình diễn: Giao diện đồ họa
-│   ├── controller          # Điều phối luồng màn hình và xử lý sự kiện giao diện
-│   ├── view                # Cửa sổ chính, biểu mẫu và bảng hiển thị
-│   └── dto                 # Đối tượng truyền dữ liệu giữa giao diện và dịch vụ
+├── presentation            # Tầng Trình diễn: Giao diện đồ họa (Kiến trúc Package-by-Feature)
+│   ├── common              # App Shell, MainFrame, bộ điều phối MainController, UI constants, export
+│   ├── dto                 # Đối tượng truyền dữ liệu (DTO) biên giữa giao diện và dịch vụ
+│   ├── dashboard           # Phân hệ Bảng điều khiển / Tổng quan (View, Presenter, ViewModel, Model)
+│   ├── wallet              # Phân hệ Quản lý Ví tài chính (Panel, View, Presenter, Controller, dialog, model, viewmodel)
+│   ├── transaction         # Phân hệ Giao dịch Thu Chi (Panel, View, Presenter, Controller, dialog, model, viewmodel)
+│   ├── transfer            # Phân hệ Chuyển tiền Nội bộ (Panel, View, Presenter, Controller, dialog, model, viewmodel)
+│   ├── category            # Phân hệ Quản lý Danh mục (Panel, View, Presenter, Controller, dialog, component)
+│   ├── report              # Phân hệ Báo cáo Thống kê (Panel, View, Presenter, Controller, dialog, model)
+│   └── data                # Phân hệ Quản trị Dữ liệu & Sao lưu (Panel, View, Presenter, Controller, model)
 ├── service                 # Tầng Dịch vụ: Giao diện điều phối ca sử dụng nghiệp vụ
 │   └── impl                # Lớp cài đặt dịch vụ công khai và tiện ích điều phối nội bộ
 ├── domain                  # Tầng Nghiệp vụ: Thực thể, quy tắc và hợp đồng kho lưu trữ
@@ -98,7 +104,8 @@ Bảng ma trận xác lập các gói được phép tham chiếu và phạm vi 
 Nhằm tối thiểu hóa khả năng tiếp cận của các lớp theo nguyên lý đóng gói hướng đối tượng:
 1. Các giao diện dịch vụ, lớp cài đặt dịch vụ trong các gói con phân hệ thuộc `service.impl` (phục vụ khởi tạo và tiêm phụ thuộc từ điểm khởi chạy ứng dụng), lớp tiện ích dùng chung trong `service.impl.common` (`EntityLookupSupport`, `RollbackSupport`), giao diện kho lưu trữ, đối tượng truyền dữ liệu DTO và thực thể nghiệp vụ được khai báo ở mức `public` để phục vụ tương tác liên tầng.
 2. Các lớp hỗ trợ điều phối nội bộ bên trong từng phân hệ của tầng dịch vụ (`FileStorageSupport`, `SystemDataReconciler`, `TransactionPersistenceCoordinator`, `TransferPersistenceCoordinator`, `CategoryHierarchySupport`, `WalletSummaryCalculator`, `SpendingPeriodAccumulator`) và các phương thức trợ giúp kỹ thuật được giới hạn ở phạm vi nội bộ gói (`package-private`), ngăn chặn việc các gói bên ngoài phụ thuộc trực tiếp vào chi tiết hỗ trợ của phân hệ.
-3. Các lớp tiện ích thuộc `common.util` được thiết kế theo chuẩn Utility Class (hằng số, phương thức tĩnh `public static`, constructor `private` ném ngoại lệ ngăn chặn hành vi khởi tạo đối tượng).
+3. Tầng Trình diễn (`presentation`) áp dụng kiến trúc Package-by-Feature với nguyên tắc "Cốt lõi ở ngoài - Vệ tinh gom vào trong": tại gốc mỗi package tính năng chỉ công khai 4 file trụ cột (`*Panel`, `*View`, `*Presenter`, `*GUIController`), trong khi các thành phần vệ tinh chuyên biệt như `*TableModel` trong `model/`, hộp thoại `*Dialog` trong `dialog/` được giới hạn phạm vi nội bộ (`package-private`) phục vụ riêng cho phân hệ đó.
+4. Các lớp tiện ích thuộc `common.util` được thiết kế theo chuẩn Utility Class (hằng số, phương thức tĩnh `public static`, constructor `private` ném ngoại lệ ngăn chặn hành vi khởi tạo đối tượng).
 
 ## 1.4 Luồng Xử lý và Biến đổi Dữ liệu
 
