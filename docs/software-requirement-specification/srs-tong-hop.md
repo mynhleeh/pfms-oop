@@ -2224,7 +2224,7 @@ Quy tắc xử lý:
 
 1. Chọn các ví `ACTIVE` và các ví `ARCHIVED` có số dư lớn hơn 0.00 VNĐ; ví `ARCHIVED` số dư 0.00 VNĐ không đưa vào.
 2. Tổng số dư bằng tổng số dư các ví được chọn, tính theo quy tắc Độ chính xác tài chính (`BR-FIN-01`).
-3. Tổng bằng 0.00 VNĐ: tỷ lệ mọi ví là 0.00%, không chia cho 0, tránh lỗi chia cho 0 (`ERR-FIN-003`).
+3. Tổng bằng 0.00 VNĐ: tỷ lệ mọi ví là 0.00%, không chia cho 0, tránh lỗi chia cho 0 (`ERR-FIN-002`).
 4. Tổng lớn hơn 0: tỷ lệ bằng số dư ví chia tổng số dư nhân 100%, tính với tối thiểu 4 chữ số thập phân trung gian, làm tròn ngân hàng 2 chữ số thập phân. Ví `ARCHIVED` hiển thị kèm nhãn "đã lưu trữ".
 5. Sắp xếp theo tỷ lệ giảm dần.
 
@@ -4220,7 +4220,7 @@ Mã phân loại &
 Bắt buộc \\ \hline
 Đường dẫn lưu trữ &
 Chuỗi ký tự &
-Thư mục hoặc tệp đích hợp lệ trên đĩa cục bộ &
+Thư mục đích hợp lệ trên đĩa cục bộ &
 Bắt buộc \\ \hline
 \end{longtable}
 \endgroup
@@ -4251,7 +4251,7 @@ Thành phần &
 Nội dung \\ \hline
 \endhead
 Bản ghi dữ liệu &
-Tệp JSON hoàn chỉnh tại đường dẫn chỉ định. \\ \hline
+Tệp JSON hoàn chỉnh tạo theo tên tự động trong thư mục đích chỉ định. \\ \hline
 \end{longtable}
 \endgroup
 ```

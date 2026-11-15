@@ -140,7 +140,7 @@ Bảng ánh xạ chi tiết các thao tác giao diện người dùng đến t�
 | **Quản lý Danh mục** | Xem cây danh mục | Hiển thị cấu trúc cây 3 cấp bằng JTree | `UC-CAT-04` | `CategoryGUIController` |
 | **Báo cáo Thống kê** | Báo cáo dòng tiền | Biểu diễn chuỗi dòng tiền 12 tháng liên tục | `UC-REP-01` | `ReportGUIController` |
 | **Báo cáo Thống kê** | Cơ cấu thu chi | Phân tích cơ cấu và tỷ trọng thu chi theo nhóm nhu cầu và danh mục | `UC-REP-02` | `ReportGUIController` |
-| **Quản trị Dữ liệu** | Xuất sao lưu | Mở hộp thoại chọn tệp lưu dữ liệu JSON | `UC-DAT-01` | `DataManagementGUIController` |
+| **Quản trị Dữ liệu** | Xuất sao lưu | Mở hộp thoại chọn thư mục lưu dữ liệu sao lưu | `UC-DAT-01` | `DataManagementGUIController` |
 | **Quản trị Dữ liệu** | Phục hồi dữ liệu | Mở hộp thoại chọn tệp JSON để phục hồi | `UC-DAT-02` | `DataManagementGUIController` |
 | **Quản trị Dữ liệu** | Kiểm tra đối soát | Kích hoạt quy trình đối soát toàn vẹn | `UC-DAT-03` | `DataManagementGUIController` |
 
@@ -210,7 +210,7 @@ Nguyên tắc đóng gói và thiết kế bất biến:
 
 ### 7.4.2 Danh mục các Lớp Truyền Dữ liệu Chi tiết
 
-Toàn bộ 32 lớp DTO trình diễn trong hệ thống (14 lớp Yêu cầu và 18 lớp Phản hồi) được đặt trong gói `com.pfms.presentation.dto` (tách biệt với lớp đóng gói nội bộ `BackupPayload` thuộc `com.pfms.service.impl.data`) và phân định thành hai nhóm chính:
+Toàn bộ các lớp DTO trình diễn trong hệ thống được đặt trong gói `com.pfms.presentation.dto` (tách biệt với lớp đóng gói nội bộ `BackupPayload` thuộc `com.pfms.service.impl.data`) và phân định thành hai nhóm chính gồm DTO Yêu cầu và DTO Phản hồi:
 
 Bảng Danh mục các Lớp DTO Yêu cầu:
 
@@ -221,20 +221,22 @@ Bảng Danh mục các Lớp DTO Yêu cầu:
 | `UpdateWalletRequestDTO` | `walletId: UUID, name: String, note: String` | Đóng gói dữ liệu đầu vào gồm mã định danh ví, tên ví mới và ghi chú mới cần cập nhật mà giữ nguyên số dư hiện hành. |
 | `AdjustBalanceRequestDTO` | `walletId: UUID, actualBalance: BigDecimal, reason: String, adjustedAt: LocalDate` | Đóng gói dữ liệu kiểm kê thực tế gồm mã ví, số dư quan sát được, lý do điều chỉnh và ngày kiểm kê để đối soát và cân đối số dư sổ cái. |
 | **Phân hệ Ghi nhận Thu Chi (TXN)** |  |  |
-| `RecordTransactionRequestDTO` | `walletId: UUID, categoryId: UUID, amount: BigDecimal, transactionDate: LocalDate, note: String, feeAmount: BigDecimal, feeCategoryId: UUID` | Đóng gói dữ liệu đầu vào ghi nhận giao dịch thu nhập hoặc chi tiêu, kèm mức phí phát sinh và danh mục chi phí phụ thuộc trích từ cùng ví (`UC-TXN-01`). |
-| `UpdateTransactionRequestDTO` | `transactionId: UUID, newAmount: BigDecimal, newDate: LocalDate, newCategoryId: UUID, newNote: String, newFeeAmount: BigDecimal, newFeeCategoryId: UUID` | Đóng gói dữ liệu cập nhật khoản thu chi đã ghi nhận gồm số tiền, ngày giao dịch, danh mục, ghi chú và phụ phí mới để thực hiện quy trình hoàn nguyên và hạch toán an toàn hai pha (`UC-TXN-03`). |
-| `FilterTransactionsRequestDTO` | `startDate: LocalDate, endDate: LocalDate, walletIds: Set<UUID>, transactionType: String, categoryIds: Set<UUID>, keyword: String, pageNumber: int, pageSize: int` | Đóng gói bộ tiêu chí tra cứu và lọc sổ giao dịch (khoảng ngày, tập ví, loại thu chi, danh mục, từ khóa ghi chú) kèm thông số phân trang phục vụ kết xuất dữ liệu bảng (`UC-TXN-02`). |
+| `RecordTransactionRequestDTO` | `walletId: UUID, categoryId: UUID, amount: BigDecimal, transactionDate: LocalDate, note: String, feeAmount: BigDecimal, feeCategoryId: UUID` | Đóng gói dữ liệu đầu vào ghi nhận giao dịch thu nhập hoặc chi tiêu, kèm mức phí phát sinh và danh mục chi phí phụ thuộc trích từ cùng ví. |
+| `UpdateTransactionRequestDTO` | `transactionId: UUID, newWalletId: UUID, newAmount: BigDecimal, newDate: LocalDate, newCategoryId: UUID, newNote: String, newFeeAmount: BigDecimal, newFeeCategoryId: UUID` | Đóng gói dữ liệu cập nhật khoản thu chi đã ghi nhận gồm ví nguồn mới, số tiền, ngày giao dịch, danh mục, ghi chú và phụ phí mới để thực hiện hoàn nguyên và hạch toán lại an toàn. |
+| `FilterTransactionsRequestDTO` | `startDate: LocalDate, endDate: LocalDate, walletIds: Set<UUID>, transactionType: String, categoryIds: Set<UUID>, keyword: String, pageNumber: int, pageSize: int` | Đóng gói bộ tiêu chí tra cứu và lọc sổ giao dịch (khoảng ngày, tập ví, loại thu chi, danh mục, từ khóa ghi chú) kèm thông số phân trang phục vụ kết xuất dữ liệu bảng. |
 | **Phân hệ Chuyển tiền Nội bộ (TRF)** |  |  |
-| `TransferFundsRequestDTO` | `sourceWalletId: UUID, destinationWalletId: UUID, amount: BigDecimal, transferDate: LocalDate, note: String, feeAmount: BigDecimal, feeCategoryId: UUID` | Đóng gói dữ liệu đầu vào điều chuyển tiền giữa hai ví phân biệt, kèm chi phí giao dịch và danh mục phí trích từ ví nguồn (`UC-TRF-01`). |
-| `FilterTransfersRequestDTO` | `startDate: LocalDate, endDate: LocalDate, sourceWalletId: UUID, destinationWalletId: UUID, pageNumber: int, pageSize: int` | Đóng gói tiêu chí tra cứu lịch sử chuyển tiền theo khoảng ngày, ví gửi, ví nhận và thông số phân trang (`UC-TRF-02`). |
+| `TransferFundsRequestDTO` | `sourceWalletId: UUID, destinationWalletId: UUID, amount: BigDecimal, transferDate: LocalDate, note: String, feeAmount: BigDecimal, feeCategoryId: UUID` | Đóng gói dữ liệu đầu vào điều chuyển tiền giữa hai ví phân biệt, kèm chi phí giao dịch và danh mục phí trích từ ví nguồn. |
+| `FilterTransfersRequestDTO` | `startDate: LocalDate, endDate: LocalDate, sourceWalletId: UUID, destinationWalletId: UUID, pageNumber: int, pageSize: int` | Đóng gói tiêu chí tra cứu lịch sử chuyển tiền theo khoảng ngày, ví gửi, ví nhận và thông số phân trang. |
 | **Phân hệ Quản lý Danh mục (CAT)** |  |  |
+| `CreateNeedGroupRequestDTO` | `transactionType: String, name: String, icon: String, color: String` | Đóng gói dữ liệu đầu vào tạo mới nhóm nhu cầu cấp 2 thuộc loại thu chi xác định kèm biểu tượng và mã màu hiển thị. |
+| `RenameNeedGroupRequestDTO` | `needGroupId: UUID, name: String, icon: String, color: String` | Đóng gói dữ liệu đầu vào đổi tên hiển thị hoặc cập nhật biểu tượng, mã màu cho nhóm nhu cầu cấp 2. |
 | `CreateCategoryRequestDTO` | `parentGroupId: UUID, name: String` | Đóng gói dữ liệu đầu vào để tạo danh mục chi tiết cấp 3 thuộc nhóm nhu cầu cha đang hoạt động. |
 | `RenameCategoryRequestDTO` | `categoryId: UUID, name: String, newParentGroupId: UUID` | Đóng gói dữ liệu đầu vào để đổi tên hiển thị hoặc chuyển đổi nhóm nhu cầu cha trực thuộc của danh mục cấp 3. |
 | **Phân hệ Báo cáo Thống kê (REP)** |  |  |
 | `CashFlowReportRequestDTO` | `endMonth: int, endYear: int` | Đóng gói mốc thời gian tháng và năm kết thúc để yêu cầu truy vấn chuỗi dòng tiền 12 tháng liên tục lùi. |
 | `SpendingStructureReportRequestDTO` | `startDate: LocalDate, endDate: LocalDate, transactionType: String` | Đóng gói khoảng ngày phân tích và loại luồng tiền (`EXPENSE` hoặc `INCOME`) để yêu cầu phân tích cơ cấu tỷ trọng thu chi 2 cấp. |
 | **Phân hệ Quản trị Dữ liệu (DAT)** |  |  |
-| `ExportBackupRequestDTO` | `destinationPath: String, scope: String` | Đóng gói đường dẫn tệp xuất và phạm vi sao lưu (`FULL` toàn hệ thống hoặc `TRANSACTIONS` riêng sổ giao dịch) để trích xuất dữ liệu an toàn. |
+| `ExportBackupRequestDTO` | `destinationPath: String, scope: String` | Đóng gói đường dẫn thư mục đích và phạm vi sao lưu (`FULL` toàn hệ thống hoặc `TRANSACTIONS` riêng sổ giao dịch) để trích xuất dữ liệu an toàn. |
 | `RestoreBackupRequestDTO` | `backupFilePath: String` | Đóng gói đường dẫn tệp sao lưu JSON cần nạp để phục hồi dữ liệu qua quy trình kiểm định toàn vẹn 4 bước. |
 
 Bảng Danh mục các Lớp DTO Phản hồi:
@@ -252,6 +254,7 @@ Bảng Danh mục các Lớp DTO Phản hồi:
 | `TransferResponseDTO` | `transferId: UUID, sourceWalletId: UUID, sourceWalletName: String, destinationWalletId: UUID, destinationWalletName: String, amount: BigDecimal, transferDate: LocalDate, note: String, feeAmount: BigDecimal, feeCategoryId: UUID, feeCategoryName: String, sourceBalanceAfter: BigDecimal, destinationBalanceAfter: BigDecimal, createdAt: LocalDateTime` | Kết quả giao dịch chuyển khoản nguyên tử hai chiều gồm mã giao dịch, cặp ví liên quan, số tiền chuyển, phụ phí phát sinh và số dư cập nhật tức thời của cả hai ví. |
 | `TransferListResponseDTO` | `items: List<TransferResponseDTO>, totalTransferredAmount: BigDecimal, totalFees: BigDecimal, pageNumber: int, pageSize: int, totalRecords: long, totalPages: int` | Bảng kết xuất phân trang lịch sử các lần chuyển tiền nội bộ thỏa mãn bộ lọc kèm hai chỉ số tài chính tổng hợp (tổng tiền điều chuyển và tổng phụ phí phát sinh). |
 | **Phân hệ Quản lý Danh mục (CAT)** |  |  |
+| `NeedGroupResponseDTO` | `needGroupId: UUID, name: String, transactionType: String, status: String, icon: String, color: String, createdAt: LocalDateTime` | Thông tin chi tiết một nhóm nhu cầu cấp 2 gồm trạng thái hoạt động, biểu tượng, mã màu và thời điểm tạo phục vụ quản lý và hiển thị cây phân cấp. |
 | `CategoryResponseDTO` | `categoryId: UUID, name: String, parentGroupId: UUID, parentGroupName: String, transactionType: String, status: String, createdAt: LocalDateTime` | Thông tin chi tiết một danh mục phân loại cấp 3 kèm thông tin nhóm cha và loại thu chi phục vụ hiển thị trên bảng hoặc hộp chọn. |
 | `CategoryHierarchyResponseDTO` | `transactionType: String, needGroupId: UUID, needGroupName: String, needGroupStatus: String, categories: List<CategoryResponseDTO>` | Cấu trúc phân cấp 3 cấp theo từng nhóm nhu cầu kèm danh sách các danh mục con trực thuộc phục vụ kết xuất cây danh mục `JTree`. |
 | **Phân hệ Báo cáo Thống kê (REP)** |  |  |

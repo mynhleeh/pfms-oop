@@ -1,6 +1,6 @@
 ## 3. QUY TẮC NGHIỆP VỤ VÀ QUY ĐỊNH TÀI CHÍNH
 
-Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán và bảo vệ tính toàn vẹn của mục tiêu hệ thống: 
+Hệ thống quản lý tài chính cá nhân áp dụng các quy tắc nghiệp vụ, đóng vai trò chính sách cốt lõi của miền bài toán và bảo vệ tính toàn vẹn của mục tiêu hệ thống:
 
 Mỗi quy tắc nghiệp vụ được đặc tả nhất quán theo khuôn mẫu:
 1. Tên và mã quy tắc: cú pháp `<Tên quy tắc> (BR-<DOMAIN>-NN)`, phân loại theo miền nghiệp vụ tài chính (`BR-FIN`) hoặc miền định danh (`BR-NAM`).
@@ -92,6 +92,7 @@ Mỗi số hạng trong công thức được xác định như sau:
 | Kiểm tra tiền điều kiện | Trước khi thực hiện thao tác làm giảm số dư ví (chi tiêu, chuyển đi, điều chỉnh giảm, ghi chi phí, xóa hoặc sửa giao dịch dẫn tới giảm số dư ví), hệ thống phải kiểm tra số dư khả dụng. Thao tác bị từ chối theo Lỗi số dư ví không đủ (`ERR-WAL-001`) nếu số dư không đủ. |
 
 #### Lỗi vi phạm
+
 | Mã lỗi | Tên lỗi | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
 | :--- | :--- | :--- | :--- | :--- |
 | `ERR-WAL-001` | Lỗi số dư ví không đủ | Giao dịch làm số dư ví âm hoặc không đủ thanh toán số tiền và chi phí | Từ chối thực hiện giao dịch, giữ nguyên trạng thái số dư | "Giao dịch bị từ chối: Số dư ví không đủ để thực hiện thao tác." |
@@ -148,6 +149,7 @@ Quy tắc áp dụng cho thực thể giao dịch chuyển tiền, cặp thực 
 | Quy tắc xóa chuyển tiền | Khi xóa chuyển tiền, hệ thống xóa bản ghi chuyển tiền khỏi sổ giao dịch chuyển tiền, xóa phí giao dịch liên kết (nếu có) khỏi sổ giao dịch thu chi, hoàn số tiền chuyển cộng chi phí về ví nguồn và trừ số tiền chuyển khỏi ví đích. Cả hai ví được tính lại số dư theo Quy tắc bảo toàn số dư ví (`BR-FIN-02`) từ các giao dịch đang tồn tại. Hệ thống từ chối xóa theo Lỗi số dư ví không đủ (`ERR-WAL-001`) nếu số dư ví đích nhỏ hơn số tiền chuyển. |
 
 #### Lỗi vi phạm
+
 | Mã lỗi | Tên lỗi | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
 | :--- | :--- | :--- | :--- | :--- |
 | `ERR-TRF-001` | Lỗi ví nguồn trùng ví đích | Ví nguồn trùng với ví đích | Từ chối thực hiện giao dịch | "Giao dịch không hợp lệ: Ví chuyển và ví nhận phải khác nhau." |
@@ -223,6 +225,7 @@ Bảng phạm vi duy nhất của tên:
 | Dữ liệu khi bị từ chối | Hệ thống không tạo, không đổi tên, không chuyển nhóm và không khôi phục. Dữ liệu giữ nguyên. |
 
 #### Lỗi vi phạm
+
 | Mã lỗi | Tên lỗi | Điều kiện vi phạm | Hành động của hệ thống | Thông điệp thông báo người dùng |
 | :--- | :--- | :--- | :--- | :--- |
 | `ERR-NAM-001` | Lỗi định dạng tên | Tên rỗng sau khi cắt khoảng trắng ở hai đầu, hoặc dài hơn 50 ký tự | Từ chối thao tác | "Tên phải có từ 1 đến 50 ký tự, không tính khoảng trắng ở hai đầu." |

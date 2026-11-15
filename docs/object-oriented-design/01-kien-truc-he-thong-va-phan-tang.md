@@ -96,8 +96,8 @@ Bảng ma trận xác lập các gói được phép tham chiếu và phạm vi 
 **Quy tắc kiểm soát phạm vi lớp nội bộ:**
 
 Nhằm tối thiểu hóa khả năng tiếp cận của các lớp theo nguyên lý đóng gói hướng đối tượng:
-1. Các giao diện dịch vụ, lớp cài đặt dịch vụ trong gói `service.impl` (phục vụ khởi tạo và tiêm phụ thuộc từ điểm khởi chạy ứng dụng), giao diện kho lưu trữ, đối tượng truyền dữ liệu DTO và thực thể nghiệp vụ được khai báo ở mức `public` để phục vụ tương tác liên tầng.
-2. Các lớp hỗ trợ điều phối nội bộ trong tầng dịch vụ (`EntityLookupSupport`, `RollbackSupport`), lớp điều phối tệp tin nội bộ và các phương thức trợ giúp kỹ thuật được giới hạn ở phạm vi nội bộ gói (`package-private`), ngăn chặn việc các gói bên ngoài phụ thuộc trực tiếp vào chi tiết hỗ trợ nội bộ.
+1. Các giao diện dịch vụ, lớp cài đặt dịch vụ trong các gói con phân hệ thuộc `service.impl` (phục vụ khởi tạo và tiêm phụ thuộc từ điểm khởi chạy ứng dụng), lớp tiện ích dùng chung trong `service.impl.common` (`EntityLookupSupport`, `RollbackSupport`), giao diện kho lưu trữ, đối tượng truyền dữ liệu DTO và thực thể nghiệp vụ được khai báo ở mức `public` để phục vụ tương tác liên tầng.
+2. Các lớp hỗ trợ điều phối nội bộ bên trong từng phân hệ của tầng dịch vụ (`BackupStorageSupport`, `SystemDataReconciler`, `TransactionPersistenceCoordinator`, `TransferPersistenceCoordinator`, `CategoryHierarchySupport`, `WalletSummaryCalculator`, `SpendingPeriodAccumulator`) và các phương thức trợ giúp kỹ thuật được giới hạn ở phạm vi nội bộ gói (`package-private`), ngăn chặn việc các gói bên ngoài phụ thuộc trực tiếp vào chi tiết hỗ trợ của phân hệ.
 3. Các lớp tiện ích thuộc `common.util` được thiết kế theo chuẩn Utility Class (hằng số, phương thức tĩnh `public static`, constructor `private` ném ngoại lệ ngăn chặn hành vi khởi tạo đối tượng).
 
 ## 1.4 Luồng Xử lý và Biến đổi Dữ liệu

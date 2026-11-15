@@ -197,7 +197,7 @@ Cấu trúc các trường dữ liệu `JSON` lưu trữ trạng thái của cá
 
 ### 4.3.2 Cơ chế Đọc Ghi và An toàn Dữ liệu
 
-Bộ điều hợp `JsonDataStore` cùng các lớp kho lưu trữ `JsonWalletRepository`, `JsonTransactionRepository`, `JsonCategoryRepository` và `JsonBalanceAdjustmentRepository` áp dụng cơ chế đọc ghi tệp an toàn qua luồng đệm UTF-8 và tệp trung gian tạm thời kết hợp đổi tên nguyên tử nhằm ngăn ngừa triệt để nguy cơ hỏng dữ liệu khi ứng dụng gặp sự cố dừng đột ngột, mất điện hoặc đầy đĩa trong quá trình lưu trữ hoặc xuất sao lưu. Trong lần chạy đầu tiên khi chưa có tệp lưu trữ, bộ điều hợp tự động tạo thư mục lưu trữ và tệp `JSON` gốc chứa các mảng rỗng hợp lệ cùng cấu trúc danh mục mẫu mặc định theo quy định khởi tạo danh mục mẫu, kết hợp cơ chế tự động tạo bản sao lưu an toàn trước khi phục hồi dữ liệu hệ thống.
+Bộ điều hợp `JsonDataStore` cùng các lớp kho lưu trữ `JsonWalletRepository`, `JsonTransactionRepository`, `JsonCategoryRepository` và `JsonBalanceAdjustmentRepository` áp dụng cơ chế đọc ghi tệp an toàn qua luồng đệm UTF-8 và tệp trung gian tạm thời kết hợp đổi tên nguyên tử nhằm ngăn ngừa triệt để nguy cơ hỏng dữ liệu khi ứng dụng gặp sự cố dừng đột ngột, mất điện hoặc đầy đĩa trong quá trình lưu trữ dữ liệu. Trong lần chạy đầu tiên khi chưa có tệp lưu trữ, bộ điều hợp tự động tạo thư mục lưu trữ và tệp `JSON` gốc chứa các mảng rỗng hợp lệ cùng cấu trúc danh mục mẫu mặc định theo quy định khởi tạo danh mục mẫu, kết hợp cơ chế tự động tạo bản sao lưu an toàn trước khi phục hồi dữ liệu hệ thống.
 
 **Quy trình ghi tệp nguyên tử**
 

@@ -47,7 +47,7 @@ def text(prefix, base=False):
     return srs_file(prefix).read_text(encoding="utf-8")
 
 
-PREFIXES = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"]
+PREFIXES = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
 
 
 def g_lint():
@@ -64,7 +64,7 @@ def g_r08():
         out = subprocess.run([sys.executable, "-I", str(R08), str(path)], capture_output=True, text=True, encoding="utf-8").stdout
         if not out.startswith("PASS"):
             bad.append(path.name + ":" + out.strip()[:80])
-    rec("r08", "rule 08 PASS on 12 files", not bad, "; ".join(bad) if bad else "12/12")
+    rec("r08", "rule 08 PASS on 11 files", not bad, "; ".join(bad) if bad else "11/11")
 
 
 def g_old():
@@ -74,19 +74,19 @@ def g_old():
 
 
 def g_codes():
-    t04 = text("04")
-    defined = set(re.findall(r"^\| `(ERR-[A-Z]{3}-\d{3})` \|", t04, re.M))
+    t03, t04 = text("03"), text("04")
+    defined = set(re.findall(r"^\| `(ERR-[A-Z]{3}-\d{3})` \|", t03 + "\n" + t04, re.M))
     allc = {}
     for p in PREFIXES:
         for m in re.findall(r"ERR-[A-Z]{3}-\d{3}", text(p)):
             allc[m] = allc.get(m, 0) + 1
     undefined = sorted(set(allc) - defined)
-    rec("codes", "every cited ERR code is defined in 04", not undefined, f"undefined={undefined}")
-    rec("codes", "distinct ERR codes defined == 15", len(defined) == 15, f"defined={len(defined)}")
+    rec("codes", "every cited ERR code is defined in 03 or 04", not undefined, f"undefined={undefined}")
+    rec("codes", "distinct ERR codes defined == 16", len(defined) == 16, f"defined={len(defined)}")
     for c in ["ERR-NAM-001", "ERR-NAM-002", "ERR-CAT-005"]:
-        defn = len(re.findall(r"^\| `" + c + r"` \|", t04, re.M))
+        defn = len(re.findall(r"^\| `" + c + r"` \|", t03, re.M))
         cited = sum(text(p).count(c) for p in PREFIXES) - defn
-        rec("codes", f"{c}: defined once in 04 and cited elsewhere", defn == 1 and cited >= 1, f"defined={defn}, cited_elsewhere={cited}")
+        rec("codes", f"{c}: defined once in 03 and cited elsewhere", defn == 1 and cited >= 1, f"defined={defn}, cited_elsewhere={cited}")
 
 
 def block(t, start_pat, end_pat):
@@ -98,8 +98,8 @@ def block(t, start_pat, end_pat):
 
 
 def g_ac():
-    t05 = text("05")
-    ids = re.findall(r"^\| `(AC-[A-Z]+-\d+\.\d+)` \|", t05, re.M)
+    t04 = text("04")
+    ids = re.findall(r"^\| `(AC-[A-Z]+-\d+\.\d+)` \|", t04, re.M)
     dup = sorted({i for i in ids if ids.count(i) > 1})
     by = {}
     for i in ids:
@@ -108,41 +108,40 @@ def g_ac():
     contiguous = all(v == list(range(1, len(v) + 1)) for v in by.values())
     rec("ac", "AC ids unique", not dup, f"dup={dup}")
     rec("ac", "AC numbering contiguous per FR", contiguous)
-    rec("ac", "total AC count", None, f"{len(ids)} (expected 152)")
+    rec("ac", "total AC count", None, f"{len(ids)} (expected 74)")
 
 
 def g_blocks():
-    t05, t07, t09 = text("05"), text("07"), text("09")
-    b05 = block(t05, r"^#### [\d.]+ FR-DAT-02", r"^#### ")
-    b07 = block(t07, r"^### [\d.]+ UC-DAT-02", r"^### ")
-    for name, b in [("05 FR-DAT-02", b05), ("07 UC-DAT-02", b07)]:
+    t04, t06, t08 = text("04"), text("06"), text("08")
+    b04 = block(t04, r"^#### [\d.]+ FR-DAT-02", r"^#### ")
+    b06 = block(t06, r"^### [\d.]+ UC-DAT-02", r"^### ")
+    for name, b in [("04 FR-DAT-02", b04), ("06 UC-DAT-02", b06)]:
         if b is None:
             rec("blocks", f"{name} block found", False)
             continue
         n = len(re.findall(r"BR-NAM-01|ERR-NAM", b))
         rec("blocks", f"{name} has 0 BR-NAM-01 / ERR-NAM", n == 0, f"count={n}")
-    row = [l for l in t09.split("\n") if l.startswith("| `BR-NAM-01`")]
-    rec("blocks", "09 BR-NAM-01 row has no FR-DAT-02", bool(row) and "FR-DAT-02" not in row[0])
-    t08 = text("08")
+    row = [l for l in t08.split("\n") if l.startswith("| `BR-NAM-01`")]
+    rec("blocks", "08 BR-NAM-01 row has no FR-DAT-02", bool(row) and "FR-DAT-02" not in row[0])
     dat_rows = [l for l in t08.split("\n") if "UC-DAT-01" in l and "BR-" in l]
     rec("blocks", "08 UC-DAT rows have no BR-NAM-01", all("BR-NAM-01" not in l for l in dat_rows), f"rows={len(dat_rows)}")
 
 
 def g_as02():
-    t03, t04 = text("03"), text("04")
-    d = len(re.findall(r"^\| `AS-02` \|", t03, re.M))
-    p = t04.count("AS-02")
-    rec("as02", "AS-02 defined once in 03", d == 1, f"defined={d}")
-    rec("as02", "AS-02 pointed once in 04", p == 1, f"pointer={p}")
+    t02, t03 = text("02"), text("03")
+    d = len(re.findall(r"^\| `AS-02` \|", t02, re.M))
+    p = t03.count("AS-02")
+    rec("as02", "AS-02 defined once in 02", d == 1, f"defined={d}")
+    rec("as02", "AS-02 pointed once in 03", p == 1, f"pointer={p}")
 
 
 def g_cite():
-    t11 = text("11")
-    n = len(re.findall(r"^- ", t11, re.M))
-    rec("cite", "11 has exactly 14 citation entries (APA)", n == 14, f"count={n}")
+    t10 = text("10")
+    n = len(re.findall(r"^- ", t10, re.M))
+    rec("cite", "10 has exactly 14 citation entries (APA)", n == 14, f"count={n}")
     want = "International Software Testing Qualifications Board. (2024). *Certified Tester Foundation Level syllabus* (Version 4.0.1). https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
-    rec("cite", "ISTQB entry matches verbatim", ("- " + want) in t11)
-    lines = [l[2:] for l in t11.split("\n") if l.startswith("- ")]
+    rec("cite", "ISTQB entry matches verbatim", ("- " + want) in t10)
+    lines = [l[2:] for l in t10.split("\n") if l.startswith("- ")]
     ia = [i for i, l in enumerate(lines) if l.startswith("International Software")]
     if ia:
         prev = lines[ia[0] - 1]

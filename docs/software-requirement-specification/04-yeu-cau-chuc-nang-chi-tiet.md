@@ -9,7 +9,7 @@ Mỗi yêu cầu chức năng được đặc tả theo khuôn mẫu:
 3. Dữ liệu đầu vào: tham số, kiểu dữ liệu, ràng buộc giá trị và tính bắt buộc.
 4. Quy tắc xử lý: các bước xử lý tuần tự, kiểm tra hợp lệ và mã lỗi tương ứng (`ERR-*`).
 5. Dữ liệu đầu ra và bất biến: kết quả ghi nhận, thông điệp phản hồi và bất biến tài chính sau xử lý.
-6. Tiêu chí nghiệm thu: kịch bản Given-When-Then kèm mã `AC-FR-xxx-yy`.
+6. Tiêu chí nghiệm thu: kịch bản Given-When-Then kèm mã tiêu chí kiểm chứng (ví dụ: `AC-WAL-01.1`).
 
 **Quy ước chung:**
 
@@ -934,7 +934,7 @@ Dữ liệu đầu vào:
 | :--- | :--- | :--- | :---: |
 | Phạm vi xuất dữ liệu | Mã phân loại | `FULL` (toàn bộ hệ thống) hoặc `TRANSACTIONS` (sổ thu chi) | Bắt buộc |
 | Định dạng tệp xuất | Mã phân loại | `JSON` cho cả hai phạm vi | Bắt buộc |
-| Đường dẫn lưu trữ | Chuỗi ký tự | Thư mục hoặc tệp đích hợp lệ trên đĩa cục bộ | Bắt buộc |
+| Đường dẫn lưu trữ | Chuỗi ký tự | Thư mục đích hợp lệ trên đĩa cục bộ | Bắt buộc |
 
 Quy tắc xử lý:
 
@@ -949,7 +949,7 @@ Dữ liệu đầu ra và bất biến hệ thống:
 
 | Thành phần | Nội dung |
 | :--- | :--- |
-| Bản ghi dữ liệu | Tệp JSON hoàn chỉnh tại đường dẫn chỉ định. |
+| Bản ghi dữ liệu | Tệp JSON hoàn chỉnh tạo theo tên tự động trong thư mục đích chỉ định. |
 
 Tiêu chí nghiệm thu:
 

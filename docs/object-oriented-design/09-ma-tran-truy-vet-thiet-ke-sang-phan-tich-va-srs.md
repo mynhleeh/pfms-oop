@@ -15,12 +15,12 @@ Bảng ma trận dưới đây phân định trách nhiệm hiện thực hóa c
 | Mã ca sử dụng | Tên ca sử dụng | Tầng Trình diễn | Tầng Dịch vụ | Tầng Nghiệp vụ | Tầng Hạ tầng Lưu trữ | Mẫu thiết kế áp dụng |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Nhóm Quản lý Ví** |  |  |  |  |  |  |
-| `UC-WAL-01` | Tạo ví mới | `WalletController` | `WalletService` | `Wallet`, `CashWallet`, `CreditWallet` | `WalletRepository` | `State` |
+| `UC-WAL-01` | Tạo ví mới | `WalletController` | `WalletService` | `Wallet`, `WalletState` | `WalletRepository` | `State` |
 | `UC-WAL-02` | Theo dõi số dư tính lại từ lịch sử dòng tiền và cơ cấu ví | `WalletController` | `WalletService` | `Wallet`, `Money` | `WalletRepository`, `TransactionRepository` | `Observer` |
 | `UC-WAL-03` | Cập nhật thông tin ví | `WalletController` | `WalletService` | `Wallet` | `WalletRepository` | `State` |
-| `UC-WAL-04` | Điều chỉnh số dư ví | `WalletController` | `WalletService` | `Wallet`, `BalanceAdjustment` | `WalletRepository`, `BalanceAdjustmentRepository` | Không áp dụng |
+| `UC-WAL-04` | Điều chỉnh số dư ví | `WalletController` | `WalletService` | `Wallet`, `BalanceAdjustmentRecord` | `WalletRepository`, `BalanceAdjustmentRepository` | Không áp dụng |
 | **Nhóm Ghi nhận Thu Chi** |  |  |  |  |  |  |
-| `UC-TXN-01` | Ghi nhận giao dịch thu chi | `TransactionController` | `TransactionService` | `Transaction`, `IncomeTransaction`, `ExpenseTransaction`, `Wallet` | `TransactionRepository`, `WalletRepository`, `CategoryRepository` | `Factory Method`, `Observer` |
+| `UC-TXN-01` | Ghi nhận giao dịch thu chi | `TransactionController` | `TransactionService` | `Transaction`, `IncomeExpenseTransaction`, `TransactionFee`, `TransactionFactory`, `Wallet` | `TransactionRepository`, `WalletRepository`, `CategoryRepository` | `Factory Method`, `Observer` |
 | `UC-TXN-02` | Tra cứu và lọc lịch sử giao dịch thu chi | `TransactionController` | `TransactionService` | `Transaction`, `Category` | `TransactionRepository` | Không áp dụng |
 | `UC-TXN-03` | Chỉnh sửa giao dịch thu chi | `TransactionController` | `TransactionService` | `Transaction`, `Wallet` | `TransactionRepository`, `WalletRepository` | `Observer` |
 | `UC-TXN-04` | Xóa giao dịch thu chi | `TransactionController` | `TransactionService` | `Transaction`, `Wallet` | `TransactionRepository`, `WalletRepository` | `Observer` |
@@ -47,8 +47,8 @@ Mục này xác lập ma trận đối chiếu việc cài đặt các quy tắc
 
 | Mã quy tắc | Tên quy tắc nghiệp vụ | Lớp thiết kế chịu trách nhiệm | Phương thức thực thi chính | Cơ chế kiểm soát kỹ thuật |
 | :--- | :--- | :--- | :--- | :--- |
-| `BR-FIN-01` | Độ chính xác tài chính | `Money`, `NetCashFlow`, `SavingsRate`, `SpendingStructureShare` | `of`, `plus`, `minus`, `multiply`, `divide` | Sử dụng `BigDecimal` quy tắc làm tròn ngân hàng (`HALF_EVEN`), tiền làm tròn 2 chữ số, tỷ lệ giữ tối thiểu 4 chữ số thập phân trung gian và bảo vệ mẫu số bằng không. |
-| `BR-FIN-02` | Bảo toàn số dư ví | `Wallet`, `WalletServiceImpl` | `validateSufficientBalance`, `recalculateBalance`, `adjustBalance` | Kiểm soát số dư khả dụng không âm đối với ví tiền mặt, tính toán lại số dư từ dòng tiền và ghi vết kiểm kê. |
-| `BR-FIN-03` | Ghi nhận đồng thời khi chuyển tiền | `TransferTransaction`, `TransferServiceImpl` | `transferFunds`, `deleteTransfer` | Cập nhật nguyên tử đồng thời hai ví nguồn và ví đích, hoàn nguyên cả hai ví và kiểm tra số dư ví đích khi xóa. |
-| `BR-FIN-04` | Phân cấp danh mục thu chi ba cấp | `Category`, `NeedGroup`, `CategoryServiceImpl` | `addCategory`, `deleteCategory`, `validateHierarchy` | Duy trì cây phân cấp ba cấp, cấm đổi loại khi đã có giao dịch, thực thi xóa mềm để bảo toàn lịch sử dữ liệu. |
-| `BR-NAM-01` | Quy tắc định danh và tên duy nhất | `InputValidator`, `WalletServiceImpl`, `CategoryServiceImpl` | `validateName`, `existsByName` | Cắt khoảng trắng hai đầu, giới hạn từ 1 đến 50 ký tự, kiểm tra tính duy nhất không phân biệt hoa thường. |
+| `BR-FIN-01` | Độ chính xác tài chính | `Money`, `NetCashFlow`, `SavingsRate`, `SpendingStructureShare` | `of`, `add`, `subtract`, `multiply`, `divide` | Sử dụng `BigDecimal` quy tắc làm tròn ngân hàng (`HALF_EVEN`), tiền làm tròn 2 chữ số, tỷ lệ giữ tối thiểu 4 chữ số thập phân trung gian và bảo vệ mẫu số bằng không. |
+| `BR-FIN-02` | Bảo toàn số dư ví | `Wallet`, `WalletServiceImpl` | `debit`, `hasSufficientBalance`, `adjustBalance` | Kiểm soát số dư khả dụng không âm đối với ví tiền mặt, tính toán lại số dư từ dòng tiền và ghi vết kiểm kê. |
+| `BR-FIN-03` | Ghi nhận đồng thời khi chuyển tiền | `TransferTransaction`, `TransferServiceImpl` | `applyToWallet`, `revertFromWallet`, `transferFunds`, `deleteTransfer` | Cập nhật nguyên tử đồng thời hai ví nguồn và ví đích, hoàn nguyên cả hai ví và kiểm tra số dư ví đích khi xóa. |
+| `BR-FIN-04` | Phân cấp danh mục thu chi ba cấp | `Category`, `NeedGroup`, `CategoryServiceImpl` | `createCategory`, `renameCategory`, `restoreCategory`, `deleteCategory`, `deleteNeedGroup`, `changeNeedGroup`, `restore` | Duy trì cây phân cấp ba cấp, cấm đổi loại khi đã có giao dịch, thực thi xóa mềm để bảo toàn lịch sử dữ liệu. |
+| `BR-NAM-01` | Quy tắc định danh và tên duy nhất | `EntityName`, `WalletServiceImpl`, `CategoryServiceImpl` | `of`, `matches`, `existsByName` | Cắt khoảng trắng hai đầu, giới hạn từ 1 đến 50 ký tự, kiểm tra tính duy nhất không phân biệt hoa thường. |

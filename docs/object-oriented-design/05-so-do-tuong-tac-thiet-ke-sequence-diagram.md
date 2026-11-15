@@ -87,7 +87,7 @@ sequenceDiagram
     User->>+GUI: 1. Nhập tên ví, ghi chú và bấm "Lưu ví"
     GUI->>+WalletService: 2. createWallet(CreateWalletRequestDTO)
     alt Tên ví để trống hoặc vượt quá 50 ký tự
-        WalletService-->>GUI: 3. ném ValidationException
+        WalletService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo tên ví không hợp lệ
     else Tên ví hợp lệ về độ dài
         WalletService->>+WalletRepo: 5. existsByName(trimmedName)
@@ -181,7 +181,7 @@ sequenceDiagram
         GUI-->>User: 6. Hiển thị thông báo không tìm thấy ví
     else Tìm thấy thực thể ví
         alt Tên ví mới để trống hoặc vượt quá 50 ký tự
-            WalletService-->>GUI: 7. ném ValidationException
+            WalletService-->>GUI: 7. ném BusinessException
             GUI-->>User: 8. Hiển thị thông báo tên ví không hợp lệ
         else Tên mới khác tên hiện tại và đã tồn tại trong hệ thống
             WalletService->>+WalletRepo: 9. existsByName(trimmedNewName)
@@ -231,7 +231,7 @@ sequenceDiagram
     User->>+GUI: 1. Nhập số dư thực tế, lý do kiểm kê và bấm "Xác nhận kiểm kê"
     GUI->>+WalletService: 2. adjustBalance(AdjustBalanceRequestDTO)
     alt Số dư thực tế âm (< 0)
-        WalletService-->>GUI: 3. ném ValidationException
+        WalletService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo số dư thực tế không được âm
     else Số dư thực tế hợp lệ
         WalletService->>+WalletRepo: 5. findById(walletId)
@@ -293,7 +293,7 @@ sequenceDiagram
     User->>+GUI: 1. Nhập thông tin giao dịch (ví, danh mục, số tiền, ngày, phí) và bấm "Lưu"
     GUI->>+TransactionService: 2. recordIncomeExpense(RecordTransactionRequestDTO)
     alt Số tiền <= 0 hoặc phí < 0
-        TransactionService-->>GUI: 3. ném ValidationException
+        TransactionService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo số tiền hoặc chi phí không hợp lệ
     else Có phí phát sinh nhưng chưa chọn danh mục phí
         TransactionService-->>GUI: 5. ném BusinessException
@@ -361,7 +361,7 @@ sequenceDiagram
     User->>+GUI: 1. Chọn tiêu chí lọc (khoảng ngày, ví, danh mục) và bấm "Tìm kiếm"
     GUI->>+TransactionService: 2. filterTransactions(FilterTransactionsRequestDTO)
     alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
-        TransactionService-->>GUI: 3. ném ValidationException
+        TransactionService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo khoảng thời gian lọc không hợp lệ
     else Khoảng thời gian lọc hợp lệ
         TransactionService->>+TxnRepo: 5. findByDateRange(...) hoặc findByWalletId / findByCategoryId
@@ -528,7 +528,7 @@ sequenceDiagram
         TransferService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo ví chuyển và nhận phải khác nhau
     else Số tiền chuyển <= 0 hoặc phí < 0
-        TransferService-->>GUI: 5. ném ValidationException
+        TransferService-->>GUI: 5. ném BusinessException
         GUI-->>User: 6. Hiển thị thông báo số tiền hoặc chi phí không hợp lệ
     else Có phí phát sinh nhưng chưa chọn danh mục phí
         TransferService-->>GUI: 7. ném BusinessException
@@ -594,7 +594,7 @@ sequenceDiagram
     User->>+GUI: 1. Chọn tiêu chí lọc (khoảng ngày, ví nguồn, ví đích) và bấm "Tìm kiếm"
     GUI->>+TransferService: 2. filterTransfers(FilterTransfersRequestDTO)
     alt Ngày bắt đầu lớn hơn ngày kết thúc (startDate > endDate)
-        TransferService-->>GUI: 3. ném ValidationException
+        TransferService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo khoảng thời gian lọc không hợp lệ
     else Khoảng thời gian lọc hợp lệ
         TransferService->>+TxnRepo: 5. findByDateRange(startDate, endDate)
@@ -701,7 +701,7 @@ sequenceDiagram
     User->>+GUI: 1. Nhập thông tin danh mục mới (categoryName, parentCategoryId)
     GUI->>+CategoryService: 2. createCategory(CreateCategoryRequestDTO)
     alt Tên danh mục rỗng hoặc vượt quá 50 ký tự
-        CategoryService-->>GUI: 3. ném ValidationException
+        CategoryService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo tên danh mục không hợp lệ
     else Tên danh mục hợp lệ
         CategoryService->>+CategoryRepo: 5. findById(parentCategoryId)
@@ -757,7 +757,7 @@ sequenceDiagram
     User->>+GUI: 1. Nhập yêu cầu đổi tên (categoryId, newName)
     GUI->>+CategoryService: 2. renameCategory(RenameCategoryRequestDTO)
     alt Tên mới rỗng hoặc vượt quá 50 ký tự
-        CategoryService-->>GUI: 3. ném ValidationException
+        CategoryService-->>GUI: 3. ném BusinessException
         GUI-->>User: 4. Hiển thị thông báo tên mới không hợp lệ
     else Định dạng tên mới hợp lệ
         CategoryService->>+CategoryRepo: 5. findById(categoryId)
@@ -1007,14 +1007,14 @@ Thao tác trích xuất và tính toán tỷ trọng phân bổ thu chi ở ch�
 
 ### 5.6.3 Sơ đồ Xuất Dữ liệu Sao lưu Hệ thống
 
-Luồng tương tác mô tả quy trình trích xuất toàn bộ dữ liệu tài chính trong hệ thống và đóng gói thành tệp sao lưu JSON chuẩn hóa theo cấu trúc đã định. Dịch vụ ứng dụng nạp toàn bộ thực thể từ tất cả các kho lưu trữ dữ liệu, tổng hợp vào đối tượng dữ liệu sao lưu và ủy quyền cho bộ điều hợp tệp ghi an toàn xuống đĩa cục bộ.
+Luồng tương tác mô tả quy trình trích xuất dữ liệu tài chính theo phạm vi chỉ định và đóng gói thành tệp sao lưu JSON chuẩn hóa. Dịch vụ ứng dụng kiểm tra phạm vi xuất hợp lệ, xác thực đường dẫn thư mục đích để tự sinh tên tệp `pfms_export_{scope}_{yyyyMMdd_HHmmss}.json`, nạp ảnh chụp từ các kho lưu trữ rồi tuần tự hóa và ghi an toàn xuống đĩa cục bộ.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-DAT-01`
-- Thao tác hệ thống: `exportBackupData(destinationPath)`
+- Thao tác hệ thống: `exportBackupData(destinationPath, scope)`
 - Yêu cầu chức năng: `FR-DAT-01`
 - Quy tắc nghiệp vụ: `BR-FIN-01`
-- Mã lỗi xử lý: `StorageException`
+- Mã lỗi xử lý: `ERR-DAT-001`, `StorageException`
 
 **Sơ đồ tuần tự tương tác:**
 
@@ -1024,35 +1024,52 @@ sequenceDiagram
     actor User as Người dùng
     participant GUI as Tầng Trình diễn
     participant DataService as DataManagementServiceImpl
+    participant StorageSupport as BackupStorageSupport
     participant WalletRepo as WalletRepository
-    participant TxnRepo as TransactionRepository
-    participant CategoryRepo as CategoryRepository
     participant NeedGroupRepo as NeedGroupRepository
+    participant CategoryRepo as CategoryRepository
+    participant TxnRepo as TransactionRepository
     participant AdjRepo as BalanceAdjustmentRepository
-    participant StorageAdapter as JsonDataStore
+    participant JsonSerializer as BackupJsonSerializer
 
     User->>+GUI: 1. Nhập lệnh xuất sao lưu (destinationPath, scope)
     GUI->>+DataService: 2. exportBackupData(ExportBackupRequestDTO)
-    DataService->>+WalletRepo: 3. findAll()
-    WalletRepo-->>-DataService: 4. List<Wallet>
-    DataService->>+TxnRepo: 5. findAll()
-    TxnRepo-->>-DataService: 6. List<Transaction>
-    DataService->>+CategoryRepo: 7. findAll()
-    CategoryRepo-->>-DataService: 8. List<Category>
-    DataService->>+NeedGroupRepo: 9. findAll()
-    NeedGroupRepo-->>-DataService: 10. List<NeedGroup>
-    DataService->>+AdjRepo: 11. findAll()
-    AdjRepo-->>-DataService: 12. List<BalanceAdjustmentRecord>
-    DataService->>DataService: 13. tổng hợp dữ liệu vào BackupPayload (nội bộ service.impl.data)
-    DataService->>+StorageAdapter: 14. writeBackupFile(destinationPath, backupPayload)
-    alt Sự cố I/O, lỗi quyền ghi hoặc không đủ dung lượng đĩa
-        StorageAdapter-->>DataService: 15. ném StorageException
-        DataService-->>GUI: 16. ném StorageException
-        GUI-->>User: 17. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
-    else Ghi tệp sao lưu an toàn thành công
-        StorageAdapter-->>-DataService: 18. BackupFileMetadata
-        DataService-->>-GUI: 19. ExportBackupResponseDTO
-        GUI-->>-User: 20. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
+    alt Phạm vi scope không thuộc FULL hoặc TRANSACTIONS
+        DataService-->>GUI: 3. ném BusinessException (ERR-DAT-001)
+        GUI-->>User: 4. Thông báo phạm vi xuất dữ liệu không hợp lệ
+    else Phạm vi xuất hợp lệ
+        DataService->>+StorageSupport: 5. resolveWritableTargetPath(destinationPath, scope, exportedAt)
+        alt Đường dẫn rỗng, trỏ tới tệp hoặc mang phần mở rộng tệp
+            StorageSupport-->>DataService: 6. ném StorageException
+            DataService-->>GUI: 7. ném StorageException
+            GUI-->>User: 8. Hiển thị thông báo yêu cầu chọn thư mục đích hợp lệ
+        else Thư mục đích hợp lệ và ghép tên pfms_export_{scope}_{yyyyMMdd_HHmmss}.json
+            StorageSupport-->>-DataService: 9. Path targetPath
+            DataService->>+TxnRepo: 10. findAll()
+            TxnRepo-->>-DataService: 11. List<Transaction>
+            opt Phạm vi FULL
+                DataService->>+WalletRepo: 12. findAll()
+                WalletRepo-->>-DataService: 13. List<Wallet>
+                DataService->>+NeedGroupRepo: 14. findAll()
+                NeedGroupRepo-->>-DataService: 15. List<NeedGroup>
+                DataService->>+CategoryRepo: 16. findAll()
+                CategoryRepo-->>-DataService: 17. List<Category>
+                DataService->>+AdjRepo: 18. findAll()
+                AdjRepo-->>-DataService: 19. List<BalanceAdjustmentRecord>
+            end
+            DataService->>+JsonSerializer: 20. toJson(BackupPayload)
+            JsonSerializer-->>-DataService: 21. String jsonContent (tiền tệ chuẩn 2 chữ số thập phân)
+            DataService->>+StorageSupport: 22. writeUtf8Safely(targetPath, jsonContent)
+            alt Sự cố I/O, lỗi tạo thư mục, quyền ghi hoặc ổ đĩa đầy
+                StorageSupport-->>DataService: 23. dọn tệp .tmp và ném StorageException
+                DataService-->>GUI: 24. ném StorageException
+                GUI-->>User: 25. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
+            else Ghi tệp sao lưu an toàn thành công (UTF-8 không BOM)
+                StorageSupport-->>-DataService: 26. long fileSizeBytes
+                DataService-->>-GUI: 27. ExportBackupResponseDTO (kèm targetPath và exportedAt đồng bộ)
+                GUI-->>-User: 28. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
+            end
+        end
     end
 ```
 
@@ -1060,7 +1077,7 @@ Việc xuất dữ liệu sao lưu là thao tác chỉ đọc dữ liệu nghi�
 
 ### 5.6.4 Sơ đồ Phục hồi Dữ liệu Hệ thống
 
-Luồng tương tác mô tả quy trình nạp dữ liệu từ tệp sao lưu JSON, thực thi tuần tự quy trình kiểm định bốn bước nghiêm ngặt theo nguyên tắc tất cả hoặc không trước khi ghi đè dữ liệu vào các kho lưu trữ. Toàn bộ dữ liệu hiện tại được bảo lưu nguyên vẹn nếu phát hiện bất kỳ sai phạm nào trong các bước kiểm định.
+Luồng tương tác mô tả quy trình nạp dữ liệu từ tệp sao lưu JSON, giải tuần tự hóa thành thực thể lịch sử và thực thi quy trình kiểm định toàn vẹn nghiêm ngặt theo nguyên tắc tất cả hoặc không trước khi thay thế dữ liệu vào các kho lưu trữ. Nếu phát sinh lỗi ghi khi thay thế, dịch vụ tự động hoàn nguyên bản chụp qua `RollbackSupport` để bảo toàn nguyên vẹn dữ liệu hiện tại.
 
 **Quy chiếu yêu cầu:**
 - Ca sử dụng: `UC-DAT-02`
@@ -1077,62 +1094,64 @@ sequenceDiagram
     actor User as Người dùng
     participant GUI as Tầng Trình diễn
     participant DataService as DataManagementServiceImpl
-    participant StorageAdapter as JsonDataStore
+    participant StorageSupport as BackupStorageSupport
+    participant JsonDeserializer as BackupJsonDeserializer
+    participant Reconciler as SystemDataReconciler
     participant WalletRepo as WalletRepository
-    participant TxnRepo as TransactionRepository
-    participant CategoryRepo as CategoryRepository
     participant NeedGroupRepo as NeedGroupRepository
+    participant CategoryRepo as CategoryRepository
     participant AdjRepo as BalanceAdjustmentRepository
+    participant TxnRepo as TransactionRepository
+    participant Rollback as RollbackSupport
 
     User->>+GUI: 1. Nhập đường dẫn tệp sao lưu (backupFilePath)
     GUI->>+DataService: 2. restoreBackupData(RestoreBackupRequestDTO)
-    DataService->>+StorageAdapter: 3. readBackupFile(backupFilePath)
-    alt Tệp không tồn tại hoặc lỗi đọc I/O
-        StorageAdapter-->>DataService: 4. ném StorageException
+    DataService->>+StorageSupport: 3. resolveReadableBackupPath và readUtf8String(backupFilePath)
+    alt Tệp không tồn tại, không phải tệp thường hoặc lỗi đọc I/O
+        StorageSupport-->>DataService: 4. ném StorageException
         DataService-->>GUI: 5. ném StorageException
         GUI-->>User: 6. Hiển thị thông báo không thể đọc tệp sao lưu
-    else Đọc tệp thành công
-        StorageAdapter-->>-DataService: 7. BackupPayload
-        Note over DataService: Bước 1: Kiểm tra cấu trúc cú pháp JSON và schema bắt buộc
-        alt Sai cú pháp JSON hoặc thiếu các khóa thực thể bắt buộc
-            DataService-->>GUI: 8. ném DataCorruptionException
-            GUI-->>User: 9. Từ chối: Sai cấu trúc schema tệp sao lưu
-        else Cấu trúc JSON hợp lệ
-            Note over DataService: Bước 2: Kiểm tra cấu trúc phân cấp danh mục 3 cấp
-            alt Vi phạm phân cấp 3 cấp hoặc phát hiện danh mục mồ côi
-                DataService-->>GUI: 10. ném DataCorruptionException
-                GUI-->>User: 11. Từ chối: Vi phạm cấu trúc phân cấp danh mục
-            else Phân cấp danh mục hợp lệ
-                Note over DataService: Bước 3: Kiểm tra liên kết chuyển tiền hai chiều và phí
-                alt Sai lệch cặp giao dịch chuyển tiền hoặc phí mồ côi
-                    DataService-->>GUI: 12. ném DataCorruptionException
-                    GUI-->>User: 13. Từ chối: Vi phạm liên kết chuyển tiền hoặc phí mồ côi
-                else Liên kết giao dịch hợp lệ
-                    Note over DataService: Bước 4: Tái tính toán số dư ví từ lịch sử
-                    alt Phát hiện số dư ví bị âm tại bất kỳ thời điểm nào
-                        DataService-->>GUI: 14. ném DataCorruptionException
-                        GUI-->>User: 15. Từ chối: Vi phạm quy tắc số dư ví không được âm
-                    else Vượt qua toàn bộ 4 bước kiểm định (All-or-Nothing)
-                        DataService->>+WalletRepo: 16. deleteAll(), saveAll(wallets)
-                        WalletRepo-->>-DataService: 17. void
-                        DataService->>+NeedGroupRepo: 18. deleteAll(), saveAll(needGroups)
-                        NeedGroupRepo-->>-DataService: 19. void
-                        DataService->>+CategoryRepo: 20. deleteAll(), saveAll(categories)
-                        CategoryRepo-->>-DataService: 21. void
-                        DataService->>+TxnRepo: 22. deleteAll(), saveAll(transactions)
-                        TxnRepo-->>-DataService: 23. void
-                        DataService->>+AdjRepo: 24. deleteAll(), saveAll(adjustments)
-                        AdjRepo-->>-DataService: 25. void
-                        DataService-->>-GUI: 26. RestoreBackupResponseDTO
-                        GUI-->>-User: 27. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
-                    end
+    else Đọc tệp UTF-8 thành công (loại bỏ BOM nếu có)
+        StorageSupport-->>-DataService: 7. String jsonContent
+        DataService->>+JsonDeserializer: 8. fromJson(jsonContent)
+        alt Sai cú pháp JSON, thiếu khóa bắt buộc hoặc sai định dạng số liệu
+            JsonDeserializer-->>DataService: 9. ném DataCorruptionException (ERR-DAT-001)
+            DataService-->>GUI: 10. ném DataCorruptionException
+            GUI-->>User: 11. Từ chối: Tệp sao lưu sai cấu trúc hoặc hỏng dữ liệu
+        else Tái cấu thành BackupPayload (giữ trạng thái lịch sử qua reconstitute)
+            JsonDeserializer-->>-DataService: 12. BackupPayload payload
+            DataService->>+Reconciler: 13. reconcile(wallets, transactions, categories, needGroups, adjustments)
+            Reconciler-->>-DataService: 14. ReconciliationReportResponseDTO
+            Note over DataService: Kiểm định toàn vẹn (trùng mã, số dư âm, tham chiếu ví, danh mục, chuyển tiền và phí)
+            alt Vi phạm toàn vẹn hoặc là tệp xuất chỉ chứa sổ giao dịch
+                DataService-->>GUI: 15. ném DataCorruptionException (ERR-DAT-002)
+                GUI-->>User: 16. Từ chối: Dữ liệu sao lưu vi phạm ràng buộc toàn vẹn hoặc số dư
+            else Đạt toàn bộ kiểm định toàn vẹn (All-or-Nothing)
+                DataService->>DataService: 17. Chụp bản sao dữ liệu hiện hành từ các kho lưu trữ
+                DataService->>TxnRepo: 18. deleteAll()
+                DataService->>AdjRepo: 19. deleteAll()
+                DataService->>CategoryRepo: 20. deleteAll()
+                DataService->>NeedGroupRepo: 21. deleteAll()
+                DataService->>WalletRepo: 22. deleteAll()
+                DataService->>WalletRepo: 23. saveAll(wallets)
+                DataService->>NeedGroupRepo: 24. saveAll(needGroups)
+                DataService->>CategoryRepo: 25. saveAll(categories)
+                DataService->>AdjRepo: 26. saveAll(adjustments)
+                DataService->>TxnRepo: 27. saveAll(transactions)
+                alt Phát sinh RuntimeException hoặc StorageException khi xóa hoặc ghi
+                    DataService->>Rollback: 28. runRollbackStep(...) dọn phần ghi dở và khôi phục bản chụp
+                    DataService-->>GUI: 29. ném StorageException
+                    GUI-->>User: 30. Thông báo lỗi lưu trữ; dữ liệu cũ đã được hoàn nguyên
+                else Thay thế toàn bộ kho lưu trữ thành công
+                    DataService-->>-GUI: 31. RestoreBackupResponseDTO
+                    GUI-->>-User: 32. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
                 end
             end
         end
     end
 ```
 
-Hệ thống bảo lưu nguyên vẹn dữ liệu hiện tại nếu phát hiện bất kỳ sai phạm nào trong bốn bước kiểm định và chỉ ghi đè khi toàn bộ tệp sao lưu hợp lệ 100%.
+Hệ thống bảo lưu nguyên vẹn dữ liệu hiện tại nếu phát hiện bất kỳ sai phạm nào trong quá trình kiểm định và chỉ ghi đè khi toàn bộ tệp sao lưu hợp lệ.
 
 ### 5.6.5 Sơ đồ Đối soát Toàn vẹn Dữ liệu Tài chính
 
@@ -1156,6 +1175,9 @@ sequenceDiagram
     participant WalletRepo as WalletRepository
     participant TxnRepo as TransactionRepository
     participant CategoryRepo as CategoryRepository
+    participant NeedGroupRepo as NeedGroupRepository
+    participant AdjRepo as BalanceAdjustmentRepository
+    participant Reconciler as SystemDataReconciler
 
     User->>+GUI: 1. Yêu cầu đối soát dữ liệu hệ thống
     GUI->>+DataService: 2. reconcileSystemData()
@@ -1165,18 +1187,23 @@ sequenceDiagram
     TxnRepo-->>-DataService: 6. List<Transaction>
     DataService->>+CategoryRepo: 7. findAll()
     CategoryRepo-->>-DataService: 8. List<Category>
-    Note over DataService: Điều kiện 1: Tái tính số dư ví từ lịch sử dòng tiền và so khớp số dư hiện hành
-    Note over DataService: Điều kiện 2: Kiểm tra cân bằng nguồn - đích và chi phí chuyển tiền
-    Note over DataService: Điều kiện 3: Kiểm tra liên kết phân cấp danh mục 3 cấp và loại thu chi
-    Note over DataService: Điều kiện 4: Kiểm tra chi phí phát sinh (TransactionFee) gắn kèm các giao dịch thu chi và chuyển tiền, bảo đảm không có phí mồ côi
-    DataService->>DataService: 9. tổng hợp sai lệch và phân loại mức độ nghiêm trọng (INFO, WARNING, ERROR)
-    alt Tất cả 4 điều kiện đều thỏa mãn 100%
-        DataService->>DataService: 10. đánh dấu trạng thái dữ liệu nhất quán hoàn hảo (INFO)
+    DataService->>+NeedGroupRepo: 9. findAll()
+    NeedGroupRepo-->>-DataService: 10. List<NeedGroup>
+    DataService->>+AdjRepo: 11. findAll()
+    AdjRepo-->>-DataService: 12. List<BalanceAdjustmentRecord>
+    DataService->>+Reconciler: 13. reconcile(wallets, transactions, categories, needGroups, adjustments)
+    Note over Reconciler: Điều kiện 1: Tái tính số dư ví từ lịch sử dòng tiền và mốc điều chỉnh, so khớp số dư hiện hành
+    Note over Reconciler: Điều kiện 2: Kiểm tra cân bằng nguồn và đích cùng chi phí chuyển tiền
+    Note over Reconciler: Điều kiện 3: Kiểm tra liên kết phân cấp danh mục và loại thu chi
+    Note over Reconciler: Điều kiện 4: Kiểm tra chi phí phát sinh (TransactionFee) gắn kèm giao dịch, bảo đảm không có phí mồ côi
+    alt Tất cả các điều kiện đều thỏa mãn
+        Reconciler->>Reconciler: 14. đánh dấu trạng thái dữ liệu nhất quán (INFO)
     else Phát hiện sai lệch dữ liệu
-        DataService->>DataService: 11. đóng gói danh sách chi tiết bất thường kèm khuyến nghị (WARNING/ERROR)
+        Reconciler->>Reconciler: 15. đóng gói chi tiết bất thường kèm khuyến nghị (WARNING/ERROR)
     end
-    DataService-->>-GUI: 12. ReconciliationReportResponseDTO
-    GUI-->>-User: 13. Kết xuất Báo cáo đối soát toàn vẹn dữ liệu tài chính chi tiết
+    Reconciler-->>-DataService: 16. ReconciliationReportResponseDTO
+    DataService-->>-GUI: 17. ReconciliationReportResponseDTO
+    GUI-->>-User: 18. Kết xuất Báo cáo đối soát toàn vẹn dữ liệu tài chính chi tiết
 ```
 
 Thao tác đối soát vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi bất kỳ bản ghi tài chính nào và cung cấp báo cáo minh bạch về mức độ nhất quán của sổ cái.

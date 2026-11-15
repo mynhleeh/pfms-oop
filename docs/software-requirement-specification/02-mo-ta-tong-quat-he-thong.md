@@ -34,7 +34,6 @@ flowchart TD
 
 Các mục tiêu nghiệp vụ định lượng và tiêu chí kiểm chứng tương ứng.
 
-
 | Mã mục tiêu | Tên mục tiêu | Định nghĩa | Tiêu chí đo kiểm |
 | --- | --- | --- | --- |
 | `G-01` | Ghi nhận dòng tiền và cấu trúc danh mục phân cấp | Lưu các biến động số dư và gán nhãn theo cấu trúc danh mục 3 cấp (Loại, Nhóm nhu cầu, Danh mục chi tiết) | Tỷ lệ giao dịch thu chi đã lưu được định danh đúng ví và đúng danh mục hợp lệ bằng 100.00%. Kiểm chứng theo Tạo mới giao dịch thu nhập (`FR-TXN-01`) và Tạo mới giao dịch chi tiêu (`FR-TXN-02`). Danh mục hợp lệ gồm danh mục đang dùng và danh mục đã xóa còn tồn tại theo Phục hồi dữ liệu hệ thống từ bản sao lưu (`FR-DAT-02`). Số dư ví cập nhật ngay sau khi ghi nhận theo Hiệu năng và độ trễ phản hồi (`NFR-02`). |

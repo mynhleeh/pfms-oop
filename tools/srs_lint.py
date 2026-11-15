@@ -15,8 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 DEFAULT_DIR = Path(__file__).resolve().parent.parent / "docs" / "software-requirement-specification"
-CITATION_FILE = "11-tai-lieu-trich-dan.md"
-TOC_FILE = "01-muc-luc-tong-quan.md"
+CITATION_FILE = "10-tai-lieu-trich-dan.md"
+TOC_FILE = "00-preamble.md"
 MAX_PARAGRAPH_LINES = 8
 MAX_RANGE_SPAN = 200
 MAX_CONSECUTIVE_TABLES = 2
@@ -459,7 +459,7 @@ def check_b10(corpus: dict[str, list[Line]]) -> list[Finding]:
 
 
 def load_corpus(folder: Path) -> dict[str, list[Line]]:
-    return {path.name: load_lines(path) for path in sorted(folder.glob("*.md"))}
+    return {path.name: load_lines(path) for path in sorted(folder.glob("[0-9][0-9]-*.md"))}
 
 
 def run_checks(corpus: dict[str, list[Line]], selected: list[str]) -> list[Finding]:
