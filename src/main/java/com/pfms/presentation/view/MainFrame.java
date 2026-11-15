@@ -4,9 +4,9 @@ import com.pfms.presentation.controller.MainController;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.view.category.CategoryPanel;
 import com.pfms.presentation.view.common.ViewConstants;
-import com.pfms.presentation.view.component.PlaceholderPanel;
 import com.pfms.presentation.view.component.SidebarPanel;
 import com.pfms.presentation.view.component.StatusBarPanel;
+import com.pfms.presentation.view.dashboard.DashboardPanel;
 import com.pfms.presentation.view.data.DataManagementPanel;
 import com.pfms.presentation.view.report.ReportPanel;
 import com.pfms.presentation.view.transaction.TransactionPanel;
@@ -33,6 +33,7 @@ public class MainFrame extends JFrame {
     private final JPanel contentPanel;
     private final CardLayout cardLayout;
     private String currentCardName = MainController.CARD_DASHBOARD;
+    private DashboardPanel dashboardPanel;
     private WalletPanel walletPanel;
     private TransactionPanel transactionPanel;
     private TransferPanel transferPanel;
@@ -90,7 +91,12 @@ public class MainFrame extends JFrame {
                 this.mainController.getDataManagementController(), storagePath);
         this.dataManagementPanel.setOnDataRestoredListener(this::refreshAllSubsystems);
 
-        this.contentPanel.add(new PlaceholderPanel(MainController.CARD_DASHBOARD, "Tổng quan"), MainController.CARD_DASHBOARD);
+        this.dashboardPanel = new DashboardPanel(
+                this.mainController.getWalletController(),
+                this.mainController.getTransactionController(),
+                this.mainController.getReportController());
+
+        this.contentPanel.add(this.dashboardPanel, MainController.CARD_DASHBOARD);
         this.contentPanel.add(this.walletPanel, MainController.CARD_WALLETS);
         this.contentPanel.add(this.transactionPanel, MainController.CARD_TRANSACTIONS);
         this.contentPanel.add(this.transferPanel, MainController.CARD_TRANSFERS);
@@ -107,6 +113,9 @@ public class MainFrame extends JFrame {
         this.cardLayout.show(this.contentPanel, targetCard);
         this.currentCardName = targetCard;
         this.sidebarPanel.setActiveCard(targetCard);
+        if (MainController.CARD_DASHBOARD.equals(targetCard) && this.dashboardPanel != null) {
+            this.dashboardPanel.reloadDashboard();
+        }
     }
 
     public void refreshStatusMetrics() {
@@ -122,6 +131,9 @@ public class MainFrame extends JFrame {
 
     public void refreshAllSubsystems() {
         refreshStatusMetrics();
+        if (this.dashboardPanel != null) {
+            this.dashboardPanel.reloadDashboard();
+        }
         if (this.walletPanel != null) {
             this.walletPanel.reloadWallets();
         }
@@ -177,5 +189,9 @@ public class MainFrame extends JFrame {
 
     public DataManagementPanel getDataManagementPanel() {
         return this.dataManagementPanel;
+    }
+
+    public DashboardPanel getDashboardPanel() {
+        return this.dashboardPanel;
     }
 }

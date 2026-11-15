@@ -96,6 +96,10 @@ public final class WalletGUIController {
     public WalletsSummaryResponseDTO loadWalletsSummary() {
         return this.walletService.getWalletsSummary();
     }
+
+    public WalletsSummaryResponseDTO getWalletsSummary() {
+        return loadWalletsSummary();
+    }
     // endregion
     // endregion
 }

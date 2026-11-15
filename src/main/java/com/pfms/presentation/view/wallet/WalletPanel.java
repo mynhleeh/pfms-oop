@@ -26,8 +26,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -37,14 +37,22 @@ import java.util.function.Predicate;
 
 /**
  * Bảng điều khiển trung tâm của Phân hệ Quản lý Ví tài chính (WAL).
+ * Áp dụng bảng màu phẳng Luxury Black & Gold và thứ tự cột chuẩn.
  */
 public class WalletPanel extends JPanel {
 
     private final WalletGUIController walletController;
     private final WalletTableModel tableModel;
     private final JTable table;
+    private final JScrollPane scrollPane;
     private final JComboBox<String> statusFilterBox;
     private final JLabel summaryLabel;
+    private final JPanel bottomPanel;
+    private final JButton addButton;
+    private final JButton editButton;
+    private final JButton adjustButton;
+    private final JButton toggleStatusButton;
+    private final JButton deleteButton;
     private final DecimalFormat currencyFormatter;
     private Runnable onWalletChangedListener;
 
@@ -98,34 +106,37 @@ public class WalletPanel extends JPanel {
 
         JLabel filterLabel = new JLabel("Trạng thái:");
         filterLabel.setFont(ViewConstants.FONT_BODY);
+        filterLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
 
         this.statusFilterBox = new JComboBox<>(new String[]{"Tất cả", "ACTIVE", "ARCHIVED", "DELETED"});
         this.statusFilterBox.setFont(ViewConstants.FONT_BODY);
+        this.statusFilterBox.setBackground(ViewConstants.COLOR_CARD_BG);
+        this.statusFilterBox.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.statusFilterBox.addActionListener(e -> applyFilter());
 
-        JButton addButton = createToolButton("Thêm ví mới", ViewConstants.COLOR_PRIMARY_LIGHT, Color.WHITE);
-        addButton.addActionListener(e -> handleAddWallet());
+        this.addButton = createToolButton("Thêm ví mới", ViewConstants.COLOR_PRIMARY, Color.BLACK, ViewConstants.FONT_NAV_ACTIVE);
+        this.addButton.addActionListener(e -> handleAddWallet());
 
-        JButton editButton = createToolButton("Sửa", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN);
-        editButton.addActionListener(e -> handleEditWallet());
+        this.editButton = createToolButton("Sửa", ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_TEXT_MAIN, ViewConstants.FONT_BODY);
+        this.editButton.addActionListener(e -> handleEditWallet());
 
-        JButton adjustButton = createToolButton("Kiểm kê số dư", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN);
-        adjustButton.addActionListener(e -> handleAdjustBalance());
+        this.adjustButton = createToolButton("Kiểm kê số dư", ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_TEXT_MAIN, ViewConstants.FONT_BODY);
+        this.adjustButton.addActionListener(e -> handleAdjustBalance());
 
-        JButton toggleStatusButton = createToolButton("Lưu trữ / Kích hoạt", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN);
-        toggleStatusButton.addActionListener(e -> handleToggleStatus());
+        this.toggleStatusButton = createToolButton("Lưu trữ / Kích hoạt", ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_TEXT_MAIN, ViewConstants.FONT_BODY);
+        this.toggleStatusButton.addActionListener(e -> handleToggleStatus());
 
-        JButton deleteButton = createToolButton("Xóa ví", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_EXPENSE);
-        deleteButton.addActionListener(e -> handleDeleteWallet());
+        this.deleteButton = createToolButton("Xóa ví", ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_EXPENSE, ViewConstants.FONT_BODY);
+        this.deleteButton.addActionListener(e -> handleDeleteWallet());
 
         toolbar.add(filterLabel);
         toolbar.add(this.statusFilterBox);
         toolbar.add(Box.createHorizontalStrut(8));
-        toolbar.add(addButton);
-        toolbar.add(editButton);
-        toolbar.add(adjustButton);
-        toolbar.add(toggleStatusButton);
-        toolbar.add(deleteButton);
+        toolbar.add(this.addButton);
+        toolbar.add(this.editButton);
+        toolbar.add(this.adjustButton);
+        toolbar.add(this.toggleStatusButton);
+        toolbar.add(this.deleteButton);
 
         topContainer.add(toolbar);
         add(topContainer, BorderLayout.NORTH);
@@ -133,34 +144,73 @@ public class WalletPanel extends JPanel {
         // Center Table
         this.table = new JTable(this.tableModel);
         this.table.setFont(ViewConstants.FONT_BODY);
-        this.table.setRowHeight(28);
+        this.table.setRowHeight(30);
+        this.table.setBackground(ViewConstants.COLOR_CARD_BG);
+        this.table.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.table.setGridColor(ViewConstants.COLOR_BORDER);
+        this.table.setShowGrid(true);
+        this.table.setSelectionBackground(ViewConstants.COLOR_SIDEBAR_ACTIVE);
+        this.table.setSelectionForeground(ViewConstants.COLOR_TEXT_ACTIVE);
+
+        // Header Styling
+        this.table.getTableHeader().setBackground(new Color(14, 14, 14));
+        this.table.getTableHeader().setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
         this.table.getTableHeader().setFont(ViewConstants.FONT_NAV_ACTIVE);
+        this.table.getTableHeader().setReorderingAllowed(false);
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+                setBackground(new Color(14, 14, 14));
+                setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+                setFont(ViewConstants.FONT_NAV_ACTIVE);
+                setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 1, 0, ViewConstants.COLOR_BORDER),
+                        BorderFactory.createEmptyBorder(6, 8, 6, 8)));
+                if (col == 2) {
+                    setHorizontalAlignment(SwingConstants.RIGHT);
+                } else if (col == 0 || col == 3 || col == 4 || col == 5) {
+                    setHorizontalAlignment(SwingConstants.CENTER);
+                } else {
+                    setHorizontalAlignment(SwingConstants.LEFT);
+                }
+                return this;
+            }
+        };
+        this.table.getTableHeader().setDefaultRenderer(headerRenderer);
         configureTableRenderers();
 
-        JScrollPane scrollPane = new JScrollPane(this.table);
-        scrollPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 24, 12, 24),
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
-        add(scrollPane, BorderLayout.CENTER);
+        JPanel centerContainer = new JPanel(new BorderLayout());
+        centerContainer.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        centerContainer.setBorder(BorderFactory.createEmptyBorder(0, 24, 12, 24));
+
+        this.scrollPane = new JScrollPane(this.table);
+        this.scrollPane.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
+        this.scrollPane.setBackground(ViewConstants.COLOR_CARD_BG);
+        this.scrollPane.setBorder(BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER));
+        centerContainer.add(this.scrollPane, BorderLayout.CENTER);
+
+        add(centerContainer, BorderLayout.CENTER);
 
         // Bottom Summary
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 24, 10));
-        bottomPanel.setBackground(ViewConstants.COLOR_STATUS_BG);
-        bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
+        this.bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 24, 10));
+        this.bottomPanel.setBackground(ViewConstants.COLOR_STATUS_BG);
+        this.bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
 
         this.summaryLabel = new JLabel("Đang tải dữ liệu...");
         this.summaryLabel.setFont(ViewConstants.FONT_BODY);
-        this.summaryLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        bottomPanel.add(this.summaryLabel);
+        this.summaryLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+        this.bottomPanel.add(this.summaryLabel);
 
-        add(bottomPanel, BorderLayout.SOUTH);
+        add(this.bottomPanel, BorderLayout.SOUTH);
 
         reloadWallets();
     }
 
-    private JButton createToolButton(String text, Color bg, Color fg) {
+    private JButton createToolButton(String text, Color bg, Color fg, Font font) {
         JButton btn = new JButton(text);
-        btn.setFont(ViewConstants.FONT_BODY);
+        btn.setFont(font);
         btn.setBackground(bg);
         btn.setForeground(fg);
         btn.setFocusPainted(false);
@@ -171,19 +221,89 @@ public class WalletPanel extends JPanel {
     }
 
     private void configureTableRenderers() {
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+                if (!isSelected) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    setForeground(ViewConstants.COLOR_TEXT_MAIN);
+                }
+                return this;
+            }
+        };
 
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        DefaultTableCellRenderer numRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+                if (!isSelected) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    setForeground(ViewConstants.COLOR_TEXT_MUTED);
+                }
+                return this;
+            }
+        };
+
+        DefaultTableCellRenderer textRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+                setHorizontalAlignment(SwingConstants.LEFT);
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                if (!isSelected) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    setForeground(ViewConstants.COLOR_TEXT_MAIN);
+                }
+                return this;
+            }
+        };
+
+        DefaultTableCellRenderer balanceRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+                setHorizontalAlignment(SwingConstants.RIGHT);
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                if (!isSelected) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+                }
+                return this;
+            }
+        };
+
+        DefaultTableCellRenderer noteRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+                setHorizontalAlignment(SwingConstants.LEFT);
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                if (!isSelected) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    setForeground(ViewConstants.COLOR_TEXT_MUTED);
+                }
+                return this;
+            }
+        };
 
         this.table.getColumnModel().getColumn(0).setPreferredWidth(40);
-        this.table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        this.table.getColumnModel().getColumn(0).setCellRenderer(numRenderer);
 
         this.table.getColumnModel().getColumn(1).setPreferredWidth(180);
+        this.table.getColumnModel().getColumn(1).setCellRenderer(textRenderer);
 
         this.table.getColumnModel().getColumn(2).setPreferredWidth(140);
-        this.table.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
+        this.table.getColumnModel().getColumn(2).setCellRenderer(balanceRenderer);
 
         this.table.getColumnModel().getColumn(3).setPreferredWidth(60);
         this.table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
@@ -195,6 +315,7 @@ public class WalletPanel extends JPanel {
         this.table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
 
         this.table.getColumnModel().getColumn(6).setPreferredWidth(200);
+        this.table.getColumnModel().getColumn(6).setCellRenderer(noteRenderer);
     }
 
     public void reloadWallets() {
@@ -342,6 +463,42 @@ public class WalletPanel extends JPanel {
 
     public JTable getTable() {
         return this.table;
+    }
+
+    public JScrollPane getScrollPane() {
+        return this.scrollPane;
+    }
+
+    public JButton getAddButton() {
+        return this.addButton;
+    }
+
+    public JButton getEditButton() {
+        return this.editButton;
+    }
+
+    public JButton getAdjustButton() {
+        return this.adjustButton;
+    }
+
+    public JButton getToggleStatusButton() {
+        return this.toggleStatusButton;
+    }
+
+    public JButton getDeleteButton() {
+        return this.deleteButton;
+    }
+
+    public JComboBox<String> getStatusFilterBox() {
+        return this.statusFilterBox;
+    }
+
+    public JLabel getSummaryLabel() {
+        return this.summaryLabel;
+    }
+
+    public JPanel getBottomPanel() {
+        return this.bottomPanel;
     }
 
     public String getSummaryText() {

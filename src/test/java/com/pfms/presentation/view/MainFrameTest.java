@@ -73,6 +73,7 @@ class MainFrameTest {
         assertNotNull(mainFrame.getCategoryPanel());
         assertNotNull(mainFrame.getReportPanel());
         assertNotNull(mainFrame.getDataManagementPanel());
+        assertNotNull(mainFrame.getDashboardPanel());
         assertEquals(MainController.CARD_DASHBOARD, mainFrame.getCurrentCardName());
         assertTrue(mainFrame.getStatusBarPanel().getTotalBalanceText().contains("5,000,000 VNĐ"));
     }

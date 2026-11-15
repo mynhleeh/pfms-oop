@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -51,12 +52,15 @@ public class RecordTransactionDialog extends JDialog {
     private final JComboBox<String> typeCombo;
     private final JTextField amountField;
     private final JComboBox<WalletResponseDTO> walletCombo;
+    private final JLabel availableBalanceLabel;
     private final JComboBox<CategoryResponseDTO> categoryCombo;
     private final JTextField dateField;
     private final JTextField noteField;
     private final JCheckBox feeCheckBox;
     private final JTextField feeAmountField;
     private final JComboBox<CategoryResponseDTO> feeCategoryCombo;
+    private final JButton cancelButton;
+    private final JButton saveButton;
 
     private final List<CategoryResponseDTO> expenseCategories = new ArrayList<>();
     private final List<CategoryResponseDTO> incomeCategories = new ArrayList<>();
@@ -89,11 +93,12 @@ public class RecordTransactionDialog extends JDialog {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         formPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
-        formPanel.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        formPanel.setBackground(ViewConstants.COLOR_CARD_BG);
 
         // Loại giao dịch
         JLabel typeLabel = new JLabel("Loại giao dịch (*):");
         typeLabel.setFont(ViewConstants.FONT_BODY);
+        typeLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.typeCombo = new JComboBox<>(new String[]{"Chi tiêu", "Thu nhập"});
         this.typeCombo.setFont(ViewConstants.FONT_BODY);
         this.typeCombo.addActionListener(e -> updateCategoriesForSelectedType());
@@ -101,19 +106,26 @@ public class RecordTransactionDialog extends JDialog {
         // Số tiền
         JLabel amountLabel = new JLabel("Số tiền (*):");
         amountLabel.setFont(ViewConstants.FONT_BODY);
+        amountLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.amountField = new JTextField();
         this.amountField.setFont(ViewConstants.FONT_BODY);
 
         // Ví
         JLabel walletLabel = new JLabel("Ví tài chính (*):");
         walletLabel.setFont(ViewConstants.FONT_BODY);
+        walletLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.walletCombo = new JComboBox<>();
         this.walletCombo.setFont(ViewConstants.FONT_BODY);
+        this.availableBalanceLabel = new JLabel();
+        this.availableBalanceLabel.setFont(ViewConstants.FONT_STATUS);
+        this.availableBalanceLabel.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+        this.availableBalanceLabel.setVisible(false);
         configureWalletCombo();
 
         // Danh mục
         JLabel categoryLabel = new JLabel("Danh mục (*):");
         categoryLabel.setFont(ViewConstants.FONT_BODY);
+        categoryLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.categoryCombo = new JComboBox<>();
         this.categoryCombo.setFont(ViewConstants.FONT_BODY);
         configureCategoryCombo(this.categoryCombo);
@@ -121,28 +133,34 @@ public class RecordTransactionDialog extends JDialog {
         // Ngày
         JLabel dateLabel = new JLabel("Ngày giao dịch (yyyy-MM-dd):");
         dateLabel.setFont(ViewConstants.FONT_BODY);
+        dateLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.dateField = new JTextField(LocalDate.now().toString());
         this.dateField.setFont(ViewConstants.FONT_BODY);
 
         // Ghi chú
         JLabel noteLabel = new JLabel("Ghi chú:");
         noteLabel.setFont(ViewConstants.FONT_BODY);
+        noteLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.noteField = new JTextField();
         this.noteField.setFont(ViewConstants.FONT_BODY);
 
         // Phụ phí
         this.feeCheckBox = new JCheckBox("Có phụ phí phát sinh");
         this.feeCheckBox.setFont(ViewConstants.FONT_BODY);
-        this.feeCheckBox.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        this.feeCheckBox.setBackground(ViewConstants.COLOR_CARD_BG);
+        this.feeCheckBox.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.feeCheckBox.setFocusPainted(false);
 
         JLabel feeAmountLabel = new JLabel("Số tiền phí:");
         feeAmountLabel.setFont(ViewConstants.FONT_BODY);
+        feeAmountLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.feeAmountField = new JTextField("0");
         this.feeAmountField.setFont(ViewConstants.FONT_BODY);
         this.feeAmountField.setEnabled(false);
 
         JLabel feeCategoryLabel = new JLabel("Danh mục phí:");
         feeCategoryLabel.setFont(ViewConstants.FONT_BODY);
+        feeCategoryLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.feeCategoryCombo = new JComboBox<>();
         this.feeCategoryCombo.setFont(ViewConstants.FONT_BODY);
         this.feeCategoryCombo.setEnabled(false);
@@ -171,6 +189,8 @@ public class RecordTransactionDialog extends JDialog {
         formPanel.add(walletLabel);
         formPanel.add(Box.createVerticalStrut(4));
         formPanel.add(this.walletCombo);
+        formPanel.add(Box.createVerticalStrut(4));
+        formPanel.add(this.availableBalanceLabel);
         formPanel.add(Box.createVerticalStrut(8));
 
         formPanel.add(categoryLabel);
@@ -192,14 +212,14 @@ public class RecordTransactionDialog extends JDialog {
         formPanel.add(Box.createVerticalStrut(6));
 
         JPanel feeRow = new JPanel(new GridLayout(1, 2, 8, 0));
-        feeRow.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        feeRow.setBackground(ViewConstants.COLOR_CARD_BG);
         JPanel feeAmountCol = new JPanel(new BorderLayout(0, 4));
-        feeAmountCol.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        feeAmountCol.setBackground(ViewConstants.COLOR_CARD_BG);
         feeAmountCol.add(feeAmountLabel, BorderLayout.NORTH);
         feeAmountCol.add(this.feeAmountField, BorderLayout.CENTER);
 
         JPanel feeCatCol = new JPanel(new BorderLayout(0, 4));
-        feeCatCol.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        feeCatCol.setBackground(ViewConstants.COLOR_CARD_BG);
         feeCatCol.add(feeCategoryLabel, BorderLayout.NORTH);
         feeCatCol.add(this.feeCategoryCombo, BorderLayout.CENTER);
 
@@ -212,18 +232,23 @@ public class RecordTransactionDialog extends JDialog {
         buttonPanel.setBackground(ViewConstants.COLOR_STATUS_BG);
         buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
 
-        JButton cancelButton = new JButton("Hủy bỏ");
-        cancelButton.setFont(ViewConstants.FONT_BODY);
-        cancelButton.addActionListener(e -> dispose());
+        this.cancelButton = new JButton("Hủy bỏ");
+        this.cancelButton.setFont(ViewConstants.FONT_BODY);
+        this.cancelButton.setBackground(ViewConstants.COLOR_CARD_BG);
+        this.cancelButton.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.cancelButton.setBorder(BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER));
+        this.cancelButton.setFocusPainted(false);
+        this.cancelButton.addActionListener(e -> dispose());
 
-        JButton saveButton = new JButton("Lưu giao dịch");
-        saveButton.setFont(ViewConstants.FONT_BODY);
-        saveButton.setBackground(ViewConstants.COLOR_PRIMARY_LIGHT);
-        saveButton.setForeground(ViewConstants.COLOR_STATUS_BG);
-        saveButton.addActionListener(e -> triggerSave());
+        this.saveButton = new JButton("Lưu giao dịch");
+        this.saveButton.setFont(ViewConstants.FONT_NAV_ACTIVE);
+        this.saveButton.setBackground(ViewConstants.COLOR_PRIMARY);
+        this.saveButton.setForeground(Color.BLACK);
+        this.saveButton.setFocusPainted(false);
+        this.saveButton.addActionListener(e -> triggerSave());
 
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(saveButton);
+        buttonPanel.add(this.cancelButton);
+        buttonPanel.add(this.saveButton);
 
         add(formPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
@@ -259,20 +284,33 @@ public class RecordTransactionDialog extends JDialog {
             }
         }
 
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-        symbols.setGroupingSeparator(',');
-        DecimalFormat formatter = new DecimalFormat("#,##0", symbols);
-
         this.walletCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof WalletResponseDTO w) {
-                    setText(w.getName() + " (" + formatter.format(w.getBalance()) + " VNĐ)");
+                    setText(w.getName());
                 }
                 return this;
             }
         });
+
+        this.walletCombo.addActionListener(e -> updateAvailableBalance());
+        updateAvailableBalance();
+    }
+
+    private void updateAvailableBalance() {
+        WalletResponseDTO w = (WalletResponseDTO) this.walletCombo.getSelectedItem();
+        if (w != null && w.getBalance() != null) {
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+            symbols.setGroupingSeparator(',');
+            DecimalFormat formatter = new DecimalFormat("#,##0", symbols);
+            this.availableBalanceLabel.setText("Số dư khả dụng: " + formatter.format(w.getBalance()) + " VNĐ");
+            this.availableBalanceLabel.setVisible(true);
+        } else {
+            this.availableBalanceLabel.setText("");
+            this.availableBalanceLabel.setVisible(false);
+        }
     }
 
     private void configureCategoryCombo(JComboBox<CategoryResponseDTO> combo) {
@@ -281,7 +319,7 @@ public class RecordTransactionDialog extends JDialog {
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof CategoryResponseDTO cat) {
-                    setText(cat.getName() + " [" + cat.getParentGroupName() + "]");
+                    setText(cat.getName());
                 }
                 return this;
             }
@@ -394,6 +432,31 @@ public class RecordTransactionDialog extends JDialog {
 
     public void setSelectedWallet(WalletResponseDTO wallet) {
         this.walletCombo.setSelectedItem(wallet);
+        updateAvailableBalance();
+    }
+
+    public JLabel getAvailableBalanceLabel() {
+        return this.availableBalanceLabel;
+    }
+
+    public JComboBox<WalletResponseDTO> getWalletCombo() {
+        return this.walletCombo;
+    }
+
+    public JComboBox<CategoryResponseDTO> getCategoryCombo() {
+        return this.categoryCombo;
+    }
+
+    public JButton getCancelButton() {
+        return this.cancelButton;
+    }
+
+    public JButton getSaveButton() {
+        return this.saveButton;
+    }
+
+    public JCheckBox getFeeCheckBox() {
+        return this.feeCheckBox;
     }
 
     public CategoryResponseDTO getSelectedCategory() {

@@ -117,6 +117,10 @@ public final class TransactionGUIController {
                 filter == null ? new FilterTransactionsRequestDTO() : filter);
     }
 
+    public TransactionListResponseDTO filterTransactions(FilterTransactionsRequestDTO filter) {
+        return loadTransactions(filter);
+    }
+
     public TransactionListResponseDTO loadTransactions(
             String rawStartDate,
             String rawEndDate,

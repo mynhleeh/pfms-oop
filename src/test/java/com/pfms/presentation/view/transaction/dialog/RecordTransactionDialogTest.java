@@ -10,12 +10,18 @@ import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
+import com.pfms.presentation.view.common.ViewConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+import java.awt.Color;
+import java.awt.Component;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +40,7 @@ class RecordTransactionDialogTest {
     private CategoryGUIController categoryController;
 
     private WalletResponseDTO sampleWallet;
+    private WalletResponseDTO secondWallet;
     private CategoryResponseDTO sampleExpenseCategory;
     private CategoryResponseDTO sampleIncomeCategory;
     private RecordTransactionDialog dialog;
@@ -46,8 +53,10 @@ class RecordTransactionDialogTest {
 
         sampleWallet = new WalletResponseDTO(
                 UUID.randomUUID(), "Ví Tiền mặt", new BigDecimal("5000000"), "VND", true, "ACTIVE", "Tiêu vặt", LocalDateTime.now());
+        secondWallet = new WalletResponseDTO(
+                UUID.randomUUID(), "Tài khoản VCB", new BigDecimal("1234567"), "VND", false, "ACTIVE", "Tiết kiệm", LocalDateTime.now());
         when(walletController.loadWalletsSummary()).thenReturn(
-                new WalletsSummaryResponseDTO(List.of(sampleWallet), new BigDecimal("5000000"), "VND", Collections.emptyMap()));
+                new WalletsSummaryResponseDTO(List.of(sampleWallet, secondWallet), new BigDecimal("6234567"), "VND", Collections.emptyMap()));
 
         sampleExpenseCategory = new CategoryResponseDTO(
                 UUID.randomUUID(), "Ăn uống", UUID.randomUUID(), "Thiết yếu", "EXPENSE", "ACTIVE");
@@ -124,5 +133,75 @@ class RecordTransactionDialogTest {
         assertFalse(dialog.isSuccess());
         assertNull(dialog.getCreatedTransaction());
         assertEquals("Số tiền giao dịch phải là số dương lớn hơn 0", dialog.getErrorMessage());
+    }
+
+    @Test
+    @DisplayName("availableBalanceLabel hiển thị đúng chuỗi định dạng số dư khả dụng khi chọn ví")
+    void testAvailableBalanceLabelOnWalletSelection() {
+        assertNotNull(dialog.getAvailableBalanceLabel());
+        assertTrue(dialog.getAvailableBalanceLabel().isVisible());
+        assertEquals("Số dư khả dụng: 5,000,000 VNĐ", dialog.getAvailableBalanceLabel().getText());
+
+        dialog.setSelectedWallet(secondWallet);
+
+        assertTrue(dialog.getAvailableBalanceLabel().isVisible());
+        assertEquals("Số dư khả dụng: 1,234,567 VNĐ", dialog.getAvailableBalanceLabel().getText());
+    }
+
+    @Test
+    @DisplayName("availableBalanceLabel ẩn đi (isVisible = false) khi ví không được chọn hoặc là null")
+    void testAvailableBalanceLabelHiddenWhenNoWalletSelected() {
+        assertNotNull(dialog.getAvailableBalanceLabel());
+        dialog.setSelectedWallet(null);
+        assertFalse(dialog.getAvailableBalanceLabel().isVisible());
+    }
+
+    @Test
+    @DisplayName("Renderer của category chỉ hiển thị tên danh mục thuần túy không chứa dấu ngoặc vuông tên nhóm")
+    void testCategoryComboRendererPureName() {
+        ListCellRenderer<? super CategoryResponseDTO> renderer = dialog.getCategoryCombo().getRenderer();
+        assertNotNull(renderer);
+
+        Component comp = renderer.getListCellRendererComponent(
+                new JList<>(), sampleExpenseCategory, 0, false, false);
+        assertTrue(comp instanceof JLabel);
+        JLabel label = (JLabel) comp;
+        assertEquals("Ăn uống", label.getText());
+        assertFalse(label.getText().contains("[Thiết yếu]"));
+        assertFalse(label.getText().contains("["));
+        assertFalse(label.getText().contains("]"));
+    }
+
+    @Test
+    @DisplayName("Renderer của wallet chỉ hiển thị tên ví thuần túy không chứa số dư ngoặc đơn")
+    void testWalletComboRendererPureName() {
+        ListCellRenderer<? super WalletResponseDTO> renderer = dialog.getWalletCombo().getRenderer();
+        assertNotNull(renderer);
+
+        Component comp = renderer.getListCellRendererComponent(
+                new JList<>(), sampleWallet, 0, false, false);
+        assertTrue(comp instanceof JLabel);
+        JLabel label = (JLabel) comp;
+        assertEquals("Ví Tiền mặt", label.getText());
+        assertFalse(label.getText().contains("(5,000,000 VNĐ)"));
+        assertFalse(label.getText().contains("("));
+    }
+
+    @Test
+    @DisplayName("Giao diện & Bảng màu Luxury Black & Gold cho Form Ghi Nhận Thu Chi")
+    void testLuxuryBlackAndGoldStyling() {
+        assertEquals(ViewConstants.FONT_STATUS, dialog.getAvailableBalanceLabel().getFont());
+        assertEquals(ViewConstants.COLOR_PRIMARY_LIGHT, dialog.getAvailableBalanceLabel().getForeground());
+
+        assertEquals(ViewConstants.COLOR_CARD_BG, dialog.getCancelButton().getBackground());
+        assertEquals(ViewConstants.COLOR_TEXT_MAIN, dialog.getCancelButton().getForeground());
+        assertEquals(ViewConstants.FONT_BODY, dialog.getCancelButton().getFont());
+
+        assertEquals(ViewConstants.COLOR_PRIMARY, dialog.getSaveButton().getBackground());
+        assertEquals(Color.BLACK, dialog.getSaveButton().getForeground());
+        assertEquals(ViewConstants.FONT_NAV_ACTIVE, dialog.getSaveButton().getFont());
+
+        assertEquals(ViewConstants.COLOR_CARD_BG, dialog.getFeeCheckBox().getBackground());
+        assertEquals(ViewConstants.COLOR_TEXT_MAIN, dialog.getFeeCheckBox().getForeground());
     }
 }
