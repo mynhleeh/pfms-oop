@@ -1,6 +1,6 @@
 package com.pfms;
 
-import com.pfms.presentation.view.MainFrame;
+import com.pfms.presentation.common.MainFrame;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
