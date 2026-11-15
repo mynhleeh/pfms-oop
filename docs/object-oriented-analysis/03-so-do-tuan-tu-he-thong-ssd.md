@@ -1,31 +1,31 @@
-# 3. Sơ đồ Tuần tự Hệ thống
+# 3. Sơ đồ tuần tự hệ thống
 
-Sơ đồ tuần tự hệ thống mô tả trình tự tương tác giữa Người dùng và Hệ thống cho từng kịch bản ca sử dụng theo trục thời gian. Trong giai đoạn phân tích, sơ đồ này đóng vai trò cầu nối nghiệp vụ: chuyển các bước mô tả bằng lời văn trong hồ sơ ca sử dụng thành các sự kiện đầu vào rõ ràng, làm căn cứ xác định các hợp đồng thao tác tại Mục 4 trước khi bước vào thiết kế chi tiết các lớp bên trong phần mềm.
+Sơ đồ tuần tự hệ thống (SSD) mô tả trình tự tương tác theo thời gian giữa người dùng và hệ thống cho từng kịch bản ca sử dụng. Ở giai đoạn phân tích, sơ đồ chuyển hóa các bước nghiệp vụ thành các sự kiện đầu vào tường minh, làm cơ sở xác định hợp đồng thao tác tại mục 4 trước khi thiết kế chi tiết lớp.
 
-## 3.1 Nguyên tắc Mô hình hóa và Ranh giới Tương tác Hệ thống
+## 3.1 Nguyên tắc mô hình hóa và ranh giới tương tác hệ thống
 
-Khi mô hình hóa tuần tự ở tầng phân tích, toàn bộ phần mềm được xem như một thể thống nhất, tiếp cận hoàn toàn từ góc nhìn của người dùng bên ngoài. Cách tiếp cận này chỉ tập trung vào hai yếu tố: thông tin Người dùng gửi vào và kết quả Hệ thống phản hồi lại. Cấu trúc bên trong phần mềm được giữ kín, không đề cập đến các thành phần lập trình như bộ điều khiển, dịch vụ xử lý, các lớp dữ liệu hay cấu trúc cơ sở dữ liệu.
+Ở tầng phân tích, hệ thống được xem như một hộp đen thống nhất, chỉ xét thông tin người dùng gửi vào và kết quả hệ thống phản hồi mà không đi vào cấu trúc nội bộ (bộ điều khiển, dịch vụ, lớp dữ liệu hay cơ sở dữ liệu).
 
-Các yêu cầu Người dùng gửi đến được chuẩn hóa thành các thao tác hệ thống bằng tiếng Anh theo dạng động từ kết hợp danh từ như `createWallet`, `recordTransaction`, `transferFunds`. Các tham số truyền vào thể hiện dữ liệu nghiệp vụ thực tế, không gắn với kiểu dữ liệu của bất kỳ ngôn ngữ lập trình nào. Phía Hệ thống sẽ kiểm tra các quy tắc nghiệp vụ về số dư và tính hợp lệ của dữ liệu để phản hồi kết quả thành công hoặc gửi thông báo từ chối tương ứng khi phát hiện vi phạm.
+Yêu cầu từ người dùng được chuẩn hóa thành các thao tác hệ thống dạng động từ kết hợp danh từ (như `createWallet`, `recordIncomeExpense`, `transferFunds`) với tham số mang ý nghĩa nghiệp vụ, độc lập với ngôn ngữ lập trình. Hệ thống kiểm tra các quy tắc về số dư và tính hợp lệ dữ liệu để phản hồi thành công hoặc từ chối kèm mã lỗi tương ứng.
 
-## 3.2 Tổng hợp Thao tác Hệ thống theo Nhóm Chức năng
+## 3.2 Tổng hợp thao tác hệ thống theo nhóm chức năng
 
-Hệ thống PFMS tiếp nhận 20 thao tác từ người dùng, tương ứng với 20 ca sử dụng đã xác định trong tài liệu yêu cầu. Các thao tác này được chia theo 6 nhóm chức năng. Mỗi thao tác là một yêu cầu gửi đến Hệ thống để truy vấn thông tin hoặc thay đổi trạng thái của các thực thể tài chính.
+Hệ thống PFMS cung cấp 20 thao tác tương ứng với 20 ca sử dụng thuộc 6 nhóm chức năng nhằm truy vấn hoặc thay đổi trạng thái các thực thể tài chính:
 
 | STT | Nhóm chức năng | Mã nhóm | Ca sử dụng | Thao tác hệ thống |
 | :---: | :--- | :---: | :---: | :--- |
-| 1 | Quản lý Ví | `WAL` | `UC-WAL-01` đến `UC-WAL-04` | `createWallet`, `getWalletsSummary`, `updateWallet`, `adjustBalance` |
-| 2 | Ghi nhận Thu chi | `TXN` | `UC-TXN-01` đến `UC-TXN-04` | `recordIncomeExpense`, `filterTransactions`, `updateTransaction`, `deleteTransaction` |
-| 3 | Chuyển tiền Nội bộ | `TRF` | `UC-TRF-01` đến `UC-TRF-03` | `transferFunds`, `filterTransfers`, `deleteTransfer` |
-| 4 | Danh mục Phân loại | `CAT` | `UC-CAT-01` đến `UC-CAT-04` | `addCategory`, `renameCategory`, `restoreCategory`, `deleteCategory` |
-| 5 | Thống kê và Báo cáo | `REP` | `UC-REP-01`, `UC-REP-02` | `generateCashFlowReport`, `generateSpendingStructureReport` |
-| 6 | Lưu trữ và Sao lưu Dữ liệu | `DAT` | `UC-DAT-01` đến `UC-DAT-03` | `exportBackupData`, `restoreBackupData`, `reconcileSystemData` |
+| 1 | Quản lý ví | `WAL` | `UC-WAL-01` – `UC-WAL-04` | `createWallet`, `getWalletsSummary`, `updateWallet`, `adjustBalance` |
+| 2 | Ghi nhận thu chi | `TXN` | `UC-TXN-01` – `UC-TXN-04` | `recordIncomeExpense`, `filterTransactions`, `updateTransaction`, `deleteTransaction` |
+| 3 | Chuyển tiền nội bộ | `TRF` | `UC-TRF-01` – `UC-TRF-03` | `transferFunds`, `filterTransfers`, `deleteTransfer` |
+| 4 | Danh mục phân loại | `CAT` | `UC-CAT-01` – `UC-CAT-04` | `addCategory`, `renameCategory`, `restoreCategory`, `deleteCategory` |
+| 5 | Thống kê và báo cáo | `REP` | `UC-REP-01`, `UC-REP-02` | `generateCashFlowReport`, `generateSpendingStructureReport` |
+| 6 | Lưu trữ và sao lưu | `DAT` | `UC-DAT-01` – `UC-DAT-03` | `exportBackupData`, `restoreBackupData`, `reconcileSystemData` |
 
-Bảng thông số chi tiết của từng thao tác, bao gồm danh sách tham số, dữ liệu phản hồi và kịch bản tuần tự được trình bày cụ thể trong từng nhóm chức năng tương ứng từ Mục 3.3 đến Mục 3.8.
+Chi tiết tham số, phản hồi và sơ đồ tuần tự của từng thao tác được trình bày từ mục 3.3 đến mục 3.8.
 
-## 3.3 Nhóm Chức năng Quản lý Ví (WAL)
+## 3.3 Nhóm chức năng Quản lý ví (WAL)
 
-Nhóm chức năng Quản lý Ví quản lý các nguồn tiền thanh toán, theo dõi số dư khả dụng và xử lý chênh lệch kiểm kê thực tế. Các thao tác trong nhóm tuân thủ quy tắc đặt tên duy nhất (`BR-NAM-01`) và bảo toàn số dư không âm (`BR-FIN-02`).
+Nhóm chức năng Quản lý ví quản lý các nguồn tiền thanh toán, theo dõi số dư khả dụng và xử lý chênh lệch kiểm kê, tuân thủ quy tắc đặt tên duy nhất (`BR-NAM-01`) và bảo toàn số dư không âm (`BR-FIN-02`).
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
 | :---: | :--- | :--- | :--- | :--- |
@@ -36,17 +36,17 @@ Nhóm chức năng Quản lý Ví quản lý các nguồn tiền thanh toán, th
 
 ### 3.3.1 Tạo ví mới
 
-Người dùng gửi yêu cầu khởi tạo một nguồn tiền mới kèm tên định danh và ghi chú mô tả để theo dõi số dư tách biệt. Hệ thống kiểm tra tên ví (`BR-NAM-01`), tạo bản ghi ví mới với số dư khởi điểm 0.00 VNĐ (`BR-FIN-02`) và tính lại cơ cấu phân bổ giữa các ví (`FR-WAL-04`).
+Người dùng yêu cầu khởi tạo ví mới kèm tên và ghi chú. Hệ thống kiểm tra tên ví (`BR-NAM-01`), tạo ví với số dư khởi điểm `0.00 VNĐ` (`BR-FIN-02`) và tính lại cơ cấu phân bổ ví (`FR-WAL-04`).
 
-- Thao tác hệ thống: `createWallet(walletName, note)`
-- Kết quả phản hồi: Hệ thống khởi tạo bản ghi ví mới ở trạng thái hoạt động (`ACTIVE`) với mã định danh duy nhất, gán số dư ban đầu 0.00 VNĐ (`BR-FIN-02`), cập nhật bảng cơ cấu số dư và trả về thông tin ví vừa tạo; trường hợp vi phạm, hệ thống từ chối thao tác và báo lỗi tên sai định dạng (`ERR-NAM-001`), trùng tên ví (`ERR-NAM-002`) hoặc ghi chú vượt quá 255 ký tự.
+- **Thao tác hệ thống**: `createWallet(walletName, note)`
+- **Kết quả phản hồi**: Khởi tạo ví ở trạng thái `ACTIVE` với số dư `0.00 VNĐ` (`BR-FIN-02`), cập nhật cơ cấu số dư và trả về thông tin ví mới; từ chối nếu tên sai định dạng (`ERR-NAM-001`), trùng tên (`ERR-NAM-002`) hoặc ghi chú quá 255 ký tự.
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `walletName` | Tên gọi của ví thanh toán mới cần khởi tạo | Chuỗi 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu (`trim`), không để rỗng và duy nhất trên toàn bộ ví trong hệ thống (gồm cả ví đang hoạt động và ví lưu trữ), không phân biệt hoa thường (`BR-NAM-01`); trường hợp vi phạm, báo lỗi tên sai định dạng (`ERR-NAM-001`), trùng tên ví (`ERR-NAM-002`). |
-| `note` | Ghi chú mô tả mục đích sử dụng hoặc thông tin tài khoản của ví | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-01`). |
+| `walletName` | Tên ví mới | Chuỗi 1–50 ký tự sau khi `trim`, không rỗng (`ERR-NAM-001`), duy nhất toàn hệ thống (cả ví `ACTIVE` và `ARCHIVED`, không phân biệt hoa thường) (`BR-NAM-01`, `ERR-NAM-002`). |
+| `note` | Ghi chú ví | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-WAL-01`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -71,14 +71,10 @@ sequenceDiagram
 
 ### 3.3.2 Xem tổng hợp số dư và cơ cấu ví
 
-Người dùng truy vấn danh sách ví hiện có để xem số dư khả dụng tức thời và tỷ trọng phân bổ tài sản toàn hệ thống. Hệ thống tính lại số dư từng ví từ lịch sử dòng tiền (`BR-FIN-02`), tổng hợp cơ cấu phân bổ giữa các ví (`FR-WAL-04`) và làm tròn tỷ lệ phần trăm tương ứng (`BR-FIN-01`).
+Người dùng truy vấn danh sách ví để xem số dư khả dụng và tỷ trọng phân bổ tài sản. Hệ thống tính lại số dư từng ví từ lịch sử dòng tiền (`BR-FIN-02`) và làm tròn tỷ lệ phân bổ (`BR-FIN-01`, `FR-WAL-04`).
 
-- Thao tác hệ thống: `getWalletsSummary()`
-- Kết quả phản hồi: Hệ thống trả về danh sách ví kèm số dư tính lại từ lịch sử dòng tiền (`BR-FIN-02`), tổng số dư hệ thống và tỷ lệ phân bổ từng ví làm tròn ngân hàng 2 chữ số thập phân (`BR-FIN-01`); nếu tổng số dư bằng 0.00 VNĐ, hệ thống gán tỷ lệ 0.00% cho mọi ví để tránh lỗi chia cho 0 (`ERR-FIN-002`). Thao tác chỉ đọc dữ liệu, không làm thay đổi trạng thái hệ thống.
-
-**Danh sách tham số đầu vào**
-
-Thao tác này không yêu cầu tham số đầu vào.
+- **Thao tác hệ thống**: `getWalletsSummary()` (không có tham số đầu vào)
+- **Kết quả phản hồi**: Trả về danh sách ví kèm số dư tính lại (`BR-FIN-02`), tổng số dư hệ thống và tỷ lệ phân bổ từng ví làm tròn ngân hàng 2 chữ số thập phân (`BR-FIN-01`); gán `0.00%` cho mọi ví nếu tổng số dư bằng `0.00 VNĐ` (`ERR-FIN-002`). Thao tác chỉ đọc dữ liệu.
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -101,18 +97,18 @@ sequenceDiagram
 
 ### 3.3.3 Cập nhật thông tin ví
 
-Người dùng gửi yêu cầu chỉnh sửa tên hiển thị hoặc ghi chú mô tả của một ví đang tồn tại. Hệ thống kiểm tra thông tin mới (`BR-NAM-01`) và cập nhật hồ sơ ví mà không thay đổi số dư hay lịch sử giao dịch (`BR-FIN-02`).
+Người dùng yêu cầu sửa tên hoặc ghi chú của ví hiện có. Hệ thống kiểm tra tính hợp lệ (`BR-NAM-01`) và cập nhật thông tin mà không làm thay đổi số dư hay lịch sử giao dịch (`BR-FIN-02`).
 
-- Thao tác hệ thống: `updateWallet(walletId, walletName, note)`
-- Kết quả phản hồi: Hệ thống cập nhật tên và ghi chú mới cho ví, giữ nguyên `walletId`, số dư hiện hành và các giao dịch liên kết (`BR-FIN-02`), trả về thông tin ví sau cập nhật; trường hợp vi phạm, hệ thống từ chối thao tác và báo lỗi không tìm thấy ví, tên sai định dạng (`ERR-NAM-001`), trùng tên với ví khác (`ERR-NAM-002`) hoặc ghi chú vượt quá 255 ký tự.
+- **Thao tác hệ thống**: `updateWallet(walletId, walletName, note)`
+- **Kết quả phản hồi**: Cập nhật tên và ghi chú mới, giữ nguyên `walletId`, số dư và giao dịch liên kết (`BR-FIN-02`); từ chối nếu không tìm thấy ví, tên sai định dạng (`ERR-NAM-001`), trùng tên (`ERR-NAM-002`) hoặc ghi chú quá 255 ký tự.
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `walletId` | Mã định danh của ví cần cập nhật thông tin | Chuỗi định danh bắt buộc tồn tại trong danh sách ví của hệ thống (`FR-WAL-03`). |
-| `walletName` | Tên gọi mới cần áp dụng cho ví | Chuỗi 1 đến 50 ký tự sau khi cắt khoảng trắng hai đầu (`trim`), không để rỗng và duy nhất so với các ví khác trong hệ thống, không phân biệt hoa thường (`BR-NAM-01`); trường hợp vi phạm, báo lỗi tên sai định dạng (`ERR-NAM-001`), trùng tên ví (`ERR-NAM-002`). |
-| `note` | Ghi chú mô tả mới của ví | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-03`). |
+| `walletId` | Mã định danh ví | Bắt buộc tồn tại trong danh sách ví (`FR-WAL-03`). |
+| `walletName` | Tên gọi mới | Chuỗi 1–50 ký tự sau khi `trim`, không rỗng (`ERR-NAM-001`), duy nhất toàn hệ thống, không phân biệt hoa thường (`BR-NAM-01`, `ERR-NAM-002`). |
+| `note` | Ghi chú mới | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-WAL-03`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -139,18 +135,18 @@ sequenceDiagram
 
 ### 3.3.4 Điều chỉnh số dư ví thực tế
 
-Người dùng đối chiếu tiền thực tế với số dư phần mềm và gửi yêu cầu điều chỉnh khi có chênh lệch. Hệ thống tính mức chênh lệch (`BR-FIN-01`), tạo bản ghi điều chỉnh cố định và đồng bộ số dư ví khớp với giá trị thực tế (`BR-FIN-02`).
+Người dùng đối chiếu tiền thực tế với phần mềm và yêu cầu điều chỉnh khi có chênh lệch. Hệ thống tính mức chênh lệch (`BR-FIN-01`), tạo bản ghi điều chỉnh bất biến và đồng bộ số dư ví theo giá trị thực tế (`BR-FIN-02`).
 
-- Thao tác hệ thống: `adjustBalance(walletId, actualBalance, reason)`
-- Kết quả phản hồi: Hệ thống tính chênh lệch giữa số dư thực tế và số dư hiện tại, tạo bản ghi điều chỉnh (`BalanceAdjustmentRecord`) cố định, cập nhật số dư ví khớp với `actualBalance` (`BR-FIN-02`) và trả về bản ghi vừa tạo; trường hợp vi phạm, hệ thống từ chối thao tác và báo lỗi ví không hoạt động, sai định dạng số học (`ERR-FIN-001`), số dư thực tế âm (`ERR-WAL-001`), chênh lệch bằng 0.00 VNĐ hoặc lý do vượt quá 255 ký tự.
+- **Thao tác hệ thống**: `adjustBalance(walletId, actualBalance, reason)`
+- **Kết quả phản hồi**: Tạo bản ghi `BalanceAdjustmentRecord` bất biến, đồng bộ số dư ví bằng `actualBalance` (`BR-FIN-02`) và trả về bản ghi vừa tạo; từ chối nếu ví không `ACTIVE`, sai định dạng số (`ERR-FIN-001`), số dư thực tế âm (`ERR-WAL-001`), chênh lệch bằng `0.00 VNĐ` hoặc lý do quá 255 ký tự.
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `walletId` | Mã định danh của ví cần điều chỉnh số dư thực tế | Chuỗi định danh tồn tại trong hệ thống, ví đang ở trạng thái hoạt động (`ACTIVE`) (`FR-WAL-05`). |
-| `actualBalance` | Số dư thực tế quan sát được khi kiểm kê ví | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`), không âm (`BR-FIN-02`) và khác số dư hiện tại của ví (`FR-WAL-05`); trường hợp vi phạm, báo lỗi sai định dạng số học (`ERR-FIN-001`), số dư thực tế âm (`ERR-WAL-001`). |
-| `reason` | Lý do giải trình nguyên nhân chênh lệch số dư | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-WAL-05`). |
+| `walletId` | Mã ví cần điều chỉnh | Tồn tại và đang ở trạng thái `ACTIVE` (`FR-WAL-05`). |
+| `actualBalance` | Số dư thực tế | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`) và khác số dư hiện tại của ví (`FR-WAL-05`). |
+| `reason` | Lý do chênh lệch | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-WAL-05`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -175,35 +171,35 @@ sequenceDiagram
     end
 ```
 
-## 3.4 Nhóm Chức năng Ghi nhận Thu chi (TXN)
+## 3.4 Nhóm chức năng Ghi nhận thu chi (TXN)
 
-Nhóm chức năng Ghi nhận Thu chi xử lý các giao dịch dòng tiền hàng ngày của người dùng. Các thao tác trong nhóm hạch toán thu nhập, chi tiêu kèm chi phí phát sinh, đồng thời kiểm soát việc chỉnh sửa, xóa giao dịch đảm bảo số dư ví không âm (`BR-FIN-02`) và đúng phân cấp danh mục 3 cấp (`BR-FIN-04`).
+Nhóm chức năng Ghi nhận thu chi hạch toán các khoản thu nhập, chi tiêu kèm phí phát sinh, đồng thời kiểm soát việc sửa, xóa giao dịch nhằm bảo toàn số dư ví không âm (`BR-FIN-02`) và phân cấp danh mục 3 cấp (`BR-FIN-04`).
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
 | :---: | :--- | :--- | :--- | :--- |
-| `UC-TXN-01` | Ghi nhận giao dịch thu chi | `recordIncomeExpense` | Ghi nhận khoản thu nhập hoặc chi tiêu phát sinh kèm chi phí liên kết nếu có | Ghi nhận |
-| `UC-TXN-02` | Tra cứu và lọc lịch sử giao dịch thu chi | `filterTransactions` | Trích xuất danh sách giao dịch thu chi theo thời gian, ví thanh toán và danh mục | Truy vấn |
+| `UC-TXN-01` | Ghi nhận giao dịch thu chi | `recordIncomeExpense` | Ghi nhận khoản thu/chi kèm chi phí liên kết (nếu có) | Ghi nhận |
+| `UC-TXN-02` | Tra cứu và lọc lịch sử giao dịch thu chi | `filterTransactions` | Trích xuất danh sách thu chi theo thời gian, ví và danh mục | Truy vấn |
 | `UC-TXN-03` | Chỉnh sửa giao dịch thu chi | `updateTransaction` | Điều chỉnh thuộc tính giao dịch, hoàn nguyên tác động cũ và kiểm soát số dư | Cập nhật |
-| `UC-TXN-04` | Xóa giao dịch thu chi | `deleteTransaction` | Loại bỏ giao dịch khỏi sổ theo dõi, hoàn nguyên số dư ví và xóa chi phí kèm theo | Xóa |
+| `UC-TXN-04` | Xóa giao dịch thu chi | `deleteTransaction` | Xóa giao dịch, hoàn nguyên số dư ví và xóa chi phí kèm theo | Xóa |
 
 ### 3.4.1 Ghi nhận giao dịch thu chi
 
-Người dùng gửi thông tin khoản thu nhập hoặc chi tiêu kèm ví thanh toán, danh mục và chi phí phát sinh (nếu có). Hệ thống kiểm tra danh mục cấp 3 (`BR-FIN-04`) và số dư ví (`BR-FIN-02`), sau đó ghi nhận đồng thời giao dịch gốc cùng bản ghi phí liên kết.
+Người dùng gửi thông tin khoản thu/chi kèm ví thanh toán, danh mục và phí phát sinh (nếu có). Hệ thống kiểm tra danh mục cấp 3 (`BR-FIN-04`), số dư ví (`BR-FIN-02`) và ghi nhận đồng thời giao dịch gốc cùng bản ghi phí liên kết.
 
-- Thao tác hệ thống: `recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
-- Kết quả phản hồi: Hệ thống tạo bản ghi giao dịch (`IncomeExpenseTransaction`) với mã duy nhất, tạo bản ghi phí (`TransactionFee`) liên kết nếu `feeAmount > 0.00 VNĐ`, cập nhật số dư ví (`BR-FIN-02`) và trả về thông tin giao dịch vừa lưu; trường hợp vi phạm, hệ thống hủy thao tác và báo lỗi số tiền sai định dạng hoặc $\le 0$ (`ERR-FIN-001`), chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`), không đủ số dư ví (`ERR-WAL-001`), hoặc từ chối khi ví không hoạt động hay danh mục sai phân cấp (`BR-FIN-04`).
+- **Thao tác hệ thống**: `recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
+- **Kết quả phản hồi**: Tạo `IncomeExpenseTransaction`, tạo `TransactionFee` liên kết nếu `feeAmount > 0.00 VNĐ`, cập nhật số dư ví (`BR-FIN-02`) và trả về giao dịch vừa lưu; từ chối nếu số tiền sai định dạng hoặc ≤ 0 (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại/đã xóa (`ERR-FEE-003`), ví không đủ số dư (`ERR-WAL-001`), hoặc ví/danh mục không hợp lệ (`BR-FIN-04`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `walletId` | Mã định danh của ví tiếp nhận khoản thu hoặc chi trả khoản chi | Mã ví tồn tại và đang hoạt động (`ACTIVE`) khi ghi nhận thu nhập (`FR-TXN-01`) hoặc chi tiêu (`FR-TXN-02`). Số dư ví sau khi áp dụng giao dịch và chi phí phải không âm (`BR-FIN-02`); trường hợp vi phạm, báo lỗi không đủ số dư ví (`ERR-WAL-001`). |
-| `categoryId` | Mã định danh danh mục chi tiết cấp 3 dùng để phân loại giao dịch | Mã danh mục cấp 3 đang hoạt động (`ACTIVE`), thuộc nhánh Thu nhập (`INCOME`) hoặc Chi tiêu (`EXPENSE`) (`BR-FIN-04`). |
-| `amount` | Số tiền gốc của giao dịch thu nhập hoặc chi tiêu | Số thập phân chính xác lớn hơn 0.00 VNĐ với 2 chữ số thập phân (`BR-FIN-01`); trường hợp vi phạm, báo lỗi số tiền sai định dạng (`ERR-FIN-001`). |
-| `transactionDate` | Ngày phát sinh giao dịch thực tế | Ngày tháng định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại đối với khoản thu (`FR-TXN-01`) và khoản chi (`FR-TXN-02`). |
-| `note` | Ghi chú diễn giải nội dung khoản thu chi | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu đối với khoản thu (`FR-TXN-01`) và khoản chi (`FR-TXN-02`). |
-| `feeAmount` | Số tiền chi phí phụ phát sinh đi kèm giao dịch | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`), không âm ($\ge 0.00$ VNĐ) và mặc định 0.00 VNĐ (`BR-FIN-02`); trường hợp vi phạm, báo lỗi chi phí âm (`ERR-FEE-001`). |
-| `feeCategoryId` | Mã định danh danh mục chi tiêu dùng để hạch toán chi phí giao dịch | Tùy chọn khi `feeAmount = 0.00 VNĐ`; bắt buộc chọn khi `feeAmount > 0.00 VNĐ` (`BR-FIN-02`). Phải là danh mục cấp 3 đang hoạt động (`ACTIVE`) thuộc nhánh Chi tiêu (`EXPENSE`) (`BR-FIN-04`); trường hợp vi phạm, báo lỗi thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`). |
+| `walletId` | Mã ví thanh toán | Tồn tại và đang `ACTIVE` (`FR-TXN-01`, `FR-TXN-02`). Số dư sau giao dịch và phí phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `categoryId` | Mã danh mục cấp 3 | Đang `ACTIVE`, thuộc nhánh `INCOME` hoặc `EXPENSE` (`BR-FIN-04`). |
+| `amount` | Số tiền giao dịch | Số thập phân 2 chữ số, > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
+| `transactionDate` | Ngày giao dịch | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-01`, `FR-TXN-02`). |
+| `note` | Ghi chú | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TXN-01`, `FR-TXN-02`). |
+| `feeAmount` | Số tiền phí | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-02`, `ERR-FEE-001`). |
+| `feeCategoryId` | Mã danh mục phí | Tùy chọn khi `feeAmount = 0.00 VNĐ`, bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); phải là danh mục cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -230,19 +226,19 @@ sequenceDiagram
 
 ### 3.4.2 Tra cứu và lọc lịch sử giao dịch
 
-Người dùng gửi tiêu chí lọc theo khoảng thời gian, ví thanh toán và danh mục để trích xuất lịch sử thu chi. Hệ thống lọc sổ giao dịch và tổng hợp tổng thu, tổng chi (gồm cả phí giao dịch) cùng dòng tiền thuần (`BR-FIN-01`).
+Người dùng gửi tiêu chí lọc theo khoảng thời gian, ví và danh mục. Hệ thống lọc sổ giao dịch và tổng hợp tổng thu, tổng chi (gồm cả phí) cùng dòng tiền thuần (`BR-FIN-01`).
 
-- Thao tác hệ thống: `filterTransactions(startDate, endDate, walletId, categoryId)`
-- Kết quả phản hồi: Hệ thống trả về danh sách giao dịch thu chi và phí giao dịch thỏa mãn bộ lọc sắp xếp theo ngày giảm dần (kèm nhãn đã xóa nếu danh mục đã xóa mềm), cùng tổng thu nhập, tổng chi tiêu và dòng tiền thuần (`BR-FIN-01`); nếu `startDate > endDate`, hệ thống từ chối truy vấn và báo lỗi khoảng thời gian. Thao tác chỉ đọc dữ liệu, không làm biến động số dư ví.
+- **Thao tác hệ thống**: `filterTransactions(startDate, endDate, walletId, categoryId)`
+- **Kết quả phản hồi**: Trả về danh sách giao dịch thu chi và phí thỏa mãn bộ lọc sắp xếp theo ngày giảm dần (kèm nhãn "(đã xóa)" nếu danh mục đã xóa mềm), cùng tổng thu, tổng chi và dòng tiền thuần (`BR-FIN-01`); từ chối nếu `startDate > endDate`. Thao tác chỉ đọc dữ liệu.
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu của khoảng thời gian tra cứu lịch sử thu chi | Ngày bắt đầu định dạng `YYYY-MM-DD`, nhỏ hơn hoặc bằng `endDate` (`FR-TXN-03`). |
-| `endDate` | Ngày kết thúc của khoảng thời gian tra cứu lịch sử thu chi | Ngày kết thúc định dạng `YYYY-MM-DD`, lớn hơn hoặc bằng `startDate` (`FR-TXN-03`). |
-| `walletId` | Mã định danh ví thanh toán cần lọc giao dịch | Tham số tùy chọn; truyền mã ví hợp lệ để lọc riêng một ví hoặc để trống để lấy toàn bộ ví (`FR-TXN-03`). |
-| `categoryId` | Mã định danh nhóm nhu cầu hoặc danh mục chi tiết cần lọc | Tham số tùy chọn theo tiêu chí lọc (`FR-TXN-03`); nhận mã nhóm nhu cầu hoặc danh mục chi tiết, bao gồm cả mục đã xóa mềm (`DELETED`) (`BR-FIN-04`). |
+| `startDate` | Ngày bắt đầu | Định dạng `YYYY-MM-DD`, `≤ endDate` (`FR-TXN-03`). |
+| `endDate` | Ngày kết thúc | Định dạng `YYYY-MM-DD`, `≥ startDate` (`FR-TXN-03`). |
+| `walletId` | Mã ví cần lọc | Tùy chọn; để trống để lấy toàn bộ ví (`FR-TXN-03`). |
+| `categoryId` | Mã nhóm hoặc danh mục | Tùy chọn; nhận mã `NeedGroup` hoặc `Category` (kể cả mục đã `DELETED`) (`BR-FIN-04`, `FR-TXN-03`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -267,23 +263,23 @@ sequenceDiagram
 
 ### 3.4.3 Chỉnh sửa giao dịch thu chi
 
-Người dùng gửi yêu cầu hiệu chỉnh thông tin một giao dịch thu chi đã lưu. Hệ thống hoàn nguyên tác động tài chính cũ trên ví ban đầu và áp dụng thông số mới lên ví đích trong cùng một bước xử lý, đảm bảo số dư các ví không âm (`BR-FIN-02`).
+Người dùng yêu cầu sửa thông tin một giao dịch thu chi đã lưu. Hệ thống hoàn nguyên tác động cũ trên ví ban đầu và áp dụng thông số mới lên ví đích trong cùng một bước nguyên tử, đảm bảo số dư các ví không âm (`BR-FIN-02`).
 
-- Thao tác hệ thống: `updateTransaction(transactionId, walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
-- Kết quả phản hồi: Hệ thống hoàn nguyên số dư ví cũ, cập nhật số dư ví mới (`BR-FIN-02`), ghi đè bản ghi giao dịch gốc, đồng thời tạo mới, cập nhật hoặc xóa bản ghi phí (`TransactionFee`) liên kết và trả về giao dịch sau chỉnh sửa; trường hợp vi phạm, hệ thống giữ nguyên dữ liệu cũ và báo lỗi sai định dạng số tiền (`ERR-FIN-001`), chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`), làm âm số dư ví (`ERR-WAL-001`), hoặc từ chối khi không tìm thấy giao dịch, sửa trực tiếp bản ghi phí độc lập hay đổi loại thu chi (`BR-FIN-04`).
+- **Thao tác hệ thống**: `updateTransaction(transactionId, walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
+- **Kết quả phản hồi**: Hoàn nguyên số dư ví cũ, cập nhật số dư ví mới (`BR-FIN-02`), cập nhật giao dịch gốc và đồng bộ (tạo/sửa/xóa) `TransactionFee` liên kết; từ chối và giữ nguyên dữ liệu cũ nếu sai định dạng tiền (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu/sai danh mục phí (`ERR-FEE-002`, `ERR-FEE-003`), làm âm số dư ví (`ERR-WAL-001`), hoặc khi giao dịch không tồn tại, sửa trực tiếp bản ghi phí hay đổi loại thu chi (`BR-FIN-04`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transactionId` | Mã định danh của giao dịch thu chi gốc cần chỉnh sửa | Mã giao dịch gốc tồn tại trong sổ thu chi (`FR-TXN-04`), không phải bản ghi phí giao dịch độc lập (`BR-FIN-02`). |
-| `walletId` | Mã định danh của ví thanh toán áp dụng sau khi chỉnh sửa | Mã ví tồn tại và đang hoạt động (`ACTIVE`). Số dư ví cũ sau hoàn nguyên và số dư ví mới sau cập nhật đều phải không âm (`BR-FIN-02`); trường hợp vi phạm, báo lỗi làm âm số dư ví (`ERR-WAL-001`). |
-| `categoryId` | Mã định danh danh mục chi tiết cấp 3 sau khi chỉnh sửa | Mã danh mục cấp 3 cùng nhánh Loại thu chi (`INCOME` hoặc `EXPENSE`) với giao dịch gốc (`BR-FIN-04`). Danh mục chọn mới phải đang hoạt động (`ACTIVE`), cho phép giữ nguyên danh mục cũ đã xóa mềm (`FR-TXN-04`). |
-| `amount` | Số tiền giao dịch mới sau khi hiệu chỉnh | Số thập phân chính xác lớn hơn 0.00 VNĐ với 2 chữ số thập phân (`BR-FIN-01`); trường hợp vi phạm, báo lỗi số tiền sai định dạng (`ERR-FIN-001`). |
-| `transactionDate` | Ngày phát sinh giao dịch mới | Ngày tháng định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-04`). |
-| `note` | Ghi chú diễn giải mới của giao dịch | Chuỗi ký tự tùy chọn, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-TXN-04`). |
-| `feeAmount` | Số tiền chi phí giao dịch mới | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`) và không âm ($\ge 0.00$ VNĐ) (`BR-FIN-02`); trường hợp vi phạm, báo lỗi chi phí âm (`ERR-FEE-001`). |
-| `feeCategoryId` | Mã định danh danh mục chi tiêu cho khoản phí mới | Bắt buộc chọn khi `feeAmount > 0.00 VNĐ` (`BR-FIN-02`). Phải thuộc nhánh Chi tiêu (`EXPENSE`) và đang hoạt động (`ACTIVE`) nếu chọn mới, hoặc giữ nguyên danh mục phí cũ đã xóa mềm (`FR-TXN-04`); trường hợp vi phạm, báo lỗi thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`). |
+| `transactionId` | Mã giao dịch cần sửa | Giao dịch gốc tồn tại trong sổ thu chi (`FR-TXN-04`), không phải bản ghi phí độc lập (`BR-FIN-02`). |
+| `walletId` | Mã ví thanh toán mới | Tồn tại và đang `ACTIVE`. Số dư ví cũ sau hoàn nguyên và ví mới sau cập nhật phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `categoryId` | Mã danh mục cấp 3 mới | Cùng nhánh `TransactionType` với giao dịch gốc (`BR-FIN-04`). Phải đang `ACTIVE` nếu chọn mới, hoặc giữ nguyên danh mục cũ đã xóa mềm (`FR-TXN-04`). |
+| `amount` | Số tiền mới | Số thập phân 2 chữ số, > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
+| `transactionDate` | Ngày giao dịch mới | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-04`). |
+| `note` | Ghi chú mới | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TXN-04`). |
+| `feeAmount` | Số tiền phí mới | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-FEE-001`). |
+| `feeCategoryId` | Mã danh mục phí mới | Bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); thuộc nhánh `EXPENSE` và đang `ACTIVE` (hoặc giữ nguyên danh mục phí cũ đã xóa mềm) (`FR-TXN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -308,16 +304,16 @@ sequenceDiagram
 
 ### 3.4.4 Xóa giao dịch thu chi
 
-Người dùng yêu cầu xóa một giao dịch thu chi khỏi sổ theo dõi. Hệ thống kiểm tra số dư hoàn nguyên (`BR-FIN-02`), xóa đồng thời giao dịch gốc cùng bản ghi phí liên kết (nếu có) và khôi phục số dư ví.
+Người dùng yêu cầu xóa một giao dịch thu chi. Hệ thống kiểm tra số dư hoàn nguyên (`BR-FIN-02`), xóa đồng thời giao dịch gốc cùng bản ghi phí liên kết và khôi phục số dư ví.
 
-- Thao tác hệ thống: `deleteTransaction(transactionId)`
-- Kết quả phản hồi: Hệ thống xóa vĩnh viễn bản ghi giao dịch gốc và bản ghi phí (`TransactionFee`) liên kết, hoàn nguyên số dư ví (`BR-FIN-02`) và phản hồi thông báo xóa thành công; trường hợp vi phạm, hệ thống từ chối thao tác và báo lỗi làm âm số dư ví khi trừ lại khoản thu nhập (`ERR-WAL-001`), hoặc từ chối khi không tìm thấy giao dịch hay xóa trực tiếp bản ghi phí độc lập (`BR-FIN-02`).
+- **Thao tác hệ thống**: `deleteTransaction(transactionId)`
+- **Kết quả phản hồi**: Xóa vĩnh viễn giao dịch gốc và `TransactionFee` đi kèm, hoàn nguyên số dư ví (`BR-FIN-02`); từ chối nếu không tìm thấy giao dịch, xóa trực tiếp bản ghi phí độc lập, hoặc việc trừ lại khoản thu làm âm số dư ví (`ERR-WAL-001`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transactionId` | Mã định danh của giao dịch thu chi cần xóa khỏi hệ thống | Mã giao dịch gốc tồn tại trong sổ thu chi (`FR-TXN-05`), không phải bản ghi phí độc lập và khi xóa giao dịch thu nhập (`INCOME`), số dư ví sau khi trừ khoản thu và cộng lại phí liên kết phải không âm (`BR-FIN-02`); trường hợp vi phạm, báo lỗi làm âm số dư ví (`ERR-WAL-001`). |
+| `transactionId` | Mã giao dịch cần xóa | Giao dịch gốc tồn tại (`FR-TXN-05`), không phải bản ghi phí độc lập. Nếu xóa giao dịch `INCOME`, số dư ví sau khi trừ khoản thu và hoàn phí phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -338,34 +334,34 @@ sequenceDiagram
     end
 ```
 
-## 3.5 Nhóm Chức năng Chuyển tiền Nội bộ (TRF)
+## 3.5 Nhóm chức năng Chuyển tiền nội bộ (TRF)
 
-Nhóm chức năng Chuyển tiền Nội bộ quản lý các giao dịch điều chuyển tiền giữa các ví của người dùng. Các thao tác trong nhóm thực hiện ghi nhận đồng thời trừ ví nguồn, cộng ví đích kèm chi phí phát sinh (`BR-FIN-03`) và giữ số dư các ví luôn không âm (`BR-FIN-02`).
+Nhóm chức năng Chuyển tiền nội bộ điều chuyển tiền giữa các ví của người dùng theo cơ chế ghi nhận đồng thời (trừ ví nguồn, cộng ví đích kèm phí phát sinh theo `BR-FIN-03`) và bảo toàn số dư không âm (`BR-FIN-02`).
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
 | :---: | :--- | :--- | :--- | :--- |
-| `UC-TRF-01` | Chuyển tiền nội bộ giữa hai ví | `transferFunds` | Điều chuyển tiền giữa hai ví theo cơ chế ghi nhận đồng thời kèm chi phí nếu có | Ghi nhận |
-| `UC-TRF-02` | Tra cứu lịch sử chuyển tiền | `filterTransfers` | Trích xuất lịch sử các lượt điều chuyển tiền nội bộ và tổng chi phí phát sinh | Truy vấn |
-| `UC-TRF-03` | Xóa giao dịch chuyển tiền | `deleteTransfer` | Hủy giao dịch chuyển tiền, hoàn nguyên đồng thời số dư hai ví và xóa chi phí | Xóa |
+| `UC-TRF-01` | Chuyển tiền nội bộ giữa hai ví | `transferFunds` | Điều chuyển tiền giữa hai ví theo cơ chế ghi nhận đồng thời kèm phí (nếu có) | Ghi nhận |
+| `UC-TRF-02` | Tra cứu lịch sử chuyển tiền | `filterTransfers` | Trích xuất lịch sử chuyển tiền nội bộ và tổng chi phí phát sinh | Truy vấn |
+| `UC-TRF-03` | Xóa giao dịch chuyển tiền | `deleteTransfer` | Hủy giao dịch chuyển tiền, hoàn nguyên đồng thời số dư hai ví và xóa phí | Xóa |
 
 ### 3.5.1 Chuyển tiền giữa hai ví
 
-Người dùng yêu cầu điều chuyển tiền từ ví nguồn sang ví đích kèm chi phí chuyển tiền (nếu có). Hệ thống kiểm tra hai ví phân biệt (`BR-FIN-03`) và số dư khả dụng của ví nguồn (`BR-FIN-02`), sau đó trừ tiền ví nguồn, cộng tiền ví đích đồng thời và tạo bản ghi phí liên kết.
+Người dùng yêu cầu chuyển tiền từ ví nguồn sang ví đích kèm phí chuyển tiền (nếu có). Hệ thống kiểm tra hai ví phân biệt (`BR-FIN-03`) và số dư ví nguồn (`BR-FIN-02`), sau đó trừ ví nguồn, cộng ví đích đồng thời và tạo bản ghi phí liên kết.
 
-- Thao tác hệ thống: `transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)`
-- Kết quả phản hồi: Hệ thống tạo bản ghi chuyển tiền (`TransferTransaction`) với mã duy nhất, trừ đồng thời số tiền chuyển và phí khỏi ví nguồn, cộng số tiền chuyển vào ví đích (`BR-FIN-03`), tạo bản ghi phí (`TransactionFee`) loại `EXPENSE` nếu `feeAmount > 0.00 VNĐ` và trả về số dư mới của hai ví; trường hợp vi phạm, hệ thống hủy giao dịch và báo lỗi trùng ví chuyển và ví nhận (`ERR-TRF-001`), số tiền chuyển $\le 0$ (`ERR-TRF-002`), sai định dạng số học (`ERR-FIN-001`), chi phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`), hoặc ví nguồn không đủ số dư (`ERR-WAL-001`).
+- **Thao tác hệ thống**: `transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)`
+- **Kết quả phản hồi**: Tạo `TransferTransaction`, trừ đồng thời `amount + feeAmount` ở ví nguồn, cộng `amount` vào ví đích (`BR-FIN-03`), tạo `TransactionFee` (loại `EXPENSE`) nếu `feeAmount > 0.00 VNĐ` và trả về số dư mới của hai ví; từ chối nếu trùng ví nguồn và đích (`ERR-TRF-001`), số tiền chuyển ≤ 0 (`ERR-TRF-002`), sai định dạng số (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu/sai danh mục phí (`ERR-FEE-002`, `ERR-FEE-003`) hoặc ví nguồn không đủ số dư (`ERR-WAL-001`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `sourceWalletId` | Mã định danh của ví nguồn trích tiền chuyển đi | Mã ví nguồn tồn tại và đang hoạt động (`ACTIVE`) (`BR-FIN-03`), có số dư khả dụng lớn hơn hoặc bằng `amount + feeAmount` (`BR-FIN-02`); trường hợp vi phạm, báo lỗi ví nguồn không đủ số dư (`ERR-WAL-001`). |
-| `destinationWalletId` | Mã định danh của ví đích tiếp nhận khoản tiền chuyển đến | Mã ví đích tồn tại, đang hoạt động (`ACTIVE`) và khác `sourceWalletId` (`BR-FIN-03`); trường hợp vi phạm, báo lỗi trùng ví chuyển và ví nhận (`ERR-TRF-001`). |
-| `amount` | Số tiền điều chuyển giữa hai ví nội bộ | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`) và lớn hơn 0.00 VNĐ (`BR-FIN-03`); trường hợp vi phạm, báo lỗi sai định dạng số học (`ERR-FIN-001`), số tiền chuyển nhỏ hơn hoặc bằng 0 (`ERR-TRF-002`). |
-| `transferDate` | Ngày thực hiện giao dịch chuyển tiền | Ngày tháng định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TRF-01`). |
-| `note` | Ghi chú diễn giải mục đích điều chuyển tiền | Chuỗi ký tự tùy chọn, cho phép để trống, tối đa 255 ký tự sau khi cắt khoảng trắng hai đầu (`FR-TRF-01`). |
-| `feeAmount` | Số tiền chi phí chuyển tiền phát sinh do bên thứ ba thu | Số thập phân chính xác 2 chữ số thập phân (`BR-FIN-01`), không âm ($\ge 0.00$ VNĐ) và mặc định 0.00 VNĐ (`BR-FIN-03`); trường hợp vi phạm, báo lỗi chi phí âm (`ERR-FEE-001`). |
-| `feeCategoryId` | Mã định danh danh mục chi tiêu dùng để hạch toán phí chuyển tiền | Tùy chọn khi `feeAmount = 0.00 VNĐ`; bắt buộc chọn khi `feeAmount > 0.00 VNĐ` (`BR-FIN-02`). Phải là danh mục cấp 3 đang hoạt động (`ACTIVE`) thuộc nhánh Chi tiêu (`EXPENSE`) (`BR-FIN-04`); trường hợp vi phạm, báo lỗi thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại hoặc đã xóa (`ERR-FEE-003`). |
+| `sourceWalletId` | Mã ví nguồn | Tồn tại, đang `ACTIVE` (`BR-FIN-03`) và có số dư `≥ amount + feeAmount` (`BR-FIN-02`, `ERR-WAL-001`). |
+| `destinationWalletId` | Mã ví đích | Tồn tại, đang `ACTIVE` và khác `sourceWalletId` (`BR-FIN-03`, `ERR-TRF-001`). |
+| `amount` | Số tiền chuyển | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), > 0.00 VNĐ (`BR-FIN-03`, `ERR-TRF-002`). |
+| `transferDate` | Ngày chuyển tiền | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TRF-01`). |
+| `note` | Ghi chú | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TRF-01`). |
+| `feeAmount` | Số tiền phí chuyển | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-03`, `ERR-FEE-001`). |
+| `feeCategoryId` | Mã danh mục phí | Tùy chọn khi `feeAmount = 0.00 VNĐ`, bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); phải là danh mục cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -390,19 +386,19 @@ sequenceDiagram
 
 ### 3.5.2 Tra cứu lịch sử chuyển tiền
 
-Người dùng truy vấn lịch sử điều chuyển tiền nội bộ theo khoảng thời gian, ví nguồn hoặc ví đích. Hệ thống lọc sổ chuyển tiền, kết hợp thông tin chi phí liên kết và trả về danh sách sắp xếp theo ngày giảm dần (`FR-TRF-02`).
+Người dùng truy vấn lịch sử chuyển tiền nội bộ theo khoảng thời gian, ví nguồn hoặc ví đích. Hệ thống lọc sổ chuyển tiền kèm phí liên kết và trả về danh sách sắp xếp theo ngày giảm dần (`FR-TRF-02`).
 
-- Thao tác hệ thống: `filterTransfers(startDate, endDate, sourceWalletId, destinationWalletId)`
-- Kết quả phản hồi: Hệ thống trả về danh sách bản ghi chuyển tiền thỏa mãn bộ lọc sắp xếp theo ngày giảm dần (gồm mã chuyển tiền, ngày thực hiện, ví nguồn, ví đích, số tiền chuyển, chi phí và ghi chú) kèm tổng tiền chuyển và tổng chi phí (`BR-FIN-01`); nếu `startDate > endDate`, hệ thống từ chối truy vấn và báo lỗi khoảng thời gian. Thao tác chỉ đọc dữ liệu, không làm thay đổi số dư ví.
+- **Thao tác hệ thống**: `filterTransfers(startDate, endDate, sourceWalletId, destinationWalletId)`
+- **Kết quả phản hồi**: Trả về danh sách bản ghi chuyển tiền thỏa mãn bộ lọc sắp xếp theo ngày giảm dần kèm tổng tiền chuyển và tổng chi phí (`BR-FIN-01`); từ chối nếu `startDate > endDate`. Thao tác chỉ đọc dữ liệu.
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu của khoảng thời gian tra cứu lịch sử chuyển tiền | Ngày bắt đầu tùy chọn định dạng `YYYY-MM-DD`, nhỏ hơn hoặc bằng `endDate` (`FR-TRF-02`). |
-| `endDate` | Ngày kết thúc của khoảng thời gian tra cứu lịch sử chuyển tiền | Ngày kết thúc tùy chọn định dạng `YYYY-MM-DD`, lớn hơn hoặc bằng `startDate` (`FR-TRF-02`). |
-| `sourceWalletId` | Mã định danh ví nguồn cần lọc các giao dịch chuyển tiền đi | Tham số tùy chọn; truyền mã ví hợp lệ hoặc để trống để lấy toàn bộ ví nguồn (`FR-TRF-02`). |
-| `destinationWalletId` | Mã định danh ví đích cần lọc các giao dịch nhận tiền chuyển đến | Tham số tùy chọn; truyền mã ví hợp lệ hoặc để trống để lấy toàn bộ ví đích (`FR-TRF-02`). |
+| `startDate` | Ngày bắt đầu | Tùy chọn, định dạng `YYYY-MM-DD`, `≤ endDate` (`FR-TRF-02`). |
+| `endDate` | Ngày kết thúc | Tùy chọn, định dạng `YYYY-MM-DD`, `≥ startDate` (`FR-TRF-02`). |
+| `sourceWalletId` | Mã ví nguồn | Tùy chọn; để trống để lấy toàn bộ ví nguồn (`FR-TRF-02`). |
+| `destinationWalletId` | Mã ví đích | Tùy chọn; để trống để lấy toàn bộ ví đích (`FR-TRF-02`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -427,16 +423,16 @@ sequenceDiagram
 
 ### 3.5.3 Xóa giao dịch chuyển tiền
 
-Người dùng yêu cầu xóa một giao dịch chuyển tiền nội bộ để khôi phục số dư hai ví về trạng thái trước khi chuyển. Hệ thống kiểm tra số dư khả dụng của ví đích (`BR-FIN-02`), xóa đồng thời bản ghi chuyển tiền cùng phí liên kết và hoàn nguyên số dư hai ví (`BR-FIN-03`).
+Người dùng yêu cầu xóa một giao dịch chuyển tiền để khôi phục số dư hai ví. Hệ thống kiểm tra số dư ví đích (`BR-FIN-02`), xóa đồng thời bản ghi chuyển tiền cùng phí liên kết và hoàn nguyên số dư hai ví (`BR-FIN-03`).
 
-- Thao tác hệ thống: `deleteTransfer(transferId)`
-- Kết quả phản hồi: Hệ thống xóa vĩnh viễn bản ghi chuyển tiền (`TransferTransaction`) và bản ghi phí (`TransactionFee`) liên kết, hoàn nguyên đồng thời hai đầu ví (`BR-FIN-03`), tính lại số dư khả dụng (`BR-FIN-02`) và phản hồi thông báo xóa thành công; trường hợp vi phạm, hệ thống giữ nguyên dữ liệu hai ví và báo lỗi ví đích không đủ số dư để hoàn trả (`ERR-WAL-001`) hoặc từ chối khi không tìm thấy giao dịch.
+- **Thao tác hệ thống**: `deleteTransfer(transferId)`
+- **Kết quả phản hồi**: Xóa vĩnh viễn `TransferTransaction` và `TransactionFee` liên kết, hoàn nguyên đồng thời hai đầu ví (`BR-FIN-02`, `BR-FIN-03`); từ chối nếu giao dịch không tồn tại hoặc ví đích không đủ số dư để thu hồi (`ERR-WAL-001`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transferId` | Mã định danh của giao dịch chuyển tiền nội bộ cần xóa | Mã giao dịch chuyển tiền tồn tại trong hệ thống (`FR-TRF-02`). Khi hoàn nguyên đồng thời hai đầu ví (`BR-FIN-03`), số dư khả dụng hiện tại của ví đích phải lớn hơn hoặc bằng số tiền đã nhận (`amount`) để không làm âm ví đích (`BR-FIN-02`); trường hợp vi phạm, báo lỗi ví đích không đủ số dư để hoàn trả (`ERR-WAL-001`). |
+| `transferId` | Mã chuyển tiền cần xóa | Tồn tại trong hệ thống (`FR-TRF-02`). Số dư hiện tại của ví đích phải `≥ amount` để không làm âm ví đích khi thu hồi (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -457,30 +453,30 @@ sequenceDiagram
     end
 ```
 
-## 3.6 Nhóm Chức năng Danh mục Phân loại (CAT)
+## 3.6 Nhóm chức năng Danh mục phân loại (CAT)
 
-Nhóm chức năng Danh mục Phân loại thiết lập hệ thống phân loại thu chi phục vụ theo dõi và phân tích tài chính. Các thao tác trong nhóm vận hành theo cấu trúc phân cấp 3 cấp quy định tại `BR-FIN-04`, bảo đảm tính duy nhất của tên gọi theo `BR-NAM-01` và duy trì tính toàn vẹn lịch sử giao dịch thông qua cơ chế xóa mềm.
+Nhóm chức năng Danh mục phân loại quản lý cây phân loại thu chi 3 cấp (`BR-FIN-04`), bảo đảm tính duy nhất của tên gọi (`BR-NAM-01`) và bảo toàn lịch sử giao dịch thông qua cơ chế xóa mềm.
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
 | :---: | :--- | :--- | :--- | :--- |
-| `UC-CAT-01` | Bổ sung danh mục phân loại mới | `addCategory` | Tạo mới danh mục chi tiết thuộc nhóm nhu cầu hợp lệ trong cấu trúc phân cấp | Ghi nhận |
-| `UC-CAT-02` | Đổi tên danh mục | `renameCategory` | Thay đổi tên hiển thị của danh mục hoặc nhóm nhu cầu và kiểm tra tính duy nhất | Cập nhật |
-| `UC-CAT-03` | Khôi phục hoặc tạo lại mục đã xóa | `restoreCategory` | Phục hồi trạng thái hoạt động cho danh mục đã bị xóa mềm trước đó | Cập nhật |
-| `UC-CAT-04` | Xóa danh mục hoặc nhóm | `deleteCategory` | Xóa hoàn toàn danh mục chưa có dữ liệu hoặc xóa mềm nếu đã phát sinh giao dịch | Xóa |
+| `UC-CAT-01` | Bổ sung danh mục phân loại mới | `addCategory` | Tạo mới danh mục chi tiết hoặc nhóm nhu cầu trong cây phân cấp | Ghi nhận |
+| `UC-CAT-02` | Đổi tên danh mục | `renameCategory` | Đổi tên hiển thị của danh mục hoặc nhóm nhu cầu | Cập nhật |
+| `UC-CAT-03` | Khôi phục hoặc tạo lại mục đã xóa | `restoreCategory` | Phục hồi trạng thái hoạt động cho mục đã xóa mềm | Cập nhật |
+| `UC-CAT-04` | Xóa danh mục hoặc nhóm | `deleteCategory` | Xóa vĩnh viễn mục chưa có dữ liệu hoặc xóa mềm nếu đã có giao dịch | Xóa |
 
 ### 3.6.1 Thêm danh mục phân loại mới
 
-Người dùng tương tác với Hệ thống để bổ sung một danh mục chi tiết (cấp 3) vào một nhóm nhu cầu cha đang dùng (cấp 2), hoặc bổ sung một nhóm nhu cầu mới (cấp 2) vào một nhánh loại thu chi (cấp 1) nhằm phục vụ phân loại giao dịch chính xác.
+Người dùng yêu cầu thêm một danh mục chi tiết (cấp 3) vào nhóm nhu cầu đang hoạt động (cấp 2), hoặc thêm một nhóm nhu cầu (cấp 2) vào nhánh loại thu chi (cấp 1).
 
-- Thao tác hệ thống: `addCategory(categoryName, parentCategoryId)`
-- Kết quả phản hồi: Hệ thống khởi tạo bản ghi danh mục mới ở trạng thái đang dùng (`ACTIVE`), cấp phát mã định danh duy nhất, kế thừa thuộc tính loại thu chi từ nhóm cha và trả về thông tin danh mục vừa tạo kèm cấu trúc danh mục đã làm mới; trường hợp vi phạm, hệ thống từ chối thao tác và gửi thông báo lỗi: `ERR-NAM-001` (tên sai định dạng hoặc rỗng), `ERR-NAM-002` (tên trùng lặp trong cùng nhóm cha), hoặc `ERR-CAT-005` (nhóm cha đang ở trạng thái đã xóa).
+- **Thao tác hệ thống**: `addCategory(categoryName, parentCategoryId)`
+- **Kết quả phản hồi**: Khởi tạo bản ghi mới ở trạng thái `ACTIVE`, kế thừa loại thu chi từ nhánh cha và trả về cây danh mục đã cập nhật; từ chối nếu tên sai định dạng/rỗng (`ERR-NAM-001`), trùng tên trong cùng cấp cha (`ERR-NAM-002`) hoặc nhóm cha đã bị xóa (`ERR-CAT-005`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `categoryName` | Tên gọi của danh mục chi tiết hoặc nhóm nhu cầu mới cần tạo | Chuỗi ký tự từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng hai đầu (`trim`), không được để rỗng theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-001`). Phải là duy nhất trong cùng nhóm nhu cầu cha hoặc cùng loại thu chi theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-002`). |
-| `parentCategoryId` | Mã định danh của nhóm nhu cầu cha (nếu tạo danh mục cấp 3) hoặc loại thu chi gốc (nếu tạo nhóm cấp 2) | Chuỗi định danh hợp lệ của nhóm nhu cầu hoặc loại thu chi (`INCOME`, `EXPENSE`). Nhóm cha bắt buộc phải đang ở trạng thái hoạt động (`ACTIVE`), không được ở trạng thái đã xóa theo `BR-FIN-04` (vi phạm báo lỗi `ERR-CAT-005`). |
+| `categoryName` | Tên danh mục/nhóm mới | Chuỗi 1–50 ký tự sau khi `trim`, không rỗng (`ERR-NAM-001`), duy nhất trong cùng nhóm cha hoặc cùng loại thu chi (`BR-NAM-01`, `ERR-NAM-002`). |
+| `parentCategoryId` | Mã nhóm cha hoặc loại thu chi | Mã hợp lệ của `NeedGroup` (khi tạo cấp 3) hoặc `TransactionType` (`INCOME`/`EXPENSE`, khi tạo cấp 2). Nhóm cha phải đang `ACTIVE` (`BR-FIN-04`, `ERR-CAT-005`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -498,24 +494,24 @@ sequenceDiagram
     else Nhóm cha đang ở trạng thái đã xóa (DELETED)
         System-->>User: Từ chối thao tác: Không thể tạo danh mục trong nhóm đã xóa
     else Dữ liệu hợp lệ
-        Note over System: Khởi tạo Category (Cấp 3) hoặc NeedGroup (Cấp 2)<br/>Gán trạng thái ACTIVE, sinh mã định danh duy nhất<br/>Kế thừa TransactionType từ nhóm cha
+        Note over System: Khởi tạo Category (cấp 3) hoặc NeedGroup (cấp 2)<br/>Gán trạng thái ACTIVE, sinh mã định danh duy nhất<br/>Kế thừa TransactionType từ nhóm cha
         System-->>User: Phản hồi thành công (Thông tin danh mục mới, làm mới cây danh mục 3 cấp)
     end
 ```
 
 ### 3.6.2 Đổi tên danh mục
 
-Người dùng yêu cầu Hệ thống thay đổi tên hiển thị của một danh mục chi tiết hoặc nhóm nhu cầu đang tồn tại nhằm chuẩn hóa cách gọi và trực quan hóa sổ theo dõi thu chi mà không làm thay đổi các liên kết lịch sử.
+Người dùng yêu cầu đổi tên hiển thị của một danh mục chi tiết hoặc nhóm nhu cầu mà không làm thay đổi các liên kết giao dịch lịch sử.
 
-- Thao tác hệ thống: `renameCategory(categoryId, newName)`
-- Kết quả phản hồi: Hệ thống cập nhật tên mới cho danh mục hoặc nhóm nhu cầu, bảo toàn nguyên vẹn mã định danh, trạng thái hoạt động và các liên kết giao dịch trong quá khứ, trả về thông tin danh mục sau cập nhật; trường hợp vi phạm, hệ thống từ chối thao tác và gửi thông báo lỗi: `ERR-NAM-001` (tên sai định dạng hoặc rỗng), `ERR-NAM-002` (tên mới trùng lặp trong cùng phạm vi cha), hoặc thông báo không tìm thấy danh mục.
+- **Thao tác hệ thống**: `renameCategory(categoryId, newName)`
+- **Kết quả phản hồi**: Cập nhật tên mới, giữ nguyên ID, trạng thái và các giao dịch liên kết; từ chối nếu không tìm thấy mục, tên sai định dạng (`ERR-NAM-001`) hoặc trùng tên trong cùng phạm vi cha (`ERR-NAM-002`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `categoryId` | Mã định danh của danh mục chi tiết hoặc nhóm nhu cầu cần đổi tên | Chuỗi định danh bắt buộc tồn tại trong hệ thống và thuộc cấu trúc phân cấp danh mục đang quản lý (`BR-FIN-04`). |
-| `newName` | Tên gọi mới cần áp dụng cho danh mục hoặc nhóm nhu cầu | Chuỗi ký tự từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng hai đầu (`trim`), không được để rỗng theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-001`). Phải là duy nhất trong cùng nhóm cha đối với danh mục chi tiết, hoặc trong cùng loại thu chi đối với nhóm nhu cầu theo `BR-NAM-01` (vi phạm báo lỗi `ERR-NAM-002`). |
+| `categoryId` | Mã danh mục/nhóm | Bắt buộc tồn tại trong cây phân cấp danh mục (`BR-FIN-04`). |
+| `newName` | Tên gọi mới | Chuỗi 1–50 ký tự sau khi `trim`, không rỗng (`ERR-NAM-001`), duy nhất trong cùng nhóm cha (với cấp 3) hoặc cùng loại thu chi (với cấp 2) (`BR-NAM-01`, `ERR-NAM-002`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -540,16 +536,16 @@ sequenceDiagram
 
 ### 3.6.3 Khôi phục danh mục đã xóa
 
-Người dùng thực hiện phục hồi trạng thái hoạt động cho một danh mục chi tiết (hoặc nhóm nhu cầu) đã bị xóa mềm trước đó để tiếp tục sử dụng trong việc ghi nhận các giao dịch thu chi mới.
+Người dùng phục hồi trạng thái hoạt động cho một danh mục chi tiết hoặc nhóm nhu cầu đã xóa mềm để tiếp tục sử dụng cho các giao dịch mới.
 
-- Thao tác hệ thống: `restoreCategory(categoryId)`
-- Kết quả phản hồi: Hệ thống chuyển đổi trạng thái của danh mục từ đã xóa (`DELETED`) sang đang dùng (`ACTIVE`), đưa danh mục trở lại danh sách chọn trên các biểu mẫu giao dịch và phản hồi thông báo khôi phục thành công; trường hợp nhóm cha của danh mục đang ở trạng thái đã xóa, hệ thống từ chối theo `ERR-CAT-004`; trường hợp tên của danh mục khôi phục trùng với một danh mục đang hoạt động khác trong cùng nhóm, hệ thống từ chối theo `ERR-NAM-002`.
+- **Thao tác hệ thống**: `restoreCategory(categoryId)`
+- **Kết quả phản hồi**: Chuyển trạng thái từ `DELETED` sang `ACTIVE` và đưa trở lại danh sách chọn; từ chối nếu nhóm cha đang ở trạng thái đã xóa (`ERR-CAT-004`) hoặc tên mục khôi phục bị trùng với một mục đang `ACTIVE` cùng nhóm (`ERR-NAM-002`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `categoryId` | Mã định danh của danh mục hoặc nhóm nhu cầu đang ở trạng thái đã xóa cần khôi phục | Bắt buộc tồn tại trong hệ thống và hiện có trạng thái là đã xóa mềm (`isDeleted = true`, trạng thái `DELETED` / `SOFT_DELETED`). Khôi phục giữ nguyên vẹn mã định danh cũ để bảo toàn liên kết dữ liệu theo `BR-FIN-04`. |
+| `categoryId` | Mã mục cần khôi phục | Tồn tại và đang ở trạng thái xóa mềm (`DELETED`); giữ nguyên ID cũ khi khôi phục (`BR-FIN-04`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -574,16 +570,16 @@ sequenceDiagram
 
 ### 3.6.4 Xóa danh mục phân loại
 
-Người dùng yêu cầu xóa một danh mục chi tiết hoặc một nhóm nhu cầu không còn sử dụng, hệ thống tự động đánh giá lịch sử phát sinh giao dịch để quyết định xóa hẳn khỏi cơ sở dữ liệu hay thực hiện xóa mềm bảo toàn số liệu.
+Người dùng yêu cầu xóa một danh mục hoặc nhóm nhu cầu. Hệ thống kiểm tra lịch sử giao dịch để quyết định xóa vĩnh viễn hay xóa mềm nhằm bảo toàn số liệu lịch sử.
 
-- Thao tác hệ thống: `deleteCategory(categoryId)`
-- Kết quả phản hồi: Hệ thống xóa hoàn toàn (xóa cứng) nếu mục chưa từng phát sinh giao dịch thu chi, hoặc chuyển trạng thái sang đã xóa (`DELETED` - xóa mềm) và ẩn khỏi danh sách tạo giao dịch mới nếu mục đã có giao dịch lịch sử; trường hợp người dùng xóa nhóm nhu cầu đang dùng cuối cùng của một Loại thu chi, hệ thống từ chối theo `ERR-CAT-002`.
+- **Thao tác hệ thống**: `deleteCategory(categoryId)`
+- **Kết quả phản hồi**: Xóa vĩnh viễn nếu mục chưa từng phát sinh giao dịch, hoặc chuyển sang trạng thái `DELETED` (xóa mềm) nếu đã có giao dịch lịch sử; từ chối nếu xóa nhóm nhu cầu `ACTIVE` cuối cùng của một loại thu chi (`ERR-CAT-002`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `categoryId` | Mã định danh của danh mục chi tiết hoặc nhóm nhu cầu cần xóa | Chuỗi định danh bắt buộc tồn tại trong hệ thống và đang ở trạng thái hoạt động (`ACTIVE`). Nếu là nhóm nhu cầu, không được là nhóm hoạt động cuối cùng của loại thu chi theo `BR-FIN-04` (vi phạm báo lỗi `ERR-CAT-002`). |
+| `categoryId` | Mã mục cần xóa | Tồn tại và đang `ACTIVE`. Nếu là `NeedGroup`, không được là nhóm `ACTIVE` cuối cùng của nhánh loại thu chi (`BR-FIN-04`, `ERR-CAT-002`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -594,7 +590,7 @@ sequenceDiagram
     participant System as Hệ thống
 
     User->>System: deleteCategory(categoryId)
-    alt Nhóm cần xóa là nhóm đang dùng cuối cùng của Loại thu chi
+    alt Nhóm cần xóa là nhóm đang dùng cuối cùng của loại thu chi
         System-->>User: Từ chối thao tác: Không thể xóa nhóm cuối cùng của loại thu chi này
     else Mục chưa từng phát sinh giao dịch thu chi
         Note over System: Xóa hoàn toàn (Hard Delete): Loại bỏ vĩnh viễn<br/>bản ghi khỏi cơ sở dữ liệu hệ thống
@@ -605,28 +601,28 @@ sequenceDiagram
     end
 ```
 
-## 3.7 Nhóm Chức năng Thống kê và Báo cáo (REP)
+## 3.7 Nhóm chức năng Thống kê và báo cáo (REP)
 
-Nhóm chức năng Thống kê và Báo cáo cung cấp các công cụ truy vấn và phân tích số liệu tài chính định kỳ cho người dùng. Các thao tác trong nhóm thực hiện trích xuất chuỗi dữ liệu 12 tháng liên tục, tính toán dòng tiền thuần và cơ cấu thu chi (`EXPENSE` gồm cả phí giao dịch, hoặc `INCOME`) theo nhóm nhu cầu và danh mục theo các quy tắc `BR-FIN-01`, `BR-FIN-02` và `BR-FIN-04` mà không làm thay đổi trạng thái dữ liệu hệ thống.
+Nhóm chức năng Thống kê và báo cáo trích xuất chuỗi dữ liệu 12 tháng liên tục, tính dòng tiền thuần và phân tích cơ cấu thu chi (`EXPENSE` gồm cả phí giao dịch, hoặc `INCOME`) theo các quy tắc `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04` ở chế độ chỉ đọc.
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
 | :---: | :--- | :--- | :--- | :--- |
 | `UC-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | `generateCashFlowReport` | Trích xuất chuỗi dữ liệu 12 tháng liên tục, tính dòng tiền thuần và tỷ lệ tiết kiệm | Truy vấn |
-| `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | `generateSpendingStructureReport` | Phân tích cơ cấu thu chi theo từng nhóm nhu cầu, danh mục chi tiết và biến động kỳ liền kề | Truy vấn |
+| `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | `generateSpendingStructureReport` | Phân tích cơ cấu thu chi theo nhóm nhu cầu, danh mục và biến động kỳ liền kề | Truy vấn |
 
 ### 3.7.1 Báo cáo dòng tiền 12 tháng gần nhất
 
-Người dùng yêu cầu Hệ thống tổng hợp và phân tích chuỗi dữ liệu dòng tiền liên tục trong vòng 12 tháng tính lùi từ một mốc tháng chỉ định nhằm đánh giá xu hướng thu nhập, chi tiêu và năng lực tích lũy tài chính định kỳ.
+Người dùng yêu cầu tổng hợp chuỗi dòng tiền trong 12 tháng liên tục tính lùi từ một mốc tháng chỉ định để đánh giá xu hướng thu chi và tỷ lệ tiết kiệm.
 
-- Thao tác hệ thống: `generateCashFlowReport(endMonth, endYear)`
-- Kết quả phản hồi: Hệ thống tổng hợp và trả về bảng thống kê tài chính gồm đúng 12 dòng tháng liên tục sắp xếp theo trình tự thời gian tăng dần (gồm tổng thu nhập, tổng chi tiêu kèm phí giao dịch, dòng tiền thuần và tỷ lệ tiết kiệm từng tháng) kèm 3 chỉ số bình quân tháng trên toàn bộ chuỗi 12 tháng; thao tác hoạt động ở chế độ thuần đọc, hỗ trợ mốc thời gian tương lai mà không làm thay đổi trạng thái hay số dư tài chính của hệ thống.
+- **Thao tác hệ thống**: `generateCashFlowReport(endMonth, endYear)`
+- **Kết quả phản hồi**: Trả về bảng thống kê 12 tháng liên tục theo thứ tự thời gian tăng dần (tổng thu, tổng chi kèm phí, dòng tiền thuần, tỷ lệ tiết kiệm từng tháng) cùng 3 chỉ số bình quân tháng; từ chối nếu tham số thời gian không hợp lệ (`ERR-REP-001`). Thao tác thuần đọc, hỗ trợ cả mốc thời gian tương lai.
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `endMonth` | Tháng kết thúc của chuỗi 12 tháng thống kê dòng tiền | Số nguyên dương từ 1 đến 12; giao diện mặc định tháng hiện tại từ đồng hồ hệ thống (`FR-REP-01`), từ chối (`ERR-REP-001`) nếu thiếu yêu cầu hoặc ngoài đoạn. |
-| `endYear` | Năm kết thúc của chuỗi 12 tháng thống kê dòng tiền | Số nguyên dương hợp lệ từ năm 2000 trở đi; giao diện mặc định năm hiện tại từ đồng hồ hệ thống (`FR-REP-01`), từ chối (`ERR-REP-001`) nếu thiếu yêu cầu hoặc nhỏ hơn 2000. |
+| `endMonth` | Tháng kết thúc kỳ 12 tháng | Số nguyên từ 1 đến 12 (mặc định là tháng hiện tại, `FR-REP-01`, `ERR-REP-001`). |
+| `endYear` | Năm kết thúc kỳ 12 tháng | Số nguyên ≥ 2000 (mặc định là năm hiện tại, `FR-REP-01`, `ERR-REP-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -640,25 +636,25 @@ sequenceDiagram
     alt Thiếu tham số hoặc mốc thời gian không hợp lệ (tháng ngoài 1-12 hoặc năm < 2000)
         System-->>User: Từ chối truy vấn và trả mã lỗi ERR-REP-001
     else Mốc thời gian hợp lệ (bao gồm mốc tương lai ở chế độ chỉ đọc)
-        Note over System: Xác định 12 mốc tháng liên tục lùi từ (endMonth, endYear)<br/>Duyệt giao dịch và phí liên kết (BR-FIN-02), tính Thu nhập và Chi tiêu từng tháng<br/>Tính NetCashFlow = Income - Expense<br/>Tính SavingsRate = (Net / Income) * 100% nếu Income > 0, ngược lại 0.00%<br/>Tính 3 mức bình quân tháng chia cho 12 (kể cả tháng 0.00 VNĐ)
-        System-->>User: Phản hồi Báo cáo dòng tiền 12 tháng (Bảng dữ liệu 12 dòng + Dòng bình quân + Biểu đồ)
+        Note over System: Xác định 12 mốc tháng liên tục lùi từ (endMonth, endYear)<br/>Duyệt giao dịch và phí liên kết (BR-FIN-02), tính thu nhập và chi tiêu từng tháng<br/>Tính NetCashFlow = Income - Expense<br/>Tính SavingsRate = (Net / Income) * 100% nếu Income > 0, ngược lại 0.00%<br/>Tính 3 mức bình quân tháng chia cho 12 (kể cả tháng 0.00 VNĐ)
+        System-->>User: Phản hồi báo cáo dòng tiền 12 tháng (Bảng dữ liệu 12 dòng + Dòng bình quân + Biểu đồ)
     end
 ```
 
 ### 3.7.2 Phân tích cơ cấu thu chi theo nhóm
 
-Người dùng yêu cầu Hệ thống phân tích tỷ trọng và cơ cấu phân bổ dòng tiền chi tiết theo từng nhóm nhu cầu và danh mục con trong một khoảng thời gian xác định, kèm đối chiếu biến động với kỳ liền trước, nhằm nhận diện thói quen chi tiêu hoặc nguồn thu nhập chính.
+Người dùng yêu cầu phân tích tỷ trọng dòng tiền theo nhóm nhu cầu và danh mục chi tiết trong một khoảng thời gian kèm đối chiếu kỳ liền trước.
 
-- Thao tác hệ thống: `generateSpendingStructureReport(startDate, endDate, transactionType)`
-- Kết quả phản hồi: Hệ thống trích xuất và trả về báo cáo cơ cấu phân cấp đa tầng gồm tổng giá trị phát sinh của loại thu chi trong kỳ, biến động so với kỳ liền kề, danh sách phân bổ cho các nhóm nhu cầu (cấp 2) và danh mục chi tiết (cấp 3) có phát sinh dương kèm tỷ trọng phần trăm chính xác (theo `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`; khi tổng kỳ bằng `0.00 VNĐ` thì tỷ trọng bằng `0.00%` và trả về danh sách rỗng); trường hợp tham số không hợp lệ, hệ thống từ chối (`ERR-REP-001`). Cho phép truy vấn khoảng thời gian tương lai ở chế độ chỉ đọc.
+- **Thao tác hệ thống**: `generateSpendingStructureReport(startDate, endDate, transactionType)`
+- **Kết quả phản hồi**: Trả về tổng giá trị phát sinh trong kỳ, biến động so với kỳ liền trước, và danh sách phân bổ theo `NeedGroup` (cấp 2), `Category` (cấp 3) có phát sinh dương kèm tỷ trọng phần trăm (`BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`; trả về tỷ trọng `0.00%` và danh sách rỗng nếu tổng kỳ bằng `0.00 VNĐ`); từ chối nếu tham số không hợp lệ (`ERR-REP-001`).
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu khoảng thời gian phân tích | Ngày hợp lệ theo chuẩn `YYYY-MM-DD`, bắt buộc khác rỗng và thỏa mãn `startDate <= endDate` (`FR-REP-02`). |
-| `endDate` | Ngày kết thúc khoảng thời gian phân tích | Ngày hợp lệ theo chuẩn `YYYY-MM-DD`, bắt buộc khác rỗng và thỏa mãn `startDate <= endDate` (`FR-REP-02`). |
-| `transactionType` | Loại giao dịch tài chính cần lập báo cáo cơ cấu | Bắt buộc khác rỗng và nhận một trong hai giá trị cố định: `INCOME` (Thu nhập) hoặc `EXPENSE` (Chi tiêu, mặc định ở giao diện) theo chuẩn phân cấp (`BR-FIN-04`). |
+| `startDate` | Ngày bắt đầu kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và `≤ endDate` (`FR-REP-02`). |
+| `endDate` | Ngày kết thúc kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và `≥ startDate` (`FR-REP-02`). |
+| `transactionType` | Loại thu chi cần phân tích | Khác rỗng, nhận giá trị `INCOME` hoặc `EXPENSE` (mặc định là `EXPENSE`, `BR-FIN-04`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -672,33 +668,33 @@ sequenceDiagram
     alt Thiếu ngày hoặc transactionType, khoảng ngày không hợp lệ (startDate > endDate) hoặc transactionType ngoài INCOME/EXPENSE
         System-->>User: Từ chối truy vấn và trả mã lỗi ERR-REP-001
     else Tham số hợp lệ (bao gồm khoảng thời gian tương lai ở chế độ chỉ đọc)
-        Note over System: Quét giao dịch trong [startDate, endDate], với EXPENSE cộng thêm TransactionFee (BR-FIN-02)<br/>Nếu tổng kỳ = 0.00 VNĐ thì tỷ trọng 0.00% và trả danh sách rỗng<br/>Gom cụm số liệu phát sinh dương theo NeedGroup (Cấp 2) và Category (Cấp 3)<br/>Giữ tên gốc và trạng thái DELETED cho mục đã xóa để giao diện hiển thị (đã xóa)<br/>So sánh kỳ liền trước cùng độ dài (Mới nếu kỳ này > 0 và kỳ trước = 0, và 0.00% nếu cả hai kỳ = 0)<br/>Tính tỷ trọng % trung gian >= 4 chữ số thập phân, làm tròn ngân hàng 2 chữ số
-        System-->>User: Phản hồi Báo cáo cơ cấu thu chi (Cây tỷ trọng cấp 2 - cấp 3 + So sánh kỳ trước + Biểu đồ)
+        Note over System: Quét giao dịch trong [startDate, endDate], với EXPENSE cộng thêm TransactionFee (BR-FIN-02)<br/>Nếu tổng kỳ = 0.00 VNĐ thì tỷ trọng 0.00% và trả danh sách rỗng<br/>Gom cụm số liệu phát sinh dương theo NeedGroup (cấp 2) và Category (cấp 3)<br/>Giữ tên gốc và trạng thái DELETED cho mục đã xóa để giao diện hiển thị (đã xóa)<br/>So sánh kỳ liền trước cùng độ dài (Mới nếu kỳ này > 0 và kỳ trước = 0, và 0.00% nếu cả hai kỳ = 0)<br/>Tính tỷ trọng % trung gian >= 4 chữ số thập phân, làm tròn ngân hàng 2 chữ số
+        System-->>User: Phản hồi báo cáo cơ cấu thu chi (Cây tỷ trọng cấp 2 - cấp 3 + So sánh kỳ trước + Biểu đồ)
     end
 ```
 
-## 3.8 Nhóm Chức năng Lưu trữ và Sao lưu Dữ liệu (DAT)
+## 3.8 Nhóm chức năng Lưu trữ và sao lưu dữ liệu (DAT)
 
-Nhóm chức năng Lưu trữ và Sao lưu Dữ liệu đảm bảo an toàn và tính toàn vẹn cho dữ liệu tài chính của người dùng trên môi trường máy tính cá nhân. Các thao tác trong nhóm chịu trách nhiệm sao lưu nguyên khối dữ liệu ra tệp cục bộ, xác thực và phục hồi an toàn từ bản sao lưu, đồng thời cung cấp công cụ đối soát độc lập để phát hiện sai lệch số dư theo các quy tắc `BR-FIN-02` và `BR-FIN-03`.
+Nhóm chức năng Lưu trữ và sao lưu dữ liệu đảm bảo an toàn và toàn vẹn dữ liệu trên máy tính cá nhân thông qua việc sao lưu nguyên khối ra tệp cục bộ, xác thực phục hồi và đối soát độc lập số dư theo `BR-FIN-02`, `BR-FIN-03`.
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
 | :---: | :--- | :--- | :--- | :--- |
-| `UC-DAT-01` | Xuất dữ liệu tài chính | `exportBackupData` | Đóng gói toàn bộ dữ liệu tài chính của hệ thống ra tệp sao lưu an toàn | Truy vấn |
-| `UC-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu | `restoreBackupData` | Kiểm tra toàn vẹn tệp sao lưu và nạp lại toàn bộ dữ liệu tài chính vào bộ nhớ | Cập nhật |
-| `UC-DAT-03` | Kiểm tra lại dữ liệu hệ thống | `reconcileSystemData` | Duyệt lại toàn bộ lịch sử giao dịch để đối soát độc lập tính cân bằng số dư ví | Đối soát |
+| `UC-DAT-01` | Xuất dữ liệu tài chính | `exportBackupData` | Đóng gói toàn bộ dữ liệu tài chính ra tệp sao lưu an toàn | Truy vấn |
+| `UC-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu | `restoreBackupData` | Kiểm tra toàn vẹn tệp sao lưu và nạp lại dữ liệu vào hệ thống | Cập nhật |
+| `UC-DAT-03` | Kiểm tra lại dữ liệu hệ thống | `reconcileSystemData` | Duyệt lịch sử giao dịch để đối soát độc lập tính cân bằng số dư ví | Đối soát |
 
 ### 3.8.1 Xuất dữ liệu sao lưu
 
-Người dùng yêu cầu Hệ thống trích xuất ảnh chụp trạng thái toàn vẹn của toàn bộ dữ liệu tài chính tại một thời điểm ra tệp lưu trữ JSON trên đĩa cứng cục bộ để phòng ngừa sự cố mất mát dữ liệu hoặc phục vụ lưu trữ lâu dài.
+Người dùng yêu cầu trích xuất toàn bộ dữ liệu tài chính hiện tại ra tệp JSON trên đĩa cứng cục bộ để sao lưu dự phòng.
 
-- Thao tác hệ thống: `exportBackupData(exportPath)`
-- Kết quả phản hồi: Hệ thống đóng gói toàn bộ 5 nhóm thực thể tài chính thành tệp tin JSON an toàn (mã hóa UTF-8, định dạng số học chuẩn xác theo `BR-FIN-01`), lưu trữ tại đường dẫn chỉ định và phản hồi thông báo thành công kèm đường dẫn tệp sao lưu; trường hợp đường dẫn đích không hợp lệ hoặc thiếu quyền ghi tệp, hệ thống từ chối và báo lỗi thiết bị lưu trữ.
+- **Thao tác hệ thống**: `exportBackupData(exportPath)`
+- **Kết quả phản hồi**: Đóng gói 5 nhóm thực thể tài chính thành tệp JSON (UTF-8, định dạng số chính xác theo `BR-FIN-01`), ghi tại `exportPath` và trả về đường dẫn tệp; từ chối và báo lỗi thiết bị nếu đường dẫn không hợp lệ, thiếu quyền ghi hoặc hết dung lượng đĩa.
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `exportPath` | Đường dẫn thư mục hoặc vị trí tệp đích trên máy tính cục bộ để lưu tệp sao lưu | Chuỗi ký tự biểu diễn đường dẫn hợp lệ trên hệ điều hành, thư mục phải tồn tại và ứng dụng có quyền ghi tệp (`WRITE permission`). |
+| `exportPath` | Đường dẫn lưu tệp sao lưu | Đường dẫn thư mục/tệp hợp lệ trên hệ điều hành, tồn tại và có quyền ghi (`WRITE permission`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -714,23 +710,23 @@ sequenceDiagram
     else Không gian đĩa cứng không đủ dung lượng
         System-->>User: Thông báo lỗi không đủ dung lượng lưu trữ
     else Đường dẫn hợp lệ và đủ quyền ghi
-        Note over System: Chụp ảnh dữ liệu snapshot nhất quán toàn hệ thống<br/>Định dạng JSON UTF-8 (5 nhóm thực thể: Ví, Danh mục, Thu chi, Chuyển tiền, Kiểm kê)<br/>Áp dụng độ chính xác số học cố định<br/>Thực hiện ghi tệp an toàn (Atomic File Write)
+        Note over System: Chụp ảnh dữ liệu snapshot nhất quán toàn hệ thống<br/>Định dạng JSON UTF-8 (5 nhóm thực thể: ví, danh mục, thu chi, chuyển tiền, kiểm kê)<br/>Áp dụng độ chính xác số học cố định<br/>Thực hiện ghi tệp an toàn (Atomic File Write)
         System-->>User: Phản hồi thành công (Tệp pfms_export_FULL_*.json, đường dẫn lưu và kích thước tệp)
     end
 ```
 
 ### 3.8.2 Phục hồi dữ liệu từ bản sao lưu
 
-Người dùng yêu cầu nạp lại toàn bộ dữ liệu tài chính của hệ thống từ một tệp sao lưu JSON đã tạo trước đó, hệ thống thực hiện quy trình kiểm tra nghiêm ngặt 4 bước độc lập theo cơ chế "All-or-Nothing" trước khi ghi đè dữ liệu.
+Người dùng yêu cầu nạp lại dữ liệu từ tệp sao lưu JSON. Hệ thống thực hiện kiểm định 4 bước độc lập theo cơ chế "All-or-Nothing" trước khi ghi đè dữ liệu.
 
-- Thao tác hệ thống: `restoreBackupData(backupFilePath)`
-- Kết quả phản hồi: Hệ thống phục hồi thành công toàn bộ dữ liệu tài chính nếu tệp sao lưu vượt qua đầy đủ 4 bước kiểm định (cấu trúc JSON, phân cấp danh mục `BR-FIN-04`, liên kết chuyển tiền `BR-FIN-03`, số dư ví không âm `BR-FIN-02`), nạp lại toàn bộ vào bộ nhớ và phản hồi thông báo thành công; trường hợp phát hiện bất kỳ sai phạm nào trong 4 bước kiểm định, hệ thống hủy bỏ toàn bộ thao tác, bảo toàn 100% dữ liệu hiện tại và thông báo lý do từ chối cụ thể.
+- **Thao tác hệ thống**: `restoreBackupData(backupFilePath)`
+- **Kết quả phản hồi**: Ghi đè và nạp lại toàn bộ dữ liệu nếu tệp vượt qua đủ 4 bước kiểm định (cấu trúc JSON, phân cấp danh mục `BR-FIN-04`, cân bằng chuyển tiền và phí `BR-FIN-03`, số dư ví không âm `BR-FIN-02`); nếu vi phạm bất kỳ bước nào, hủy thao tác, giữ nguyên 100% dữ liệu hiện tại và báo lỗi chi tiết.
 
-**Danh sách tham số đầu vào**
+**Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `backupFilePath` | Đường dẫn tuyệt đối tới tệp sao lưu dữ liệu JSON trên máy tính cá nhân | Chuỗi ký tự biểu diễn đường dẫn tệp sao lưu hợp lệ trên đĩa cứng, tệp phải tồn tại, có quyền đọc (`READ permission`) và định dạng tệp là JSON theo `FR-DAT-02`. |
+| `backupFilePath` | Đường dẫn tệp sao lưu | Đường dẫn tệp JSON hợp lệ, tồn tại và có quyền đọc (`READ permission`, `FR-DAT-02`). |
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -750,21 +746,17 @@ sequenceDiagram
     else Vi phạm số dư ví bị âm tại bất kỳ thời điểm nào (Bước 4)
         System-->>User: Từ chối phục hồi (Lỗi số dư ví không được âm)
     else Vượt qua toàn bộ 4 bước kiểm tra toàn vẹn
-        Note over System: Cơ chế All-or-Nothing: Ghi đè toàn bộ dữ liệu mới<br/>Nạp lại trạng thái các Ví, Danh mục, Giao dịch vào bộ nhớ
+        Note over System: Cơ chế All-or-Nothing: Ghi đè toàn bộ dữ liệu mới<br/>Nạp lại trạng thái các ví, danh mục, giao dịch vào bộ nhớ
         System-->>User: Phản hồi thành công (Phục hồi toàn bộ dữ liệu, thống kê số lượng bản ghi)
     end
 ```
 
 ### 3.8.3 Đối soát toàn vẹn dữ liệu hệ thống
 
-Người dùng kích hoạt tiến trình đối soát độc lập tự động của Hệ thống nhằm rà soát và kiểm chứng 4 điều kiện toàn vẹn cốt lõi của toàn bộ cơ sở dữ liệu tài chính, phát hiện kịp thời các sai lệch số dư hoặc liên kết mồ côi.
+Người dùng kích hoạt tiến trình đối soát độc lập để rà soát 4 điều kiện toàn vẹn cốt lõi của cơ sở dữ liệu tài chính, phát hiện sai lệch số dư hoặc liên kết mồ côi.
 
-- Thao tác hệ thống: `reconcileSystemData()`
-- Kết quả phản hồi: Hệ thống thực thi duyệt lại toàn bộ các bản ghi và trả về Báo cáo Kiểm tra Toàn vẹn Dữ liệu chi tiết cho cả 4 điều kiện đối soát (Số dư ví theo `BR-FIN-02`, Cân bằng nguồn - đích chuyển tiền theo `BR-FIN-03`, Toàn vẹn liên kết danh mục theo `BR-FIN-04`, và Toàn vẹn liên kết phí chuyển tiền), phân loại mức độ nghiêm trọng (`INFO`, `WARNING`, `ERROR`) kèm khuyến nghị khắc phục nếu phát hiện sai lệch; thao tác là thuần kiểm tra chỉ đọc, không làm biến động số dư hoặc sửa đổi bản ghi tài chính.
-
-**Danh sách tham số đầu vào**
-
-Thao tác này không yêu cầu tham số đầu vào.
+- **Thao tác hệ thống**: `reconcileSystemData()` (không có tham số đầu vào)
+- **Kết quả phản hồi**: Duyệt toàn bộ bản ghi và trả về báo cáo kiểm tra toàn vẹn dữ liệu cho 4 điều kiện (số dư ví `BR-FIN-02`, cân bằng chuyển tiền `BR-FIN-03`, phân cấp danh mục `BR-FIN-04`, liên kết phí), phân loại mức độ (`INFO`, `WARNING`, `ERROR`) kèm khuyến nghị xử lý. Thao tác thuần đọc, không làm thay đổi dữ liệu.
 
 **Sơ đồ tuần tự hệ thống**
 
@@ -777,8 +769,8 @@ sequenceDiagram
     User->>System: reconcileSystemData()
     Note over System: Quét toàn bộ tệp dữ liệu kiểm tra 4 điều kiện độc lập:<br/>1. Tính lại số dư ví từ lịch sử dòng tiền<br/>2. Kiểm tra cân bằng nguồn - đích chuyển tiền<br/>3. Kiểm tra liên kết danh mục và loại thu chi<br/>4. Kiểm tra phí chuyển tiền mồ côi
     alt Tất cả 4 điều kiện đều ĐẠT 100%
-        System-->>User: Phản hồi Báo cáo đối soát: Dữ liệu hoàn toàn nhất quán (100% ĐẠT)
+        System-->>User: Phản hồi báo cáo đối soát: Dữ liệu hoàn toàn nhất quán (100% ĐẠT)
     else Phát hiện sai lệch dữ liệu (Số dư / Mất cân bằng / Sai liên kết)
-        System-->>User: Phản hồi Báo cáo đối soát: Liệt kê chi tiết sai lệch, mức độ cảnh báo và đề xuất xử lý
+        System-->>User: Phản hồi báo cáo đối soát: Liệt kê chi tiết sai lệch, mức độ cảnh báo và đề xuất xử lý
     end
 ```
