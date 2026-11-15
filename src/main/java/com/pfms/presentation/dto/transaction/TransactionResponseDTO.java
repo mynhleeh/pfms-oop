@@ -3,6 +3,7 @@ package com.pfms.presentation.dto.transaction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -74,7 +75,7 @@ public final class TransactionResponseDTO {
         this.amount = Objects.requireNonNull(amount, "Số tiền giao dịch không được để null");
         this.transactionType = Objects.requireNonNull(transactionType, "Loại giao dịch không được để null")
                 .trim()
-                .toUpperCase();
+                .toUpperCase(Locale.ROOT);
         this.walletBalanceAfter = Objects.requireNonNull(walletBalanceAfter, "Số dư ví sau giao dịch không được để null");
 
         BigDecimal normalizedFee = (feeAmount == null) ? BigDecimal.ZERO : feeAmount;

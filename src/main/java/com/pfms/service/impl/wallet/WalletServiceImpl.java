@@ -24,7 +24,6 @@ import com.pfms.service.WalletService;
 import com.pfms.service.impl.common.EntityLookupSupport;
 import com.pfms.service.impl.common.RollbackSupport;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -86,6 +85,9 @@ public class WalletServiceImpl implements WalletService {
 
         Wallet wallet = EntityLookupSupport.findEntityOrThrow(
                 walletRepository, request.getWalletId(), EntityLookupSupport.LABEL_WALLET);
+        if (wallet.getStatus() == EntityStatus.DELETED) {
+            throw new BusinessException(ErrorCode.ERR_WAL_001, "Không thể cập nhật thông tin ví đã bị xóa.");
+        }
 
         if (!wallet.getName().equalsIgnoreCase(validName) && walletRepository.existsByName(validName)) {
             throw new DuplicateEntityException(ErrorCode.ERR_NAM_002, "Ví", validName);
@@ -129,6 +131,10 @@ public class WalletServiceImpl implements WalletService {
         Objects.requireNonNull(request.getWalletId(), "Mã ví không được để null");
 
         Money actualBalance = Money.of(request.getActualBalance());
+        if (actualBalance.isNegative()) {
+            throw new BusinessException(ErrorCode.ERR_WAL_001,
+                    "Số dư thực tế quan sát không được nhỏ hơn 0.");
+        }
         TransactionDate adjustedAt = TransactionDate.ofOrToday(request.getAdjustedAt());
 
         Wallet wallet = EntityLookupSupport.findEntityOrThrow(
@@ -139,9 +145,19 @@ public class WalletServiceImpl implements WalletService {
         walletRepository.save(wallet);
         try {
             balanceAdjustmentRepository.save(record);
-        } catch (StorageException storageException) {
-            RollbackSupport.runRollbackStep(() -> walletRepository.save(previousSnapshot), storageException);
-            throw storageException;
+        } catch (RuntimeException persistenceException) {
+            if (persistenceException instanceof StorageException storageException) {
+                RollbackSupport.runRollbackStep(() -> walletRepository.save(previousSnapshot), storageException);
+            } else {
+                try {
+                    walletRepository.save(previousSnapshot);
+                } catch (RuntimeException rollbackException) {
+                    if (rollbackException != persistenceException) {
+                        persistenceException.addSuppressed(rollbackException);
+                    }
+                }
+            }
+            throw persistenceException;
         }
         return toAdjustmentResponseDTO(record);
     }
@@ -159,7 +175,11 @@ public class WalletServiceImpl implements WalletService {
         Objects.requireNonNull(walletId, "Mã ví không được để null");
         Wallet wallet = EntityLookupSupport.findEntityOrThrow(
                 walletRepository, walletId, EntityLookupSupport.LABEL_WALLET);
-        stateTransition.accept(wallet);
+        try {
+            stateTransition.accept(wallet);
+        } catch (IllegalStateException ex) {
+            throw new BusinessException(ErrorCode.ERR_WAL_001, ex.getMessage());
+        }
         return WalletSummaryCalculator.toResponseDTO(walletRepository.save(wallet));
     }
 
@@ -173,7 +193,7 @@ public class WalletServiceImpl implements WalletService {
                 record.getActualBalance().getCurrency(),
                 record.getReason(),
                 record.getAdjustedAt().getDate(),
-                LocalDateTime.now());
+                record.getCreatedAt());
     }
     // endregion
 }

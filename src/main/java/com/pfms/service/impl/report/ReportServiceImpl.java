@@ -35,6 +35,7 @@ public class ReportServiceImpl implements ReportService {
     // region Constants
     private static final int CASH_FLOW_MONTH_WINDOW = 12;
     private static final int MIN_REPORT_YEAR = 2000;
+    private static final int MAX_REPORT_YEAR = 9999;
     // endregion
 
     // region State
@@ -96,7 +97,8 @@ public class ReportServiceImpl implements ReportService {
         if (request == null
                 || request.getEndMonth() < 1
                 || request.getEndMonth() > 12
-                || request.getEndYear() < MIN_REPORT_YEAR) {
+                || request.getEndYear() < MIN_REPORT_YEAR
+                || request.getEndYear() > MAX_REPORT_YEAR) {
             throw new BusinessException(ErrorCode.ERR_REP_001);
         }
         return YearMonth.of(request.getEndYear(), request.getEndMonth());

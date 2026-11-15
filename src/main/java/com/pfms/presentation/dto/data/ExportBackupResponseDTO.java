@@ -1,6 +1,7 @@
 package com.pfms.presentation.dto.data;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -37,7 +38,7 @@ public final class ExportBackupResponseDTO {
         this.exportedAt = (exportedAt == null) ? LocalDateTime.now() : exportedAt;
         this.scope = (scope == null || scope.trim().isEmpty())
                 ? ExportBackupRequestDTO.DEFAULT_SCOPE
-                : scope.trim().toUpperCase();
+                : scope.trim().toUpperCase(Locale.ROOT);
         this.walletCount = Math.max(0, walletCount);
         this.categoryCount = Math.max(0, categoryCount);
         this.transactionCount = Math.max(0, transactionCount);

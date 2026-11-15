@@ -2,6 +2,7 @@ package com.pfms.presentation.dto.category;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -47,10 +48,10 @@ public final class CategoryResponseDTO {
         this.parentGroupName = (parentGroupName == null) ? "" : parentGroupName.trim();
         this.transactionType = (transactionType == null || transactionType.trim().isEmpty())
                 ? "EXPENSE"
-                : transactionType.trim().toUpperCase();
+                : transactionType.trim().toUpperCase(Locale.ROOT);
         this.status = (status == null || status.trim().isEmpty())
                 ? "ACTIVE"
-                : status.trim().toUpperCase();
+                : status.trim().toUpperCase(Locale.ROOT);
         this.createdAt = (createdAt == null) ? LocalDateTime.now() : createdAt;
     }
     // endregion

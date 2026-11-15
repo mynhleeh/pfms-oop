@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UpdateTransactionRequestDTOTest {
 
     private final UUID sampleTxnId = UUID.fromString("00000000-0000-0000-0000-000000000010");
+    private final UUID sampleWalletId = UUID.fromString("00000000-0000-0000-0000-000000000015");
     private final UUID sampleCategoryId = UUID.fromString("00000000-0000-0000-0000-000000000020");
     private final UUID sampleFeeCategoryId = UUID.fromString("00000000-0000-0000-0000-000000000030");
     private final LocalDate sampleDate = LocalDate.of(2026, 11, 11);
@@ -25,13 +26,14 @@ class UpdateTransactionRequestDTOTest {
     class ValidCreationTests {
 
         @Test
-        @DisplayName("Khởi tạo thành công với đầy đủ 7 trường dữ liệu cập nhật kèm phí mới")
-        void shouldCreateWithAllFieldsAndFee() {
+        @DisplayName("Khởi tạo thành công với đầy đủ 8 trường dữ liệu cập nhật gồm ví mới và phí mới")
+        void shouldCreateWithAllFieldsWalletAndFee() {
             BigDecimal amount = new BigDecimal("450000.00");
             BigDecimal fee = new BigDecimal("7000.00");
 
             UpdateTransactionRequestDTO dto = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     amount,
                     sampleDate,
                     sampleCategoryId,
@@ -41,6 +43,7 @@ class UpdateTransactionRequestDTOTest {
             );
 
             assertEquals(sampleTxnId, dto.getTransactionId());
+            assertEquals(sampleWalletId, dto.getNewWalletId());
             assertEquals(amount, dto.getNewAmount());
             assertEquals(sampleDate, dto.getNewDate());
             assertEquals(sampleCategoryId, dto.getNewCategoryId());
@@ -51,12 +54,13 @@ class UpdateTransactionRequestDTOTest {
         }
 
         @Test
-        @DisplayName("Khởi tạo không có phí với hàm khởi tạo 5 tham số (newFeeAmount mặc định ZERO, newFeeCategoryId null)")
-        void shouldCreateWithoutFeeUsing5Params() {
+        @DisplayName("Khởi tạo 6 tham số kèm ví mới mặc định giữ nguyên phí (newFeeAmount null)")
+        void shouldCreateWith6ParamsKeepingFeeUnset() {
             BigDecimal amount = new BigDecimal("600000.00");
 
             UpdateTransactionRequestDTO dto = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     amount,
                     sampleDate,
                     sampleCategoryId,
@@ -64,71 +68,77 @@ class UpdateTransactionRequestDTOTest {
             );
 
             assertEquals(sampleTxnId, dto.getTransactionId());
+            assertEquals(sampleWalletId, dto.getNewWalletId());
             assertEquals(amount, dto.getNewAmount());
             assertEquals(sampleDate, dto.getNewDate());
             assertEquals(sampleCategoryId, dto.getNewCategoryId());
             assertEquals("Mua phụ kiện máy tính", dto.getNewNote());
-            assertEquals(BigDecimal.ZERO, dto.getNewFeeAmount());
+            assertNull(dto.getNewFeeAmount());
             assertNull(dto.getNewFeeCategoryId());
             assertFalse(dto.hasFee());
         }
 
         @Test
-        @DisplayName("Khởi tạo tối giản 3 tham số (tự gán ngày hiện tại, ghi chú rỗng và không phí)")
-        void shouldCreateMinimalWith3Params() {
+        @DisplayName("Khởi tạo tối giản 4 tham số kèm ví mới mặc định ngày hiện tại, ghi chú rỗng và newFeeAmount null")
+        void shouldCreateMinimalWith4ParamsKeepingFeeUnset() {
             BigDecimal amount = new BigDecimal("85000.00");
 
             UpdateTransactionRequestDTO dto = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     amount,
                     sampleCategoryId
             );
 
             assertEquals(sampleTxnId, dto.getTransactionId());
+            assertEquals(sampleWalletId, dto.getNewWalletId());
             assertEquals(amount, dto.getNewAmount());
             assertEquals(LocalDate.now(), dto.getNewDate());
             assertEquals(sampleCategoryId, dto.getNewCategoryId());
             assertEquals("", dto.getNewNote());
-            assertEquals(BigDecimal.ZERO, dto.getNewFeeAmount());
+            assertNull(dto.getNewFeeAmount());
             assertNull(dto.getNewFeeCategoryId());
             assertFalse(dto.hasFee());
         }
 
         @Test
-        @DisplayName("Tự động chuẩn hóa khoảng trắng của ghi chú và chuyển null thành chuỗi rỗng / ngày hiện tại / phí ZERO")
-        void shouldNormalizeNullsAndWhitespace() {
+        @DisplayName("Chuẩn hóa ghi chú và ngày null đồng thời giữ nguyên newFeeAmount null để bảo toàn phí hiện tại")
+        void shouldPreserveNullFeeAmountAndNormalizeDateAndNote() {
             BigDecimal amount = new BigDecimal("150000.00");
 
             UpdateTransactionRequestDTO dto = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     amount,
                     null,
                     sampleCategoryId,
                     "   Ăn tối   ",
                     null,
-                    null
+                    sampleFeeCategoryId
             );
 
+            assertEquals(sampleWalletId, dto.getNewWalletId());
             assertEquals(LocalDate.now(), dto.getNewDate());
             assertEquals("Ăn tối", dto.getNewNote());
-            assertEquals(BigDecimal.ZERO, dto.getNewFeeAmount());
+            assertNull(dto.getNewFeeAmount());
             assertNull(dto.getNewFeeCategoryId());
             assertFalse(dto.hasFee());
         }
 
         @Test
-        @DisplayName("Chấp nhận mức phí bằng 0 kèm danh mục phí null")
+        @DisplayName("Chấp nhận mức phí bằng 0 kèm danh mục phí null để biểu diễn ý định xóa phí hiện có")
         void shouldAcceptZeroFeeWithNullCategory() {
             BigDecimal amount = new BigDecimal("200000.00");
 
             UpdateTransactionRequestDTO dto = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     amount,
                     sampleDate,
                     sampleCategoryId,
                     "Tiền điện thoại",
                     BigDecimal.ZERO,
-                    null
+                    sampleFeeCategoryId
             );
 
             assertEquals(BigDecimal.ZERO, dto.getNewFeeAmount());
@@ -146,9 +156,34 @@ class UpdateTransactionRequestDTOTest {
         void shouldThrowWhenTransactionIdIsNull() {
             NullPointerException ex = assertThrows(
                     NullPointerException.class,
-                    () -> new UpdateTransactionRequestDTO(null, new BigDecimal("100000"), sampleCategoryId)
+                    () -> new UpdateTransactionRequestDTO(
+                            null, sampleWalletId, new BigDecimal("100000"), sampleCategoryId)
             );
             assertTrue(ex.getMessage().contains("Mã giao dịch"));
+        }
+
+        @Test
+        @DisplayName("Ném NullPointerException khi mã ví mới newWalletId bị null ở các constructor mới")
+        void shouldThrowWhenNewWalletIdIsNull() {
+            NullPointerException ex4 = assertThrows(
+                    NullPointerException.class,
+                    () -> new UpdateTransactionRequestDTO(
+                            sampleTxnId, null, new BigDecimal("100000"), sampleCategoryId)
+            );
+            NullPointerException ex6 = assertThrows(
+                    NullPointerException.class,
+                    () -> new UpdateTransactionRequestDTO(
+                            sampleTxnId, null, new BigDecimal("100000"), sampleDate, sampleCategoryId, "note")
+            );
+            NullPointerException ex8 = assertThrows(
+                    NullPointerException.class,
+                    () -> new UpdateTransactionRequestDTO(
+                            sampleTxnId, null, new BigDecimal("100000"), sampleDate, sampleCategoryId,
+                            "note", null, null)
+            );
+            assertTrue(ex4.getMessage().contains("Mã ví mới"));
+            assertTrue(ex6.getMessage().contains("Mã ví mới"));
+            assertTrue(ex8.getMessage().contains("Mã ví mới"));
         }
 
         @Test
@@ -156,7 +191,7 @@ class UpdateTransactionRequestDTOTest {
         void shouldThrowWhenNewAmountIsNull() {
             NullPointerException ex = assertThrows(
                     NullPointerException.class,
-                    () -> new UpdateTransactionRequestDTO(sampleTxnId, null, sampleCategoryId)
+                    () -> new UpdateTransactionRequestDTO(sampleTxnId, sampleWalletId, null, sampleCategoryId)
             );
             assertTrue(ex.getMessage().contains("Số tiền"));
         }
@@ -165,7 +200,8 @@ class UpdateTransactionRequestDTOTest {
         @DisplayName("Cho phép số tiền newAmount bằng 0 đi qua DTO để Domain/Service xử lý ERR_FIN_001")
         void shouldAllowZeroNewAmountPassthroughForDomainValidation() {
             UpdateTransactionRequestDTO dto = assertDoesNotThrow(
-                    () -> new UpdateTransactionRequestDTO(sampleTxnId, BigDecimal.ZERO, sampleCategoryId)
+                    () -> new UpdateTransactionRequestDTO(
+                            sampleTxnId, sampleWalletId, BigDecimal.ZERO, sampleCategoryId)
             );
             assertEquals(0, BigDecimal.ZERO.compareTo(dto.getNewAmount()));
         }
@@ -176,7 +212,7 @@ class UpdateTransactionRequestDTOTest {
         void shouldAllowNegativeNewAmountPassthroughForDomainValidation(String negativeAmount) {
             BigDecimal expected = new BigDecimal(negativeAmount);
             UpdateTransactionRequestDTO dto = assertDoesNotThrow(
-                    () -> new UpdateTransactionRequestDTO(sampleTxnId, expected, sampleCategoryId)
+                    () -> new UpdateTransactionRequestDTO(sampleTxnId, sampleWalletId, expected, sampleCategoryId)
             );
             assertEquals(0, expected.compareTo(dto.getNewAmount()));
         }
@@ -186,7 +222,8 @@ class UpdateTransactionRequestDTOTest {
         void shouldThrowWhenNewCategoryIdIsNull() {
             NullPointerException ex = assertThrows(
                     NullPointerException.class,
-                    () -> new UpdateTransactionRequestDTO(sampleTxnId, new BigDecimal("100000"), null)
+                    () -> new UpdateTransactionRequestDTO(
+                            sampleTxnId, sampleWalletId, new BigDecimal("100000"), null)
             );
             assertTrue(ex.getMessage().contains("Mã danh mục mới"));
         }
@@ -199,6 +236,7 @@ class UpdateTransactionRequestDTOTest {
             UpdateTransactionRequestDTO dto = assertDoesNotThrow(
                     () -> new UpdateTransactionRequestDTO(
                             sampleTxnId,
+                            sampleWalletId,
                             new BigDecimal("100000"),
                             sampleDate,
                             sampleCategoryId,
@@ -218,6 +256,7 @@ class UpdateTransactionRequestDTOTest {
             UpdateTransactionRequestDTO dto = assertDoesNotThrow(
                     () -> new UpdateTransactionRequestDTO(
                             sampleTxnId,
+                            sampleWalletId,
                             new BigDecimal("100000"),
                             sampleDate,
                             sampleCategoryId,
@@ -240,6 +279,7 @@ class UpdateTransactionRequestDTOTest {
             UpdateTransactionRequestDTO dto = assertDoesNotThrow(
                     () -> new UpdateTransactionRequestDTO(
                             sampleTxnId,
+                            sampleWalletId,
                             new BigDecimal("100000"),
                             futureDate,
                             sampleCategoryId,
@@ -261,6 +301,7 @@ class UpdateTransactionRequestDTOTest {
         void shouldBeEqualRegardlessOfScale() {
             UpdateTransactionRequestDTO dto1 = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("300000.0"),
                     sampleDate,
                     sampleCategoryId,
@@ -271,6 +312,7 @@ class UpdateTransactionRequestDTOTest {
 
             UpdateTransactionRequestDTO dto2 = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("300000.00"),
                     sampleDate,
                     sampleCategoryId,
@@ -281,6 +323,7 @@ class UpdateTransactionRequestDTOTest {
 
             UpdateTransactionRequestDTO dtoNeg1 = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("-100"),
                     sampleDate,
                     sampleCategoryId,
@@ -291,6 +334,7 @@ class UpdateTransactionRequestDTOTest {
 
             UpdateTransactionRequestDTO dtoNeg2 = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("-100.00"),
                     sampleDate,
                     sampleCategoryId,
@@ -307,10 +351,63 @@ class UpdateTransactionRequestDTOTest {
         }
 
         @Test
+        @DisplayName("An toàn equals, hashCode khi newFeeAmount null và phân biệt rõ null (giữ phí) với ZERO (xóa phí)")
+        void shouldDistinguishNullFeeFromZeroFeeInIdentityContract() {
+            UpdateTransactionRequestDTO dtoNullFee1 = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
+                    sampleWalletId,
+                    new BigDecimal("100000"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Giữ phí cũ",
+                    null,
+                    null
+            );
+            UpdateTransactionRequestDTO dtoNullFee2 = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
+                    sampleWalletId,
+                    new BigDecimal("100000.00"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Giữ phí cũ",
+                    null,
+                    null
+            );
+            UpdateTransactionRequestDTO dtoZeroFee = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
+                    sampleWalletId,
+                    new BigDecimal("100000"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Giữ phí cũ",
+                    BigDecimal.ZERO,
+                    null
+            );
+            UpdateTransactionRequestDTO dtoZeroScaled = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
+                    sampleWalletId,
+                    new BigDecimal("100000"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Giữ phí cũ",
+                    new BigDecimal("0.00"),
+                    null
+            );
+
+            assertEquals(dtoNullFee1, dtoNullFee2);
+            assertEquals(dtoNullFee1.hashCode(), dtoNullFee2.hashCode());
+            assertEquals(dtoZeroFee, dtoZeroScaled);
+            assertEquals(dtoZeroFee.hashCode(), dtoZeroScaled.hashCode());
+            assertNotEquals(dtoNullFee1, dtoZeroFee);
+            assertNotEquals(dtoZeroFee, dtoNullFee1);
+        }
+
+        @Test
         @DisplayName("An toàn equals, hashCode và toString khi phí mới dương nhưng newFeeCategoryId bị null")
         void shouldHandleNullNewFeeCategoryIdSafelyInIdentityContract() {
             UpdateTransactionRequestDTO dto1 = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("100000"),
                     sampleDate,
                     sampleCategoryId,
@@ -320,6 +417,7 @@ class UpdateTransactionRequestDTOTest {
             );
             UpdateTransactionRequestDTO dto2 = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("100000"),
                     sampleDate,
                     sampleCategoryId,
@@ -338,6 +436,7 @@ class UpdateTransactionRequestDTOTest {
         void shouldNotEqualWhenFieldsDiffer() {
             UpdateTransactionRequestDTO base = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("200000"),
                     sampleDate,
                     sampleCategoryId,
@@ -347,6 +446,18 @@ class UpdateTransactionRequestDTOTest {
             );
 
             UpdateTransactionRequestDTO diffTxn = new UpdateTransactionRequestDTO(
+                    UUID.randomUUID(),
+                    sampleWalletId,
+                    new BigDecimal("200000"),
+                    sampleDate,
+                    sampleCategoryId,
+                    "Tiền nước",
+                    BigDecimal.ZERO,
+                    null
+            );
+
+            UpdateTransactionRequestDTO diffWallet = new UpdateTransactionRequestDTO(
+                    sampleTxnId,
                     UUID.randomUUID(),
                     new BigDecimal("200000"),
                     sampleDate,
@@ -358,6 +469,7 @@ class UpdateTransactionRequestDTOTest {
 
             UpdateTransactionRequestDTO diffAmount = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("350000"),
                     sampleDate,
                     sampleCategoryId,
@@ -367,6 +479,7 @@ class UpdateTransactionRequestDTOTest {
             );
 
             assertNotEquals(base, diffTxn);
+            assertNotEquals(base, diffWallet);
             assertNotEquals(base, diffAmount);
             assertNotEquals(base, null);
             assertNotEquals(base, "some string");
@@ -377,6 +490,7 @@ class UpdateTransactionRequestDTOTest {
         void shouldProduceMeaningfulToString() {
             UpdateTransactionRequestDTO dto = new UpdateTransactionRequestDTO(
                     sampleTxnId,
+                    sampleWalletId,
                     new BigDecimal("180000"),
                     sampleDate,
                     sampleCategoryId,
@@ -388,6 +502,7 @@ class UpdateTransactionRequestDTOTest {
             String str = dto.toString();
             assertTrue(str.contains("UpdateTransactionRequestDTO"));
             assertTrue(str.contains(sampleTxnId.toString()));
+            assertTrue(str.contains(sampleWalletId.toString()));
             assertTrue(str.contains("180000"));
             assertTrue(str.contains(sampleCategoryId.toString()));
             assertTrue(str.contains("Ghi chú sửa"));

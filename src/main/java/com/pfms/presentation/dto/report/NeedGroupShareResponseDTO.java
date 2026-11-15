@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -67,7 +68,7 @@ public final class NeedGroupShareResponseDTO {
         this.name = (name == null) ? "" : name.trim();
         this.status = (status == null || status.trim().isEmpty())
                 ? "ACTIVE"
-                : status.trim().toUpperCase();
+                : status.trim().toUpperCase(Locale.ROOT);
         this.totalAmount = (totalAmount != null) ? totalAmount : BigDecimal.ZERO;
         this.share = (share != null) ? share : BigDecimal.ZERO;
         this.previousTotalAmount = (previousTotalAmount != null) ? previousTotalAmount : BigDecimal.ZERO;

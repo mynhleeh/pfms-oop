@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -51,7 +52,7 @@ public final class SpendingStructureReportResponseDTO {
 
         this.transactionType = (transactionType == null || transactionType.trim().isEmpty())
                 ? "EXPENSE"
-                : transactionType.trim().toUpperCase();
+                : transactionType.trim().toUpperCase(Locale.ROOT);
 
         LocalDate now = LocalDate.now();
         this.startDate = (startDate == null) ? now.withDayOfMonth(1) : startDate;

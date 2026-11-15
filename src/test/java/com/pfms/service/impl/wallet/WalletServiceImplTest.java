@@ -1,11 +1,14 @@
 package com.pfms.service.impl.wallet;
 
+import com.pfms.domain.exception.BusinessException;
+import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
+import com.pfms.domain.model.wallet.DeletedWalletState;
 import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.infrastructure.memory.MemoryBalanceAdjustmentRepository;
 import com.pfms.infrastructure.memory.MemoryTransactionRepository;
@@ -21,6 +24,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -330,6 +335,48 @@ class WalletServiceImplTest {
             assertEquals(new java.math.BigDecimal("87.50"), summary.getWalletShare(w2.getId()));
             assertEquals(new java.math.BigDecimal("12.50"), summary.getWalletShare(w1.getId()));
         }
+
+        @Test
+        @DisplayName("Sắp xếp danh sách ví trả về tăng dần theo tên tiếng Việt (FR-WAL-02)")
+        void shouldSortFilteredWalletsAscendingByVietnameseName() {
+            LocalDateTime now = LocalDateTime.now();
+            Wallet cash = new Wallet(UUID.randomUUID(), "Tiền mặt", "", true,
+                    now, new com.pfms.domain.model.wallet.ActiveWalletState(), Money.of("100.00"));
+            Wallet dining = new Wallet(UUID.randomUUID(), "Ăn uống", "", false,
+                    now, new com.pfms.domain.model.wallet.ActiveWalletState(), Money.of("200.00"));
+            Wallet bank = new Wallet(UUID.randomUUID(), "Bảo hiểm", "", false,
+                    now, new com.pfms.domain.model.wallet.ActiveWalletState(), Money.of("300.00"));
+
+            walletRepository.save(cash);
+            walletRepository.save(dining);
+            walletRepository.save(bank);
+
+            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary(EntityStatus.ACTIVE);
+            List<String> names = summary.getWallets().stream()
+                    .map(WalletResponseDTO::getName)
+                    .toList();
+            assertEquals(List.of("Ăn uống", "Bảo hiểm", "Tiền mặt"), names);
+        }
+
+        @Test
+        @DisplayName("Loại ví DELETED khỏi danh sách ALL, tổng tài sản và bảng tỷ trọng")
+        void shouldExcludeDeletedWalletFromAllSummary() {
+            LocalDateTime now = LocalDateTime.now();
+            Wallet active = new Wallet(UUID.randomUUID(), "Ví Active", "", false,
+                    now, new com.pfms.domain.model.wallet.ActiveWalletState(), Money.of("500.00"));
+            Wallet deleted = new Wallet(UUID.randomUUID(), "Ví Đã Xóa", "", false,
+                    now, new DeletedWalletState(), Money.of("900.00"));
+
+            walletRepository.save(active);
+            walletRepository.save(deleted);
+
+            WalletsSummaryResponseDTO all = walletService.getWalletsSummary(null);
+            assertEquals(1, all.getWalletCount());
+            assertEquals(active.getId(), all.getWallets().get(0).getWalletId());
+            assertEquals(0, new java.math.BigDecimal("500.00").compareTo(all.getTotalBalance()));
+            assertEquals(1, all.getWalletShares().size());
+            assertFalse(all.getWalletShares().containsKey(deleted.getId()));
+        }
     }
 
     @Nested
@@ -435,6 +482,18 @@ class WalletServiceImplTest {
         }
 
         @Test
+        @DisplayName("Từ chối cập nhật thông tin ví đang ở trạng thái DELETED")
+        void shouldRejectUpdatingDeletedWallet() {
+            Wallet deleted = new Wallet(UUID.randomUUID(), "Ví Đã Xóa", "", false,
+                    LocalDateTime.now(), new DeletedWalletState(), Money.ZERO);
+            walletRepository.save(deleted);
+
+            UpdateWalletRequestDTO request = new UpdateWalletRequestDTO(deleted.getId(), "Tên Mới", "Ghi chú mới");
+            BusinessException ex = assertThrows(BusinessException.class, () -> walletService.updateWallet(request));
+            assertEquals(ErrorCode.ERR_WAL_001, ex.getErrorCode());
+        }
+
+        @Test
         @DisplayName("Ném NullPointerException khi request null")
         void shouldThrowExceptionWhenRequestIsNull() {
             assertThrows(NullPointerException.class, () -> walletService.updateWallet(null));
@@ -461,18 +520,49 @@ class WalletServiceImplTest {
         }
 
         @Test
-        @DisplayName("Từ chối lưu trữ ví mặc định của hệ thống")
+        @DisplayName("Từ chối lưu trữ ví mặc định của hệ thống bằng BusinessException(ERR_WAL_001)")
         void shouldRejectArchivingDefaultWallet() {
             // Arrange
             walletService.initializeDefaultWallet();
             Wallet defaultWallet = walletRepository.findDefaultWallet().orElseThrow();
 
             // Act & Assert
-            IllegalStateException ex = assertThrows(
-                    IllegalStateException.class,
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
                     () -> walletService.archiveWallet(defaultWallet.getId())
             );
+            assertEquals(ErrorCode.ERR_WAL_001, ex.getErrorCode());
             assertTrue(ex.getMessage().contains("mặc định"));
+        }
+
+        @Test
+        @DisplayName("Chuyển đổi IllegalStateException thành BusinessException(ERR_WAL_001) khi chuyển trạng thái không hợp lệ")
+        void shouldWrapIllegalStateTransitionsInBusinessException() {
+            Wallet activeWallet = new Wallet(UUID.randomUUID(), "Ví Active", "", false,
+                    LocalDateTime.now(), new com.pfms.domain.model.wallet.ActiveWalletState(), Money.ZERO);
+            Wallet archivedWallet = new Wallet(UUID.randomUUID(), "Ví Archived", "", false,
+                    LocalDateTime.now(), new com.pfms.domain.model.wallet.ArchivedWalletState(), Money.ZERO);
+            Wallet deletedWallet = new Wallet(UUID.randomUUID(), "Ví Deleted", "", false,
+                    LocalDateTime.now(), new DeletedWalletState(), Money.ZERO);
+            walletRepository.save(activeWallet);
+            walletRepository.save(archivedWallet);
+            walletRepository.save(deletedWallet);
+
+            BusinessException ex1 = assertThrows(BusinessException.class,
+                    () -> walletService.activateWallet(activeWallet.getId()));
+            assertEquals(ErrorCode.ERR_WAL_001, ex1.getErrorCode());
+
+            BusinessException ex2 = assertThrows(BusinessException.class,
+                    () -> walletService.archiveWallet(archivedWallet.getId()));
+            assertEquals(ErrorCode.ERR_WAL_001, ex2.getErrorCode());
+
+            BusinessException ex3 = assertThrows(BusinessException.class,
+                    () -> walletService.archiveWallet(deletedWallet.getId()));
+            assertEquals(ErrorCode.ERR_WAL_001, ex3.getErrorCode());
+
+            BusinessException ex4 = assertThrows(BusinessException.class,
+                    () -> walletService.activateWallet(deletedWallet.getId()));
+            assertEquals(ErrorCode.ERR_WAL_001, ex4.getErrorCode());
         }
 
         @Test
@@ -642,6 +732,33 @@ class WalletServiceImplTest {
         }
 
         @Test
+        @DisplayName("Trả về chính xác thời điểm tạo bản ghi kiểm kê (createdAt) thay vì LocalDateTime.now()")
+        void shouldPreserveRecordCreatedAtTimestampInResponse() {
+            Wallet wallet = new Wallet(UUID.randomUUID(), "Ví Thời Gian", "", false,
+                    LocalDateTime.now(), new com.pfms.domain.model.wallet.ActiveWalletState(), Money.of("100000.00"));
+            walletRepository.save(wallet);
+
+            MemoryBalanceAdjustmentRepository tickAdvancingRepo = new MemoryBalanceAdjustmentRepository() {
+                @Override
+                public BalanceAdjustmentRecord save(BalanceAdjustmentRecord entity) {
+                    long deadlineNanos = System.nanoTime() + 50_000_000L;
+                    while (!LocalDateTime.now().isAfter(entity.getCreatedAt()) && System.nanoTime() < deadlineNanos) {
+                        Thread.onSpinWait();
+                    }
+                    return super.save(entity);
+                }
+            };
+            WalletServiceImpl timedService = new WalletServiceImpl(
+                    walletRepository, tickAdvancingRepo, transactionRepository);
+
+            BalanceAdjustmentResponseDTO response = timedService.adjustBalance(new AdjustBalanceRequestDTO(
+                    wallet.getId(), new java.math.BigDecimal("120000.00"), "Kiểm tra createdAt"));
+
+            BalanceAdjustmentRecord savedRecord = tickAdvancingRepo.findByWalletId(wallet.getId()).get(0);
+            assertEquals(savedRecord.getCreatedAt(), response.getCreatedAt());
+        }
+
+        @Test
         @DisplayName("Từ chối điều chỉnh số dư khi ví không ở trạng thái ACTIVE")
         void shouldRejectAdjustmentWhenWalletIsNotActive() {
             // Arrange
@@ -762,6 +879,58 @@ class WalletServiceImplTest {
                     persistedWallet.getCurrentBalance(),
                     "Số dư ví trong kho lưu trữ phải được hoàn nguyên về 500,000.00 VNĐ khi lưu vết kiểm toán thất bại"
             );
+            assertTrue(failingAdjustmentRepo.findByWalletId(wallet.getId()).isEmpty());
+        }
+
+        @Test
+        @DisplayName("Từ chối số dư thực tế âm (ERR_WAL_001) trước khi truy vấn kho lưu trữ")
+        void shouldRejectNegativeActualBalanceBeforeRepositoryLookup() {
+            MemoryWalletRepository guardingWalletRepo = new MemoryWalletRepository() {
+                @Override
+                public Optional<Wallet> findById(UUID id) {
+                    return fail("Không được phép truy vấn findById khi actualBalance âm");
+                }
+            };
+            WalletServiceImpl guardedService = new WalletServiceImpl(
+                    guardingWalletRepo, balanceAdjustmentRepository, transactionRepository);
+
+            AdjustBalanceRequestDTO request = new AdjustBalanceRequestDTO(
+                    UUID.randomUUID(),
+                    new java.math.BigDecimal("-100.00"),
+                    "Số dư âm"
+            );
+
+            BusinessException ex = assertThrows(BusinessException.class, () -> guardedService.adjustBalance(request));
+            assertEquals(ErrorCode.ERR_WAL_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Hoàn nguyên số dư ví khi lưu bản ghi kiểm kê phát sinh RuntimeException không phải StorageException")
+        void shouldRollbackWalletBalanceWhenSavingAdjustmentRecordThrowsRuntimeException() {
+            Wallet wallet = new Wallet(UUID.randomUUID(), "Ví Kiểm Toán Runtime", "Ghi chú ban đầu", false,
+                    LocalDateTime.now(), new com.pfms.domain.model.wallet.ActiveWalletState(), Money.of("500000.00"));
+            walletRepository.save(wallet);
+
+            MemoryBalanceAdjustmentRepository failingAdjustmentRepo = new MemoryBalanceAdjustmentRepository() {
+                @Override
+                public BalanceAdjustmentRecord save(BalanceAdjustmentRecord entity) {
+                    throw new IllegalStateException("Simulated unexpected persistence failure");
+                }
+            };
+
+            WalletServiceImpl atomicWalletService = new WalletServiceImpl(
+                    walletRepository, failingAdjustmentRepo, transactionRepository);
+
+            AdjustBalanceRequestDTO request = new AdjustBalanceRequestDTO(
+                    wallet.getId(),
+                    new java.math.BigDecimal("350000.00"),
+                    "Kiểm kê lỗi runtime"
+            );
+
+            assertThrows(IllegalStateException.class, () -> atomicWalletService.adjustBalance(request));
+
+            Wallet persistedWallet = walletRepository.findById(wallet.getId()).orElseThrow();
+            assertEquals(Money.of("500000.00"), persistedWallet.getCurrentBalance());
             assertTrue(failingAdjustmentRepo.findByWalletId(wallet.getId()).isEmpty());
         }
     }

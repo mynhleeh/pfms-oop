@@ -568,6 +568,7 @@ class ReportServiceImplTest {
             assertErrRep001(() -> reportService.generateCashFlowReport(new CashFlowReportRequestDTO(0, 2025)));
             assertErrRep001(() -> reportService.generateCashFlowReport(new CashFlowReportRequestDTO(13, 2025)));
             assertErrRep001(() -> reportService.generateCashFlowReport(new CashFlowReportRequestDTO(5, 1999)));
+            assertErrRep001(() -> reportService.generateCashFlowReport(new CashFlowReportRequestDTO(5, 10000)));
         }
 
         @Test

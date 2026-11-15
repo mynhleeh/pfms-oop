@@ -3,6 +3,7 @@ package com.pfms.presentation.dto.category;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,11 +32,11 @@ public final class CategoryHierarchyResponseDTO {
         this.needGroupId = Objects.requireNonNull(needGroupId, "Mã nhóm nhu cầu không được để null");
         this.transactionType = (transactionType == null || transactionType.trim().isEmpty())
                 ? "EXPENSE"
-                : transactionType.trim().toUpperCase();
+                : transactionType.trim().toUpperCase(Locale.ROOT);
         this.needGroupName = (needGroupName == null) ? "" : needGroupName.trim();
         this.needGroupStatus = (needGroupStatus == null || needGroupStatus.trim().isEmpty())
                 ? "ACTIVE"
-                : needGroupStatus.trim().toUpperCase();
+                : needGroupStatus.trim().toUpperCase(Locale.ROOT);
         this.categories = (categories == null)
                 ? Collections.emptyList()
                 : Collections.unmodifiableList(new ArrayList<>(categories));

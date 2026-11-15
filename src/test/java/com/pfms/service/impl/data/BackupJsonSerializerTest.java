@@ -102,6 +102,7 @@ class BackupJsonSerializerTest {
         assertTrue(json.contains("100000.00"));
         assertTrue(json.contains("2026-11-14"));
         assertTrue(json.contains("\"fee\": {"));
+        assertTrue(json.contains("\"createdAt\":"));
     }
 }
 

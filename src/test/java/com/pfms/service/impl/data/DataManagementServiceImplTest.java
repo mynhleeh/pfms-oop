@@ -5,6 +5,7 @@ import com.pfms.domain.model.category.NeedGroup;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
+import com.pfms.domain.model.transaction.Transaction;
 import com.pfms.domain.model.transaction.TransactionFee;
 import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.model.transaction.TransferTransaction;
@@ -35,11 +36,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -178,20 +182,28 @@ class DataManagementServiceImplTest {
         @Test
         @DisplayName("Should reject invalid scope")
         void shouldRejectInvalidScope() {
-            String path = tempDir.resolve("backup.json").toString();
-            ExportBackupRequestDTO req = new ExportBackupRequestDTO(path, "CUSTOM_SCOPE");
+            ExportBackupRequestDTO req = new ExportBackupRequestDTO(tempDir.toString(), "CUSTOM_SCOPE");
             assertThrows(BusinessException.class, () -> service.exportBackupData(req));
         }
 
         @Test
-        @DisplayName("Should reject destination path that is an existing directory")
-        void shouldRejectDirectoryDestinationPath() {
-            ExportBackupRequestDTO req = new ExportBackupRequestDTO(tempDir.toString());
+        @DisplayName("Should reject destination path pointing to existing regular file")
+        void shouldRejectExistingFileDestinationPath() throws Exception {
+            Path existingFile = Files.writeString(tempDir.resolve("existing.json"), "{}");
+            ExportBackupRequestDTO req = new ExportBackupRequestDTO(existingFile.toString());
             assertThrows(StorageException.class, () -> service.exportBackupData(req));
         }
 
         @Test
-        @DisplayName("Should export backup data successfully with FULL scope")
+        @DisplayName("Should reject destination path carrying a file extension")
+        void shouldRejectFileExtensionDestinationPath() {
+            Path filePath = tempDir.resolve("manual_backup.json");
+            ExportBackupRequestDTO req = new ExportBackupRequestDTO(filePath.toString());
+            assertThrows(StorageException.class, () -> service.exportBackupData(req));
+        }
+
+        @Test
+        @DisplayName("Should export backup data successfully with FULL scope using auto-generated filename")
         void shouldExportSuccessfullyWithFullScope() throws Exception {
             Wallet wallet = new Wallet(UUID.randomUUID(), "Ví Tiền Mặt", "Ví 1", true);
             wallet.credit(Money.of("500000.00"));
@@ -211,13 +223,14 @@ class DataManagementServiceImplTest {
             BalanceAdjustmentRecord adj = wallet.adjustBalance(Money.of("450000.00"), TransactionDate.of(LocalDate.now()), "Kiểm kê");
             balanceAdjustmentRepository.save(adj);
 
-            Path targetFile = tempDir.resolve("full_backup.json");
-            ExportBackupRequestDTO req = new ExportBackupRequestDTO(targetFile.toString(), "FULL");
+            ExportBackupRequestDTO req = new ExportBackupRequestDTO(tempDir.toString(), "FULL");
 
             ExportBackupResponseDTO res = service.exportBackupData(req);
 
             assertNotNull(res);
-            assertEquals(targetFile.toAbsolutePath().toString(), res.getFilePath());
+            Path exportedFile = Path.of(res.getFilePath());
+            assertEquals(tempDir.toAbsolutePath().normalize(), exportedFile.getParent());
+            assertTrue(exportedFile.getFileName().toString().matches("pfms_export_full_\\d{8}_\\d{6}\\.json"));
             assertTrue(res.getFileSizeBytes() > 0);
             assertTrue(res.isFullScope());
             assertEquals(1, res.getWalletCount());
@@ -226,8 +239,14 @@ class DataManagementServiceImplTest {
             assertEquals(1, res.getAdjustmentCount());
             assertEquals(4, res.getTotalRecordCount());
 
-            assertTrue(Files.exists(targetFile));
-            String content = Files.readString(targetFile);
+            assertTrue(Files.exists(exportedFile));
+            byte[] raw = Files.readAllBytes(exportedFile);
+            assertFalse(raw.length >= 3
+                    && (raw[0] & 0xFF) == 0xEF
+                    && (raw[1] & 0xFF) == 0xBB
+                    && (raw[2] & 0xFF) == 0xBF);
+
+            String content = Files.readString(exportedFile, StandardCharsets.UTF_8);
             assertTrue(content.contains("\"wallets\""));
             assertTrue(content.contains("\"needGroups\""));
             assertTrue(content.contains("\"categories\""));
@@ -254,19 +273,20 @@ class DataManagementServiceImplTest {
                     Money.of("35000.00"), TransactionDate.of(LocalDate.now()), "Bánh mì", null);
             transactionRepository.save(txn);
 
-            Path targetFile = tempDir.resolve("txn_backup.json");
-            ExportBackupRequestDTO req = new ExportBackupRequestDTO(targetFile.toString(), "TRANSACTIONS");
+            ExportBackupRequestDTO req = new ExportBackupRequestDTO(tempDir.toString(), "TRANSACTIONS");
 
             ExportBackupResponseDTO res = service.exportBackupData(req);
 
             assertNotNull(res);
+            Path exportedFile = Path.of(res.getFilePath());
+            assertTrue(exportedFile.getFileName().toString().matches("pfms_export_transactions_\\d{8}_\\d{6}\\.json"));
             assertTrue(res.isTransactionsScope());
             assertEquals(0, res.getWalletCount());
             assertEquals(0, res.getCategoryCount());
             assertEquals(0, res.getAdjustmentCount());
             assertEquals(1, res.getTransactionCount());
 
-            String content = Files.readString(targetFile);
+            String content = Files.readString(exportedFile, StandardCharsets.UTF_8);
             assertTrue(content.contains("\"wallets\": [\n  ]"));
             assertTrue(content.contains("\"transactions\""));
             assertTrue(content.contains("Bánh mì"));
@@ -274,15 +294,16 @@ class DataManagementServiceImplTest {
         }
 
         @Test
-        @DisplayName("Should auto-create parent directories if they do not exist")
+        @DisplayName("Should auto-create destination directories if they do not exist")
         void shouldCreateParentDirectoriesWhenNeeded() {
-            Path nestedTarget = tempDir.resolve("nested/dir/sub/backup.json");
-            ExportBackupRequestDTO req = new ExportBackupRequestDTO(nestedTarget.toString());
+            Path nestedDir = tempDir.resolve("nested/dir/sub");
+            ExportBackupRequestDTO req = new ExportBackupRequestDTO(nestedDir.toString());
 
             ExportBackupResponseDTO res = service.exportBackupData(req);
 
             assertNotNull(res);
-            assertTrue(Files.exists(nestedTarget));
+            assertTrue(Files.isDirectory(nestedDir));
+            assertTrue(Files.exists(Path.of(res.getFilePath())));
         }
 
         @Test
@@ -304,13 +325,12 @@ class DataManagementServiceImplTest {
                     trfId, source, dest, Money.of("100000.00"), TransactionDate.of(LocalDate.now()), "Chuyển liên ngân hàng", fee);
             transactionRepository.save(trf);
 
-            Path targetFile = tempDir.resolve("transfer_fee_backup.json");
-            ExportBackupRequestDTO req = new ExportBackupRequestDTO(targetFile.toString());
+            ExportBackupRequestDTO req = new ExportBackupRequestDTO(tempDir.toString());
 
             ExportBackupResponseDTO res = service.exportBackupData(req);
 
             assertNotNull(res);
-            String content = Files.readString(targetFile);
+            String content = Files.readString(Path.of(res.getFilePath()), StandardCharsets.UTF_8);
             assertTrue(content.contains("TRANSFER"));
             assertTrue(content.contains("\"sourceWalletId\""));
             assertTrue(content.contains("\"destinationWalletId\""));
@@ -612,6 +632,213 @@ class DataManagementServiceImplTest {
             ReconciliationReportResponseDTO report = service.reconcileSystemData();
             assertTrue(report.isFullyConsistent());
             assertTrue(report.getIssues().isEmpty());
+        }
+
+        @Test
+        @DisplayName("Should reject TRANSACTIONS-only backup missing wallet references on restore and keep current data")
+        void shouldRejectTransactionsOnlyBackupMissingWallet(@TempDir Path tempDir) {
+            Wallet wallet = new Wallet(UUID.randomUUID(), "Ví Hiện Có", "", true);
+            wallet.credit(Money.of("100000.00"));
+            walletRepository.save(wallet);
+
+            NeedGroup group = new NeedGroup(UUID.randomUUID(), "Ăn Uống", TransactionType.EXPENSE, "food", "#F00");
+            needGroupRepository.save(group);
+            Category cat = new Category(UUID.randomUUID(), "Cơm", group.getNeedGroupId(), TransactionType.EXPENSE, "rice", "#F00");
+            categoryRepository.save(cat);
+
+            IncomeExpenseTransaction txn = new IncomeExpenseTransaction(
+                    UUID.randomUUID(), TransactionType.EXPENSE, wallet, cat,
+                    Money.of("25000.00"), TransactionDate.of(LocalDate.now()), "Cơm trưa", null);
+            transactionRepository.save(txn);
+
+            ExportBackupResponseDTO exported = service.exportBackupData(
+                    new ExportBackupRequestDTO(tempDir.toString(), "TRANSACTIONS"));
+
+            DataCorruptionException ex = assertThrows(
+                    DataCorruptionException.class,
+                    () -> service.restoreBackupData(new RestoreBackupRequestDTO(exported.getFilePath())));
+
+            assertEquals(ErrorCode.ERR_DAT_002, ex.getErrorCode());
+            assertEquals(1, walletRepository.findAll().size());
+            assertEquals(1, categoryRepository.findAll().size());
+            assertEquals(1, transactionRepository.findAll().size());
+        }
+
+        @Test
+        @DisplayName("Should reject backup when adjustment record references missing wallet")
+        void shouldRejectBackupWhenAdjustmentReferencesMissingWallet(@TempDir Path tempDir) throws Exception {
+            Wallet orphanWallet = new Wallet(UUID.randomUUID(), "Ví Mồ Côi", "", false);
+            BalanceAdjustmentRecord adj = orphanWallet.adjustBalance(
+                    Money.of("50000.00"), TransactionDate.of(LocalDate.now()), "Điều chỉnh mồ côi");
+
+            BackupPayload payload = new BackupPayload(
+                    List.of(), List.of(), List.of(), List.of(), List.of(adj));
+            Path backupFile = tempDir.resolve("orphan_adjustment.json");
+            Files.writeString(backupFile, BackupJsonSerializer.toJson(payload), StandardCharsets.UTF_8);
+
+            DataCorruptionException ex = assertThrows(
+                    DataCorruptionException.class,
+                    () -> service.restoreBackupData(new RestoreBackupRequestDTO(backupFile.toString())));
+
+            assertEquals(ErrorCode.ERR_DAT_002, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Should rollback all 5 repositories atomically when saveAll throws StorageException")
+        void shouldRollbackAllRepositoriesWhenSaveAllFails(@TempDir Path tempDir) throws Exception {
+            AtomicBoolean failOnFirstSaveAll = new AtomicBoolean(true);
+            MemoryTransactionRepository flakyTxnRepo = new MemoryTransactionRepository() {
+                @Override
+                public List<Transaction> saveAll(Iterable<Transaction> entities) {
+                    if (failOnFirstSaveAll.compareAndSet(true, false)) {
+                        throw new StorageException("Mô phỏng lỗi ghi ổ đĩa", new IOException("Disk full"));
+                    }
+                    return super.saveAll(entities);
+                }
+            };
+
+            DataManagementServiceImpl serviceWithFlakyRepo = new DataManagementServiceImpl(
+                    walletRepository, flakyTxnRepo, categoryRepository, needGroupRepository, balanceAdjustmentRepository);
+
+            Wallet oldWallet = new Wallet(UUID.randomUUID(), "Ví Ban Đầu", "", true);
+            BalanceAdjustmentRecord oldAdj = oldWallet.adjustBalance(
+                    Money.of("300000.00"), TransactionDate.of(LocalDate.now()), "Số dư đầu kỳ");
+            walletRepository.save(oldWallet);
+            balanceAdjustmentRepository.save(oldAdj);
+
+            NeedGroup oldGroup = new NeedGroup(UUID.randomUUID(), "Sinh Hoạt", TransactionType.EXPENSE, "home", "#000");
+            needGroupRepository.save(oldGroup);
+            Category oldCategory = new Category(
+                    UUID.randomUUID(), "Tiền Điện", oldGroup.getNeedGroupId(), TransactionType.EXPENSE, "power", "#000");
+            categoryRepository.save(oldCategory);
+
+            IncomeExpenseTransaction oldTxn = new IncomeExpenseTransaction(
+                    UUID.randomUUID(), TransactionType.EXPENSE, oldWallet, oldCategory,
+                    Money.of("50000.00"), TransactionDate.of(LocalDate.now()), "Hóa đơn cũ", null);
+            flakyTxnRepo.save(oldTxn);
+
+            Wallet newWallet = new Wallet(UUID.randomUUID(), "Ví Mới", "", true);
+            BalanceAdjustmentRecord newAdj = newWallet.adjustBalance(
+                    Money.of("800000.00"), TransactionDate.of(LocalDate.now()), "Nạp từ backup");
+            NeedGroup newGroup = new NeedGroup(UUID.randomUUID(), "Thu Nhập", TransactionType.INCOME, "cash", "#0F0");
+            Category newCategory = new Category(
+                    UUID.randomUUID(), "Lương", newGroup.getNeedGroupId(), TransactionType.INCOME, "salary", "#0F0");
+            IncomeExpenseTransaction newTxn = new IncomeExpenseTransaction(
+                    UUID.randomUUID(), TransactionType.INCOME, newWallet, newCategory,
+                    Money.of("200000.00"), TransactionDate.of(LocalDate.now()), "Thưởng", null);
+            newWallet.credit(Money.of("200000.00"));
+
+            BackupPayload backupPayload = new BackupPayload(
+                    List.of(newWallet), List.of(newGroup), List.of(newCategory), List.of(newTxn), List.of(newAdj));
+            Path backupFile = tempDir.resolve("rollback_test.json");
+            Files.writeString(backupFile, BackupJsonSerializer.toJson(backupPayload), StandardCharsets.UTF_8);
+
+            assertThrows(StorageException.class,
+                    () -> serviceWithFlakyRepo.restoreBackupData(new RestoreBackupRequestDTO(backupFile.toString())));
+
+            assertEquals(1, walletRepository.findAll().size());
+            assertEquals(oldWallet.getId(), walletRepository.findAll().get(0).getId());
+            assertEquals(1, needGroupRepository.findAll().size());
+            assertEquals(oldGroup.getNeedGroupId(), needGroupRepository.findAll().get(0).getNeedGroupId());
+            assertEquals(1, categoryRepository.findAll().size());
+            assertEquals(oldCategory.getCategoryId(), categoryRepository.findAll().get(0).getCategoryId());
+            assertEquals(1, balanceAdjustmentRepository.findAll().size());
+            assertEquals(oldAdj.getRecordId(), balanceAdjustmentRepository.findAll().get(0).getRecordId());
+            assertEquals(1, flakyTxnRepo.findAll().size());
+            assertEquals(oldTxn.getTransactionId(), flakyTxnRepo.findAll().get(0).getTransactionId());
+        }
+
+        @Test
+        @DisplayName("Should report ERR_DAT_002 duplicate wallet ID message rather than balance mismatch when duplicate IDs exist")
+        void shouldRejectDuplicateWalletIdWithDuplicateMessage(@TempDir Path tempDir) throws Exception {
+            UUID dupWalletId = UUID.randomUUID();
+            Wallet firstWallet = new Wallet(dupWalletId, "Ví Trùng 1", "", true);
+            Wallet secondWallet = new Wallet(dupWalletId, "Ví Trùng 2", "", false);
+            secondWallet.credit(Money.of("100000.00"));
+
+            BackupPayload dupPayload = new BackupPayload(
+                    List.of(firstWallet, secondWallet), List.of(), List.of(), List.of(), List.of());
+            Path backupFile = tempDir.resolve("dup_wallet.json");
+            Files.writeString(backupFile, BackupJsonSerializer.toJson(dupPayload), StandardCharsets.UTF_8);
+
+            DataCorruptionException ex = assertThrows(
+                    DataCorruptionException.class,
+                    () -> service.restoreBackupData(new RestoreBackupRequestDTO(backupFile.toString())));
+
+            assertEquals(ErrorCode.ERR_DAT_002, ex.getErrorCode());
+            assertTrue(ex.getMessage().contains("Trùng mã ví"),
+                    () -> "Expected duplicate wallet message, but was: " + ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject backup with negative wallet balance as ERR_DAT_002 end-to-end and keep existing repositories intact")
+        void shouldRejectNegativeWalletBalanceWithErrDat002EndToEnd(@TempDir Path tempDir) throws Exception {
+            Wallet existingWallet = new Wallet(UUID.randomUUID(), "Ví Hiện Tại", "", true);
+            walletRepository.save(existingWallet);
+
+            String negativeWalletJson = """
+            {
+              "wallets": [
+                {
+                  "walletId": "11111111-1111-1111-1111-111111111111",
+                  "name": "Ví Số Dư Âm",
+                  "currentBalance": "-50000.00",
+                  "status": "ACTIVE",
+                  "isDefault": true,
+                  "note": "",
+                  "createdAt": "2026-01-01T10:00:00"
+                }
+              ],
+              "needGroups": [
+                {
+                  "groupId": "33333333-3333-3333-3333-333333333333",
+                  "groupName": "Chi tiêu",
+                  "flowType": "EXPENSE",
+                  "groupStatus": "ACTIVE",
+                  "icon": "",
+                  "color": "",
+                  "createdAt": "2026-01-01T10:00:00"
+                }
+              ],
+              "categories": [
+                {
+                  "categoryId": "44444444-4444-4444-4444-444444444444",
+                  "name": "Ăn uống",
+                  "groupId": "33333333-3333-3333-3333-333333333333",
+                  "flowType": "EXPENSE",
+                  "status": "ACTIVE",
+                  "icon": "",
+                  "color": "",
+                  "createdAt": "2026-01-01T10:00:00"
+                }
+              ],
+              "transactions": [
+                {
+                  "transactionId": "55555555-5555-5555-5555-555555555555",
+                  "amount": "50000.00",
+                  "transactionDate": "2026-01-05",
+                  "note": "",
+                  "createdAt": "2026-01-05T12:00:00",
+                  "recordType": "INCOME_EXPENSE",
+                  "transactionType": "EXPENSE",
+                  "walletId": "11111111-1111-1111-1111-111111111111",
+                  "categoryId": "44444444-4444-4444-4444-444444444444",
+                  "fee": null
+                }
+              ],
+              "adjustments": []
+            }
+            """;
+            Path backupFile = tempDir.resolve("negative_wallet.json");
+            Files.writeString(backupFile, negativeWalletJson, StandardCharsets.UTF_8);
+
+            DataCorruptionException ex = assertThrows(
+                    DataCorruptionException.class,
+                    () -> service.restoreBackupData(new RestoreBackupRequestDTO(backupFile.toString())));
+
+            assertEquals(ErrorCode.ERR_DAT_002, ex.getErrorCode());
+            assertEquals(1, walletRepository.findAll().size());
+            assertEquals(existingWallet.getId(), walletRepository.findAll().get(0).getId());
         }
     }
 }

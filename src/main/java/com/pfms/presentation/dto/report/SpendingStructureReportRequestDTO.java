@@ -1,6 +1,7 @@
 package com.pfms.presentation.dto.report;
 
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -37,7 +38,7 @@ public final class SpendingStructureReportRequestDTO {
         if (transactionType == null || transactionType.trim().isEmpty()) {
             this.transactionType = DEFAULT_TRANSACTION_TYPE;
         } else {
-            this.transactionType = transactionType.trim().toUpperCase();
+            this.transactionType = transactionType.trim().toUpperCase(Locale.ROOT);
         }
     }
     // endregion

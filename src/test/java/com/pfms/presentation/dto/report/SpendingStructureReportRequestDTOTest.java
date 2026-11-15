@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -180,6 +181,24 @@ class SpendingStructureReportRequestDTOTest {
             assertTrue(str.contains("2026-01-31"));
             assertTrue(str.contains("EXPENSE"));
             assertTrue(str.contains("SpendingStructureReportRequestDTO"));
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa transactionType không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeTransactionTypeWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                SpendingStructureReportRequestDTO dto = new SpendingStructureReportRequestDTO(
+                        LocalDate.of(2026, 1, 1),
+                        LocalDate.of(2026, 1, 31),
+                        "income"
+                );
+
+                assertEquals("INCOME", dto.getTransactionType());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

@@ -9,10 +9,14 @@ import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,6 +27,7 @@ final class WalletSummaryCalculator {
 
     // region Constants
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
+    private static final Locale VIETNAMESE_LOCALE = Locale.forLanguageTag("vi-VN");
     // endregion
 
     // region Constructors
@@ -35,27 +40,42 @@ final class WalletSummaryCalculator {
     static WalletsSummaryResponseDTO buildWalletsSummary(
             WalletRepository walletRepository, EntityStatus statusFilter) {
 
-        List<Wallet> allWallets = walletRepository.findAll();
-        List<Wallet> filteredWallets = (statusFilter == null)
-                ? allWallets
-                : walletRepository.findByStatus(statusFilter);
+        Objects.requireNonNull(walletRepository, "WalletRepository không được để null");
 
-        Money totalSystemMoney = allWallets.stream()
-                .filter(WalletSummaryCalculator::isIncludedInSystemTotal)
-                .map(Wallet::getCurrentBalance)
-                .reduce(Money.ZERO, Money::add);
+        List<Wallet> allWallets = walletRepository.findAll();
+        List<Wallet> filteredWallets = new ArrayList<>();
+        Money totalSystemMoney = Money.ZERO;
+        for (Wallet wallet : allWallets) {
+            if (matchesStatusFilter(wallet, statusFilter)) {
+                filteredWallets.add(wallet);
+            }
+            if (isIncludedInSystemTotal(wallet)) {
+                totalSystemMoney = totalSystemMoney.add(wallet.getCurrentBalance());
+            }
+        }
+
+        Collator viCollator = Collator.getInstance(VIETNAMESE_LOCALE);
+        viCollator.setStrength(Collator.SECONDARY);
+        Comparator<Wallet> walletOrder = Comparator
+                .comparing(Wallet::getName, viCollator)
+                .thenComparing(Wallet::getId);
+
+        List<Wallet> sortedWallets = filteredWallets.stream()
+                .sorted(walletOrder)
+                .toList();
 
         BigDecimal totalBalance = totalSystemMoney.getAmount();
-        List<WalletResponseDTO> walletDtos = filteredWallets.stream()
+        List<WalletResponseDTO> walletDtos = sortedWallets.stream()
                 .map(WalletSummaryCalculator::toResponseDTO)
                 .toList();
 
-        Map<UUID, BigDecimal> sortedShares = calculateWalletShares(filteredWallets, totalBalance);
+        Map<UUID, BigDecimal> sortedShares = calculateWalletShares(sortedWallets, totalBalance);
 
         return new WalletsSummaryResponseDTO(walletDtos, totalBalance, totalSystemMoney.getCurrency(), sortedShares);
     }
 
     static WalletResponseDTO toResponseDTO(Wallet wallet) {
+        Objects.requireNonNull(wallet, "Thực thể ví không được để null");
         return new WalletResponseDTO(
                 wallet.getId(),
                 wallet.getName(),
@@ -69,6 +89,12 @@ final class WalletSummaryCalculator {
     // endregion
 
     // region Helpers
+    private static boolean matchesStatusFilter(Wallet wallet, EntityStatus statusFilter) {
+        return (statusFilter == null)
+                ? wallet.getStatus() != EntityStatus.DELETED
+                : wallet.getStatus() == statusFilter;
+    }
+
     private static boolean isIncludedInSystemTotal(Wallet wallet) {
         return wallet.getStatus() == EntityStatus.ACTIVE
                 || (wallet.getStatus() == EntityStatus.ARCHIVED && wallet.getCurrentBalance().isPositive());
@@ -76,10 +102,10 @@ final class WalletSummaryCalculator {
 
     private static Map<UUID, BigDecimal> calculateWalletShares(List<Wallet> wallets, BigDecimal totalBalance) {
         boolean isTotalZero = totalBalance.compareTo(BigDecimal.ZERO) == 0;
-        Map<UUID, BigDecimal> rawShares = new HashMap<>();
+        Map<UUID, BigDecimal> rawShares = new LinkedHashMap<>();
 
         for (Wallet wallet : wallets) {
-            if (wallet.getStatus() == EntityStatus.ARCHIVED && wallet.getCurrentBalance().isZero()) {
+            if (!isIncludedInSystemTotal(wallet)) {
                 continue;
             }
             rawShares.put(wallet.getId(), calculateShare(wallet, totalBalance, isTotalZero));

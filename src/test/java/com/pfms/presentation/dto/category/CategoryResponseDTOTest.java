@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -177,6 +178,28 @@ class CategoryResponseDTOTest {
             assertTrue(str.contains("Sách"));
             assertTrue(str.contains(sampleParentGroupId.toString()));
             assertTrue(str.contains("Giáo dục"));
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa transactionType và status không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeFieldsWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                CategoryResponseDTO dto = new CategoryResponseDTO(
+                        UUID.randomUUID(),
+                        "Lương",
+                        UUID.randomUUID(),
+                        "Thu nhập",
+                        "income",
+                        "active"
+                );
+
+                assertEquals("INCOME", dto.getTransactionType());
+                assertEquals("ACTIVE", dto.getStatus());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

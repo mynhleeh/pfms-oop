@@ -45,7 +45,7 @@ final class SystemDataReconciler {
 
         List<ReconciliationIssueResponseDTO> issues = new ArrayList<>();
 
-        boolean walletBalanceConsistent = checkWalletBalances(wallets, transactions, adjustments, issues);
+        boolean walletBalanceConsistent = checkWalletBalances(wallets, walletMap, transactions, adjustments, issues);
         boolean transferConsistent = TransactionIntegrityChecker.checkTransfers(
                 walletMap, transactions, categoryMap, issues);
         boolean categoryHierarchyConsistent = checkCategoryHierarchy(
@@ -67,6 +67,7 @@ final class SystemDataReconciler {
     // region Helpers
     private static boolean checkWalletBalances(
             List<Wallet> wallets,
+            Map<UUID, Wallet> walletMap,
             List<Transaction> transactions,
             List<BalanceAdjustmentRecord> adjustments,
             List<ReconciliationIssueResponseDTO> issues) {
@@ -74,6 +75,13 @@ final class SystemDataReconciler {
         Map<UUID, Money> calculatedBalances = computeNetBalances(transactions, adjustments);
         boolean consistent = true;
         for (Wallet wallet : wallets) {
+            if (wallet.getCurrentBalance().isNegative()) {
+                consistent = recordIssue(issues, "BR-FIN-02", "BALANCE_MISMATCH",
+                        String.format("Ví [%s] có số dư âm không hợp lệ (%s)",
+                                wallet.getName(), wallet.getCurrentBalance().formatDisplay()),
+                        wallet.getId().toString(),
+                        "Thực hiện kiểm kê điều chỉnh số dư ví về mức không âm hoặc phục hồi dữ liệu từ bản sao lưu");
+            }
             Money calculated = calculatedBalances.getOrDefault(wallet.getId(), Money.ZERO);
             if (calculated.compareTo(wallet.getCurrentBalance()) != 0) {
                 consistent = recordIssue(issues, "BR-FIN-02", "BALANCE_MISMATCH",
@@ -83,6 +91,24 @@ final class SystemDataReconciler {
                                 wallet.getCurrentBalance().subtract(calculated).formatDisplay()),
                         wallet.getId().toString(),
                         "Thực hiện kiểm kê đối soát số dư ví hoặc phục hồi dữ liệu từ bản sao lưu gần nhất");
+            }
+        }
+        for (Transaction txn : transactions) {
+            if (txn instanceof IncomeExpenseTransaction ie && !walletMap.containsKey(ie.getWallet().getId())) {
+                consistent = recordIssue(issues, "BR-FIN-02", "BALANCE_MISMATCH",
+                        String.format("Giao dịch thu chi [%s] trỏ tới ví [%s] không tồn tại",
+                                ie.getTransactionId(), ie.getWallet().getId()),
+                        ie.getTransactionId().toString(),
+                        "Kiểm tra lại mã ví của giao dịch thu chi hoặc phục hồi từ bản sao lưu hợp lệ");
+            }
+        }
+        for (BalanceAdjustmentRecord adj : adjustments) {
+            if (!walletMap.containsKey(adj.getWalletId())) {
+                consistent = recordIssue(issues, "BR-FIN-02", "BALANCE_MISMATCH",
+                        String.format("Bản ghi kiểm kê [%s] trỏ tới ví [%s] không tồn tại",
+                                adj.getRecordId(), adj.getWalletId()),
+                        adj.getRecordId().toString(),
+                        "Kiểm tra lại mã ví của bản ghi kiểm kê hoặc phục hồi từ bản sao lưu hợp lệ");
             }
         }
         return consistent;

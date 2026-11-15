@@ -1,10 +1,11 @@
 package com.pfms.presentation.dto.data;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
  * DTO yêu cầu xuất bản sao lưu dữ liệu tài chính của hệ thống (FR-DAT-01).
- * Đóng gói đường dẫn thư mục/tệp đích và phạm vi xuất dữ liệu (FULL hoặc TRANSACTIONS).
+ * Đóng gói đường dẫn thư mục đích và phạm vi xuất dữ liệu (FULL hoặc TRANSACTIONS).
  */
 public final class ExportBackupRequestDTO {
 
@@ -28,7 +29,7 @@ public final class ExportBackupRequestDTO {
         if (scope == null || scope.trim().isEmpty()) {
             this.scope = DEFAULT_SCOPE;
         } else {
-            this.scope = scope.trim().toUpperCase();
+            this.scope = scope.trim().toUpperCase(Locale.ROOT);
         }
     }
     // endregion

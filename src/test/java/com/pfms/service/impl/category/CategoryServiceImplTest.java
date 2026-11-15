@@ -4,8 +4,10 @@ import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.DuplicateEntityException;
 import com.pfms.domain.exception.EntityNotFoundException;
 import com.pfms.domain.exception.ErrorCode;
+import com.pfms.domain.exception.StorageException;
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
@@ -17,7 +19,10 @@ import com.pfms.infrastructure.memory.MemoryTransactionRepository;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.category.CreateCategoryRequestDTO;
+import com.pfms.presentation.dto.category.CreateNeedGroupRequestDTO;
+import com.pfms.presentation.dto.category.NeedGroupResponseDTO;
 import com.pfms.presentation.dto.category.RenameCategoryRequestDTO;
+import com.pfms.presentation.dto.category.RenameNeedGroupRequestDTO;
 import com.pfms.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -750,8 +755,8 @@ class CategoryServiceImplTest {
         }
 
         @Test
-        @DisplayName("Ném BusinessException(ERR_CAT_002) khi danh mục là mục hoạt động duy nhất còn lại trong nhóm")
-        void shouldThrowExceptionWhenDeletingLastActiveCategoryInNeedGroup() {
+        @DisplayName("Cho phép xóa danh mục hoạt động duy nhất còn lại trong nhóm theo BR-FIN-04 và Phương án A")
+        void shouldAllowDeletingLastActiveCategoryInNeedGroup() {
             UUID singleCatGroupId = UUID.fromString("00000000-0000-0000-0000-000000000009");
             NeedGroup singleCatGroup = new NeedGroup(
                     singleCatGroupId, "Học tập", TransactionType.EXPENSE, "book", "#3F51B5");
@@ -760,12 +765,9 @@ class CategoryServiceImplTest {
             CategoryResponseDTO onlyCat = categoryService.createCategory(
                     new CreateCategoryRequestDTO(singleCatGroupId, "Sách giáo trình"));
 
-            BusinessException ex = assertThrows(
-                    BusinessException.class,
-                    () -> categoryService.deleteCategory(onlyCat.getCategoryId())
-            );
-            assertEquals(ErrorCode.ERR_CAT_002, ex.getErrorCode());
-            assertTrue(ex.getMessage().contains("cuối cùng"));
+            categoryService.deleteCategory(onlyCat.getCategoryId());
+
+            assertTrue(categoryRepository.findById(onlyCat.getCategoryId()).isEmpty());
         }
     }
 
@@ -813,8 +815,8 @@ class CategoryServiceImplTest {
         }
 
         @Test
-        @DisplayName("Loại trừ các nhóm nhu cầu đã bị xóa (DELETED) khỏi cây phân cấp")
-        void shouldExcludeDeletedNeedGroups() {
+        @DisplayName("Bao gồm cả nhóm nhu cầu đã xóa mềm (DELETED) trong cây phân cấp theo OOD 03")
+        void shouldIncludeDeletedNeedGroupsInHierarchy() {
             UUID activeGroupId = UUID.fromString("00000000-0000-0000-0000-000000000001");
             NeedGroup activeGroup = new NeedGroup(
                     activeGroupId, "Ăn uống", TransactionType.EXPENSE, "utensils", "#FF5722");
@@ -828,8 +830,11 @@ class CategoryServiceImplTest {
 
             List<CategoryHierarchyResponseDTO> hierarchy = categoryService.getCategoryHierarchy();
 
-            assertEquals(1, hierarchy.size());
+            assertEquals(2, hierarchy.size());
             assertEquals(activeGroupId, hierarchy.get(0).getNeedGroupId());
+            assertEquals("ACTIVE", hierarchy.get(0).getNeedGroupStatus());
+            assertEquals(deletedGroupId, hierarchy.get(1).getNeedGroupId());
+            assertEquals("DELETED", hierarchy.get(1).getNeedGroupStatus());
         }
 
         @Test
@@ -908,6 +913,398 @@ class CategoryServiceImplTest {
             // Nhóm 3: INCOME - Lương thưởng
             assertEquals("INCOME", hierarchy.get(2).getTransactionType());
             assertEquals("Lương thưởng", hierarchy.get(2).getNeedGroupName());
+        }
+    }
+
+    @Nested
+    @DisplayName("Ca sử dụng UC-CAT-01 (3a): Tạo nhóm nhu cầu mới (createNeedGroup)")
+    class CreateNeedGroupTests {
+
+        @Test
+        @DisplayName("Tạo nhóm nhu cầu mới thành công với đầy đủ thuộc tính và lưu vào kho")
+        void shouldCreateNeedGroupSuccessfully() {
+            NeedGroupResponseDTO created = categoryService.createNeedGroup(
+                    new CreateNeedGroupRequestDTO("  expense ", "  Sức khỏe  ", " heart ", " #E91E63 "));
+
+            assertNotNull(created.getNeedGroupId());
+            assertEquals("Sức khỏe", created.getName());
+            assertEquals("EXPENSE", created.getTransactionType());
+            assertEquals("ACTIVE", created.getStatus());
+            assertEquals("heart", created.getIcon());
+            assertEquals("#E91E63", created.getColor());
+            assertNotNull(created.getCreatedAt());
+
+            Optional<NeedGroup> saved = needGroupRepository.findById(created.getNeedGroupId());
+            assertTrue(saved.isPresent());
+            assertEquals("Sức khỏe", saved.get().getName());
+            assertEquals("heart", saved.get().getIcon());
+            assertEquals("#E91E63", saved.get().getColor());
+        }
+
+        @Test
+        @DisplayName("Cho phép tạo trùng tên giữa EXPENSE và INCOME, hoặc trùng tên nhóm đã bị DELETED")
+        void shouldAllowSameNameAcrossTypesOrWhenExistingIsDeleted() {
+            NeedGroupResponseDTO expenseFirst = categoryService.createNeedGroup(
+                    new CreateNeedGroupRequestDTO("EXPENSE", "Đầu tư"));
+            NeedGroupResponseDTO incomeSameName = categoryService.createNeedGroup(
+                    new CreateNeedGroupRequestDTO("INCOME", "Đầu tư"));
+
+            assertNotEquals(expenseFirst.getNeedGroupId(), incomeSameName.getNeedGroupId());
+
+            categoryService.createNeedGroup(new CreateNeedGroupRequestDTO("EXPENSE", "Khác"));
+            categoryService.deleteNeedGroup(expenseFirst.getNeedGroupId());
+
+            NeedGroupResponseDTO recreated = categoryService.createNeedGroup(
+                    new CreateNeedGroupRequestDTO("EXPENSE", "Đầu tư"));
+            assertNotEquals(expenseFirst.getNeedGroupId(), recreated.getNeedGroupId());
+        }
+
+        @Test
+        @DisplayName("Ném DuplicateEntityException(ERR_NAM_002) khi trùng tên nhóm đang hoạt động cùng loại")
+        void shouldThrowDuplicateExceptionWhenActiveGroupNameExistsInSameType() {
+            categoryService.createNeedGroup(new CreateNeedGroupRequestDTO("EXPENSE", "Ăn uống"));
+
+            DuplicateEntityException ex = assertThrows(
+                    DuplicateEntityException.class,
+                    () -> categoryService.createNeedGroup(new CreateNeedGroupRequestDTO("EXPENSE", "  ĂN UỐNG "))
+            );
+            assertEquals(ErrorCode.ERR_NAM_002, ex.getErrorCode());
+        }
+
+        @ParameterizedTest(name = "Loại thu chi không hợp lệ \"{0}\" bị từ chối với ERR_CAT_001")
+        @NullAndEmptySource
+        @ValueSource(strings = {"   ", "TRANSFER", "OTHER"})
+        @DisplayName("Ném BusinessException(ERR_CAT_001) khi transactionType null hoặc không hợp lệ")
+        void shouldThrowBusinessExceptionWhenTransactionTypeInvalid(String invalidType) {
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> categoryService.createNeedGroup(new CreateNeedGroupRequestDTO(invalidType, "Nhóm mới"))
+            );
+            assertEquals(ErrorCode.ERR_CAT_001, ex.getErrorCode());
+        }
+
+        @ParameterizedTest(name = "Tên nhóm không hợp lệ \"{0}\" bị từ chối với ERR_NAM_001")
+        @NullAndEmptySource
+        @ValueSource(strings = {"   "})
+        @DisplayName("Ném BusinessException(ERR_NAM_001) khi tên nhóm null, rỗng hoặc quá 50 ký tự")
+        void shouldThrowBusinessExceptionWhenNameInvalid(String invalidName) {
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> categoryService.createNeedGroup(new CreateNeedGroupRequestDTO("EXPENSE", invalidName))
+            );
+            assertEquals(ErrorCode.ERR_NAM_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Ném BusinessException(ERR_NAM_001) khi tên nhóm vượt quá 50 ký tự")
+        void shouldThrowBusinessExceptionWhenNameTooLong() {
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> categoryService.createNeedGroup(new CreateNeedGroupRequestDTO("INCOME", "N".repeat(51)))
+            );
+            assertEquals(ErrorCode.ERR_NAM_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Ném NullPointerException khi request createNeedGroup là null")
+        void shouldThrowExceptionWhenRequestIsNull() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
+                    () -> categoryService.createNeedGroup(null)
+            );
+            assertTrue(ex.getMessage().contains("Yêu cầu"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Ca sử dụng UC-CAT-02: Đổi tên và cập nhật hiển thị nhóm (renameNeedGroup)")
+    class RenameNeedGroupTests {
+
+        private UUID group1Id;
+        private UUID group2Id;
+
+        @BeforeEach
+        void initGroups() {
+            group1Id = UUID.fromString("00000000-0000-0000-0000-000000000011");
+            group2Id = UUID.fromString("00000000-0000-0000-0000-000000000012");
+            needGroupRepository.save(new NeedGroup(group1Id, "Sức khỏe", TransactionType.EXPENSE, "heart", "#E91E63"));
+            needGroupRepository.save(new NeedGroup(group2Id, "Giải trí", TransactionType.EXPENSE, "film", "#9C27B0"));
+        }
+
+        @Test
+        @DisplayName("Đổi tên bằng DTO 2 tham số giữ nguyên icon và color hiện có")
+        void shouldRenameWithoutOverwritingAppearance() {
+            NeedGroupResponseDTO updated = categoryService.renameNeedGroup(
+                    new RenameNeedGroupRequestDTO(group1Id, "  Y tế & Sức khỏe  "));
+
+            assertEquals(group1Id, updated.getNeedGroupId());
+            assertEquals("Y tế & Sức khỏe", updated.getName());
+            assertEquals("heart", updated.getIcon());
+            assertEquals("#E91E63", updated.getColor());
+        }
+
+        @Test
+        @DisplayName("Cập nhật tên cùng icon/color từng phần hoặc toàn phần và cho phép trùng tên chính mình")
+        void shouldRenameAndUpdateAppearanceIncludingPartialOrSameNameCaseChange() {
+            NeedGroupResponseDTO onlyColorUpdated = categoryService.renameNeedGroup(
+                    new RenameNeedGroupRequestDTO(group1Id, "SỨC KHỎE", null, "#009688"));
+
+            assertEquals("SỨC KHỎE", onlyColorUpdated.getName());
+            assertEquals("heart", onlyColorUpdated.getIcon());
+            assertEquals("#009688", onlyColorUpdated.getColor());
+
+            NeedGroupResponseDTO clearedAppearance = categoryService.renameNeedGroup(
+                    new RenameNeedGroupRequestDTO(group1Id, "Y tế", "", ""));
+
+            assertEquals("Y tế", clearedAppearance.getName());
+            assertEquals("", clearedAppearance.getIcon());
+            assertEquals("", clearedAppearance.getColor());
+        }
+
+        @Test
+        @DisplayName("Ném DuplicateEntityException(ERR_NAM_002) khi tên mới trùng nhóm đang dùng khác cùng loại")
+        void shouldThrowDuplicateExceptionWhenNewNameMatchesAnotherActiveGroup() {
+            DuplicateEntityException ex = assertThrows(
+                    DuplicateEntityException.class,
+                    () -> categoryService.renameNeedGroup(new RenameNeedGroupRequestDTO(group1Id, "  giải trí  "))
+            );
+            assertEquals(ErrorCode.ERR_NAM_002, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Ném BusinessException(ERR_NAM_001) khi tên mới không hợp lệ")
+        void shouldThrowBusinessExceptionWhenNewNameIsInvalid() {
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> categoryService.renameNeedGroup(new RenameNeedGroupRequestDTO(group1Id, "   "))
+            );
+            assertEquals(ErrorCode.ERR_NAM_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Ném EntityNotFoundException(ERR_NOT_FOUND) khi nhóm không tồn tại hoặc đã bị xóa mềm")
+        void shouldThrowNotFoundWhenGroupMissingOrDeleted() {
+            UUID unknownId = UUID.fromString("00000000-0000-0000-0000-000000000099");
+            assertEquals(ErrorCode.ERR_NOT_FOUND, assertThrows(
+                    EntityNotFoundException.class,
+                    () -> categoryService.renameNeedGroup(new RenameNeedGroupRequestDTO(unknownId, "Tên mới"))
+            ).getErrorCode());
+
+            NeedGroup deletedGroup = needGroupRepository.findById(group1Id).orElseThrow();
+            deletedGroup.markDeleted(2);
+            needGroupRepository.save(deletedGroup);
+
+            assertEquals(ErrorCode.ERR_NOT_FOUND, assertThrows(
+                    EntityNotFoundException.class,
+                    () -> categoryService.renameNeedGroup(new RenameNeedGroupRequestDTO(group1Id, "Tên mới"))
+            ).getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Ném NullPointerException khi request renameNeedGroup là null")
+        void shouldThrowExceptionWhenRequestIsNull() {
+            assertThrows(NullPointerException.class, () -> categoryService.renameNeedGroup(null));
+        }
+    }
+
+    @Nested
+    @DisplayName("Ca sử dụng UC-CAT-03: Khôi phục nhóm nhu cầu đã xóa (restoreNeedGroup)")
+    class RestoreNeedGroupTests {
+
+        private UUID deletedGroupId;
+        private UUID childCategoryId;
+
+        @BeforeEach
+        void initDeletedGroup() {
+            deletedGroupId = UUID.fromString("00000000-0000-0000-0000-000000000021");
+            NeedGroup group = new NeedGroup(deletedGroupId, "Du lịch", TransactionType.EXPENSE, "plane", "#00BCD4");
+            group.markDeleted(2);
+            needGroupRepository.save(group);
+
+            childCategoryId = UUID.fromString("00000000-0000-0000-0000-000000000221");
+            Category child = Category.reconstitute(
+                    childCategoryId, "Vé máy bay", deletedGroupId, TransactionType.EXPENSE,
+                    EntityStatus.DELETED, "", "", group.getCreatedAt());
+            categoryRepository.save(child);
+        }
+
+        @Test
+        @DisplayName("Khôi phục riêng nhóm từ DELETED sang ACTIVE mà giữ nguyên danh mục con đã xóa (UC-CAT-03)")
+        void shouldRestoreGroupOnlyWithoutAutoRestoringDeletedChildren() {
+            NeedGroupResponseDTO restored = categoryService.restoreNeedGroup(deletedGroupId);
+
+            assertEquals(deletedGroupId, restored.getNeedGroupId());
+            assertEquals("ACTIVE", restored.getStatus());
+            assertTrue(restored.isActive());
+
+            NeedGroup savedGroup = needGroupRepository.findById(deletedGroupId).orElseThrow();
+            assertTrue(savedGroup.isActive());
+
+            Category childAfterRestore = categoryRepository.findById(childCategoryId).orElseThrow();
+            assertTrue(childAfterRestore.isDeleted());
+        }
+
+        @Test
+        @DisplayName("Ném DuplicateEntityException(ERR_NAM_002) nếu đã có nhóm ACTIVE trùng tên trong cùng loại")
+        void shouldThrowDuplicateExceptionWhenActiveGroupWithSameNameExists() {
+            categoryService.createNeedGroup(new CreateNeedGroupRequestDTO("EXPENSE", "Du lịch"));
+
+            DuplicateEntityException ex = assertThrows(
+                    DuplicateEntityException.class,
+                    () -> categoryService.restoreNeedGroup(deletedGroupId)
+            );
+            assertEquals(ErrorCode.ERR_NAM_002, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Ném EntityNotFoundException(ERR_NOT_FOUND) khi nhóm không tồn tại hoặc đang ACTIVE")
+        void shouldThrowNotFoundWhenMissingOrAlreadyActive() {
+            assertEquals(ErrorCode.ERR_NOT_FOUND, assertThrows(
+                    EntityNotFoundException.class,
+                    () -> categoryService.restoreNeedGroup(UUID.randomUUID())
+            ).getErrorCode());
+
+            NeedGroupResponseDTO activeGroup = categoryService.createNeedGroup(
+                    new CreateNeedGroupRequestDTO("EXPENSE", "Mua sắm"));
+            assertEquals(ErrorCode.ERR_NOT_FOUND, assertThrows(
+                    EntityNotFoundException.class,
+                    () -> categoryService.restoreNeedGroup(activeGroup.getNeedGroupId())
+            ).getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Ném NullPointerException khi needGroupId là null")
+        void shouldThrowExceptionWhenIdIsNull() {
+            assertThrows(NullPointerException.class, () -> categoryService.restoreNeedGroup(null));
+        }
+    }
+
+    @Nested
+    @DisplayName("Ca sử dụng UC-CAT-04: Xóa nhóm nhu cầu (deleteNeedGroup)")
+    class DeleteNeedGroupTests {
+
+        private UUID removableGroupId;
+        private UUID backupExpenseGroupId;
+        private UUID soleIncomeGroupId;
+        private Wallet testWallet;
+
+        @BeforeEach
+        void initGroups() {
+            removableGroupId = UUID.fromString("00000000-0000-0000-0000-000000000031");
+            backupExpenseGroupId = UUID.fromString("00000000-0000-0000-0000-000000000032");
+            soleIncomeGroupId = UUID.fromString("00000000-0000-0000-0000-000000000033");
+
+            needGroupRepository.save(new NeedGroup(removableGroupId, "Giải trí", TransactionType.EXPENSE, "", ""));
+            needGroupRepository.save(new NeedGroup(backupExpenseGroupId, "Thiết yếu", TransactionType.EXPENSE, "", ""));
+            needGroupRepository.save(new NeedGroup(soleIncomeGroupId, "Lương chính", TransactionType.INCOME, "", ""));
+
+            testWallet = new Wallet(UUID.randomUUID(), "Ví tiền mặt", "", true);
+        }
+
+        @Test
+        @DisplayName("Xóa cứng nhóm và mọi danh mục con khi chưa có giao dịch nào liên kết")
+        void shouldHardDeleteGroupAndAllChildrenWhenNoTransactionsExist() {
+            CategoryResponseDTO child1 = categoryService.createCategory(
+                    new CreateCategoryRequestDTO(removableGroupId, "Xem phim"));
+            CategoryResponseDTO child2 = categoryService.createCategory(
+                    new CreateCategoryRequestDTO(removableGroupId, "Nghe nhạc"));
+
+            categoryService.deleteNeedGroup(removableGroupId);
+
+            assertTrue(needGroupRepository.findById(removableGroupId).isEmpty());
+            assertTrue(categoryRepository.findById(child1.getCategoryId()).isEmpty());
+            assertTrue(categoryRepository.findById(child2.getCategoryId()).isEmpty());
+        }
+
+        @Test
+        @DisplayName("Xóa mềm nhóm và danh mục có giao dịch, đồng thời xóa cứng danh mục con chưa có giao dịch")
+        void shouldSoftDeleteGroupAndTxChildrenWhileHardDeletingUnusedChildren() {
+            CategoryResponseDTO unusedChild = categoryService.createCategory(
+                    new CreateCategoryRequestDTO(removableGroupId, "Sách truyện"));
+            CategoryResponseDTO usedChild = categoryService.createCategory(
+                    new CreateCategoryRequestDTO(removableGroupId, "Du lịch"));
+
+            Category usedCategoryEntity = categoryRepository.findById(usedChild.getCategoryId()).orElseThrow();
+            transactionRepository.save(new IncomeExpenseTransaction(
+                    UUID.randomUUID(), TransactionType.EXPENSE, testWallet, usedCategoryEntity,
+                    Money.of("500000.00"), TransactionDate.now(), "Vé tham quan", null));
+
+            categoryService.deleteNeedGroup(removableGroupId);
+
+            NeedGroup deletedGroup = needGroupRepository.findById(removableGroupId).orElseThrow();
+            assertTrue(deletedGroup.isDeleted());
+
+            Category softDeletedChild = categoryRepository.findById(usedChild.getCategoryId()).orElseThrow();
+            assertTrue(softDeletedChild.isDeleted());
+
+            assertTrue(categoryRepository.findById(unusedChild.getCategoryId()).isEmpty());
+        }
+
+        @Test
+        @DisplayName("Ném BusinessException(ERR_CAT_002) khi xóa nhóm đang dùng cuối cùng của một loại thu chi và giữ nguyên con")
+        void shouldThrowBusinessExceptionWhenDeletingLastActiveGroupInType() {
+            CategoryResponseDTO incomeCat = categoryService.createCategory(
+                    new CreateCategoryRequestDTO(soleIncomeGroupId, "Lương tháng"));
+
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> categoryService.deleteNeedGroup(soleIncomeGroupId)
+            );
+            assertEquals(ErrorCode.ERR_CAT_002, ex.getErrorCode());
+
+            assertTrue(needGroupRepository.findById(soleIncomeGroupId).orElseThrow().isActive());
+            assertTrue(categoryRepository.findById(incomeCat.getCategoryId()).orElseThrow().isActive());
+        }
+
+        @Test
+        @DisplayName("Ném EntityNotFoundException(ERR_NOT_FOUND) khi nhóm không tồn tại hoặc đã xóa")
+        void shouldThrowNotFoundWhenGroupMissingOrAlreadyDeleted() {
+            assertEquals(ErrorCode.ERR_NOT_FOUND, assertThrows(
+                    EntityNotFoundException.class,
+                    () -> categoryService.deleteNeedGroup(UUID.randomUUID())
+            ).getErrorCode());
+
+            categoryService.deleteNeedGroup(removableGroupId);
+            assertEquals(ErrorCode.ERR_NOT_FOUND, assertThrows(
+                    EntityNotFoundException.class,
+                    () -> categoryService.deleteNeedGroup(removableGroupId)
+            ).getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Ném NullPointerException khi needGroupId là null")
+        void shouldThrowExceptionWhenIdIsNull() {
+            assertThrows(NullPointerException.class, () -> categoryService.deleteNeedGroup(null));
+        }
+
+        @Test
+        @DisplayName("Hoàn nguyên nhóm nhu cầu và danh mục con khi xóa nhóm phát sinh StorageException")
+        void shouldRollbackNeedGroupAndChildrenWhenStorageExceptionOccurs() {
+            CategoryResponseDTO child1 = categoryService.createCategory(
+                    new CreateCategoryRequestDTO(removableGroupId, "Danh mục test 1"));
+            CategoryResponseDTO child2 = categoryService.createCategory(
+                    new CreateCategoryRequestDTO(removableGroupId, "Danh mục test 2"));
+
+            MemoryNeedGroupRepository failingNeedGroupRepo = new MemoryNeedGroupRepository() {
+                @Override
+                public boolean deleteById(UUID id) {
+                    throw new StorageException("Lỗi mô phỏng xóa nhóm trên đĩa", new java.io.IOException());
+                }
+            };
+            for (NeedGroup g : needGroupRepository.findAll()) {
+                failingNeedGroupRepo.save(g);
+            }
+
+            CategoryService failingService = new CategoryServiceImpl(
+                    categoryRepository, failingNeedGroupRepo, transactionRepository);
+
+            assertThrows(StorageException.class, () -> failingService.deleteNeedGroup(removableGroupId));
+
+            assertTrue(failingNeedGroupRepo.findById(removableGroupId).isPresent());
+            assertTrue(categoryRepository.findById(child1.getCategoryId()).isPresent(),
+                    "Danh mục con 1 phải được khôi phục nguyên vẹn");
+            assertTrue(categoryRepository.findById(child2.getCategoryId()).isPresent(),
+                    "Danh mục con 2 phải được khôi phục nguyên vẹn");
         }
     }
 }

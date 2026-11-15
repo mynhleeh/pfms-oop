@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -253,6 +254,24 @@ class NeedGroupShareResponseDTOTest {
             assertEquals(a, b);
             assertEquals(a.hashCode(), b.hashCode());
             assertNotEquals(a, c);
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa status không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeStatusWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                NeedGroupShareResponseDTO dto = new NeedGroupShareResponseDTO(
+                        UUID.randomUUID(), "Thiết yếu", "active",
+                        new BigDecimal("1000000"), new BigDecimal("60.00"),
+                        null, null, null, false, List.of()
+                );
+
+                assertEquals("ACTIVE", dto.getStatus());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.pfms.service.impl.data;
 
 import com.pfms.domain.model.category.Category;
+import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.Transaction;
 import com.pfms.domain.model.transaction.TransactionFee;
 import com.pfms.domain.model.transaction.TransactionType;
@@ -59,6 +60,12 @@ final class TransactionIntegrityChecker {
                         String.format("Phụ phí [%s] có mã giao dịch cha không khớp với giao dịch [%s]",
                                 fee.getFeeId(), txn.getTransactionId()),
                         feeIdStr, "Cập nhật lại mã giao dịch cha cho phụ phí");
+            }
+            if (txn instanceof IncomeExpenseTransaction ie && !fee.getWallet().getId().equals(ie.getWallet().getId())) {
+                consistent = recordIssue(issues, "BR-FIN-02", "FEE_INCONSISTENCY",
+                        String.format("Phụ phí [%s] có ví thanh toán không trùng với ví của giao dịch thu chi [%s]",
+                                fee.getFeeId(), txn.getTransactionId()),
+                        feeIdStr, "Gán lại mã ví của phụ phí khớp với ví của giao dịch");
             }
             Category feeCat = categoryMap.get(fee.getCategory().getCategoryId());
             if (feeCat == null) {

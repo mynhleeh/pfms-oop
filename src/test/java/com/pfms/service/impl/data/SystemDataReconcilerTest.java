@@ -8,6 +8,8 @@ import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.Transaction;
 import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.model.transaction.TransferTransaction;
+import com.pfms.domain.model.wallet.ActiveWalletState;
+import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.presentation.dto.data.ReconciliationReportResponseDTO;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -105,5 +108,72 @@ class SystemDataReconcilerTest {
         assertFalse(report.isFullyConsistent());
         assertFalse(report.isTransferConsistent());
         assertTrue(report.getIssues().stream().anyMatch(i -> "TRANSFER_INCONSISTENCY".equals(i.getIssueType())));
+    }
+
+    @Test
+    @DisplayName("reconcile should flag negative wallet balance even when transaction net flow equals balance")
+    void reconcileShouldFlagNegativeWalletBalanceEvenWhenFlowMatches() {
+        Wallet negativeWallet = Wallet.reconstitute(
+                UUID.randomUUID(), "Ví Số Dư Âm", "Ghi chú", false,
+                LocalDateTime.of(2026, 1, 1, 10, 0), new ActiveWalletState(), Money.of("-50000.00"));
+        NeedGroup group = new NeedGroup(UUID.randomUUID(), "Chi tiêu", TransactionType.EXPENSE, "icon", "#fff");
+        Category category = new Category(
+                UUID.randomUUID(), "Ăn uống", group.getNeedGroupId(), TransactionType.EXPENSE, "icon", "#fff");
+        Transaction expense = new IncomeExpenseTransaction(
+                UUID.randomUUID(), TransactionType.EXPENSE, negativeWallet, category, Money.of("50000.00"),
+                TransactionDate.of(LocalDate.of(2026, 1, 15)), "Chi vượt số dư", null);
+
+        ReconciliationReportResponseDTO report = SystemDataReconciler.reconcile(
+                List.of(negativeWallet),
+                List.of(expense),
+                List.of(category),
+                List.of(group),
+                Collections.emptyList());
+
+        assertFalse(report.isFullyConsistent());
+        assertFalse(report.isWalletBalanceConsistent());
+        assertTrue(report.getIssues().stream().anyMatch(i -> "BALANCE_MISMATCH".equals(i.getIssueType())));
+    }
+
+    @Test
+    @DisplayName("reconcile should flag IncomeExpenseTransaction referencing wallet not present in wallets list")
+    void reconcileShouldFlagIncomeExpenseTransactionWithMissingWallet() {
+        Wallet orphanWallet = new Wallet(UUID.randomUUID(), "Ví Ngoài Hệ Thống", "", false);
+        NeedGroup group = new NeedGroup(UUID.randomUUID(), "Chi tiêu", TransactionType.EXPENSE, "icon", "#fff");
+        Category category = new Category(
+                UUID.randomUUID(), "Ăn uống", group.getNeedGroupId(), TransactionType.EXPENSE, "icon", "#fff");
+        Transaction orphanTxn = new IncomeExpenseTransaction(
+                UUID.randomUUID(), TransactionType.EXPENSE, orphanWallet, category, Money.of("30000.00"),
+                TransactionDate.of(LocalDate.of(2026, 1, 15)), "Giao dịch ví mồ côi", null);
+
+        ReconciliationReportResponseDTO report = SystemDataReconciler.reconcile(
+                Collections.emptyList(),
+                List.of(orphanTxn),
+                List.of(category),
+                List.of(group),
+                Collections.emptyList());
+
+        assertFalse(report.isFullyConsistent());
+        assertFalse(report.isWalletBalanceConsistent());
+        assertTrue(report.getIssues().stream().anyMatch(i -> "BALANCE_MISMATCH".equals(i.getIssueType())));
+    }
+
+    @Test
+    @DisplayName("reconcile should flag BalanceAdjustmentRecord referencing wallet not present in wallets list")
+    void reconcileShouldFlagBalanceAdjustmentWithMissingWallet() {
+        BalanceAdjustmentRecord orphanAdj = BalanceAdjustmentRecord.reconstitute(
+                UUID.randomUUID(), UUID.randomUUID(), Money.ZERO, Money.of("100000.00"),
+                TransactionDate.of(LocalDate.of(2026, 1, 15)), "Kiểm kê mồ côi", LocalDateTime.of(2026, 1, 15, 9, 0));
+
+        ReconciliationReportResponseDTO report = SystemDataReconciler.reconcile(
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                List.of(orphanAdj));
+
+        assertFalse(report.isFullyConsistent());
+        assertFalse(report.isWalletBalanceConsistent());
+        assertTrue(report.getIssues().stream().anyMatch(i -> "BALANCE_MISMATCH".equals(i.getIssueType())));
     }
 }

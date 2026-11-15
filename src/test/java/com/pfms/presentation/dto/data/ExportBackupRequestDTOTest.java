@@ -7,6 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Locale;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Kiểm thử ExportBackupRequestDTO")
@@ -20,9 +22,9 @@ class ExportBackupRequestDTOTest {
         @DisplayName("Khởi tạo thành công với đường dẫn và phạm vi FULL")
         void shouldCreateWithFullScope() {
             ExportBackupRequestDTO dto = new ExportBackupRequestDTO(
-                    "C:/backups/pfms_2026.json", "FULL");
+                    "C:/backups/full", "FULL");
 
-            assertEquals("C:/backups/pfms_2026.json", dto.getDestinationPath());
+            assertEquals("C:/backups/full", dto.getDestinationPath());
             assertEquals("FULL", dto.getScope());
             assertTrue(dto.isFullScope());
             assertFalse(dto.isTransactionsScope());
@@ -32,9 +34,9 @@ class ExportBackupRequestDTOTest {
         @DisplayName("Khởi tạo thành công với đường dẫn và phạm vi TRANSACTIONS")
         void shouldCreateWithTransactionsScope() {
             ExportBackupRequestDTO dto = new ExportBackupRequestDTO(
-                    "C:/backups/pfms_txns.json", "TRANSACTIONS");
+                    "C:/backups/txns", "TRANSACTIONS");
 
-            assertEquals("C:/backups/pfms_txns.json", dto.getDestinationPath());
+            assertEquals("C:/backups/txns", dto.getDestinationPath());
             assertEquals("TRANSACTIONS", dto.getScope());
             assertFalse(dto.isFullScope());
             assertTrue(dto.isTransactionsScope());
@@ -43,9 +45,9 @@ class ExportBackupRequestDTOTest {
         @Test
         @DisplayName("Constructor tiện ích tự động gán phạm vi mặc định là FULL")
         void shouldDefaultToFullScopeInConvenienceConstructor() {
-            ExportBackupRequestDTO dto = new ExportBackupRequestDTO("C:/backups/pfms.json");
+            ExportBackupRequestDTO dto = new ExportBackupRequestDTO("C:/backups");
 
-            assertEquals("C:/backups/pfms.json", dto.getDestinationPath());
+            assertEquals("C:/backups", dto.getDestinationPath());
             assertEquals(ExportBackupRequestDTO.DEFAULT_SCOPE, dto.getScope());
             assertTrue(dto.isFullScope());
             assertFalse(dto.isTransactionsScope());
@@ -66,9 +68,9 @@ class ExportBackupRequestDTOTest {
         @DisplayName("Tự động cắt khoảng trắng và viết hoa phạm vi đầu vào")
         void shouldTrimAndUppercaseScope() {
             ExportBackupRequestDTO dto = new ExportBackupRequestDTO(
-                    "  C:/backups/pfms.json  ", "  transactions  ");
+                    "  C:/backups/txns  ", "  transactions  ");
 
-            assertEquals("C:/backups/pfms.json", dto.getDestinationPath());
+            assertEquals("C:/backups/txns", dto.getDestinationPath());
             assertEquals("TRANSACTIONS", dto.getScope());
             assertTrue(dto.isTransactionsScope());
         }
@@ -90,9 +92,9 @@ class ExportBackupRequestDTOTest {
         @Test
         @DisplayName("equals và hashCode hoạt động nhất quán")
         void shouldRespectEqualsAndHashCode() {
-            ExportBackupRequestDTO dto1 = new ExportBackupRequestDTO("C:/b1.json", "FULL");
-            ExportBackupRequestDTO dto2 = new ExportBackupRequestDTO("C:/b1.json", "FULL");
-            ExportBackupRequestDTO dto3 = new ExportBackupRequestDTO("C:/b1.json", "TRANSACTIONS");
+            ExportBackupRequestDTO dto1 = new ExportBackupRequestDTO("C:/b1", "FULL");
+            ExportBackupRequestDTO dto2 = new ExportBackupRequestDTO("C:/b1", "FULL");
+            ExportBackupRequestDTO dto3 = new ExportBackupRequestDTO("C:/b1", "TRANSACTIONS");
 
             assertEquals(dto1, dto1);
             assertEquals(dto1, dto2);
@@ -105,11 +107,25 @@ class ExportBackupRequestDTOTest {
         @Test
         @DisplayName("toString thể hiện đường dẫn đích và phạm vi xuất")
         void shouldContainFieldsInToString() {
-            ExportBackupRequestDTO dto = new ExportBackupRequestDTO("C:/b1.json", "FULL");
+            ExportBackupRequestDTO dto = new ExportBackupRequestDTO("C:/b1", "FULL");
             String str = dto.toString();
 
-            assertTrue(str.contains("destinationPath='C:/b1.json'"));
+            assertTrue(str.contains("destinationPath='C:/b1'"));
             assertTrue(str.contains("scope='FULL'"));
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa scope không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeScopeWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                ExportBackupRequestDTO dto = new ExportBackupRequestDTO("C:/backups/txns", "transactions");
+
+                assertEquals("TRANSACTIONS", dto.getScope());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

@@ -7,13 +7,16 @@ import java.util.UUID;
 
 /**
  * DTO yêu cầu cập nhật giao dịch thu chi gửi từ giao diện xuống tầng dịch vụ (UC-TXN-03).
- * Đóng gói mã giao dịch cùng các thông tin cập nhật (số tiền, ngày, danh mục, ghi chú, phụ phí)
- * phục vụ quy trình hạch toán và hoàn nguyên số dư ví hai pha.
+ * Đóng gói mã giao dịch cùng các thông tin cập nhật (ví mới, số tiền, ngày, danh mục, ghi chú, phụ phí)
+ * phục vụ quy trình hoàn nguyên và hạch toán số dư ví hai pha.
+ * Giá trị {@code newFeeAmount == null} biểu thị giữ nguyên chi phí hiện tại,
+ * trong khi {@code BigDecimal.ZERO} yêu cầu xóa bỏ chi phí liên kết theo {@code FR-TXN-04}.
  */
 public final class UpdateTransactionRequestDTO {
 
     // region State
     private final UUID transactionId;
+    private final UUID newWalletId;
     private final BigDecimal newAmount;
     private final LocalDate newDate;
     private final UUID newCategoryId;
@@ -23,22 +26,25 @@ public final class UpdateTransactionRequestDTO {
     // endregion
 
     // region Constructors
-    public UpdateTransactionRequestDTO(UUID transactionId, BigDecimal newAmount, UUID newCategoryId) {
-        this(transactionId, newAmount, LocalDate.now(), newCategoryId, "", BigDecimal.ZERO, null);
+    public UpdateTransactionRequestDTO(
+            UUID transactionId, UUID newWalletId, BigDecimal newAmount, UUID newCategoryId) {
+        this(transactionId, newWalletId, newAmount, LocalDate.now(), newCategoryId, "", null, null);
     }
 
     public UpdateTransactionRequestDTO(
             UUID transactionId,
+            UUID newWalletId,
             BigDecimal newAmount,
             LocalDate newDate,
             UUID newCategoryId,
             String newNote) {
 
-        this(transactionId, newAmount, newDate, newCategoryId, newNote, BigDecimal.ZERO, null);
+        this(transactionId, newWalletId, newAmount, newDate, newCategoryId, newNote, null, null);
     }
 
     public UpdateTransactionRequestDTO(
             UUID transactionId,
+            UUID newWalletId,
             BigDecimal newAmount,
             LocalDate newDate,
             UUID newCategoryId,
@@ -47,11 +53,14 @@ public final class UpdateTransactionRequestDTO {
             UUID newFeeCategoryId) {
 
         this.transactionId = Objects.requireNonNull(transactionId, "Mã giao dịch không được để null");
+        this.newWalletId = Objects.requireNonNull(newWalletId, "Mã ví mới không được để null");
         this.newAmount = Objects.requireNonNull(newAmount, "Số tiền giao dịch mới không được để null");
         this.newCategoryId = Objects.requireNonNull(newCategoryId, "Mã danh mục mới không được để null");
 
-        this.newFeeAmount = (newFeeAmount == null) ? BigDecimal.ZERO : newFeeAmount;
-        this.newFeeCategoryId = (this.newFeeAmount.compareTo(BigDecimal.ZERO) > 0) ? newFeeCategoryId : null;
+        this.newFeeAmount = newFeeAmount;
+        this.newFeeCategoryId = (this.newFeeAmount != null && this.newFeeAmount.compareTo(BigDecimal.ZERO) > 0)
+                ? newFeeCategoryId
+                : null;
         this.newDate = (newDate == null) ? LocalDate.now() : newDate;
         this.newNote = (newNote == null) ? "" : newNote.trim();
     }
@@ -60,6 +69,10 @@ public final class UpdateTransactionRequestDTO {
     // region Getters
     public UUID getTransactionId() {
         return this.transactionId;
+    }
+
+    public UUID getNewWalletId() {
+        return this.newWalletId;
     }
 
     public BigDecimal getNewAmount() {
@@ -87,7 +100,7 @@ public final class UpdateTransactionRequestDTO {
     }
 
     public boolean hasFee() {
-        return this.newFeeAmount.compareTo(BigDecimal.ZERO) > 0;
+        return this.newFeeAmount != null && this.newFeeAmount.compareTo(BigDecimal.ZERO) > 0;
     }
     // endregion
 
@@ -101,11 +114,12 @@ public final class UpdateTransactionRequestDTO {
             return false;
         }
         return Objects.equals(this.transactionId, that.transactionId)
-                && (this.newAmount.compareTo(that.newAmount) == 0)
+                && Objects.equals(this.newWalletId, that.newWalletId)
+                && sameBigDecimal(this.newAmount, that.newAmount)
                 && Objects.equals(this.newDate, that.newDate)
                 && Objects.equals(this.newCategoryId, that.newCategoryId)
                 && Objects.equals(this.newNote, that.newNote)
-                && (this.newFeeAmount.compareTo(that.newFeeAmount) == 0)
+                && sameBigDecimal(this.newFeeAmount, that.newFeeAmount)
                 && Objects.equals(this.newFeeCategoryId, that.newFeeCategoryId);
     }
 
@@ -113,11 +127,12 @@ public final class UpdateTransactionRequestDTO {
     public int hashCode() {
         return Objects.hash(
                 this.transactionId,
-                this.newAmount.stripTrailingZeros(),
+                this.newWalletId,
+                normalizeForHash(this.newAmount),
                 this.newDate,
                 this.newCategoryId,
                 this.newNote,
-                this.newFeeAmount.stripTrailingZeros(),
+                normalizeForHash(this.newFeeAmount),
                 this.newFeeCategoryId
         );
     }
@@ -126,6 +141,7 @@ public final class UpdateTransactionRequestDTO {
     public String toString() {
         return "UpdateTransactionRequestDTO{" +
                 "transactionId=" + this.transactionId +
+                ", newWalletId=" + this.newWalletId +
                 ", newAmount=" + this.newAmount +
                 ", newDate=" + this.newDate +
                 ", newCategoryId=" + this.newCategoryId +
@@ -133,6 +149,25 @@ public final class UpdateTransactionRequestDTO {
                 ", newFeeAmount=" + this.newFeeAmount +
                 ", newFeeCategoryId=" + this.newFeeCategoryId +
                 '}';
+    }
+
+    private static boolean sameBigDecimal(BigDecimal left, BigDecimal right) {
+        if (left == right) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return false;
+        }
+        return left.compareTo(right) == 0;
+    }
+
+    private static BigDecimal normalizeForHash(BigDecimal value) {
+        if (value == null) {
+            return null;
+        }
+        return (value.compareTo(BigDecimal.ZERO) == 0)
+                ? BigDecimal.ZERO
+                : value.stripTrailingZeros();
     }
     // endregion
 }

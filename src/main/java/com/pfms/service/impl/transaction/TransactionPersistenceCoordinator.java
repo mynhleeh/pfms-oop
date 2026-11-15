@@ -12,6 +12,8 @@ import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
 import com.pfms.service.impl.common.RollbackSupport;
 
+import java.util.Objects;
+
 /**
  * Bộ điều phối nội bộ lưu trữ hai pha (Two-Phase Persistence) cho giao dịch thu chi.
  * Đảm bảo tính nhất quán dữ liệu giữa bảng giao dịch và số dư ví, tự động hoàn nguyên khi lưu trữ thất bại.
@@ -45,7 +47,8 @@ final class TransactionPersistenceCoordinator {
     static void persistUpdateWithRollback(
             TransactionRepository transactionRepository,
             WalletRepository walletRepository,
-            Wallet wallet,
+            Wallet currentWallet,
+            Wallet newWallet,
             IncomeExpenseTransaction transaction,
             Category newCategory,
             Money newAmount,
@@ -53,22 +56,50 @@ final class TransactionPersistenceCoordinator {
             String newNote,
             TransactionFee newFee) {
 
-        Wallet walletSnapshot = wallet.copy();
-        Category oldCategory = transaction.getCategory();
-        Money oldAmount = transaction.getAmount();
-        TransactionDate oldDate = transaction.getTransactionDate();
-        String oldNote = transaction.getNote();
-        TransactionFee oldFee = transaction.getFee().orElse(null);
+        Objects.requireNonNull(currentWallet, "Ví hiện tại không được để null");
+        Objects.requireNonNull(newWallet, "Ví mới không được để null");
 
-        transaction.updateDetails(wallet, newCategory, newAmount, newDate, newNote, newFee);
+        if (Objects.equals(currentWallet.getId(), newWallet.getId())) {
+            Wallet walletSnapshot = currentWallet.copy();
+            IncomeExpenseTransaction transactionSnapshot = snapshotTransaction(transaction, currentWallet);
 
-        executeTwoPhasePersistence(
-                walletRepository,
-                () -> transactionRepository.save(transaction),
-                () -> transaction.updateDetails(wallet, oldCategory, oldAmount, oldDate, oldNote, oldFee),
-                () -> transactionRepository.save(transaction),
-                wallet,
-                walletSnapshot);
+            transaction.updateDetails(currentWallet, currentWallet, newCategory, newAmount, newDate, newNote, newFee);
+
+            executeTwoPhasePersistence(
+                    walletRepository,
+                    () -> transactionRepository.save(transaction),
+                    () -> rollbackInMemoryUpdate(transaction, transactionSnapshot, currentWallet),
+                    () -> transactionRepository.save(transactionSnapshot),
+                    currentWallet,
+                    walletSnapshot);
+            return;
+        }
+
+        Wallet currentWalletSnapshot = currentWallet.copy();
+        Wallet newWalletSnapshot = newWallet.copy();
+        IncomeExpenseTransaction transactionSnapshot = snapshotTransaction(transaction, currentWallet);
+
+        transaction.updateDetails(currentWallet, newWallet, newCategory, newAmount, newDate, newNote, newFee);
+
+        boolean transactionSaved = false;
+        boolean currentWalletSaved = false;
+        try {
+            transactionRepository.save(transaction);
+            transactionSaved = true;
+            walletRepository.save(currentWallet);
+            currentWalletSaved = true;
+            walletRepository.save(newWallet);
+        } catch (StorageException storageException) {
+            rollbackInMemoryUpdate(transaction, transactionSnapshot, newWallet);
+            if (currentWalletSaved) {
+                RollbackSupport.runRollbackStep(() -> walletRepository.save(currentWalletSnapshot), storageException);
+                RollbackSupport.runRollbackStep(() -> walletRepository.save(newWalletSnapshot), storageException);
+            }
+            if (transactionSaved) {
+                RollbackSupport.runRollbackStep(() -> transactionRepository.save(transactionSnapshot), storageException);
+            }
+            throw storageException;
+        }
     }
 
     static void persistDeletionWithRollback(
@@ -78,12 +109,12 @@ final class TransactionPersistenceCoordinator {
             Wallet wallet) {
 
         Wallet walletSnapshot = wallet.copy();
-        revertTransactionBalance(transaction, wallet);
+        transaction.revertFromWallet(wallet);
 
         executeTwoPhasePersistence(
                 walletRepository,
                 () -> transactionRepository.deleteById(transaction.getTransactionId()),
-                transaction::applyToWallet,
+                () -> restoreRevertedInMemoryWallet(transaction, wallet),
                 () -> transactionRepository.save(transaction),
                 wallet,
                 walletSnapshot);
@@ -91,21 +122,6 @@ final class TransactionPersistenceCoordinator {
     // endregion
 
     // region Helpers
-    private static void revertTransactionBalance(IncomeExpenseTransaction transaction, Wallet wallet) {
-        transaction.revertFromWallet();
-        if (transaction.getWallet() != wallet) {
-            Money fee = transaction.getFee().map(TransactionFee::getAmount).orElse(Money.ZERO);
-            if (fee.isPositive()) {
-                wallet.credit(fee);
-            }
-            if (transaction.getTransactionType() == TransactionType.INCOME) {
-                wallet.debit(transaction.getAmount());
-            } else if (transaction.getTransactionType() == TransactionType.EXPENSE) {
-                wallet.credit(transaction.getAmount());
-            }
-        }
-    }
-
     private static void executeTwoPhasePersistence(
             WalletRepository walletRepository,
             Runnable primaryStorageAction,
@@ -131,6 +147,53 @@ final class TransactionPersistenceCoordinator {
             }
             RollbackSupport.runRollbackStep(() -> walletRepository.save(walletSnapshot), storageException);
             throw storageException;
+        }
+    }
+
+    private static IncomeExpenseTransaction snapshotTransaction(
+            IncomeExpenseTransaction transaction, Wallet currentWallet) {
+        return IncomeExpenseTransaction.reconstitute(
+                transaction.getTransactionId(),
+                transaction.getTransactionType(),
+                currentWallet != null ? currentWallet : transaction.getWallet(),
+                transaction.getCategory(),
+                transaction.getAmount(),
+                transaction.getTransactionDate(),
+                transaction.getNote(),
+                transaction.getFee().orElse(null),
+                transaction.getCreatedAt());
+    }
+
+    private static void rollbackInMemoryUpdate(
+            IncomeExpenseTransaction transaction,
+            IncomeExpenseTransaction transactionSnapshot,
+            Wallet newWallet) {
+        try {
+            transaction.revertFromWallet(newWallet);
+            transaction.restoreFromSnapshot(transactionSnapshot);
+            transaction.applyToWallet();
+        } catch (RuntimeException ignore) {
+        }
+    }
+
+    private static void restoreRevertedInMemoryWallet(IncomeExpenseTransaction transaction, Wallet wallet) {
+        if (wallet == null) {
+            return;
+        }
+        Money feeAmount = transaction.getFee().map(TransactionFee::getAmount).orElse(Money.ZERO);
+        if (transaction.getTransactionType() == TransactionType.INCOME) {
+            wallet.credit(transaction.getAmount());
+            if (feeAmount.isPositive()) {
+                wallet.debit(feeAmount);
+            }
+        } else if (transaction.getTransactionType() == TransactionType.EXPENSE) {
+            wallet.debit(transaction.getAmount());
+            if (feeAmount.isPositive()) {
+                wallet.debit(feeAmount);
+            }
+        }
+        if (transaction.getWallet() != null && transaction.getWallet() != wallet) {
+            restoreRevertedInMemoryWallet(transaction, transaction.getWallet());
         }
     }
     // endregion

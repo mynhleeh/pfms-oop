@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -128,6 +129,26 @@ class ExportBackupResponseDTOTest {
             assertTrue(str.contains("fileSizeBytes=100"));
             assertTrue(str.contains("totalRecordCount=11"));
             assertTrue(str.contains("scope='FULL'"));
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa scope không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeScopeWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                ExportBackupResponseDTO dto = new ExportBackupResponseDTO(
+                        "C:/backups/pfms_txns.json",
+                        51200L,
+                        LocalDateTime.of(2026, 11, 10, 14, 30),
+                        "transactions",
+                        0, 0, 75, 0
+                );
+
+                assertEquals("TRANSACTIONS", dto.getScope());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

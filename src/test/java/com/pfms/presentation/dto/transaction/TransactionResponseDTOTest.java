@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -380,6 +381,32 @@ class TransactionResponseDTOTest {
             assertTrue(str.contains("Ăn uống"));
             assertTrue(str.contains("120000"));
             assertTrue(str.contains("880000"));
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa transactionType không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeTransactionTypeWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                TransactionResponseDTO dto = new TransactionResponseDTO(
+                        UUID.randomUUID(),
+                        UUID.randomUUID(),
+                        "Ví Tiền mặt",
+                        UUID.randomUUID(),
+                        "Lương",
+                        new BigDecimal("120000"),
+                        "income",
+                        LocalDate.of(2026, 11, 10),
+                        "Lương tháng",
+                        new BigDecimal("880000"),
+                        LocalDateTime.of(2026, 11, 10, 14, 30)
+                );
+
+                assertEquals("INCOME", dto.getTransactionType());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -230,6 +231,24 @@ class CategoryShareResponseDTOTest {
             assertEquals(a, b);
             assertEquals(a.hashCode(), b.hashCode());
             assertNotEquals(a, c);
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa status không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeStatusWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                CategoryShareResponseDTO dto = new CategoryShareResponseDTO(
+                        UUID.randomUUID(), "Ăn uống", "active",
+                        new BigDecimal("100"), new BigDecimal("20.00"),
+                        null, null, null, null, false
+                );
+
+                assertEquals("ACTIVE", dto.getStatus());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

@@ -86,28 +86,34 @@ public class TransactionServiceImpl implements TransactionService {
         validateUpdateRequest(request);
 
         IncomeExpenseTransaction transaction = loadIncomeExpenseOrThrow(request.getTransactionId());
-        Wallet wallet = EntityLookupSupport.loadActiveWallet(walletRepository, transaction.getWallet().getId());
-        Category newCategory = EntityLookupSupport.loadActiveCategory(categoryRepository, request.getNewCategoryId());
+        Wallet currentWallet = EntityLookupSupport.loadActiveWallet(walletRepository, transaction.getWallet().getId());
+
+        UUID targetWalletId = request.getNewWalletId() != null ? request.getNewWalletId() : currentWallet.getId();
+        Wallet targetWallet = Objects.equals(targetWalletId, currentWallet.getId())
+                ? currentWallet
+                : EntityLookupSupport.loadActiveWallet(walletRepository, targetWalletId);
+
+        UUID existingCategoryId = transaction.getCategory().getCategoryId();
+        Category newCategory = Objects.equals(existingCategoryId, request.getNewCategoryId())
+                ? EntityLookupSupport.findEntityOrThrow(categoryRepository, request.getNewCategoryId(), EntityLookupSupport.LABEL_CATEGORY)
+                : EntityLookupSupport.loadActiveCategory(categoryRepository, request.getNewCategoryId());
+
         if (newCategory.getTransactionType() != transaction.getTransactionType()) {
             throw new BusinessException(
                     ErrorCode.ERR_CAT_001, "Loại danh mục mới không tương thích với loại giao dịch.");
         }
 
         Money newAmount = Money.of(request.getNewAmount());
-        Money newFeeAmount = (request.getNewFeeAmount() != null) ? Money.of(request.getNewFeeAmount()) : Money.ZERO;
         TransactionDate newDate = TransactionDate.ofOrToday(request.getNewDate());
         String newNote = Note.of(request.getNewNote(), "Ghi chú giao dịch").getValue();
-        Category newFeeCategory = EntityLookupSupport.resolveActiveExpenseFeeCategory(
-                categoryRepository, newFeeAmount, request.getNewFeeCategoryId());
-        TransactionFee newFee = newFeeAmount.isPositive()
-                ? TransactionFactory.createFee(transaction.getTransactionId(), newFeeAmount, wallet, newFeeCategory)
-                : null;
+
+        TransactionFee newFee = resolveNewFee(request, transaction, targetWallet);
 
         TransactionPersistenceCoordinator.persistUpdateWithRollback(
-                transactionRepository, walletRepository, wallet, transaction,
+                transactionRepository, walletRepository, currentWallet, targetWallet, transaction,
                 newCategory, newAmount, newDate, newNote, newFee);
 
-        return TransactionQuerySupport.toResponseDTO(transaction, wallet, newCategory, categoryRepository);
+        return TransactionQuerySupport.toResponseDTO(transaction, targetWallet, newCategory, categoryRepository);
     }
 
     @Override
@@ -155,9 +161,47 @@ public class TransactionServiceImpl implements TransactionService {
     private void validateUpdateRequest(UpdateTransactionRequestDTO request) {
         Objects.requireNonNull(request, "Yêu cầu cập nhật giao dịch không được để null");
         Objects.requireNonNull(request.getTransactionId(), "Mã giao dịch không được để null");
+        Objects.requireNonNull(request.getNewWalletId(), "Mã ví mới không được để null");
         Objects.requireNonNull(request.getNewCategoryId(), "Mã danh mục mới không được để null");
         EntityLookupSupport.validateAmountAndFee(
                 request.getNewAmount(), ErrorCode.ERR_FIN_001, request.getNewFeeAmount(), request.getNewFeeCategoryId());
+    }
+
+    private TransactionFee resolveNewFee(
+            UpdateTransactionRequestDTO request,
+            IncomeExpenseTransaction transaction,
+            Wallet targetWallet) {
+
+        if (request.getNewFeeAmount() == null) {
+            return transaction.getFee()
+                    .map(existingFee -> TransactionFactory.createFee(
+                            transaction.getTransactionId(),
+                            existingFee.getAmount(),
+                            targetWallet,
+                            existingFee.getCategory()))
+                    .orElse(null);
+        }
+
+        Money newFeeAmount = Money.of(request.getNewFeeAmount());
+        if (!newFeeAmount.isPositive()) {
+            return null;
+        }
+
+        Category feeCategory;
+        if (transaction.getFee().isPresent()
+                && Objects.equals(request.getNewFeeCategoryId(), transaction.getFee().get().getCategory().getCategoryId())) {
+            feeCategory = EntityLookupSupport.findEntityOrThrow(
+                    categoryRepository, request.getNewFeeCategoryId(), EntityLookupSupport.LABEL_FEE_CATEGORY);
+            if (feeCategory.getTransactionType() != TransactionType.EXPENSE) {
+                throw new BusinessException(ErrorCode.ERR_FEE_003);
+            }
+        } else {
+            feeCategory = EntityLookupSupport.resolveActiveExpenseFeeCategory(
+                    categoryRepository, newFeeAmount, request.getNewFeeCategoryId());
+        }
+
+        return TransactionFactory.createFee(
+                transaction.getTransactionId(), newFeeAmount, targetWallet, feeCategory);
     }
 
     private IncomeExpenseTransaction loadIncomeExpenseOrThrow(UUID transactionId) {

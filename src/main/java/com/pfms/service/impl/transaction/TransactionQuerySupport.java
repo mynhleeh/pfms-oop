@@ -20,6 +20,7 @@ import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -144,12 +145,13 @@ final class TransactionQuerySupport {
             return false;
         }
         if (!request.getCategoryIds().isEmpty()
-                && !request.getCategoryIds().contains(transaction.getCategory().getCategoryId())) {
+                && !request.getCategoryIds().contains(transaction.getCategory().getCategoryId())
+                && !request.getCategoryIds().contains(transaction.getCategory().getNeedGroupId())) {
             return false;
         }
         return request.getKeyword() == null || request.getKeyword().isEmpty()
                 || (transaction.getNote() != null
-                && transaction.getNote().toLowerCase().contains(request.getKeyword().toLowerCase()));
+                && transaction.getNote().toLowerCase(Locale.ROOT).contains(request.getKeyword().toLowerCase(Locale.ROOT)));
     }
 
     private static List<TransactionResponseDTO> toPageItems(

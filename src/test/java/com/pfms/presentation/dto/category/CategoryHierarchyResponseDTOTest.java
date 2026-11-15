@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -169,6 +170,27 @@ class CategoryHierarchyResponseDTOTest {
             assertTrue(str.contains(sampleNeedGroupId.toString()));
             assertTrue(str.contains("Ăn uống"));
             assertTrue(str.contains("EXPENSE"));
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa ASCII không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeUppercaseWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                CategoryHierarchyResponseDTO dto = new CategoryHierarchyResponseDTO(
+                        "income",
+                        UUID.randomUUID(),
+                        "Thu nhập",
+                        "active",
+                        List.of()
+                );
+
+                assertEquals("INCOME", dto.getTransactionType());
+                assertEquals("ACTIVE", dto.getNeedGroupStatus());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

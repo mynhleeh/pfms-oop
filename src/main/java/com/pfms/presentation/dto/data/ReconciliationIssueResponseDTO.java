@@ -1,5 +1,6 @@
 package com.pfms.presentation.dto.data;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -28,7 +29,7 @@ public final class ReconciliationIssueResponseDTO {
 
         this.severity = (severity == null || severity.trim().isEmpty())
                 ? "INFO"
-                : severity.trim().toUpperCase();
+                : severity.trim().toUpperCase(Locale.ROOT);
         this.ruleCode = (ruleCode == null) ? "" : ruleCode.trim();
         this.issueType = (issueType == null) ? "" : issueType.trim();
         this.message = (message == null) ? "" : message.trim();

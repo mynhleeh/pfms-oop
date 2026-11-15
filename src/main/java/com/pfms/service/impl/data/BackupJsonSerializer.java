@@ -80,7 +80,8 @@ final class BackupJsonSerializer {
             appendField(buf, "currentBalance", formatMoney(wallet.getCurrentBalance()), true);
             appendField(buf, "status", wallet.getStatus().name(), true);
             appendField(buf, "isDefault", wallet.isDefault(), true);
-            appendField(buf, "note", wallet.getNote(), false);
+            appendField(buf, "note", wallet.getNote(), true);
+            appendField(buf, "createdAt", wallet.getCreatedAt(), false);
         });
     }
 
@@ -91,7 +92,8 @@ final class BackupJsonSerializer {
             appendField(buf, "flowType", group.getTransactionType().name(), true);
             appendField(buf, "groupStatus", group.getStatus().name(), true);
             appendField(buf, "icon", group.getIcon(), true);
-            appendField(buf, "color", group.getColor(), false);
+            appendField(buf, "color", group.getColor(), true);
+            appendField(buf, "createdAt", group.getCreatedAt(), false);
         });
     }
 
@@ -103,7 +105,8 @@ final class BackupJsonSerializer {
             appendField(buf, "flowType", category.getTransactionType().name(), true);
             appendField(buf, "status", category.getStatus().name(), true);
             appendField(buf, "icon", category.getIcon(), true);
-            appendField(buf, "color", category.getColor(), false);
+            appendField(buf, "color", category.getColor(), true);
+            appendField(buf, "createdAt", category.getCreatedAt(), false);
         });
     }
 
@@ -113,6 +116,7 @@ final class BackupJsonSerializer {
             appendField(buf, "amount", formatMoney(txn.getAmount()), true);
             appendField(buf, "transactionDate", txn.getTransactionDate().getIsoString(), true);
             appendField(buf, "note", txn.getNote(), true);
+            appendField(buf, "createdAt", txn.getCreatedAt(), true);
             appendTransactionSubtypeFields(buf, txn);
             appendFeeJson(buf, txn.getFee().orElse(null));
         });
@@ -153,7 +157,8 @@ final class BackupJsonSerializer {
             appendField(buf, "actualBalance", formatMoney(adj.getActualBalance()), true);
             appendField(buf, "difference", formatMoney(adj.getDifference()), true);
             appendField(buf, "adjustedAt", adj.getAdjustedAt().getIsoString(), true);
-            appendField(buf, "reason", adj.getReason(), false);
+            appendField(buf, "reason", adj.getReason(), true);
+            appendField(buf, "createdAt", adj.getCreatedAt(), false);
         });
     }
 

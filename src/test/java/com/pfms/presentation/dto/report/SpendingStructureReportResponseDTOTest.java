@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -247,6 +248,26 @@ class SpendingStructureReportResponseDTOTest {
             assertEquals(a, b);
             assertEquals(a.hashCode(), b.hashCode());
             assertNotEquals(a, c);
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa transactionType không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeTransactionTypeWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                SpendingStructureReportResponseDTO dto = new SpendingStructureReportResponseDTO(
+                        "income",
+                        LocalDate.of(2026, 1, 1),
+                        LocalDate.of(2026, 1, 31),
+                        new BigDecimal("1500000"),
+                        null, null, null, false, List.of()
+                );
+
+                assertEquals("INCOME", dto.getTransactionType());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

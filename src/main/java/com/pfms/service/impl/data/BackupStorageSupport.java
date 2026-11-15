@@ -12,11 +12,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
- * Bộ hỗ trợ nội bộ kiểm tra đường dẫn và đọc ghi tệp sao lưu an toàn theo chuẩn UTF-8.
+ * Bộ hỗ trợ nội bộ kiểm tra đường dẫn thư mục/tệp và đọc ghi tệp sao lưu an toàn theo chuẩn UTF-8.
  */
 final class BackupStorageSupport {
+
+    // region Constants
+    private static final DateTimeFormatter EXPORT_TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+    private static final String UTF8_BOM = "\uFEFF";
+    // endregion
 
     // region Constructors
     private BackupStorageSupport() {
@@ -25,17 +33,43 @@ final class BackupStorageSupport {
     // endregion
 
     // region Operations
-    static Path resolveWritableTargetPath(String destinationPath) {
-        if (destinationPath == null || destinationPath.trim().isEmpty()) {
-            throw new StorageException("Đường dẫn lưu trữ đích không hợp lệ hoặc rỗng",
+    static Path resolveWritableTargetPath(String destinationDirectoryPath, String scope) {
+        return resolveWritableTargetPath(destinationDirectoryPath, scope, LocalDateTime.now());
+    }
+
+    static Path resolveWritableTargetPath(
+            String destinationDirectoryPath,
+            String scope,
+            LocalDateTime exportedAt) {
+        if (destinationDirectoryPath == null || destinationDirectoryPath.trim().isEmpty()) {
+            throw new StorageException("Đường dẫn thư mục lưu trữ đích không hợp lệ hoặc rỗng",
                     new IllegalArgumentException("destinationPath cannot be blank"));
         }
-        Path targetPath = normalizePath(destinationPath);
-        if (Files.exists(targetPath) && Files.isDirectory(targetPath)) {
-            throw new StorageException("Đường dẫn lưu trữ phải là tệp, không được là thư mục: " + destinationPath,
-                    new IllegalArgumentException("destinationPath is a directory"));
+        Path directoryPath = normalizePath(destinationDirectoryPath);
+        if (Files.exists(directoryPath)) {
+            if (!Files.isDirectory(directoryPath)) {
+                throw new StorageException(
+                        "Đường dẫn xuất sao lưu phải là thư mục hợp lệ, không được là tệp: "
+                                + destinationDirectoryPath,
+                        new IllegalArgumentException("destinationPath is not a directory"));
+            }
+        } else if (hasFileExtension(directoryPath)) {
+            throw new StorageException(
+                    "Đường dẫn xuất sao lưu phải là thư mục hợp lệ, không được truyền tên tệp: "
+                            + destinationDirectoryPath,
+                    new IllegalArgumentException("destinationPath appears to be a file path"));
         }
-        return targetPath;
+
+        String normalizedScope = (scope == null || scope.trim().isEmpty())
+                ? "full"
+                : scope.trim().toLowerCase(Locale.ROOT);
+        LocalDateTime effectiveTimestamp = (exportedAt == null) ? LocalDateTime.now() : exportedAt;
+        String fileName = "pfms_export_"
+                + normalizedScope
+                + "_"
+                + EXPORT_TIMESTAMP_FORMATTER.format(effectiveTimestamp)
+                + ".json";
+        return directoryPath.resolve(fileName);
     }
 
     static Path resolveReadableBackupPath(String backupFilePath) {
@@ -48,12 +82,20 @@ final class BackupStorageSupport {
             throw new StorageException("Tệp sao lưu không tồn tại hoặc không phải là tệp hợp lệ: " + backupFilePath,
                     new FileNotFoundException(backupFilePath));
         }
+        if (!Files.isReadable(backupPath)) {
+            throw new StorageException("Không có quyền đọc tệp sao lưu: " + backupFilePath,
+                    new IOException("File is not readable: " + backupFilePath));
+        }
         return backupPath;
     }
 
     static String readUtf8String(Path backupPath) {
         try {
-            return Files.readString(backupPath, StandardCharsets.UTF_8);
+            String content = Files.readString(backupPath, StandardCharsets.UTF_8);
+            if (content.startsWith(UTF8_BOM)) {
+                return content.substring(UTF8_BOM.length());
+            }
+            return content;
         } catch (IOException e) {
             throw new StorageException("Không thể đọc tệp sao lưu: " + backupPath, e);
         }
@@ -115,6 +157,16 @@ final class BackupStorageSupport {
             Files.deleteIfExists(path);
         } catch (IOException ignored) {
         }
+    }
+
+    private static boolean hasFileExtension(Path directoryPath) {
+        Path lastSegment = directoryPath.getFileName();
+        if (lastSegment == null) {
+            return false;
+        }
+        String name = lastSegment.toString();
+        int lastDotIndex = name.lastIndexOf('.');
+        return lastDotIndex > 0 && lastDotIndex < name.length() - 1;
     }
     // endregion
 }

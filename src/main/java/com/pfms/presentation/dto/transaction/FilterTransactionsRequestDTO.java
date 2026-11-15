@@ -3,11 +3,14 @@ package com.pfms.presentation.dto.transaction;
 import com.pfms.common.util.PaginationUtils;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.*;
 
 /**
- * DTO đóng gói bộ tiêu chí tra cứu và lọc sổ giao dịch thu chi kèm thông số phân trang (UC-TXN-02).
- * Hỗ trợ lọc theo khoảng thời gian, tập các ví, loại thu chi, tập danh mục và từ khóa tìm kiếm.
+ * DTO đóng gói bộ tiêu chí tra cứu và lọc sổ giao dịch thu chi kèm thông số
+ * phân trang (UC-TXN-02).
+ * Hỗ trợ lọc theo khoảng thời gian, tập các ví, loại thu chi, tập danh mục và
+ * từ khóa tìm kiếm.
  */
 public final class FilterTransactionsRequestDTO {
 
@@ -55,23 +58,27 @@ public final class FilterTransactionsRequestDTO {
             int pageNumber,
             int pageSize) {
 
-        if (transactionType != null && !transactionType.trim().isEmpty()) {
-            this.transactionType = transactionType.trim().toUpperCase();
+        if (transactionType != null) {
+            String normalizedType = transactionType.trim().toUpperCase(Locale.ROOT);
+            this.transactionType = (normalizedType.isEmpty() || "ALL".equals(normalizedType))
+                    ? null
+                    : normalizedType;
         } else {
             this.transactionType = null;
         }
 
         this.startDate = startDate;
         this.endDate = endDate;
-        this.walletIds = (walletIds == null)
-                ? Collections.emptySet()
-                : Collections.unmodifiableSet(new HashSet<>(walletIds));
-        this.categoryIds = (categoryIds == null)
-                ? Collections.emptySet()
-                : Collections.unmodifiableSet(new HashSet<>(categoryIds));
+        this.walletIds = copyNonNullSet(walletIds);
+        this.categoryIds = copyNonNullSet(categoryIds);
         this.keyword = (keyword == null) ? "" : keyword.trim();
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
+    }
+
+    public static FilterTransactionsRequestDTO currentMonth() {
+        YearMonth currentMonth = YearMonth.now();
+        return new FilterTransactionsRequestDTO(currentMonth.atDay(1), currentMonth.atEndOfMonth(), null);
     }
     // endregion
 
@@ -158,8 +165,7 @@ public final class FilterTransactionsRequestDTO {
                 this.categoryIds,
                 this.keyword,
                 this.pageNumber,
-                this.pageSize
-        );
+                this.pageSize);
     }
 
     @Override
@@ -175,6 +181,18 @@ public final class FilterTransactionsRequestDTO {
                 ", pageSize=" + this.pageSize +
                 '}';
     }
+
+    private static Set<UUID> copyNonNullSet(Set<UUID> source) {
+        if (source == null || source.isEmpty()) {
+            return Collections.emptySet();
+        }
+        Set<UUID> copy = new HashSet<>(source.size());
+        for (UUID id : source) {
+            if (id != null) {
+                copy.add(id);
+            }
+        }
+        return copy.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(copy);
+    }
     // endregion
 }
-

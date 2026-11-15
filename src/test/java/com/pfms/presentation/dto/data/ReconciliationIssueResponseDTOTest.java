@@ -7,6 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Locale;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Kiểm thử ReconciliationIssueResponseDTO")
@@ -134,6 +136,22 @@ class ReconciliationIssueResponseDTOTest {
             assertTrue(str.contains("message='Lệch số dư'"));
             assertTrue(str.contains("affectedEntityId='w-1'"));
             assertTrue(str.contains("recommendation='Kiểm kê'"));
+        }
+
+        @Test
+        @DisplayName("Chuẩn hóa severity không phụ thuộc Locale mặc định (tr-TR)")
+        void shouldNormalizeSeverityWithLocaleRoot() {
+            Locale previous = Locale.getDefault();
+            try {
+                Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                ReconciliationIssueResponseDTO dto = new ReconciliationIssueResponseDTO(
+                        "info", "BR-FIN-02", "WALLET_BALANCE", "Thông báo", "w-1", "Kiểm tra"
+                );
+
+                assertEquals("INFO", dto.getSeverity());
+            } finally {
+                Locale.setDefault(previous);
+            }
         }
     }
 }

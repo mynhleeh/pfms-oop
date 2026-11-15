@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -133,6 +134,44 @@ class FilterTransactionsRequestDTOTest {
             assertTrue(dto.getWalletIds().isEmpty());
             assertTrue(dto.getCategoryIds().isEmpty());
         }
+
+        @Test
+        @DisplayName("Factory currentMonth khởi tạo khoảng lọc từ đầu đến cuối tháng hiện tại theo FR-TXN-03")
+        void shouldCreateCurrentMonthDefaultFilter() {
+            YearMonth before = YearMonth.now();
+            FilterTransactionsRequestDTO dto = FilterTransactionsRequestDTO.currentMonth();
+            YearMonth after = YearMonth.now();
+
+            LocalDate expectedStartMin = before.atDay(1);
+            LocalDate expectedStartMax = after.atDay(1);
+            LocalDate expectedEndMin = before.atEndOfMonth();
+            LocalDate expectedEndMax = after.atEndOfMonth();
+
+            assertNotNull(dto.getStartDate());
+            assertNotNull(dto.getEndDate());
+            assertFalse(dto.getStartDate().isBefore(expectedStartMin));
+            assertFalse(dto.getStartDate().isAfter(expectedStartMax));
+            assertFalse(dto.getEndDate().isBefore(expectedEndMin));
+            assertFalse(dto.getEndDate().isAfter(expectedEndMax));
+            assertTrue(dto.hasDateFilter());
+            assertTrue(dto.getWalletIds().isEmpty());
+            assertNull(dto.getTransactionType());
+            assertTrue(dto.getCategoryIds().isEmpty());
+            assertEquals("", dto.getKeyword());
+            assertEquals(1, dto.getPageNumber());
+            assertEquals(50, dto.getPageSize());
+        }
+
+        @ParameterizedTest(name = "Loại giao dịch \"{0}\" mang nghĩa tất cả được chuẩn hóa thành null")
+        @ValueSource(strings = {"ALL", "all", "  All  "})
+        @DisplayName("Chuẩn hóa transactionType ALL (không phân biệt hoa thường) về null")
+        void shouldNormalizeAllTransactionTypeToNull(String allType) {
+            FilterTransactionsRequestDTO dto = new FilterTransactionsRequestDTO(
+                    null, null, null, allType, null, "", 1, 50);
+
+            assertNull(dto.getTransactionType());
+            assertFalse(dto.hasTypeFilter());
+        }
     }
 
     @Nested
@@ -163,6 +202,26 @@ class FilterTransactionsRequestDTOTest {
 
             assertThrows(UnsupportedOperationException.class, () -> dto.getWalletIds().add(wallet2));
             assertThrows(UnsupportedOperationException.class, () -> dto.getCategoryIds().clear());
+        }
+
+        @Test
+        @DisplayName("Loại bỏ phần tử null khi sao chép phòng thủ walletIds và categoryIds")
+        void shouldIgnoreNullElementsInsideWalletAndCategorySets() {
+            Set<UUID> walletsWithNull = new HashSet<>();
+            walletsWithNull.add(wallet1);
+            walletsWithNull.add(null);
+
+            Set<UUID> categoriesOnlyNull = new HashSet<>();
+            categoriesOnlyNull.add(null);
+
+            FilterTransactionsRequestDTO dto = new FilterTransactionsRequestDTO(
+                    null, null, walletsWithNull, null, categoriesOnlyNull, "", 1, 50);
+
+            assertEquals(Set.of(wallet1), dto.getWalletIds());
+            assertFalse(dto.getWalletIds().contains(null));
+            assertTrue(dto.hasWalletFilter());
+            assertTrue(dto.getCategoryIds().isEmpty());
+            assertFalse(dto.hasCategoryFilter());
         }
     }
 
