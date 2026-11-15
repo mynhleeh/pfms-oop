@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 
 /**
  * Thanh điều hướng bên trái (BorderLayout.WEST, chiều rộng 220px).
- * Hiển thị khối logo/tiêu đề và 7 nút bấm chuyển đổi giữa các phân hệ theo bảng màu Luxury Black & Gold.
+ * Hiển thị khối logo/tiêu đề và 7 nút bấm chuyển đổi giữa các phân hệ theo bảng màu Luxury Black &amp; Gold.
  */
 public class SidebarPanel extends JPanel {
 

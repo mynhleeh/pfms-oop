@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * Bộ điều phối giao diện đồ họa cho phân hệ Báo cáo & Thống kê tài chính (REP).
+ * Bộ điều phối giao diện đồ họa cho phân hệ Báo cáo &amp; Thống kê tài chính (REP).
  * Tiếp nhận yêu cầu báo cáo dòng tiền và cơ cấu chi tiêu, tích hợp
  * ReportExporter (GoF Strategy) để kết xuất dữ liệu.
  */

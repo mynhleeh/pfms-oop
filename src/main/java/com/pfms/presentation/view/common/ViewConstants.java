@@ -5,7 +5,7 @@ import java.awt.Font;
 
 /**
  * Hằng số cấu hình chuẩn cho Tầng Trình diễn (Presentation Layer).
- * Bao gồm kích thước cửa sổ, bảng màu giao diện phẳng Luxury Black & Gold và kiểu phông chữ hệ thống.
+ * Bao gồm kích thước cửa sổ, bảng màu giao diện phẳng Luxury Black &amp; Gold và kiểu phông chữ hệ thống.
  */
 public final class ViewConstants {
 
@@ -31,6 +31,7 @@ public final class ViewConstants {
     public static final Color COLOR_TEXT_ACTIVE = new Color(229, 192, 123);   // Champagne Gold (#E5C07B)
     public static final Color COLOR_CONTENT_BG = new Color(7, 7, 7);          // Deep Obsidian (#070707)
     public static final Color COLOR_CARD_BG = new Color(18, 18, 18);          // Onyx Card (#121212)
+    public static final Color COLOR_HEADER_BG = new Color(14, 14, 14);        // Dark Header (#0E0E0E)
     public static final Color COLOR_STATUS_BG = new Color(0, 0, 0);           // Pure Black (#000000)
     public static final Color COLOR_BORDER = new Color(34, 34, 34);           // Metallic Dark (#222222)
     public static final Color COLOR_TEXT_MAIN = new Color(250, 250, 250);     // Pearl White (#FAFAFA)
@@ -48,6 +49,8 @@ public final class ViewConstants {
     public static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 12);
     public static final Font FONT_STATUS = new Font("Segoe UI", Font.PLAIN, 11);
     public static final Font FONT_PANEL_HEADER = new Font("Segoe UI", Font.BOLD, 20);
+    public static final Font FONT_TABLE_HEADER = new Font("Segoe UI", Font.BOLD, 13);
+    public static final Font FONT_TABLE_BODY = new Font("Segoe UI", Font.PLAIN, 12);
     // endregion
 
     // region Application Strings

@@ -41,7 +41,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Hộp thoại modal ghi nhận giao dịch Thu & Chi mới (UC-TRN-01, UC-TRN-02).
+ * Hộp thoại modal ghi nhận giao dịch Thu &amp; Chi mới (UC-TRN-01, UC-TRN-02).
  */
 public class RecordTransactionDialog extends JDialog {
 
