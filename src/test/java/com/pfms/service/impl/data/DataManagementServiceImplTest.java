@@ -2,6 +2,7 @@ package com.pfms.service.impl.data;
 
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
+import com.pfms.domain.model.data.BackupPayload;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
@@ -12,10 +13,12 @@ import com.pfms.domain.model.transaction.TransferTransaction;
 import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.repository.BalanceAdjustmentRepository;
+import com.pfms.domain.repository.BackupRepository;
 import com.pfms.domain.repository.CategoryRepository;
 import com.pfms.domain.repository.NeedGroupRepository;
 import com.pfms.domain.repository.TransactionRepository;
 import com.pfms.domain.repository.WalletRepository;
+import com.pfms.infrastructure.file.FileBackupRepository;
 import com.pfms.infrastructure.memory.MemoryBalanceAdjustmentRepository;
 import com.pfms.infrastructure.memory.MemoryCategoryRepository;
 import com.pfms.infrastructure.memory.MemoryNeedGroupRepository;
@@ -55,6 +58,7 @@ class DataManagementServiceImplTest {
     private CategoryRepository categoryRepository;
     private NeedGroupRepository needGroupRepository;
     private BalanceAdjustmentRepository balanceAdjustmentRepository;
+    private BackupRepository backupRepository;
 
     private DataManagementServiceImpl service;
 
@@ -65,13 +69,15 @@ class DataManagementServiceImplTest {
         categoryRepository = new MemoryCategoryRepository();
         needGroupRepository = new MemoryNeedGroupRepository();
         balanceAdjustmentRepository = new MemoryBalanceAdjustmentRepository();
+        backupRepository = new FileBackupRepository();
 
         service = new DataManagementServiceImpl(
                 walletRepository,
                 transactionRepository,
                 categoryRepository,
                 needGroupRepository,
-                balanceAdjustmentRepository);
+                balanceAdjustmentRepository,
+                backupRepository);
     }
 
     @Nested
@@ -94,7 +100,8 @@ class DataManagementServiceImplTest {
                             transactionRepository,
                             categoryRepository,
                             needGroupRepository,
-                            balanceAdjustmentRepository));
+                            balanceAdjustmentRepository,
+                            backupRepository));
             assertTrue(ex.getMessage().contains("WalletRepository không được để null"));
         }
 
@@ -108,7 +115,8 @@ class DataManagementServiceImplTest {
                             null,
                             categoryRepository,
                             needGroupRepository,
-                            balanceAdjustmentRepository));
+                            balanceAdjustmentRepository,
+                            backupRepository));
             assertTrue(ex.getMessage().contains("TransactionRepository không được để null"));
         }
 
@@ -122,7 +130,8 @@ class DataManagementServiceImplTest {
                             transactionRepository,
                             null,
                             needGroupRepository,
-                            balanceAdjustmentRepository));
+                            balanceAdjustmentRepository,
+                            backupRepository));
             assertTrue(ex.getMessage().contains("CategoryRepository không được để null"));
         }
 
@@ -136,7 +145,8 @@ class DataManagementServiceImplTest {
                             transactionRepository,
                             categoryRepository,
                             null,
-                            balanceAdjustmentRepository));
+                            balanceAdjustmentRepository,
+                            backupRepository));
             assertTrue(ex.getMessage().contains("NeedGroupRepository không được để null"));
         }
 
@@ -150,8 +160,24 @@ class DataManagementServiceImplTest {
                             transactionRepository,
                             categoryRepository,
                             needGroupRepository,
-                            null));
+                            null,
+                            backupRepository));
             assertTrue(ex.getMessage().contains("BalanceAdjustmentRepository không được để null"));
+        }
+
+        @Test
+        @DisplayName("Should throw NullPointerException when BackupRepository is null")
+        void shouldThrowWhenBackupRepositoryIsNull() {
+            NullPointerException ex = assertThrows(
+                    NullPointerException.class,
+                    () -> new DataManagementServiceImpl(
+                            walletRepository,
+                            transactionRepository,
+                            categoryRepository,
+                            needGroupRepository,
+                            balanceAdjustmentRepository,
+                            null));
+            assertTrue(ex.getMessage().contains("BackupRepository không được để null"));
         }
     }
 
@@ -287,7 +313,7 @@ class DataManagementServiceImplTest {
             assertEquals(1, res.getTransactionCount());
 
             String content = Files.readString(exportedFile, StandardCharsets.UTF_8);
-            assertTrue(content.contains("\"wallets\": [\n  ]"));
+            assertTrue(content.contains("\"wallets\": []"));
             assertTrue(content.contains("\"transactions\""));
             assertTrue(content.contains("Bánh mì"));
             assertTrue(content.contains("35000.00"));
@@ -554,7 +580,7 @@ class DataManagementServiceImplTest {
                     List.of());
 
             Path backupFile = tempDir.resolve("integrity_error.json");
-            Files.writeString(backupFile, BackupJsonSerializer.toJson(payload));
+            backupRepository.writeBackup(backupFile, payload);
 
             DataCorruptionException ex = assertThrows(
                     DataCorruptionException.class,
@@ -603,7 +629,7 @@ class DataManagementServiceImplTest {
                     List.of(adj));
 
             Path backupFile = tempDir.resolve("valid_backup.json");
-            Files.writeString(backupFile, BackupJsonSerializer.toJson(payload));
+            backupRepository.writeBackup(backupFile, payload);
 
             // Execute restore
             RestoreBackupResponseDTO result = service.restoreBackupData(new RestoreBackupRequestDTO(backupFile.toString()));
@@ -674,7 +700,7 @@ class DataManagementServiceImplTest {
             BackupPayload payload = new BackupPayload(
                     List.of(), List.of(), List.of(), List.of(), List.of(adj));
             Path backupFile = tempDir.resolve("orphan_adjustment.json");
-            Files.writeString(backupFile, BackupJsonSerializer.toJson(payload), StandardCharsets.UTF_8);
+            backupRepository.writeBackup(backupFile, payload);
 
             DataCorruptionException ex = assertThrows(
                     DataCorruptionException.class,
@@ -698,7 +724,7 @@ class DataManagementServiceImplTest {
             };
 
             DataManagementServiceImpl serviceWithFlakyRepo = new DataManagementServiceImpl(
-                    walletRepository, flakyTxnRepo, categoryRepository, needGroupRepository, balanceAdjustmentRepository);
+                    walletRepository, flakyTxnRepo, categoryRepository, needGroupRepository, balanceAdjustmentRepository, backupRepository);
 
             Wallet oldWallet = new Wallet(UUID.randomUUID(), "Ví Ban Đầu", "", true);
             BalanceAdjustmentRecord oldAdj = oldWallet.adjustBalance(
@@ -731,7 +757,7 @@ class DataManagementServiceImplTest {
             BackupPayload backupPayload = new BackupPayload(
                     List.of(newWallet), List.of(newGroup), List.of(newCategory), List.of(newTxn), List.of(newAdj));
             Path backupFile = tempDir.resolve("rollback_test.json");
-            Files.writeString(backupFile, BackupJsonSerializer.toJson(backupPayload), StandardCharsets.UTF_8);
+            backupRepository.writeBackup(backupFile, backupPayload);
 
             assertThrows(StorageException.class,
                     () -> serviceWithFlakyRepo.restoreBackupData(new RestoreBackupRequestDTO(backupFile.toString())));
@@ -759,7 +785,7 @@ class DataManagementServiceImplTest {
             BackupPayload dupPayload = new BackupPayload(
                     List.of(firstWallet, secondWallet), List.of(), List.of(), List.of(), List.of());
             Path backupFile = tempDir.resolve("dup_wallet.json");
-            Files.writeString(backupFile, BackupJsonSerializer.toJson(dupPayload), StandardCharsets.UTF_8);
+            backupRepository.writeBackup(backupFile, dupPayload);
 
             DataCorruptionException ex = assertThrows(
                     DataCorruptionException.class,

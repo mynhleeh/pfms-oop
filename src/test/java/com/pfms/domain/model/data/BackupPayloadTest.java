@@ -1,4 +1,4 @@
-package com.pfms.service.impl.data;
+package com.pfms.domain.model.data;
 
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
@@ -64,9 +64,9 @@ class BackupPayloadTest {
     class ConstructorTests {
 
         @Test
-        @DisplayName("Should isolate BackupPayload as package-private inside com.pfms.service.impl.data")
-        void shouldBePackagePrivateInsideServiceDataPackage() {
-            assertFalse(Modifier.isPublic(BackupPayload.class.getModifiers()));
+        @DisplayName("Should expose BackupPayload as public final domain carrier")
+        void shouldBePublicInsideDomainDataPackage() {
+            assertTrue(Modifier.isPublic(BackupPayload.class.getModifiers()));
             assertTrue(Modifier.isFinal(BackupPayload.class.getModifiers()));
         }
 
@@ -203,4 +203,3 @@ class BackupPayloadTest {
         }
     }
 }
-

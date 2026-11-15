@@ -1,4 +1,4 @@
-package com.pfms.service.impl.data;
+package com.pfms.infrastructure.file;
 
 import com.pfms.domain.exception.StorageException;
 
@@ -56,7 +56,7 @@ final class BackupStorageSupport {
         } else if (hasFileExtension(directoryPath)) {
             throw new StorageException(
                     "Đường dẫn xuất sao lưu phải là thư mục hợp lệ, không được truyền tên tệp: "
-                            + destinationDirectoryPath,
+                                + destinationDirectoryPath,
                     new IllegalArgumentException("destinationPath appears to be a file path"));
         }
 
@@ -170,4 +170,3 @@ final class BackupStorageSupport {
     }
     // endregion
 }
-

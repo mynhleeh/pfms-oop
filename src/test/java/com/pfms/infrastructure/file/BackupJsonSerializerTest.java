@@ -1,9 +1,10 @@
-package com.pfms.service.impl.data;
+package com.pfms.infrastructure.file;
 
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
+import com.pfms.domain.model.data.BackupPayload;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.TransactionFee;
 import com.pfms.domain.model.transaction.TransactionType;
@@ -49,11 +50,11 @@ class BackupJsonSerializerTest {
         String json = BackupJsonSerializer.toJson(payload);
 
         assertNotNull(json);
-        assertTrue(json.contains("\"wallets\": [\n  ]"));
-        assertTrue(json.contains("\"needGroups\": [\n  ]"));
-        assertTrue(json.contains("\"categories\": [\n  ]"));
-        assertTrue(json.contains("\"transactions\": [\n  ]"));
-        assertTrue(json.contains("\"adjustments\": [\n  ]"));
+        assertTrue(json.contains("\"wallets\": []"));
+        assertTrue(json.contains("\"needGroups\": []"));
+        assertTrue(json.contains("\"categories\": []"));
+        assertTrue(json.contains("\"transactions\": []"));
+        assertTrue(json.contains("\"adjustments\": []"));
     }
 
     @Test
@@ -105,4 +106,3 @@ class BackupJsonSerializerTest {
         assertTrue(json.contains("\"createdAt\":"));
     }
 }
-

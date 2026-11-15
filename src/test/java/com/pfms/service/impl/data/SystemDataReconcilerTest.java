@@ -4,8 +4,10 @@ import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
+import com.pfms.domain.model.data.BackupPayload;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.Transaction;
+import com.pfms.domain.model.transaction.TransactionFee;
 import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.model.transaction.TransferTransaction;
 import com.pfms.domain.model.wallet.ActiveWalletState;
@@ -175,5 +177,56 @@ class SystemDataReconcilerTest {
         assertFalse(report.isFullyConsistent());
         assertFalse(report.isWalletBalanceConsistent());
         assertTrue(report.getIssues().stream().anyMatch(i -> "BALANCE_MISMATCH".equals(i.getIssueType())));
+    }
+
+    @Test
+    @DisplayName("reconcile(BackupPayload) should accept valid BackupPayload and return report")
+    void reconcileWithBackupPayloadShouldReturnReport() {
+        BackupPayload payload = BackupPayload.empty();
+        ReconciliationReportResponseDTO report = SystemDataReconciler.reconcile(payload);
+
+        assertNotNull(report);
+        assertTrue(report.isFullyConsistent());
+    }
+
+    @Test
+    @DisplayName("reconcile(BackupPayload) should throw NullPointerException when payload is null")
+    void reconcileWithNullBackupPayloadShouldThrowNpe() {
+        NullPointerException ex = assertThrows(
+                NullPointerException.class,
+                () -> SystemDataReconciler.reconcile((BackupPayload) null));
+        assertTrue(ex.getMessage().contains("BackupPayload không được để null"));
+    }
+
+    @Test
+    @DisplayName("reconcile should flag fee inconsistency when fee category is not of EXPENSE type in system")
+    void reconcileShouldFlagFeeWithIncomeCategory() {
+        Wallet wallet = new Wallet(UUID.randomUUID(), "Ví Chính", "", false);
+        wallet.credit(Money.of("50000.00"));
+        NeedGroup group = new NeedGroup(UUID.randomUUID(), "Chi Tiêu", TransactionType.EXPENSE, "icon", "#fff");
+        Category feeCategory = new Category(UUID.randomUUID(), "Phí Chuyển", group.getNeedGroupId(), TransactionType.EXPENSE, "icon", "#fff");
+
+        UUID txnId = UUID.randomUUID();
+        TransactionFee validDomainFee = new TransactionFee(
+                UUID.randomUUID(), txnId, Money.of("5000.00"), wallet, feeCategory);
+        IncomeExpenseTransaction txn = new IncomeExpenseTransaction(
+                txnId, TransactionType.EXPENSE, wallet, feeCategory, Money.of("45000.00"),
+                TransactionDate.of(LocalDate.of(2026, 1, 15)), "Chi có phí", validDomainFee);
+
+        // Giả lập dữ liệu hệ thống bị biến đổi: danh mục cùng UUID bị đổi sang INCOME
+        NeedGroup incomeGroup = new NeedGroup(UUID.randomUUID(), "Thu Nhập", TransactionType.INCOME, "icon", "#fff");
+        Category corruptedCategory = new Category(
+                feeCategory.getCategoryId(), "Phí Bị Sửa", incomeGroup.getNeedGroupId(), TransactionType.INCOME, "icon", "#fff");
+
+        ReconciliationReportResponseDTO report = SystemDataReconciler.reconcile(
+                List.of(wallet),
+                List.of(txn),
+                List.of(corruptedCategory),
+                List.of(group, incomeGroup),
+                Collections.emptyList());
+
+        assertFalse(report.isFullyConsistent());
+        assertFalse(report.isFeeConsistent());
+        assertTrue(report.getIssues().stream().anyMatch(i -> "FEE_INCONSISTENCY".equals(i.getIssueType())));
     }
 }

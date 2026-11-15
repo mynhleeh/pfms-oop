@@ -1,4 +1,4 @@
-package com.pfms.service.impl.data;
+package com.pfms.infrastructure.file;
 
 import com.pfms.domain.exception.DataCorruptionException;
 import com.pfms.domain.exception.ErrorCode;
@@ -6,6 +6,7 @@ import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
+import com.pfms.domain.model.data.BackupPayload;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.TransactionFee;
 import com.pfms.domain.model.transaction.TransactionType;
@@ -460,4 +461,3 @@ class BackupJsonDeserializerTest {
                 () -> BackupJsonDeserializer.fromJson(missingAdjustmentBalanceJson));
     }
 }
-

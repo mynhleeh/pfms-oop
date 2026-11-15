@@ -1,4 +1,4 @@
-package com.pfms.service.impl.data;
+package com.pfms.infrastructure.file;
 
 import com.pfms.domain.exception.StorageException;
 import org.junit.jupiter.api.DisplayName;
@@ -98,4 +98,3 @@ class BackupStorageSupportTest {
         assertEquals("{\"wallets\":[]}", BackupStorageSupport.readUtf8String(resolved));
     }
 }
-

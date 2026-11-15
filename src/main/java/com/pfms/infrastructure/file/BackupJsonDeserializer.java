@@ -1,11 +1,15 @@
-package com.pfms.service.impl.data;
+package com.pfms.infrastructure.file;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.pfms.domain.exception.DataCorruptionException;
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
 import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
+import com.pfms.domain.model.data.BackupPayload;
 import com.pfms.domain.model.transaction.IncomeExpenseTransaction;
 import com.pfms.domain.model.transaction.Transaction;
 import com.pfms.domain.model.transaction.TransactionFee;
@@ -17,12 +21,12 @@ import com.pfms.domain.model.wallet.BalanceAdjustmentRecord;
 import com.pfms.domain.model.wallet.DeletedWalletState;
 import com.pfms.domain.model.wallet.Wallet;
 import com.pfms.domain.model.wallet.WalletState;
-import com.pfms.service.impl.common.EntityLookupSupport;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -31,10 +35,13 @@ import java.util.UUID;
 import java.util.function.Function;
 
 /**
- * Bộ giải mã nội bộ chuỗi JSON sao lưu hệ thống sang cấu trúc
- * {@link BackupPayload}.
+ * Bộ giải mã nội bộ chuỗi JSON sao lưu hệ thống sang cấu trúc {@link BackupPayload}.
  */
 final class BackupJsonDeserializer {
+
+    // region Constants
+    private static final Gson GSON = new Gson();
+    // endregion
 
     // region Constructors
     private BackupJsonDeserializer() {
@@ -52,17 +59,17 @@ final class BackupJsonDeserializer {
         }
 
         try {
-            Object parsed = new SimpleJsonParser(json).parse();
-            if (!(parsed instanceof Map<?, ?> rawRoot)) {
+            JsonElement element = JsonParser.parseString(json);
+            if (!element.isJsonObject()) {
                 throw new IllegalArgumentException("JSON gốc phải là một đối tượng");
             }
-            Map<String, Object> root = (Map<String, Object>) rawRoot;
+            Map<String, Object> root = GSON.fromJson(element, Map.class);
 
             List<Wallet> wallets = parseWallets(root.get("wallets"));
             List<NeedGroup> needGroups = parseNeedGroups(root.get("needGroups"));
             List<Category> categories = parseCategories(root.get("categories"));
-            Map<UUID, Wallet> walletMap = EntityLookupSupport.indexById(wallets, Wallet::getId);
-            Map<UUID, Category> categoryMap = EntityLookupSupport.indexById(categories, Category::getCategoryId);
+            Map<UUID, Wallet> walletMap = indexById(wallets, Wallet::getId);
+            Map<UUID, Category> categoryMap = indexById(categories, Category::getCategoryId);
 
             return new BackupPayload(
                     wallets, needGroups, categories,
@@ -77,6 +84,22 @@ final class BackupJsonDeserializer {
     // endregion
 
     // region Helpers
+    private static <T, ID> Map<ID, T> indexById(List<T> items, Function<T, ID> idExtractor) {
+        if (items == null || items.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<ID, T> map = new HashMap<>(items.size());
+        for (T item : items) {
+            if (item != null) {
+                ID id = idExtractor.apply(item);
+                if (id != null) {
+                    map.put(id, item);
+                }
+            }
+        }
+        return Collections.unmodifiableMap(map);
+    }
+
     private static List<Wallet> parseWallets(Object raw) {
         return parseList(raw, "wallets", map -> {
             WalletState state = parseWalletState(requireNonBlankString(map, "status"));
@@ -132,63 +155,74 @@ final class BackupJsonDeserializer {
         if (!(raw instanceof List<?> rawList)) {
             throw new IllegalArgumentException("Trường transactions phải là mảng");
         }
-
-        List<Transaction> transactions = new ArrayList<>();
+        List<Transaction> result = new ArrayList<>();
         for (Object item : rawList) {
-            if (!(item instanceof Map<?, ?> itemMap)) {
-                throw new IllegalArgumentException("Phần tử trong transactions phải là đối tượng JSON");
+            if (!(item instanceof Map<?, ?> map)) {
+                throw new IllegalArgumentException("Mỗi giao dịch phải là đối tượng JSON");
             }
-            transactions.add(parseTransaction((Map<String, Object>) itemMap, walletMap, categoryMap));
+            Map<String, Object> m = (Map<String, Object>) map;
+            String recordType = requireNonBlankString(m, "recordType");
+            result.add(switch (recordType) {
+                case "INCOME_EXPENSE" -> parseIncomeExpense(m, walletMap, categoryMap);
+                case "TRANSFER" -> parseTransfer(m, walletMap, categoryMap);
+                default -> throw new IllegalArgumentException("recordType không hợp lệ: " + recordType);
+            });
         }
-        return transactions;
+        return result;
     }
 
-    private static Transaction parseTransaction(
-            Map<String, Object> fields,
-            Map<UUID, Wallet> walletMap,
-            Map<UUID, Category> categoryMap) {
-        UUID transactionId = requireUuid(fields, "transactionId");
-        Money amount = requireMoney(fields, "amount");
-        TransactionDate transactionDate = requireDate(fields, "transactionDate");
-        String note = getOptionalString(fields, "note");
-        LocalDateTime createdAt = requireDateTime(fields, "createdAt");
-        TransactionFee fee = parseFee(fields.get("fee"), walletMap, categoryMap);
-        String recordType = requireNonBlankString(fields, "recordType").toUpperCase(Locale.ROOT);
+    private static IncomeExpenseTransaction parseIncomeExpense(
+            Map<String, Object> m, Map<UUID, Wallet> walletMap, Map<UUID, Category> categoryMap) {
+        UUID walletId = requireUuid(m, "walletId");
+        UUID categoryId = requireUuid(m, "categoryId");
+        TransactionType type = TransactionType.fromString(requireNonBlankString(m, "transactionType"));
 
-        return switch (recordType) {
-            case "TRANSFER" -> {
-                Wallet sourceWallet = resolveWallet(
-                        walletMap, requireUuid(fields, "sourceWalletId"), "Ví nguồn tạm");
-                Wallet destinationWallet = resolveWallet(
-                        walletMap, requireUuid(fields, "destinationWalletId"), "Ví đích tạm");
-                yield TransferTransaction.reconstitute(
-                        transactionId, sourceWallet, destinationWallet,
-                        amount, transactionDate, note, fee, createdAt);
-            }
-            case "INCOME_EXPENSE" -> {
-                TransactionType transactionType = TransactionType.fromString(
-                        requireNonBlankString(fields, "transactionType"));
-                Wallet wallet = resolveWallet(walletMap, requireUuid(fields, "walletId"), "Ví tạm");
-                Category category = resolveCategory(
-                        categoryMap, requireUuid(fields, "categoryId"), "Danh mục tạm", transactionType);
-                yield IncomeExpenseTransaction.reconstitute(
-                        transactionId, transactionType, wallet, category,
-                        amount, transactionDate, note, fee, createdAt);
-            }
-            default -> throw new IllegalArgumentException("Loại bản ghi giao dịch không hợp lệ: " + recordType);
-        };
+        Wallet wallet = resolveWallet(walletMap, walletId, "Ví tạm");
+        Category category = resolveCategory(categoryMap, categoryId, "Danh mục tạm", type);
+        TransactionFee fee = parseFeeIfPresent(m.get("fee"), walletMap, categoryMap);
+
+        return IncomeExpenseTransaction.reconstitute(
+                requireUuid(m, "transactionId"),
+                type,
+                wallet,
+                category,
+                requireMoney(m, "amount"),
+                requireDate(m, "transactionDate"),
+                getOptionalString(m, "note"),
+                fee,
+                requireDateTime(m, "createdAt"));
+    }
+
+    private static TransferTransaction parseTransfer(
+            Map<String, Object> m, Map<UUID, Wallet> walletMap, Map<UUID, Category> categoryMap) {
+        UUID srcId = requireUuid(m, "sourceWalletId");
+        UUID dstId = requireUuid(m, "destinationWalletId");
+
+        Wallet src = resolveWallet(walletMap, srcId, "Ví nguồn tạm");
+        Wallet dst = resolveWallet(walletMap, dstId, "Ví đích tạm");
+        TransactionFee fee = parseFeeIfPresent(m.get("fee"), walletMap, categoryMap);
+
+        return TransferTransaction.reconstitute(
+                requireUuid(m, "transactionId"),
+                src,
+                dst,
+                requireMoney(m, "amount"),
+                requireDate(m, "transactionDate"),
+                getOptionalString(m, "note"),
+                fee,
+                requireDateTime(m, "createdAt"));
     }
 
     @SuppressWarnings("unchecked")
-    private static TransactionFee parseFee(Object rawFee, Map<UUID, Wallet> walletMap,
-            Map<UUID, Category> categoryMap) {
-        if (rawFee == null) {
+    private static TransactionFee parseFeeIfPresent(
+            Object feeRaw, Map<UUID, Wallet> walletMap, Map<UUID, Category> categoryMap) {
+        if (feeRaw == null) {
             return null;
         }
-        if (!(rawFee instanceof Map<?, ?> rawMap)) {
-            throw new IllegalArgumentException("Trường fee phải là đối tượng JSON");
+        if (!(feeRaw instanceof Map<?, ?> feeMap)) {
+            throw new IllegalArgumentException("fee phải là một đối tượng JSON");
         }
-        Map<String, Object> m = (Map<String, Object>) rawMap;
+        Map<String, Object> m = (Map<String, Object>) feeMap;
         return TransactionFee.reconstitute(
                 requireUuid(m, "feeId"),
                 requireUuid(m, "parentTransactionId"),

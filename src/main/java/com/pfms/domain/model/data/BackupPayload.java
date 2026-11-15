@@ -1,4 +1,4 @@
-package com.pfms.service.impl.data;
+package com.pfms.domain.model.data;
 
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Đối tượng đóng gói nội bộ toàn bộ dữ liệu tài chính phục vụ tuần tự hóa sao lưu và phục hồi hệ thống.
+ * Đối tượng đóng gói toàn bộ dữ liệu tài chính phục vụ tuần tự hóa sao lưu và phục hồi hệ thống.
  */
-final class BackupPayload {
+public final class BackupPayload {
 
     // region State
     private final List<Wallet> wallets;
@@ -25,7 +25,7 @@ final class BackupPayload {
     // endregion
 
     // region Constructors
-    BackupPayload(
+    public BackupPayload(
             List<Wallet> wallets,
             List<NeedGroup> needGroups,
             List<Category> categories,
@@ -51,7 +51,7 @@ final class BackupPayload {
     // endregion
 
     // region Factory
-    static BackupPayload empty() {
+    public static BackupPayload empty() {
         return new BackupPayload(
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -62,27 +62,27 @@ final class BackupPayload {
     // endregion
 
     // region Getters
-    List<Wallet> getWallets() {
+    public List<Wallet> getWallets() {
         return this.wallets;
     }
 
-    List<NeedGroup> getNeedGroups() {
+    public List<NeedGroup> getNeedGroups() {
         return this.needGroups;
     }
 
-    List<Category> getCategories() {
+    public List<Category> getCategories() {
         return this.categories;
     }
 
-    List<Transaction> getTransactions() {
+    public List<Transaction> getTransactions() {
         return this.transactions;
     }
 
-    List<BalanceAdjustmentRecord> getAdjustments() {
+    public List<BalanceAdjustmentRecord> getAdjustments() {
         return this.adjustments;
     }
 
-    int getTotalRecordCount() {
+    public int getTotalRecordCount() {
         return this.wallets.size()
                 + this.needGroups.size()
                 + this.categories.size()
@@ -90,7 +90,7 @@ final class BackupPayload {
                 + this.adjustments.size();
     }
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return getTotalRecordCount() == 0;
     }
     // endregion
@@ -129,4 +129,3 @@ final class BackupPayload {
     }
     // endregion
 }
-
