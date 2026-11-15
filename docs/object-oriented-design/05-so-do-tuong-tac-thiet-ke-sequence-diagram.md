@@ -1024,13 +1024,14 @@ sequenceDiagram
     actor User as Người dùng
     participant GUI as Tầng Trình diễn
     participant DataService as DataManagementServiceImpl
-    participant StorageSupport as BackupStorageSupport
+    participant BackupRepo as BackupRepository
     participant WalletRepo as WalletRepository
     participant NeedGroupRepo as NeedGroupRepository
     participant CategoryRepo as CategoryRepository
     participant TxnRepo as TransactionRepository
     participant AdjRepo as BalanceAdjustmentRepository
-    participant JsonSerializer as BackupJsonSerializer
+    participant JsonSerializer as JsonEntitySerializer
+    participant StorageSupport as FileStorageSupport
 
     User->>+GUI: 1. Nhập lệnh xuất sao lưu (destinationPath, scope)
     GUI->>+DataService: 2. exportBackupData(ExportBackupRequestDTO)
@@ -1038,36 +1039,43 @@ sequenceDiagram
         DataService-->>GUI: 3. ném BusinessException (ERR-DAT-001)
         GUI-->>User: 4. Thông báo phạm vi xuất dữ liệu không hợp lệ
     else Phạm vi xuất hợp lệ
-        DataService->>+StorageSupport: 5. resolveWritableTargetPath(destinationPath, scope, exportedAt)
+        DataService->>+BackupRepo: 5. resolveWritableTargetPath(destinationPath, scope, exportedAt)
+        BackupRepo->>+StorageSupport: 6. resolveWritableTargetPath(...)
         alt Đường dẫn rỗng, trỏ tới tệp hoặc mang phần mở rộng tệp
-            StorageSupport-->>DataService: 6. ném StorageException
-            DataService-->>GUI: 7. ném StorageException
-            GUI-->>User: 8. Hiển thị thông báo yêu cầu chọn thư mục đích hợp lệ
+            StorageSupport-->>BackupRepo: 7. ném StorageException
+            BackupRepo-->>DataService: 8. ném StorageException
+            DataService-->>GUI: 9. ném StorageException
+            GUI-->>User: 10. Hiển thị thông báo yêu cầu chọn thư mục đích hợp lệ
         else Thư mục đích hợp lệ và ghép tên pfms_export_{scope}_{yyyyMMdd_HHmmss}.json
-            StorageSupport-->>-DataService: 9. Path targetPath
-            DataService->>+TxnRepo: 10. findAll()
-            TxnRepo-->>-DataService: 11. List<Transaction>
+            StorageSupport-->>-BackupRepo: 11. Path targetPath
+            BackupRepo-->>-DataService: 12. Path targetPath
+            DataService->>+TxnRepo: 13. findAll()
+            TxnRepo-->>-DataService: 14. List<Transaction>
             opt Phạm vi FULL
-                DataService->>+WalletRepo: 12. findAll()
-                WalletRepo-->>-DataService: 13. List<Wallet>
-                DataService->>+NeedGroupRepo: 14. findAll()
-                NeedGroupRepo-->>-DataService: 15. List<NeedGroup>
-                DataService->>+CategoryRepo: 16. findAll()
-                CategoryRepo-->>-DataService: 17. List<Category>
-                DataService->>+AdjRepo: 18. findAll()
-                AdjRepo-->>-DataService: 19. List<BalanceAdjustmentRecord>
+                DataService->>+WalletRepo: 15. findAll()
+                WalletRepo-->>-DataService: 16. List<Wallet>
+                DataService->>+NeedGroupRepo: 17. findAll()
+                NeedGroupRepo-->>-DataService: 18. List<NeedGroup>
+                DataService->>+CategoryRepo: 19. findAll()
+                CategoryRepo-->>-DataService: 20. List<Category>
+                DataService->>+AdjRepo: 21. findAll()
+                AdjRepo-->>-DataService: 22. List<BalanceAdjustmentRecord>
             end
-            DataService->>+JsonSerializer: 20. toJson(BackupPayload)
-            JsonSerializer-->>-DataService: 21. String jsonContent (tiền tệ chuẩn 2 chữ số thập phân)
-            DataService->>+StorageSupport: 22. writeUtf8Safely(targetPath, jsonContent)
+            Note over DataService: Đóng gói BackupPayload
+            DataService->>+BackupRepo: 23. writeBackup(targetPath, payload)
+            BackupRepo->>+JsonSerializer: 24. toJson(payload)
+            JsonSerializer-->>-BackupRepo: 25. String jsonContent (tiền tệ chuẩn 2 chữ số thập phân)
+            BackupRepo->>+StorageSupport: 26. writeUtf8Safely(targetPath, jsonContent)
             alt Sự cố I/O, lỗi tạo thư mục, quyền ghi hoặc ổ đĩa đầy
-                StorageSupport-->>DataService: 23. dọn tệp .tmp và ném StorageException
-                DataService-->>GUI: 24. ném StorageException
-                GUI-->>User: 25. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
+                StorageSupport-->>BackupRepo: 27. dọn tệp .tmp và ném StorageException
+                BackupRepo-->>DataService: 28. ném StorageException
+                DataService-->>GUI: 29. ném StorageException
+                GUI-->>User: 30. Hiển thị thông báo lỗi xuất dữ liệu sao lưu
             else Ghi tệp sao lưu an toàn thành công (UTF-8 không BOM)
-                StorageSupport-->>-DataService: 26. long fileSizeBytes
-                DataService-->>-GUI: 27. ExportBackupResponseDTO (kèm targetPath và exportedAt đồng bộ)
-                GUI-->>-User: 28. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
+                StorageSupport-->>-BackupRepo: 31. long fileSizeBytes
+                BackupRepo-->>-DataService: 32. long fileSizeBytes
+                DataService-->>-GUI: 33. ExportBackupResponseDTO (kèm targetPath và exportedAt đồng bộ)
+                GUI-->>-User: 34. Kết xuất thông báo xuất dữ liệu thành công kèm đường dẫn tệp
             end
         end
     end
@@ -1094,8 +1102,9 @@ sequenceDiagram
     actor User as Người dùng
     participant GUI as Tầng Trình diễn
     participant DataService as DataManagementServiceImpl
-    participant StorageSupport as BackupStorageSupport
-    participant JsonDeserializer as BackupJsonDeserializer
+    participant BackupRepo as BackupRepository
+    participant StorageSupport as FileStorageSupport
+    participant JsonDeserializer as JsonEntityDeserializer
     participant Reconciler as SystemDataReconciler
     participant WalletRepo as WalletRepository
     participant NeedGroupRepo as NeedGroupRepository
@@ -1106,45 +1115,49 @@ sequenceDiagram
 
     User->>+GUI: 1. Nhập đường dẫn tệp sao lưu (backupFilePath)
     GUI->>+DataService: 2. restoreBackupData(RestoreBackupRequestDTO)
-    DataService->>+StorageSupport: 3. resolveReadableBackupPath và readUtf8String(backupFilePath)
+    DataService->>+BackupRepo: 3. readBackup(backupFilePath)
+    BackupRepo->>+StorageSupport: 4. resolveReadableBackupPath và readUtf8String(backupFilePath)
     alt Tệp không tồn tại, không phải tệp thường hoặc lỗi đọc I/O
-        StorageSupport-->>DataService: 4. ném StorageException
-        DataService-->>GUI: 5. ném StorageException
-        GUI-->>User: 6. Hiển thị thông báo không thể đọc tệp sao lưu
+        StorageSupport-->>BackupRepo: 5. ném StorageException
+        BackupRepo-->>DataService: 6. ném StorageException
+        DataService-->>GUI: 7. ném StorageException
+        GUI-->>User: 8. Hiển thị thông báo không thể đọc tệp sao lưu
     else Đọc tệp UTF-8 thành công (loại bỏ BOM nếu có)
-        StorageSupport-->>-DataService: 7. String jsonContent
-        DataService->>+JsonDeserializer: 8. fromJson(jsonContent)
+        StorageSupport-->>-BackupRepo: 9. String jsonContent
+        BackupRepo->>+JsonDeserializer: 10. fromJson(jsonContent)
         alt Sai cú pháp JSON, thiếu khóa bắt buộc hoặc sai định dạng số liệu
-            JsonDeserializer-->>DataService: 9. ném DataCorruptionException (ERR-DAT-001)
-            DataService-->>GUI: 10. ném DataCorruptionException
-            GUI-->>User: 11. Từ chối: Tệp sao lưu sai cấu trúc hoặc hỏng dữ liệu
+            JsonDeserializer-->>BackupRepo: 11. ném DataCorruptionException (ERR-DAT-001)
+            BackupRepo-->>DataService: 12. ném DataCorruptionException
+            DataService-->>GUI: 13. ném DataCorruptionException
+            GUI-->>User: 14. Từ chối: Tệp sao lưu sai cấu trúc hoặc hỏng dữ liệu
         else Tái cấu thành BackupPayload (giữ trạng thái lịch sử qua reconstitute)
-            JsonDeserializer-->>-DataService: 12. BackupPayload payload
-            DataService->>+Reconciler: 13. reconcile(wallets, transactions, categories, needGroups, adjustments)
-            Reconciler-->>-DataService: 14. ReconciliationReportResponseDTO
+            JsonDeserializer-->>-BackupRepo: 15. BackupPayload payload
+            BackupRepo-->>-DataService: 16. BackupPayload payload
+            DataService->>+Reconciler: 17. reconcile(payload)
+            Reconciler-->>-DataService: 18. ReconciliationReportResponseDTO
             Note over DataService: Kiểm định toàn vẹn (trùng mã, số dư âm, tham chiếu ví, danh mục, chuyển tiền và phí)
             alt Vi phạm toàn vẹn hoặc là tệp xuất chỉ chứa sổ giao dịch
-                DataService-->>GUI: 15. ném DataCorruptionException (ERR-DAT-002)
-                GUI-->>User: 16. Từ chối: Dữ liệu sao lưu vi phạm ràng buộc toàn vẹn hoặc số dư
+                DataService-->>GUI: 19. ném DataCorruptionException (ERR-DAT-002)
+                GUI-->>User: 20. Từ chối: Dữ liệu sao lưu vi phạm ràng buộc toàn vẹn hoặc số dư
             else Đạt toàn bộ kiểm định toàn vẹn (All-or-Nothing)
-                DataService->>DataService: 17. Chụp bản sao dữ liệu hiện hành từ các kho lưu trữ
-                DataService->>TxnRepo: 18. deleteAll()
-                DataService->>AdjRepo: 19. deleteAll()
-                DataService->>CategoryRepo: 20. deleteAll()
-                DataService->>NeedGroupRepo: 21. deleteAll()
-                DataService->>WalletRepo: 22. deleteAll()
-                DataService->>WalletRepo: 23. saveAll(wallets)
-                DataService->>NeedGroupRepo: 24. saveAll(needGroups)
-                DataService->>CategoryRepo: 25. saveAll(categories)
-                DataService->>AdjRepo: 26. saveAll(adjustments)
-                DataService->>TxnRepo: 27. saveAll(transactions)
+                DataService->>DataService: 21. Chụp bản sao dữ liệu hiện hành từ các kho lưu trữ
+                DataService->>TxnRepo: 22. deleteAll()
+                DataService->>AdjRepo: 23. deleteAll()
+                DataService->>CategoryRepo: 24. deleteAll()
+                DataService->>NeedGroupRepo: 25. deleteAll()
+                DataService->>WalletRepo: 26. deleteAll()
+                DataService->>WalletRepo: 27. saveAll(wallets)
+                DataService->>NeedGroupRepo: 28. saveAll(needGroups)
+                DataService->>CategoryRepo: 29. saveAll(categories)
+                DataService->>AdjRepo: 30. saveAll(adjustments)
+                DataService->>TxnRepo: 31. saveAll(transactions)
                 alt Phát sinh RuntimeException hoặc StorageException khi xóa hoặc ghi
-                    DataService->>Rollback: 28. runRollbackStep(...) dọn phần ghi dở và khôi phục bản chụp
-                    DataService-->>GUI: 29. ném StorageException
-                    GUI-->>User: 30. Thông báo lỗi lưu trữ; dữ liệu cũ đã được hoàn nguyên
+                    DataService->>Rollback: 32. runRollbackStep(...) dọn phần ghi dở và khôi phục bản chụp
+                    DataService-->>GUI: 33. ném StorageException
+                    GUI-->>User: 34. Thông báo lỗi lưu trữ; dữ liệu cũ đã được hoàn nguyên
                 else Thay thế toàn bộ kho lưu trữ thành công
-                    DataService-->>-GUI: 31. RestoreBackupResponseDTO
-                    GUI-->>-User: 32. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
+                    DataService-->>-GUI: 35. RestoreBackupResponseDTO
+                    GUI-->>-User: 36. Kết xuất thông báo phục hồi toàn bộ dữ liệu thành công
                 end
             end
         end

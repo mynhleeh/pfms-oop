@@ -166,9 +166,36 @@ Giao diện `com.pfms.domain.repository.BalanceAdjustmentRepository` kế thừa
 - Kế thừa từ `GenericRepository<BalanceAdjustmentRecord, UUID>` nhưng thực thi nghiêm ngặt cơ chế chỉ cho phép ghi thêm bản ghi mới: phương thức `save` chỉ lưu bản ghi kiểm kê mới bất biến, trong khi thao tác cập nhật bản ghi cũ hoặc gọi `deleteById` bị chặn và ném `UnsupportedOperationException` nhằm bảo vệ tính toàn vẹn của vết kiểm toán.
 - Bảo đảm mọi bản ghi lưu trữ đều có số dư thực tế `actualBalance` không âm và độ lệch `difference` khác `0.00 VNĐ`; khoản chênh lệch chỉ được `WalletService` cập nhật trực tiếp vào số dư ví liên kết mà không sinh giao dịch thu chi giả mạo trong `TransactionRepository`.
 
+### 4.2.5 Kho Lưu trữ Sao lưu Hệ thống
+
+Giao diện `BackupRepository` trong gói `com.pfms.domain.repository` định nghĩa hợp đồng trừu tượng phục vụ việc xuất và phục hồi tệp sao lưu dữ liệu toàn hệ thống mà không phụ thuộc vào công nghệ tệp hay thư viện thứ ba.
+
+**Quy chiếu yêu cầu:**
+- Ca sử dụng: `UC-DAT-01`, `UC-DAT-02`
+- Yêu cầu chức năng: `FR-DAT-01`, `FR-DAT-02`
+- Quy tắc nghiệp vụ: `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04`, `BR-DAT-01`, `BR-DAT-02`
+- Mã lỗi: `ERR-DAT-001`, `ERR-DAT-002`, `StorageException`
+
+**Giao diện kho lưu trữ:**
+
+| Phương thức | Tham số | Kiểu trả về | Mô tả kỹ thuật |
+| :--- | :--- | :--- | :--- |
+| `writeBackup` | `Path targetPath, BackupPayload payload` | `long` | Tuần tự hóa cấu trúc `BackupPayload` sang JSON và ghi nguyên tử vào tệp đích `targetPath`, trả về dung lượng tệp (bytes) đã ghi. |
+| `resolveWritableTargetPath` | `String destinationDirectoryPath, String scope, LocalDateTime exportedAt` | `Path` | Xác thực đường dẫn thư mục đích và sinh đường dẫn tệp sao lưu chuẩn hóa có nhãn thời gian: `pfms_export_{scope}_{yyyyMMdd_HHmmss}.json`. |
+| `readBackup` | `String backupFilePath` | `BackupPayload` | Xác thực tính hợp lệ của tệp sao lưu, đọc nội dung UTF-8 (loại bỏ BOM) và giải tuần tự hóa JSON thành cấu trúc `BackupPayload`. |
+
+**Chỉ dẫn thiết kế và cài đặt:**
+
+- Khác với các kho lưu trữ thực thể kế thừa `GenericRepository`, `BackupRepository` là kho lưu trữ chuyên biệt xử lý đối tượng tổng hợp `BackupPayload`. Giao diện này thuộc Tầng Nghiệp vụ (`domain.repository`), giúp Tầng Dịch vụ (`DataManagementServiceImpl`) hoàn toàn không phụ thuộc vào các engine xử lý tệp hay thư viện JSON cụ thể.
+- Tại Tầng Hạ tầng, lớp cài đặt `FileBackupRepository` thuộc gói `com.pfms.infrastructure.file` hiện thực hóa giao diện này bằng cách phối hợp với các thành phần hỗ trợ kỹ thuật trong gói con `com.pfms.infrastructure.file.support` (`FileStorageSupport`, `JsonEntitySerializer`, `JsonEntityDeserializer`).
+
 ## 4.3 Cài đặt Hạ tầng Lưu trữ
 
-Tầng Hạ tầng (`com.pfms.infrastructure`) hiện thực hóa toàn bộ các giao diện kho lưu trữ đã khai báo tại Tầng Nghiệp vụ (`com.pfms.domain.repository`), bảo đảm nguyên lý đảo ngược phụ thuộc. Hệ thống cung cấp hai cơ chế lưu trữ chuyên biệt: bộ điều hợp tệp tin (`com.pfms.infrastructure.file`) phục vụ lưu trữ bền vững trong môi trường vận hành thực tế và bộ điều hợp bộ nhớ (`com.pfms.infrastructure.memory`) phục vụ môi trường kiểm thử tự động.
+Tầng Hạ tầng (`com.pfms.infrastructure`) hiện thực hóa toàn bộ các giao diện kho lưu trữ đã khai báo tại Tầng Nghiệp vụ (`com.pfms.domain.repository`), bảo đảm nguyên lý đảo ngược phụ thuộc DIP. Hệ thống cung cấp hai cơ chế lưu trữ chuyên biệt: bộ điều hợp tệp tin (`com.pfms.infrastructure.file`) phục vụ lưu trữ bền vững trong môi trường vận hành thực tế và bộ điều hợp bộ nhớ (`com.pfms.infrastructure.memory`) phục vụ môi trường kiểm thử tự động.
+
+Nhằm bảo đảm tính đóng gói và cấu trúc rạch ròi, gói hạ tầng tệp tin được phân tách thành 2 cấp độ:
+1. **Gói công khai `com.pfms.infrastructure.file`:** Chứa các lớp Repository hiện thực hóa trực tiếp các giao diện từ `domain.repository` (`JsonWalletRepository`, `JsonNeedGroupRepository`, `JsonCategoryRepository`, `JsonTransactionRepository`, `JsonBalanceAdjustmentRepository`, `FileBackupRepository`).
+2. **Gói con kỹ thuật `com.pfms.infrastructure.file.support`:** Đóng kín các engine I/O và tiện ích cấp thấp (`FileStorageSupport`, `JsonEntitySerializer`, `JsonEntityDeserializer`, `JsonDataStore`), ngăn chặn việc rò rỉ chi tiết công nghệ Gson hay cơ chế hoán đổi tệp nguyên tử ra ngoài.
 
 Hai cơ chế này đóng kín toàn bộ chi tiết thao tác vào ra vật lý và cấu trúc dữ liệu nội bộ. Tầng Hạ tầng chịu trách nhiệm chuyển đổi hai chiều giữa dữ liệu lưu trữ và thực thể nghiệp vụ, quản lý an toàn luồng dữ liệu, đồng thời đóng gói các ngoại lệ vào ra cấp thấp thành `StorageException` nhằm giữ cho tầng nghiệp vụ hoàn toàn độc lập với môi trường thực thi.
 
@@ -197,7 +224,7 @@ Cấu trúc các trường dữ liệu `JSON` lưu trữ trạng thái của cá
 
 ### 4.3.2 Cơ chế Đọc Ghi và An toàn Dữ liệu
 
-Bộ điều hợp `JsonDataStore` cùng các lớp kho lưu trữ `JsonWalletRepository`, `JsonTransactionRepository`, `JsonCategoryRepository` và `JsonBalanceAdjustmentRepository` áp dụng cơ chế đọc ghi tệp an toàn qua luồng đệm UTF-8 và tệp trung gian tạm thời kết hợp đổi tên nguyên tử nhằm ngăn ngừa triệt để nguy cơ hỏng dữ liệu khi ứng dụng gặp sự cố dừng đột ngột, mất điện hoặc đầy đĩa trong quá trình lưu trữ dữ liệu. Trong lần chạy đầu tiên khi chưa có tệp lưu trữ, bộ điều hợp tự động tạo thư mục lưu trữ và tệp `JSON` gốc chứa các mảng rỗng hợp lệ cùng cấu trúc danh mục mẫu mặc định theo quy định khởi tạo danh mục mẫu, kết hợp cơ chế tự động tạo bản sao lưu an toàn trước khi phục hồi dữ liệu hệ thống.
+Bộ điều hợp `JsonDataStore` cùng các lớp kho lưu trữ `JsonWalletRepository`, `JsonNeedGroupRepository`, `JsonCategoryRepository`, `JsonTransactionRepository`, `JsonBalanceAdjustmentRepository` và `FileBackupRepository` áp dụng cơ chế đọc ghi tệp an toàn qua luồng đệm UTF-8 và tệp trung gian tạm thời kết hợp đổi tên nguyên tử nhằm ngăn ngừa triệt để nguy cơ hỏng dữ liệu khi ứng dụng gặp sự cố dừng đột ngột, mất điện hoặc đầy đĩa trong quá trình lưu trữ dữ liệu. Trong lần chạy đầu tiên khi chưa có tệp lưu trữ, bộ điều hợp tự động tạo thư mục lưu trữ và tệp `JSON` gốc chứa các mảng rỗng hợp lệ cùng cấu trúc danh mục mẫu mặc định theo quy định khởi tạo danh mục mẫu, kết hợp cơ chế tự động tạo bản sao lưu an toàn trước khi phục hồi dữ liệu hệ thống.
 
 **Quy trình ghi tệp nguyên tử**
 
