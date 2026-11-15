@@ -250,7 +250,7 @@ class WalletServiceImplTest {
             walletRepository.save(w3);
 
             // Act
-            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary(null);
+            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary((EntityStatus) null);
 
             // Assert
             assertEquals(3, summary.getWalletCount());
@@ -281,7 +281,7 @@ class WalletServiceImplTest {
             walletRepository.save(archivedZeroWallet);
 
             // Act
-            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary(null);
+            WalletsSummaryResponseDTO summary = walletService.getWalletsSummary((EntityStatus) null);
 
             // Assert
             assertEquals(2, summary.getWalletCount());
@@ -312,7 +312,7 @@ class WalletServiceImplTest {
             assertEquals(1, archivedOnly.getWalletCount());
             assertEquals("Ví Archived", archivedOnly.getWallets().get(0).getName());
 
-            WalletsSummaryResponseDTO all = walletService.getWalletsSummary(null);
+            WalletsSummaryResponseDTO all = walletService.getWalletsSummary((EntityStatus) null);
             assertEquals(2, all.getWalletCount());
         }
 
@@ -370,12 +370,32 @@ class WalletServiceImplTest {
             walletRepository.save(active);
             walletRepository.save(deleted);
 
-            WalletsSummaryResponseDTO all = walletService.getWalletsSummary(null);
+            WalletsSummaryResponseDTO all = walletService.getWalletsSummary((EntityStatus) null);
             assertEquals(1, all.getWalletCount());
             assertEquals(active.getId(), all.getWallets().get(0).getWalletId());
             assertEquals(0, new java.math.BigDecimal("500.00").compareTo(all.getTotalBalance()));
             assertEquals(1, all.getWalletShares().size());
             assertFalse(all.getWalletShares().containsKey(deleted.getId()));
+        }
+
+        @Test
+        @DisplayName("Hỗ trợ lọc ví qua chuỗi String và mặc định không tham số")
+        void shouldSupportStringStatusFilterAndNoArgSummary() {
+            walletService.createWallet(new CreateWalletRequestDTO("Ví Hoạt Động"));
+
+            WalletsSummaryResponseDTO active = walletService.getWalletsSummary("ACTIVE");
+            assertNotNull(active);
+            assertEquals(1, active.getWalletCount());
+
+            WalletsSummaryResponseDTO defaultSummary = walletService.getWalletsSummary();
+            assertNotNull(defaultSummary);
+            assertEquals(1, defaultSummary.getWalletCount());
+
+            WalletsSummaryResponseDTO allSummary = walletService.getWalletsSummary("ALL");
+            assertNotNull(allSummary);
+            assertEquals(1, allSummary.getWalletCount());
+
+            assertThrows(IllegalArgumentException.class, () -> walletService.getWalletsSummary("INVALID_STATUS"));
         }
     }
 

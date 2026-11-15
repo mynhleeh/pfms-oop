@@ -35,7 +35,7 @@ Giao diện `com.pfms.service.WalletService` cung cấp các phương thức sau
 | :--- | :--- | :--- | :--- | :--- |
 | `initializeDefaultWallet` | `Không có` | `void` | `StorageException` | Kiểm tra khi khởi động ứng dụng; nếu chưa có ví mặc định thì tạo sẵn ví `"Tiền mặt"` ở trạng thái hoạt động với số dư bằng không. |
 | `createWallet` | `CreateWalletRequestDTO request` | `WalletResponseDTO` | `BusinessException`, `DuplicateEntityException`, `StorageException` | Kiểm tra hợp lệ tên ví, kiểm tra trùng tên và khởi tạo ví mới ở trạng thái hoạt động với số dư bằng không. |
-| `getWalletsSummary` | `EntityStatus statusFilter` | `WalletsSummaryResponseDTO` | `StorageException` | Truy xuất danh sách ví theo bộ lọc trạng thái, tính tổng số dư hệ thống và tỷ trọng phân bổ của từng ví ở chế độ chỉ đọc. |
+| `getWalletsSummary` | `EntityStatus statusFilter` hoặc `String statusFilter` hoặc không tham số | `WalletsSummaryResponseDTO` | `StorageException` | Truy xuất danh sách ví theo bộ lọc trạng thái (hỗ trợ cả enum miền nội bộ, chuỗi `"ACTIVE"`, `"ARCHIVED"`, `"ALL"` cho Tầng Trình diễn bảo đảm Zero Domain Import, hoặc mặc định nạp ví `ACTIVE`), tính tổng số dư hệ thống và tỷ trọng phân bổ của từng ví ở chế độ chỉ đọc. |
 | `updateWallet` | `UpdateWalletRequestDTO request` | `WalletResponseDTO` | `EntityNotFoundException`, `BusinessException`, `DuplicateEntityException`, `StorageException` | Nạp ví cần sửa, xác thực tên mới không trùng với ví khác và cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
 | `archiveWallet` | `UUID walletId` | `WalletResponseDTO` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Chuyển một ví đang hoạt động không phải ví mặc định sang trạng thái lưu trữ để ngừng phát sinh giao dịch mới. |
 | `activateWallet` | `UUID walletId` | `WalletResponseDTO` | `EntityNotFoundException`, `BusinessException`, `StorageException` | Mở lại một ví đang ở trạng thái lưu trữ về trạng thái hoạt động bình thường. |
@@ -62,7 +62,7 @@ Lớp cài đặt công khai `com.pfms.service.impl.wallet.WalletServiceImpl` nh
 
 **Phương thức `getWalletsSummary`:**
 
-- Tiếp nhận bộ lọc trạng thái (mặc định là `ACTIVE` từ Tầng Trình diễn hoặc `null` khi cần xem toàn bộ) và nạp danh sách ví từ `WalletRepository`.
+- Tiếp nhận bộ lọc trạng thái (hỗ trợ `EntityStatus`, chuỗi lọc `String statusFilter` như `"ACTIVE"`, `"ARCHIVED"`, `"ALL"`, hoặc phương thức nạp mặc định không tham số cho ví `ACTIVE`) và nạp danh sách ví từ `WalletRepository`.
 - Tính tổng số dư toàn hệ thống bằng `Money` trên tất cả ví `ACTIVE` cùng các ví `ARCHIVED` có số dư dương; giữ nguyên cơ chế chỉ đọc, không thay đổi trạng thái bất kỳ thực thể nào.
 - Tính tỷ trọng phần trăm từng ví với tối thiểu 4 chữ số thập phân trung gian rồi làm tròn nửa chẵn về 2 chữ số; gán `0.00%` cho mọi ví khi tổng tài sản bằng không, loại các ví `ARCHIVED` có số dư bằng không khỏi bảng cơ cấu và sắp xếp bảng cơ cấu theo tỷ trọng giảm dần.
 - Đóng gói danh sách ví đã lọc, tổng số dư toàn hệ thống và bảng cơ cấu vào `WalletsSummaryResponseDTO`.

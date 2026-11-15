@@ -168,6 +168,24 @@ public class WalletServiceImpl implements WalletService {
     public WalletsSummaryResponseDTO getWalletsSummary(EntityStatus statusFilter) {
         return WalletSummaryCalculator.buildWalletsSummary(walletRepository, statusFilter);
     }
+
+    @Override
+    public WalletsSummaryResponseDTO getWalletsSummary(String statusFilter) {
+        if (statusFilter == null || statusFilter.isBlank() || "ALL".equalsIgnoreCase(statusFilter.trim())) {
+            return getWalletsSummary((EntityStatus) null);
+        }
+        try {
+            EntityStatus status = EntityStatus.valueOf(statusFilter.trim().toUpperCase(java.util.Locale.ROOT));
+            return getWalletsSummary(status);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Trạng thái ví không hợp lệ: " + statusFilter, ex);
+        }
+    }
+
+    @Override
+    public WalletsSummaryResponseDTO getWalletsSummary() {
+        return getWalletsSummary(EntityStatus.ACTIVE);
+    }
     // endregion
 
     // region Helpers

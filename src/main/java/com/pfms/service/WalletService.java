@@ -34,5 +34,9 @@ public interface WalletService {
 
     // region Queries
     WalletsSummaryResponseDTO getWalletsSummary(EntityStatus statusFilter);
+
+    WalletsSummaryResponseDTO getWalletsSummary(String statusFilter);
+
+    WalletsSummaryResponseDTO getWalletsSummary();
     // endregion
 }

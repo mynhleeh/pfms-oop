@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>Personal Finance Management System</name>
-    <description>Core domain logic and console application for PFMS</description>
+    <description>Core domain logic and Swing Desktop Application for PFMS</description>
 
     <properties>
         <java.version>17</java.version>

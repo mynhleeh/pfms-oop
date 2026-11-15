@@ -164,7 +164,7 @@ classDiagram
         +exportSpendingStructure(SpendingStructureReportResponseDTO) String*
     }
 
-    class TableViewReportStrategy {
+    class TextTableReportStrategy {
         +exportCashFlow(CashFlowReportResponseDTO) String
         +exportSpendingStructure(SpendingStructureReportResponseDTO) String
     }
@@ -181,7 +181,7 @@ classDiagram
     ReportServiceImpl ..> CashFlowReportResponseDTO : trả kết quả
     ReportServiceImpl ..> SpendingStructureReportResponseDTO : trả kết quả
     ReportExporter o-- ReportExportStrategy : sử dụng chiến lược
-    ReportExportStrategy <|.. TableViewReportStrategy : cài đặt
+    ReportExportStrategy <|.. TextTableReportStrategy : cài đặt
     ReportExportStrategy <|.. JsonReportStrategy : cài đặt
     ReportExportStrategy ..> CashFlowReportResponseDTO : nhận dữ liệu
     ReportExportStrategy ..> SpendingStructureReportResponseDTO : nhận dữ liệu
@@ -192,7 +192,7 @@ classDiagram
 Mẫu Strategy kết hợp với ranh giới tách biệt khỏi `ReportService` mang lại các giá trị kỹ thuật trực tiếp:
 
 - Bảo toàn ranh giới sạch cho `ReportService`: `ReportServiceImpl` chỉ phụ thuộc ba kho lưu trữ (`TransactionRepository`, `CategoryRepository`, `NeedGroupRepository`) và trả về DTO phản hồi bất biến, không phụ thuộc vào giao diện hay chiến lược kết xuất.
-- Tráo đổi định dạng tại thời điểm chạy: Bộ điều khiển tại tầng Trình diễn (`presentation.controller`) nhận DTO từ `ReportService`, chọn chiến lược tương ứng (`TableViewReportStrategy` hoặc `JsonReportStrategy`) cho `ReportExporter` để định dạng hiển thị hoặc xuất dữ liệu.
+- Tráo đổi định dạng tại thời điểm chạy: Bộ điều khiển tại tầng Trình diễn (`presentation.controller`) nhận DTO từ `ReportService`, chọn chiến lược tương ứng (`TextTableReportStrategy` xuất văn bản dạng bảng hoặc `JsonReportStrategy` xuất JSON) cho `ReportExporter` để định dạng hiển thị hoặc xuất dữ liệu.
 - Khả năng mở rộng không xâm lấn: Khi bổ sung định dạng xuất mới trong tương lai (như `CsvReportStrategy`), lập trình viên chỉ cần thêm một lớp cài đặt `ReportExportStrategy` mà không phải sửa bất kỳ dòng mã nào trong `ReportServiceImpl` hay `ReportExporter`.
 - Năng lực kiểm thử độc lập: Quy trình tính toán tài chính trong `ReportServiceImpl` được kiểm thử độc lập trên DTO thuần, còn từng chiến lược kết xuất được kiểm thử chuỗi đầu ra riêng biệt theo đúng DTO đầu vào.
 
