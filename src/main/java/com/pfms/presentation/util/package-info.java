@@ -1,5 +1,4 @@
 /**
- * Các tiện ích hỗ trợ kiểm tra dữ liệu đầu vào và định dạng giao diện dòng lệnh.
+ * Các tiện ích hỗ trợ xác thực dữ liệu biểu mẫu và định dạng giao diện người dùng.
  */
 package com.pfms.presentation.util;
-
