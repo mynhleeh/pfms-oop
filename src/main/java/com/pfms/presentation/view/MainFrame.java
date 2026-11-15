@@ -27,6 +27,7 @@ import java.util.Objects;
  */
 public class MainFrame extends JFrame {
 
+    // region Fields
     private final MainController mainController;
     private final SidebarPanel sidebarPanel;
     private final StatusBarPanel statusBarPanel;
@@ -40,7 +41,9 @@ public class MainFrame extends JFrame {
     private CategoryPanel categoryPanel;
     private ReportPanel reportPanel;
     private DataManagementPanel dataManagementPanel;
+    // endregion
 
+    // region Constructors
     public MainFrame(MainController mainController, String storagePath) {
         this.mainController = Objects.requireNonNull(mainController, "MainController không được để null");
 
@@ -67,7 +70,9 @@ public class MainFrame extends JFrame {
 
         refreshStatusMetrics();
     }
+    // endregion
 
+    // region UI
     private void registerPanels(String storagePath) {
         this.walletPanel = new WalletPanel(this.mainController.getWalletController());
         this.walletPanel.setOnWalletChangedListener(this::refreshStatusMetrics);
@@ -104,7 +109,9 @@ public class MainFrame extends JFrame {
         this.contentPanel.add(this.reportPanel, MainController.CARD_REPORTS);
         this.contentPanel.add(this.dataManagementPanel, MainController.CARD_DATA_MANAGEMENT);
     }
+    // endregion
 
+    // region Actions
     public void showCard(String cardName) {
         if (cardName == null || cardName.trim().isEmpty()) {
             return;
@@ -117,7 +124,9 @@ public class MainFrame extends JFrame {
             this.dashboardPanel.reloadDashboard();
         }
     }
+    // endregion
 
+    // region Data
     public void refreshStatusMetrics() {
         try {
             WalletsSummaryResponseDTO summary = this.mainController.loadDashboardWallets();
@@ -150,7 +159,9 @@ public class MainFrame extends JFrame {
             this.reportPanel.reloadReports();
         }
     }
+    // endregion
 
+    // region Getters
     public SidebarPanel getSidebarPanel() {
         return this.sidebarPanel;
     }
@@ -194,4 +205,5 @@ public class MainFrame extends JFrame {
     public DashboardPanel getDashboardPanel() {
         return this.dashboardPanel;
     }
+    // endregion
 }

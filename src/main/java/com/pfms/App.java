@@ -41,11 +41,18 @@ import java.util.Objects;
  */
 public final class App {
 
-    public static final String DEFAULT_DATA_PATH = "data/pfms_data.json";
+    // region Fields
 
+    public static final String DEFAULT_DATA_PATH = "data/pfms_data.json";
+    // endregion
+
+    // region Constructors
     private App() {
-        // Chặn khởi tạo trực tiếp
+        // Chặn khởi tạo trực tiếp lớp tiện ích
     }
+    // endregion
+
+    // region Actions
 
     public static MainFrame createApplication(Path storagePath) {
         Objects.requireNonNull(storagePath, "Đường dẫn tệp lưu trữ không được để null");
@@ -77,6 +84,18 @@ public final class App {
         return new MainFrame(mainController, storagePath.toString());
     }
 
+    public static void main(String[] args) {
+        setupLookAndFeel();
+        Path storagePath = Paths.get(DEFAULT_DATA_PATH);
+        SwingUtilities.invokeLater(() -> {
+            MainFrame frame = createApplication(storagePath);
+            frame.setVisible(true);
+        });
+    }
+    // endregion
+
+    // region UI
+
     public static void setupLookAndFeel() {
         try {
             com.formdev.flatlaf.FlatDarkLaf.setup();
@@ -94,13 +113,5 @@ public final class App {
             // An toàn trong môi trường test/headless
         }
     }
-
-    public static void main(String[] args) {
-        setupLookAndFeel();
-        Path storagePath = Paths.get(DEFAULT_DATA_PATH);
-        SwingUtilities.invokeLater(() -> {
-            MainFrame frame = createApplication(storagePath);
-            frame.setVisible(true);
-        });
-    }
+    // endregion
 }
