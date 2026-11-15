@@ -60,7 +60,10 @@ public class TransactionPanel extends JPanel implements TransactionView {
         delBtn.addActionListener(e -> handleDeleteTransaction()); refBtn.addActionListener(e -> { loadWallets(); reloadTransactions(); });
         for (Component b : new Component[]{addBtn, editBtn, delBtn, refBtn}) bar.add(b);
         north.add(bar); add(north, BorderLayout.NORTH); configureTable();
-        JScrollPane scroll = new JScrollPane(this.table); scroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 20, 8, 20), BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
+        JScrollPane scroll = new JScrollPane(this.table);
+        scroll.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
+        scroll.setBackground(ViewConstants.COLOR_CARD_BG);
+        scroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 20, 8, 20), BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
         add(scroll, BorderLayout.CENTER);
         JPanel south = new JPanel(); south.setLayout(new BoxLayout(south, BoxLayout.Y_AXIS)); south.setBackground(ViewConstants.COLOR_STATUS_BG);
         south.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
@@ -74,21 +77,34 @@ public class TransactionPanel extends JPanel implements TransactionView {
         south.add(pgn); south.add(sum); add(south, BorderLayout.SOUTH);
     }
     private void configureTable() {
-        this.table.setFont(ViewConstants.FONT_BODY); this.table.setRowHeight(28); this.table.getTableHeader().setFont(ViewConstants.FONT_NAV_ACTIVE);
-        DefaultTableCellRenderer c = new DefaultTableCellRenderer(), r = new DefaultTableCellRenderer();
-        c.setHorizontalAlignment(SwingConstants.CENTER); r.setHorizontalAlignment(SwingConstants.RIGHT);
+        com.pfms.presentation.common.ViewUtils.styleTable(this.table);
         int[] w = {40, 90, 90, 140, 120, 120, 90, 180};
         for (int i = 0; i < w.length; i++) this.table.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
-        for (int i : new int[]{0, 1, 2}) this.table.getColumnModel().getColumn(i).setCellRenderer(c);
-        this.table.getColumnModel().getColumn(6).setCellRenderer(r);
+        DefaultTableCellRenderer center = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.CENTER, ViewConstants.COLOR_TEXT_MUTED);
+        DefaultTableCellRenderer left = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MAIN);
+        DefaultTableCellRenderer right = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.RIGHT, ViewConstants.COLOR_TEXT_MAIN);
+
+        for (int i : new int[]{0, 1, 2}) this.table.getColumnModel().getColumn(i).setCellRenderer(center);
+        this.table.getColumnModel().getColumn(3).setCellRenderer(left);
+        this.table.getColumnModel().getColumn(5).setCellRenderer(left);
+        this.table.getColumnModel().getColumn(6).setCellRenderer(right);
+        this.table.getColumnModel().getColumn(7).setCellRenderer(left);
+
         this.table.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
             @Override public Component getTableCellRendererComponent(JTable t, Object v, boolean s, boolean f, int row, int col) {
-                super.getTableCellRendererComponent(t, v, s, f, row, col); setHorizontalAlignment(SwingConstants.RIGHT);
-                TransactionResponseDTO d = tableModel.getTransactionAt(row);
-                if (d != null && !s) {
-                    if ("INCOME".equalsIgnoreCase(d.getTransactionType())) setForeground(ViewConstants.COLOR_INCOME);
-                    else if ("EXPENSE".equalsIgnoreCase(d.getTransactionType())) setForeground(ViewConstants.COLOR_EXPENSE);
-                    else setForeground(ViewConstants.COLOR_TEXT_MAIN);
+                super.getTableCellRendererComponent(t, v, s, f, row, col);
+                setHorizontalAlignment(SwingConstants.RIGHT);
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                if (!s) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    TransactionResponseDTO d = tableModel.getTransactionAt(row);
+                    if (d != null) {
+                        if ("INCOME".equalsIgnoreCase(d.getTransactionType())) setForeground(ViewConstants.COLOR_INCOME);
+                        else if ("EXPENSE".equalsIgnoreCase(d.getTransactionType())) setForeground(ViewConstants.COLOR_EXPENSE);
+                        else setForeground(ViewConstants.COLOR_TEXT_MAIN);
+                    } else {
+                        setForeground(ViewConstants.COLOR_TEXT_MAIN);
+                    }
                 }
                 return this;
             }

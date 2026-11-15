@@ -79,14 +79,11 @@ public class ReportPanel extends JPanel implements ReportView {
     }
 
     private void setupTable(JTable t, int[] w, int[] a) {
-        t.setFont(ViewConstants.FONT_BODY); t.setRowHeight(28); t.getTableHeader().setFont(ViewConstants.FONT_NAV_ACTIVE);
-        t.getTableHeader().setBackground(new Color(245, 245, 245)); t.setGridColor(ViewConstants.COLOR_BORDER);
+        com.pfms.presentation.common.ViewUtils.styleTable(t);
         for (int i = 0; i < w.length && i < t.getColumnModel().getColumnCount(); i++) {
             t.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
-            if (a[i] != SwingConstants.LEFT) {
-                DefaultTableCellRenderer r = new DefaultTableCellRenderer(); r.setHorizontalAlignment(a[i]);
-                t.getColumnModel().getColumn(i).setCellRenderer(r);
-            }
+            Color fg = (a[i] == SwingConstants.RIGHT) ? ViewConstants.COLOR_PRIMARY_LIGHT : ViewConstants.COLOR_TEXT_MAIN;
+            t.getColumnModel().getColumn(i).setCellRenderer(com.pfms.presentation.common.ViewUtils.createCellRenderer(a[i], fg));
         }
     }
 
@@ -103,7 +100,9 @@ public class ReportPanel extends JPanel implements ReportView {
     private JPanel createTab(JPanel tb, JTable tbl, JLabel sum) {
         JPanel p = new JPanel(new BorderLayout(10, 10)); p.setBackground(ViewConstants.COLOR_CONTENT_BG);
         p.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); p.add(tb, BorderLayout.NORTH);
-        JScrollPane sp = new JScrollPane(tbl); sp.getViewport().setBackground(Color.WHITE);
+        JScrollPane sp = new JScrollPane(tbl);
+        sp.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
+        sp.setBackground(ViewConstants.COLOR_CARD_BG);
         sp.setBorder(BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)); p.add(sp, BorderLayout.CENTER);
         JPanel s = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 8)); s.setBackground(ViewConstants.COLOR_STATUS_BG);
         s.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER)); s.add(sum);

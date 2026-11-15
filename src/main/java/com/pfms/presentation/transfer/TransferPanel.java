@@ -62,7 +62,9 @@ public class TransferPanel extends JPanel implements TransferView {
         btnNew.addActionListener(e -> openTransferFundsDialog()); btnDel.addActionListener(e -> handleDeleteTransfer()); btnRefresh.addActionListener(e -> { loadWallets(); reloadTransfers(); });
         for (Component c : new Component[]{btnNew, btnDel, btnRefresh}) actionRow.add(c);
         north.add(actionRow); add(north, BorderLayout.NORTH); setupTable();
-        JScrollPane scroll = new JScrollPane(this.table); scroll.getViewport().setBackground(Color.WHITE);
+        JScrollPane scroll = new JScrollPane(this.table);
+        scroll.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
+        scroll.setBackground(ViewConstants.COLOR_CARD_BG);
         scroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 24, 12, 24), BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
         add(scroll, BorderLayout.CENTER);
         JPanel south = new JPanel(new BorderLayout()); south.setBackground(ViewConstants.COLOR_STATUS_BG);
@@ -75,15 +77,23 @@ public class TransferPanel extends JPanel implements TransferView {
         south.add(pgn, BorderLayout.EAST); add(south, BorderLayout.SOUTH);
     }
     private void setupTable() {
-        this.table.setFont(ViewConstants.FONT_BODY); this.table.setRowHeight(28);
-        this.table.getTableHeader().setFont(ViewConstants.FONT_NAV_ACTIVE); this.table.setGridColor(ViewConstants.COLOR_BORDER);
-        DefaultTableCellRenderer c = new DefaultTableCellRenderer(), r = new DefaultTableCellRenderer();
-        c.setHorizontalAlignment(SwingConstants.CENTER); r.setHorizontalAlignment(SwingConstants.RIGHT);
+        com.pfms.presentation.common.ViewUtils.styleTable(this.table);
+        DefaultTableCellRenderer c = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.CENTER, ViewConstants.COLOR_TEXT_MUTED);
+        DefaultTableCellRenderer l = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MAIN);
+        DefaultTableCellRenderer rAmount = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.RIGHT, ViewConstants.COLOR_PRIMARY_LIGHT);
+        DefaultTableCellRenderer rFee = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.RIGHT, ViewConstants.COLOR_TEXT_MUTED);
+        DefaultTableCellRenderer lNote = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MUTED);
+
         if (this.table.getColumnModel().getColumnCount() >= 7) {
             int[] w = {50, 100, 160, 160, 130, 110, 200};
             for (int i = 0; i < w.length; i++) this.table.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
-            this.table.getColumnModel().getColumn(0).setCellRenderer(c); this.table.getColumnModel().getColumn(1).setCellRenderer(c);
-            this.table.getColumnModel().getColumn(4).setCellRenderer(r); this.table.getColumnModel().getColumn(5).setCellRenderer(r);
+            this.table.getColumnModel().getColumn(0).setCellRenderer(c);
+            this.table.getColumnModel().getColumn(1).setCellRenderer(c);
+            this.table.getColumnModel().getColumn(2).setCellRenderer(l);
+            this.table.getColumnModel().getColumn(3).setCellRenderer(l);
+            this.table.getColumnModel().getColumn(4).setCellRenderer(rAmount);
+            this.table.getColumnModel().getColumn(5).setCellRenderer(rFee);
+            this.table.getColumnModel().getColumn(6).setCellRenderer(lNote);
         }
     }
     // endregion

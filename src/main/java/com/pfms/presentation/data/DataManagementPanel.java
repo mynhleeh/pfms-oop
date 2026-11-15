@@ -92,6 +92,10 @@ public class DataManagementPanel extends JPanel implements DataManagementView {
         c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
         c.setBackground(ViewConstants.COLOR_CONTENT_BG);
         c.setBorder(BorderFactory.createEmptyBorder(0, 24, 12, 12));
+        this.exportResultLabel.setFont(ViewConstants.FONT_BODY);
+        this.exportResultLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+        this.restoreResultLabel.setFont(ViewConstants.FONT_BODY);
+        this.restoreResultLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
         JButton expBtn = createBtn("Xuất Sao lưu", ViewConstants.COLOR_PRIMARY_LIGHT, Color.WHITE,
                 e -> triggerExportBackup(this.destinationField.getText(), (String) this.scopeBox.getSelectedItem()));
         c.add(box("Xuất Bản Sao lưu JSON (UC-DAT-01)",
@@ -109,7 +113,7 @@ public class DataManagementPanel extends JPanel implements DataManagementView {
 
     private JPanel createReconciliationPanel() {
         JPanel p = new JPanel(new BorderLayout(10, 10));
-        p.setBackground(Color.WHITE);
+        p.setBackground(ViewConstants.COLOR_CONTENT_BG);
         p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 12, 12, 24),
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createTitledBorder(BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER),
@@ -117,9 +121,9 @@ public class DataManagementPanel extends JPanel implements DataManagementView {
                                 ViewConstants.COLOR_TEXT_MAIN),
                         BorderFactory.createEmptyBorder(12, 16, 16, 16))));
         JPanel top = new JPanel(new BorderLayout(10, 8));
-        top.setBackground(Color.WHITE);
+        top.setBackground(ViewConstants.COLOR_CONTENT_BG);
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 4));
-        btnRow.setBackground(Color.WHITE);
+        btnRow.setBackground(ViewConstants.COLOR_CONTENT_BG);
         btnRow.add(createBtn("Đối soát dữ liệu ngay", ViewConstants.COLOR_PRIMARY_LIGHT, Color.WHITE,
                 e -> triggerReconcile()));
         top.add(btnRow, BorderLayout.NORTH);
@@ -127,25 +131,25 @@ public class DataManagementPanel extends JPanel implements DataManagementView {
                 this.feeStatusLabel), BorderLayout.SOUTH);
         p.add(top, BorderLayout.NORTH);
         JScrollPane sp = new JScrollPane(this.issueTable);
-        sp.getViewport().setBackground(Color.WHITE);
+        sp.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
+        sp.setBackground(ViewConstants.COLOR_CARD_BG);
         sp.setBorder(BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER));
         p.add(sp, BorderLayout.CENTER);
         return p;
     }
 
     private void setupIssueTable() {
-        this.issueTable.setFont(ViewConstants.FONT_BODY);
-        this.issueTable.setRowHeight(28);
-        this.issueTable.getTableHeader().setFont(ViewConstants.FONT_NAV_ACTIVE);
-        this.issueTable.getTableHeader().setBackground(new Color(245, 245, 245));
-        this.issueTable.setGridColor(ViewConstants.COLOR_BORDER);
-        DefaultTableCellRenderer cr = new DefaultTableCellRenderer();
-        cr.setHorizontalAlignment(SwingConstants.CENTER);
+        com.pfms.presentation.common.ViewUtils.styleTable(this.issueTable);
+        DefaultTableCellRenderer cr = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.CENTER, ViewConstants.COLOR_TEXT_MUTED);
+        DefaultTableCellRenderer lr = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MAIN);
         int[] w = { 80, 110, 140, 220, 160 };
         for (int i = 0; i < w.length && i < this.issueTable.getColumnModel().getColumnCount(); i++) {
             this.issueTable.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
-            if (i < 2)
+            if (i < 2) {
                 this.issueTable.getColumnModel().getColumn(i).setCellRenderer(cr);
+            } else {
+                this.issueTable.getColumnModel().getColumn(i).setCellRenderer(lr);
+            }
         }
     }
     // endregion
@@ -313,9 +317,13 @@ public class DataManagementPanel extends JPanel implements DataManagementView {
 
     private JPanel row(String l, Component... c) {
         JPanel r = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        r.setBackground(Color.WHITE);
-        if (!l.isEmpty())
-            r.add(new JLabel(l));
+        r.setBackground(ViewConstants.COLOR_CARD_BG);
+        if (!l.isEmpty()) {
+            JLabel lbl = new JLabel(l);
+            lbl.setFont(ViewConstants.FONT_BODY);
+            lbl.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+            r.add(lbl);
+        }
         for (Component comp : c)
             r.add(comp);
         return r;
@@ -324,10 +332,10 @@ public class DataManagementPanel extends JPanel implements DataManagementView {
     private JPanel box(String t, Component... c) {
         JPanel b = new JPanel();
         b.setLayout(new BoxLayout(b, BoxLayout.Y_AXIS));
-        b.setBackground(Color.WHITE);
+        b.setBackground(ViewConstants.COLOR_CARD_BG);
         b.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER), t, 0, 0,
-                        ViewConstants.FONT_NAV_ACTIVE, ViewConstants.COLOR_TEXT_MAIN),
+                        ViewConstants.FONT_NAV_ACTIVE, ViewConstants.COLOR_PRIMARY_LIGHT),
                 BorderFactory.createEmptyBorder(12, 16, 16, 16)));
         for (Component comp : c)
             b.add(comp);

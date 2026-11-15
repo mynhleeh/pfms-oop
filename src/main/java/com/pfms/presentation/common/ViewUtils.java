@@ -55,32 +55,77 @@ public final class ViewUtils {
     }
 
     public static DefaultTableCellRenderer createRightAlignRenderer() {
-        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-        renderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        return renderer;
+        return createCellRenderer(SwingConstants.RIGHT, ViewConstants.COLOR_TEXT_MAIN);
     }
 
     public static DefaultTableCellRenderer createCenterAlignRenderer() {
-        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-        renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        return renderer;
+        return createCellRenderer(SwingConstants.CENTER, ViewConstants.COLOR_TEXT_MAIN);
     }
 
     public static void styleTable(JTable table) {
         if (table == null) {
             return;
         }
-        table.setRowHeight(32);
+        table.setRowHeight(30);
         table.setFont(ViewConstants.FONT_TABLE_BODY);
         table.setBackground(ViewConstants.COLOR_CARD_BG);
         table.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         table.setGridColor(ViewConstants.COLOR_BORDER);
         table.setShowGrid(true);
+        table.setSelectionBackground(ViewConstants.COLOR_SIDEBAR_ACTIVE);
+        table.setSelectionForeground(ViewConstants.COLOR_TEXT_ACTIVE);
         if (table.getTableHeader() != null) {
-            table.getTableHeader().setFont(ViewConstants.FONT_TABLE_HEADER);
+            table.getTableHeader().setReorderingAllowed(false);
+            table.getTableHeader().setFont(ViewConstants.FONT_NAV_ACTIVE);
             table.getTableHeader().setBackground(ViewConstants.COLOR_HEADER_BG);
-            table.getTableHeader().setForeground(ViewConstants.COLOR_TEXT_MAIN);
+            table.getTableHeader().setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+            table.getTableHeader().setDefaultRenderer(createHeaderRenderer());
         }
+    }
+
+    public static DefaultTableCellRenderer createHeaderRenderer() {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(
+                    JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setBackground(ViewConstants.COLOR_HEADER_BG);
+                setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+                setFont(ViewConstants.FONT_NAV_ACTIVE);
+                setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                        javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, ViewConstants.COLOR_BORDER),
+                        javax.swing.BorderFactory.createEmptyBorder(6, 8, 6, 8)));
+                return this;
+            }
+        };
+    }
+
+    public static void styleScrollPane(javax.swing.JScrollPane scrollPane) {
+        if (scrollPane == null) {
+            return;
+        }
+        scrollPane.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
+        scrollPane.setBackground(ViewConstants.COLOR_CARD_BG);
+        scrollPane.setBorder(javax.swing.BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER));
+    }
+
+    public static DefaultTableCellRenderer createCellRenderer(int alignment, java.awt.Color fgColor) {
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(
+                    JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(alignment);
+                setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                if (!isSelected) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    setForeground(fgColor != null ? fgColor : ViewConstants.COLOR_TEXT_MAIN);
+                }
+                return this;
+            }
+        };
+        renderer.setHorizontalAlignment(alignment);
+        return renderer;
     }
     // endregion
 }

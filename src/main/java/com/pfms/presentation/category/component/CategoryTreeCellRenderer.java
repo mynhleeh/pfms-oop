@@ -20,8 +20,10 @@ public class CategoryTreeCellRenderer extends DefaultTreeCellRenderer {
     public CategoryTreeCellRenderer() {
         setFont(ViewConstants.FONT_BODY);
         setBorder(new EmptyBorder(3, 4, 3, 4));
+        setBackgroundNonSelectionColor(ViewConstants.COLOR_CARD_BG);
         setBackgroundSelectionColor(ViewConstants.COLOR_SIDEBAR_ACTIVE);
         setTextSelectionColor(ViewConstants.COLOR_TEXT_ACTIVE);
+        setTextNonSelectionColor(ViewConstants.COLOR_TEXT_MAIN);
     }
     // endregion
 

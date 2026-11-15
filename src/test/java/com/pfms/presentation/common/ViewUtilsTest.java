@@ -47,7 +47,22 @@ class ViewUtilsTest {
     void testStyleTable() {
         JTable table = new JTable(new DefaultTableModel(2, 2));
         ViewUtils.styleTable(table);
-        assertEquals(32, table.getRowHeight());
+        assertEquals(30, table.getRowHeight());
+        assertEquals(ViewConstants.COLOR_CARD_BG, table.getBackground());
+        assertEquals(ViewConstants.COLOR_TEXT_MAIN, table.getForeground());
+        assertEquals(ViewConstants.COLOR_BORDER, table.getGridColor());
         assertNotNull(table.getTableHeader());
+        assertEquals(ViewConstants.COLOR_HEADER_BG, table.getTableHeader().getBackground());
+        assertEquals(ViewConstants.COLOR_PRIMARY_LIGHT, table.getTableHeader().getForeground());
+    }
+
+    @Test
+    @DisplayName("styleScrollPane applies dark card background and metallic border")
+    void testStyleScrollPane() {
+        javax.swing.JScrollPane sp = new javax.swing.JScrollPane();
+        ViewUtils.styleScrollPane(sp);
+        assertEquals(ViewConstants.COLOR_CARD_BG, sp.getViewport().getBackground());
+        assertEquals(ViewConstants.COLOR_CARD_BG, sp.getBackground());
+        assertNotNull(sp.getBorder());
     }
 }

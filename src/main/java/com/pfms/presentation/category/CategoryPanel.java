@@ -55,7 +55,10 @@ public class CategoryPanel extends JPanel implements CategoryView {
     // region UI
     private void initViews() {
         setLayout(new BorderLayout(10, 10)); setBackground(ViewConstants.COLOR_CONTENT_BG);
-        this.tree.setFont(ViewConstants.FONT_BODY); this.tree.setCellRenderer(new CategoryTreeCellRenderer());
+        this.tree.setFont(ViewConstants.FONT_BODY);
+        this.tree.setBackground(ViewConstants.COLOR_CARD_BG);
+        this.tree.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.tree.setCellRenderer(new CategoryTreeCellRenderer());
         this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         this.tree.addTreeSelectionListener(e -> onTreeNodeSelected()); setupDetailTable();
         this.summaryLabel.setFont(ViewConstants.FONT_NAV_ACTIVE); this.summaryLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
@@ -74,7 +77,10 @@ public class CategoryPanel extends JPanel implements CategoryView {
         north.add(title); north.add(Box.createVerticalStrut(12)); north.add(bar); add(north, BorderLayout.NORTH);
 
         JScrollPane treeSp = new JScrollPane(this.tree), tblSp = new JScrollPane(this.detailTable);
-        treeSp.getViewport().setBackground(Color.WHITE); tblSp.getViewport().setBackground(Color.WHITE);
+        treeSp.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
+        treeSp.setBackground(ViewConstants.COLOR_CARD_BG);
+        tblSp.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
+        tblSp.setBackground(ViewConstants.COLOR_CARD_BG);
         treeSp.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 24, 12, 6), BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
         tblSp.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 6, 12, 24), BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeSp, tblSp);
@@ -87,14 +93,17 @@ public class CategoryPanel extends JPanel implements CategoryView {
     }
 
     private void setupDetailTable() {
-        this.detailTable.setFont(ViewConstants.FONT_BODY); this.detailTable.setRowHeight(28);
-        this.detailTable.getTableHeader().setFont(ViewConstants.FONT_NAV_ACTIVE);
-        this.detailTable.getTableHeader().setBackground(new Color(245, 245, 245)); this.detailTable.setGridColor(ViewConstants.COLOR_BORDER);
-        DefaultTableCellRenderer c = new DefaultTableCellRenderer(); c.setHorizontalAlignment(SwingConstants.CENTER);
+        com.pfms.presentation.common.ViewUtils.styleTable(this.detailTable);
+        DefaultTableCellRenderer c = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.CENTER, ViewConstants.COLOR_TEXT_MUTED);
+        DefaultTableCellRenderer l = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MAIN);
         int[] w = {100, 180, 200, 110};
         for (int i = 0; i < Math.min(4, this.detailTable.getColumnModel().getColumnCount()); i++) {
             this.detailTable.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
-            if (i == 0 || i == 3) this.detailTable.getColumnModel().getColumn(i).setCellRenderer(c);
+            if (i == 0 || i == 3) {
+                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(c);
+            } else {
+                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(l);
+            }
         }
     }
 
