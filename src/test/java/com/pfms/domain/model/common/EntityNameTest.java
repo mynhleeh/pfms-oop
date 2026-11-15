@@ -227,5 +227,32 @@ class EntityNameTest {
             assertEquals("Ví Chính", name.toString());
         }
     }
+
+    @Nested
+    @DisplayName("Group 7: Reconstitute for Backup Restore [AS-02]")
+    class ReconstituteTests {
+
+        @Test
+        @DisplayName("Should reconstitute valid name preserving exact trimmed value and key")
+        void testReconstituteValidName() {
+            EntityName name = EntityName.reconstitute("  Ví Tiết Kiệm  ");
+            assertEquals("Ví Tiết Kiệm", name.getValue());
+            assertEquals("ví tiết kiệm", name.getNormalizedKey());
+        }
+
+        @Test
+        @DisplayName("Should bypass BR-NAM-01 length constraints on restore per AS-02")
+        void testReconstituteBypassesBrNam01() {
+            String longName = "Tên rất dài vượt quá 50 ký tự ".repeat(3);
+            EntityName nameLong = assertDoesNotThrow(() -> EntityName.reconstitute(longName));
+            assertEquals(longName.trim(), nameLong.getValue());
+
+            EntityName nameBlank = assertDoesNotThrow(() -> EntityName.reconstitute("   "));
+            assertEquals("", nameBlank.getValue());
+
+            EntityName nameNull = assertDoesNotThrow(() -> EntityName.reconstitute(null));
+            assertEquals("", nameNull.getValue());
+        }
+    }
 }
 

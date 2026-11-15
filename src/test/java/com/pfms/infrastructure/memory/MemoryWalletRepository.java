@@ -28,7 +28,8 @@ public class MemoryWalletRepository
         Objects.requireNonNull(name, "Tên ví không được để null");
         String trimmed = name.trim();
         return storage.values().stream()
-                .filter(w -> w.getName().equalsIgnoreCase(trimmed))
+                .filter(w -> w.getStatus() != EntityStatus.DELETED
+                        && w.getName().equalsIgnoreCase(trimmed))
                 .findFirst();
     }
 
@@ -37,7 +38,8 @@ public class MemoryWalletRepository
         Objects.requireNonNull(name, "Tên ví không được để null");
         String trimmed = name.trim();
         return storage.values().stream()
-                .anyMatch(w -> w.getName().equalsIgnoreCase(trimmed));
+                .anyMatch(w -> w.getStatus() != EntityStatus.DELETED
+                        && w.getName().equalsIgnoreCase(trimmed));
     }
 
     @Override
@@ -59,7 +61,8 @@ public class MemoryWalletRepository
     @Override
     public Optional<Wallet> findDefaultWallet() {
         return storage.values().stream()
-                .filter(Wallet::isDefaultWallet)
+                .filter(w -> w.getStatus() != EntityStatus.DELETED
+                        && w.isDefaultWallet())
                 .findFirst();
     }
     // endregion

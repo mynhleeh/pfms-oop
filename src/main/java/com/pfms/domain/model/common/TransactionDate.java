@@ -27,14 +27,20 @@ public final class TransactionDate implements Comparable<TransactionDate> {
 
     // region Constructors
     public TransactionDate(LocalDate date) {
+        this(date, true);
+    }
+
+    private TransactionDate(LocalDate date, boolean validateNotFuture) {
         if (date == null) {
             throw new BusinessException(ErrorCode.ERR_FIN_001, "Ngày giao dịch không được để trống (null).");
         }
-        LocalDate today = LocalDate.now();
-        if (date.isAfter(today)) {
-            throw new BusinessException(
-                    ErrorCode.ERR_FIN_001,
-                    "Ngày giao dịch không được vượt quá ngày hiện tại: " + date + " > " + today);
+        if (validateNotFuture) {
+            LocalDate today = LocalDate.now();
+            if (date.isAfter(today)) {
+                throw new BusinessException(
+                        ErrorCode.ERR_FIN_001,
+                        "Ngày giao dịch không được vượt quá ngày hiện tại: " + date + " > " + today);
+            }
         }
         this.date = date;
         this.isoString = date.format(ISO_FORMATTER);
@@ -63,6 +69,10 @@ public final class TransactionDate implements Comparable<TransactionDate> {
 
     public static TransactionDate ofOrToday(LocalDate rawDate) {
         return (rawDate == null) ? now() : of(rawDate);
+    }
+
+    public static TransactionDate reconstitute(LocalDate date) {
+        return new TransactionDate(date, false);
     }
 
     public static void validateRange(LocalDate startDate, LocalDate endDate) {

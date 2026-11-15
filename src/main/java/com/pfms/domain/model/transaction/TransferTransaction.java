@@ -8,6 +8,7 @@ import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.wallet.Wallet;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ import java.util.UUID;
  * có).
  */
 public class TransferTransaction extends Transaction {
+
+    private static final String FEE_WALLET_MISMATCH_MESSAGE = "Ví của chi phí phải trùng với ví nguồn chuyển tiền.";
 
     // region State
     private final Wallet sourceWallet;
@@ -28,12 +31,32 @@ public class TransferTransaction extends Transaction {
             UUID transactionId, Wallet sourceWallet, Wallet destinationWallet,
             Money amount, TransactionDate transactionDate,
             String note, TransactionFee fee) {
+        this(transactionId, sourceWallet, destinationWallet, amount, transactionDate,
+                note, fee, LocalDateTime.now(), true);
+    }
 
-        super(transactionId, validateTransferAmount(amount), transactionDate, note, fee);
-        this.sourceWallet = validateWallet(sourceWallet, "Ví nguồn không được để null");
-        this.destinationWallet = validateWallet(destinationWallet, "Ví đích không được để null");
+    private TransferTransaction(
+            UUID transactionId, Wallet sourceWallet, Wallet destinationWallet,
+            Money amount, TransactionDate transactionDate,
+            String note, TransactionFee fee,
+            LocalDateTime createdAt, boolean requireActiveReferences) {
+
+        super(transactionId, validateTransferAmount(amount), transactionDate, note, fee, createdAt);
+        this.sourceWallet = validateWallet(sourceWallet, "Ví nguồn không được để null", requireActiveReferences);
+        this.destinationWallet = validateWallet(
+                destinationWallet, "Ví đích không được để null", requireActiveReferences);
         validateDistinctWallets(this.sourceWallet, this.destinationWallet);
-        validateFeeWallet(fee, this.sourceWallet);
+        validateFeeWallet(fee, this.sourceWallet, FEE_WALLET_MISMATCH_MESSAGE);
+    }
+
+    public static TransferTransaction reconstitute(
+            UUID transactionId, Wallet sourceWallet, Wallet destinationWallet,
+            Money amount, TransactionDate transactionDate,
+            String note, TransactionFee fee,
+            LocalDateTime createdAt) {
+        return new TransferTransaction(
+                transactionId, sourceWallet, destinationWallet,
+                amount, transactionDate, note, fee, createdAt, false);
     }
     // endregion
 
@@ -42,7 +65,7 @@ public class TransferTransaction extends Transaction {
     public void applyToWallet() {
         validateWalletActive(this.sourceWallet);
         validateWalletActive(this.destinationWallet);
-        validateFeeWallet(this.fee, this.sourceWallet);
+        validateFeeWallet(this.fee, this.sourceWallet, FEE_WALLET_MISMATCH_MESSAGE);
 
         Money totalDebit = getTotalSourceDeduction();
         if (!this.sourceWallet.hasSufficientBalance(totalDebit)) {
@@ -101,29 +124,10 @@ public class TransferTransaction extends Transaction {
         return amount;
     }
 
-    private static Wallet validateWallet(Wallet wallet, String nullMessage) {
-        Objects.requireNonNull(wallet, nullMessage);
-        validateWalletActive(wallet);
-        return wallet;
-    }
-
-    private static void validateWalletActive(Wallet wallet) {
-        if (!wallet.isActive()) {
-            throw new BusinessException(ErrorCode.ERR_WAL_001, "Ví thanh toán không ở trạng thái hoạt động.");
-        }
-    }
-
     private static void validateDistinctWallets(Wallet source, Wallet destination) {
         if (Objects.equals(source.getId(), destination.getId())) {
             throw new BusinessException(ErrorCode.ERR_TRF_001,
                     "Giao dịch không hợp lệ: Ví chuyển và ví nhận phải khác nhau.");
-        }
-    }
-
-    private static void validateFeeWallet(TransactionFee fee, Wallet sourceWallet) {
-        if (fee != null && !fee.getWallet().equals(sourceWallet)) {
-            throw new BusinessException(ErrorCode.ERR_FEE_001,
-                    "Ví của chi phí phải trùng với ví nguồn chuyển tiền.");
         }
     }
 
@@ -138,26 +142,11 @@ public class TransferTransaction extends Transaction {
                 "Ví đích không khớp với giao dịch chuyển tiền.");
         validateWalletActive(sourceWallet);
         validateWalletActive(destinationWallet);
-        validateFeeWallet(this.fee, sourceWallet);
+        validateFeeWallet(this.fee, sourceWallet, FEE_WALLET_MISMATCH_MESSAGE);
     }
     // endregion
 
     // region Identity
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        TransferTransaction that = (TransferTransaction) o;
-        return Objects.equals(this.transactionId, that.transactionId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.transactionId);
-    }
-
     @Override
     public String toString() {
         return String.format(

@@ -67,20 +67,40 @@ public class Wallet {
             UUID id, String name, String note, boolean defaultWallet,
             LocalDateTime createdAt, WalletState state, Money currentBalance) {
 
-        this.id = Objects.requireNonNull(id, "Mã ví không được để null");
-        this.name = EntityName.of(name, "Tên ví");
-        this.note = Note.of(note, "Ghi chú ví");
-        this.defaultWallet = defaultWallet;
-        this.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo không được để null");
-        this.state = Objects.requireNonNull(state, "Trạng thái khởi tạo không được để null");
-        this.currentBalance = Objects.requireNonNull(currentBalance, "Số dư khởi tạo không được để null");
+        this(id, name, note, defaultWallet, createdAt, state, currentBalance, false);
     }
 
     public Wallet(
             String id, String name, String note, boolean defaultWallet,
             LocalDateTime createdAt, WalletState state, Money currentBalance) {
 
-        this(parseId(id), name, note, defaultWallet, createdAt, state, currentBalance);
+        this(parseId(id), name, note, defaultWallet, createdAt, state, currentBalance, false);
+    }
+
+    private Wallet(
+            UUID id, String name, String note, boolean defaultWallet,
+            LocalDateTime createdAt, WalletState state, Money currentBalance,
+            boolean reconstituting) {
+
+        this.id = Objects.requireNonNull(id, "Mã ví không được để null");
+        this.name = reconstituting ? EntityName.reconstitute(name) : EntityName.of(name, "Tên ví");
+        this.note = Note.of(note, "Ghi chú ví");
+        this.defaultWallet = defaultWallet;
+        this.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo không được để null");
+        this.state = Objects.requireNonNull(state, "Trạng thái khởi tạo không được để null");
+        this.currentBalance = Objects.requireNonNull(currentBalance, "Số dư khởi tạo không được để null");
+        if (!reconstituting && currentBalance.isNegative()) {
+            throw new BusinessException(
+                    ErrorCode.ERR_WAL_001,
+                    "Số dư khả dụng của ví không được nhỏ hơn 0.");
+        }
+    }
+
+    public static Wallet reconstitute(
+            UUID id, String name, String note, boolean defaultWallet,
+            LocalDateTime createdAt, WalletState state, Money currentBalance) {
+
+        return new Wallet(id, name, note, defaultWallet, createdAt, state, currentBalance, true);
     }
     // endregion
 
@@ -208,7 +228,7 @@ public class Wallet {
     }
 
     public Wallet copy() {
-        return new Wallet(
+        return Wallet.reconstitute(
                 this.id,
                 this.name.getValue(),
                 this.note.getValue(),

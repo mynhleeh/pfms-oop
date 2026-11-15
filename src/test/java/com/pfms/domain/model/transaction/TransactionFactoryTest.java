@@ -15,6 +15,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -526,6 +527,213 @@ class TransactionFactoryTest {
                     )
             );
             assertEquals(ErrorCode.ERR_CAT_001, exception.getErrorCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("Group 6: Reconstitute Persisted Transactions and Fees")
+    class ReconstitutionTests {
+
+        @Test
+        @DisplayName("Tái tạo TransactionFee với ví đã lưu trữ và danh mục phí đã xóa")
+        void testReconstituteFeeWithArchivedWalletAndDeletedCategory() {
+            sourceWallet.archive();
+            feeCategory.markDeleted();
+            UUID feeId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            UUID parentId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+            Money persistedFeeAmount = Money.of("15000.00");
+
+            TransactionFee fee = TransactionFactory.reconstituteFee(
+                    feeId,
+                    parentId,
+                    persistedFeeAmount,
+                    sourceWallet,
+                    feeCategory
+            );
+
+            assertEquals(feeId, fee.getFeeId());
+            assertEquals(parentId, fee.getParentTransactionId());
+            assertEquals(Money.of("15000.00"), fee.getAmount());
+            assertSame(sourceWallet, fee.getWallet());
+            assertSame(feeCategory, fee.getCategory());
+        }
+
+        @Test
+        @DisplayName("Tái tạo TransactionFee vẫn từ chối danh mục không phải EXPENSE")
+        void testReconstituteFeeRejectsIncomeCategory() {
+            UUID feeId = UUID.randomUUID();
+            UUID parentId = UUID.randomUUID();
+
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> TransactionFactory.reconstituteFee(
+                            feeId,
+                            parentId,
+                            feeAmount,
+                            sourceWallet,
+                            incomeCategory
+                    )
+            );
+            assertEquals(ErrorCode.ERR_FEE_003, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Tái tạo IncomeExpenseTransaction giữ nguyên createdAt và cho phép ví lưu trữ, danh mục đã xóa")
+        void testReconstituteIncomeExpensePreservesCreatedAtAndAllowsInactiveReferences() {
+            sourceWallet.archive();
+            expenseCategory.markDeleted();
+            feeCategory.markDeleted();
+            UUID txnId = UUID.fromString("33333333-3333-3333-3333-333333333333");
+            UUID feeId = UUID.fromString("44444444-4444-4444-4444-444444444444");
+            LocalDateTime persistedCreatedAt = LocalDateTime.of(2024, 11, 20, 14, 45, 30);
+            TransactionDate persistedDate = TransactionDate.of(LocalDate.of(2024, 11, 20));
+            TransactionFee persistedFee = TransactionFactory.reconstituteFee(
+                    feeId, txnId, feeAmount, sourceWallet, feeCategory);
+
+            IncomeExpenseTransaction txn = TransactionFactory.reconstituteIncomeExpense(
+                    txnId,
+                    TransactionType.EXPENSE,
+                    sourceWallet,
+                    expenseCategory,
+                    Money.of("250000.00"),
+                    persistedDate,
+                    "Chi phí lịch sử",
+                    persistedFee,
+                    persistedCreatedAt
+            );
+
+            assertEquals(txnId, txn.getTransactionId());
+            assertEquals(TransactionType.EXPENSE, txn.getTransactionType());
+            assertSame(sourceWallet, txn.getWallet());
+            assertSame(expenseCategory, txn.getCategory());
+            assertEquals(Money.of("250000.00"), txn.getAmount());
+            assertEquals(persistedDate, txn.getTransactionDate());
+            assertEquals("Chi phí lịch sử", txn.getNote());
+            assertEquals(persistedCreatedAt, txn.getCreatedAt());
+            assertSame(persistedFee, txn.getFee().orElseThrow());
+        }
+
+        @Test
+        @DisplayName("Tái tạo IncomeExpenseTransaction không có phí giữ Optional.empty và từ chối sai loại danh mục")
+        void testReconstituteIncomeExpenseWithoutFeeAndRejectsCategoryMismatch() {
+            UUID txnId = UUID.randomUUID();
+            LocalDateTime persistedCreatedAt = LocalDateTime.of(2024, 9, 1, 8, 0, 0);
+
+            IncomeExpenseTransaction txn = TransactionFactory.reconstituteIncomeExpense(
+                    txnId,
+                    TransactionType.INCOME,
+                    sourceWallet,
+                    incomeCategory,
+                    Money.of("500000.00"),
+                    txnDate,
+                    "Thu nhập không phí",
+                    null,
+                    persistedCreatedAt
+            );
+
+            assertTrue(txn.getFee().isEmpty());
+            assertEquals(persistedCreatedAt, txn.getCreatedAt());
+
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> TransactionFactory.reconstituteIncomeExpense(
+                            txnId,
+                            TransactionType.INCOME,
+                            sourceWallet,
+                            expenseCategory,
+                            txnAmount,
+                            txnDate,
+                            "Sai loại",
+                            null,
+                            persistedCreatedAt
+                    )
+            );
+            assertEquals(ErrorCode.ERR_CAT_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Tái tạo TransferTransaction giữ nguyên createdAt và cho phép hai ví đã lưu trữ kèm phụ phí")
+        void testReconstituteTransferPreservesCreatedAtAndAllowsArchivedWallets() {
+            sourceWallet.archive();
+            destinationWallet.archive();
+            feeCategory.markDeleted();
+            UUID txnId = UUID.fromString("55555555-5555-5555-5555-555555555555");
+            UUID feeId = UUID.fromString("66666666-6666-6666-6666-666666666666");
+            LocalDateTime persistedCreatedAt = LocalDateTime.of(2024, 10, 5, 9, 15, 0);
+            TransactionDate persistedDate = TransactionDate.of(LocalDate.of(2024, 10, 5));
+            TransactionFee persistedFee = TransactionFactory.reconstituteFee(
+                    feeId, txnId, feeAmount, sourceWallet, feeCategory);
+
+            TransferTransaction txn = TransactionFactory.reconstituteTransfer(
+                    txnId,
+                    sourceWallet,
+                    destinationWallet,
+                    Money.of("300000.00"),
+                    persistedDate,
+                    "Chuyển khoản lịch sử",
+                    persistedFee,
+                    persistedCreatedAt
+            );
+
+            assertEquals(txnId, txn.getTransactionId());
+            assertSame(sourceWallet, txn.getSourceWallet());
+            assertSame(destinationWallet, txn.getDestinationWallet());
+            assertEquals(Money.of("300000.00"), txn.getAmount());
+            assertEquals(persistedDate, txn.getTransactionDate());
+            assertEquals("Chuyển khoản lịch sử", txn.getNote());
+            assertEquals(persistedCreatedAt, txn.getCreatedAt());
+            assertSame(persistedFee, txn.getFee().orElseThrow());
+        }
+
+        @Test
+        @DisplayName("Tái tạo TransferTransaction vẫn từ chối trùng ví nguồn-đích và createdAt null")
+        void testReconstituteTransferRejectsSameWalletsAndNullCreatedAt() {
+            UUID txnId = UUID.randomUUID();
+            LocalDateTime persistedCreatedAt = LocalDateTime.of(2024, 10, 5, 9, 15, 0);
+
+            BusinessException ex = assertThrows(
+                    BusinessException.class,
+                    () -> TransactionFactory.reconstituteTransfer(
+                            txnId,
+                            sourceWallet,
+                            sourceWallet,
+                            txnAmount,
+                            txnDate,
+                            "Trùng ví",
+                            null,
+                            persistedCreatedAt
+                    )
+            );
+            assertEquals(ErrorCode.ERR_TRF_001, ex.getErrorCode());
+
+            assertThrows(
+                    NullPointerException.class,
+                    () -> TransactionFactory.reconstituteTransfer(
+                            txnId,
+                            sourceWallet,
+                            destinationWallet,
+                            txnAmount,
+                            txnDate,
+                            "Thiếu thời điểm tạo",
+                            null,
+                            null
+                    )
+            );
+
+            assertThrows(
+                    NullPointerException.class,
+                    () -> TransactionFactory.reconstituteIncomeExpense(
+                            txnId,
+                            TransactionType.EXPENSE,
+                            sourceWallet,
+                            expenseCategory,
+                            txnAmount,
+                            txnDate,
+                            "Thiếu thời điểm tạo",
+                            null,
+                            null
+                    )
+            );
         }
     }
 }

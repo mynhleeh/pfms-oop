@@ -151,6 +151,23 @@ class MemoryCategoryRepositoryTest {
             assertTrue(found.isPresent());
             assertEquals(catId1, found.get().getCategoryId());
         }
+
+        @Test
+        @DisplayName("findByNameAndNeedGroupId ưu tiên trả về danh mục ACTIVE trước DELETED khi trùng tên")
+        void testFindByNameAndNeedGroupIdPrefersActiveOverDeleted() {
+            cat1.markDeleted();
+            repository.save(cat1);
+
+            UUID activeReplacementId = UUID.randomUUID();
+            Category activeReplacement = new Category(
+                    activeReplacementId, "Ăn uống", needGroupId1, TransactionType.EXPENSE, "new-icon", "#444");
+            repository.save(activeReplacement);
+
+            Optional<Category> found = repository.findByNameAndNeedGroupId("  ăn uống  ", needGroupId1);
+            assertTrue(found.isPresent());
+            assertTrue(found.get().isActive());
+            assertEquals(activeReplacementId, found.get().getCategoryId());
+        }
     }
 
     @Nested

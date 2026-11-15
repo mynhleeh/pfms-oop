@@ -6,6 +6,7 @@ import com.pfms.domain.model.common.EntityName;
 import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.transaction.TransactionType;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,7 +15,8 @@ import java.util.UUID;
 
 /**
  * Nhóm nhu cầu cấp 2 trong hệ thống PFMS.
- * Gom cụm các danh mục chi tiết (cấp 3) cùng loại thu/chi để phân tích tài chính.
+ * Gom cụm các danh mục chi tiết (cấp 3) cùng loại thu/chi để phân tích tài
+ * chính.
  */
 public class NeedGroup {
 
@@ -26,17 +28,39 @@ public class NeedGroup {
     private String icon;
     private String color;
     private final List<Category> categories;
+    private final LocalDateTime createdAt;
     // endregion
 
     // region Constructors
     public NeedGroup(UUID needGroupId, String name, TransactionType transactionType, String icon, String color) {
+        this(needGroupId, name, transactionType, EntityStatus.ACTIVE,
+                icon, color, LocalDateTime.now(), false);
+    }
+
+    private NeedGroup(
+            UUID needGroupId, String name, TransactionType transactionType,
+            EntityStatus status, String icon, String color, LocalDateTime createdAt,
+            boolean reconstituting) {
+
         this.needGroupId = Objects.requireNonNull(needGroupId, "Mã nhóm nhu cầu không được để null");
-        this.name = EntityName.of(name, "Tên nhóm nhu cầu");
+        this.name = reconstituting ? EntityName.reconstitute(name) : EntityName.of(name, "Tên nhóm nhu cầu");
         this.transactionType = Objects.requireNonNull(transactionType, "Loại thu chi không được để null");
-        this.status = EntityStatus.ACTIVE;
+        Objects.requireNonNull(status, "Trạng thái nhóm nhu cầu không được để null");
+        if (status != EntityStatus.ACTIVE && status != EntityStatus.DELETED) {
+            throw new IllegalArgumentException("Trạng thái nhóm nhu cầu chỉ hỗ trợ ACTIVE hoặc DELETED");
+        }
+        this.status = status;
         this.icon = normalizeIcon(icon);
         this.color = normalizeColor(color);
         this.categories = new ArrayList<>();
+        this.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo nhóm nhu cầu không được để null");
+    }
+
+    public static NeedGroup reconstitute(
+            UUID needGroupId, String name,
+            TransactionType transactionType, EntityStatus status,
+            String icon, String color, LocalDateTime createdAt) {
+        return new NeedGroup(needGroupId, name, transactionType, status, icon, color, createdAt, true);
     }
     // endregion
 
@@ -117,6 +141,10 @@ public class NeedGroup {
 
     public String getColor() {
         return this.color;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
     }
 
     public List<Category> getCategories() {

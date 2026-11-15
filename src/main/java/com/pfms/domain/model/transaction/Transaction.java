@@ -5,6 +5,7 @@ import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.Note;
 import com.pfms.domain.model.common.TransactionDate;
+import com.pfms.domain.model.wallet.Wallet;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -40,13 +41,19 @@ public abstract class Transaction {
     protected Transaction(
             UUID transactionId, Money amount, TransactionDate transactionDate,
             String note, TransactionFee fee) {
+        this(transactionId, amount, transactionDate, note, fee, LocalDateTime.now());
+    }
+
+    protected Transaction(
+            UUID transactionId, Money amount, TransactionDate transactionDate,
+            String note, TransactionFee fee, LocalDateTime createdAt) {
 
         this.transactionId = Objects.requireNonNull(transactionId, "Mã giao dịch không được để null");
         this.amount = validateAmount(amount);
         this.transactionDate = Objects.requireNonNull(transactionDate, "Ngày giao dịch không được để null");
         this.note = Note.of(note, "Ghi chú giao dịch");
         this.fee = validateFee(fee, transactionId);
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo giao dịch không được để null");
     }
     // endregion
 
@@ -119,6 +126,26 @@ public abstract class Transaction {
             throw new BusinessException(ErrorCode.ERR_FEE_001, "Mã giao dịch gốc của phí không khớp với giao dịch.");
         }
         return fee;
+    }
+
+    protected static Wallet validateWallet(Wallet wallet, String nullMessage, boolean requireActive) {
+        Objects.requireNonNull(wallet, nullMessage);
+        if (requireActive) {
+            validateWalletActive(wallet);
+        }
+        return wallet;
+    }
+
+    protected static void validateWalletActive(Wallet wallet) {
+        if (!wallet.isActive()) {
+            throw new BusinessException(ErrorCode.ERR_WAL_001, "Ví thanh toán không ở trạng thái hoạt động.");
+        }
+    }
+
+    protected static void validateFeeWallet(TransactionFee fee, Wallet expectedWallet, String mismatchMessage) {
+        if (fee != null && !fee.getWallet().equals(expectedWallet)) {
+            throw new BusinessException(ErrorCode.ERR_FEE_001, mismatchMessage);
+        }
     }
     // endregion
 

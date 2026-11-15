@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,9 @@ class NeedGroupRepositoryTest {
             Objects.requireNonNull(type, "TransactionType must not be null");
             String trimmed = name.trim();
             return storage.values().stream()
-                    .anyMatch(g -> g.getTransactionType() == type && g.getName().equalsIgnoreCase(trimmed));
+                    .anyMatch(g -> g.isActive()
+                            && g.getTransactionType() == type
+                            && g.getName().equalsIgnoreCase(trimmed));
         }
 
         @Override
@@ -93,7 +96,8 @@ class NeedGroupRepositoryTest {
             Objects.requireNonNull(needGroupId, "needGroupId must not be null");
             String trimmed = name.trim();
             return storage.values().stream()
-                    .anyMatch(g -> !g.getNeedGroupId().equals(needGroupId)
+                    .anyMatch(g -> g.isActive()
+                            && !g.getNeedGroupId().equals(needGroupId)
                             && g.getTransactionType() == type
                             && g.getName().equalsIgnoreCase(trimmed));
         }
@@ -105,6 +109,7 @@ class NeedGroupRepositoryTest {
             String trimmed = name.trim();
             return storage.values().stream()
                     .filter(g -> g.getTransactionType() == type && g.getName().equalsIgnoreCase(trimmed))
+                    .sorted(Comparator.comparing(NeedGroup::isActive).reversed())
                     .findFirst();
         }
 
@@ -203,28 +208,46 @@ class NeedGroupRepositoryTest {
     class NameUniquenessTests {
 
         @Test
-        @DisplayName("existsByNameAndType kiểm tra không phân biệt hoa thường và cắt khoảng trắng")
+        @DisplayName("existsByNameAndType kiểm tra không phân biệt hoa thường, cắt khoảng trắng và bỏ qua nhóm đã xóa")
         void testExistsByNameAndType() {
             assertTrue(repository.existsByNameAndType("  thiết yếu  ", TransactionType.EXPENSE));
             assertFalse(repository.existsByNameAndType("Thiết yếu", TransactionType.INCOME));
             assertFalse(repository.existsByNameAndType("Không tồn tại", TransactionType.EXPENSE));
+
+            expenseGroup1.markDeleted(2);
+            repository.save(expenseGroup1);
+            assertFalse(repository.existsByNameAndType("Thiết yếu", TransactionType.EXPENSE));
         }
 
         @Test
-        @DisplayName("existsByNameAndTypeAndIdNot bỏ qua chính nhóm đang cập nhật")
+        @DisplayName("existsByNameAndTypeAndIdNot bỏ qua chính nhóm đang cập nhật và nhóm đã xóa")
         void testExistsByNameAndTypeAndIdNot() {
             // Kiểm tra trùng tên với chính mình -> false
             assertFalse(repository.existsByNameAndTypeAndIdNot("Thiết yếu", TransactionType.EXPENSE, expenseGroup1.getNeedGroupId()));
             // Kiểm tra trùng tên với nhóm khác -> true
             assertTrue(repository.existsByNameAndTypeAndIdNot("Giải trí", TransactionType.EXPENSE, expenseGroup1.getNeedGroupId()));
+
+            expenseGroup2.markDeleted(2);
+            repository.save(expenseGroup2);
+            assertFalse(repository.existsByNameAndTypeAndIdNot("Giải trí", TransactionType.EXPENSE, expenseGroup1.getNeedGroupId()));
         }
 
         @Test
-        @DisplayName("findByNameAndType tìm thấy nhóm theo tên và loại thu chi")
+        @DisplayName("findByNameAndType tìm thấy nhóm theo tên/loại và ưu tiên nhóm ACTIVE hơn DELETED")
         void testFindByNameAndType() {
             Optional<NeedGroup> found = repository.findByNameAndType("Thiết yếu", TransactionType.EXPENSE);
             assertTrue(found.isPresent());
             assertEquals(expenseGroup1.getNeedGroupId(), found.get().getNeedGroupId());
+
+            expenseGroup1.markDeleted(2);
+            repository.save(expenseGroup1);
+            assertTrue(repository.findByNameAndType("Thiết yếu", TransactionType.EXPENSE).orElseThrow().isDeleted());
+
+            NeedGroup recreated = new NeedGroup(UUID.randomUUID(), "Thiết yếu", TransactionType.EXPENSE, "icon1", "#111");
+            repository.save(recreated);
+            NeedGroup resolved = repository.findByNameAndType("  thiết yếu ", TransactionType.EXPENSE).orElseThrow();
+            assertEquals(recreated.getNeedGroupId(), resolved.getNeedGroupId());
+            assertTrue(resolved.isActive());
         }
     }
 }

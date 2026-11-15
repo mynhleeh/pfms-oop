@@ -133,10 +133,23 @@ class MemoryNeedGroupRepositoryTest {
         }
 
         @Test
-        @DisplayName("existsByNameAndTypeAndIdNot bỏ qua chính ID của nhóm")
+        @DisplayName("existsByNameAndType bỏ qua nhóm đã xóa mềm (DELETED)")
+        void testExistsByNameAndTypeIgnoresSoftDeletedGroup() {
+            expenseGroup1.markDeleted(2);
+            repository.save(expenseGroup1);
+
+            assertFalse(repository.existsByNameAndType("  thiết yếu  ", TransactionType.EXPENSE));
+        }
+
+        @Test
+        @DisplayName("existsByNameAndTypeAndIdNot bỏ qua chính ID của nhóm và nhóm đã xóa mềm")
         void testExistsByNameAndTypeAndIdNot() {
             assertFalse(repository.existsByNameAndTypeAndIdNot("Thiết yếu", TransactionType.EXPENSE, groupId1));
             assertTrue(repository.existsByNameAndTypeAndIdNot("Hưởng thụ", TransactionType.EXPENSE, groupId1));
+
+            expenseGroup2.markDeleted(2);
+            repository.save(expenseGroup2);
+            assertFalse(repository.existsByNameAndTypeAndIdNot("  Hưởng thụ  ", TransactionType.EXPENSE, groupId1));
         }
 
         @Test
@@ -145,6 +158,30 @@ class MemoryNeedGroupRepositoryTest {
             Optional<NeedGroup> found = repository.findByNameAndType("Thiết yếu", TransactionType.EXPENSE);
             assertTrue(found.isPresent());
             assertEquals(groupId1, found.get().getNeedGroupId());
+        }
+
+        @Test
+        @DisplayName("findByNameAndType ưu tiên nhóm ACTIVE khi có nhóm DELETED trùng tên")
+        void testFindByNameAndTypePrefersActiveOverDeleted() {
+            expenseGroup1.markDeleted(2);
+            repository.save(expenseGroup1);
+
+            NeedGroup deletedOnly = repository.findByNameAndType("  thiết yếu  ", TransactionType.EXPENSE).orElseThrow();
+            assertTrue(deletedOnly.isDeleted());
+
+            for (int i = 0; i < 5; i++) {
+                String name = "Nhóm trùng tên " + i;
+                NeedGroup deletedDup = new NeedGroup(UUID.randomUUID(), name, TransactionType.EXPENSE, "icon", "#111");
+                deletedDup.markDeleted(2);
+                NeedGroup activeDup = new NeedGroup(UUID.randomUUID(), name, TransactionType.EXPENSE, "icon", "#222");
+                repository.save(deletedDup);
+                repository.save(activeDup);
+
+                NeedGroup resolved = repository.findByNameAndType("  " + name.toLowerCase() + " ", TransactionType.EXPENSE)
+                        .orElseThrow();
+                assertEquals(activeDup.getNeedGroupId(), resolved.getNeedGroupId());
+                assertTrue(resolved.isActive());
+            }
         }
     }
 
@@ -163,6 +200,8 @@ class MemoryNeedGroupRepositoryTest {
             assertThrows(NullPointerException.class, () -> repository.existsByNameAndTypeAndIdNot(null, TransactionType.EXPENSE, groupId1));
             assertThrows(NullPointerException.class, () -> repository.existsByNameAndTypeAndIdNot("A", null, groupId1));
             assertThrows(NullPointerException.class, () -> repository.existsByNameAndTypeAndIdNot("A", TransactionType.EXPENSE, null));
+            assertThrows(NullPointerException.class, () -> repository.findByNameAndType(null, TransactionType.EXPENSE));
+            assertThrows(NullPointerException.class, () -> repository.findByNameAndType("A", null));
         }
     }
 

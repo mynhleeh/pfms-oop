@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,8 +53,36 @@ class NeedGroupTest {
             assertEquals(EntityStatus.ACTIVE, group.getStatus());
             assertEquals("essential-icon", group.getIcon());
             assertEquals("#FF5733", group.getColor());
+            assertNotNull(group.getCreatedAt());
             assertTrue(group.isActive());
             assertFalse(group.isDeleted());
+            assertTrue(group.getCategories().isEmpty());
+        }
+
+        @Test
+        @DisplayName("Tái tạo nhóm nhu cầu từ dữ liệu lưu trữ giữ nguyên trạng thái DELETED và thời điểm tạo lịch sử")
+        void testReconstituteDeletedGroupWithHistoricalCreatedAt() {
+            LocalDateTime historicalTime = LocalDateTime.of(2024, 3, 15, 10, 45, 0);
+
+            NeedGroup group = NeedGroup.reconstitute(
+                    needGroupId,
+                    "Giải trí cũ",
+                    TransactionType.EXPENSE,
+                    EntityStatus.DELETED,
+                    "gamepad",
+                    "#9C27B0",
+                    historicalTime
+            );
+
+            assertEquals(needGroupId, group.getNeedGroupId());
+            assertEquals("Giải trí cũ", group.getName());
+            assertEquals(TransactionType.EXPENSE, group.getTransactionType());
+            assertEquals(EntityStatus.DELETED, group.getStatus());
+            assertTrue(group.isDeleted());
+            assertFalse(group.isActive());
+            assertEquals("gamepad", group.getIcon());
+            assertEquals("#9C27B0", group.getColor());
+            assertEquals(historicalTime, group.getCreatedAt());
             assertTrue(group.getCategories().isEmpty());
         }
 
@@ -399,6 +428,38 @@ class NeedGroupTest {
             assertTrue(str.contains(needGroupId.toString()));
             assertTrue(str.contains("Nhu cầu thiết yếu"));
             assertTrue(str.contains("EXPENSE"));
+        }
+
+        @Test
+        @DisplayName("Tái tạo nhóm nhu cầu từ chối tham số status/createdAt null hoặc trạng thái ARCHIVED không hợp lệ")
+        void testReconstituteRejectsInvalidStatusOrNullCreatedAt() {
+            LocalDateTime createdAt = LocalDateTime.of(2025, 6, 15, 9, 30, 0);
+
+            assertThrows(NullPointerException.class, () -> NeedGroup.reconstitute(
+                    needGroupId, "Nhu cầu", TransactionType.EXPENSE, null, "", "", createdAt));
+            assertThrows(NullPointerException.class, () -> NeedGroup.reconstitute(
+                    needGroupId, "Nhu cầu", TransactionType.EXPENSE, EntityStatus.ACTIVE, "", "", null));
+            assertThrows(IllegalArgumentException.class, () -> NeedGroup.reconstitute(
+                    needGroupId, "Nhu cầu", TransactionType.EXPENSE, EntityStatus.ARCHIVED, "", "", createdAt));
+        }
+
+        @Test
+        @DisplayName("Tái tạo nhóm nhu cầu lịch sử vượt 50 ký tự vẫn thành công theo AS-02 (bỏ qua BR-NAM-01)")
+        void testReconstituteBypassesBrNam01LegacyName() {
+            LocalDateTime createdAt = LocalDateTime.of(2025, 6, 15, 9, 30, 0);
+            String legacyLongName = "A".repeat(55);
+
+            NeedGroup reconstituted = assertDoesNotThrow(() -> NeedGroup.reconstitute(
+                    needGroupId,
+                    "  " + legacyLongName + "  ",
+                    TransactionType.EXPENSE,
+                    EntityStatus.ACTIVE,
+                    "",
+                    "",
+                    createdAt));
+
+            assertEquals(legacyLongName, reconstituted.getName());
+            assertEquals(createdAt, reconstituted.getCreatedAt());
         }
     }
 }

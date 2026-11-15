@@ -2,6 +2,8 @@ package com.pfms.domain.model.transaction;
 
 import com.pfms.common.util.Preconditions;
 
+import java.util.Locale;
+
 /**
  * Kiểu liệt kê loại giao dịch và nhánh danh mục cấp 1 trong hệ thống PFMS.
  * Xác định chiều dòng tiền (Thu nhập hoặc Chi tiêu) và ràng buộc tính tương
@@ -57,9 +59,9 @@ public enum TransactionType {
     // region Parsers
     public static TransactionType fromString(String rawValue) {
         String nonBlank = Preconditions.requireNonBlank(rawValue, "Loại giao dịch không được để trống.");
-        String normalized = nonBlank.toUpperCase();
+        String normalized = nonBlank.toUpperCase(Locale.ROOT);
         for (TransactionType type : values()) {
-            if (type.name().equals(normalized) || type.code.equalsIgnoreCase(normalized)) {
+            if (type.name().equals(normalized) || type.code.equals(normalized)) {
                 return type;
             }
         }

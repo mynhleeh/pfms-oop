@@ -25,11 +25,26 @@ public class TransactionFee {
 
     // region Constructors
     public TransactionFee(UUID feeId, UUID parentTransactionId, Money amount, Wallet wallet, Category category) {
+        this(feeId, parentTransactionId, amount, wallet, category, true);
+    }
+
+    private TransactionFee(
+            UUID feeId,
+            UUID parentTransactionId,
+            Money amount,
+            Wallet wallet,
+            Category category,
+            boolean requireActiveReferences) {
         this.feeId = Objects.requireNonNull(feeId, "Mã chi phí không được để null");
         this.parentTransactionId = Objects.requireNonNull(parentTransactionId, "Mã giao dịch gốc không được để null");
         this.amount = validateAmount(amount);
-        this.wallet = validateWallet(wallet);
-        this.category = validateCategory(category);
+        this.wallet = validateWallet(wallet, requireActiveReferences);
+        this.category = validateCategory(category, requireActiveReferences);
+    }
+
+    public static TransactionFee reconstitute(
+            UUID feeId, UUID parentTransactionId, Money amount, Wallet wallet, Category category) {
+        return new TransactionFee(feeId, parentTransactionId, amount, wallet, category, false);
     }
     // endregion
 
@@ -44,8 +59,8 @@ public class TransactionFee {
 
     public void updateFee(Money newAmount, Category newCategory, Wallet newWallet) {
         this.amount = validateAmount(newAmount);
-        this.category = validateCategory(newCategory);
-        this.wallet = validateWallet(newWallet);
+        this.category = validateCategory(newCategory, true);
+        this.wallet = validateWallet(newWallet, true);
     }
     // endregion
 
@@ -79,20 +94,21 @@ public class TransactionFee {
         return amount;
     }
 
-    private static Wallet validateWallet(Wallet wallet) {
+    private static Wallet validateWallet(Wallet wallet, boolean requireActive) {
         Objects.requireNonNull(wallet, "Ví thanh toán không được để null");
-        if (!wallet.isActive()) {
+        if (requireActive && !wallet.isActive()) {
             throw new BusinessException(ErrorCode.ERR_FEE_001, "Ví thanh toán không ở trạng thái hoạt động.");
         }
         return wallet;
     }
 
-    private static Category validateCategory(Category category) {
+    private static Category validateCategory(Category category, boolean requireActive) {
         if (category == null) {
             throw new BusinessException(ErrorCode.ERR_FEE_002, "Vui lòng chọn danh mục cho phí giao dịch.");
         }
-        if (!category.isActive() || category.getTransactionType() != TransactionType.EXPENSE) {
-            throw new BusinessException(ErrorCode.ERR_FEE_003, "Danh mục phí không hợp lệ hoặc không tương thích với loại chi tiêu.");
+        if ((requireActive && !category.isActive()) || category.getTransactionType() != TransactionType.EXPENSE) {
+            throw new BusinessException(ErrorCode.ERR_FEE_003,
+                    "Danh mục phí không hợp lệ hoặc không tương thích với loại chi tiêu.");
         }
         return category;
     }

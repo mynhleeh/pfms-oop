@@ -383,5 +383,36 @@ class TransactionDateTest {
             assertEquals(ErrorCode.ERR_FIN_001, exception.getErrorCode());
         }
     }
+
+    @Nested
+    @DisplayName("Group 5: Reconstitute Factory (Persistence Rehydration AS-02)")
+    class ReconstituteTests {
+
+        @Test
+        @DisplayName("reconstitute should allow future dates without throwing ERR_FIN_001")
+        void testReconstituteAllowsFutureDate() {
+            LocalDate futureDate = LocalDate.now().plusYears(1);
+
+            TransactionDate reconstituted = assertDoesNotThrow(() -> TransactionDate.reconstitute(futureDate));
+            assertEquals(futureDate, reconstituted.getDate());
+            assertEquals(futureDate.toString(), reconstituted.getIsoString());
+        }
+
+        @Test
+        @DisplayName("reconstitute should produce equal TransactionDate for historical dates")
+        void testReconstituteMatchesOfForHistoricalDates() {
+            LocalDate leapDay = LocalDate.of(2024, 2, 29);
+            assertEquals(TransactionDate.of(leapDay), TransactionDate.reconstitute(leapDay));
+        }
+
+        @Test
+        @DisplayName("reconstitute should still reject null date with ERR_FIN_001")
+        void testReconstituteRejectsNull() {
+            BusinessException exception = assertThrows(
+                    BusinessException.class,
+                    () -> TransactionDate.reconstitute(null));
+            assertEquals(ErrorCode.ERR_FIN_001, exception.getErrorCode());
+        }
+    }
 }
 

@@ -2,6 +2,8 @@ package com.pfms.domain.model.common;
 
 import com.pfms.common.util.Preconditions;
 
+import java.util.Locale;
+
 /**
  * Trạng thái vòng đời của các thực thể miền trong hệ thống PFMS (Ví, Danh mục, Nhóm nhu cầu).
  * Định nghĩa thống nhất các trạng thái khả dụng cho luồng xử lý tài chính và lưu trữ lịch sử.
@@ -53,9 +55,9 @@ public enum EntityStatus {
     // region Parsers
     public static EntityStatus fromString(String rawValue) {
         String nonBlank = Preconditions.requireNonBlank(rawValue, "Trạng thái không được để trống.");
-        String normalized = nonBlank.toUpperCase();
+        String normalized = nonBlank.toUpperCase(Locale.ROOT);
         for (EntityStatus status : values()) {
-            if (status.name().equals(normalized) || status.code.equalsIgnoreCase(normalized)) {
+            if (status.name().equals(normalized) || status.code.equals(normalized)) {
                 return status;
             }
         }

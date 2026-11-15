@@ -6,12 +6,14 @@ import com.pfms.domain.model.common.EntityName;
 import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.transaction.TransactionType;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
  * Thực thể miền Danh mục chi tiết (Category) trong hệ thống PFMS.
- * Đại diện cho đơn vị phân loại cấp 3 gán nhãn mục đích cho các giao dịch thu chi.
+ * Đại diện cho đơn vị phân loại cấp 3 gán nhãn mục đích cho các giao dịch thu
+ * chi.
  */
 public class Category {
 
@@ -23,19 +25,44 @@ public class Category {
     private EntityStatus status;
     private String icon;
     private String color;
+    private final LocalDateTime createdAt;
     // endregion
 
     // region Constructors
-    public Category(UUID categoryId, String name, UUID needGroupId,
-                    TransactionType transactionType, String icon, String color) {
+    public Category(
+            UUID categoryId, String name, UUID needGroupId,
+            TransactionType transactionType, String icon, String color) {
+
+        this(categoryId, name, needGroupId, transactionType,
+                EntityStatus.ACTIVE, icon, color, LocalDateTime.now(), false);
+    }
+
+    private Category(
+            UUID categoryId, String name, UUID needGroupId,
+            TransactionType transactionType, EntityStatus status,
+            String icon, String color, LocalDateTime createdAt, boolean reconstituting) {
 
         this.categoryId = Objects.requireNonNull(categoryId, "Mã danh mục không được để null");
-        this.name = EntityName.of(name, "Tên danh mục");
+        this.name = reconstituting ? EntityName.reconstitute(name) : EntityName.of(name, "Tên danh mục");
         this.needGroupId = Objects.requireNonNull(needGroupId, "Mã nhóm nhu cầu không được để null");
         this.transactionType = Objects.requireNonNull(transactionType, "Loại thu chi không được để null");
-        this.status = EntityStatus.ACTIVE;
+        Objects.requireNonNull(status, "Trạng thái danh mục không được để null");
+        if (status != EntityStatus.ACTIVE && status != EntityStatus.DELETED) {
+            throw new IllegalArgumentException("Trạng thái danh mục chỉ hỗ trợ ACTIVE hoặc DELETED");
+        }
+        this.status = status;
         this.icon = normalizeIcon(icon);
         this.color = normalizeColor(color);
+        this.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo danh mục không được để null");
+    }
+
+    public static Category reconstitute(
+            UUID categoryId, String name, UUID needGroupId,
+            TransactionType transactionType, EntityStatus status,
+            String icon, String color, LocalDateTime createdAt) {
+
+        return new Category(categoryId, name, needGroupId, transactionType,
+                status, icon, color, createdAt, true);
     }
     // endregion
 
@@ -104,6 +131,10 @@ public class Category {
 
     public String getColor() {
         return this.color;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
     }
 
     public boolean isActive() {

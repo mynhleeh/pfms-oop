@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,11 +48,32 @@ class BalanceAdjustmentRecordTest {
             assertEquals(actual, record.getActualBalance());
             assertEquals(validDate, record.getAdjustedAt());
             assertEquals(reason, record.getReason());
+            assertNotNull(record.getCreatedAt());
 
             // difference = 150_000 - 100_000 = +50_000
             assertEquals(Money.of(50_000), record.getDifference());
             assertEquals(Money.of(50_000), record.getAbsoluteDifference());
             assertTrue(record.isSurplus());
+        }
+
+        @Test
+        @DisplayName("Khởi tạo với constructor 7 tham số giữ nguyên thời điểm tạo lịch sử")
+        void testConstructor_PreservesHistoricalCreatedAt() {
+            Money previous = Money.of(100_000);
+            Money actual = Money.of(150_000);
+            LocalDateTime historicalTime = LocalDateTime.of(2024, 5, 20, 14, 15, 0);
+
+            BalanceAdjustmentRecord record = new BalanceAdjustmentRecord(
+                    recordId, walletId, previous, actual, validDate, "Khôi phục kiểm kê", historicalTime);
+
+            assertEquals(recordId, record.getRecordId());
+            assertEquals(walletId, record.getWalletId());
+            assertEquals(previous, record.getPreviousBalance());
+            assertEquals(actual, record.getActualBalance());
+            assertEquals(Money.of(50_000), record.getDifference());
+            assertEquals(validDate, record.getAdjustedAt());
+            assertEquals("Khôi phục kiểm kê", record.getReason());
+            assertEquals(historicalTime, record.getCreatedAt());
         }
 
         @Test
@@ -146,11 +168,11 @@ class BalanceAdjustmentRecordTest {
         }
 
         @Test
-        @DisplayName("Khởi tạo với previousBalance âm ném BusinessException ERR_FIN_001")
+        @DisplayName("Khởi tạo với previousBalance âm ném BusinessException ERR_WAL_001")
         void testConstructor_NegativePreviousBalance_ThrowsBusinessException() {
             BusinessException ex = assertThrows(BusinessException.class, () -> new BalanceAdjustmentRecord(
                     recordId, walletId, Money.of(-50_000), Money.of(100_000), validDate, "Reason"));
-            assertEquals(ErrorCode.ERR_FIN_001, ex.getErrorCode());
+            assertEquals(ErrorCode.ERR_WAL_001, ex.getErrorCode());
         }
 
         @Test
@@ -161,11 +183,11 @@ class BalanceAdjustmentRecordTest {
         }
 
         @Test
-        @DisplayName("Khởi tạo với actualBalance âm ném BusinessException ERR_FIN_001")
+        @DisplayName("Khởi tạo với actualBalance âm ném BusinessException ERR_WAL_001")
         void testConstructor_NegativeActualBalance_ThrowsBusinessException() {
             BusinessException ex = assertThrows(BusinessException.class, () -> new BalanceAdjustmentRecord(
                     recordId, walletId, Money.of(100_000), Money.of(-50_000), validDate, "Reason"));
-            assertEquals(ErrorCode.ERR_FIN_001, ex.getErrorCode());
+            assertEquals(ErrorCode.ERR_WAL_001, ex.getErrorCode());
         }
 
         @Test
@@ -189,6 +211,13 @@ class BalanceAdjustmentRecordTest {
             String longReason = "a".repeat(256);
             assertThrows(IllegalArgumentException.class, () -> new BalanceAdjustmentRecord(
                     recordId, walletId, Money.of(100_000), Money.of(150_000), validDate, longReason));
+        }
+
+        @Test
+        @DisplayName("Khởi tạo 7 tham số với createdAt null ném NullPointerException")
+        void testConstructor_NullCreatedAt_ThrowsException() {
+            assertThrows(NullPointerException.class, () -> new BalanceAdjustmentRecord(
+                    recordId, walletId, Money.of(100_000), Money.of(150_000), validDate, "Reason", null));
         }
     }
 
@@ -241,6 +270,26 @@ class BalanceAdjustmentRecordTest {
             assertTrue(str.contains(walletId.toString()));
             assertTrue(str.contains("150.000"));
             assertTrue(str.contains("50.000"));
+        }
+
+        @Test
+        @DisplayName("reconstitute tái tạo thành công bản ghi kiểm kê lịch sử từ dữ liệu lưu trữ")
+        void testReconstitutePreservesPersistedRecord() {
+            TransactionDate futureHistoricalDate = TransactionDate.reconstitute(java.time.LocalDate.now().plusDays(1));
+            LocalDateTime historicalCreatedAt = LocalDateTime.of(2025, 3, 10, 8, 45);
+
+            BalanceAdjustmentRecord reconstituted = assertDoesNotThrow(() -> BalanceAdjustmentRecord.reconstitute(
+                    recordId, walletId, Money.of("100000.00"), Money.of("80000.00"),
+                    futureHistoricalDate, "  Đối soát lưu trữ  ", historicalCreatedAt));
+
+            assertEquals(recordId, reconstituted.getRecordId());
+            assertEquals(walletId, reconstituted.getWalletId());
+            assertEquals(Money.of("100000.00"), reconstituted.getPreviousBalance());
+            assertEquals(Money.of("80000.00"), reconstituted.getActualBalance());
+            assertEquals(Money.of("-20000.00"), reconstituted.getDifference());
+            assertEquals(futureHistoricalDate, reconstituted.getAdjustedAt());
+            assertEquals("Đối soát lưu trữ", reconstituted.getReason());
+            assertEquals(historicalCreatedAt, reconstituted.getCreatedAt());
         }
     }
 }

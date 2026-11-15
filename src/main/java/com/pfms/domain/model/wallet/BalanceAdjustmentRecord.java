@@ -6,6 +6,7 @@ import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -23,27 +24,56 @@ public class BalanceAdjustmentRecord {
     private final Money difference;
     private final TransactionDate adjustedAt;
     private final String reason;
+    private final LocalDateTime createdAt;
     // endregion
 
     // region Constructors
     public BalanceAdjustmentRecord(
             UUID recordId, UUID walletId, Money previousBalance,
             Money actualBalance, TransactionDate adjustedAt, String reason) {
-
-        this.recordId = Objects.requireNonNull(recordId, "Mã bản ghi kiểm kê không được để null");
-        this.walletId = Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
-        this.previousBalance = validatePreviousBalance(previousBalance);
-        this.actualBalance = validateActualBalance(actualBalance);
-        this.adjustedAt = Objects.requireNonNull(adjustedAt, "Mốc ngày kiểm kê không được để null");
-        this.reason = normalizeReason(reason);
-        this.difference = calculateAndValidateDifference(this.actualBalance, this.previousBalance);
+        this(recordId, walletId, previousBalance, actualBalance, adjustedAt, reason, LocalDateTime.now());
     }
 
     public BalanceAdjustmentRecord(
             UUID recordId, String walletId, Money previousBalance,
             Money actualBalance, TransactionDate adjustedAt, String reason) {
+        this(recordId, parseWalletId(walletId), previousBalance, actualBalance, adjustedAt, reason,
+                LocalDateTime.now());
+    }
 
-        this(recordId, parseWalletId(walletId), previousBalance, actualBalance, adjustedAt, reason);
+    public BalanceAdjustmentRecord(
+            UUID recordId, UUID walletId, Money previousBalance,
+            Money actualBalance, TransactionDate adjustedAt, String reason, LocalDateTime createdAt) {
+        this(recordId, walletId, previousBalance, actualBalance, adjustedAt, reason, createdAt, false);
+    }
+
+    private BalanceAdjustmentRecord(
+            UUID recordId, UUID walletId, Money previousBalance,
+            Money actualBalance, TransactionDate adjustedAt, String reason,
+            LocalDateTime createdAt, boolean reconstituting) {
+
+        this.recordId = Objects.requireNonNull(recordId, "Mã bản ghi kiểm kê không được để null");
+        this.walletId = Objects.requireNonNull(walletId, "Mã ví kiểm kê không được để null");
+        if (reconstituting) {
+            this.previousBalance = Objects.requireNonNull(previousBalance, "Số dư trước kiểm kê không được để null");
+            this.actualBalance = Objects.requireNonNull(actualBalance, "Số dư thực tế không được để null");
+            this.difference = this.actualBalance.subtract(this.previousBalance);
+        } else {
+            this.previousBalance = validatePreviousBalance(previousBalance);
+            this.actualBalance = validateActualBalance(actualBalance);
+            this.difference = calculateAndValidateDifference(this.actualBalance, this.previousBalance);
+        }
+        this.adjustedAt = Objects.requireNonNull(adjustedAt, "Mốc ngày kiểm kê không được để null");
+        this.reason = normalizeReason(reason);
+        this.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo bản ghi kiểm kê không được để null");
+    }
+
+    public static BalanceAdjustmentRecord reconstitute(
+            UUID recordId, UUID walletId, Money previousBalance,
+            Money actualBalance, TransactionDate adjustedAt, String reason, LocalDateTime createdAt) {
+
+        return new BalanceAdjustmentRecord(
+                recordId, walletId, previousBalance, actualBalance, adjustedAt, reason, createdAt, true);
     }
     // endregion
 
@@ -80,6 +110,10 @@ public class BalanceAdjustmentRecord {
         return this.reason;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
     public boolean isSurplus() {
         return this.difference.isPositive();
     }
@@ -99,7 +133,7 @@ public class BalanceAdjustmentRecord {
     private static Money validatePreviousBalance(Money previousBalance) {
         Objects.requireNonNull(previousBalance, "Số dư trước kiểm kê không được để null");
         if (previousBalance.isNegative()) {
-            throw new BusinessException(ErrorCode.ERR_FIN_001,
+            throw new BusinessException(ErrorCode.ERR_WAL_001,
                     "Số dư trước điều chỉnh không được nhỏ hơn 0.");
         }
         return previousBalance;
@@ -108,7 +142,7 @@ public class BalanceAdjustmentRecord {
     private static Money validateActualBalance(Money actualBalance) {
         Objects.requireNonNull(actualBalance, "Số dư thực tế không được để null");
         if (actualBalance.isNegative()) {
-            throw new BusinessException(ErrorCode.ERR_FIN_001,
+            throw new BusinessException(ErrorCode.ERR_WAL_001,
                     "Số dư thực tế quan sát không được nhỏ hơn 0.");
         }
         return actualBalance;

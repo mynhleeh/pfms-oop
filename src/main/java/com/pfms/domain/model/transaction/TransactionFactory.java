@@ -5,6 +5,7 @@ import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.wallet.Wallet;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -59,7 +60,7 @@ public final class TransactionFactory {
             Category feeCategory) {
 
         TransactionFee fee = createFeeInternal(transactionId, feeAmount, wallet, feeCategory);
-        return new IncomeExpenseTransaction(
+        return createIncomeExpense(
                 transactionId,
                 transactionType,
                 wallet,
@@ -71,7 +72,7 @@ public final class TransactionFactory {
     }
 
     /**
-     * Khởi tạo giao dịch thu chi với thể hiện phụ phí cung cấp trực tiếp (tái tạo từ kho lưu trữ).
+     * Khởi tạo giao dịch thu chi mới với thể hiện phụ phí cung cấp trực tiếp.
      */
     public static IncomeExpenseTransaction createIncomeExpense(
             UUID transactionId,
@@ -131,7 +132,7 @@ public final class TransactionFactory {
             Category feeCategory) {
 
         TransactionFee fee = createFeeInternal(transactionId, feeAmount, sourceWallet, feeCategory);
-        return new TransferTransaction(
+        return createTransfer(
                 transactionId,
                 sourceWallet,
                 destinationWallet,
@@ -142,7 +143,7 @@ public final class TransactionFactory {
     }
 
     /**
-     * Khởi tạo giao dịch chuyển tiền với thể hiện phụ phí cung cấp trực tiếp (tái tạo từ kho lưu trữ).
+     * Khởi tạo giao dịch chuyển tiền nội bộ mới với thể hiện phụ phí cung cấp trực tiếp.
      */
     public static TransferTransaction createTransfer(
             UUID transactionId,
@@ -185,7 +186,72 @@ public final class TransactionFactory {
             Wallet wallet,
             Category category) {
 
-        return new TransactionFee(UUID.randomUUID(), parentTransactionId, amount, wallet, category);
+        return createFee(UUID.randomUUID(), parentTransactionId, amount, wallet, category);
+    }
+
+    /**
+     * Reconstitutes a persisted income/expense transaction with its original createdAt
+     * and historical wallet/category references.
+     */
+    public static IncomeExpenseTransaction reconstituteIncomeExpense(
+            UUID transactionId,
+            TransactionType transactionType,
+            Wallet wallet,
+            Category category,
+            Money amount,
+            TransactionDate transactionDate,
+            String note,
+            TransactionFee fee,
+            LocalDateTime createdAt) {
+
+        return IncomeExpenseTransaction.reconstitute(
+                transactionId,
+                transactionType,
+                wallet,
+                category,
+                amount,
+                transactionDate,
+                note,
+                fee,
+                createdAt);
+    }
+
+    /**
+     * Reconstitutes a persisted transfer transaction with its original createdAt
+     * and historical wallet references.
+     */
+    public static TransferTransaction reconstituteTransfer(
+            UUID transactionId,
+            Wallet sourceWallet,
+            Wallet destinationWallet,
+            Money amount,
+            TransactionDate transactionDate,
+            String note,
+            TransactionFee fee,
+            LocalDateTime createdAt) {
+
+        return TransferTransaction.reconstitute(
+                transactionId,
+                sourceWallet,
+                destinationWallet,
+                amount,
+                transactionDate,
+                note,
+                fee,
+                createdAt);
+    }
+
+    /**
+     * Reconstitutes a persisted transaction fee allowing archived wallet or deleted fee category.
+     */
+    public static TransactionFee reconstituteFee(
+            UUID feeId,
+            UUID parentTransactionId,
+            Money amount,
+            Wallet wallet,
+            Category category) {
+
+        return TransactionFee.reconstitute(feeId, parentTransactionId, amount, wallet, category);
     }
     // endregion
 

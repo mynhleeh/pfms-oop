@@ -4,6 +4,7 @@ import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.wallet.ActiveWalletState;
 import com.pfms.domain.model.wallet.ArchivedWalletState;
+import com.pfms.domain.model.wallet.DeletedWalletState;
 import com.pfms.domain.model.wallet.Wallet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -140,6 +141,25 @@ class MemoryWalletRepositoryTest {
         }
 
         @Test
+        @DisplayName("Should return empty Optional when matching wallet is deleted")
+        void shouldReturnEmptyWhenWalletIsDeleted() {
+            Wallet deletedWallet = new Wallet(
+                    UUID.randomUUID(),
+                    "Ví đã xóa",
+                    "Ví ngừng sử dụng vĩnh viễn",
+                    false,
+                    LocalDateTime.now(),
+                    new DeletedWalletState(),
+                    Money.ZERO
+            );
+            repository.save(deletedWallet);
+
+            Optional<Wallet> found = repository.findByName("Ví đã xóa");
+
+            assertTrue(found.isEmpty());
+        }
+
+        @Test
         @DisplayName("Should throw NullPointerException when name is null")
         void shouldThrowExceptionWhenNameIsNull() {
             assertThrows(NullPointerException.class, () -> repository.findByName(null));
@@ -183,6 +203,23 @@ class MemoryWalletRepositoryTest {
             repository.save(defaultCashWallet);
 
             assertFalse(repository.existsByName("Ví Không Tồn Tại"));
+        }
+
+        @Test
+        @DisplayName("Should return false when matching wallet is deleted")
+        void shouldReturnFalseWhenWalletIsDeleted() {
+            Wallet deletedWallet = new Wallet(
+                    UUID.randomUUID(),
+                    "Ví đã xóa",
+                    "Ví ngừng sử dụng vĩnh viễn",
+                    false,
+                    LocalDateTime.now(),
+                    new DeletedWalletState(),
+                    Money.ZERO
+            );
+            repository.save(deletedWallet);
+
+            assertFalse(repository.existsByName("Ví đã xóa"));
         }
 
         @Test
@@ -299,6 +336,25 @@ class MemoryWalletRepositoryTest {
         void shouldReturnEmptyWhenNoDefaultWalletExists() {
             repository.save(savingsWallet);
             repository.save(archivedWallet);
+
+            Optional<Wallet> result = repository.findDefaultWallet();
+
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Should return empty Optional when default wallet is deleted")
+        void shouldReturnEmptyWhenDefaultWalletIsDeleted() {
+            Wallet deletedDefaultWallet = new Wallet(
+                    UUID.randomUUID(),
+                    "Tiền mặt",
+                    "Ví mặc định đã xóa",
+                    true,
+                    LocalDateTime.now(),
+                    new DeletedWalletState(),
+                    Money.ZERO
+            );
+            repository.save(deletedDefaultWallet);
 
             Optional<Wallet> result = repository.findDefaultWallet();
 

@@ -129,6 +129,27 @@ class TransactionFeeTest {
             assertSame(newExpenseCategory, fee.getCategory());
             assertSame(newWallet, fee.getWallet());
         }
+
+        @Test
+        @DisplayName("reconstitute cho phép tái tạo phí gắn ví lưu trữ/đã xóa và danh mục chi tiêu đã xóa mềm")
+        void testReconstituteAllowsArchivedWalletAndDeletedExpenseCategory() {
+            activeWallet.archive();
+            expenseCategory.markDeleted();
+
+            TransactionFee fee = TransactionFee.reconstitute(
+                    feeId,
+                    parentTransactionId,
+                    defaultAmount,
+                    activeWallet,
+                    expenseCategory
+            );
+
+            assertEquals(feeId, fee.getFeeId());
+            assertEquals(parentTransactionId, fee.getParentTransactionId());
+            assertEquals(defaultAmount, fee.getAmount());
+            assertSame(activeWallet, fee.getWallet());
+            assertSame(expenseCategory, fee.getCategory());
+        }
     }
 
     @Nested
@@ -255,6 +276,34 @@ class TransactionFeeTest {
                     new TransactionFee(feeId, parentTransactionId, defaultAmount, activeWallet, expenseCategory)
             );
             assertEquals(ErrorCode.ERR_FEE_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("reconstitute vẫn từ chối số tiền không dương, tham chiếu null và danh mục loại INCOME")
+        void testReconstituteRejectsInvalidAmountNullReferencesAndIncomeCategory() {
+            Category incomeCategory = new Category(
+                    UUID.randomUUID(),
+                    "Thu nhập khác",
+                    UUID.randomUUID(),
+                    TransactionType.INCOME,
+                    "income-icon",
+                    "#4CAF50"
+            );
+
+            assertThrows(NullPointerException.class, () ->
+                    TransactionFee.reconstitute(feeId, parentTransactionId, defaultAmount, null, expenseCategory));
+
+            BusinessException missingCategory = assertThrows(BusinessException.class, () ->
+                    TransactionFee.reconstitute(feeId, parentTransactionId, defaultAmount, activeWallet, null));
+            assertEquals(ErrorCode.ERR_FEE_002, missingCategory.getErrorCode());
+
+            BusinessException wrongCategoryType = assertThrows(BusinessException.class, () ->
+                    TransactionFee.reconstitute(feeId, parentTransactionId, defaultAmount, activeWallet, incomeCategory));
+            assertEquals(ErrorCode.ERR_FEE_003, wrongCategoryType.getErrorCode());
+
+            BusinessException invalidAmount = assertThrows(BusinessException.class, () ->
+                    TransactionFee.reconstitute(feeId, parentTransactionId, Money.ZERO, activeWallet, expenseCategory));
+            assertEquals(ErrorCode.ERR_FEE_001, invalidAmount.getErrorCode());
         }
     }
 

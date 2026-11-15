@@ -89,6 +89,22 @@ class WalletTest {
             assertEquals(Money.ZERO, wallet.getCurrentBalance());
             assertEquals(EntityStatus.ACTIVE, wallet.getStatus());
         }
+
+        @Test
+        @DisplayName("Constructors should reject negative initial balance with ERR_WAL_001 per BR-FIN-02")
+        void testNegativeInitialBalanceThrowsErrWal001() {
+            BusinessException singleArgEx = assertThrows(
+                    BusinessException.class,
+                    () -> new Wallet(Money.of(-10_000)));
+            assertEquals(ErrorCode.ERR_WAL_001, singleArgEx.getErrorCode());
+
+            BusinessException fullArgEx = assertThrows(
+                    BusinessException.class,
+                    () -> new Wallet(
+                            UUID.randomUUID(), "Ví Âm", "", false,
+                            LocalDateTime.now(), new ActiveWalletState(), Money.of("-0.01")));
+            assertEquals(ErrorCode.ERR_WAL_001, fullArgEx.getErrorCode());
+        }
     }
 
     @Nested
@@ -455,14 +471,14 @@ class WalletTest {
         }
 
         @Test
-        @DisplayName("adjustBalance with negative actual balance should throw BusinessException with ERR_FIN_001")
+        @DisplayName("adjustBalance with negative actual balance should throw BusinessException with ERR_WAL_001")
         void testAdjustBalanceNegativeActualThrows() {
             Wallet wallet = new Wallet("Ví Test");
             wallet.credit(Money.of(50_000));
 
             BusinessException ex = assertThrows(BusinessException.class, () ->
                     wallet.adjustBalance(Money.of(-10_000), TransactionDate.now(), "Âm tiền"));
-            assertEquals(ErrorCode.ERR_FIN_001, ex.getErrorCode());
+            assertEquals(ErrorCode.ERR_WAL_001, ex.getErrorCode());
             assertEquals(Money.of(50_000), wallet.getCurrentBalance());
         }
 
@@ -549,6 +565,47 @@ class WalletTest {
             assertEquals(EntityStatus.ACTIVE, archivedWallet.getStatus());
             assertEquals(EntityStatus.ARCHIVED, snapshot.getStatus());
             assertEquals(Money.of("100000.00"), snapshot.getCurrentBalance());
+        }
+    }
+
+    @Nested
+    @DisplayName("Group 7: Reconstitute Factory (Persistence Rehydration AS-02)")
+    class ReconstituteTests {
+
+        @Test
+        @DisplayName("reconstitute should bypass BR-NAM-01 length constraint and copy() should preserve reconstituted wallet")
+        void testReconstituteBypassesBrNam01AndCopySucceeds() {
+            UUID walletId = UUID.randomUUID();
+            LocalDateTime createdAt = LocalDateTime.of(2025, 2, 20, 14, 15);
+            String legacyLongName = "A".repeat(55);
+
+            Wallet reconstituted = assertDoesNotThrow(() -> Wallet.reconstitute(
+                    walletId, legacyLongName, "Ghi chú cũ", false,
+                    createdAt, new ActiveWalletState(), Money.of("250000.00")));
+
+            assertEquals(walletId, reconstituted.getId());
+            assertEquals(legacyLongName, reconstituted.getName());
+            assertEquals("Ghi chú cũ", reconstituted.getNote());
+            assertEquals(createdAt, reconstituted.getCreatedAt());
+            assertEquals(Money.of("250000.00"), reconstituted.getCurrentBalance());
+
+            Wallet copied = assertDoesNotThrow(reconstituted::copy);
+            assertNotSame(reconstituted, copied);
+            assertEquals(legacyLongName, copied.getName());
+            assertEquals(Money.of("250000.00"), copied.getCurrentBalance());
+        }
+
+        @Test
+        @DisplayName("reconstitute should preserve persisted balance without blocking SystemDataReconciler")
+        void testReconstitutePreservesNegativeBalanceForReconcilerAudit() {
+            UUID walletId = UUID.randomUUID();
+            LocalDateTime createdAt = LocalDateTime.of(2025, 2, 20, 14, 15);
+
+            Wallet reconstituted = assertDoesNotThrow(() -> Wallet.reconstitute(
+                    walletId, "Ví Hỏng", "", false,
+                    createdAt, new ActiveWalletState(), Money.of("-1000.00")));
+
+            assertEquals(Money.of("-1000.00"), reconstituted.getCurrentBalance());
         }
     }
 }

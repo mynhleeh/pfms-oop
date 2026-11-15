@@ -48,22 +48,15 @@ class TransactionTest {
     static class ConcreteTestTransaction extends Transaction {
         private boolean applied = false;
         private boolean reverted = false;
-        private final LocalDateTime customCreatedAt;
 
         public ConcreteTestTransaction(UUID transactionId, Money amount, TransactionDate transactionDate,
                 String note, TransactionFee fee) {
-            this(transactionId, amount, transactionDate, note, fee, null);
+            super(transactionId, amount, transactionDate, note, fee);
         }
 
         public ConcreteTestTransaction(UUID transactionId, Money amount, TransactionDate transactionDate,
-                String note, TransactionFee fee, LocalDateTime customCreatedAt) {
-            super(transactionId, amount, transactionDate, note, fee);
-            this.customCreatedAt = customCreatedAt;
-        }
-
-        @Override
-        public LocalDateTime getCreatedAt() {
-            return (this.customCreatedAt != null) ? this.customCreatedAt : super.getCreatedAt();
+                String note, TransactionFee fee, LocalDateTime createdAt) {
+            super(transactionId, amount, transactionDate, note, fee, createdAt);
         }
 
         @Override
@@ -124,6 +117,22 @@ class TransactionTest {
             assertTrue(txn.getFee().isEmpty());
             assertNotNull(txn.getCreatedAt());
             assertTrue(txn.getCreatedAt().isBefore(LocalDateTime.now().plusSeconds(1)));
+        }
+
+        @Test
+        @DisplayName("Khởi tạo giao dịch giữ nguyên thời điểm createdAt lịch sử qua constructor 6 tham số")
+        void testValidConstructionPreservesHistoricalCreatedAt() {
+            LocalDateTime historicalTime = LocalDateTime.of(2024, 4, 10, 15, 20, 30);
+
+            ConcreteTestTransaction txn = new ConcreteTestTransaction(
+                    transactionId,
+                    defaultAmount,
+                    defaultDate,
+                    "Giao dịch lịch sử",
+                    null,
+                    historicalTime);
+
+            assertEquals(historicalTime, txn.getCreatedAt());
         }
 
         @Test
@@ -300,6 +309,13 @@ class TransactionTest {
                     () -> new ConcreteTestTransaction(transactionId, defaultAmount, defaultDate, "Test",
                             mismatchedFee));
             assertEquals(ErrorCode.ERR_FEE_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("Từ chối khởi tạo khi createdAt truyền vào constructor 6 tham số bị null")
+        void testNullCreatedAtThrowsException() {
+            assertThrows(NullPointerException.class,
+                    () -> new ConcreteTestTransaction(transactionId, defaultAmount, defaultDate, "Test", null, null));
         }
     }
 

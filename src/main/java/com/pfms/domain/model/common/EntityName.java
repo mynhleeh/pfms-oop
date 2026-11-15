@@ -60,6 +60,15 @@ public final class EntityName implements Comparable<EntityName>, Serializable {
         String key = trimmed.toLowerCase(Locale.ROOT);
         return new EntityName(trimmed, key);
     }
+
+    public static EntityName reconstitute(String rawName) {
+        if (rawName == null) {
+            return new EntityName("", "");
+        }
+        String trimmed = rawName.trim();
+        String key = trimmed.toLowerCase(Locale.ROOT);
+        return new EntityName(trimmed, key);
+    }
     // endregion
 
     // region Getters

@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,6 +59,34 @@ class CategoryTest {
             assertEquals("#FF5733", category.getColor());
             assertTrue(category.isActive());
             assertFalse(category.isDeleted());
+            assertNotNull(category.getCreatedAt());
+        }
+
+        @Test
+        @DisplayName("Tái tạo danh mục từ dữ liệu lưu trữ giữ nguyên trạng thái DELETED và createdAt lịch sử")
+        void testReconstituteDeletedCategoryWithHistoricalCreatedAt() {
+            LocalDateTime historicalTime = LocalDateTime.of(2025, 6, 15, 9, 30, 0);
+
+            Category category = Category.reconstitute(
+                    categoryId,
+                    "Trà sữa",
+                    needGroupId,
+                    TransactionType.EXPENSE,
+                    EntityStatus.DELETED,
+                    "cup",
+                    "#795548",
+                    historicalTime
+            );
+
+            assertEquals(categoryId, category.getCategoryId());
+            assertEquals("Trà sữa", category.getName());
+            assertEquals(needGroupId, category.getNeedGroupId());
+            assertEquals(TransactionType.EXPENSE, category.getTransactionType());
+            assertEquals(EntityStatus.DELETED, category.getStatus());
+            assertTrue(category.isDeleted());
+            assertEquals("cup", category.getIcon());
+            assertEquals("#795548", category.getColor());
+            assertEquals(historicalTime, category.getCreatedAt());
         }
 
         @Test
@@ -401,6 +430,39 @@ class CategoryTest {
             assertTrue(str.contains("Ăn uống"));
             assertTrue(str.contains("EXPENSE"));
             assertTrue(str.contains("ACTIVE"));
+        }
+
+        @Test
+        @DisplayName("Tái tạo danh mục từ chối tham số status/createdAt null hoặc trạng thái ARCHIVED không hợp lệ")
+        void testReconstituteRejectsInvalidStatusOrNullCreatedAt() {
+            LocalDateTime createdAt = LocalDateTime.of(2025, 6, 15, 9, 30, 0);
+
+            assertThrows(NullPointerException.class, () -> Category.reconstitute(
+                    categoryId, "Ăn uống", needGroupId, TransactionType.EXPENSE, null, "", "", createdAt));
+            assertThrows(NullPointerException.class, () -> Category.reconstitute(
+                    categoryId, "Ăn uống", needGroupId, TransactionType.EXPENSE, EntityStatus.ACTIVE, "", "", null));
+            assertThrows(IllegalArgumentException.class, () -> Category.reconstitute(
+                    categoryId, "Ăn uống", needGroupId, TransactionType.EXPENSE, EntityStatus.ARCHIVED, "", "", createdAt));
+        }
+
+        @Test
+        @DisplayName("Tái tạo danh mục lịch sử vượt 50 ký tự vẫn thành công theo AS-02 (bỏ qua BR-NAM-01)")
+        void testReconstituteBypassesBrNam01LegacyName() {
+            LocalDateTime createdAt = LocalDateTime.of(2025, 6, 15, 9, 30, 0);
+            String legacyLongName = "A".repeat(55);
+
+            Category reconstituted = assertDoesNotThrow(() -> Category.reconstitute(
+                    categoryId,
+                    "  " + legacyLongName + "  ",
+                    needGroupId,
+                    TransactionType.EXPENSE,
+                    EntityStatus.ACTIVE,
+                    "",
+                    "",
+                    createdAt));
+
+            assertEquals(legacyLongName, reconstituted.getName());
+            assertEquals(createdAt, reconstituted.getCreatedAt());
         }
     }
 }

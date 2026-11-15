@@ -4,6 +4,7 @@ import com.pfms.domain.exception.BusinessException;
 import com.pfms.domain.exception.ErrorCode;
 import com.pfms.domain.exception.InsufficientBalanceException;
 import com.pfms.domain.model.category.Category;
+import com.pfms.domain.model.common.EntityStatus;
 import com.pfms.domain.model.common.Money;
 import com.pfms.domain.model.common.TransactionDate;
 import com.pfms.domain.model.wallet.Wallet;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -289,6 +291,115 @@ class IncomeExpenseTransactionTest {
 
                         assertEquals(initialBalance, activeWallet.getCurrentBalance());
                 }
+
+                @Test
+                @DisplayName("reconstitute() giữ nguyên createdAt lịch sử và cho phép ví/danh mục không ACTIVE")
+                void testReconstitute_PreservesHistoricalCreatedAtAndAllowsInactiveReferences() {
+                        UUID txId = UUID.randomUUID();
+                        LocalDateTime historicalTime = LocalDateTime.of(2024, 2, 14, 8, 30, 0);
+                        Wallet archivedWallet = activeWallet.copy();
+                        archivedWallet.archive();
+                        Category deletedCategory = Category.reconstitute(
+                                        activeExpenseCategory.getCategoryId(),
+                                        "Ăn uống cũ",
+                                        activeExpenseCategory.getNeedGroupId(),
+                                        TransactionType.EXPENSE,
+                                        EntityStatus.DELETED,
+                                        "",
+                                        "",
+                                        historicalTime.minusDays(10));
+                        TransactionFee historicalFee = TransactionFee.reconstitute(
+                                        UUID.randomUUID(), txId, Money.of(5_000), archivedWallet, deletedCategory);
+
+                        IncomeExpenseTransaction restored = IncomeExpenseTransaction.reconstitute(
+                                        txId, TransactionType.EXPENSE, archivedWallet, deletedCategory,
+                                        Money.of(120_000), validDate, "Khôi phục từ backup", historicalFee,
+                                        historicalTime);
+
+                        assertEquals(txId, restored.getTransactionId());
+                        assertSame(archivedWallet, restored.getWallet());
+                        assertSame(deletedCategory, restored.getCategory());
+                        assertTrue(restored.getFee().isPresent());
+                        assertSame(historicalFee, restored.getFee().get());
+                        assertEquals(historicalTime, restored.getCreatedAt());
+                }
+
+                @Test
+                @DisplayName("revertFromWallet(liveWallet) hoàn tiền và phí vào instance ví sống thay vì snapshot cũ")
+                void testRevertFromWallet_LiveWalletInstanceWithFee_RevertsLiveBalance() {
+                        UUID txId = UUID.randomUUID();
+                        Money amount = Money.of(400_000);
+                        Money feeAmount = Money.of(10_000);
+                        Wallet snapshotWallet = activeWallet.copy();
+                        TransactionFee snapshotFee = new TransactionFee(
+                                        UUID.randomUUID(), txId, feeAmount, snapshotWallet, activeExpenseCategory);
+
+                        IncomeExpenseTransaction tx = IncomeExpenseTransaction.reconstitute(
+                                        txId, TransactionType.EXPENSE, snapshotWallet, activeExpenseCategory,
+                                        amount, validDate, "Snapshot tx", snapshotFee,
+                                        LocalDateTime.of(2025, 1, 15, 12, 0));
+
+                        activeWallet.debit(amount.add(feeAmount)); // live balance: 5_000_000 - 410_000 = 4_590_000
+                        Money snapshotBeforeRevert = snapshotWallet.getCurrentBalance();
+
+                        tx.revertFromWallet(activeWallet);
+
+                        assertEquals(Money.of(5_000_000), activeWallet.getCurrentBalance());
+                        assertEquals(snapshotBeforeRevert, snapshotWallet.getCurrentBalance());
+                }
+
+                @Test
+                @DisplayName("updateDetails() cho phép giữ nguyên danh mục đã xóa mềm nếu không đổi sang danh mục khác")
+                void testUpdateDetails_KeepUnchangedDeletedCategory_Success() {
+                        UUID txId = UUID.randomUUID();
+                        IncomeExpenseTransaction tx = new IncomeExpenseTransaction(
+                                        txId, TransactionType.EXPENSE, activeWallet, activeExpenseCategory,
+                                        Money.of(200_000), validDate, "Gốc", null);
+                        tx.applyToWallet();
+
+                        activeExpenseCategory.markDeleted();
+
+                        tx.updateDetails(activeWallet, activeExpenseCategory, Money.of(350_000), validDate,
+                                        "Sửa số tiền giữ danh mục cũ", null);
+
+                        assertEquals(Money.of(4_650_000), activeWallet.getCurrentBalance());
+                        assertEquals(Money.of(350_000), tx.getAmount());
+                        assertSame(activeExpenseCategory, tx.getCategory());
+                }
+
+                @Test
+                @DisplayName("updateDetails(liveOld, newWallet, ...) chuyển ví thành công và rollback đầy đủ ví cũ khi ví mới thiếu tiền")
+                void testUpdateDetails_SevenArgsTwoLiveWalletsMoveAndRollback() {
+                        UUID txId = UUID.randomUUID();
+                        Money oldAmount = Money.of(500_000);
+                        Money oldFeeAmount = Money.of(10_000);
+                        Wallet snapshotOldWallet = activeWallet.copy();
+                        TransactionFee oldFee = new TransactionFee(
+                                        UUID.randomUUID(), txId, oldFeeAmount, snapshotOldWallet,
+                                        activeExpenseCategory);
+                        IncomeExpenseTransaction tx = IncomeExpenseTransaction.reconstitute(
+                                        txId, TransactionType.EXPENSE, snapshotOldWallet, activeExpenseCategory,
+                                        oldAmount, validDate, "Ban đầu", oldFee, LocalDateTime.of(2025, 2, 1, 9, 0));
+                        activeWallet.debit(oldAmount.add(oldFeeAmount)); // live activeWallet = 4_490_000
+
+                        // Case 1: Ví đích thiếu số dư -> phải rollback toàn bộ trên activeWallet (vẫn 4_490_000)
+                        Wallet smallTargetWallet = new Wallet("Ví nhỏ");
+                        smallTargetWallet.credit(Money.of(100_000));
+                        assertThrows(InsufficientBalanceException.class, () -> tx.updateDetails(
+                                        activeWallet, smallTargetWallet, activeExpenseCategory, Money.of(600_000),
+                                        validDate, "Vượt số dư ví đích", null));
+                        assertEquals(Money.of(4_490_000), activeWallet.getCurrentBalance());
+                        assertEquals(Money.of(100_000), smallTargetWallet.getCurrentBalance());
+                        assertEquals(oldAmount, tx.getAmount());
+                        assertEquals("Ban đầu", tx.getNote());
+
+                        // Case 2: Chuyển sang secondaryWallet đủ số dư -> activeWallet hoàn 510k về 5M, secondaryWallet bị trừ 600k còn 9.4M
+                        tx.updateDetails(activeWallet, secondaryWallet, activeExpenseCategory, Money.of(600_000),
+                                        validDate, "Chuyển ví thành công", null);
+                        assertEquals(Money.of(5_000_000), activeWallet.getCurrentBalance());
+                        assertEquals(Money.of(9_400_000), secondaryWallet.getCurrentBalance());
+                        assertSame(secondaryWallet, tx.getWallet());
+                }
         }
 
         @Nested
@@ -527,6 +638,122 @@ class IncomeExpenseTransactionTest {
                         assertEquals(initialBalance.subtract(originalAmount), activeWallet.getCurrentBalance());
                         assertEquals(originalAmount, tx.getAmount());
                         assertEquals("Chi 1M", tx.getNote());
+                }
+
+                @Test
+                @DisplayName("updateDetails() từ chối khi đổi sang một danh mục khác đang ở trạng thái DELETED (ERR_CAT_001)")
+                void testUpdateDetails_ChangeToDifferentDeletedCategory_ThrowsBusinessException() {
+                        IncomeExpenseTransaction tx = new IncomeExpenseTransaction(
+                                        UUID.randomUUID(), TransactionType.EXPENSE, activeWallet, activeExpenseCategory,
+                                        Money.of(100_000), validDate, "Gốc", null);
+                        tx.applyToWallet();
+
+                        Category otherDeletedCategory = new Category(
+                                        UUID.randomUUID(), "Danh mục khác đã xóa", UUID.randomUUID(),
+                                        TransactionType.EXPENSE, "", "");
+                        otherDeletedCategory.markDeleted();
+
+                        BusinessException ex = assertThrows(BusinessException.class, () -> tx.updateDetails(
+                                        activeWallet, otherDeletedCategory, Money.of(150_000), validDate, "Đổi", null));
+                        assertEquals(ErrorCode.ERR_CAT_001, ex.getErrorCode());
+                        assertEquals(Money.of(4_900_000), activeWallet.getCurrentBalance());
+                }
+
+                @Test
+                @DisplayName("revertFromWallet(liveWallet) từ chối khi truyền vào ví khác ID với ví của giao dịch")
+                void testRevertFromWallet_LiveWalletIdMismatch_ThrowsIllegalArgumentException() {
+                        IncomeExpenseTransaction tx = new IncomeExpenseTransaction(
+                                        UUID.randomUUID(), TransactionType.EXPENSE, activeWallet, activeExpenseCategory,
+                                        Money.of(100_000), validDate, "Gốc", null);
+
+                        assertThrows(IllegalArgumentException.class, () -> tx.revertFromWallet(secondaryWallet));
+                }
+
+                @Test
+                @DisplayName("applyToWallet() cho INCOME với phí giữ snapshot ví tách rời hạch toán đúng trên ví giao dịch và không mutate ví snapshot")
+                void testApplyToWallet_IncomeWithDetachedFeeWallet_AvoidsSplitBrain() {
+                        Wallet liveWallet = new Wallet("Ví 0đ");
+                        Wallet snapshotFeeWallet = liveWallet.copy();
+                        UUID txId = UUID.randomUUID();
+                        TransactionFee detachedFee = new TransactionFee(
+                                        UUID.randomUUID(), txId, Money.of(20_000), snapshotFeeWallet,
+                                        activeExpenseCategory);
+                        IncomeExpenseTransaction tx = new IncomeExpenseTransaction(
+                                        txId, TransactionType.INCOME, liveWallet, activeIncomeCategory,
+                                        Money.of(100_000), validDate, "Thu nhập kèm phí", detachedFee);
+
+                        assertDoesNotThrow(tx::applyToWallet);
+
+                        assertEquals(Money.of(80_000), liveWallet.getCurrentBalance());
+                        assertEquals(Money.ZERO, snapshotFeeWallet.getCurrentBalance());
+                }
+
+                @Test
+                @DisplayName("applyToWallet() cho EXPENSE với phí giữ snapshot ví tách rời trừ đủ tiền hàng và phí trên ví giao dịch")
+                void testApplyToWallet_ExpenseWithDetachedFeeWallet_DebitsLiveWalletIncludingFee() {
+                        Wallet snapshotFeeWallet = activeWallet.copy();
+                        UUID txId = UUID.randomUUID();
+                        TransactionFee detachedFee = new TransactionFee(
+                                        UUID.randomUUID(), txId, Money.of(15_000), snapshotFeeWallet,
+                                        activeExpenseCategory);
+                        IncomeExpenseTransaction tx = new IncomeExpenseTransaction(
+                                        txId, TransactionType.EXPENSE, activeWallet, activeExpenseCategory,
+                                        Money.of(100_000), validDate, "Chi tiêu kèm phí", detachedFee);
+
+                        tx.applyToWallet();
+
+                        assertEquals(Money.of(4_885_000), activeWallet.getCurrentBalance());
+                        assertEquals(Money.of(5_000_000), snapshotFeeWallet.getCurrentBalance());
+                }
+
+                @Test
+                @DisplayName("applyToWallet() cho INCOME ném InsufficientBalanceException và giữ nguyên ví khi thu nhập cộng số dư hiện có nhỏ hơn phí")
+                void testApplyToWallet_IncomeWithFeeExceedingProjectedBalance_ThrowsWithoutMutating() {
+                        Wallet poorWallet = new Wallet("Ví rỗng");
+                        UUID txId = UUID.randomUUID();
+                        TransactionFee highFee = new TransactionFee(
+                                        UUID.randomUUID(), txId, Money.of(80_000), poorWallet,
+                                        activeExpenseCategory);
+                        IncomeExpenseTransaction tx = new IncomeExpenseTransaction(
+                                        txId, TransactionType.INCOME, poorWallet, activeIncomeCategory,
+                                        Money.of(50_000), validDate, "Phí lớn hơn thu", highFee);
+
+                        assertThrows(InsufficientBalanceException.class, tx::applyToWallet);
+                        assertEquals(Money.ZERO, poorWallet.getCurrentBalance());
+                }
+
+                @Test
+                @DisplayName("updateDetails(liveOld, targetWallet, ...) trên INCOME khi thất bại hoàn nguyên cả số dư ví cũ, giữ ví đích nguyên vẹn và khôi phục nguyên bản reference ví/phí")
+                void testUpdateDetails_IncomeMoveFails_RollsBackAllReferencesAndTargetBalance() {
+                        Wallet sourceLive = new Wallet("Nguồn 100k");
+                        sourceLive.credit(Money.of(100_000));
+                        Wallet sourceSnapshot = sourceLive.copy();
+                        Wallet targetLive = new Wallet("Đích 0đ");
+                        UUID txId = UUID.randomUUID();
+                        TransactionFee oldFee = new TransactionFee(
+                                        UUID.randomUUID(), txId, Money.of(10_000), sourceSnapshot,
+                                        activeExpenseCategory);
+                        IncomeExpenseTransaction tx = IncomeExpenseTransaction.reconstitute(
+                                        txId, TransactionType.INCOME, sourceSnapshot, activeIncomeCategory,
+                                        Money.of(50_000), validDate, "Thu cũ", oldFee,
+                                        LocalDateTime.of(2025, 2, 1, 9, 0));
+                        sourceLive.credit(Money.of(50_000));
+                        sourceLive.debit(Money.of(10_000)); // 140_000
+
+                        TransactionFee excessiveNewFee = new TransactionFee(
+                                        UUID.randomUUID(), txId, Money.of(80_000), targetLive,
+                                        activeExpenseCategory);
+
+                        assertThrows(InsufficientBalanceException.class, () -> tx.updateDetails(
+                                        sourceLive, targetLive, activeIncomeCategory, Money.of(50_000),
+                                        validDate, "Chuyển sang đích thất bại", excessiveNewFee));
+
+                        assertEquals(Money.of(140_000), sourceLive.getCurrentBalance());
+                        assertEquals(Money.ZERO, targetLive.getCurrentBalance());
+                        assertSame(sourceSnapshot, tx.getWallet());
+                        assertSame(oldFee, tx.getFee().orElseThrow());
+                        assertEquals(Money.of(50_000), tx.getAmount());
+                        assertEquals("Thu cũ", tx.getNote());
                 }
         }
 

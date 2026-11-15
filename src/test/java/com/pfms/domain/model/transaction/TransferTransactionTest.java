@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -161,6 +162,31 @@ class TransferTransactionTest {
             assertEquals(initialSource, sourceWallet.getCurrentBalance());
             assertEquals(initialDest, destinationWallet.getCurrentBalance());
         }
+
+        @Test
+        @DisplayName("reconstitute() giữ nguyên createdAt lịch sử và cho phép ví nguồn/đích đã lưu trữ hoặc xóa mềm")
+        void testReconstitute_PreservesHistoricalCreatedAtAndAllowsArchivedOrDeletedWallets() {
+            UUID txId = UUID.randomUUID();
+            LocalDateTime historicalTime = LocalDateTime.of(2024, 1, 20, 18, 10, 0);
+            Wallet archivedSource = sourceWallet.copy();
+            archivedSource.archive();
+            Wallet deletedDest = destinationWallet.copy();
+            deletedDest.delete();
+            feeCategory.markDeleted();
+            TransactionFee historicalFee = TransactionFee.reconstitute(
+                    UUID.randomUUID(), txId, Money.of(3_300), archivedSource, feeCategory);
+
+            TransferTransaction restored = TransferTransaction.reconstitute(
+                    txId, archivedSource, deletedDest, Money.of(1_200_000), validDate,
+                    "Khôi phục chuyển khoản", historicalFee, historicalTime);
+
+            assertEquals(txId, restored.getTransactionId());
+            assertSame(archivedSource, restored.getSourceWallet());
+            assertSame(deletedDest, restored.getDestinationWallet());
+            assertTrue(restored.getFee().isPresent());
+            assertSame(historicalFee, restored.getFee().get());
+            assertEquals(historicalTime, restored.getCreatedAt());
+        }
     }
 
     @Nested
@@ -274,6 +300,29 @@ class TransferTransactionTest {
                             txId, sourceWallet, destinationWallet,
                             Money.of(100_000), validDate, "Sai parent ID", fee));
             assertEquals(ErrorCode.ERR_FEE_001, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("reconstitute() vẫn từ chối trùng ví, số tiền không dương và createdAt null")
+        void testReconstitute_StillRejectsSameWalletInvalidAmountAndNullCreatedAt() {
+            LocalDateTime historicalTime = LocalDateTime.of(2024, 1, 20, 18, 10, 0);
+
+            BusinessException sameWalletEx = assertThrows(BusinessException.class, () ->
+                    TransferTransaction.reconstitute(
+                            UUID.randomUUID(), sourceWallet, sourceWallet,
+                            Money.of(100_000), validDate, "Trùng ví", null, historicalTime));
+            assertEquals(ErrorCode.ERR_TRF_001, sameWalletEx.getErrorCode());
+
+            BusinessException zeroAmountEx = assertThrows(BusinessException.class, () ->
+                    TransferTransaction.reconstitute(
+                            UUID.randomUUID(), sourceWallet, destinationWallet,
+                            Money.ZERO, validDate, "Tiền 0", null, historicalTime));
+            assertEquals(ErrorCode.ERR_TRF_002, zeroAmountEx.getErrorCode());
+
+            assertThrows(NullPointerException.class, () ->
+                    TransferTransaction.reconstitute(
+                            UUID.randomUUID(), sourceWallet, destinationWallet,
+                            Money.of(100_000), validDate, "Null time", null, null));
         }
     }
 

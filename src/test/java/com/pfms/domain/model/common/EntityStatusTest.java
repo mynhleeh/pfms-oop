@@ -14,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Locale;
+
 @DisplayName("EntityStatus - Kiểm thử trạng thái thực thể dùng chung")
 class EntityStatusTest {
 
@@ -116,6 +118,22 @@ class EntityStatusTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> EntityStatus.fromString(raw));
             assertEquals("Trạng thái không hợp lệ: " + raw, ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("Không phụ thuộc JVM default Locale (ví dụ tr-TR) khi parse chuỗi thường")
+        void shouldParseLowercaseIndependentlyOfDefaultLocale() {
+            Locale previousLocale = Locale.getDefault();
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            try {
+                assertEquals(EntityStatus.ACTIVE, EntityStatus.fromString("active"));
+                assertEquals(EntityStatus.ARCHIVED, EntityStatus.fromString("archived"));
+                assertEquals(EntityStatus.DELETED, EntityStatus.fromString("deleted"));
+                assertThrows(IllegalArgumentException.class,
+                        () -> EntityStatus.fromString("ACT\u0130VE"));
+            } finally {
+                Locale.setDefault(previousLocale);
+            }
         }
     }
 }

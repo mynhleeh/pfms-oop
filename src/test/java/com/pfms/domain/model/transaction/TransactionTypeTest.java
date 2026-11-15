@@ -7,6 +7,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Locale;
+
 @DisplayName("Unit Tests for TransactionType Enum")
 class TransactionTypeTest {
 
@@ -96,6 +98,21 @@ class TransactionTypeTest {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> TransactionType.fromString(null));
         assertTrue(ex.getMessage().contains("không được để trống"));
+    }
+
+    @Test
+    @DisplayName("Should parse case-insensitively and reject non-ASCII dotted-I independently of default Locale")
+    void testFromStringLocaleIndependent() {
+        Locale previousLocale = Locale.getDefault();
+        Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+        try {
+            assertSame(TransactionType.INCOME, TransactionType.fromString("income"));
+            assertSame(TransactionType.EXPENSE, TransactionType.fromString("expense"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> TransactionType.fromString("\u0130NCOME"));
+        } finally {
+            Locale.setDefault(previousLocale);
+        }
     }
 }
 

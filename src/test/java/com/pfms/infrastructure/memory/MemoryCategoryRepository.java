@@ -4,6 +4,7 @@ import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.transaction.TransactionType;
 import com.pfms.domain.repository.CategoryRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,6 +72,7 @@ public class MemoryCategoryRepository
         return storage.values().stream()
                 .filter(c -> c.getNeedGroupId().equals(needGroupId)
                         && c.getName().equalsIgnoreCase(trimmed))
+                .sorted(Comparator.comparing(Category::isActive).reversed())
                 .findFirst();
     }
 
