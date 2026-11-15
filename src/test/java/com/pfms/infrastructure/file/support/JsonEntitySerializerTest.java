@@ -1,4 +1,4 @@
-package com.pfms.infrastructure.file;
+package com.pfms.infrastructure.file.support;
 
 import com.pfms.domain.model.category.Category;
 import com.pfms.domain.model.category.NeedGroup;
@@ -25,13 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("BackupJsonSerializer Unit Tests")
-class BackupJsonSerializerTest {
+@DisplayName("JsonEntitySerializer Unit Tests")
+class JsonEntitySerializerTest {
 
     @Test
     @DisplayName("Should throw AssertionError when trying to instantiate utility class")
     void testUtilityClassDesign() throws Exception {
-        Constructor<BackupJsonSerializer> constructor = BackupJsonSerializer.class.getDeclaredConstructor();
+        Constructor<JsonEntitySerializer> constructor = JsonEntitySerializer.class.getDeclaredConstructor();
         constructor.setAccessible(true);
         InvocationTargetException ex = assertThrows(InvocationTargetException.class, constructor::newInstance);
         assertInstanceOf(AssertionError.class, ex.getCause());
@@ -40,14 +40,14 @@ class BackupJsonSerializerTest {
     @Test
     @DisplayName("toJson should reject null payload")
     void toJsonShouldRejectNullPayload() {
-        assertThrows(NullPointerException.class, () -> BackupJsonSerializer.toJson(null));
+        assertThrows(NullPointerException.class, () -> JsonEntitySerializer.toJson(null));
     }
 
     @Test
     @DisplayName("toJson should serialize empty payload with empty arrays")
     void toJsonShouldSerializeEmptyPayload() {
         BackupPayload payload = BackupPayload.empty();
-        String json = BackupJsonSerializer.toJson(payload);
+        String json = JsonEntitySerializer.toJson(payload);
 
         assertNotNull(json);
         assertTrue(json.contains("\"wallets\": []"));
@@ -90,7 +90,7 @@ class BackupJsonSerializerTest {
                 List.of(ieTxn, transferTxn),
                 List.of(adj));
 
-        String json = BackupJsonSerializer.toJson(payload);
+        String json = JsonEntitySerializer.toJson(payload);
 
         assertNotNull(json);
         assertTrue(json.contains("Ví \\\"Đặc Biệt\\\" \\n & Tiền Mặt"));

@@ -1,4 +1,4 @@
-package com.pfms.infrastructure.file;
+package com.pfms.infrastructure.file.support;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,30 +21,30 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * Bộ tuần tự hóa nội bộ dữ liệu sao lưu hệ thống sang chuỗi JSON chuẩn UTF-8 qua Gson.
+ * Bộ tuần tự hóa dữ liệu thực thể sao lưu hệ thống sang chuỗi JSON chuẩn UTF-8 qua Gson.
  */
-final class BackupJsonSerializer {
+public final class JsonEntitySerializer {
 
     // region Constants
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().serializeNulls().create();
     // endregion
 
     // region Constructors
-    private BackupJsonSerializer() {
+    private JsonEntitySerializer() {
         throw new AssertionError("Utility class cannot be instantiated");
     }
     // endregion
 
     // region Operations
-    static String toJson(BackupPayload payload) {
+    public static String toJson(BackupPayload payload) {
         Objects.requireNonNull(payload, "BackupPayload không được để null");
 
         JsonObject root = new JsonObject();
-        root.add("wallets", mapToJsonArray(payload.getWallets(), BackupJsonSerializer::serializeWallet));
-        root.add("needGroups", mapToJsonArray(payload.getNeedGroups(), BackupJsonSerializer::serializeNeedGroup));
-        root.add("categories", mapToJsonArray(payload.getCategories(), BackupJsonSerializer::serializeCategory));
-        root.add("transactions", mapToJsonArray(payload.getTransactions(), BackupJsonSerializer::serializeTransaction));
-        root.add("adjustments", mapToJsonArray(payload.getAdjustments(), BackupJsonSerializer::serializeAdjustment));
+        root.add("wallets", mapToJsonArray(payload.getWallets(), JsonEntitySerializer::serializeWallet));
+        root.add("needGroups", mapToJsonArray(payload.getNeedGroups(), JsonEntitySerializer::serializeNeedGroup));
+        root.add("categories", mapToJsonArray(payload.getCategories(), JsonEntitySerializer::serializeCategory));
+        root.add("transactions", mapToJsonArray(payload.getTransactions(), JsonEntitySerializer::serializeTransaction));
+        root.add("adjustments", mapToJsonArray(payload.getAdjustments(), JsonEntitySerializer::serializeAdjustment));
         return GSON.toJson(root) + "\n";
     }
     // endregion

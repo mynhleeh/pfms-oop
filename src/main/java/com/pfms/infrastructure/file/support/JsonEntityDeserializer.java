@@ -1,4 +1,4 @@
-package com.pfms.infrastructure.file;
+package com.pfms.infrastructure.file.support;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -35,23 +35,23 @@ import java.util.UUID;
 import java.util.function.Function;
 
 /**
- * Bộ giải mã nội bộ chuỗi JSON sao lưu hệ thống sang cấu trúc {@link BackupPayload}.
+ * Bộ giải mã chuỗi JSON sao lưu hệ thống sang cấu trúc {@link BackupPayload}.
  */
-final class BackupJsonDeserializer {
+public final class JsonEntityDeserializer {
 
     // region Constants
     private static final Gson GSON = new Gson();
     // endregion
 
     // region Constructors
-    private BackupJsonDeserializer() {
+    private JsonEntityDeserializer() {
         throw new AssertionError("Utility class cannot be instantiated");
     }
     // endregion
 
     // region Operations
     @SuppressWarnings("unchecked")
-    static BackupPayload fromJson(String json) {
+    public static BackupPayload fromJson(String json) {
         Objects.requireNonNull(json, "Chuỗi JSON không được để null");
         if (json.trim().isEmpty()) {
             throw DataCorruptionException.syntaxError(

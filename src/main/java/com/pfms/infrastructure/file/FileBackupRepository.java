@@ -2,6 +2,9 @@ package com.pfms.infrastructure.file;
 
 import com.pfms.domain.model.data.BackupPayload;
 import com.pfms.domain.repository.BackupRepository;
+import com.pfms.infrastructure.file.support.FileStorageSupport;
+import com.pfms.infrastructure.file.support.JsonEntityDeserializer;
+import com.pfms.infrastructure.file.support.JsonEntitySerializer;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -24,22 +27,22 @@ public class FileBackupRepository implements BackupRepository {
     public long writeBackup(Path targetPath, BackupPayload payload) {
         Objects.requireNonNull(targetPath, "Đường dẫn tệp đích không được để null");
         Objects.requireNonNull(payload, "Dữ liệu sao lưu không được để null");
-        String jsonContent = BackupJsonSerializer.toJson(payload);
-        return BackupStorageSupport.writeUtf8Safely(targetPath, jsonContent);
+        String jsonContent = JsonEntitySerializer.toJson(payload);
+        return FileStorageSupport.writeUtf8Safely(targetPath, jsonContent);
     }
     // endregion
 
     // region Queries
     @Override
     public Path resolveWritableTargetPath(String destinationDirectoryPath, String scope, LocalDateTime exportedAt) {
-        return BackupStorageSupport.resolveWritableTargetPath(destinationDirectoryPath, scope, exportedAt);
+        return FileStorageSupport.resolveWritableTargetPath(destinationDirectoryPath, scope, exportedAt);
     }
 
     @Override
     public BackupPayload readBackup(String backupFilePath) {
-        Path backupPath = BackupStorageSupport.resolveReadableBackupPath(backupFilePath);
-        String jsonContent = BackupStorageSupport.readUtf8String(backupPath);
-        return BackupJsonDeserializer.fromJson(jsonContent);
+        Path backupPath = FileStorageSupport.resolveReadableBackupPath(backupFilePath);
+        String jsonContent = FileStorageSupport.readUtf8String(backupPath);
+        return JsonEntityDeserializer.fromJson(jsonContent);
     }
     // endregion
 }

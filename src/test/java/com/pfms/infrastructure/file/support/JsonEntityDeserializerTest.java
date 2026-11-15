@@ -1,4 +1,4 @@
-package com.pfms.infrastructure.file;
+package com.pfms.infrastructure.file.support;
 
 import com.pfms.domain.exception.DataCorruptionException;
 import com.pfms.domain.exception.ErrorCode;
@@ -28,13 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("BackupJsonDeserializer Unit Tests")
-class BackupJsonDeserializerTest {
+@DisplayName("JsonEntityDeserializer Unit Tests")
+class JsonEntityDeserializerTest {
 
     @Test
     @DisplayName("Should throw AssertionError when trying to instantiate utility class")
     void testUtilityClassDesign() throws Exception {
-        Constructor<BackupJsonDeserializer> constructor = BackupJsonDeserializer.class.getDeclaredConstructor();
+        Constructor<JsonEntityDeserializer> constructor = JsonEntityDeserializer.class.getDeclaredConstructor();
         constructor.setAccessible(true);
         InvocationTargetException ex = assertThrows(InvocationTargetException.class, constructor::newInstance);
         assertInstanceOf(AssertionError.class, ex.getCause());
@@ -43,23 +43,23 @@ class BackupJsonDeserializerTest {
     @Test
     @DisplayName("fromJson should reject null or blank json")
     void fromJsonShouldRejectNullOrBlank() {
-        assertThrows(NullPointerException.class, () -> BackupJsonDeserializer.fromJson(null));
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson(""));
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson("   \n\t"));
+        assertThrows(NullPointerException.class, () -> JsonEntityDeserializer.fromJson(null));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson(""));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson("   \n\t"));
     }
 
     @Test
     @DisplayName("fromJson should reject malformed JSON syntax")
     void fromJsonShouldRejectMalformedJson() {
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson("{ not a valid json"));
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson("{\"wallets\": ["));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson("{ not a valid json"));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson("{\"wallets\": ["));
     }
 
     @Test
     @DisplayName("fromJson should parse empty payload")
     void fromJsonShouldParseEmptyPayload() {
         String json = "{\"wallets\":[],\"needGroups\":[],\"categories\":[],\"transactions\":[],\"adjustments\":[]}";
-        BackupPayload payload = BackupJsonDeserializer.fromJson(json);
+        BackupPayload payload = JsonEntityDeserializer.fromJson(json);
 
         assertNotNull(payload);
         assertTrue(payload.isEmpty());
@@ -99,8 +99,8 @@ class BackupJsonDeserializerTest {
                 List.of(ieTxn, transferTxn),
                 List.of(adj));
 
-        String json = BackupJsonSerializer.toJson(original);
-        BackupPayload restored = BackupJsonDeserializer.fromJson(json);
+        String json = JsonEntitySerializer.toJson(original);
+        BackupPayload restored = JsonEntityDeserializer.fromJson(json);
 
         assertNotNull(restored);
         assertEquals(2, restored.getWallets().size());
@@ -228,7 +228,7 @@ class BackupJsonDeserializerTest {
         }
         """;
 
-        BackupPayload payload = BackupJsonDeserializer.fromJson(json);
+        BackupPayload payload = JsonEntityDeserializer.fromJson(json);
 
         assertNotNull(payload);
         assertEquals(2, payload.getWallets().size());
@@ -312,7 +312,7 @@ class BackupJsonDeserializerTest {
         }
         """.formatted(futureDate, futureDate);
 
-        BackupPayload payload = BackupJsonDeserializer.fromJson(json);
+        BackupPayload payload = JsonEntityDeserializer.fromJson(json);
 
         assertEquals(Money.of("-50000.00"), payload.getWallets().get(0).getCurrentBalance());
         assertEquals(LocalDate.parse(futureDate), payload.getTransactions().get(0).getTransactionDate().getDate());
@@ -339,7 +339,7 @@ class BackupJsonDeserializerTest {
         }
         """;
         DataCorruptionException missingBalanceEx = assertThrows(
-                DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson(missingBalanceJson));
+                DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson(missingBalanceJson));
         assertEquals(ErrorCode.ERR_DAT_001, missingBalanceEx.getErrorCode());
 
         String invalidCreatedAtJson = """
@@ -358,7 +358,7 @@ class BackupJsonDeserializerTest {
           "needGroups": [], "categories": [], "transactions": [], "adjustments": []
         }
         """;
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson(invalidCreatedAtJson));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson(invalidCreatedAtJson));
 
         String invalidStatusJson = """
         {
@@ -376,7 +376,7 @@ class BackupJsonDeserializerTest {
           "needGroups": [], "categories": [], "transactions": [], "adjustments": []
         }
         """;
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson(invalidStatusJson));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson(invalidStatusJson));
 
         String invalidBooleanJson = """
         {
@@ -394,7 +394,7 @@ class BackupJsonDeserializerTest {
           "needGroups": [], "categories": [], "transactions": [], "adjustments": []
         }
         """;
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson(invalidBooleanJson));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson(invalidBooleanJson));
     }
 
     @Test
@@ -418,7 +418,7 @@ class BackupJsonDeserializerTest {
           "transactions": [], "adjustments": []
         }
         """;
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson(invalidCategoryStatusJson));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson(invalidCategoryStatusJson));
 
         String unknownRecordTypeJson = """
         {
@@ -440,7 +440,7 @@ class BackupJsonDeserializerTest {
           "adjustments": []
         }
         """;
-        assertThrows(DataCorruptionException.class, () -> BackupJsonDeserializer.fromJson(unknownRecordTypeJson));
+        assertThrows(DataCorruptionException.class, () -> JsonEntityDeserializer.fromJson(unknownRecordTypeJson));
 
         String missingAdjustmentBalanceJson = """
         {
@@ -458,6 +458,6 @@ class BackupJsonDeserializerTest {
         }
         """;
         assertThrows(DataCorruptionException.class,
-                () -> BackupJsonDeserializer.fromJson(missingAdjustmentBalanceJson));
+                () -> JsonEntityDeserializer.fromJson(missingAdjustmentBalanceJson));
     }
 }

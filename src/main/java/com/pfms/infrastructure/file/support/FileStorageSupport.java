@@ -1,4 +1,4 @@
-package com.pfms.infrastructure.file;
+package com.pfms.infrastructure.file.support;
 
 import com.pfms.domain.exception.StorageException;
 
@@ -17,9 +17,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
- * Bộ hỗ trợ nội bộ kiểm tra đường dẫn thư mục/tệp và đọc ghi tệp sao lưu an toàn theo chuẩn UTF-8.
+ * Bộ hỗ trợ kiểm tra đường dẫn thư mục/tệp và đọc ghi tệp an toàn theo chuẩn UTF-8 nguyên tử.
  */
-final class BackupStorageSupport {
+public final class FileStorageSupport {
 
     // region Constants
     private static final DateTimeFormatter EXPORT_TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
@@ -27,17 +27,17 @@ final class BackupStorageSupport {
     // endregion
 
     // region Constructors
-    private BackupStorageSupport() {
+    private FileStorageSupport() {
         throw new AssertionError("Utility class cannot be instantiated");
     }
     // endregion
 
     // region Operations
-    static Path resolveWritableTargetPath(String destinationDirectoryPath, String scope) {
+    public static Path resolveWritableTargetPath(String destinationDirectoryPath, String scope) {
         return resolveWritableTargetPath(destinationDirectoryPath, scope, LocalDateTime.now());
     }
 
-    static Path resolveWritableTargetPath(
+    public static Path resolveWritableTargetPath(
             String destinationDirectoryPath,
             String scope,
             LocalDateTime exportedAt) {
@@ -57,7 +57,7 @@ final class BackupStorageSupport {
             throw new StorageException(
                     "Đường dẫn xuất sao lưu phải là thư mục hợp lệ, không được truyền tên tệp: "
                                 + destinationDirectoryPath,
-                    new IllegalArgumentException("destinationPath appears to be a file path"));
+                        new IllegalArgumentException("destinationPath appears to be a file path"));
         }
 
         String normalizedScope = (scope == null || scope.trim().isEmpty())
@@ -72,7 +72,7 @@ final class BackupStorageSupport {
         return directoryPath.resolve(fileName);
     }
 
-    static Path resolveReadableBackupPath(String backupFilePath) {
+    public static Path resolveReadableBackupPath(String backupFilePath) {
         if (backupFilePath == null || backupFilePath.trim().isEmpty()) {
             throw new StorageException("Đường dẫn tệp phục hồi không hợp lệ hoặc rỗng",
                     new IllegalArgumentException("backupFilePath cannot be blank"));
@@ -89,7 +89,7 @@ final class BackupStorageSupport {
         return backupPath;
     }
 
-    static String readUtf8String(Path backupPath) {
+    public static String readUtf8String(Path backupPath) {
         try {
             String content = Files.readString(backupPath, StandardCharsets.UTF_8);
             if (content.startsWith(UTF8_BOM)) {
@@ -101,7 +101,7 @@ final class BackupStorageSupport {
         }
     }
 
-    static long writeUtf8Safely(Path targetPath, String content) {
+    public static long writeUtf8Safely(Path targetPath, String content) {
         ensureParentDirectoryExists(targetPath);
         Path tempPath = targetPath.resolveSibling(targetPath.getFileName().toString() + ".tmp");
         try {
