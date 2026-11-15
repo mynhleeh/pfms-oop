@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Bộ điều phối giao diện đồ họa cho phân hệ Quản trị & An toàn dữ liệu (DAT).
+ * Bộ điều phối giao diện đồ họa cho phân hệ Quản trị &amp; An toàn dữ liệu (DAT).
  * Tiếp nhận yêu cầu xuất sao lưu JSON, phục hồi dữ liệu và kích hoạt đối soát tính toàn vẹn hệ thống.
  */
 public final class DataManagementGUIController {

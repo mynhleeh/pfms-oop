@@ -14,7 +14,7 @@ import java.util.Locale;
 
 /**
  * Thanh trạng thái thông tin hệ thống (BorderLayout.SOUTH).
- * Hiển thị tệp lưu trữ đang làm việc theo chuẩn giao diện Luxury Black & Gold.
+ * Hiển thị tệp lưu trữ đang làm việc theo chuẩn giao diện Luxury Black &amp; Gold.
  */
 public class StatusBarPanel extends JPanel {
 
