@@ -1,14 +1,94 @@
-# Hồ sơ Phân tích Hướng đối tượng Hệ thống Quản lý Tài chính Cá nhân (PFMS)
+---
+header-includes: |
+  \usepackage{longtable}
+  \usepackage{tikz}
+  \usetikzlibrary{calc}
+  \usepackage{array}
+  \usepackage{float}
+  \floatplacement{figure}{H}
+  \usepackage{caption}
+  \captionsetup[figure]{labelformat=empty}
+  \usepackage{calc}
+  \usepackage{booktabs}
+  \usepackage{colortbl}
+  \usepackage{xcolor}
+  \setlength{\arrayrulewidth}{0.5pt}
+  \setlength{\tabcolsep}{5pt}
+  \setlength{\emergencystretch}{3em}
+  \setlength{\LTpre}{8pt}
+  \setlength{\LTpost}{8pt}
+  \usepackage{etoolbox}
+  \usepackage{xparse}
+  \ExplSyntaxOn
+  \NewDocumentCommand{\normalcode}{m}
+   {
+    \tl_set:Nn \l_tmpa_tl { #1 }
+    \regex_replace_all:nnN { ([a-z])([A-Z]) } { \1\c{-}\2 } \l_tmpa_tl
+    \regex_replace_all:nnN { (\.) } { \1\c{allowbreak} } \l_tmpa_tl
+    \regex_replace_all:nnN { (_) } { \c{textunderscore}\c{allowbreak} } \l_tmpa_tl
+    \tl_use:N \l_tmpa_tl
+   }
+  \ExplSyntaxOff
+  \renewcommand{\texttt}[1]{\normalcode{#1}}
+  \AtBeginDocument{\let\passthrough\normalcode}
+  \ifPDFTeX\else\newfontfamily\tablefont{Times New Roman}\AtBeginEnvironment{longtable}{\tablefont}\fi
+  \usepackage{enumitem}
+  \setlist[itemize,1]{label={}}
+  \setlist[itemize,2]{label={}}
+  \setlist[itemize,3]{label={}}
+---
 
-> **HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG (PTIT)**
+\begin{center}
+  {\LARGE\bfseries HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG\par}
+\end{center}
 
-| Thông tin | Chi tiết |
-| :--- | :--- |
-| **Khoa** | Khoa Công nghệ Thông tin 1 |
-| **Học phần** | Lập trình Hướng đối tượng |
-| **Giảng viên** | Phạm Hoàng Việt <br/> Nguyễn Đình Quảng |
-| **Nhóm** | 3 |
-| **Thành viên** | Lê Anh Minh (B24DCCE180)<br/>Ứng Trọng Trình (B24DCCE271)<br/>Nguyễn Đình Tiến (B24DCCE264)<br/>Nguyễn Đinh Anh Quân (B24DCCE222) |
+\vspace*{1cm}
+
+\begin{tikzpicture}[remember picture, overlay]
+  % Viền ngoài
+  \draw[line width=1.6pt]
+    ([shift={(1.2cm,-1.2cm)}]current page.north west)
+    rectangle
+    ([shift={(-1.2cm,1.2cm)}]current page.south east);
+  % Viền trong
+  \draw[line width=0.5pt]
+    ([shift={(1.45cm,-1.45cm)}]current page.north west)
+    rectangle
+    ([shift={(-1.45cm,1.45cm)}]current page.south east);
+\end{tikzpicture}
+
+```{=latex}
+\begin{center}
+  \includegraphics[width=0.2\textwidth]{docs/object-oriented-analysis/images/logo.jpg}
+\end{center}
+```
+
+\vspace*{1cm}
+
+\begin{center}
+  {\LARGE\bfseries HỆ THỐNG QUẢN LÝ TÀI CHÍNH CÁ NHÂN\par}
+\end{center}
+
+\vspace*{1.5cm}
+
+```{=latex}
+\newcommand{\cell}[1]{\begin{tabular}[t]{@{}l@{}}#1\end{tabular}}
+
+\begin{center}
+{\large
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{@{}>{\bfseries}l@{\hspace{2em}}l@{}}
+Khoa & Công nghệ Thông tin 1 \\
+Học phần & Lập trình Hướng đối tượng \\
+Giảng viên & \cell{Phạm Hoàng Việt \\ Nguyễn Đình Quảng} \\
+Nhóm & 3 \\
+Thành viên & \cell{Lê Anh Minh - B24DCCE180 \\ Ứng Trọng Trình - B24DCCE271 \\ Nguyễn Đình Tiến - B24DCCE264 \\ Nguyễn Đinh Anh Quân - B24DCCE222} \\
+\end{tabular}
+}
+\end{center}
+```
+
+\newpage
 
 ## Mục lục Tổng quan
 
@@ -118,6 +198,7 @@
   - [7.2 Kiểm soát quy tắc nghiệp vụ](#72-kiểm-soát-quy-tắc-nghiệp-vụ)
 - [8. Tổng kết](#8-tổng-kết)
 - [9. Tài liệu Trích dẫn](#9-tài-liệu-trích-dẫn)
+\newpage
 
 # 1. Giới thiệu và ngữ cảnh hệ thống
 
@@ -128,7 +209,7 @@ Tài liệu Phân tích hướng đối tượng (OOA) xác lập mô hình mi�
 Tài liệu mô hình hóa miền khái niệm, hành vi tương tác hộp đen và hợp đồng thao tác trên toàn bộ 6 nhóm chức năng nghiệp vụ:
 
 | STT | Nhóm chức năng | Mã nhóm | Số UC | Dải ca sử dụng | Nội dung nghiệp vụ chính |
-| :---: | :--- | :---: | :---: | :---: | :--- |
+| :-: | :-------- | :-: | :-: | :------- | :------------------------ |
 | 1 | Quản lý ví | `WAL` | 4 | `UC-WAL-01` - `UC-WAL-04` | Quản lý ví tiền mặt và các ví tạo thêm; tính số dư khả dụng, tỷ lệ phân bổ; bảo toàn số dư không âm (`BR-FIN-02`), số học chính xác (`BR-FIN-01`) và chuẩn đặt tên (`BR-NAM-01`). |
 | 2 | Ghi nhận thu chi | `TXN` | 4 | `UC-TXN-01` - `UC-TXN-04` | Ghi nhận giao dịch thu chi; liên kết ví, gán danh mục theo phân cấp (`BR-FIN-04`), cập nhật số dư tức thời (`BR-FIN-02`) và hạch toán phí chính xác (`BR-FIN-01`). |
 | 3 | Chuyển tiền nội bộ | `TRF` | 3 | `UC-TRF-01` - `UC-TRF-03` | Điều chuyển tiền giữa hai ví nội bộ; ghi nhận đồng thời bảo toàn tổng số dư (`BR-FIN-03`), kiểm soát số dư ví nguồn (`BR-FIN-02`) và tính phí chính xác (`BR-FIN-01`). |
@@ -150,23 +231,7 @@ Tài liệu phục vụ 4 nhóm đối tượng kỹ thuật:
 
 Hệ thống được tiếp cận theo mô hình hộp đen, chỉ xét thông tin tiếp nhận từ môi trường ngoài và kết quả phản hồi mà không đi vào cấu trúc nội bộ. Phần mềm vận hành cục bộ trên máy tính cá nhân, phục vụ một người dùng duy nhất và tương tác với hai thành phần môi trường là đồng hồ hệ thống (`DE-01`) cùng hệ thống tệp cục bộ (`DE-02`).
 
-```mermaid
-flowchart LR
-    USER["Người dùng"]
-    SYS["Hệ thống PFMS"]
-    CLOCK["Đồng hồ hệ thống<br/>DE-01"]
-    FS["Hệ thống tệp cục bộ<br/>DE-02"]
-
-    USER -->|"Lệnh thu chi, chuyển tiền, điều chỉnh số dư"| SYS
-    USER -->|"Cấu hình danh mục, yêu cầu báo cáo"| SYS
-    USER -->|"Yêu cầu xuất, nhập dữ liệu sao lưu"| SYS
-    SYS -->|"Phản hồi kết quả, số dư khả dụng, báo cáo thống kê"| USER
-
-    CLOCK -->|"Mốc thời gian thực tế"| SYS
-
-    SYS -->|"Ghi dữ liệu an toàn"| FS
-    FS -->|"Đọc dữ liệu lưu trữ"| SYS
-```
+![Sơ đồ ngữ cảnh hệ thống PFMS](docs/object-oriented-analysis/images/hinh1.2.png){width=80%}
 
 Các thành phần tương tác qua ranh giới hệ thống:
 - **Người dùng**: Tác nhân duy nhất vận hành hệ thống cục bộ (`AS-01`), kiểm soát toàn bộ 6 nhóm chức năng (20 ca sử dụng). Do chạy đơn tiến trình cục bộ, hệ thống không yêu cầu xác thực danh tính, quản lý phiên mạng hay phân quyền.
@@ -178,13 +243,14 @@ Các thành phần tương tác qua ranh giới hệ thống:
 Bảng tổng hợp các thực thể, đối tượng giá trị và quy tắc nghiệp vụ của 6 nhóm chức năng:
 
 | Nhóm chức năng | Ca sử dụng | Thực thể miền | Đối tượng giá trị | Quy tắc nghiệp vụ áp dụng |
-| :--- | :--- | :--- | :--- | :--- |
+| :----- | :----- | :--------- | :-------- | :------------ |
 | Quản lý ví (`WAL`) | `UC-WAL-01` - `UC-WAL-04` | `Wallet`, `BalanceAdjustmentRecord` | `Money` | Chính xác số học (`BR-FIN-01`), số dư không âm (`BR-FIN-02`), tên ví duy nhất (`BR-NAM-01`) |
 | Ghi nhận thu chi (`TXN`) | `UC-TXN-01` - `UC-TXN-04` | `IncomeExpenseTransaction`, `TransactionFee` | `Money`, `TransactionType` | Chính xác số học (`BR-FIN-01`), cập nhật số dư tức thời (`BR-FIN-02`), phân loại hợp lệ (`BR-FIN-04`) |
 | Chuyển tiền nội bộ (`TRF`) | `UC-TRF-01` - `UC-TRF-03` | `TransferTransaction`, `TransactionFee` | `Money` | Chính xác số học (`BR-FIN-01`), kiểm soát ví nguồn (`BR-FIN-02`), ghi nhận đồng thời (`BR-FIN-03`) |
 | Danh mục phân loại (`CAT`) | `UC-CAT-01` - `UC-CAT-04` | `Category`, `NeedGroup` | `TransactionType` | Cấu trúc phân cấp 3 cấp (`BR-FIN-04`), tên danh mục duy nhất (`BR-NAM-01`) |
 | Thống kê và báo cáo (`REP`) | `UC-REP-01` - `UC-REP-02` | `IncomeExpenseTransaction`, `TransactionFee`, `NeedGroup`, `Category`, `TransferTransaction` (chỉ đọc ngày của phí) | `NetCashFlow`, `SavingsRate`, `SpendingStructureShare`, `TransactionDate`, `TransactionType` | Làm tròn ngân hàng (`BR-FIN-01`), cộng phí giao dịch bảo toàn số dư (`BR-FIN-02`), tổng hợp theo nhóm nhu cầu (`BR-FIN-04`) |
 | Lưu trữ và sao lưu (`DAT`) | `UC-DAT-01` - `UC-DAT-03` | | | Bảo toàn số dư khi phục hồi (`BR-FIN-02`) |
+\newpage
 
 # 2. Mô hình miền khái niệm
 
@@ -224,8 +290,8 @@ Hệ thống gồm 7 thực thể quản lý dữ liệu tài chính và 6 đố
 | `TransactionDate` | Ngày, tháng, năm | Ngày phát sinh giao dịch hợp lệ theo lịch thực tế. |
 | `TransactionType` | Giá trị cố định: Thu nhập hoặc Chi tiêu | Gồm hai giá trị cố định, quyết định chiều cộng/trừ tiền vào ví (`BR-FIN-04`). |
 | `NetCashFlow` | Số tiền | Tổng thu nhập trừ tổng chi tiêu trong kỳ (`BR-FIN-01`). |
-| `SavingsRate` | Tỷ lệ phần trăm | Bằng dòng tiền thuần chia tổng thu nhập, giữ tối thiểu 4 chữ số thập phân trung gian và làm tròn ngân hàng 2 chữ số (`0.00%` khi tổng thu nhập ≤ 0 theo `BR-FIN-01`). |
-| `SpendingStructureShare` | Tỷ lệ phần trăm | Tỷ trọng thu/chi (gồm phí theo `BR-FIN-02`) của nhóm hoặc danh mục trên tổng kỳ/nhóm cha, làm tròn ngân hàng 2 chữ số (`0.00%` khi mẫu số ≤ 0 theo `BR-FIN-01`). |
+| `SavingsRate` | Tỷ lệ phần trăm | Bằng dòng tiền thuần chia tổng thu nhập, giữ tối thiểu 4 chữ số thập phân trung gian và làm tròn ngân hàng 2 chữ số (`0.00%` khi tổng thu nhập $\le 0$ theo `BR-FIN-01`). |
+| `SpendingStructureShare` | Tỷ lệ phần trăm | Tỷ trọng thu/chi (gồm phí theo `BR-FIN-02`) của nhóm hoặc danh mục trên tổng kỳ/nhóm cha, làm tròn ngân hàng 2 chữ số (`0.00%` khi mẫu số $\le 0$ theo `BR-FIN-01`). |
 
 ## 2.3 Đặc tả chi tiết các lớp thực thể
 
@@ -244,17 +310,17 @@ Ví (`Wallet`) đại diện cho nguồn tiền hoặc tài khoản thanh toán 
 | `status` | Trạng thái hoạt động | Nhận giá trị `ACTIVE` (mặc định) hoặc `ARCHIVED` (`FR-WAL-01`, `FR-WAL-03`). Cấm xóa hoặc lưu trữ ví "Tiền mặt" (`AC-WAL-03.2`). Ví khác chỉ xóa vĩnh viễn khi chưa có giao dịch, nếu đã có chỉ được chuyển sang `ARCHIVED` (`AC-WAL-03.3`). |
 | `note` | Ghi chú | Mô tả tùy chọn, tối đa 255 ký tự sau khi `trim` (`CON-05`, `FR-WAL-01`, `FR-WAL-03`). |
 | `createdAt` | Thời điểm tạo | Mốc thời gian từ `DE-01`, bất biến, dùng để sắp xếp và đối soát (`FR-WAL-01`, `FR-WAL-02`). |
-| `currentBalance` | Số dư khả dụng (dẫn xuất) | Kiểu `Money`, tính từ lịch sử dòng tiền (`BR-FIN-02`), không gán trực tiếp. Khởi điểm `0.00 VNĐ` (`FR-WAL-01`), luôn ≥ 0.00 VNĐ (`ERR-WAL-001`). |
+| `currentBalance` | Số dư khả dụng (dẫn xuất) | Kiểu `Money`, tính từ lịch sử dòng tiền (`BR-FIN-02`), không gán trực tiếp. Khởi điểm `0.00 VNĐ` (`FR-WAL-01`), luôn $\ge 0.00$ VNĐ (`ERR-WAL-001`). |
 
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**:
-  - Số dư khả dụng luôn không âm (`WalletBalance(w, t) ≥ 0.00 VNĐ`) và chỉ biến động qua các giao dịch thu chi, chuyển tiền hoặc điều chỉnh số dư hợp lệ (`BR-FIN-02`, `ERR-WAL-001`).
+  - Số dư khả dụng luôn không âm ($\text{WalletBalance}(w, t) \ge 0.00$ VNĐ) và chỉ biến động qua các giao dịch thu chi, chuyển tiền hoặc điều chỉnh số dư hợp lệ (`BR-FIN-02`, `ERR-WAL-001`).
   - Tên ví duy nhất toàn hệ thống giữa cả ví `ACTIVE` và `ARCHIVED` (`BR-NAM-01`, `ERR-NAM-002`).
   - Ví "Tiền mặt" mặc định tồn tại vĩnh viễn, cấm xóa hoặc lưu trữ (`FR-WAL-03`, `AC-WAL-03.2`).
 - **Quy tắc vận hành**:
   - Kiểm tra khả năng chi trả: Mọi thao tác giảm số dư (`FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`, `FR-TRF-01`, `FR-WAL-05`) phải kiểm tra đủ số dư khả dụng, nếu thiếu từ chối theo `ERR-WAL-001`.
-  - Tỷ lệ phân bổ ví: Bằng `(currentBalance / totalBalance) × 100%` (`FR-WAL-04`), làm tròn ngân hàng (`BR-FIN-01`); gán `0.00%` nếu tổng số dư bằng 0 (`ERR-FIN-002`). Ví `ARCHIVED` có số dư > 0 hiển thị kèm nhãn "(đã lưu trữ)" (`AC-WAL-04.3`).
+  - Tỷ lệ phân bổ ví: Bằng $(\text{currentBalance} / \text{totalBalance}) \times 100\%$ (`FR-WAL-04`), làm tròn ngân hàng (`BR-FIN-01`); gán `0.00%` nếu tổng số dư bằng 0 (`ERR-FIN-002`). Ví `ARCHIVED` có số dư $> 0$ hiển thị kèm nhãn "(đã lưu trữ)" (`AC-WAL-04.3`).
   - Tính số dư thời gian thực (`BR-FIN-02`) theo công thức:
 
 $$
@@ -274,7 +340,7 @@ Giao dịch thu chi (`IncomeExpenseTransaction`) ghi nhận dòng tiền vào (`
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
 | `transactionId` | Mã định danh giao dịch | Chuỗi ID sinh tự động, bất biến và không tái sử dụng (`FR-TXN-01`, `FR-TXN-02`). |
-| `amount` | Số tiền giao dịch | Kiểu `Money`, bắt buộc > 0.00 VNĐ (`BR-FIN-01`, `FR-TXN-01`, `FR-TXN-02`, `ERR-FIN-001`). |
+| `amount` | Số tiền giao dịch | Kiểu `Money`, bắt buộc $> 0.00$ VNĐ (`BR-FIN-01`, `FR-TXN-01`, `FR-TXN-02`, `ERR-FIN-001`). |
 | `transactionDate` | Ngày giao dịch | Kiểu `TransactionDate` (`YYYY-MM-DD`), không vượt quá ngày hiện tại từ `DE-01` (`FR-TXN-01`, `FR-TXN-02`); mặc định là ngày hiện tại. |
 | `transactionType` | Loại giao dịch | Kiểu `TransactionType` (`INCOME` hoặc `EXPENSE`, `BR-FIN-04`). Bất biến sau khi tạo (`FR-TXN-04`). |
 | `walletId` | Mã ví liên kết | Tham chiếu `Wallet` đang `ACTIVE` (`FR-TXN-01`, `FR-TXN-02`). |
@@ -285,11 +351,11 @@ Giao dịch thu chi (`IncomeExpenseTransaction`) ghi nhận dòng tiền vào (`
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**:
-  - Số tiền bắt buộc > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `transactionType` bất biến sau khi tạo (`FR-TXN-04`).
+  - Số tiền bắt buộc $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `transactionType` bất biến sau khi tạo (`FR-TXN-04`).
   - Liên kết với một ví `ACTIVE` và một danh mục cấp 3 `ACTIVE` cùng loại thu chi (`BR-FIN-04`); cấm liên kết lên cấp 1 hoặc cấp 2 (`AC-CAT-01.2`).
-  - Khả năng chi trả: Giao dịch `EXPENSE` phải thỏa `currentBalance ≥ amount + feeAmount` (`BR-FIN-02`, `ERR-WAL-001`).
+  - Khả năng chi trả: Giao dịch `EXPENSE` phải thỏa $\text{currentBalance} \ge \text{amount} + \text{feeAmount}$ (`BR-FIN-02`, `ERR-WAL-001`).
 - **Quy tắc vận hành**:
-  - Cập nhật số dư và phí: Cộng `amount` vào ví nếu `INCOME`, trừ `amount` nếu `EXPENSE` (`BR-FIN-02`). Khi `feeAmount > 0`, tự động tạo `TransactionFee` đi kèm trong cùng một thao tác nguyên tử (`FR-TXN-01`, `FR-TXN-02`).
+  - Cập nhật số dư và phí: Cộng `amount` vào ví nếu `INCOME`, trừ `amount` nếu `EXPENSE` (`BR-FIN-02`). Khi $\text{feeAmount} > 0$, tự động tạo `TransactionFee` đi kèm trong cùng một thao tác nguyên tử (`FR-TXN-01`, `FR-TXN-02`).
   - Chỉnh sửa hai pha (`FR-TXN-04`): Hoàn nguyên số dư trên ví cũ (kiểm tra không âm `ERR-WAL-001` nếu hoàn nguyên khoản thu), áp dụng số dư mới lên ví mới (kiểm tra đủ chi trả nếu là khoản chi) và đồng bộ phí liên kết.
   - Xóa giao dịch (`FR-TXN-05`): Hoàn nguyên số dư ví (kiểm tra `ERR-WAL-001` nếu xóa khoản thu) và xóa đồng thời `TransactionFee` đi kèm (`AC-TXN-05.3`).
 
@@ -304,7 +370,7 @@ Giao dịch chuyển tiền (`TransferTransaction`) ghi nhận việc điều ch
 | `transferId` | Mã định danh chuyển tiền | Chuỗi ID sinh tự động, bất biến và không tái sử dụng (`FR-TRF-01`). |
 | `sourceWalletId` | Mã ví nguồn | Tham chiếu ví trích tiền đang `ACTIVE`, bắt buộc khác ví đích (`BR-FIN-03`, `ERR-TRF-001`). |
 | `destinationWalletId` | Mã ví đích | Tham chiếu ví nhận tiền đang `ACTIVE`, bắt buộc khác ví nguồn (`BR-FIN-03`, `ERR-TRF-001`). |
-| `amount` | Số tiền chuyển | Kiểu `Money`, bắt buộc > 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-03`, `FR-TRF-01`, `ERR-TRF-002`). |
+| `amount` | Số tiền chuyển | Kiểu `Money`, bắt buộc $> 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-03`, `FR-TRF-01`, `ERR-TRF-002`). |
 | `transactionDate` | Ngày chuyển tiền | Kiểu `TransactionDate` (`YYYY-MM-DD`), không vượt quá ngày hiện tại từ `DE-01` (`FR-TRF-01`). |
 | `note` | Ghi chú | Mô tả tùy chọn, tối đa 255 ký tự sau khi `trim` (`CON-05`, `FR-TRF-01`, `FR-TRF-02`). |
 | `createdAt` | Thời điểm tạo | Mốc thời gian từ `DE-01`, bất biến, phục vụ sắp xếp và kiểm toán (`FR-TRF-02`). |
@@ -312,12 +378,12 @@ Giao dịch chuyển tiền (`TransferTransaction`) ghi nhận việc điều ch
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**:
-  - Ví nguồn và ví đích phải khác nhau (`sourceWalletId ≠ destinationWalletId`, `BR-FIN-03`, `ERR-TRF-001`); số tiền chuyển > 0.00 VNĐ (`ERR-TRF-002`).
+  - Ví nguồn và ví đích phải khác nhau ($\text{sourceWalletId} \neq \text{destinationWalletId}$, `BR-FIN-03`, `ERR-TRF-001`); số tiền chuyển $> 0.00$ VNĐ (`ERR-TRF-002`).
   - Bảo toàn tổng số dư hệ thống trước phí: $\sum \text{WalletBalance}(\text{after}) = \sum \text{WalletBalance}(\text{before})$ (`BR-FIN-03`); nếu có phí `feeAmount`, tổng số dư giảm đúng bằng `feeAmount`.
-  - Ví nguồn phải đủ số dư thanh toán cả tiền chuyển và phí (`sourceWallet.currentBalance ≥ amount + feeAmount`, `BR-FIN-02`, `ERR-WAL-001`).
+  - Ví nguồn phải đủ số dư thanh toán cả tiền chuyển và phí ($\text{sourceWallet.currentBalance} \ge \text{amount} + \text{feeAmount}$, `BR-FIN-02`, `ERR-WAL-001`).
 - **Quy tắc vận hành**:
-  - Ghi nhận đồng thời (`Atomic Execution`): Trừ ví nguồn `amount + feeAmount` và cộng ví đích `amount` trong cùng một giao dịch nguyên tử (`BR-FIN-03`). Nếu `feeAmount > 0`, tự động tạo `TransactionFee` (loại `EXPENSE`) trích từ ví nguồn (`FR-TRF-01`).
-  - Hoàn tác khi xóa (`FR-TRF-02`): Kiểm tra ví đích đủ số dư `≥ amount` (`ERR-WAL-001`), trừ `amount` ở ví đích, hoàn `amount + feeAmount` về ví nguồn và xóa `TransactionFee` liên kết (`BR-FIN-03`, `AC-TRF-02.1`).
+  - Ghi nhận đồng thời (`Atomic Execution`): Trừ ví nguồn $\text{amount} + \text{feeAmount}$ và cộng ví đích `amount` trong cùng một giao dịch nguyên tử (`BR-FIN-03`). Nếu $\text{feeAmount} > 0$, tự động tạo `TransactionFee` (loại `EXPENSE`) trích từ ví nguồn (`FR-TRF-01`).
+  - Hoàn tác khi xóa (`FR-TRF-02`): Kiểm tra ví đích đủ số dư $\ge \text{amount}$ (`ERR-WAL-001`), trừ `amount` ở ví đích, hoàn $\text{amount} + \text{feeAmount}$ về ví nguồn và xóa `TransactionFee` liên kết (`BR-FIN-03`, `AC-TRF-02.1`).
 
 ### 2.3.4 Thực thể Chi phí giao dịch - TransactionFee
 
@@ -328,7 +394,7 @@ Chi phí giao dịch (`TransactionFee`) là khoản phí phụ do bên thứ ba 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
 | `feeId` | Mã định danh chi phí | Chuỗi ID sinh tự động, bất biến và không tái sử dụng (`BR-FIN-02`, `FR-TXN-01`, `FR-TRF-01`). |
-| `amount` | Số tiền phí | Kiểu `Money`, ≥ 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). Không tạo bản ghi khi phí bằng `0.00 VNĐ`. |
+| `amount` | Số tiền phí | Kiểu `Money`, $\ge 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). Không tạo bản ghi khi phí bằng `0.00 VNĐ`. |
 | `walletId` | Mã ví chịu phí | Tham chiếu ví phát sinh thu chi hoặc ví chuyển tiền nguồn đang `ACTIVE` (`BR-FIN-02`). |
 | `categoryId` | Mã danh mục phí | Tham chiếu `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`). |
 | `parentTransactionId` | Mã giao dịch gốc | Tham chiếu `transactionId` hoặc `transferId`, bất biến, loại trừ phí mồ côi (`BR-FIN-02`). |
@@ -337,7 +403,7 @@ Chi phí giao dịch (`TransactionFee`) là khoản phí phụ do bên thứ ba 
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**:
-  - Số tiền phí không âm (`amount ≥ 0.00 VNĐ`, `ERR-FEE-001`); khi `amount > 0.00 VNĐ` bắt buộc gắn danh mục cấp 3 `ACTIVE` thuộc nhánh `EXPENSE` (`ERR-FEE-002`, `ERR-FEE-003`).
+  - Số tiền phí không âm ($\text{amount} \ge 0.00$ VNĐ, `ERR-FEE-001`); khi $\text{amount} > 0.00$ VNĐ bắt buộc gắn danh mục cấp 3 `ACTIVE` thuộc nhánh `EXPENSE` (`ERR-FEE-002`, `ERR-FEE-003`).
   - Không tồn tại phí mồ côi (`No Orphan Fee`): Phí luôn gắn với `parentTransactionId`; cấm người dùng tạo, sửa hoặc xóa trực tiếp độc lập với giao dịch gốc (`BR-FIN-02`, `FR-TXN-04`, `FR-TXN-05`).
 - **Quy tắc vận hành**:
   - Hạch toán và hiển thị: Ghi nhận như một khoản `EXPENSE` trừ vào ví chịu phí, tính vào tổng chi tiêu và dòng tiền thuần (`FR-REP-01`, `AC-TXN-03.3`), hiển thị dòng riêng kèm nhãn liên kết tới giao dịch gốc trên sổ thu chi (`FR-TXN-03`).
@@ -403,9 +469,9 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 | :--- | :--- | :--- |
 | `recordId` | Mã định danh bản ghi | Chuỗi ID sinh tự động, bất biến và không tái sử dụng (`BR-FIN-02`, `FR-WAL-05`). |
 | `walletId` | Mã ví điều chỉnh | Tham chiếu `Wallet` đang `ACTIVE`; từ chối ví `ARCHIVED` (`FR-WAL-05`, `AC-WAL-05.3`). |
-| `actualBalance` | Số dư thực tế | Kiểu `Money`, bắt buộc ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`, `ERR-FIN-001`). |
+| `actualBalance` | Số dư thực tế | Kiểu `Money`, bắt buộc $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`, `ERR-FIN-001`). |
 | `previousBalance` | Số dư trước điều chỉnh | Kiểu `Money`, tính từ lịch sử dòng tiền ngay trước thời điểm kiểm kê (`BR-FIN-02`, `FR-WAL-05`). |
-| `difference` | Chênh lệch điều chỉnh | Kiểu `Money` có dấu (`actualBalance - previousBalance`), bắt buộc ≠ 0.00 VNĐ (`BR-FIN-01`, `AC-WAL-05.3`). |
+| `difference` | Chênh lệch điều chỉnh | Kiểu `Money` có dấu ($\text{actualBalance} - \text{previousBalance}$), bắt buộc $\neq 0.00$ VNĐ (`BR-FIN-01`, `AC-WAL-05.3`). |
 | `reason` | Lý do điều chỉnh | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`CON-05`, `FR-WAL-05`, `AC-WAL-05.4`). |
 | `adjustedAt` | Ngày điều chỉnh | Kiểu `TransactionDate` (`YYYY-MM-DD`), không vượt quá ngày hiện tại từ `DE-01` (`FR-WAL-05`). |
 
@@ -413,7 +479,7 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 
 - **Quy tắc bất biến**:
   - Bất biến tuyệt đối (`Immutability`): Không được sửa hoặc xóa sau khi tạo (`BR-FIN-02`, `FR-WAL-05`).
-  - Chỉ áp dụng cho ví `ACTIVE`, với `actualBalance ≥ 0.00 VNĐ` (`ERR-WAL-001`) và `difference ≠ 0.00 VNĐ` (`AC-WAL-05.3`).
+  - Chỉ áp dụng cho ví `ACTIVE`, với $\text{actualBalance} \ge 0.00$ VNĐ (`ERR-WAL-001`) và $\text{difference} \neq 0.00$ VNĐ (`AC-WAL-05.3`).
 - **Quy tắc vận hành**:
   - Đồng bộ số dư ví tức thời về đúng `actualBalance`, làm tổng tài sản hệ thống biến động đúng bằng `difference` mà không tính vào thu nhập, chi phí hay dòng tiền thuần (`BR-FIN-02`, `FR-WAL-05`, `FR-REP-01`).
 
@@ -436,7 +502,7 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 
 - **Quy tắc bất biến**:
   - Mọi phép toán số học trả về một thể hiện `Money` mới với quy mô cố định 2 chữ số thập phân (`Scale = 2`, `BR-FIN-01`, `CON-02`).
-  - Hai đối tượng `Money` bằng nhau khi cùng đơn vị tiền tệ và cùng giá trị đại số (ví dụ `100.00 VNĐ` = `100.0 VNĐ`). Giá trị `Money` của số dư ví luôn ≥ 0.00 VNĐ (`ERR-WAL-001`).
+  - Hai đối tượng `Money` bằng nhau khi cùng đơn vị tiền tệ và cùng giá trị đại số (ví dụ `100.00 VNĐ` = `100.0 VNĐ`). Giá trị `Money` của số dư ví luôn $\ge 0.00$ VNĐ (`ERR-WAL-001`).
 - **Quy tắc vận hành**:
   - Làm tròn ngân hàng (`Banker's Rounding` - làm tròn nửa chẵn) cho mọi phép chia không hết (`BR-FIN-01`, `ERR-FIN-002`).
   - Hiển thị số nguyên đồng trên giao diện nhưng lưu trữ và tính toán nội bộ đúng 2 chữ số thập phân (`CON-04`, `BR-FIN-01`).
@@ -457,7 +523,7 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 **Quy tắc bất biến và vận hành**
 
 - **Quy tắc bất biến**: Tuân thủ lịch Gregory và không vượt quá ngày hiện tại từ `DE-01` khi ghi nhận (`FR-TXN-01`, `FR-TXN-02`, `FR-TRF-01`).
-- **Quy tắc vận hành**: Hỗ trợ so sánh thứ tự thời gian để lọc khoảng ngày (`startDate ≤ endDate`, `FR-TXN-03`), gom cụm theo tháng (`YYYY-MM`) cho báo cáo 12 tháng (`FR-REP-01`) hoặc đoạn ngày cho báo cáo cơ cấu (`FR-REP-02`). Các giao dịch cùng `TransactionDate` được sắp xếp thứ cấp theo `createdAt`.
+- **Quy tắc vận hành**: Hỗ trợ so sánh thứ tự thời gian để lọc khoảng ngày ($\text{startDate} \le \text{endDate}$, `FR-TXN-03`), gom cụm theo tháng (`YYYY-MM`) cho báo cáo 12 tháng (`FR-REP-01`) hoặc đoạn ngày cho báo cáo cơ cấu (`FR-REP-02`). Các giao dịch cùng `TransactionDate` được sắp xếp thứ cấp theo `createdAt`.
 
 ### 2.4.3 Loại giao dịch - TransactionType
 
@@ -478,7 +544,7 @@ Bản ghi điều chỉnh số dư (`BalanceAdjustmentRecord`) ghi nhận sự k
 
 ### 2.4.4 Dòng tiền thuần - NetCashFlow
 
-`NetCashFlow` là đối tượng giá trị tiền tệ tổng hợp bất biến, phản ánh thặng dư hoặc thâm hụt tài chính ròng trong một kỳ quan sát `M`.
+`NetCashFlow` là đối tượng giá trị tiền tệ tổng hợp bất biến, phản ánh thặng dư hoặc thâm hụt tài chính ròng trong một kỳ quan sát $M$.
 
 **Cấu trúc thuộc tính**
 
@@ -494,7 +560,7 @@ $$
 $$
 
 - $\sum_{t \in M} \text{Expense}(t)$ bao gồm cả các khoản phí giao dịch liên kết (`TransactionFee`) phát sinh trong kỳ.
-- Ngữ nghĩa: `> 0` là thặng dư, `< 0` là thâm hụt (chi vượt thu), `= 0` là cân bằng thu chi. Hiển thị số nguyên đồng trên giao diện hoặc 2 chữ số thập phân trên báo cáo chi tiết.
+- Ngữ nghĩa: $> 0$ là thặng dư, $< 0$ là thâm hụt (chi vượt thu), $= 0$ là cân bằng thu chi. Hiển thị số nguyên đồng trên giao diện hoặc 2 chữ số thập phân trên báo cáo chi tiết.
 
 ### 2.4.5 Tỷ lệ tiết kiệm - SavingsRate
 
@@ -516,7 +582,7 @@ $$
 \end{cases}
 $$
 
-- Khi `TotalIncome ≤ 0`, mặc định bằng `0.00%` để tránh lỗi chia cho 0 (`BR-FIN-01`). Khi `TotalIncome > 0` và `NetCashFlow < 0`, tỷ lệ mang giá trị âm phản ánh mức thâm hụt.
+- Khi $\text{TotalIncome} \le 0$, mặc định bằng `0.00%` để tránh lỗi chia cho 0 (`BR-FIN-01`). Khi $\text{TotalIncome} > 0$ và $\text{NetCashFlow} < 0$, tỷ lệ mang giá trị âm phản ánh mức thâm hụt.
 
 ### 2.4.6 Tỷ trọng cơ cấu thu chi - SpendingStructureShare
 
@@ -526,7 +592,7 @@ $$
 
 | Thuộc tính | Ý nghĩa | Ràng buộc nghiệp vụ |
 | :--- | :--- | :--- |
-| `share` | Giá trị tỷ trọng | Số thập phân chính xác trong đoạn `[0.00, 100.00]`, giữ tối thiểu 4 chữ số thập phân trung gian và làm tròn ngân hàng về 2 chữ số. |
+| `share` | Giá trị tỷ trọng | Số thập phân chính xác trong đoạn $[0.00, 100.00]$, giữ tối thiểu 4 chữ số thập phân trung gian và làm tròn ngân hàng về 2 chữ số. |
 | `unit` | Đơn vị đo | Cố định là ký hiệu `%`. |
 | `scope` | Phạm vi phân tích | Cấp nhóm nhu cầu (`NeedGroup`), danh mục trên nhóm cha, hoặc danh mục trên toàn kỳ (`Category`). |
 
@@ -539,9 +605,9 @@ $$
 \end{cases}
 $$
 
-- Khi `TotalAmount = 0.00 VNĐ`, gán tỷ trọng `0.00%` và trả về danh sách rỗng.
-- Chỉ hiển thị các mục có `ItemAmount > 0.00 VNĐ` (`FR-REP-02`); mục đã xóa mềm vẫn giữ tên gốc kèm nhãn "(đã xóa)".
-- Khi `TotalAmount > 0`, tổng tỷ trọng các thành phần cùng cấp xấp xỉ `100.00%` ($\sum_{i=1}^{n} \text{SpendingStructureShare}(i) \approx 100.00\%$, sai số tối đa `± 0.005% × n` do làm tròn ngân hàng độc lập từng phần tử theo `BR-FIN-01`).
+- Khi $\text{TotalAmount} = 0.00$ VNĐ, gán tỷ trọng `0.00%` và trả về danh sách rỗng.
+- Chỉ hiển thị các mục có $\text{ItemAmount} > 0.00$ VNĐ (`FR-REP-02`); mục đã xóa mềm vẫn giữ tên gốc kèm nhãn "(đã xóa)".
+- Khi $\text{TotalAmount} > 0$, tổng tỷ trọng các thành phần cùng cấp xấp xỉ `100.00%` ($\sum_{i=1}^{n} \text{SpendingStructureShare}(i) \approx 100.00\%$, sai số tối đa $\pm 0.005\% \times n$ do làm tròn ngân hàng độc lập từng phần tử theo `BR-FIN-01`).
 
 ## 2.5 Các mối quan hệ ngữ nghĩa và bất biến miền
 
@@ -555,16 +621,17 @@ Thiết lập liên kết một-nhiều (1:N) giữa một `Wallet` với các d
 
 ### 2.5.2 Quan hệ phân cấp danh mục 3 cấp
 
-Thiết lập quan hệ hợp thành 3 tầng nghiêm ngặt: `TransactionType` (cấp 1, cố định) → `NeedGroup` (cấp 2, nhóm nhu cầu) → `Category` (cấp 3, danh mục chi tiết) (`BR-FIN-04`, `FR-CAT-01`–`FR-CAT-03`):
+Thiết lập quan hệ hợp thành 3 tầng nghiêm ngặt: `TransactionType` (cấp 1, cố định) $\rightarrow$ `NeedGroup` (cấp 2, nhóm nhu cầu) $\rightarrow$ `Category` (cấp 3, danh mục chi tiết) (`BR-FIN-04`, `FR-CAT-01`–`FR-CAT-03`):
 - **Toàn vẹn cấu trúc và liên kết**: Giao dịch thu chi và phí chỉ được liên kết vào cấp 3 (`Category`, `AC-CAT-01.2`). Không tồn tại danh mục mồ côi (`ERR-CAT-004`, `ERR-CAT-005`); mỗi nhánh `TransactionType` cố định và luôn phải duy trì tối thiểu một `NeedGroup` đang hoạt động (`ERR-CAT-001`, `ERR-CAT-002`).
 - **Đồng bộ xóa và chuyển nhóm**: Xóa `NeedGroup` sẽ tự động xóa kéo theo các `Category` con (xóa mềm nếu đã có giao dịch để giữ nguyên dữ liệu lịch sử kèm nhãn "(đã xóa)", hoặc xóa vĩnh viễn nếu chưa có giao dịch theo `AC-REP-02.3`). Chuyển nhóm cha chỉ hợp lệ trong cùng `TransactionType` và tới nhóm đang `ACTIVE` (`ERR-CAT-003`, chi tiết tại mục **2.3.5** và **2.3.6**).
 
 ### 2.5.3 Quan hệ phụ thuộc sinh tử giữa giao dịch gốc và phí
 
 Thiết lập quan hệ phụ thuộc sinh tử (`Composition`) giữa giao dịch gốc (`IncomeExpenseTransaction` hoặc `TransferTransaction`) và khoản phí đi kèm (`TransactionFee`), tách bạch chi phí bên thứ ba khỏi dòng tiền cốt lõi (`BR-FIN-02`, `BR-FIN-03`, `FR-TXN-01`, `FR-TXN-02`, `FR-TRF-01`):
-- **Loại trừ phí mồ côi**: `TransactionFee` luôn gắn với `parentTransactionId`, chỉ được tạo khi phí > 0.00 VNĐ kèm một `Category` cấp 3 thuộc nhánh `EXPENSE` (`ERR-FEE-001`–`ERR-FEE-003`), và hạch toán như một khoản chi tiêu độc lập trên báo cáo (`FR-REP-01`, `AC-TXN-03.3`).
+- **Loại trừ phí mồ côi**: `TransactionFee` luôn gắn với `parentTransactionId`, chỉ được tạo khi phí $> 0.00$ VNĐ kèm một `Category` cấp 3 thuộc nhánh `EXPENSE` (`ERR-FEE-001`–`ERR-FEE-003`), và hạch toán như một khoản chi tiêu độc lập trên báo cáo (`FR-REP-01`, `AC-TXN-03.3`).
 - **Đồng bộ vòng đời nguyên tử**: Bản ghi phí được tự động khởi tạo, cập nhật (hoặc xóa khi phí về 0) và xóa kèm hoàn tiền về ví đồng thời với thao tác tạo, sửa, xóa giao dịch gốc (`FR-TXN-04`, `AC-TXN-05.3`, `AC-TRF-02.1`, chi tiết tại mục **2.3.3** và **2.3.4**).
 
+\newpage
 # 3. Sơ đồ tuần tự hệ thống
 
 Sơ đồ tuần tự hệ thống (SSD) mô tả trình tự tương tác theo thời gian giữa người dùng và hệ thống cho từng kịch bản ca sử dụng. Ở giai đoạn phân tích, sơ đồ chuyển hóa các bước nghiệp vụ thành các sự kiện đầu vào tường minh, làm cơ sở xác định hợp đồng thao tác tại mục 4 trước khi thiết kế chi tiết lớp.
@@ -580,7 +647,7 @@ Yêu cầu từ người dùng được chuẩn hóa thành các thao tác hệ 
 Hệ thống PFMS cung cấp 20 thao tác tương ứng với 20 ca sử dụng thuộc 6 nhóm chức năng nhằm truy vấn hoặc thay đổi trạng thái các thực thể tài chính:
 
 | STT | Nhóm chức năng | Mã nhóm | Ca sử dụng | Thao tác hệ thống |
-| :---: | :--- | :---: | :---: | :--- |
+| :-: | :-------- | :-: | :-------- | :----------------- |
 | 1 | Quản lý ví | `WAL` | `UC-WAL-01` – `UC-WAL-04` | `createWallet`, `getWalletsSummary`, `updateWallet`, `adjustBalance` |
 | 2 | Ghi nhận thu chi | `TXN` | `UC-TXN-01` – `UC-TXN-04` | `recordIncomeExpense`, `filterTransactions`, `updateTransaction`, `deleteTransaction` |
 | 3 | Chuyển tiền nội bộ | `TRF` | `UC-TRF-01` – `UC-TRF-03` | `transferFunds`, `filterTransfers`, `deleteTransfer` |
@@ -595,7 +662,7 @@ Chi tiết tham số, phản hồi và sơ đồ tuần tự của từng thao t
 Nhóm chức năng Quản lý ví quản lý các nguồn tiền thanh toán, theo dõi số dư khả dụng và xử lý chênh lệch kiểm kê, tuân thủ quy tắc đặt tên duy nhất (`BR-NAM-01`) và bảo toàn số dư không âm (`BR-FIN-02`).
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
-| :---: | :--- | :--- | :--- | :--- |
+| :---- | :-------- | :---------- | :------------ | :----- |
 | `UC-WAL-01` | Tạo ví mới | `createWallet` | Khởi tạo nguồn tiền mới với số dư ban đầu bằng 0 | Ghi nhận |
 | `UC-WAL-02` | Theo dõi số dư tính lại và cơ cấu ví | `getWalletsSummary` | Tính số dư khả dụng tức thời và tỷ lệ phân bổ ví | Truy vấn |
 | `UC-WAL-03` | Cập nhật thông tin ví | `updateWallet` | Sửa tên, ghi chú hoặc chuyển đổi trạng thái lưu trữ ví | Cập nhật |
@@ -617,24 +684,7 @@ Người dùng yêu cầu khởi tạo ví mới kèm tên và ghi chú. Hệ th
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: createWallet(walletName, note)
-    alt Tên ví sai định dạng
-        System-->>User: Từ chối thao tác: Tên ví không hợp lệ
-    else Tên ví đã tồn tại trong hệ thống
-        System-->>User: Từ chối thao tác: Tên ví bị trùng lặp
-    else Ghi chú vượt quá độ dài cho phép
-        System-->>User: Từ chối thao tác: Ghi chú vượt quá giới hạn ký tự
-    else Dữ liệu hợp lệ
-        Note over System: Khởi tạo ví mới ở trạng thái hoạt động với số dư bằng 0<br/>Cập nhật tổng số dư và cơ cấu phân bổ các ví
-        System-->>User: Phản hồi thành công (Thông tin ví mới và danh sách ví cập nhật)
-    end
-```
+![Sơ đồ tuần tự tạo ví](docs/object-oriented-analysis/images/so-do-tuan-tu-tao-vi.png){width=80%}
 
 ### 3.3.2 Xem tổng hợp số dư và cơ cấu ví
 
@@ -645,22 +695,7 @@ Người dùng truy vấn danh sách ví để xem số dư khả dụng và t�
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: getWalletsSummary()
-    Note over System: Tính lại số dư từng ví từ lịch sử dòng tiền<br/>Tổng hợp tổng số dư toàn hệ thống
-    alt Tổng số dư toàn hệ thống bằng 0
-        Note over System: Gán tỷ lệ phân bổ mặc định 0% cho các ví
-        System-->>User: Phản hồi danh sách số dư ví và thông báo tổng số dư bằng 0
-    else Tổng số dư toàn hệ thống lớn hơn 0
-        Note over System: Tính tỷ lệ phân bổ của từng ví và sắp xếp giảm dần
-        System-->>User: Phản hồi danh sách số dư ví, tổng số dư và cơ cấu phân bổ
-    end
-```
+![Sơ đồ tuần tự xem tổng quan ví](docs/object-oriented-analysis/images/so-do-tuan-tu-tong-quan-vi.png){width=80%}
 
 ### 3.3.3 Cập nhật thông tin ví
 
@@ -679,26 +714,7 @@ Người dùng yêu cầu sửa tên hoặc ghi chú của ví hiện có. Hệ 
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: updateWallet(walletId, walletName, note)
-    alt Không tìm thấy ví trong hệ thống
-        System-->>User: Từ chối thao tác: Ví không tồn tại
-    else Tên ví mới sai định dạng
-        System-->>User: Từ chối thao tác: Tên ví không hợp lệ
-    else Tên ví mới trùng với ví khác
-        System-->>User: Từ chối thao tác: Tên ví đã tồn tại
-    else Ghi chú mới vượt quá độ dài cho phép
-        System-->>User: Từ chối thao tác: Ghi chú vượt quá giới hạn ký tự
-    else Dữ liệu hợp lệ
-        Note over System: Cập nhật tên và ghi chú của ví<br/>Giữ nguyên mã định danh, số dư và lịch sử giao dịch
-        System-->>User: Phản hồi thành công (Thông tin ví sau khi cập nhật)
-    end
-```
+![Sơ đồ tuần tự cập nhật ví](docs/object-oriented-analysis/images/so-do-tuan-tu-cap-nhat-vi.png){width=80%}
 
 ### 3.3.4 Điều chỉnh số dư ví thực tế
 
@@ -712,38 +728,19 @@ Người dùng đối chiếu tiền thực tế với phần mềm và yêu c�
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
 | `walletId` | Mã ví cần điều chỉnh | Tồn tại và đang ở trạng thái `ACTIVE` (`FR-WAL-05`). |
-| `actualBalance` | Số dư thực tế | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`) và khác số dư hiện tại của ví (`FR-WAL-05`). |
+| `actualBalance` | Số dư thực tế | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`) và khác số dư hiện tại của ví (`FR-WAL-05`). |
 | `reason` | Lý do chênh lệch | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-WAL-05`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: adjustBalance(walletId, actualBalance, reason)
-    alt Ví không tồn tại hoặc không ở trạng thái hoạt động
-        System-->>User: Từ chối thao tác: Ví không khả dụng để điều chỉnh
-    else Số dư thực tế sai định dạng hoặc bị âm
-        System-->>User: Từ chối thao tác: Số dư thực tế không hợp lệ
-    else Lý do điều chỉnh vượt quá độ dài cho phép
-        System-->>User: Từ chối thao tác: Lý do vượt quá giới hạn ký tự
-    else Số dư thực tế trùng với số dư hiện tại
-        System-->>User: Từ chối thao tác: Không phát sinh chênh lệch số dư
-    else Dữ liệu hợp lệ
-        Note over System: Tính mức chênh lệch và tạo bản ghi điều chỉnh số dư<br/>Cập nhật số dư khả dụng của ví theo số dư thực tế
-        System-->>User: Phản hồi thành công (Bản ghi điều chỉnh và số dư ví mới)
-    end
-```
+![Sơ đồ tuần tự điều chỉnh số dư ví](docs/object-oriented-analysis/images/so-do-tuan-tu-dieu-chinh-so-du.png){width=80%}
 
 ## 3.4 Nhóm chức năng Ghi nhận thu chi (TXN)
 
 Nhóm chức năng Ghi nhận thu chi hạch toán các khoản thu nhập, chi tiêu kèm phí phát sinh, đồng thời kiểm soát việc sửa, xóa giao dịch nhằm bảo toàn số dư ví không âm (`BR-FIN-02`) và phân cấp danh mục 3 cấp (`BR-FIN-04`).
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
-| :---: | :--- | :--- | :--- | :--- |
+| :---- | :-------- | :---------- | :------------ | :----- |
 | `UC-TXN-01` | Ghi nhận giao dịch thu chi | `recordIncomeExpense` | Ghi nhận khoản thu/chi kèm chi phí liên kết (nếu có) | Ghi nhận |
 | `UC-TXN-02` | Tra cứu và lọc lịch sử giao dịch thu chi | `filterTransactions` | Trích xuất danh sách thu chi theo thời gian, ví và danh mục | Truy vấn |
 | `UC-TXN-03` | Chỉnh sửa giao dịch thu chi | `updateTransaction` | Điều chỉnh thuộc tính giao dịch, hoàn nguyên tác động cũ và kiểm soát số dư | Cập nhật |
@@ -754,79 +751,43 @@ Nhóm chức năng Ghi nhận thu chi hạch toán các khoản thu nhập, chi 
 Người dùng gửi thông tin khoản thu/chi kèm ví thanh toán, danh mục và phí phát sinh (nếu có). Hệ thống kiểm tra danh mục cấp 3 (`BR-FIN-04`), số dư ví (`BR-FIN-02`) và ghi nhận đồng thời giao dịch gốc cùng bản ghi phí liên kết.
 
 - **Thao tác hệ thống**: `recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)`
-- **Kết quả phản hồi**: Tạo `IncomeExpenseTransaction`, tạo `TransactionFee` liên kết nếu `feeAmount > 0.00 VNĐ`, cập nhật số dư ví (`BR-FIN-02`) và trả về giao dịch vừa lưu; từ chối nếu số tiền sai định dạng hoặc ≤ 0 (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại/đã xóa (`ERR-FEE-003`), ví không đủ số dư (`ERR-WAL-001`), hoặc ví/danh mục không hợp lệ (`BR-FIN-04`).
+- **Kết quả phản hồi**: Tạo `IncomeExpenseTransaction`, tạo `TransactionFee` liên kết nếu $\text{feeAmount} > 0.00$ VNĐ, cập nhật số dư ví (`BR-FIN-02`) và trả về giao dịch vừa lưu; từ chối nếu số tiền sai định dạng hoặc $\le 0$ (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu danh mục phí (`ERR-FEE-002`), danh mục phí sai loại/đã xóa (`ERR-FEE-003`), ví không đủ số dư (`ERR-WAL-001`), hoặc ví/danh mục không hợp lệ (`BR-FIN-04`).
 
 **Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `walletId` | Mã ví thanh toán | Tồn tại và đang `ACTIVE` (`FR-TXN-01`, `FR-TXN-02`). Số dư sau giao dịch và phí phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `walletId` | Mã ví thanh toán | Tồn tại và đang `ACTIVE` (`FR-TXN-01`, `FR-TXN-02`). Số dư sau giao dịch và phí phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
 | `categoryId` | Mã danh mục cấp 3 | Đang `ACTIVE`, thuộc nhánh `INCOME` hoặc `EXPENSE` (`BR-FIN-04`). |
-| `amount` | Số tiền giao dịch | Số thập phân 2 chữ số, > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
+| `amount` | Số tiền giao dịch | Số thập phân 2 chữ số, $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
 | `transactionDate` | Ngày giao dịch | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-01`, `FR-TXN-02`). |
 | `note` | Ghi chú | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TXN-01`, `FR-TXN-02`). |
-| `feeAmount` | Số tiền phí | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-02`, `ERR-FEE-001`). |
-| `feeCategoryId` | Mã danh mục phí | Tùy chọn khi `feeAmount = 0.00 VNĐ`, bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); phải là danh mục cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`). |
+| `feeAmount` | Số tiền phí | Số thập phân 2 chữ số (`BR-FIN-01`), $\ge 0.00$ VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-02`, `ERR-FEE-001`). |
+| `feeCategoryId` | Mã danh mục phí | Tùy chọn khi $\text{feeAmount} = 0.00$ VNĐ, bắt buộc khi $\text{feeAmount} > 0.00$ VNĐ (`ERR-FEE-002`); phải là danh mục cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: recordIncomeExpense(walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)
-    alt Số tiền giao dịch không hợp lệ
-        System-->>User: Từ chối thao tác: Số tiền sai định dạng hoặc không lớn hơn 0
-    else Ví thanh toán hoặc danh mục phân loại không hợp lệ
-        System-->>User: Từ chối thao tác: Ví hoặc danh mục không khả dụng
-    else Thông tin chi phí hoặc danh mục phí không hợp lệ
-        System-->>User: Từ chối thao tác: Chi phí hoặc danh mục phí sai quy định
-    else Số dư ví không đủ thực hiện giao dịch
-        System-->>User: Từ chối thao tác: Số dư ví không đủ thanh toán
-    else Dữ liệu hợp lệ và đủ số dư
-        Note over System: Lưu bản ghi giao dịch thu chi và bản ghi phí liên kết (nếu có)<br/>Cập nhật số dư khả dụng của ví và thống kê dòng tiền
-        System-->>User: Phản hồi thành công (Thông tin giao dịch mới và số dư ví cập nhật)
-    end
-```
+![Sơ đồ tuần tự ghi nhận thu chi](docs/object-oriented-analysis/images/so-do-tuan-tu-ghi-nhan-thu-chi.png){width=80%}
 
 ### 3.4.2 Tra cứu và lọc lịch sử giao dịch
 
 Người dùng gửi tiêu chí lọc theo khoảng thời gian, ví và danh mục. Hệ thống lọc sổ giao dịch và tổng hợp tổng thu, tổng chi (gồm cả phí) cùng dòng tiền thuần (`BR-FIN-01`).
 
 - **Thao tác hệ thống**: `filterTransactions(startDate, endDate, walletId, categoryId)`
-- **Kết quả phản hồi**: Trả về danh sách giao dịch thu chi và phí thỏa mãn bộ lọc sắp xếp theo ngày giảm dần (kèm nhãn "(đã xóa)" nếu danh mục đã xóa mềm), cùng tổng thu, tổng chi và dòng tiền thuần (`BR-FIN-01`); từ chối nếu `startDate > endDate`. Thao tác chỉ đọc dữ liệu.
+- **Kết quả phản hồi**: Trả về danh sách giao dịch thu chi và phí thỏa mãn bộ lọc sắp xếp theo ngày giảm dần (kèm nhãn "(đã xóa)" nếu danh mục đã xóa mềm), cùng tổng thu, tổng chi và dòng tiền thuần (`BR-FIN-01`); từ chối nếu $\text{startDate} > \text{endDate}$. Thao tác chỉ đọc dữ liệu.
 
 **Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu | Định dạng `YYYY-MM-DD`, `≤ endDate` (`FR-TXN-03`). |
-| `endDate` | Ngày kết thúc | Định dạng `YYYY-MM-DD`, `≥ startDate` (`FR-TXN-03`). |
+| `startDate` | Ngày bắt đầu | Định dạng `YYYY-MM-DD`, $\le \text{endDate}$ (`FR-TXN-03`). |
+| `endDate` | Ngày kết thúc | Định dạng `YYYY-MM-DD`, $\ge \text{startDate}$ (`FR-TXN-03`). |
 | `walletId` | Mã ví cần lọc | Tùy chọn; để trống để lấy toàn bộ ví (`FR-TXN-03`). |
 | `categoryId` | Mã nhóm hoặc danh mục | Tùy chọn; nhận mã `NeedGroup` hoặc `Category` (kể cả mục đã `DELETED`) (`BR-FIN-04`, `FR-TXN-03`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: filterTransactions(startDate, endDate, walletId, categoryId)
-    alt Khoảng thời gian tra cứu không hợp lệ
-        System-->>User: Từ chối truy vấn: Khoảng thời gian không hợp lệ
-    else Tiêu chí lọc hợp lệ
-        Note over System: Lọc các giao dịch thu chi và phí giao dịch theo bộ tiêu chí<br/>Sắp xếp theo ngày giảm dần và tổng hợp thu, chi, dòng tiền thuần
-        alt Không có bản ghi thỏa mãn
-            System-->>User: Phản hồi danh sách rỗng và các chỉ số tổng hợp bằng 0
-        else Có bản ghi thỏa mãn
-            System-->>User: Phản hồi danh sách giao dịch và kết quả tổng hợp dòng tiền
-        end
-    end
-```
+![Sơ đồ tuần tự lọc giao dịch](docs/object-oriented-analysis/images/so-do-tuan-tu-loc-giao-dich.png){width=80%}
 
 ### 3.4.3 Chỉnh sửa giao dịch thu chi
 
@@ -840,34 +801,17 @@ Người dùng yêu cầu sửa thông tin một giao dịch thu chi đã lưu. 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
 | `transactionId` | Mã giao dịch cần sửa | Giao dịch gốc tồn tại trong sổ thu chi (`FR-TXN-04`), không phải bản ghi phí độc lập (`BR-FIN-02`). |
-| `walletId` | Mã ví thanh toán mới | Tồn tại và đang `ACTIVE`. Số dư ví cũ sau hoàn nguyên và ví mới sau cập nhật phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `walletId` | Mã ví thanh toán mới | Tồn tại và đang `ACTIVE`. Số dư ví cũ sau hoàn nguyên và ví mới sau cập nhật phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
 | `categoryId` | Mã danh mục cấp 3 mới | Cùng nhánh `TransactionType` với giao dịch gốc (`BR-FIN-04`). Phải đang `ACTIVE` nếu chọn mới, hoặc giữ nguyên danh mục cũ đã xóa mềm (`FR-TXN-04`). |
-| `amount` | Số tiền mới | Số thập phân 2 chữ số, > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
+| `amount` | Số tiền mới | Số thập phân 2 chữ số, $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`). |
 | `transactionDate` | Ngày giao dịch mới | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TXN-04`). |
 | `note` | Ghi chú mới | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TXN-04`). |
-| `feeAmount` | Số tiền phí mới | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-FEE-001`). |
-| `feeCategoryId` | Mã danh mục phí mới | Bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); thuộc nhánh `EXPENSE` và đang `ACTIVE` (hoặc giữ nguyên danh mục phí cũ đã xóa mềm) (`FR-TXN-04`, `ERR-FEE-003`). |
+| `feeAmount` | Số tiền phí mới | Số thập phân 2 chữ số (`BR-FIN-01`), $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-FEE-001`). |
+| `feeCategoryId` | Mã danh mục phí mới | Bắt buộc khi $\text{feeAmount} > 0.00$ VNĐ (`ERR-FEE-002`); thuộc nhánh `EXPENSE` và đang `ACTIVE` (hoặc giữ nguyên danh mục phí cũ đã xóa mềm) (`FR-TXN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: updateTransaction(transactionId, walletId, categoryId, amount, transactionDate, note, feeAmount, feeCategoryId)
-    alt Giao dịch không tồn tại hoặc là bản ghi phí độc lập
-        System-->>User: Từ chối thao tác: Giao dịch không hợp lệ để chỉnh sửa
-    else Thông tin số tiền, ví, danh mục hoặc chi phí mới không hợp lệ
-        System-->>User: Từ chối thao tác: Dữ liệu cập nhật vi phạm ràng buộc
-    else Hoàn nguyên giao dịch cũ hoặc áp dụng giao dịch mới làm âm số dư ví
-        System-->>User: Từ chối thao tác: Số dư ví không đủ để thực hiện thay đổi
-    else Dữ liệu hợp lệ và đảm bảo số dư
-        Note over System: Hoàn nguyên tác động cũ và cập nhật số dư ví mới<br/>Cập nhật bản ghi giao dịch gốc và điều chỉnh bản ghi phí liên kết
-        System-->>User: Phản hồi thành công (Thông tin giao dịch sau chỉnh sửa và số dư ví mới)
-    end
-```
+![Sơ đồ tuần tự chỉnh sửa giao dịch](docs/object-oriented-analysis/images/so-do-tuan-tu-chinh-sua-giao-dich.png){width=80%}
 
 ### 3.4.4 Xóa giao dịch thu chi
 
@@ -880,33 +824,18 @@ Người dùng yêu cầu xóa một giao dịch thu chi. Hệ thống kiểm tr
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transactionId` | Mã giao dịch cần xóa | Giao dịch gốc tồn tại (`FR-TXN-05`), không phải bản ghi phí độc lập. Nếu xóa giao dịch `INCOME`, số dư ví sau khi trừ khoản thu và hoàn phí phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
+| `transactionId` | Mã giao dịch cần xóa | Giao dịch gốc tồn tại (`FR-TXN-05`), không phải bản ghi phí độc lập. Nếu xóa giao dịch `INCOME`, số dư ví sau khi trừ khoản thu và hoàn phí phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: deleteTransaction(transactionId)
-    alt Giao dịch không tồn tại hoặc là bản ghi phí độc lập
-        System-->>User: Từ chối thao tác: Giao dịch không hợp lệ để xóa
-    else Hoàn nguyên khoản thu làm âm số dư ví
-        System-->>User: Từ chối thao tác: Số dư ví không đủ để thu hồi khoản thu
-    else Đủ điều kiện xóa
-        Note over System: Xóa bản ghi giao dịch gốc và bản ghi phí liên kết (nếu có)<br/>Hoàn nguyên số dư khả dụng của ví và cập nhật thống kê
-        System-->>User: Phản hồi thành công (Đã xóa giao dịch và khôi phục số dư ví)
-    end
-```
+![Sơ đồ tuần tự xóa giao dịch](docs/object-oriented-analysis/images/so-do-tuan-tu-xoa-giao-dich.png){width=80%}
 
 ## 3.5 Nhóm chức năng Chuyển tiền nội bộ (TRF)
 
 Nhóm chức năng Chuyển tiền nội bộ điều chuyển tiền giữa các ví của người dùng theo cơ chế ghi nhận đồng thời (trừ ví nguồn, cộng ví đích kèm phí phát sinh theo `BR-FIN-03`) và bảo toàn số dư không âm (`BR-FIN-02`).
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
-| :---: | :--- | :--- | :--- | :--- |
+| :---- | :-------- | :---------- | :------------ | :----- |
 | `UC-TRF-01` | Chuyển tiền nội bộ giữa hai ví | `transferFunds` | Điều chuyển tiền giữa hai ví theo cơ chế ghi nhận đồng thời kèm phí (nếu có) | Ghi nhận |
 | `UC-TRF-02` | Tra cứu lịch sử chuyển tiền | `filterTransfers` | Trích xuất lịch sử chuyển tiền nội bộ và tổng chi phí phát sinh | Truy vấn |
 | `UC-TRF-03` | Xóa giao dịch chuyển tiền | `deleteTransfer` | Hủy giao dịch chuyển tiền, hoàn nguyên đồng thời số dư hai ví và xóa phí | Xóa |
@@ -916,77 +845,43 @@ Nhóm chức năng Chuyển tiền nội bộ điều chuyển tiền giữa cá
 Người dùng yêu cầu chuyển tiền từ ví nguồn sang ví đích kèm phí chuyển tiền (nếu có). Hệ thống kiểm tra hai ví phân biệt (`BR-FIN-03`) và số dư ví nguồn (`BR-FIN-02`), sau đó trừ ví nguồn, cộng ví đích đồng thời và tạo bản ghi phí liên kết.
 
 - **Thao tác hệ thống**: `transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)`
-- **Kết quả phản hồi**: Tạo `TransferTransaction`, trừ đồng thời `amount + feeAmount` ở ví nguồn, cộng `amount` vào ví đích (`BR-FIN-03`), tạo `TransactionFee` (loại `EXPENSE`) nếu `feeAmount > 0.00 VNĐ` và trả về số dư mới của hai ví; từ chối nếu trùng ví nguồn và đích (`ERR-TRF-001`), số tiền chuyển ≤ 0 (`ERR-TRF-002`), sai định dạng số (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu/sai danh mục phí (`ERR-FEE-002`, `ERR-FEE-003`) hoặc ví nguồn không đủ số dư (`ERR-WAL-001`).
+- **Kết quả phản hồi**: Tạo `TransferTransaction`, trừ đồng thời $\text{amount} + \text{feeAmount}$ ở ví nguồn, cộng `amount` vào ví đích (`BR-FIN-03`), tạo `TransactionFee` (loại `EXPENSE`) nếu $\text{feeAmount} > 0.00$ VNĐ và trả về số dư mới của hai ví; từ chối nếu trùng ví nguồn và đích (`ERR-TRF-001`), số tiền chuyển $\le 0$ (`ERR-TRF-002`), sai định dạng số (`ERR-FIN-001`), phí âm (`ERR-FEE-001`), thiếu/sai danh mục phí (`ERR-FEE-002`, `ERR-FEE-003`) hoặc ví nguồn không đủ số dư (`ERR-WAL-001`).
 
 **Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `sourceWalletId` | Mã ví nguồn | Tồn tại, đang `ACTIVE` (`BR-FIN-03`) và có số dư `≥ amount + feeAmount` (`BR-FIN-02`, `ERR-WAL-001`). |
+| `sourceWalletId` | Mã ví nguồn | Tồn tại, đang `ACTIVE` (`BR-FIN-03`) và có số dư $\ge \text{amount} + \text{feeAmount}$ (`BR-FIN-02`, `ERR-WAL-001`). |
 | `destinationWalletId` | Mã ví đích | Tồn tại, đang `ACTIVE` và khác `sourceWalletId` (`BR-FIN-03`, `ERR-TRF-001`). |
-| `amount` | Số tiền chuyển | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), > 0.00 VNĐ (`BR-FIN-03`, `ERR-TRF-002`). |
+| `amount` | Số tiền chuyển | Số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), $> 0.00$ VNĐ (`BR-FIN-03`, `ERR-TRF-002`). |
 | `transferDate` | Ngày chuyển tiền | Định dạng `YYYY-MM-DD`, không vượt quá ngày hiện tại (`FR-TRF-01`). |
 | `note` | Ghi chú | Chuỗi tùy chọn, tối đa 255 ký tự sau khi `trim` (`FR-TRF-01`). |
-| `feeAmount` | Số tiền phí chuyển | Số thập phân 2 chữ số (`BR-FIN-01`), ≥ 0.00 VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-03`, `ERR-FEE-001`). |
-| `feeCategoryId` | Mã danh mục phí | Tùy chọn khi `feeAmount = 0.00 VNĐ`, bắt buộc khi `feeAmount > 0.00 VNĐ` (`ERR-FEE-002`); phải là danh mục cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`). |
+| `feeAmount` | Số tiền phí chuyển | Số thập phân 2 chữ số (`BR-FIN-01`), $\ge 0.00$ VNĐ, mặc định `0.00 VNĐ` (`BR-FIN-03`, `ERR-FEE-001`). |
+| `feeCategoryId` | Mã danh mục phí | Tùy chọn khi $\text{feeAmount} = 0.00$ VNĐ, bắt buộc khi $\text{feeAmount} > 0.00$ VNĐ (`ERR-FEE-002`); phải là danh mục cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: transferFunds(sourceWalletId, destinationWalletId, amount, transferDate, note, feeAmount, feeCategoryId)
-    alt Ví nguồn hoặc ví đích không hoạt động hoặc trùng nhau
-        System-->>User: Từ chối thao tác: Ví chuyển và ví nhận không hợp lệ
-    else Số tiền chuyển hoặc thông tin chi phí không hợp lệ
-        System-->>User: Từ chối thao tác: Dữ liệu số tiền hoặc phí chuyển tiền sai quy định
-    else Ví nguồn không đủ số dư thanh toán
-        System-->>User: Từ chối thao tác: Số dư ví nguồn không đủ thực hiện chuyển tiền
-    else Đủ điều kiện thực hiện chuyển tiền
-        Note over System: Tạo bản ghi chuyển tiền và bản ghi phí liên kết (nếu có)<br/>Trừ số dư ví nguồn và cộng số dư ví đích đồng thời
-        System-->>User: Phản hồi thành công (Thông tin chuyển tiền và số dư mới của hai ví)
-    end
-```
+![Sơ đồ tuần tự chuyển tiền giữa các ví](docs/object-oriented-analysis/images/so-do-tuan-tu-chuyen-tien.png){width=80%}
 
 ### 3.5.2 Tra cứu lịch sử chuyển tiền
 
 Người dùng truy vấn lịch sử chuyển tiền nội bộ theo khoảng thời gian, ví nguồn hoặc ví đích. Hệ thống lọc sổ chuyển tiền kèm phí liên kết và trả về danh sách sắp xếp theo ngày giảm dần (`FR-TRF-02`).
 
 - **Thao tác hệ thống**: `filterTransfers(startDate, endDate, sourceWalletId, destinationWalletId)`
-- **Kết quả phản hồi**: Trả về danh sách bản ghi chuyển tiền thỏa mãn bộ lọc sắp xếp theo ngày giảm dần kèm tổng tiền chuyển và tổng chi phí (`BR-FIN-01`); từ chối nếu `startDate > endDate`. Thao tác chỉ đọc dữ liệu.
+- **Kết quả phản hồi**: Trả về danh sách bản ghi chuyển tiền thỏa mãn bộ lọc sắp xếp theo ngày giảm dần kèm tổng tiền chuyển và tổng chi phí (`BR-FIN-01`); từ chối nếu $\text{startDate} > \text{endDate}$. Thao tác chỉ đọc dữ liệu.
 
 **Tham số đầu vào**
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu | Tùy chọn, định dạng `YYYY-MM-DD`, `≤ endDate` (`FR-TRF-02`). |
-| `endDate` | Ngày kết thúc | Tùy chọn, định dạng `YYYY-MM-DD`, `≥ startDate` (`FR-TRF-02`). |
+| `startDate` | Ngày bắt đầu | Tùy chọn, định dạng `YYYY-MM-DD`, $\le \text{endDate}$ (`FR-TRF-02`). |
+| `endDate` | Ngày kết thúc | Tùy chọn, định dạng `YYYY-MM-DD`, $\ge \text{startDate}$ (`FR-TRF-02`). |
 | `sourceWalletId` | Mã ví nguồn | Tùy chọn; để trống để lấy toàn bộ ví nguồn (`FR-TRF-02`). |
 | `destinationWalletId` | Mã ví đích | Tùy chọn; để trống để lấy toàn bộ ví đích (`FR-TRF-02`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: filterTransfers(startDate, endDate, sourceWalletId, destinationWalletId)
-    alt Khoảng thời gian tra cứu không hợp lệ
-        System-->>User: Từ chối truy vấn: Khoảng thời gian không hợp lệ
-    else Tiêu chí lọc hợp lệ
-        Note over System: Lọc lịch sử chuyển tiền và chi phí liên kết theo bộ tiêu chí<br/>Sắp xếp theo ngày giảm dần và tổng hợp chi phí phát sinh
-        alt Không có bản ghi thỏa mãn
-            System-->>User: Phản hồi danh sách rỗng
-        else Có bản ghi thỏa mãn
-            System-->>User: Phản hồi danh sách lịch sử chuyển tiền và tổng chi phí
-        end
-    end
-```
+![Sơ đồ tuần tự lọc lịch sử chuyển tiền](docs/object-oriented-analysis/images/so-do-tuan-tu-loc-chuyen-tien.png){width=80%}
 
 ### 3.5.3 Xóa giao dịch chuyển tiền
 
@@ -999,33 +894,18 @@ Người dùng yêu cầu xóa một giao dịch chuyển tiền để khôi ph�
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `transferId` | Mã chuyển tiền cần xóa | Tồn tại trong hệ thống (`FR-TRF-02`). Số dư hiện tại của ví đích phải `≥ amount` để không làm âm ví đích khi thu hồi (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). |
+| `transferId` | Mã chuyển tiền cần xóa | Tồn tại trong hệ thống (`FR-TRF-02`). Số dư hiện tại của ví đích phải $\ge \text{amount}$ để không làm âm ví đích khi thu hồi (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: deleteTransfer(transferId)
-    alt Không tìm thấy giao dịch chuyển tiền
-        System-->>User: Từ chối thao tác: Giao dịch chuyển tiền không tồn tại
-    else Ví đích không đủ số dư để thu hồi tiền chuyển
-        System-->>User: Từ chối thao tác: Số dư ví đích không đủ để hoàn nguyên
-    else Ví đích đủ số dư hoàn nguyên
-        Note over System: Xóa bản ghi chuyển tiền và bản ghi phí liên kết (nếu có)<br/>Hoàn nguyên đồng thời số dư của ví nguồn và ví đích
-        System-->>User: Phản hồi thành công (Đã xóa chuyển tiền và khôi phục số dư hai ví)
-    end
-```
+![Sơ đồ tuần tự xóa giao dịch chuyển tiền](docs/object-oriented-analysis/images/so-do-tuan-tu-xoa-chuyen-tien.png){width=80%}
 
 ## 3.6 Nhóm chức năng Danh mục phân loại (CAT)
 
 Nhóm chức năng Danh mục phân loại quản lý cây phân loại thu chi 3 cấp (`BR-FIN-04`), bảo đảm tính duy nhất của tên gọi (`BR-NAM-01`) và bảo toàn lịch sử giao dịch thông qua cơ chế xóa mềm.
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
-| :---: | :--- | :--- | :--- | :--- |
+| :---- | :-------- | :---------- | :------------ | :----- |
 | `UC-CAT-01` | Bổ sung danh mục phân loại mới | `addCategory` | Tạo mới danh mục chi tiết hoặc nhóm nhu cầu trong cây phân cấp | Ghi nhận |
 | `UC-CAT-02` | Đổi tên danh mục | `renameCategory` | Đổi tên hiển thị của danh mục hoặc nhóm nhu cầu | Cập nhật |
 | `UC-CAT-03` | Khôi phục hoặc tạo lại mục đã xóa | `restoreCategory` | Phục hồi trạng thái hoạt động cho mục đã xóa mềm | Cập nhật |
@@ -1047,24 +927,7 @@ Người dùng yêu cầu thêm một danh mục chi tiết (cấp 3) vào nhóm
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: addCategory(categoryName, parentCategoryId)
-    alt Tên sai định dạng (rỗng hoặc vượt quá 50 ký tự)
-        System-->>User: Từ chối thao tác: Tên phải từ 1 đến 50 ký tự
-    else Tên trùng với danh mục/nhóm đang hoạt động cùng cấp cha
-        System-->>User: Từ chối thao tác: Tên danh mục đã tồn tại trong cùng nhóm
-    else Nhóm cha đang ở trạng thái đã xóa (DELETED)
-        System-->>User: Từ chối thao tác: Không thể tạo danh mục trong nhóm đã xóa
-    else Dữ liệu hợp lệ
-        Note over System: Khởi tạo Category (cấp 3) hoặc NeedGroup (cấp 2)<br/>Gán trạng thái ACTIVE, sinh mã định danh duy nhất<br/>Kế thừa TransactionType từ nhóm cha
-        System-->>User: Phản hồi thành công (Thông tin danh mục mới, làm mới cây danh mục 3 cấp)
-    end
-```
+![Sơ đồ tuần tự thêm danh mục](docs/object-oriented-analysis/images/so-do-tuan-tu-them-danh-muc.png){width=80%}
 
 ### 3.6.2 Đổi tên danh mục
 
@@ -1082,24 +945,7 @@ Người dùng yêu cầu đổi tên hiển thị của một danh mục chi ti
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: renameCategory(categoryId, newName)
-    alt Không tìm thấy mã danh mục trong hệ thống
-        System-->>User: Thông báo lỗi danh mục không tồn tại
-    else Tên mới sai định dạng (rỗng hoặc quá 50 ký tự)
-        System-->>User: Từ chối thao tác: Tên phải từ 1 đến 50 ký tự
-    else Tên mới trùng với mục khác đang hoạt động trong cùng phạm vi cha
-        System-->>User: Từ chối thao tác: Tên danh mục đã tồn tại trong nhóm
-    else Dữ liệu hợp lệ
-        Note over System: Cập nhật trường name của thực thể<br/>Giữ nguyên mã categoryId và toàn bộ giao dịch liên kết
-        System-->>User: Phản hồi thành công (Thông tin danh mục sau khi đổi tên)
-    end
-```
+![Sơ đồ tuần tự đổi tên danh mục](docs/object-oriented-analysis/images/so-do-tuan-tu-doi-ten-danh-muc.png){width=80%}
 
 ### 3.6.3 Khôi phục danh mục đã xóa
 
@@ -1116,24 +962,7 @@ Người dùng phục hồi trạng thái hoạt động cho một danh mục ch
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: restoreCategory(categoryId)
-    alt Không tìm thấy danh mục hoặc danh mục đang ở trạng thái ACTIVE
-        System-->>User: Thông báo lỗi danh mục không hợp lệ để khôi phục
-    else Nhóm cha đang ở trạng thái đã xóa (DELETED)
-        System-->>User: Từ chối thao tác: Nhóm chứa danh mục đang ở trạng thái đã xóa
-    else Tên danh mục bị trùng với một mục đang hoạt động trong cùng nhóm
-        System-->>User: Từ chối thao tác: Tên danh mục trùng với mục đang dùng
-    else Đủ điều kiện khôi phục
-        Note over System: Đổi trạng thái thực thể từ DELETED sang ACTIVE<br/>Bảo toàn nguyên vẹn mã cũ và lịch sử giao dịch<br/>Cập nhật danh sách chọn tại biểu mẫu thu chi
-        System-->>User: Phản hồi thành công (Khôi phục danh mục thành công, trạng thái ACTIVE)
-    end
-```
+![Sơ đồ tuần tự khôi phục danh mục](docs/object-oriented-analysis/images/so-do-tuan-tu-khoi-phuc-danh-muc.png){width=80%}
 
 ### 3.6.4 Xóa danh mục phân loại
 
@@ -1150,30 +979,14 @@ Người dùng yêu cầu xóa một danh mục hoặc nhóm nhu cầu. Hệ th�
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: deleteCategory(categoryId)
-    alt Nhóm cần xóa là nhóm đang dùng cuối cùng của loại thu chi
-        System-->>User: Từ chối thao tác: Không thể xóa nhóm cuối cùng của loại thu chi này
-    else Mục chưa từng phát sinh giao dịch thu chi
-        Note over System: Xóa hoàn toàn (Hard Delete): Loại bỏ vĩnh viễn<br/>bản ghi khỏi cơ sở dữ liệu hệ thống
-        System-->>User: Phản hồi thành công (Đã xóa hoàn toàn danh mục khỏi hệ thống)
-    else Mục đã từng phát sinh giao dịch thu chi
-        Note over System: Xóa mềm (Soft Delete): Chuyển trạng thái sang DELETED<br/>Ẩn khỏi danh sách chọn mới, giữ nguyên lịch sử giao dịch<br/>Hiển thị kèm nhãn (đã xóa) trên các báo cáo
-        System-->>User: Phản hồi thành công (Đã chuyển danh mục sang trạng thái đã xóa)
-    end
-```
+![Sơ đồ tuần tự xóa danh mục](docs/object-oriented-analysis/images/so-do-tuan-tu-xoa-danh-muc.png){width=80%}
 
 ## 3.7 Nhóm chức năng Thống kê và báo cáo (REP)
 
 Nhóm chức năng Thống kê và báo cáo trích xuất chuỗi dữ liệu 12 tháng liên tục, tính dòng tiền thuần và phân tích cơ cấu thu chi (`EXPENSE` gồm cả phí giao dịch, hoặc `INCOME`) theo các quy tắc `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04` ở chế độ chỉ đọc.
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
-| :---: | :--- | :--- | :--- | :--- |
+| :---- | :-------- | :---------- | :------------ | :----- |
 | `UC-REP-01` | Thống kê dòng tiền 12 tháng gần nhất | `generateCashFlowReport` | Trích xuất chuỗi dữ liệu 12 tháng liên tục, tính dòng tiền thuần và tỷ lệ tiết kiệm | Truy vấn |
 | `UC-REP-02` | Phân tích cơ cấu thu chi theo nhóm và danh mục | `generateSpendingStructureReport` | Phân tích cơ cấu thu chi theo nhóm nhu cầu, danh mục và biến động kỳ liền kề | Truy vấn |
 
@@ -1189,24 +1002,11 @@ Người dùng yêu cầu tổng hợp chuỗi dòng tiền trong 12 tháng liê
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
 | `endMonth` | Tháng kết thúc kỳ 12 tháng | Số nguyên từ 1 đến 12 (mặc định là tháng hiện tại, `FR-REP-01`, `ERR-REP-001`). |
-| `endYear` | Năm kết thúc kỳ 12 tháng | Số nguyên ≥ 2000 (mặc định là năm hiện tại, `FR-REP-01`, `ERR-REP-001`). |
+| `endYear` | Năm kết thúc kỳ 12 tháng | Số nguyên $\ge 2000$ (mặc định là năm hiện tại, `FR-REP-01`, `ERR-REP-001`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: generateCashFlowReport(endMonth, endYear)
-    alt Thiếu tham số hoặc mốc thời gian không hợp lệ (tháng ngoài 1-12 hoặc năm < 2000)
-        System-->>User: Từ chối truy vấn và trả mã lỗi ERR-REP-001
-    else Mốc thời gian hợp lệ (bao gồm mốc tương lai ở chế độ chỉ đọc)
-        Note over System: Xác định 12 mốc tháng liên tục lùi từ (endMonth, endYear)<br/>Duyệt giao dịch và phí liên kết (BR-FIN-02), tính thu nhập và chi tiêu từng tháng<br/>Tính NetCashFlow = Income - Expense<br/>Tính SavingsRate = (Net / Income) * 100% nếu Income > 0, ngược lại 0.00%<br/>Tính 3 mức bình quân tháng chia cho 12 (kể cả tháng 0.00 VNĐ)
-        System-->>User: Phản hồi báo cáo dòng tiền 12 tháng (Bảng dữ liệu 12 dòng + Dòng bình quân + Biểu đồ)
-    end
-```
+![Sơ đồ tuần tự báo cáo dòng tiền](docs/object-oriented-analysis/images/so-do-tuan-tu-bao-cao-dong-tien.png){width=80%}
 
 ### 3.7.2 Phân tích cơ cấu thu chi theo nhóm
 
@@ -1219,33 +1019,20 @@ Người dùng yêu cầu phân tích tỷ trọng dòng tiền theo nhóm nhu c
 
 | Tham số | Ý nghĩa nghiệp vụ | Ràng buộc dữ liệu |
 | :--- | :--- | :--- |
-| `startDate` | Ngày bắt đầu kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và `≤ endDate` (`FR-REP-02`). |
-| `endDate` | Ngày kết thúc kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và `≥ startDate` (`FR-REP-02`). |
+| `startDate` | Ngày bắt đầu kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và $\le \text{endDate}$ (`FR-REP-02`). |
+| `endDate` | Ngày kết thúc kỳ phân tích | Định dạng `YYYY-MM-DD`, khác rỗng và $\ge \text{startDate}$ (`FR-REP-02`). |
 | `transactionType` | Loại thu chi cần phân tích | Khác rỗng, nhận giá trị `INCOME` hoặc `EXPENSE` (mặc định là `EXPENSE`, `BR-FIN-04`). |
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: generateSpendingStructureReport(startDate, endDate, transactionType)
-    alt Thiếu ngày hoặc transactionType, khoảng ngày không hợp lệ (startDate > endDate) hoặc transactionType ngoài INCOME/EXPENSE
-        System-->>User: Từ chối truy vấn và trả mã lỗi ERR-REP-001
-    else Tham số hợp lệ (bao gồm khoảng thời gian tương lai ở chế độ chỉ đọc)
-        Note over System: Quét giao dịch trong [startDate, endDate], với EXPENSE cộng thêm TransactionFee (BR-FIN-02)<br/>Nếu tổng kỳ = 0.00 VNĐ thì tỷ trọng 0.00% và trả danh sách rỗng<br/>Gom cụm số liệu phát sinh dương theo NeedGroup (cấp 2) và Category (cấp 3)<br/>Giữ tên gốc và trạng thái DELETED cho mục đã xóa để giao diện hiển thị (đã xóa)<br/>So sánh kỳ liền trước cùng độ dài (Mới nếu kỳ này > 0 và kỳ trước = 0, và 0.00% nếu cả hai kỳ = 0)<br/>Tính tỷ trọng % trung gian >= 4 chữ số thập phân, làm tròn ngân hàng 2 chữ số
-        System-->>User: Phản hồi báo cáo cơ cấu thu chi (Cây tỷ trọng cấp 2 - cấp 3 + So sánh kỳ trước + Biểu đồ)
-    end
-```
+![Sơ đồ tuần tự báo cáo cơ cấu thu chi](docs/object-oriented-analysis/images/so-do-tuan-tu-bao-cao-co-cau-thu-chi.png){width=80%}
 
 ## 3.8 Nhóm chức năng Lưu trữ và sao lưu dữ liệu (DAT)
 
 Nhóm chức năng Lưu trữ và sao lưu dữ liệu đảm bảo an toàn và toàn vẹn dữ liệu trên máy tính cá nhân thông qua việc sao lưu nguyên khối ra tệp cục bộ, xác thực phục hồi và đối soát độc lập số dư theo `BR-FIN-02`, `BR-FIN-03`.
 
 | Mã UC | Tên ca sử dụng | Thao tác hệ thống | Mục đích nghiệp vụ | Loại thao tác |
-| :---: | :--- | :--- | :--- | :--- |
+| :---- | :-------- | :---------- | :------------ | :----- |
 | `UC-DAT-01` | Xuất dữ liệu tài chính | `exportBackupData` | Đóng gói toàn bộ dữ liệu tài chính ra tệp sao lưu an toàn | Truy vấn |
 | `UC-DAT-02` | Phục hồi dữ liệu hệ thống từ bản sao lưu | `restoreBackupData` | Kiểm tra toàn vẹn tệp sao lưu và nạp lại dữ liệu vào hệ thống | Cập nhật |
 | `UC-DAT-03` | Kiểm tra lại dữ liệu hệ thống | `reconcileSystemData` | Duyệt lịch sử giao dịch để đối soát độc lập tính cân bằng số dư ví | Đối soát |
@@ -1265,22 +1052,7 @@ Người dùng yêu cầu trích xuất toàn bộ dữ liệu tài chính hiệ
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: exportBackupData(exportPath)
-    alt Đường dẫn không hợp lệ hoặc không có quyền ghi đĩa
-        System-->>User: Thông báo lỗi không thể tạo tệp tại đường dẫn chỉ định
-    else Không gian đĩa cứng không đủ dung lượng
-        System-->>User: Thông báo lỗi không đủ dung lượng lưu trữ
-    else Đường dẫn hợp lệ và đủ quyền ghi
-        Note over System: Chụp ảnh dữ liệu snapshot nhất quán toàn hệ thống<br/>Định dạng JSON UTF-8 (5 nhóm thực thể: ví, danh mục, thu chi, chuyển tiền, kiểm kê)<br/>Áp dụng độ chính xác số học cố định<br/>Thực hiện ghi tệp an toàn (Atomic File Write)
-        System-->>User: Phản hồi thành công (Tệp pfms_export_FULL_*.json, đường dẫn lưu và kích thước tệp)
-    end
-```
+![Sơ đồ tuần tự sao lưu dữ liệu](docs/object-oriented-analysis/images/so-do-tuan-tu-sao-luu-du-lieu.png){width=80%}
 
 ### 3.8.2 Phục hồi dữ liệu từ bản sao lưu
 
@@ -1297,26 +1069,7 @@ Người dùng yêu cầu nạp lại dữ liệu từ tệp sao lưu JSON. Hệ
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
-
-    User->>System: restoreBackupData(backupFilePath)
-    alt Tệp không tồn tại hoặc sai cấu trúc cú pháp JSON (Bước 1)
-        System-->>User: Từ chối phục hồi (Lỗi cấu trúc tệp sao lưu hoặc schema không tương thích)
-    else Vi phạm phân cấp danh mục 3 cấp (Bước 2)
-        System-->>User: Từ chối phục hồi (Lỗi danh mục mồ côi hoặc sai lệch nhánh thu chi)
-    else Vi phạm liên kết chuyển tiền hoặc phí mồ côi (Bước 3)
-        System-->>User: Từ chối phục hồi (Lỗi mất cân bằng chuyển tiền hoặc phí mồ côi)
-    else Vi phạm số dư ví bị âm tại bất kỳ thời điểm nào (Bước 4)
-        System-->>User: Từ chối phục hồi (Lỗi số dư ví không được âm)
-    else Vượt qua toàn bộ 4 bước kiểm tra toàn vẹn
-        Note over System: Cơ chế All-or-Nothing: Ghi đè toàn bộ dữ liệu mới<br/>Nạp lại trạng thái các ví, danh mục, giao dịch vào bộ nhớ
-        System-->>User: Phản hồi thành công (Phục hồi toàn bộ dữ liệu, thống kê số lượng bản ghi)
-    end
-```
+![Sơ đồ tuần tự phục hồi dữ liệu sao lưu](docs/object-oriented-analysis/images/so-do-tuan-tu-phuc-hoi-du-lieu.png){width=80%}
 
 ### 3.8.3 Đối soát toàn vẹn dữ liệu hệ thống
 
@@ -1327,20 +1080,9 @@ Người dùng kích hoạt tiến trình đối soát độc lập để rà so
 
 **Sơ đồ tuần tự hệ thống**
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Người dùng
-    participant System as Hệ thống
+![Sơ đồ tuần tự đối soát dữ liệu hệ thống](docs/object-oriented-analysis/images/so-do-tuan-tu-doi-soat-du-lieu.png){width=80%}
 
-    User->>System: reconcileSystemData()
-    Note over System: Quét toàn bộ tệp dữ liệu kiểm tra 4 điều kiện độc lập:<br/>1. Tính lại số dư ví từ lịch sử dòng tiền<br/>2. Kiểm tra cân bằng nguồn - đích chuyển tiền<br/>3. Kiểm tra liên kết danh mục và loại thu chi<br/>4. Kiểm tra phí chuyển tiền mồ côi
-    alt Tất cả 4 điều kiện đều ĐẠT 100%
-        System-->>User: Phản hồi báo cáo đối soát: Dữ liệu hoàn toàn nhất quán (100% ĐẠT)
-    else Phát hiện sai lệch dữ liệu (Số dư / Mất cân bằng / Sai liên kết)
-        System-->>User: Phản hồi báo cáo đối soát: Liệt kê chi tiết sai lệch, mức độ cảnh báo và đề xuất xử lý
-    end
-```
+\newpage
 
 # 4. Đặc tả biến đổi dữ liệu thao tác hệ thống
 
@@ -1381,7 +1123,7 @@ Người dùng tạo một ví mới để quản lý nguồn tiền riêng bi�
 
 - **Tạo mới thể hiện**: Khởi tạo một thể hiện `Wallet` mới (`FR-WAL-01`).
 - **Xóa thể hiện**: Không có.
-- **Biến đổi thuộc tính**: `Wallet` mới được cấp `walletId` duy nhất, gán `name = walletName`, `note = note`, `status = ACTIVE`, `createdAt` hiện tại và `currentBalance = 0.00 VNĐ` (`BR-FIN-02`); tính lại tỷ lệ phân bổ số dư giữa các ví (`FR-WAL-04`).
+- **Biến đổi thuộc tính**: `Wallet` mới được cấp `walletId` duy nhất, gán $\text{name} = \text{walletName}$, $\text{note} = \text{note}$, $\text{status} = \text{ACTIVE}$, `createdAt` hiện tại và $\text{currentBalance} = 0.00$ VNĐ (`BR-FIN-02`); tính lại tỷ lệ phân bổ số dư giữa các ví (`FR-WAL-04`).
 - **Hình thành hoặc phá vỡ liên kết**: Không có.
 
 ### 4.2.2 Thao tác cập nhật thông tin ví
@@ -1401,7 +1143,7 @@ Người dùng sửa tên hiển thị hoặc ghi chú của ví đang tồn t�
 
 - **Tạo mới thể hiện**: Không có.
 - **Xóa thể hiện**: Không có.
-- **Biến đổi thuộc tính**: Trên `Wallet` có mã `walletId`, cập nhật `name = walletName` và `note = note` (`FR-WAL-03`); giữ nguyên `walletId`, `status` và `currentBalance` (`BR-FIN-02`).
+- **Biến đổi thuộc tính**: Trên `Wallet` có mã `walletId`, cập nhật $\text{name} = \text{walletName}$ và $\text{note} = \text{note}$ (`FR-WAL-03`); giữ nguyên `walletId`, `status` và `currentBalance` (`BR-FIN-02`).
 - **Hình thành hoặc phá vỡ liên kết**: Không có.
 
 ### 4.2.3 Thao tác điều chỉnh số dư ví thực tế
@@ -1413,15 +1155,15 @@ Người dùng ghi nhận mốc kiểm kê khi tiền thực tế chênh lệch 
 
 **Tiền điều kiện**
 
-- Thể hiện `Wallet` ứng với `walletId` tồn tại và có `status = ACTIVE` (`FR-WAL-05`).
-- `actualBalance` là số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), không âm (≥ 0.00 VNĐ, `BR-FIN-02`, `ERR-WAL-001`) và khác `Wallet.currentBalance` hiện tại (`FR-WAL-05`).
+- Thể hiện `Wallet` ứng với `walletId` tồn tại và có $\text{status} = \text{ACTIVE}$ (`FR-WAL-05`).
+- `actualBalance` là số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`), không âm ($\ge 0.00$ VNĐ, `BR-FIN-02`, `ERR-WAL-001`) và khác `Wallet.currentBalance` hiện tại (`FR-WAL-05`).
 - `reason` (nếu có) dài tối đa 255 ký tự sau khi `trim` (`FR-WAL-05`).
 
 **Hậu điều kiện**
 
 - **Tạo mới thể hiện**: Khởi tạo một thể hiện `BalanceAdjustmentRecord` bất biến (`BR-FIN-02`, `FR-WAL-05`).
 - **Xóa thể hiện**: Không có.
-- **Biến đổi thuộc tính**: `BalanceAdjustmentRecord` mới ghi nhận `recordId` duy nhất, `previousBalance = Wallet.currentBalance` cũ, `actualBalance`, `difference = actualBalance - previousBalance` (`BR-FIN-01`), `reason` và `adjustedAt` hiện tại; cập nhật `Wallet.currentBalance = actualBalance` (`BR-FIN-02`).
+- **Biến đổi thuộc tính**: `BalanceAdjustmentRecord` mới ghi nhận `recordId` duy nhất, $\text{previousBalance} = \text{Wallet.currentBalance}$ cũ, `actualBalance`, $\text{difference} = \text{actualBalance} - \text{previousBalance}$ (`BR-FIN-01`), `reason` và `adjustedAt` hiện tại; cập nhật $\text{Wallet.currentBalance} = \text{actualBalance}$ (`BR-FIN-02`).
 - **Hình thành hoặc phá vỡ liên kết**: Thiết lập liên kết cố định từ `BalanceAdjustmentRecord` vừa tạo tới `Wallet` qua `walletId` (`FR-WAL-05`).
 
 ## 4.3 Các thao tác Ghi nhận thu chi
@@ -1437,18 +1179,18 @@ Người dùng ghi nhận một khoản thu nhập hoặc chi tiêu kèm phí gi
 
 **Tiền điều kiện**
 
-- Thể hiện `Wallet` ứng với `walletId` tồn tại và có `status = ACTIVE` (`FR-TXN-01`, `FR-TXN-02`).
-- Thể hiện `Category` ứng với `categoryId` tồn tại ở cấp 3, có `status = ACTIVE` và thuộc nhánh `INCOME` hoặc `EXPENSE` hợp lệ (`BR-FIN-04`).
-- `amount` là số thập phân chính xác > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `transactionDate` không vượt quá ngày hiện tại; `note` dài tối đa 255 ký tự sau khi `trim` (`FR-TXN-01`, `FR-TXN-02`).
-- `feeAmount` là số thập phân chính xác ≥ 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). Nếu `feeAmount > 0.00 VNĐ`, bắt buộc có `feeCategoryId` (`ERR-FEE-002`) trỏ tới một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`).
-- Số dư `Wallet.currentBalance` sau khi áp dụng `amount` và trừ `feeAmount` phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
+- Thể hiện `Wallet` ứng với `walletId` tồn tại và có $\text{status} = \text{ACTIVE}$ (`FR-TXN-01`, `FR-TXN-02`).
+- Thể hiện `Category` ứng với `categoryId` tồn tại ở cấp 3, có $\text{status} = \text{ACTIVE}$ và thuộc nhánh `INCOME` hoặc `EXPENSE` hợp lệ (`BR-FIN-04`).
+- `amount` là số thập phân chính xác $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `transactionDate` không vượt quá ngày hiện tại; `note` dài tối đa 255 ký tự sau khi `trim` (`FR-TXN-01`, `FR-TXN-02`).
+- `feeAmount` là số thập phân chính xác $\ge 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-02`, `ERR-FEE-001`). Nếu $\text{feeAmount} > 0.00$ VNĐ, bắt buộc có `feeCategoryId` (`ERR-FEE-002`) trỏ tới một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-003`).
+- Số dư `Wallet.currentBalance` sau khi áp dụng `amount` và trừ `feeAmount` phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
 
-- **Tạo mới thể hiện**: Khởi tạo một `IncomeExpenseTransaction` mới (`FR-TXN-01`, `FR-TXN-02`); nếu `feeAmount > 0.00 VNĐ`, khởi tạo đồng thời một `TransactionFee` đi kèm (`BR-FIN-02`).
+- **Tạo mới thể hiện**: Khởi tạo một `IncomeExpenseTransaction` mới (`FR-TXN-01`, `FR-TXN-02`); nếu $\text{feeAmount} > 0.00$ VNĐ, khởi tạo đồng thời một `TransactionFee` đi kèm (`BR-FIN-02`).
 - **Xóa thể hiện**: Không có.
-- **Biến đổi thuộc tính**: `IncomeExpenseTransaction` nhận `transactionId` duy nhất, `amount`, `transactionDate`, `note`, `createdAt` và `transactionType` từ `Category`; `TransactionFee` (nếu có) nhận `feeId` duy nhất, `amount = feeAmount` và `parentTransactionType = INCOME_EXPENSE`; `Wallet.currentBalance` tăng `amount - feeAmount` (nếu `INCOME`) hoặc giảm `amount + feeAmount` (nếu `EXPENSE`) (`BR-FIN-01`, `BR-FIN-02`).
-- **Hình thành hoặc phá vỡ liên kết**: Liên kết `IncomeExpenseTransaction` tới `Wallet` (`walletId`) và `Category` cấp 3 (`categoryId`) (`BR-FIN-04`); nếu `feeAmount > 0.00 VNĐ`, liên kết `TransactionFee` tới `IncomeExpenseTransaction` (`parentTransactionId = transactionId`), `Wallet` (`walletId`) và `Category` phí (`feeCategoryId`) (`BR-FIN-02`).
+- **Biến đổi thuộc tính**: `IncomeExpenseTransaction` nhận `transactionId` duy nhất, `amount`, `transactionDate`, `note`, `createdAt` và `transactionType` từ `Category`; `TransactionFee` (nếu có) nhận `feeId` duy nhất, $\text{amount} = \text{feeAmount}$ và $\text{parentTransactionType} = \text{INCOME\_EXPENSE}$; `Wallet.currentBalance` tăng $\text{amount} - \text{feeAmount}$ (nếu `INCOME`) hoặc giảm $\text{amount} + \text{feeAmount}$ (nếu `EXPENSE`) (`BR-FIN-01`, `BR-FIN-02`).
+- **Hình thành hoặc phá vỡ liên kết**: Liên kết `IncomeExpenseTransaction` tới `Wallet` (`walletId`) và `Category` cấp 3 (`categoryId`) (`BR-FIN-04`); nếu $\text{feeAmount} > 0.00$ VNĐ, liên kết `TransactionFee` tới `IncomeExpenseTransaction` ($\text{parentTransactionId} = \text{transactionId}$), `Wallet` (`walletId`) và `Category` phí (`feeCategoryId`) (`BR-FIN-02`).
 
 ### 4.3.2 Thao tác chỉnh sửa giao dịch thu chi
 
@@ -1460,16 +1202,16 @@ Người dùng hiệu chỉnh thông tin một giao dịch thu chi đã lưu. H�
 **Tiền điều kiện**
 
 - Thể hiện `IncomeExpenseTransaction` ứng với `transactionId` tồn tại (`FR-TXN-04`), không phải bản ghi `TransactionFee` độc lập (`BR-FIN-02`).
-- `Wallet` mới ứng với `walletId` tồn tại và có `status = ACTIVE` (`FR-TXN-04`).
-- `Category` mới ứng với `categoryId` cùng `transactionType` với giao dịch gốc (`BR-FIN-04`); phải có `status = ACTIVE` nếu chọn mới, hoặc cho phép giữ nguyên danh mục cũ đã `DELETED` (`FR-TXN-04`).
-- `amount` mới > 0.00 VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `feeAmount` mới ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-FEE-001`) và nếu `feeAmount > 0.00 VNĐ` phải có `feeCategoryId` hợp lệ thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`).
-- Số dư `currentBalance` của ví cũ sau hoàn nguyên và ví mới sau cập nhật đều ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
+- `Wallet` mới ứng với `walletId` tồn tại và có $\text{status} = \text{ACTIVE}$ (`FR-TXN-04`).
+- `Category` mới ứng với `categoryId` cùng `transactionType` với giao dịch gốc (`BR-FIN-04`); phải có $\text{status} = \text{ACTIVE}$ nếu chọn mới, hoặc cho phép giữ nguyên danh mục cũ đã `DELETED` (`FR-TXN-04`).
+- `amount` mới $> 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`); `feeAmount` mới $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-FEE-001`) và nếu $\text{feeAmount} > 0.00$ VNĐ phải có `feeCategoryId` hợp lệ thuộc nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`).
+- Số dư `currentBalance` của ví cũ sau hoàn nguyên và ví mới sau cập nhật đều $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
 
-- **Tạo mới thể hiện**: Khởi tạo một `TransactionFee` mới nếu trước khi sửa chưa có phí và sau sửa `feeAmount > 0.00 VNĐ` (`BR-FIN-02`, `FR-TXN-04`); ngược lại không có.
-- **Xóa thể hiện**: Xóa vĩnh viễn `TransactionFee` liên kết nếu trước đó có phí và sau sửa `feeAmount = 0.00 VNĐ` (`BR-FIN-02`, `FR-TXN-04`); ngược lại không có.
-- **Biến đổi thuộc tính**: Cập nhật `amount`, `transactionDate`, `note`, `walletId`, `categoryId` trên `IncomeExpenseTransaction` (giữ nguyên `transactionId`, `transactionType`); cập nhật `amount = feeAmount`, `categoryId = feeCategoryId` trên `TransactionFee` (nếu phí cũ và mới đều > 0.00 VNĐ); tính lại `currentBalance` trên `Wallet` cũ và `Wallet` mới (`BR-FIN-01`, `BR-FIN-02`).
+- **Tạo mới thể hiện**: Khởi tạo một `TransactionFee` mới nếu trước khi sửa chưa có phí và sau sửa $\text{feeAmount} > 0.00$ VNĐ (`BR-FIN-02`, `FR-TXN-04`); ngược lại không có.
+- **Xóa thể hiện**: Xóa vĩnh viễn `TransactionFee` liên kết nếu trước đó có phí và sau sửa $\text{feeAmount} = 0.00$ VNĐ (`BR-FIN-02`, `FR-TXN-04`); ngược lại không có.
+- **Biến đổi thuộc tính**: Cập nhật `amount`, `transactionDate`, `note`, `walletId`, `categoryId` trên `IncomeExpenseTransaction` (giữ nguyên `transactionId`, `transactionType`); cập nhật $\text{amount} = \text{feeAmount}$, $\text{categoryId} = \text{feeCategoryId}$ trên `TransactionFee` (nếu phí cũ và mới đều $> 0.00$ VNĐ); tính lại `currentBalance` trên `Wallet` cũ và `Wallet` mới (`BR-FIN-01`, `BR-FIN-02`).
 - **Hình thành hoặc phá vỡ liên kết**: Chuyển liên kết từ `Wallet`/`Category` cũ sang `Wallet`/`Category` mới (`BR-FIN-04`) và đồng bộ liên kết giữa `IncomeExpenseTransaction`, `TransactionFee`, `Wallet` mới cùng `Category` phí (`BR-FIN-02`).
 
 ### 4.3.3 Thao tác xóa giao dịch thu chi
@@ -1482,13 +1224,13 @@ Người dùng xóa một giao dịch thu chi khỏi sổ theo dõi. Hệ thốn
 **Tiền điều kiện**
 
 - Thể hiện `IncomeExpenseTransaction` ứng với `transactionId` tồn tại (`FR-TXN-05`), không phải bản ghi `TransactionFee` độc lập (`BR-FIN-02`).
-- Nếu xóa giao dịch `INCOME`, số dư `Wallet.currentBalance` sau khi trừ `amount` và cộng hoàn lại `TransactionFee.amount` (nếu có) phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
+- Nếu xóa giao dịch `INCOME`, số dư `Wallet.currentBalance` sau khi trừ `amount` và cộng hoàn lại `TransactionFee.amount` (nếu có) phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
 
 - **Tạo mới thể hiện**: Không có.
 - **Xóa thể hiện**: Xóa vĩnh viễn `IncomeExpenseTransaction` có mã `transactionId` (`FR-TXN-05`) cùng `TransactionFee` liên kết (nếu có) (`BR-FIN-02`).
-- **Biến đổi thuộc tính**: Hoàn nguyên `Wallet.currentBalance`: giảm `amount - feeAmount` nếu xóa giao dịch `INCOME`, hoặc tăng `amount + feeAmount` nếu xóa giao dịch `EXPENSE` (`BR-FIN-01`, `BR-FIN-02`).
+- **Biến đổi thuộc tính**: Hoàn nguyên `Wallet.currentBalance`: giảm $\text{amount} - \text{feeAmount}$ nếu xóa giao dịch `INCOME`, hoặc tăng $\text{amount} + \text{feeAmount}$ nếu xóa giao dịch `EXPENSE` (`BR-FIN-01`, `BR-FIN-02`).
 - **Hình thành hoặc phá vỡ liên kết**: Gỡ bỏ toàn bộ liên kết từ `IncomeExpenseTransaction` và `TransactionFee` (nếu có) tới `Wallet` và `Category` (`BR-FIN-02`, `FR-TXN-05`).
 
 ## 4.4 Các thao tác Chuyển tiền nội bộ
@@ -1504,17 +1246,17 @@ Người dùng điều chuyển tiền giữa hai ví nội bộ kèm phí chuy�
 
 **Tiền điều kiện**
 
-- Hai thể hiện `Wallet` ứng với `sourceWalletId` và `destinationWalletId` cùng tồn tại, có `status = ACTIVE` và phân biệt nhau (`sourceWalletId != destinationWalletId`, `BR-FIN-03`, `ERR-TRF-001`).
-- `amount` là số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`) và > 0.00 VNĐ (`BR-FIN-03`, `ERR-TRF-002`); `transferDate` không vượt quá ngày hiện tại; `note` dài tối đa 255 ký tự sau khi `trim` (`FR-TRF-01`).
-- `feeAmount` là số thập phân chính xác ≥ 0.00 VNĐ (`BR-FIN-01`, `BR-FIN-03`, `ERR-FEE-001`). Nếu `feeAmount > 0.00 VNĐ`, bắt buộc có `feeCategoryId` (`ERR-FEE-002`) trỏ tới một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-003`).
-- Số dư ví nguồn `sourceWallet.currentBalance >= amount + feeAmount` (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`).
+- Hai thể hiện `Wallet` ứng với `sourceWalletId` và `destinationWalletId` cùng tồn tại, có $\text{status} = \text{ACTIVE}$ và phân biệt nhau ($\text{sourceWalletId} \neq \text{destinationWalletId}$, `BR-FIN-03`, `ERR-TRF-001`).
+- `amount` là số thập phân 2 chữ số (`BR-FIN-01`, `ERR-FIN-001`) và $> 0.00$ VNĐ (`BR-FIN-03`, `ERR-TRF-002`); `transferDate` không vượt quá ngày hiện tại; `note` dài tối đa 255 ký tự sau khi `trim` (`FR-TRF-01`).
+- `feeAmount` là số thập phân chính xác $\ge 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-03`, `ERR-FEE-001`). Nếu $\text{feeAmount} > 0.00$ VNĐ, bắt buộc có `feeCategoryId` (`ERR-FEE-002`) trỏ tới một `Category` cấp 3 đang `ACTIVE` thuộc nhánh `EXPENSE` (`BR-FIN-02`, `BR-FIN-04`, `ERR-FEE-003`).
+- Số dư ví nguồn $\text{sourceWallet.currentBalance} \ge \text{amount} + \text{feeAmount}$ (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
 
-- **Tạo mới thể hiện**: Khởi tạo một `TransferTransaction` mới (`FR-TRF-01`); nếu `feeAmount > 0.00 VNĐ`, khởi tạo đồng thời một `TransactionFee` thuộc loại `EXPENSE` (`BR-FIN-03`).
+- **Tạo mới thể hiện**: Khởi tạo một `TransferTransaction` mới (`FR-TRF-01`); nếu $\text{feeAmount} > 0.00$ VNĐ, khởi tạo đồng thời một `TransactionFee` thuộc loại `EXPENSE` (`BR-FIN-03`).
 - **Xóa thể hiện**: Không có.
-- **Biến đổi thuộc tính**: `TransferTransaction` nhận `transferId` duy nhất, `amount`, `transactionDate = transferDate`, `note`, `createdAt`; `TransactionFee` (nếu có) nhận `feeId` duy nhất, `amount = feeAmount`, `parentTransactionType = TRANSFER`; đồng thời giảm `sourceWallet.currentBalance` đi `amount + feeAmount` và tăng `destinationWallet.currentBalance` thêm `amount` (`BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`).
-- **Hình thành hoặc phá vỡ liên kết**: Liên kết `TransferTransaction` tới `Wallet` nguồn (`sourceWalletId`) và `Wallet` đích (`destinationWalletId`) (`BR-FIN-03`); nếu `feeAmount > 0.00 VNĐ`, liên kết `TransactionFee` tới `TransferTransaction` (`parentTransactionId = transferId`), `Wallet` nguồn (`sourceWalletId`) và `Category` phí (`feeCategoryId`) (`BR-FIN-02`).
+- **Biến đổi thuộc tính**: `TransferTransaction` nhận `transferId` duy nhất, `amount`, $\text{transactionDate} = \text{transferDate}$, `note`, `createdAt`; `TransactionFee` (nếu có) nhận `feeId` duy nhất, $\text{amount} = \text{feeAmount}$, $\text{parentTransactionType} = \text{TRANSFER}$; đồng thời giảm `sourceWallet.currentBalance` đi $\text{amount} + \text{feeAmount}$ và tăng `destinationWallet.currentBalance` thêm `amount` (`BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`).
+- **Hình thành hoặc phá vỡ liên kết**: Liên kết `TransferTransaction` tới `Wallet` nguồn (`sourceWalletId`) và `Wallet` đích (`destinationWalletId`) (`BR-FIN-03`); nếu $\text{feeAmount} > 0.00$ VNĐ, liên kết `TransactionFee` tới `TransferTransaction` ($\text{parentTransactionId} = \text{transferId}$), `Wallet` nguồn (`sourceWalletId`) và `Category` phí (`feeCategoryId`) (`BR-FIN-02`).
 
 ### 4.4.2 Thao tác xóa giao dịch chuyển tiền
 
@@ -1526,13 +1268,13 @@ Người dùng hủy một giao dịch chuyển tiền nội bộ để hoàn ng
 **Tiền điều kiện**
 
 - Thể hiện `TransferTransaction` ứng với `transferId` tồn tại trong sổ chuyển tiền (`FR-TRF-02`).
-- Số dư hiện tại của `Wallet` đích `destinationWallet.currentBalance >= TransferTransaction.amount` để không làm âm ví đích khi thu hồi (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`).
+- Số dư hiện tại của `Wallet` đích $\text{destinationWallet.currentBalance} \ge \text{TransferTransaction.amount}$ để không làm âm ví đích khi thu hồi (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`).
 
 **Hậu điều kiện**
 
 - **Tạo mới thể hiện**: Không có.
 - **Xóa thể hiện**: Xóa vĩnh viễn `TransferTransaction` có mã `transferId` (`FR-TRF-02`) cùng `TransactionFee` liên kết (nếu có) (`BR-FIN-03`).
-- **Biến đổi thuộc tính**: Hoàn nguyên đồng thời hai đầu ví (`BR-FIN-01`, `BR-FIN-03`): cộng `amount + feeAmount` vào `sourceWallet.currentBalance` và trừ `amount` khỏi `destinationWallet.currentBalance` (`BR-FIN-02`).
+- **Biến đổi thuộc tính**: Hoàn nguyên đồng thời hai đầu ví (`BR-FIN-01`, `BR-FIN-03`): cộng $\text{amount} + \text{feeAmount}$ vào `sourceWallet.currentBalance` và trừ `amount` khỏi `destinationWallet.currentBalance` (`BR-FIN-02`).
 - **Hình thành hoặc phá vỡ liên kết**: Gỡ bỏ toàn bộ liên kết từ `TransferTransaction` và `TransactionFee` (nếu có) tới `Wallet` nguồn, `Wallet` đích và `Category` phí (`BR-FIN-02`, `BR-FIN-03`, `FR-TRF-02`).
 
 ## 4.5 Các thao tác Danh mục phân loại
@@ -1548,14 +1290,14 @@ Người dùng bổ sung một danh mục chi tiết (cấp 3) vào nhóm nhu c�
 
 **Tiền điều kiện**
 
-- Nhóm cha hoặc nhánh loại thu chi xác định bởi `parentCategoryId` tồn tại và đang có `status = ACTIVE` (`BR-FIN-04`); nếu nhóm cha không tồn tại hoặc đang ở trạng thái `DELETED`, báo lỗi `ERR-CAT-005`.
+- Nhóm cha hoặc nhánh loại thu chi xác định bởi `parentCategoryId` tồn tại và đang có $\text{status} = \text{ACTIVE}$ (`BR-FIN-04`); nếu nhóm cha không tồn tại hoặc đang ở trạng thái `DELETED`, báo lỗi `ERR-CAT-005`.
 - `categoryName` sau khi `trim` dài 1–50 ký tự, không để rỗng (`BR-NAM-01`, `ERR-NAM-001`) và duy nhất (không phân biệt hoa thường) trong cùng nhóm cha hoặc cùng nhánh loại thu chi đang `ACTIVE` (`ERR-NAM-002`).
 
 **Hậu điều kiện**
 
 - **Tạo mới thể hiện**: Khởi tạo một thể hiện `Category` (cấp 3) hoặc `NeedGroup` (cấp 2) mới với mã định danh duy nhất, bất biến.
 - **Xóa thể hiện**: Không có.
-- **Biến đổi thuộc tính**: Gán `name = categoryName` (đã `trim`), `status = ACTIVE` và kế thừa `transactionType` (`INCOME` hoặc `EXPENSE`) từ nhánh cha.
+- **Biến đổi thuộc tính**: Gán $\text{name} = \text{categoryName}$ (đã `trim`), $\text{status} = \text{ACTIVE}$ và kế thừa `transactionType` (`INCOME` hoặc `EXPENSE`) từ nhánh cha.
 - **Hình thành hoặc phá vỡ liên kết**: Thiết lập liên kết phân cấp từ thực thể mới tạo tới `NeedGroup` cha hoặc `TransactionType` gốc tương ứng (`parentCategoryId`, `BR-FIN-04`).
 
 ### 4.5.2 Thao tác đổi tên danh mục
@@ -1574,7 +1316,7 @@ Người dùng đổi tên hiển thị của một danh mục chi tiết hoặc
 
 - **Tạo mới thể hiện**: Không có.
 - **Xóa thể hiện**: Không có.
-- **Biến đổi thuộc tính**: Cập nhật `name = newName` (đã `trim`); giữ nguyên mã định danh và trạng thái `status`.
+- **Biến đổi thuộc tính**: Cập nhật $\text{name} = \text{newName}$ (đã `trim`); giữ nguyên mã định danh và trạng thái `status`.
 - **Hình thành hoặc phá vỡ liên kết**: Không có (bảo toàn toàn bộ liên kết phân cấp và liên kết giao dịch lịch sử).
 
 ### 4.5.3 Thao tác khôi phục danh mục đã xóa
@@ -1586,8 +1328,8 @@ Người dùng phục hồi trạng thái hoạt động cho một danh mục ho
 
 **Tiền điều kiện**
 
-- Thực thể `Category` hoặc `NeedGroup` ứng với `categoryId` tồn tại và đang có `status = DELETED`.
-- Nếu khôi phục `Category` cấp 3, `NeedGroup` cha trực thuộc phải đang có `status = ACTIVE` (`BR-FIN-04`; vi phạm báo lỗi `ERR-CAT-004`).
+- Thực thể `Category` hoặc `NeedGroup` ứng với `categoryId` tồn tại và đang có $\text{status} = \text{DELETED}$.
+- Nếu khôi phục `Category` cấp 3, `NeedGroup` cha trực thuộc phải đang có $\text{status} = \text{ACTIVE}$ (`BR-FIN-04`; vi phạm báo lỗi `ERR-CAT-004`).
 - Tên của mục cần khôi phục không trùng (không phân biệt hoa thường) với bất kỳ mục nào khác đang `ACTIVE` trong cùng nhóm cha hoặc cùng nhánh loại thu chi (`BR-NAM-01`, `ERR-NAM-002`).
 
 **Hậu điều kiện**
@@ -1606,7 +1348,7 @@ Người dùng yêu cầu xóa một danh mục hoặc nhóm nhu cầu. Hệ th�
 
 **Tiền điều kiện**
 
-- Thực thể `Category` hoặc `NeedGroup` ứng với `categoryId` tồn tại và đang có `status = ACTIVE`.
+- Thực thể `Category` hoặc `NeedGroup` ứng với `categoryId` tồn tại và đang có $\text{status} = \text{ACTIVE}$.
 - Nếu xóa `NeedGroup`, nhóm đó không phải là nhóm `ACTIVE` cuối cùng của nhánh loại thu chi (`BR-FIN-04`; vi phạm báo lỗi `ERR-CAT-002`).
 
 **Hậu điều kiện**
@@ -1632,9 +1374,9 @@ Người dùng khôi phục toàn bộ trạng thái dữ liệu tài chính t�
 - Tệp tại `backupFilePath` tồn tại, có quyền đọc (`READ permission`) và đúng cú pháp JSON mã hóa UTF-8 (`FR-DAT-02`; vi phạm báo lỗi `ERR-DAT-001`).
 - Dữ liệu trong tệp vượt qua đủ 4 bước kiểm định độc lập theo cơ chế `All-or-Nothing` (vi phạm bất kỳ bước nào báo lỗi `ERR-DAT-002`):
   1. Đầy đủ các khóa thực thể dữ liệu bắt buộc theo schema JSON.
-  2. Tuân thủ cây phân cấp danh mục 3 cấp (`TransactionType` → `NeedGroup` → `Category`), không có danh mục mồ côi (`BR-FIN-04`).
+  2. Tuân thủ cây phân cấp danh mục 3 cấp (`TransactionType` $\rightarrow$ `NeedGroup` $\rightarrow$ `Category`), không có danh mục mồ côi (`BR-FIN-04`).
   3. Toàn vẹn liên kết chuyển tiền hai chiều và không có chi phí giao dịch mồ côi (`BR-FIN-02`, `BR-FIN-03`).
-  4. Số dư tái tính toán của mọi ví từ lịch sử giao dịch luôn không âm (≥ 0.00 VNĐ, `BR-FIN-02`).
+  4. Số dư tái tính toán của mọi ví từ lịch sử giao dịch luôn không âm ($\ge 0.00$ VNĐ, `BR-FIN-02`).
 
 **Hậu điều kiện**
 
@@ -1652,8 +1394,8 @@ Người dùng trích xuất báo cáo dòng tiền 12 tháng hoặc báo cáo c
 
 **Tiền điều kiện**
 
-- Với `generateCashFlowReport`: `endMonth` thuộc đoạn `[1, 12]` và `endYear >= 2000` (`FR-REP-01`).
-- Với `generateSpendingStructureReport`: `startDate` và `endDate` hợp lệ, khác rỗng, thỏa `startDate <= endDate`; `transactionType` thuộc `{EXPENSE, INCOME}` (`FR-REP-02`, `BR-FIN-04`).
+- Với `generateCashFlowReport`: `endMonth` thuộc đoạn $[1, 12]$ và $\text{endYear} \ge 2000$ (`FR-REP-01`).
+- Với `generateSpendingStructureReport`: `startDate` và `endDate` hợp lệ, khác rỗng, thỏa $\text{startDate} \le \text{endDate}$; `transactionType` thuộc `{EXPENSE, INCOME}` (`FR-REP-02`, `BR-FIN-04`).
 - Cho phép truy vấn các mốc hoặc khoảng thời gian trong tương lai ở chế độ chỉ đọc; nếu thiếu hoặc sai tham số, từ chối và báo lỗi `ERR-REP-001`.
 
 **Hậu điều kiện**
@@ -1661,6 +1403,7 @@ Người dùng trích xuất báo cáo dòng tiền 12 tháng hoặc báo cáo c
 - **Tạo mới / Xóa thể hiện**: Không có (chỉ tạo kết quả tạm thời trả về giao diện, không tạo hay xóa thực thể lưu trữ).
 - **Biến đổi thuộc tính / Liên kết**: Không có (thao tác thuần đọc, bảo toàn nguyên vẹn số dư ví, trạng thái và các liên kết trong hệ thống).
 
+\newpage
 # 5. Mô hình trạng thái thực thể
 
 Tài liệu này mô tả vòng đời của các thực thể có hành vi biến đổi theo trạng thái dữ liệu trong hệ thống quản lý tài chính cá nhân, bao gồm tập trạng thái hợp lệ, sự kiện kích hoạt, điều kiện kiểm tra và tác vụ cập nhật số dư đi kèm. Các thực thể bất biến sau khởi tạo (như bản ghi kiểm kê số dư `BalanceAdjustmentRecord`) không thuộc phạm vi tài liệu này.
@@ -1674,7 +1417,7 @@ Mỗi biểu đồ (`direction LR`) và bảng chuyển trạng thái trong tài
 | **Trạng thái ban đầu** | Điểm đen tròn `[*]` (trái) | Điểm bắt đầu vòng đời khi thực thể được khởi tạo thành công từ một thao tác hệ thống. |
 | **Khối trạng thái** | Hộp tên trạng thái IN HOA | Tình trạng tồn tại của thực thể (`ACTIVE`, `ARCHIVED`, `RECORDED`, `MODIFIED`, `COMMITTED`, `DELETED`). |
 | **Mũi tên chuyển tiếp** | Tên thao tác / sự kiện | Thao tác hệ thống kích hoạt bước chuyển giữa hai trạng thái (không vẽ mũi tên tự lặp cho thao tác bị từ chối). |
-| **Trạng thái kết thúc** | `DELETED` → `[*]` (phải) | Thực thể chuyển sang trạng thái xóa (`DELETED`) trước khi kết thúc vòng đời tại `[*]`. |
+| **Trạng thái kết thúc** | `DELETED` $\rightarrow$ `[*]` (phải) | Thực thể chuyển sang trạng thái xóa (`DELETED`) trước khi kết thúc vòng đời tại `[*]`. |
 
 ## 5.2 Vòng đời thực thể Ví
 
@@ -1682,22 +1425,14 @@ Thực thể Ví (`Wallet`) quản lý trạng thái tồn tại của nguồn t
 
 - **Quy chiếu chéo**: `UC-WAL-01`, `UC-WAL-03`, `FR-WAL-01`, `FR-WAL-03`, `BR-NAM-01`, `BR-FIN-02`, `ERR-NAM-001`, `ERR-NAM-002`
 
-```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> ACTIVE : createWallet()
-    ACTIVE --> ARCHIVED : updateWallet()<br/>archive
-    ARCHIVED --> ACTIVE : updateWallet()<br/>activate
-    ACTIVE --> DELETED : updateWallet()<br/>delete
-    DELETED --> [*]
-```
+![Sơ đồ trạng thái của ví](docs/object-oriented-analysis/images/so-do-trang-thai-vi.png){width=80%}
 
 | Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
 | :--- | :--- | :--- |
-| **Khởi tạo ví**: `[*]` → `ACTIVE` (`createWallet`) | Tên ví dài 1–50 ký tự sau khi `trim` (`ERR-NAM-001`) và duy nhất trong các ví `ACTIVE` hoặc `ARCHIVED` (`BR-NAM-01`, `ERR-NAM-002`). | Cấp `walletId` duy nhất, đặt `status = ACTIVE`, ghi nhận `createdAt` (`FR-WAL-01`) và gán `currentBalance = 0.00 VNĐ` (`BR-FIN-02`). |
-| **Lưu trữ ví**: `ACTIVE` → `ARCHIVED` (`updateWallet`) | Thể hiện `Wallet` đang `ACTIVE` và không phải là ví "Tiền mặt" mặc định (`FR-WAL-03`). | Chuyển `status` sang `ARCHIVED`, ngừng nhận giao dịch mới (`FR-WAL-03`); vẫn cộng `currentBalance` vào tổng số dư hệ thống nếu > 0.00 VNĐ (`BR-FIN-02`). |
-| **Kích hoạt lại ví**: `ARCHIVED` → `ACTIVE` (`updateWallet`) | Thể hiện `Wallet` tồn tại và đang có `status = ARCHIVED` (`FR-WAL-03`). | Chuyển `status` về `ACTIVE`, mở lại quyền nhận giao dịch mới (`FR-WAL-03`) và giữ nguyên số dư cùng lịch sử dòng tiền (`BR-FIN-02`). |
-| **Xóa vĩnh viễn ví**: `ACTIVE` → `DELETED` → `[*]` (`updateWallet`) | `Wallet` không phải ví "Tiền mặt" mặc định và chưa từng phát sinh giao dịch thu chi, chuyển tiền hay điều chỉnh số dư (`FR-WAL-03`). | Chuyển sang `DELETED`, xóa vĩnh viễn thể hiện `Wallet` khỏi hệ thống (`FR-WAL-03`) và giải phóng tên ví (`BR-NAM-01`). |
+| **Khởi tạo ví**: `[*]` $\rightarrow$ `ACTIVE` (`createWallet`) | Tên ví dài 1–50 ký tự sau khi `trim` (`ERR-NAM-001`) và duy nhất trong các ví `ACTIVE` hoặc `ARCHIVED` (`BR-NAM-01`, `ERR-NAM-002`). | Cấp `walletId` duy nhất, đặt $\text{status} = \text{ACTIVE}$, ghi nhận `createdAt` (`FR-WAL-01`) và gán $\text{currentBalance} = 0.00$ VNĐ (`BR-FIN-02`). |
+| **Lưu trữ ví**: `ACTIVE` $\rightarrow$ `ARCHIVED` (`updateWallet`) | Thể hiện `Wallet` đang `ACTIVE` và không phải là ví "Tiền mặt" mặc định (`FR-WAL-03`). | Chuyển `status` sang `ARCHIVED`, ngừng nhận giao dịch mới (`FR-WAL-03`); vẫn cộng `currentBalance` vào tổng số dư hệ thống nếu $> 0.00$ VNĐ (`BR-FIN-02`). |
+| **Kích hoạt lại ví**: `ARCHIVED` $\rightarrow$ `ACTIVE` (`updateWallet`) | Thể hiện `Wallet` tồn tại và đang có $\text{status} = \text{ARCHIVED}$ (`FR-WAL-03`). | Chuyển `status` về `ACTIVE`, mở lại quyền nhận giao dịch mới (`FR-WAL-03`) và giữ nguyên số dư cùng lịch sử dòng tiền (`BR-FIN-02`). |
+| **Xóa vĩnh viễn ví**: `ACTIVE` $\rightarrow$ `DELETED` $\rightarrow$ `[*]` (`updateWallet`) | `Wallet` không phải ví "Tiền mặt" mặc định và chưa từng phát sinh giao dịch thu chi, chuyển tiền hay điều chỉnh số dư (`FR-WAL-03`). | Chuyển sang `DELETED`, xóa vĩnh viễn thể hiện `Wallet` khỏi hệ thống (`FR-WAL-03`) và giải phóng tên ví (`BR-NAM-01`). |
 
 ## 5.3 Vòng đời Giao dịch thu chi
 
@@ -1705,21 +1440,13 @@ Thực thể Giao dịch thu chi (`IncomeExpenseTransaction`) phản ánh vòng 
 
 - **Quy chiếu chéo**: `UC-TXN-01`, `UC-TXN-03`, `UC-TXN-04`, `FR-TXN-01`, `FR-TXN-02`, `FR-TXN-04`, `FR-TXN-05`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-04`, `ERR-FIN-001`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
-```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> RECORDED : recordIncomeExpense()
-    RECORDED --> MODIFIED : updateTransaction()
-    RECORDED --> DELETED : deleteTransaction()
-    MODIFIED --> DELETED : deleteTransaction()
-    DELETED --> [*]
-```
+![Sơ đồ trạng thái của giao dịch thu chi](docs/object-oriented-analysis/images/so-do-trang-thai-giao-dich.png){width=80%}
 
 | Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
 | :--- | :--- | :--- |
-| **Ghi nhận mới**: `[*]` → `RECORDED` (`recordIncomeExpense`) | Ví và danh mục cấp 3 đang `ACTIVE` (`BR-FIN-04`); `amount > 0.00 VNĐ` (`BR-FIN-01`, `ERR-FIN-001`); `feeAmount >= 0.00 VNĐ` (`ERR-FEE-001`) kèm danh mục phí cấp 3 nhánh `EXPENSE` nếu có phí (`ERR-FEE-002`, `ERR-FEE-003`); số dư ví sau giao dịch ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). | Khởi tạo `IncomeExpenseTransaction` ở trạng thái `RECORDED` (`FR-TXN-01`, `FR-TXN-02`), cố định `transactionType` theo danh mục (`BR-FIN-04`); tạo `TransactionFee` liên kết (nếu có phí) và cập nhật `Wallet.currentBalance` (`BR-FIN-02`). |
-| **Chỉnh sửa**: `RECORDED` → `MODIFIED` (`updateTransaction`) | Bản ghi gốc tồn tại, giữ nguyên `transactionType` (`BR-FIN-04`); `amount > 0.00 VNĐ` (`ERR-FIN-001`), phí hợp lệ (`ERR-FEE-001`–`003`); danh mục chọn mới đang `ACTIVE` (hoặc giữ nguyên danh mục cũ đã `DELETED`, `FR-TXN-04`); số dư ví cũ/mới không âm (`BR-FIN-02`, `ERR-WAL-001`). | Chuyển sang `MODIFIED`, cập nhật thông tin giao dịch (`FR-TXN-04`); đồng bộ `TransactionFee` liên kết (tạo, sửa hoặc xóa) và tính lại `currentBalance` trên ví cũ cùng ví mới (`BR-FIN-02`). |
-| **Hủy bỏ giao dịch**: `RECORDED` / `MODIFIED` → `DELETED` → `[*]` (`deleteTransaction`) | Giao dịch gốc tồn tại (`FR-TXN-05`), không phải bản ghi phí độc lập; nếu xóa khoản thu (`INCOME`), số dư ví sau hoàn nguyên phải ≥ 0.00 VNĐ (`BR-FIN-02`, `ERR-WAL-001`). | Chuyển sang `DELETED`, xóa vĩnh viễn `IncomeExpenseTransaction` (`FR-TXN-05`) cùng `TransactionFee` liên kết (nếu có) và hoàn nguyên `Wallet.currentBalance` (`BR-FIN-02`). |
+| **Ghi nhận mới**: `[*]` $\rightarrow$ `RECORDED` (`recordIncomeExpense`) | Ví và danh mục cấp 3 đang `ACTIVE` (`BR-FIN-04`); $\text{amount} > 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`); $\text{feeAmount} \ge 0.00$ VNĐ (`ERR-FEE-001`) kèm danh mục phí cấp 3 nhánh `EXPENSE` nếu có phí (`ERR-FEE-002`, `ERR-FEE-003`); số dư ví sau giao dịch $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`). | Khởi tạo `IncomeExpenseTransaction` ở trạng thái `RECORDED` (`FR-TXN-01`, `FR-TXN-02`), cố định `transactionType` theo danh mục (`BR-FIN-04`); tạo `TransactionFee` liên kết (nếu có phí) và cập nhật `Wallet.currentBalance` (`BR-FIN-02`). |
+| **Chỉnh sửa**: `RECORDED` $\rightarrow$ `MODIFIED` (`updateTransaction`) | Bản ghi gốc tồn tại, giữ nguyên `transactionType` (`BR-FIN-04`); $\text{amount} > 0.00$ VNĐ (`ERR-FIN-001`), phí hợp lệ (`ERR-FEE-001`–`003`); danh mục chọn mới đang `ACTIVE` (hoặc giữ nguyên danh mục cũ đã `DELETED`, `FR-TXN-04`); số dư ví cũ/mới không âm (`BR-FIN-02`, `ERR-WAL-001`). | Chuyển sang `MODIFIED`, cập nhật thông tin giao dịch (`FR-TXN-04`); đồng bộ `TransactionFee` liên kết (tạo, sửa hoặc xóa) và tính lại `currentBalance` trên ví cũ cùng ví mới (`BR-FIN-02`). |
+| **Hủy bỏ giao dịch**: `RECORDED` / `MODIFIED` $\rightarrow$ `DELETED` $\rightarrow$ `[*]` (`deleteTransaction`) | Giao dịch gốc tồn tại (`FR-TXN-05`), không phải bản ghi phí độc lập; nếu xóa khoản thu (`INCOME`), số dư ví sau hoàn nguyên phải $\ge 0.00$ VNĐ (`BR-FIN-02`, `ERR-WAL-001`). | Chuyển sang `DELETED`, xóa vĩnh viễn `IncomeExpenseTransaction` (`FR-TXN-05`) cùng `TransactionFee` liên kết (nếu có) và hoàn nguyên `Wallet.currentBalance` (`BR-FIN-02`). |
 
 ## 5.4 Vòng đời Giao dịch chuyển tiền
 
@@ -1727,18 +1454,12 @@ Thực thể Giao dịch chuyển tiền (`TransferTransaction`) quản lý vòn
 
 - **Quy chiếu chéo**: `UC-TRF-01`, `UC-TRF-03`, `FR-TRF-01`, `FR-TRF-02`, `BR-FIN-01`, `BR-FIN-02`, `BR-FIN-03`, `BR-FIN-04`, `ERR-FIN-001`, `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
-```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> COMMITTED : transferFunds()
-    COMMITTED --> DELETED : deleteTransfer()
-    DELETED --> [*]
-```
+![Sơ đồ trạng thái của giao dịch chuyển tiền](docs/object-oriented-analysis/images/so-do-trang-thai-chuyen-tien.png){width=80%}
 
 | Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
 | :--- | :--- | :--- |
-| **Ghi nhận đồng thời**: `[*]` → `COMMITTED` (`transferFunds`) | Ví nguồn và ví đích đều `ACTIVE`, khác nhau (`BR-FIN-03`, `ERR-TRF-001`); `amount > 0.00 VNĐ` (`BR-FIN-01`, `ERR-FIN-001`, `ERR-TRF-002`); phí ≥ 0.00 VNĐ kèm danh mục cấp 3 nhánh `EXPENSE` nếu có phí (`BR-FIN-04`, `ERR-FEE-001`–`003`); số dư ví nguồn `≥ amount + feeAmount` (`BR-FIN-02`, `ERR-WAL-001`). | Khởi tạo `TransferTransaction` ở trạng thái `COMMITTED` (`FR-TRF-01`) và `TransactionFee` liên kết (nếu có phí); đồng thời trừ `amount + feeAmount` ở ví nguồn và cộng `amount` vào ví đích (`BR-FIN-02`, `BR-FIN-03`). |
-| **Xóa và hoàn nguyên**: `COMMITTED` → `DELETED` → `[*]` (`deleteTransfer`) | Giao dịch chuyển tiền tồn tại (`FR-TRF-02`) và số dư hiện tại của ví đích `destinationWallet.currentBalance >= amount` (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). | Chuyển sang `DELETED`, xóa vĩnh viễn `TransferTransaction` (`FR-TRF-02`) cùng `TransactionFee` liên kết; đồng thời hoàn `amount + feeAmount` về ví nguồn và trừ `amount` khỏi ví đích (`BR-FIN-02`, `BR-FIN-03`). |
+| **Ghi nhận đồng thời**: `[*]` $\rightarrow$ `COMMITTED` (`transferFunds`) | Ví nguồn và ví đích đều `ACTIVE`, khác nhau (`BR-FIN-03`, `ERR-TRF-001`); $\text{amount} > 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`, `ERR-TRF-002`); phí $\ge 0.00$ VNĐ kèm danh mục cấp 3 nhánh `EXPENSE` nếu có phí (`BR-FIN-04`, `ERR-FEE-001`–`003`); số dư ví nguồn $\ge \text{amount} + \text{feeAmount}$ (`BR-FIN-02`, `ERR-WAL-001`). | Khởi tạo `TransferTransaction` ở trạng thái `COMMITTED` (`FR-TRF-01`) và `TransactionFee` liên kết (nếu có phí); đồng thời trừ $\text{amount} + \text{feeAmount}$ ở ví nguồn và cộng `amount` vào ví đích (`BR-FIN-02`, `BR-FIN-03`). |
+| **Xóa và hoàn nguyên**: `COMMITTED` $\rightarrow$ `DELETED` $\rightarrow$ `[*]` (`deleteTransfer`) | Giao dịch chuyển tiền tồn tại (`FR-TRF-02`) và số dư hiện tại của ví đích `destinationWallet.currentBalance` $\ge \text{amount}$ (`BR-FIN-02`, `BR-FIN-03`, `ERR-WAL-001`). | Chuyển sang `DELETED`, xóa vĩnh viễn `TransferTransaction` (`FR-TRF-02`) cùng `TransactionFee` liên kết; đồng thời hoàn $\text{amount} + \text{feeAmount}$ về ví nguồn và trừ `amount` khỏi ví đích (`BR-FIN-02`, `BR-FIN-03`). |
 
 ## 5.5 Vòng đời thực thể Danh mục
 
@@ -1746,22 +1467,16 @@ Thực thể Danh mục (`Category` và `NeedGroup`) quản lý vòng đời ph�
 
 - **Quy chiếu chéo**: `UC-CAT-01` – `UC-CAT-04`, `FR-CAT-01` – `FR-CAT-04`, `BR-FIN-04`, `BR-NAM-01`, `ERR-NAM-001`, `ERR-NAM-002`, `ERR-CAT-001` – `ERR-CAT-005`
 
-```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> ACTIVE : addCategory()
-    ACTIVE --> DELETED : deleteCategory()<br/>soft delete
-    DELETED --> ACTIVE : restoreCategory()
-    ACTIVE --> [*] : deleteCategory()<br/>hard delete
-```
+![Sơ đồ trạng thái của danh mục](docs/object-oriented-analysis/images/so-do-trang-thai-danh-muc.png){width=80%}
 
 | Giai đoạn chuyển đổi | Điều kiện kiểm tra | Xử lý hệ thống |
 | :--- | :--- | :--- |
-| **Khởi tạo danh mục**: `[*]` → `ACTIVE` (`addCategory`) | Nhóm nhu cầu cha (`parentCategoryId`) tồn tại và đang `ACTIVE` (`BR-FIN-04`, `ERR-CAT-005`); `categoryName` sau khi `trim` dài 1–50 ký tự, không rỗng (`BR-NAM-01`, `ERR-NAM-001`) và duy nhất trong cùng nhóm cha đang `ACTIVE` (`ERR-NAM-002`). | Cấp `categoryId` duy nhất, khởi tạo `Category` ở trạng thái `ACTIVE`, kế thừa `transactionType` từ nhóm cha và thiết lập liên kết phân cấp tới `NeedGroup` (`BR-FIN-04`, `FR-CAT-01`). |
-| **Đổi tên danh mục**: Giữ nguyên `ACTIVE` (`renameCategory`) | Thể hiện `Category` tồn tại (`BR-FIN-04`); `newName` sau khi `trim` dài 1–50 ký tự, không rỗng (`BR-NAM-01`, `ERR-NAM-001`) và không trùng với mục khác đang `ACTIVE` trong cùng nhóm cha (`ERR-NAM-002`). | Cập nhật `name = newName`; giữ nguyên `categoryId`, trạng thái `status` và toàn bộ liên kết giao dịch lịch sử (`FR-CAT-02`, `BR-FIN-04`). |
-| **Xóa mềm danh mục**: `ACTIVE` → `DELETED` (`deleteCategory`) | Mục đang `ACTIVE` và đã phát sinh giao dịch lịch sử (`BR-FIN-04`, `FR-CAT-03`); nếu là `NeedGroup`, không phải là nhóm `ACTIVE` cuối cùng của nhánh loại thu chi (`ERR-CAT-002`). | Chuyển `status` sang `DELETED` (xóa mềm), ẩn khỏi danh sách chọn khi tạo giao dịch mới nhưng bảo toàn liên kết phân cấp và hiển thị kèm nhãn "(đã xóa)" trên báo cáo lịch sử (`FR-CAT-03`, `BR-FIN-04`). |
-| **Khôi phục danh mục**: `DELETED` → `ACTIVE` (`restoreCategory`) | Mục đang ở trạng thái `DELETED`; nhóm cha `NeedGroup` đang `ACTIVE` (`BR-FIN-04`, `ERR-CAT-004`) và tên mục không trùng với mục khác đang `ACTIVE` trong cùng nhóm cha (`BR-NAM-01`, `ERR-NAM-002`). | Chuyển `status` từ `DELETED` về `ACTIVE`, giữ nguyên `categoryId` và đưa mục hiển thị trở lại trên biểu mẫu ghi nhận giao dịch (`FR-CAT-03`, `FR-CAT-04`, `BR-FIN-04`). |
-| **Xóa vĩnh viễn danh mục**: `ACTIVE` → `[*]` (`deleteCategory`) | Mục đang `ACTIVE`, chưa từng phát sinh bất kỳ giao dịch thu chi hay phí liên kết nào trong lịch sử (`FR-CAT-03`, `BR-FIN-04`), và (nếu là `NeedGroup`) không phải nhóm `ACTIVE` cuối cùng của loại thu chi (`ERR-CAT-002`). | Xóa vĩnh viễn thể hiện khỏi hệ thống lưu trữ (xóa cứng), gỡ bỏ liên kết phân cấp với nhóm cha và giải phóng tên khỏi phạm vi kiểm tra trùng tên (`BR-NAM-01`, `FR-CAT-03`). |
+| **Khởi tạo danh mục**: `[*]` $\rightarrow$ `ACTIVE` (`addCategory`) | Nhóm nhu cầu cha (`parentCategoryId`) tồn tại và đang `ACTIVE` (`BR-FIN-04`, `ERR-CAT-005`); `categoryName` sau khi `trim` dài 1–50 ký tự, không rỗng (`BR-NAM-01`, `ERR-NAM-001`) và duy nhất trong cùng nhóm cha đang `ACTIVE` (`ERR-NAM-002`). | Cấp `categoryId` duy nhất, khởi tạo `Category` ở trạng thái `ACTIVE`, kế thừa `transactionType` từ nhóm cha và thiết lập liên kết phân cấp tới `NeedGroup` (`BR-FIN-04`, `FR-CAT-01`). |
+| **Đổi tên danh mục**: Giữ nguyên `ACTIVE` (`renameCategory`) | Thể hiện `Category` tồn tại (`BR-FIN-04`); `newName` sau khi `trim` dài 1–50 ký tự, không rỗng (`BR-NAM-01`, `ERR-NAM-001`) và không trùng với mục khác đang `ACTIVE` trong cùng nhóm cha (`ERR-NAM-002`). | Cập nhật $\text{name} = \text{newName}$; giữ nguyên `categoryId`, trạng thái `status` và toàn bộ liên kết giao dịch lịch sử (`FR-CAT-02`, `BR-FIN-04`). |
+| **Xóa mềm danh mục**: `ACTIVE` $\rightarrow$ `DELETED` (`deleteCategory`) | Mục đang `ACTIVE` và đã phát sinh giao dịch lịch sử (`BR-FIN-04`, `FR-CAT-03`); nếu là `NeedGroup`, không phải là nhóm `ACTIVE` cuối cùng của nhánh loại thu chi (`ERR-CAT-002`). | Chuyển `status` sang `DELETED` (xóa mềm), ẩn khỏi danh sách chọn khi tạo giao dịch mới nhưng bảo toàn liên kết phân cấp và hiển thị kèm nhãn "(đã xóa)" trên báo cáo lịch sử (`FR-CAT-03`, `BR-FIN-04`). |
+| **Khôi phục danh mục**: `DELETED` $\rightarrow$ `ACTIVE` (`restoreCategory`) | Mục đang ở trạng thái `DELETED`; nhóm cha `NeedGroup` đang `ACTIVE` (`BR-FIN-04`, `ERR-CAT-004`) và tên mục không trùng với mục khác đang `ACTIVE` trong cùng nhóm cha (`BR-NAM-01`, `ERR-NAM-002`). | Chuyển `status` từ `DELETED` về `ACTIVE`, giữ nguyên `categoryId` và đưa mục hiển thị trở lại trên biểu mẫu ghi nhận giao dịch (`FR-CAT-03`, `FR-CAT-04`, `BR-FIN-04`). |
+| **Xóa vĩnh viễn danh mục**: `ACTIVE` $\rightarrow$ `[*]` (`deleteCategory`) | Mục đang `ACTIVE`, chưa từng phát sinh bất kỳ giao dịch thu chi hay phí liên kết nào trong lịch sử (`FR-CAT-03`, `BR-FIN-04`), và (nếu là `NeedGroup`) không phải nhóm `ACTIVE` cuối cùng của loại thu chi (`ERR-CAT-002`). | Xóa vĩnh viễn thể hiện khỏi hệ thống lưu trữ (xóa cứng), gỡ bỏ liên kết phân cấp với nhóm cha và giải phóng tên khỏi phạm vi kiểm tra trùng tên (`BR-NAM-01`, `FR-CAT-03`). |
+\newpage
 
 # 6. Sơ đồ Robustness và thẻ CRC
 
@@ -1795,28 +1510,11 @@ Người dùng tạo ví mới để theo dõi số dư và hạch toán dòng t
 | :--- | :--- | :--- |
 | Giao diện | `WalletManagementView` | Nhận `walletName`, `note` và gửi yêu cầu tạo ví; hiển thị thông tin ví mới kèm cơ cấu số dư hoặc báo lỗi tên sai định dạng (`ERR-NAM-001`), trùng tên ví (`ERR-NAM-002`). |
 | Điều khiển | `CashFlowCoordinator` | Chuẩn hóa chuỗi (`trim`), kiểm tra tên dài 1–50 ký tự và đối chiếu trùng tên trên cả ví `ACTIVE` lẫn `ARCHIVED` (`BR-NAM-01`, `ERR-NAM-001`, `ERR-NAM-002`), kiểm tra `note` tối đa 255 ký tự (`FR-WAL-01`); điều phối tạo ví và tính lại tỷ lệ phân bổ (`FR-WAL-04`). |
-| Thực thể | `Wallet` | Cung cấp danh sách tên ví hiện có để kiểm tra trùng; lưu ví mới với `walletId` duy nhất, `status = ACTIVE`, `createdAt` (`FR-WAL-01`) và `currentBalance = 0.00 VNĐ` (`BR-FIN-02`). |
+| Thực thể | `Wallet` | Cung cấp danh sách tên ví hiện có để kiểm tra trùng; lưu ví mới với `walletId` duy nhất, $\text{status} = \text{ACTIVE}$, `createdAt` (`FR-WAL-01`) và $\text{currentBalance} = 0.00$ VNĐ (`BR-FIN-02`). |
 
 **Sơ đồ Robustness**
 
-```plantuml
-@startuml
-left to right direction
-
-actor "Người dùng" as User
-boundary "WalletManagementView" as View
-control "CashFlowCoordinator" as Control
-entity "Wallet" as WalletEntity
-
-User --> View : 1. Nhập walletName, note
-View --> Control : 2. createWallet(walletName, note)
-Control --> WalletEntity : 3. Kiểm tra định dạng và trùng tên ví
-Control ..> View : 4a. [Dữ liệu không hợp lệ]\nTừ chối và báo lỗi
-Control --> WalletEntity : 4b. [Hợp lệ] Tạo ví mới (số dư bằng 0)\nvà tính lại cơ cấu ví
-Control --> View : 5. Trả về ví mới và cơ cấu số dư
-View --> User : 6. Hiển thị kết quả hoặc thông báo lỗi
-@enduml
-```
+![Sơ đồ robustness tạo ví](docs/object-oriented-analysis/images/so-do-robustness-tao-vi.png){width=80%}
 
 ### 6.1.2 Ghi nhận thu chi
 
@@ -1831,35 +1529,12 @@ Người dùng ghi nhận khoản thu nhập hoặc chi tiêu kèm chi phí giao
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
 | Giao diện | `TransactionRecordingView` | Thu thập thông tin thu chi và chi phí đi kèm; hiển thị kết quả ghi nhận cùng số dư ví mới hoặc thông báo mã lỗi tương ứng (`ERR-FIN-001`, `ERR-FEE-001`–`003`, `ERR-WAL-001`). |
-| Điều khiển | `CashFlowCoordinator` | Kiểm tra `amount > 0.00 VNĐ` (`BR-FIN-01`, `ERR-FIN-001`), trạng thái `ACTIVE` của ví cùng danh mục giao dịch và danh mục phí cấp 3 nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`), phí ≥ 0.00 VNĐ (`ERR-FEE-001`) và số dư khả dụng của ví (`BR-FIN-02`, `ERR-WAL-001`); điều phối lưu giao dịch, phí và cập nhật số dư ví. |
-| Thực thể | `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransactionFee` | `Category` xác nhận danh mục cấp 3 `ACTIVE` (`BR-FIN-04`); `Wallet` kiểm tra số dư và cập nhật `currentBalance` tức thời (`BR-FIN-02`); `IncomeExpenseTransaction` lưu khoản thu/chi (`FR-TXN-01`, `FR-TXN-02`); `TransactionFee` lưu khoản phí `EXPENSE` khi `feeAmount > 0.00 VNĐ` (`BR-FIN-02`). |
+| Điều khiển | `CashFlowCoordinator` | Kiểm tra $\text{amount} > 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`), trạng thái `ACTIVE` của ví cùng danh mục giao dịch và danh mục phí cấp 3 nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`), phí $\ge 0.00$ VNĐ (`ERR-FEE-001`) và số dư khả dụng của ví (`BR-FIN-02`, `ERR-WAL-001`); điều phối lưu giao dịch, phí và cập nhật số dư ví. |
+| Thực thể | `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransactionFee` | `Category` xác nhận danh mục cấp 3 `ACTIVE` (`BR-FIN-04`); `Wallet` kiểm tra số dư và cập nhật `currentBalance` tức thời (`BR-FIN-02`); `IncomeExpenseTransaction` lưu khoản thu/chi (`FR-TXN-01`, `FR-TXN-02`); `TransactionFee` lưu khoản phí `EXPENSE` khi $\text{feeAmount} > 0.00$ VNĐ (`BR-FIN-02`). |
 
 **Sơ đồ Robustness**
 
-```plantuml
-@startuml
-left to right direction
-
-actor "Người dùng" as User
-boundary "TransactionRecordingView" as View
-control "CashFlowCoordinator" as Control
-entity "Category" as CategoryEntity
-entity "Wallet" as WalletEntity
-entity "IncomeExpenseTransaction" as TxnEntity
-entity "TransactionFee" as FeeEntity
-
-User --> View : 1. Nhập thông tin thu chi và chi phí
-View --> Control : 2. recordIncomeExpense(...)
-Control --> CategoryEntity : 3. Kiểm tra danh mục giao dịch và danh mục phí
-Control --> WalletEntity : 4. Kiểm tra trạng thái ví và số dư khả dụng
-Control ..> View : 5a. [Dữ liệu hoặc số dư không hợp lệ]\nTừ chối và báo lỗi
-Control --> TxnEntity : 5b. [Hợp lệ] Tạo bản ghi giao dịch thu chi
-Control --> FeeEntity : 6. [Có phí] Tạo bản ghi phí liên kết
-Control --> WalletEntity : 7. Cập nhật số dư khả dụng của ví
-Control --> View : 8. Trả về giao dịch mới và số dư ví
-View --> User : 9. Hiển thị kết quả hoặc thông báo lỗi
-@enduml
-```
+![Sơ đồ robustness ghi nhận thu chi](docs/object-oriented-analysis/images/so-do-robustness-ghi-nhan-thu-chi.png){width=80%}
 
 ### 6.1.3 Chuyển tiền nội bộ
 
@@ -1874,38 +1549,12 @@ Người dùng điều chuyển tiền giữa hai ví nội bộ đang hoạt đ
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
 | Giao diện | `FundTransferView` | Thu thập ví nguồn, ví đích, số tiền chuyển và chi phí; hiển thị kết quả cùng số dư mới của hai ví hoặc báo lỗi tương ứng (`ERR-TRF-001`, `ERR-TRF-002`, `ERR-FIN-001`, `ERR-FEE-001`–`003`, `ERR-WAL-001`). |
-| Điều khiển | `CashFlowCoordinator` | Kiểm tra hai ví `ACTIVE` phân biệt (`BR-FIN-03`, `ERR-TRF-001`), `amount > 0.00 VNĐ` (`BR-FIN-01`, `ERR-FIN-001`, `ERR-TRF-002`), danh mục phí cấp 3 nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-001`–`003`) và số dư ví nguồn `≥ amount + feeAmount` (`BR-FIN-02`, `ERR-WAL-001`); điều phối hạch toán đồng thời hai ví và tách bản ghi phí (`BR-FIN-03`). |
-| Thực thể | `Wallet`, `Category`, `TransferTransaction`, `TransactionFee` | `Wallet` nguồn và đích xác nhận trạng thái `ACTIVE`, trừ `amount + feeAmount` tại ví nguồn và cộng `amount` tại ví đích đồng thời (`BR-FIN-02`, `BR-FIN-03`); `Category` xác nhận danh mục phí cấp 3 `EXPENSE` (`BR-FIN-04`); `TransferTransaction` lưu giao dịch chuyển tiền (`FR-TRF-01`); `TransactionFee` lưu phí gắn với ví nguồn khi `feeAmount > 0.00 VNĐ`. |
+| Điều khiển | `CashFlowCoordinator` | Kiểm tra hai ví `ACTIVE` phân biệt (`BR-FIN-03`, `ERR-TRF-001`), $\text{amount} > 0.00$ VNĐ (`BR-FIN-01`, `ERR-FIN-001`, `ERR-TRF-002`), danh mục phí cấp 3 nhánh `EXPENSE` (`BR-FIN-04`, `ERR-FEE-001`–`003`) và số dư ví nguồn $\ge \text{amount} + \text{feeAmount}$ (`BR-FIN-02`, `ERR-WAL-001`); điều phối hạch toán đồng thời hai ví và tách bản ghi phí (`BR-FIN-03`). |
+| Thực thể | `Wallet`, `Category`, `TransferTransaction`, `TransactionFee` | `Wallet` nguồn và đích xác nhận trạng thái `ACTIVE`, trừ $\text{amount} + \text{feeAmount}$ tại ví nguồn và cộng `amount` tại ví đích đồng thời (`BR-FIN-02`, `BR-FIN-03`); `Category` xác nhận danh mục phí cấp 3 `EXPENSE` (`BR-FIN-04`); `TransferTransaction` lưu giao dịch chuyển tiền (`FR-TRF-01`); `TransactionFee` lưu phí gắn với ví nguồn khi $\text{feeAmount} > 0.00$ VNĐ. |
 
 **Sơ đồ Robustness**
 
-```plantuml
-@startuml
-left to right direction
-
-actor "Người dùng" as User
-boundary "FundTransferView" as View
-control "CashFlowCoordinator" as Control
-entity "Wallet (Ví nguồn)" as SourceWallet
-entity "Wallet (Ví đích)" as TargetWallet
-entity "Category" as CategoryEntity
-entity "TransferTransaction" as TransferEntity
-entity "TransactionFee" as FeeEntity
-
-User --> View : 1. Nhập ví nguồn, ví đích, số tiền và phí
-View --> Control : 2. transferFunds(...)
-Control --> SourceWallet : 3. Kiểm tra trạng thái và số dư ví nguồn
-Control --> TargetWallet : 4. Kiểm tra ví đích hoạt động và khác ví nguồn
-Control --> CategoryEntity : 5. [Có phí] Kiểm tra danh mục phí
-Control ..> View : 6a. [Dữ liệu hoặc số dư không hợp lệ]\nTừ chối và báo lỗi
-Control --> TransferEntity : 6b. [Hợp lệ] Tạo bản ghi chuyển tiền
-Control --> FeeEntity : 7. [Có phí] Tạo bản ghi phí gắn với ví nguồn
-Control --> SourceWallet : 8. Trừ tiền chuyển và phí tại ví nguồn
-Control --> TargetWallet : 9. Cộng tiền chuyển tại ví đích
-Control --> View : 10. Trả về kết quả và số dư hai ví
-View --> User : 11. Hiển thị kết quả hoặc thông báo lỗi
-@enduml
-```
+![Sơ đồ robustness chuyển tiền giữa các ví](docs/object-oriented-analysis/images/so-do-robustness-chuyen-tien.png){width=80%}
 
 ### 6.1.4 Danh mục phân loại
 
@@ -1921,29 +1570,11 @@ Người dùng bổ sung một danh mục phân loại mới vào nhóm nhu cầ
 | :--- | :--- | :--- |
 | Giao diện | `CategoryUI` | Thu thập thông tin danh mục từ biểu mẫu (tên danh mục, nhóm cha) và hiển thị kết quả phản hồi hoặc thông báo lỗi (`ERR-CAT-005`, `ERR-NAM-001`, `ERR-NAM-002`). |
 | Điều khiển | `CategoryController` | Kiểm tra nhóm nhu cầu cha tồn tại và đang `ACTIVE` (`BR-FIN-04`, `ERR-CAT-005`); kiểm tra tên danh mục dài 1–50 ký tự sau khi `trim` (`ERR-NAM-001`) và duy nhất trong cùng nhóm cha (`BR-NAM-01`, `ERR-NAM-002`); khởi tạo thực thể `Category` ở trạng thái `ACTIVE` và thiết lập liên kết phân cấp 3 cấp (`BR-FIN-04`). |
-| Thực thể | `NeedGroup`, `Category` | `NeedGroup` cung cấp trạng thái hoạt động và danh sách danh mục con để kiểm tra trùng tên; `Category` lưu danh mục cấp 3 mới tạo (`categoryId`, `name`, `status = ACTIVE`), liên kết với `NeedGroup` cha và kế thừa `transactionType`. |
+| Thực thể | `NeedGroup`, `Category` | `NeedGroup` cung cấp trạng thái hoạt động và danh sách danh mục con để kiểm tra trùng tên; `Category` lưu danh mục cấp 3 mới tạo (`categoryId`, `name`, $\text{status} = \text{ACTIVE}$), liên kết với `NeedGroup` cha và kế thừa `transactionType`. |
 
 **Sơ đồ Robustness**
 
-```plantuml
-@startuml
-left to right direction
-
-actor "Người dùng" as user
-boundary "CategoryUI" as view
-control "CategoryController" as ctrl
-entity "NeedGroup\n(Nhóm nhu cầu cha)" as needGrp
-entity "Category\n(Danh mục mới)" as catEnt
-
-user --> view : 1. Nhập categoryName, chọn nhóm cha
-view --> ctrl : 2. addCategory(categoryName, parentCategoryId)
-ctrl --> needGrp : 3. Kiểm tra trạng thái nhóm cha và trùng tên
-ctrl ..> view : 4a. [Vi phạm ERR-CAT-005 / ERR-NAM-001 / ERR-NAM-002]\nTừ chối và báo lỗi
-ctrl --> catEnt : 4b. [Hợp lệ] Khởi tạo danh mục mới (ACTIVE)
-ctrl --> view : 5. Trả về danh mục mới và cây phân cấp
-view --> user : 6. Hiển thị kết quả hoặc thông báo lỗi
-@enduml
-```
+![Sơ đồ robustness thêm danh mục](docs/object-oriented-analysis/images/so-do-robustness-them-danh-muc.png){width=80%}
 
 ### 6.1.5 Thống kê và báo cáo
 
@@ -1958,33 +1589,12 @@ Người dùng yêu cầu trích xuất chuỗi số liệu dòng tiền 12 thá
 | Nhóm thành phần | Tên đối tượng | Trách nhiệm và ràng buộc |
 | :--- | :--- | :--- |
 | Giao diện | `ReportUI` | Nhận mốc kết thúc (`endMonth`, `endYear`), gửi yêu cầu tạo báo cáo; hiển thị bảng 12 tháng liên tục, dòng 3 mức bình quân tháng và biểu đồ kết hợp cột - đường, hoặc hiển thị lỗi `ERR-REP-001` khi tham số không hợp lệ. |
-| Điều khiển | `ReportController` | Kiểm tra `endMonth` thuộc `[1, 12]` và `endYear >= 2000` (`ERR-REP-001`); sinh chuỗi 12 tháng liên tục; truy vấn chỉ đọc `IncomeExpenseTransaction`, `TransactionFee` và `TransferTransaction` (chỉ đọc ngày của phí chuyển khoản); tổng hợp thu chi (`BR-FIN-02`), tính `NetCashFlow`, `SavingsRate` (trung gian ≥ 4 chữ số thập phân, làm tròn ngân hàng 2 chữ số, `0.00%` khi thu nhập ≤ 0 theo `BR-FIN-01`) và 3 mức bình quân tháng chia cho 12. |
+| Điều khiển | `ReportController` | Kiểm tra `endMonth` thuộc $[1, 12]$ và $\text{endYear} \ge 2000$ (`ERR-REP-001`); sinh chuỗi 12 tháng liên tục; truy vấn chỉ đọc `IncomeExpenseTransaction`, `TransactionFee` và `TransferTransaction` (chỉ đọc ngày của phí chuyển khoản); tổng hợp thu chi (`BR-FIN-02`), tính `NetCashFlow`, `SavingsRate` (trung gian $\ge 4$ chữ số thập phân, làm tròn ngân hàng 2 chữ số, `0.00%` khi thu nhập $\le 0$ theo `BR-FIN-01`) và 3 mức bình quân tháng chia cho 12. |
 | Thực thể | `IncomeExpenseTransaction`, `TransactionFee`, `TransferTransaction` | Cung cấp lịch sử giao dịch thu chi, chi phí liên kết (`EXPENSE`) và ngày giao dịch gốc của phí chuyển tiền phục vụ lọc theo tháng; bảo toàn nguyên vẹn trạng thái và số dư dữ liệu (bất biến chỉ đọc). |
 
 **Sơ đồ Robustness**
 
-```plantuml
-@startuml
-left to right direction
-
-actor "Người dùng" as user
-boundary "ReportUI" as view
-control "ReportController" as ctrl
-entity "IncomeExpenseTransaction" as txEnt
-entity "TransactionFee" as feeEnt
-entity "TransferTransaction" as trfEnt
-
-user --> view : 1. Chọn kỳ báo cáo (endMonth, endYear)
-view --> ctrl : 2. generateCashFlowReport(endMonth, endYear)
-ctrl ..> view : 3a. [Tham số không hợp lệ: ERR-REP-001]\nTừ chối truy vấn
-ctrl --> txEnt : 3b. Truy vấn giao dịch thu chi 12 tháng
-ctrl --> feeEnt : 4. Truy vấn phí giao dịch liên kết
-ctrl --> trfEnt : 5. Tra cứu ngày của phí chuyển tiền
-ctrl --> ctrl : 6. Tổng hợp thu chi, tính NetCashFlow, SavingsRate và bình quân
-ctrl --> view : 7. Trả về báo cáo dòng tiền 12 tháng
-view --> user : 8. Hiển thị bảng dữ liệu và biểu đồ
-@enduml
-```
+![Sơ đồ robustness báo cáo dòng tiền](docs/object-oriented-analysis/images/so-do-robustness-bao-cao-dong-tien.png){width=80%}
 
 ### 6.1.6 Lưu trữ và sao lưu
 
@@ -2003,26 +1613,7 @@ Người dùng kết xuất toàn bộ dữ liệu tài chính ra tệp JSON mã
 | Thực thể | `FinancialDataStore` | Đại diện tập hợp các thực thể tài chính (`Wallet`, `NeedGroup`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `BalanceAdjustmentRecord`); cung cấp ảnh chụp dữ liệu nhất quán ở chế độ chỉ đọc. |
 
 **Sơ đồ Robustness**
-
-```plantuml
-@startuml
-left to right direction
-
-actor "Người dùng" as user
-boundary "BackupUI" as view
-control "BackupController" as ctrl
-entity "FinancialDataStore\n(Toàn bộ thực thể tài chính)" as dataEnt
-
-user --> view : 1. Chọn đường dẫn lưu tệp (exportPath)
-view --> ctrl : 2. exportBackupData(exportPath)
-ctrl --> ctrl : 3. Kiểm tra quyền ghi và dung lượng đĩa
-ctrl ..> view : 4a. [Lỗi đường dẫn / dung lượng: ERR-DAT-001]\nTừ chối và báo lỗi
-ctrl --> dataEnt : 4b. Truy vấn ảnh chụp toàn bộ dữ liệu
-ctrl --> ctrl : 5. Tuần tự hóa JSON UTF-8 và ghi tệp an toàn
-ctrl --> view : 6. Trả về đường dẫn tệp và thống kê bản ghi
-view --> user : 7. Hiển thị kết quả xuất sao lưu
-@enduml
-```
+![Sơ đồ robustness xuất dữ liệu sao lưu](docs/object-oriented-analysis/images/so-do-robustness-xuat-sao-luu.png){width=80%}
 
 ## 6.2 Thẻ CRC
 
@@ -2055,8 +1646,8 @@ Lớp `BalanceAdjustmentRecord` lưu vết các lần kiểm kê thực tế đ�
 
 | Nhóm trách nhiệm | Nội dung trách nhiệm cụ thể | Cộng tác viên |
 | :--- | :--- | :--- |
-| Thông tin | Lưu `recordId`, `walletId`, `previousBalance`, `actualBalance >= 0.00 VNĐ` (`BR-FIN-02`), chênh lệch đại số `difference != 0.00 VNĐ` (`BR-FIN-01`), `reason` và `adjustedAt` (`FR-WAL-05`). | `Wallet` |
-| Hành vi | Tính `difference = actualBalance - previousBalance` (`BR-FIN-01`); từ chối tạo bản ghi khi `difference == 0.00 VNĐ` (`FR-WAL-05`), sai định dạng số (`ERR-FIN-001`) hoặc số dư thực tế âm (`ERR-WAL-001`); khóa bất biến sau khi lưu để bảo toàn vết kiểm toán (`BR-FIN-02`). | `CashFlowCoordinator`, `Wallet` |
+| Thông tin | Lưu `recordId`, `walletId`, `previousBalance`, $\text{actualBalance} \ge 0.00$ VNĐ (`BR-FIN-02`), chênh lệch đại số $\text{difference} \neq 0.00$ VNĐ (`BR-FIN-01`), `reason` và `adjustedAt` (`FR-WAL-05`). | `Wallet` |
+| Hành vi | Tính $\text{difference} = \text{actualBalance} - \text{previousBalance}$ (`BR-FIN-01`); từ chối tạo bản ghi khi $\text{difference} = 0.00$ VNĐ (`FR-WAL-05`), sai định dạng số (`ERR-FIN-001`) hoặc số dư thực tế âm (`ERR-WAL-001`); khóa bất biến sau khi lưu để bảo toàn vết kiểm toán (`BR-FIN-02`). | `CashFlowCoordinator`, `Wallet` |
 
 ### 6.2.3 Lớp Giao dịch thu chi - IncomeExpenseTransaction
 
@@ -2068,7 +1659,7 @@ Lớp `IncomeExpenseTransaction` ghi nhận sự kiện thu nhập (`INCOME`) ho
 
 | Nhóm trách nhiệm | Nội dung trách nhiệm cụ thể | Cộng tác viên |
 | :--- | :--- | :--- |
-| Thông tin | Lưu `transactionId`, `amount > 0.00 VNĐ` (`BR-FIN-01`), `transactionDate`, `transactionType` (`INCOME`, `EXPENSE`) bất biến sau khởi tạo (`BR-FIN-04`), `note`, `createdAt` cùng tham chiếu tới `Wallet` (`walletId`), `Category` cấp 3 (`categoryId`) và `TransactionFee`. | `Wallet`, `Category`, `TransactionFee` |
+| Thông tin | Lưu `transactionId`, $\text{amount} > 0.00$ VNĐ (`BR-FIN-01`), `transactionDate`, `transactionType` (`INCOME`, `EXPENSE`) bất biến sau khởi tạo (`BR-FIN-04`), `note`, `createdAt` cùng tham chiếu tới `Wallet` (`walletId`), `Category` cấp 3 (`categoryId`) và `TransactionFee`. | `Wallet`, `Category`, `TransactionFee` |
 | Hành vi | Kiểm tra số tiền hợp lệ (`BR-FIN-01`, `ERR-FIN-001`), ngày giao dịch và tính tương thích với danh mục cấp 3 (`BR-FIN-04`); cập nhật tăng/giảm số dư ví tức thời (`BR-FIN-02`, `ERR-WAL-001`); hoàn nguyên hai pha khi chỉnh sửa (`FR-TXN-04`) và đồng bộ vòng đời với `TransactionFee` đi kèm (`FR-TXN-05`). | `CashFlowCoordinator`, `Wallet`, `Category`, `TransactionFee` |
 
 ### 6.2.4 Lớp Chi phí giao dịch - TransactionFee
@@ -2081,8 +1672,8 @@ Lớp `TransactionFee` quản lý khoản phí phụ đi kèm giao dịch thu ch
 
 | Nhóm trách nhiệm | Nội dung trách nhiệm cụ thể | Cộng tác viên |
 | :--- | :--- | :--- |
-| Thông tin | Lưu `feeId`, `amount >= 0.00 VNĐ` (`BR-FIN-01`, `BR-FIN-02`), mã ví chịu phí `walletId`, danh mục cấp 3 `categoryId` nhánh `EXPENSE` (`BR-FIN-04`), `parentTransactionId` và `parentTransactionType` (`INCOME_EXPENSE`, `TRANSFER`). | `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction` |
-| Hành vi | Kiểm tra phí không âm (`ERR-FEE-001`) và bắt buộc gắn danh mục cấp 3 `EXPENSE` đang `ACTIVE` khi `amount > 0.00 VNĐ` (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`); chặn tạo, sửa, xóa độc lập ngoài giao dịch gốc (`BR-FIN-02`) và hạch toán vào tổng chi tiêu cũng như cơ cấu chi tiêu (`FR-REP-01`, `FR-REP-02`). | `CashFlowCoordinator`, `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction` |
+| Thông tin | Lưu `feeId`, $\text{amount} \ge 0.00$ VNĐ (`BR-FIN-01`, `BR-FIN-02`), mã ví chịu phí `walletId`, danh mục cấp 3 `categoryId` nhánh `EXPENSE` (`BR-FIN-04`), `parentTransactionId` và `parentTransactionType` (`INCOME_EXPENSE`, `TRANSFER`). | `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction` |
+| Hành vi | Kiểm tra phí không âm (`ERR-FEE-001`) và bắt buộc gắn danh mục cấp 3 `EXPENSE` đang `ACTIVE` khi $\text{amount} > 0.00$ VNĐ (`BR-FIN-04`, `ERR-FEE-002`, `ERR-FEE-003`); chặn tạo, sửa, xóa độc lập ngoài giao dịch gốc (`BR-FIN-02`) và hạch toán vào tổng chi tiêu cũng như cơ cấu chi tiêu (`FR-REP-01`, `FR-REP-02`). | `CashFlowCoordinator`, `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction` |
 
 ### 6.2.5 Lớp Giao dịch chuyển tiền - TransferTransaction
 
@@ -2094,8 +1685,8 @@ Lớp `TransferTransaction` ghi nhận sự kiện điều chuyển tiền nội
 
 | Nhóm trách nhiệm | Nội dung trách nhiệm cụ thể | Cộng tác viên |
 | :--- | :--- | :--- |
-| Thông tin | Lưu `transferId`, `sourceWalletId`, `destinationWalletId` khác ví nguồn (`BR-FIN-03`), `amount > 0.00 VNĐ` (`BR-FIN-01`), `transactionDate`, `note`, `createdAt` và liên kết tới `TransactionFee` phát sinh. | `Wallet`, `TransactionFee` |
-| Hành vi | Kiểm tra hai ví phân biệt (`ERR-TRF-001`), `amount > 0.00 VNĐ` (`ERR-FIN-001`, `ERR-TRF-002`) và đủ số dư ví nguồn (`ERR-WAL-001`); phối hợp trừ ví nguồn, cộng ví đích và tạo `TransactionFee` nguyên khối (`BR-FIN-02`, `BR-FIN-03`); kiểm tra số dư ví đích khi hủy chuyển tiền để hoàn nguyên đồng thời hai ví (`FR-TRF-02`). | `CashFlowCoordinator`, `Wallet`, `TransactionFee` |
+| Thông tin | Lưu `transferId`, `sourceWalletId`, `destinationWalletId` khác ví nguồn (`BR-FIN-03`), $\text{amount} > 0.00$ VNĐ (`BR-FIN-01`), `transactionDate`, `note`, `createdAt` và liên kết tới `TransactionFee` phát sinh. | `Wallet`, `TransactionFee` |
+| Hành vi | Kiểm tra hai ví phân biệt (`ERR-TRF-001`), $\text{amount} > 0.00$ VNĐ (`ERR-FIN-001`, `ERR-TRF-002`) và đủ số dư ví nguồn (`ERR-WAL-001`); phối hợp trừ ví nguồn, cộng ví đích và tạo `TransactionFee` nguyên khối (`BR-FIN-02`, `BR-FIN-03`); kiểm tra số dư ví đích khi hủy chuyển tiền để hoàn nguyên đồng thời hai ví (`FR-TRF-02`). | `CashFlowCoordinator`, `Wallet`, `TransactionFee` |
 
 ### 6.2.6 Lớp Danh mục phân loại - Category
 
@@ -2136,6 +1727,7 @@ Lớp `CashFlowCoordinator` đóng vai trò bộ điều khiển trung tâm đi�
 | Thông tin | Không lưu trữ trạng thái dữ liệu nghiệp vụ lâu dài; giữ tham chiếu điều phối trong phiên giao dịch tới các thực thể `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee` và `BalanceAdjustmentRecord`. | `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `BalanceAdjustmentRecord` |
 | Hành vi | Tiếp nhận yêu cầu từ tầng giao diện, kiểm tra tiền điều kiện về định dạng tên (`BR-NAM-01`), độ chính xác số học (`BR-FIN-01`), phân cấp danh mục cấp 3 (`BR-FIN-04`) và khả năng chi trả của ví (`BR-FIN-02`); điều phối thực thi nguyên tử (`Atomic Execution`) việc tạo/sửa/xóa giao dịch thu chi, chuyển tiền hai đầu ví (`BR-FIN-03`), đồng bộ `TransactionFee` đi kèm và ghi nhận `BalanceAdjustmentRecord` khi kiểm kê số dư. | `Wallet`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `BalanceAdjustmentRecord` |
 
+\newpage
 # 7. Ma trận truy vết
 
 Hệ thống ma trận truy vết hai chiều xác lập mối liên kết kiểm chứng giữa hồ sơ yêu cầu phần mềm (SRS) và mô hình phân tích hướng đối tượng (OOA), kết nối các yêu cầu chức năng, ca sử dụng và quy tắc nghiệp vụ với các lớp thực thể miền, đối tượng giá trị và thao tác hệ thống theo hai nguyên tắc:
@@ -2147,9 +1739,9 @@ Hệ thống ma trận truy vết hai chiều xác lập mối liên kết kiể
 Bảng dưới đây đối chiếu trực tiếp từng yêu cầu chức năng và ca sử dụng theo 6 nhóm nghiệp vụ với các lớp thực thể miền, đối tượng giá trị cùng các thuộc tính và ràng buộc đảm nhiệm:
 
 | Mã yêu cầu | Ca sử dụng | Lớp thực thể miền | Đối tượng giá trị liên quan | Thuộc tính và ràng buộc nghiệp vụ đảm nhiệm |
-| :--- | :--- | :--- | :--- | :--- |
+| :---- | :---- | :--------- | :-------- | :-------------- |
 | **Nhóm Quản lý ví (`WAL`)** | | | | |
-| `FR-WAL-01` | `UC-WAL-01` | `Wallet` | `Money` | Khởi tạo `walletId` (sinh tự động), `name` (1–50 ký tự, không trùng), `note`, `status` (`ACTIVE`), `createdAt`, `currentBalance = 0.00 VNĐ`. |
+| `FR-WAL-01` | `UC-WAL-01` | `Wallet` | `Money` | Khởi tạo `walletId` (sinh tự động), `name` (1–50 ký tự, không trùng), `note`, `status` (`ACTIVE`), `createdAt`, $\text{currentBalance} = 0.00$ VNĐ. |
 | `FR-WAL-02` | `UC-WAL-02` | `Wallet` | `Money` | Đọc toàn bộ thuộc tính (`walletId`, `name`, `status`, `note`, `createdAt`, `currentBalance`); tính tổng tài sản từ các ví `ACTIVE` và ví `ARCHIVED` có số dư dương. |
 | `FR-WAL-03` | `UC-WAL-03` | `Wallet` | | Cập nhật `name`, `note`; chuyển đổi `status` giữa `ACTIVE` và `ARCHIVED`; cấm xóa hoặc lưu trữ ví "Tiền mặt" mặc định; chỉ xóa vĩnh viễn khi chưa phát sinh giao dịch. |
 | `FR-WAL-04` | `UC-WAL-02` | `Wallet` | `Money`, `SpendingStructureShare` | Tính tỷ lệ phần trăm phân bổ số dư của từng ví trên tổng tài sản khả dụng theo quy tắc làm tròn ngân hàng. |
@@ -2161,14 +1753,14 @@ Bảng dưới đây đối chiếu trực tiếp từng yêu cầu chức năng
 | `FR-TXN-04` | `UC-TXN-03` | `IncomeExpenseTransaction`, `Wallet`, `Category`, `TransactionFee` | `Money`, `TransactionDate` | Hoàn nguyên số dư ví cũ và kiểm tra khả năng chi trả trên ví mới; cập nhật `amount`, `transactionDate`, `walletId`, `categoryId`, `note` và đồng bộ `TransactionFee`; giữ nguyên `transactionType`. |
 | `FR-TXN-05` | `UC-TXN-04` | `IncomeExpenseTransaction`, `Wallet`, `TransactionFee` | `Money` | Hoàn nguyên số dư ví (kiểm tra không âm khi xóa khoản thu); xóa vĩnh viễn `IncomeExpenseTransaction` và `TransactionFee` liên kết. |
 | **Nhóm Chuyển tiền nội bộ (`TRF`)** | | | | |
-| `FR-TRF-01` | `UC-TRF-01` | `TransferTransaction`, `Wallet`, `TransactionFee` | `Money`, `TransactionDate` | Kiểm tra `sourceWalletId != destinationWalletId` và số dư ví nguồn `≥ amount + feeAmount`; trừ ví nguồn, cộng ví đích đồng thời; khởi tạo `TransferTransaction` và `TransactionFee` (nếu có). |
-| `FR-TRF-02` | `UC-TRF-02`, `UC-TRF-03` | `TransferTransaction`, `Wallet`, `TransactionFee` | `Money`, `TransactionDate` | Truy vấn lịch sử chuyển tiền; khi xóa giao dịch, kiểm tra số dư ví đích `≥ amount`, hoàn nguyên đồng thời hai ví và xóa `TransactionFee` đi kèm. |
+| `FR-TRF-01` | `UC-TRF-01` | `TransferTransaction`, `Wallet`, `TransactionFee` | `Money`, `TransactionDate` | Kiểm tra $\text{sourceWalletId} \neq \text{destinationWalletId}$ và số dư ví nguồn $\ge \text{amount} + \text{feeAmount}$; trừ ví nguồn, cộng ví đích đồng thời; khởi tạo `TransferTransaction` và `TransactionFee` (nếu có). |
+| `FR-TRF-02` | `UC-TRF-02`, `UC-TRF-03` | `TransferTransaction`, `Wallet`, `TransactionFee` | `Money`, `TransactionDate` | Truy vấn lịch sử chuyển tiền; khi xóa giao dịch, kiểm tra số dư ví đích $\ge \text{amount}$, hoàn nguyên đồng thời hai ví và xóa `TransactionFee` đi kèm. |
 | **Nhóm Danh mục phân loại (`CAT`)** | | | | |
-| `FR-CAT-01` | `UC-CAT-01` | `Category`, `NeedGroup` | `TransactionType` | Khởi tạo `Category` (`categoryId`, `name`, `needGroupId`, `transactionType`, `status = ACTIVE`); kiểm tra tên duy nhất trong cùng nhóm cha và duy trì phân cấp 3 cấp. |
+| `FR-CAT-01` | `UC-CAT-01` | `Category`, `NeedGroup` | `TransactionType` | Khởi tạo `Category` (`categoryId`, `name`, `needGroupId`, `transactionType`, $\text{status} = \text{ACTIVE}$); kiểm tra tên duy nhất trong cùng nhóm cha và duy trì phân cấp 3 cấp. |
 | `FR-CAT-02` | `UC-CAT-02`, `UC-CAT-03` | `Category`, `NeedGroup` | `TransactionType` | Cập nhật `name`, `icon`, `color`; kiểm tra trùng tên sau khi `trim`; khôi phục mục từ trạng thái `DELETED` sang `ACTIVE`. |
 | `FR-CAT-03` | `UC-CAT-03`, `UC-CAT-04` | `Category`, `NeedGroup`, `IncomeExpenseTransaction` | `TransactionType` | Chuyển `status` sang `DELETED` (xóa mềm) nếu đã có giao dịch tham chiếu; chỉ xóa vĩnh viễn khi chưa phát sinh giao dịch; cấm xóa `NeedGroup` hoạt động cuối cùng của mỗi loại thu chi. |
 | **Nhóm Thống kê và báo cáo (`REP`)** | | | | |
-| `FR-REP-01` | `UC-REP-01` | `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee` | `NetCashFlow`, `SavingsRate`, `Money`, `TransactionDate` | Kiểm tra tham số (`ERR-REP-001`, hỗ trợ mốc tương lai chỉ đọc); tổng hợp thu, chi và phí liên kết (chỉ đọc `TransferTransaction` để lấy ngày của phí chuyển khoản); tính dòng tiền thuần, tỷ lệ tiết kiệm (`0.00%` khi thu ≤ 0) và 3 mức bình quân chia cho 12 tháng. |
+| `FR-REP-01` | `UC-REP-01` | `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee` | `NetCashFlow`, `SavingsRate`, `Money`, `TransactionDate` | Kiểm tra tham số (`ERR-REP-001`, hỗ trợ mốc tương lai chỉ đọc); tổng hợp thu, chi và phí liên kết (chỉ đọc `TransferTransaction` để lấy ngày của phí chuyển khoản); tính dòng tiền thuần, tỷ lệ tiết kiệm (`0.00%` khi thu $\le 0$) và 3 mức bình quân chia cho 12 tháng. |
 | `FR-REP-02` | `UC-REP-02` | `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `Category`, `NeedGroup` | `SpendingStructureShare`, `Money`, `TransactionType`, `TransactionDate` | Kiểm tra tham số (`ERR-REP-001`, chỉ đọc); phân bổ `EXPENSE` (gồm `TransactionFee`) hoặc `INCOME` theo `NeedGroup` và `Category` có phát sinh dương; giữ nhãn "(đã xóa)" cho mục `DELETED`; tính tỷ trọng và so sánh kỳ liền kề. |
 | **Nhóm Lưu trữ và sao lưu (`DAT`)** | | | | |
 | `FR-DAT-01` | `UC-DAT-01` | Toàn bộ 7 thực thể miền | `Money`, `TransactionDate`, `TransactionType` | Tuần tự hóa toàn bộ trạng thái của các thực thể miền ra tệp sao lưu JSON UTF-8 ở chế độ chỉ đọc. |
@@ -2180,16 +1772,18 @@ Bảng dưới đây đối chiếu trực tiếp từng yêu cầu chức năng
 Bảng dưới đây xác lập mối liên kết giữa 5 quy tắc nghiệp vụ cốt lõi với các thực thể miền, đối tượng giá trị kiểm soát và mã lỗi phát sinh khi vi phạm:
 
 | Mã quy tắc | Tên quy tắc nghiệp vụ | Thực thể và đối tượng giá trị kiểm soát | Mã lỗi miền tương ứng | Cơ chế kiểm soát và bất biến trong OOA |
-| :--- | :--- | :--- | :--- | :--- |
-| `BR-FIN-01` | Quy tắc độ chính xác tài chính | `Money`, `NetCashFlow`, `SavingsRate`, `SpendingStructureShare` | `ERR-FIN-001`<br/>`ERR-FIN-002` | Đóng gói giá trị tiền tệ và tỷ lệ trong các đối tượng giá trị bất biến; dùng số thập phân chính xác (cấm `float`/`double`), cố định 2 chữ số thập phân và làm tròn ngân hàng cho mọi phép chia. |
-| `BR-FIN-02` | Quy tắc bảo toàn số dư ví | `Wallet`, `IncomeExpenseTransaction`, `TransferTransaction`, `BalanceAdjustmentRecord`, `TransactionFee` | `ERR-WAL-001`<br/>`ERR-FEE-001`<br/>`ERR-FEE-002`<br/>`ERR-FEE-003` | Duy trì bất biến số dư ví ≥ 0.00 VNĐ; cấm gán trực tiếp mà tính lại từ lịch sử dòng tiền; kiểm tra khả năng chi trả trước mọi thao tác xuất quỹ; gắn vòng đời `TransactionFee` với giao dịch gốc và lưu vết `BalanceAdjustmentRecord` bất biến. |
-| `BR-FIN-03` | Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ | `TransferTransaction`, `Wallet`, `TransactionFee` | `ERR-TRF-001`<br/>`ERR-TRF-002` | Hạch toán nguyên tử đồng thời giữa ví nguồn và ví đích (`sourceWalletId != destinationWalletId`); bảo toàn tổng số dư hệ thống trước phí; tách riêng phí chuyển tiền thành khoản `EXPENSE`; hoàn nguyên đối xứng hai ví khi xóa chuyển tiền. |
-| `BR-FIN-04` | Quy tắc phân cấp danh mục thu chi | `Category`, `NeedGroup`, `TransactionType` | `ERR-CAT-001`<br/>`ERR-CAT-002`<br/>`ERR-CAT-003`<br/>`ERR-CAT-004`<br/>`ERR-CAT-005` | Duy trì phân cấp 3 cấp (`TransactionType` → `NeedGroup` → `Category`); chỉ gán giao dịch vào cấp 3; cấm đổi `TransactionType`; áp dụng xóa mềm (`DELETED`) khi đã có giao dịch lịch sử và giữ tối thiểu một `NeedGroup` đang `ACTIVE` cho mỗi nhánh. |
-| `BR-NAM-01` | Quy tắc đặt tên ví, nhóm nhu cầu và danh mục | `Wallet`, `NeedGroup`, `Category` | `ERR-NAM-001`<br/>`ERR-NAM-002` | Chuẩn hóa `trim`, giới hạn 1–50 ký tự; kiểm tra tính duy nhất không phân biệt hoa thường theo phạm vi (toàn hệ thống với `Wallet`, cùng `TransactionType` với `NeedGroup`, cùng `NeedGroup` với `Category`); giải phóng tên khi xóa vĩnh viễn. |
+| :---- | :------ | :--------- | :------ | :-------------- |
+| `BR-FIN-01` | Quy tắc độ chính xác tài chính | `Money`, `NetCashFlow`, `SavingsRate`, `SpendingStructureShare` | `ERR-FIN-001`, `ERR-FIN-002` | Đóng gói giá trị tiền tệ và tỷ lệ trong các đối tượng giá trị bất biến; dùng số thập phân chính xác (cấm `float`/`double`), cố định 2 chữ số thập phân và làm tròn ngân hàng cho mọi phép chia. |
+| `BR-FIN-02` | Quy tắc bảo toàn số dư ví | `Wallet`, `IncomeExpenseTransaction`, `TransferTransaction`, `BalanceAdjustmentRecord`, `TransactionFee` | `ERR-WAL-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003` | Duy trì bất biến số dư ví $\ge 0.00$ VNĐ; cấm gán trực tiếp mà tính lại từ lịch sử dòng tiền; kiểm tra khả năng chi trả trước mọi thao tác xuất quỹ; gắn vòng đời `TransactionFee` với giao dịch gốc và lưu vết `BalanceAdjustmentRecord` bất biến. |
+| `BR-FIN-03` | Quy tắc ghi nhận đồng thời khi chuyển tiền nội bộ | `TransferTransaction`, `Wallet`, `TransactionFee` | `ERR-TRF-001`, `ERR-TRF-002` | Hạch toán nguyên tử đồng thời giữa ví nguồn và ví đích ($\text{sourceWalletId} \neq \text{destinationWalletId}$); bảo toàn tổng số dư hệ thống trước phí; tách riêng phí chuyển tiền thành khoản `EXPENSE`; hoàn nguyên đối xứng hai ví khi xóa chuyển tiền. |
+| `BR-FIN-04` | Quy tắc phân cấp danh mục thu chi | `Category`, `NeedGroup`, `TransactionType` | `ERR-CAT-001`, `ERR-CAT-002`, `ERR-CAT-003`, `ERR-CAT-004`, `ERR-CAT-005` | Duy trì phân cấp 3 cấp (`TransactionType` $\rightarrow$ `NeedGroup` $\rightarrow$ `Category`); chỉ gán giao dịch vào cấp 3; cấm đổi `TransactionType`; áp dụng xóa mềm (`DELETED`) khi đã có giao dịch lịch sử và giữ tối thiểu một `NeedGroup` đang `ACTIVE` cho mỗi nhánh. |
+| `BR-NAM-01` | Quy tắc đặt tên ví, nhóm nhu cầu và danh mục | `Wallet`, `NeedGroup`, `Category` | `ERR-NAM-001`, `ERR-NAM-002` | Chuẩn hóa `trim`, giới hạn 1–50 ký tự; kiểm tra tính duy nhất không phân biệt hoa thường theo phạm vi (toàn hệ thống với `Wallet`, cùng `TransactionType` với `NeedGroup`, cùng `NeedGroup` với `Category`); giải phóng tên khi xóa vĩnh viễn. |
 
+\newpage
 # 8. Tổng kết
 
 Giai đoạn phân tích đã hoàn tất việc mô hình hóa các yêu cầu nghiệp vụ của Hệ thống Quản lý Tài chính Cá nhân thành cấu trúc dữ liệu và hành vi hệ thống độc lập với công nghệ cài đặt. Hệ thống ma trận truy vết và kiểm toán xác nhận toàn bộ yêu cầu chức năng, ca sử dụng cùng các quy tắc nghiệp vụ tài chính đều đã được ánh xạ vào mô hình, không còn thành phần dư thừa hay mồ côi. Kết quả phân tích trong tài liệu này là cơ sở kỹ thuật để chuyển sang giai đoạn thiết kế kiến trúc, xây dựng mô hình lớp và triển khai kiểm thử tự động.
+
 
 # 9. Tài liệu Trích dẫn
 
