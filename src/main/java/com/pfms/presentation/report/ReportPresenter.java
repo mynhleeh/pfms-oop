@@ -1,6 +1,9 @@
 package com.pfms.presentation.report;
 
 import com.pfms.presentation.common.ViewUtils;
+import com.pfms.presentation.common.export.JsonReportStrategy;
+import com.pfms.presentation.common.export.ReportExportStrategy;
+import com.pfms.presentation.common.export.TextTableReportStrategy;
 import com.pfms.presentation.dto.report.CashFlowReportResponseDTO;
 import com.pfms.presentation.dto.report.SpendingStructureReportResponseDTO;
 
@@ -31,26 +34,36 @@ public class ReportPresenter {
 
     // region Actions
     public void onExportCashFlowClicked() {
+        onExportCashFlowClicked(false);
+    }
+
+    public void onExportCashFlowClicked(boolean isJson) {
         if (this.currentCashFlowReport == null) {
             this.view.showError("Vui lòng nạp báo cáo dòng tiền trước khi xuất!");
             return;
         }
         try {
-            String content = this.controller.exportCashFlow(this.currentCashFlowReport);
-            this.view.openExportDialog("Xuất Báo cáo Dòng tiền", content);
+            ReportExportStrategy strategy = isJson ? new JsonReportStrategy() : new TextTableReportStrategy();
+            String content = this.controller.exportCashFlow(this.currentCashFlowReport, strategy);
+            this.view.openExportDialog("Xuất Báo cáo Dòng tiền" + (isJson ? " (JSON)" : ""), content);
         } catch (Exception ex) {
             this.view.showError("Xuất báo cáo thất bại: " + ex.getMessage());
         }
     }
 
     public void onExportSpendingStructureClicked() {
+        onExportSpendingStructureClicked(false);
+    }
+
+    public void onExportSpendingStructureClicked(boolean isJson) {
         if (this.currentStructureReport == null) {
             this.view.showError("Vui lòng nạp báo cáo cơ cấu trước khi xuất!");
             return;
         }
         try {
-            String content = this.controller.exportSpendingStructure(this.currentStructureReport);
-            this.view.openExportDialog("Xuất Báo cáo Cơ cấu Thu Chi", content);
+            ReportExportStrategy strategy = isJson ? new JsonReportStrategy() : new TextTableReportStrategy();
+            String content = this.controller.exportSpendingStructure(this.currentStructureReport, strategy);
+            this.view.openExportDialog("Xuất Báo cáo Cơ cấu Thu Chi" + (isJson ? " (JSON)" : ""), content);
         } catch (Exception ex) {
             this.view.showError("Xuất báo cáo thất bại: " + ex.getMessage());
         }

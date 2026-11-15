@@ -1,4 +1,7 @@
 package com.pfms.presentation.report;
+import com.pfms.presentation.common.export.JsonReportStrategy;
+import com.pfms.presentation.common.export.ReportExportStrategy;
+import com.pfms.presentation.common.export.TextTableReportStrategy;
 import com.pfms.presentation.dto.report.CashFlowReportResponseDTO;
 import com.pfms.presentation.dto.report.MonthlyCashFlowResponseDTO;
 import com.pfms.presentation.dto.report.NeedGroupShareResponseDTO;
@@ -146,22 +149,37 @@ class ReportPresenterTest {
         this.presenter.onExportCashFlowClicked();
 
         verify(this.view).showError("Vui lòng nạp báo cáo dòng tiền trước khi xuất!");
-        verify(this.controller, never()).exportCashFlow(any());
+        verify(this.controller, never()).exportCashFlow(any(), any());
     }
 
     @Test
-    @DisplayName("onExportCashFlowClicked xuất thành công và mở hộp thoại")
-    void testExportCashFlowSuccess() {
+    @DisplayName("onExportCashFlowClicked xuất dạng Text Table mặc định thành công và mở hộp thoại")
+    void testExportCashFlowTextSuccess() {
         CashFlowReportResponseDTO report = new CashFlowReportResponseDTO(
                 Collections.emptyList(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         when(this.controller.generateCashFlowReport(10, 2026)).thenReturn(report);
-        when(this.controller.exportCashFlow(report)).thenReturn("EXPORT TEXT CONTENT");
+        when(this.controller.exportCashFlow(eq(report), any(TextTableReportStrategy.class))).thenReturn("EXPORT TEXT CONTENT");
 
         this.presenter.loadCashFlowReport(10, 2026);
         this.presenter.onExportCashFlowClicked();
 
-        verify(this.controller).exportCashFlow(report);
+        verify(this.controller).exportCashFlow(eq(report), any(TextTableReportStrategy.class));
         verify(this.view).openExportDialog(eq("Xuất Báo cáo Dòng tiền"), eq("EXPORT TEXT CONTENT"));
+    }
+
+    @Test
+    @DisplayName("onExportCashFlowClicked xuất dạng JSON thành công và mở hộp thoại")
+    void testExportCashFlowJsonSuccess() {
+        CashFlowReportResponseDTO report = new CashFlowReportResponseDTO(
+                Collections.emptyList(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        when(this.controller.generateCashFlowReport(10, 2026)).thenReturn(report);
+        when(this.controller.exportCashFlow(eq(report), any(JsonReportStrategy.class))).thenReturn("{\"report\": \"JSON\"}");
+
+        this.presenter.loadCashFlowReport(10, 2026);
+        this.presenter.onExportCashFlowClicked(true);
+
+        verify(this.controller).exportCashFlow(eq(report), any(JsonReportStrategy.class));
+        verify(this.view).openExportDialog(eq("Xuất Báo cáo Dòng tiền (JSON)"), eq("{\"report\": \"JSON\"}"));
     }
 
     @Test
@@ -170,7 +188,7 @@ class ReportPresenterTest {
         CashFlowReportResponseDTO report = new CashFlowReportResponseDTO(
                 Collections.emptyList(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         when(this.controller.generateCashFlowReport(10, 2026)).thenReturn(report);
-        when(this.controller.exportCashFlow(report)).thenThrow(new RuntimeException("IO Error"));
+        when(this.controller.exportCashFlow(eq(report), any(ReportExportStrategy.class))).thenThrow(new RuntimeException("IO Error"));
 
         this.presenter.loadCashFlowReport(10, 2026);
         this.presenter.onExportCashFlowClicked();
@@ -184,22 +202,37 @@ class ReportPresenterTest {
         this.presenter.onExportSpendingStructureClicked();
 
         verify(this.view).showError("Vui lòng nạp báo cáo cơ cấu trước khi xuất!");
-        verify(this.controller, never()).exportSpendingStructure(any());
+        verify(this.controller, never()).exportSpendingStructure(any(), any());
     }
 
     @Test
-    @DisplayName("onExportSpendingStructureClicked xuất thành công và mở hộp thoại")
-    void testExportSpendingStructureSuccess() {
+    @DisplayName("onExportSpendingStructureClicked xuất dạng Text Table mặc định thành công và mở hộp thoại")
+    void testExportSpendingStructureTextSuccess() {
         SpendingStructureReportResponseDTO report = new SpendingStructureReportResponseDTO(
                 "EXPENSE", LocalDate.now(), LocalDate.now(), BigDecimal.ZERO, Collections.emptyList());
         when(this.controller.generateSpendingStructureReport(any(LocalDate.class), any(LocalDate.class), anyString())).thenReturn(report);
-        when(this.controller.exportSpendingStructure(report)).thenReturn("STRUCTURE EXPORT TEXT");
+        when(this.controller.exportSpendingStructure(eq(report), any(TextTableReportStrategy.class))).thenReturn("STRUCTURE EXPORT TEXT");
 
         this.presenter.loadSpendingStructureReport(LocalDate.now(), LocalDate.now(), "EXPENSE");
         this.presenter.onExportSpendingStructureClicked();
 
-        verify(this.controller).exportSpendingStructure(report);
+        verify(this.controller).exportSpendingStructure(eq(report), any(TextTableReportStrategy.class));
         verify(this.view).openExportDialog(eq("Xuất Báo cáo Cơ cấu Thu Chi"), eq("STRUCTURE EXPORT TEXT"));
+    }
+
+    @Test
+    @DisplayName("onExportSpendingStructureClicked xuất dạng JSON thành công và mở hộp thoại")
+    void testExportSpendingStructureJsonSuccess() {
+        SpendingStructureReportResponseDTO report = new SpendingStructureReportResponseDTO(
+                "EXPENSE", LocalDate.now(), LocalDate.now(), BigDecimal.ZERO, Collections.emptyList());
+        when(this.controller.generateSpendingStructureReport(any(LocalDate.class), any(LocalDate.class), anyString())).thenReturn(report);
+        when(this.controller.exportSpendingStructure(eq(report), any(JsonReportStrategy.class))).thenReturn("{\"structure\": \"JSON\"}");
+
+        this.presenter.loadSpendingStructureReport(LocalDate.now(), LocalDate.now(), "EXPENSE");
+        this.presenter.onExportSpendingStructureClicked(true);
+
+        verify(this.controller).exportSpendingStructure(eq(report), any(JsonReportStrategy.class));
+        verify(this.view).openExportDialog(eq("Xuất Báo cáo Cơ cấu Thu Chi (JSON)"), eq("{\"structure\": \"JSON\"}"));
     }
 
     @Test
@@ -208,7 +241,7 @@ class ReportPresenterTest {
         SpendingStructureReportResponseDTO report = new SpendingStructureReportResponseDTO(
                 "EXPENSE", LocalDate.now(), LocalDate.now(), BigDecimal.ZERO, Collections.emptyList());
         when(this.controller.generateSpendingStructureReport(any(LocalDate.class), any(LocalDate.class), anyString())).thenReturn(report);
-        when(this.controller.exportSpendingStructure(report)).thenThrow(new RuntimeException("Render error"));
+        when(this.controller.exportSpendingStructure(eq(report), any(ReportExportStrategy.class))).thenThrow(new RuntimeException("Render error"));
 
         this.presenter.loadSpendingStructureReport(LocalDate.now(), LocalDate.now(), "EXPENSE");
         this.presenter.onExportSpendingStructureClicked();

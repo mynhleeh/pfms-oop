@@ -2,6 +2,8 @@ package com.pfms.presentation.transaction;
 
 import com.pfms.presentation.category.CategoryGUIController;
 import com.pfms.presentation.wallet.WalletGUIController;
+import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
+import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.common.ViewConstants;
@@ -42,7 +44,7 @@ public class TransactionPanel extends JPanel implements TransactionView {
         this.categoryController = Objects.requireNonNull(cc, "CategoryGUIController không được null");
         this.presenter = new TransactionPresenter(this, Objects.requireNonNull(tc, "TransactionGUIController không được null"));
         this.filterToolbar = new TransactionFilterToolbar(this::reloadTransactions);
-        initUI(); loadWallets(); reloadTransactions();
+        initUI(); loadWallets(); loadCategories(); reloadTransactions();
     }
     // endregion
 
@@ -57,7 +59,7 @@ public class TransactionPanel extends JPanel implements TransactionView {
         JButton addBtn = createBtn("Thêm giao dịch", ViewConstants.COLOR_PRIMARY_LIGHT, Color.WHITE), editBtn = createBtn("Sửa", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN),
                 delBtn = createBtn("Xóa", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_EXPENSE), refBtn = createBtn("Làm mới", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN);
         addBtn.addActionListener(e -> handleAddTransaction()); editBtn.addActionListener(e -> handleEditTransaction());
-        delBtn.addActionListener(e -> handleDeleteTransaction()); refBtn.addActionListener(e -> { loadWallets(); reloadTransactions(); });
+        delBtn.addActionListener(e -> handleDeleteTransaction()); refBtn.addActionListener(e -> { loadWallets(); loadCategories(); reloadTransactions(); });
         for (Component b : new Component[]{addBtn, editBtn, delBtn, refBtn}) bar.add(b);
         north.add(bar); add(north, BorderLayout.NORTH); configureTable();
         JScrollPane scroll = new JScrollPane(this.table);
@@ -142,10 +144,25 @@ public class TransactionPanel extends JPanel implements TransactionView {
     private void loadWallets() {
         try { WalletsSummaryResponseDTO s = this.walletController.loadWalletsSummary(); if (s != null) this.filterToolbar.populateWallets(s.getWallets()); } catch (Exception ignored) {}
     }
+    private void loadCategories() {
+        try {
+            List<CategoryHierarchyResponseDTO> hierarchy = this.categoryController.loadCategoryHierarchy();
+            if (hierarchy != null) {
+                List<CategoryResponseDTO> flat = new ArrayList<>();
+                for (CategoryHierarchyResponseDTO group : hierarchy) {
+                    if (group.getCategories() != null) {
+                        flat.addAll(group.getCategories());
+                    }
+                }
+                this.filterToolbar.populateCategories(flat);
+            }
+        } catch (Exception ignored) {}
+    }
     @Override public void setSelectedTypeFilter(String type) { this.filterToolbar.setSelectedTypeFilter(type); }
     // endregion
 
     // region Getters
+    public TransactionFilterToolbar getFilterToolbar() { return this.filterToolbar; }
     public TransactionPresenter getPresenter() { return this.presenter; } public TransactionTableModel getTableModel() { return this.tableModel; }
     public JTable getTable() { return this.table; } public String getSummaryText() { return this.summaryLabel.getText(); }
     public String getPageInfoText() { return this.pageInfoLabel.getText(); } public int getPageNumber() { return this.presenter.getCurrentPage(); }

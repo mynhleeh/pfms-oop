@@ -60,6 +60,14 @@ public class CategoryPresenter {
         }
     }
 
+    public void onEditCategoryClicked(UUID categoryId, String name, UUID parentGroupId, String type) {
+        if (categoryId == null) {
+            this.view.showWarning("Vui lòng chọn một nhóm nhu cầu hoặc danh mục con trên cây để đổi tên!");
+            return;
+        }
+        this.view.openUpdateCategoryDialog(categoryId, name, parentGroupId, type);
+    }
+
     public void renameCategory(UUID categoryId, String currentName) {
         if (categoryId == null) { this.view.showWarning("Vui lòng chọn một nhóm nhu cầu hoặc danh mục con trên cây để đổi tên!"); return; }
         String newName = this.view.openRenameDialog(currentName, false);

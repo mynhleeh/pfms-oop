@@ -35,6 +35,8 @@ public class ReportPanel extends JPanel implements ReportView {
     private final JTable spendingStructureTable = new JTable(this.spendingStructureTableModel);
     private final JComboBox<String> typeBox = new JComboBox<>(new String[]{"EXPENSE", "INCOME"});
     private final JTextField startDateField, endDateField;
+    private final JComboBox<String> cfFormatBox = new JComboBox<>(new String[]{"Bảng văn bản (.txt)", "Định dạng JSON (.json)"});
+    private final JComboBox<String> stFormatBox = new JComboBox<>(new String[]{"Bảng văn bản (.txt)", "Định dạng JSON (.json)"});
     private final JLabel structureSummaryLabel = new JLabel("Tổng số tiền: 0 VNĐ");
     private Consumer<String> messageConsumer, warningConsumer, errorConsumer;
     private Predicate<String> confirmConsumer;
@@ -66,14 +68,23 @@ public class ReportPanel extends JPanel implements ReportView {
         setupTable(this.cashFlowTable, new int[]{100, 160, 160, 160, 140}, new int[]{SwingConstants.CENTER, SwingConstants.RIGHT, SwingConstants.RIGHT, SwingConstants.RIGHT, SwingConstants.RIGHT});
         setupTable(this.spendingStructureTable, new int[]{180, 140, 100, 140, 140, 110}, new int[]{SwingConstants.LEFT, SwingConstants.RIGHT, SwingConstants.RIGHT, SwingConstants.RIGHT, SwingConstants.RIGHT, SwingConstants.CENTER});
 
+        this.cfFormatBox.setFont(ViewConstants.FONT_BODY);
+        this.stFormatBox.setFont(ViewConstants.FONT_BODY);
+
         JButton cfView = createBtn("Xem báo cáo", ViewConstants.COLOR_PRIMARY_LIGHT, Color.WHITE, e -> loadCashFlow());
-        JButton cfExp = createBtn("Xuất báo cáo", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN, e -> this.presenter.onExportCashFlowClicked());
-        JPanel cfTb = createTb(new JLabel("Tháng kết thúc:"), this.monthBox, new JLabel("Năm:"), this.yearField, cfView, cfExp);
+        JButton cfExp = createBtn("Xuất báo cáo", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN, e -> {
+            boolean isJson = this.cfFormatBox.getSelectedIndex() == 1;
+            this.presenter.onExportCashFlowClicked(isJson);
+        });
+        JPanel cfTb = createTb(new JLabel("Tháng kết thúc:"), this.monthBox, new JLabel("Năm:"), this.yearField, cfView, Box.createHorizontalStrut(8), new JLabel("Định dạng:"), this.cfFormatBox, cfExp);
         this.tabbedPane.addTab("Báo cáo Dòng tiền 12 tháng", createTab(cfTb, this.cashFlowTable, this.cashFlowSummaryLabel));
 
         JButton stView = createBtn("Xem báo cáo", ViewConstants.COLOR_PRIMARY_LIGHT, Color.WHITE, e -> loadStructure());
-        JButton stExp = createBtn("Xuất báo cáo", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN, e -> this.presenter.onExportSpendingStructureClicked());
-        JPanel stTb = createTb(new JLabel("Loại:"), this.typeBox, new JLabel("Từ ngày:"), this.startDateField, new JLabel("Đến ngày:"), this.endDateField, stView, stExp);
+        JButton stExp = createBtn("Xuất báo cáo", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN, e -> {
+            boolean isJson = this.stFormatBox.getSelectedIndex() == 1;
+            this.presenter.onExportSpendingStructureClicked(isJson);
+        });
+        JPanel stTb = createTb(new JLabel("Loại:"), this.typeBox, new JLabel("Từ ngày:"), this.startDateField, new JLabel("Đến ngày:"), this.endDateField, stView, Box.createHorizontalStrut(8), new JLabel("Định dạng:"), this.stFormatBox, stExp);
         this.tabbedPane.addTab("Phân tích Cơ cấu Thu Chi", createTab(stTb, this.spendingStructureTable, this.structureSummaryLabel));
         add(this.tabbedPane, BorderLayout.CENTER);
     }
@@ -138,6 +149,8 @@ public class ReportPanel extends JPanel implements ReportView {
 
     // region Getters
     public JTabbedPane getTabbedPane() { return this.tabbedPane; }
+    public JComboBox<String> getCashFlowFormatBox() { return this.cfFormatBox; }
+    public JComboBox<String> getSpendingStructureFormatBox() { return this.stFormatBox; }
     public CashFlowTableModel getCashFlowTableModel() { return this.cashFlowTableModel; }
     public SpendingStructureTableModel getSpendingStructureTableModel() { return this.spendingStructureTableModel; }
     public String getCashFlowSummaryText() { return this.cashFlowSummaryLabel.getText(); }

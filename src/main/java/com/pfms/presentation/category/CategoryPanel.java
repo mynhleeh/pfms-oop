@@ -3,6 +3,7 @@ package com.pfms.presentation.category;
 import com.pfms.presentation.category.component.CategoryTreeCellRenderer;
 import com.pfms.presentation.category.dialog.CreateCategoryDialog;
 import com.pfms.presentation.category.dialog.CreateNeedGroupDialog;
+import com.pfms.presentation.category.dialog.UpdateCategoryDialog;
 import com.pfms.presentation.common.ViewConstants;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
@@ -117,9 +118,14 @@ public class CategoryPanel extends JPanel implements CategoryView {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
         if (node == null || node.isRoot()) { showWarning("Vui lòng chọn một nhóm nhu cầu hoặc danh mục con trên cây để đổi tên!"); return; }
         Object obj = node.getUserObject();
-        if (obj instanceof NeedGroupNode gn) this.presenter.renameNeedGroup(gn.id(), gn.name());
-        else if (obj instanceof CategoryNode cn) this.presenter.renameCategory(cn.id(), cn.name());
-        else showWarning("Không thể đổi tên nhánh cấp cao!");
+        if (obj instanceof NeedGroupNode gn) {
+            this.presenter.renameNeedGroup(gn.id(), gn.name());
+        } else if (obj instanceof CategoryNode cn) {
+            UUID parentGroupId = findParentGroupId(cn.id());
+            this.presenter.onEditCategoryClicked(cn.id(), cn.name(), parentGroupId, cn.type());
+        } else {
+            showWarning("Không thể đổi tên nhánh cấp cao!");
+        }
     }
 
     private void handleDeleteSelected() {
@@ -139,6 +145,18 @@ public class CategoryPanel extends JPanel implements CategoryView {
     @Override public void openCreateCategoryDialog() {
         CreateCategoryDialog d = new CreateCategoryDialog((JFrame) SwingUtilities.getWindowAncestor(this), this.presenter.getController());
         d.setVisible(true); if (d.isSuccess()) { showMessage("Đã tạo danh mục con thành công!"); reloadCategories(); }
+    }
+
+    @Override public void openUpdateCategoryDialog(UUID categoryId, String currentName, UUID currentParentGroupId, String transactionType) {
+        UpdateCategoryDialog d = new UpdateCategoryDialog(
+                (JFrame) SwingUtilities.getWindowAncestor(this),
+                this.presenter.getController(),
+                categoryId, currentName, currentParentGroupId, transactionType);
+        d.setVisible(true);
+        if (d.isSuccess()) {
+            showMessage("Cập nhật danh mục thành công!");
+            reloadCategories();
+        }
     }
 
     @Override public String openRenameDialog(String currentName, boolean isGroup) {
@@ -205,6 +223,22 @@ public class CategoryPanel extends JPanel implements CategoryView {
     @Override public void showWarning(String m) { if (warningConsumer != null) warningConsumer.accept(m); else JOptionPane.showMessageDialog(this, m, "Cảnh báo", JOptionPane.WARNING_MESSAGE); }
     @Override public void showError(String m) { if (errorConsumer != null) errorConsumer.accept(m); else JOptionPane.showMessageDialog(this, m, "Lỗi", JOptionPane.ERROR_MESSAGE); }
     @Override public boolean confirmAction(String m) { return (confirmConsumer != null) ? confirmConsumer.test(m) : JOptionPane.showConfirmDialog(this, m, "Xác nhận thao tác", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION; }
+
+    private UUID findParentGroupId(UUID categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
+        for (CategoryHierarchyResponseDTO group : this.cachedHierarchy) {
+            if (group.getCategories() != null) {
+                for (CategoryResponseDTO cat : group.getCategories()) {
+                    if (categoryId.equals(cat.getCategoryId())) {
+                        return group.getNeedGroupId();
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     private void populateTable(Predicate<CategoryHierarchyResponseDTO> filter) {
         for (CategoryHierarchyResponseDTO g : this.cachedHierarchy) {

@@ -18,5 +18,7 @@ public interface CategoryView extends BaseView {
 
     void openCreateCategoryDialog();
 
+    void openUpdateCategoryDialog(java.util.UUID categoryId, String currentName, java.util.UUID currentParentGroupId, String transactionType);
+
     String openRenameDialog(String currentName, boolean isGroup);
 }

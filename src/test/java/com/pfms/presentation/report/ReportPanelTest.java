@@ -81,4 +81,23 @@ class ReportPanelTest {
     void testNullControllerThrowsException() {
         assertThrows(NullPointerException.class, () -> new ReportPanel(null));
     }
+
+    @Test
+    @DisplayName("Hộp chọn định dạng xuất báo cáo khởi tạo đầy đủ các tùy chọn văn bản và JSON")
+    void testFormatBoxesInitialization() {
+        assertNotNull(panel.getCashFlowFormatBox());
+        assertEquals(2, panel.getCashFlowFormatBox().getItemCount());
+        assertEquals("Bảng văn bản (.txt)", panel.getCashFlowFormatBox().getItemAt(0));
+        assertEquals("Định dạng JSON (.json)", panel.getCashFlowFormatBox().getItemAt(1));
+        assertEquals(0, panel.getCashFlowFormatBox().getSelectedIndex());
+
+        assertNotNull(panel.getSpendingStructureFormatBox());
+        assertEquals(2, panel.getSpendingStructureFormatBox().getItemCount());
+        assertEquals("Bảng văn bản (.txt)", panel.getSpendingStructureFormatBox().getItemAt(0));
+        assertEquals("Định dạng JSON (.json)", panel.getSpendingStructureFormatBox().getItemAt(1));
+        assertEquals(0, panel.getSpendingStructureFormatBox().getSelectedIndex());
+
+        panel.getCashFlowFormatBox().setSelectedIndex(1);
+        assertEquals(1, panel.getCashFlowFormatBox().getSelectedIndex());
+    }
 }

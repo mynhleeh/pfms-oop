@@ -1,5 +1,6 @@
 package com.pfms.presentation.transaction.component;
 
+import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transaction.FilterTransactionsRequestDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.common.InputValidator;
@@ -31,6 +32,7 @@ public class TransactionFilterToolbar extends JPanel {
     // region Fields
     private final JComboBox<String> typeFilterBox = new JComboBox<>(new String[]{"Tất cả", "INCOME", "EXPENSE"});
     private final JComboBox<Object> walletFilterBox = new JComboBox<>();
+    private final JComboBox<Object> categoryFilterBox = new JComboBox<>();
     private final JTextField startDateField = new JTextField(8);
     private final JTextField endDateField = new JTextField(8);
     private final JTextField keywordField = new JTextField(10);
@@ -79,6 +81,22 @@ public class TransactionFilterToolbar extends JPanel {
         });
         this.walletFilterBox.addActionListener(e -> triggerFilter());
 
+        this.categoryFilterBox.setFont(ViewConstants.FONT_BODY);
+        this.categoryFilterBox.addItem("Tất cả danh mục");
+        this.categoryFilterBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof CategoryResponseDTO c) {
+                    setText(c.getName());
+                } else if (value != null) {
+                    setText(value.toString());
+                }
+                return this;
+            }
+        });
+        this.categoryFilterBox.addActionListener(e -> triggerFilter());
+
         this.startDateField.setFont(ViewConstants.FONT_BODY);
         this.endDateField.setFont(ViewConstants.FONT_BODY);
         this.keywordField.setFont(ViewConstants.FONT_BODY);
@@ -90,6 +108,8 @@ public class TransactionFilterToolbar extends JPanel {
         add(this.typeFilterBox);
         add(createLabel("Ví:"));
         add(this.walletFilterBox);
+        add(createLabel("Danh mục:"));
+        add(this.categoryFilterBox);
         add(createLabel("Từ:"));
         add(this.startDateField);
         add(createLabel("Đến:"));
@@ -117,11 +137,27 @@ public class TransactionFilterToolbar extends JPanel {
         }
     }
 
+    public void populateCategories(List<CategoryResponseDTO> categories) {
+        this.isUpdating = true;
+        try {
+            this.categoryFilterBox.removeAllItems();
+            this.categoryFilterBox.addItem("Tất cả danh mục");
+            if (categories != null) {
+                for (CategoryResponseDTO c : categories) {
+                    this.categoryFilterBox.addItem(c);
+                }
+            }
+        } finally {
+            this.isUpdating = false;
+        }
+    }
+
     public void resetFilters() {
         this.isUpdating = true;
         try {
             this.typeFilterBox.setSelectedIndex(0);
             this.walletFilterBox.setSelectedIndex(0);
+            this.categoryFilterBox.setSelectedIndex(0);
             this.startDateField.setText("");
             this.endDateField.setText("");
             this.keywordField.setText("");
@@ -157,11 +193,17 @@ public class TransactionFilterToolbar extends JPanel {
             walletIds = new HashSet<>(Collections.singleton(w.getWalletId()));
         }
 
+        Set<UUID> categoryIds = null;
+        Object selectedCategory = this.categoryFilterBox.getSelectedItem();
+        if (selectedCategory instanceof CategoryResponseDTO c) {
+            categoryIds = new HashSet<>(Collections.singleton(c.getCategoryId()));
+        }
+
         LocalDate start = InputValidator.parseOptionalDate(this.startDateField.getText(), "Ngày bắt đầu");
         LocalDate end = InputValidator.parseOptionalDate(this.endDateField.getText(), "Ngày kết thúc");
         String kw = this.keywordField.getText();
 
-        return new FilterTransactionsRequestDTO(start, end, walletIds, type, null, kw, page, pageSize);
+        return new FilterTransactionsRequestDTO(start, end, walletIds, type, categoryIds, kw, page, pageSize);
     }
 
     public String getSelectedTypeFilter() {
@@ -184,6 +226,7 @@ public class TransactionFilterToolbar extends JPanel {
 
     public JComboBox<String> getTypeFilterBox() { return this.typeFilterBox; }
     public JComboBox<Object> getWalletFilterBox() { return this.walletFilterBox; }
+    public JComboBox<Object> getCategoryFilterBox() { return this.categoryFilterBox; }
     public JTextField getStartDateField() { return this.startDateField; }
     public JTextField getEndDateField() { return this.endDateField; }
     public JTextField getKeywordField() { return this.keywordField; }
