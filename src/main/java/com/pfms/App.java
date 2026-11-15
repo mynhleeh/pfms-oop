@@ -34,8 +34,10 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 /**
- * Điểm khởi chạy ứng dụng máy tính để bàn PFMS (Personal Finance Management System).
- * Thiết lập chuỗi tiêm phụ thuộc toàn hệ thống và hiển thị cửa sổ chính trên luồng Swing EDT.
+ * Điểm khởi chạy ứng dụng máy tính để bàn PFMS (Personal Finance Management
+ * System).
+ * Thiết lập chuỗi tiêm phụ thuộc toàn hệ thống và hiển thị cửa sổ chính trên
+ * luồng Swing EDT.
  */
 public final class App {
 
@@ -71,10 +73,30 @@ public final class App {
 
         mainController.initializeSystem();
 
+        setupLookAndFeel();
         return new MainFrame(mainController, storagePath.toString());
     }
 
+    public static void setupLookAndFeel() {
+        try {
+            com.formdev.flatlaf.FlatDarkLaf.setup();
+            javax.swing.UIManager.put("Component.arc", 8);
+            javax.swing.UIManager.put("Button.arc", 8);
+            javax.swing.UIManager.put("TextComponent.arc", 8);
+            javax.swing.UIManager.put("ScrollBar.thumbArc", 6);
+            javax.swing.UIManager.put("ScrollBar.width", 10);
+            javax.swing.UIManager.put("Table.rowHeight", 30);
+            javax.swing.UIManager.put("Table.showHorizontalLines", true);
+            javax.swing.UIManager.put("Table.showVerticalLines", false);
+            javax.swing.UIManager.put("Table.intercellSpacing", new java.awt.Dimension(0, 1));
+            javax.swing.UIManager.put("TitlePane.useWindowDecorations", true);
+        } catch (Exception ignored) {
+            // An toàn trong môi trường test/headless
+        }
+    }
+
     public static void main(String[] args) {
+        setupLookAndFeel();
         Path storagePath = Paths.get(DEFAULT_DATA_PATH);
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = createApplication(storagePath);

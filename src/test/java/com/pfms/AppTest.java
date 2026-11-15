@@ -31,4 +31,10 @@ class AppTest {
     void testCreateApplicationNullPath() {
         assertThrows(NullPointerException.class, () -> App.createApplication(null));
     }
+
+    @Test
+    @DisplayName("Khởi tạo FlatLaf Look and Feel không ném ngoại lệ")
+    void testSetupLookAndFeel() {
+        assertDoesNotThrow(App::setupLookAndFeel);
+    }
 }

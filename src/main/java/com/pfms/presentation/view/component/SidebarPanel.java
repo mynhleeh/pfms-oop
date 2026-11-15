@@ -14,6 +14,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -21,12 +23,14 @@ import java.util.function.Consumer;
 
 /**
  * Thanh điều hướng bên trái (BorderLayout.WEST, chiều rộng 220px).
- * Hiển thị khối logo/tiêu đề và 7 nút bấm chuyển đổi giữa các phân hệ.
+ * Hiển thị khối logo/tiêu đề và 7 nút bấm chuyển đổi giữa các phân hệ theo bảng màu Luxury Black & Gold.
  */
 public class SidebarPanel extends JPanel {
 
     private final Consumer<String> onNavigateCallback;
     private final Map<String, JButton> navButtons = new LinkedHashMap<>();
+    private final JLabel brandLabel = new JLabel(ViewConstants.APP_BRAND);
+    private final JLabel subtitleLabel = new JLabel(ViewConstants.APP_SUBTITLE);
     private String activeCard = MainController.CARD_DASHBOARD;
 
     public SidebarPanel(Consumer<String> onNavigateCallback) {
@@ -35,6 +39,7 @@ public class SidebarPanel extends JPanel {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(ViewConstants.SIDEBAR_WIDTH, ViewConstants.APP_HEIGHT));
         setBackground(ViewConstants.COLOR_SIDEBAR_BG);
+        setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, ViewConstants.COLOR_BORDER));
 
         add(createHeaderPanel(), BorderLayout.NORTH);
         add(createNavButtonsPanel(), BorderLayout.CENTER);
@@ -48,19 +53,19 @@ public class SidebarPanel extends JPanel {
         header.setBackground(ViewConstants.COLOR_SIDEBAR_BG);
         header.setBorder(BorderFactory.createEmptyBorder(24, 20, 24, 20));
 
-        JLabel brandLabel = new JLabel(ViewConstants.APP_BRAND);
-        brandLabel.setFont(ViewConstants.FONT_TITLE);
-        brandLabel.setForeground(ViewConstants.COLOR_TEXT_ACTIVE);
-        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.brandLabel.setFont(ViewConstants.FONT_TITLE);
+        this.brandLabel.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+        this.brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.brandLabel.setIcon(NavIconFactory.createBrandIcon(22, ViewConstants.COLOR_PRIMARY_LIGHT));
+        this.brandLabel.setIconTextGap(10);
 
-        JLabel subtitleLabel = new JLabel(ViewConstants.APP_SUBTITLE);
-        subtitleLabel.setFont(ViewConstants.FONT_SUBTITLE);
-        subtitleLabel.setForeground(ViewConstants.COLOR_TEXT_SIDEBAR);
-        subtitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.subtitleLabel.setFont(ViewConstants.FONT_SUBTITLE);
+        this.subtitleLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+        this.subtitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        header.add(brandLabel);
+        header.add(this.brandLabel);
         header.add(Box.createVerticalStrut(4));
-        header.add(subtitleLabel);
+        header.add(this.subtitleLabel);
 
         return header;
     }
@@ -85,14 +90,38 @@ public class SidebarPanel extends JPanel {
         JButton button = new JButton(title);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setOpaque(true);
+        button.setOpaque(false);
         button.setFont(ViewConstants.FONT_NAV);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
+        button.setBackground(ViewConstants.COLOR_SIDEBAR_BG);
+        button.setForeground(ViewConstants.COLOR_TEXT_SIDEBAR);
+        button.setIcon(NavIconFactory.createNavIcon(cardName, 18));
+        button.setIconTextGap(12);
+        button.setMargin(new java.awt.Insets(8, 14, 8, 14));
+        button.putClientProperty("FlatLaf.style", "arc: 8; margin: 8,14,8,14");
 
         button.addActionListener(e -> {
             setActiveCard(cardName);
             this.onNavigateCallback.accept(cardName);
+        });
+
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (!cardName.equals(activeCard)) {
+                    button.setBackground(ViewConstants.COLOR_SIDEBAR_HOVER);
+                    button.setForeground(ViewConstants.COLOR_GOLD_LIGHT);
+                    button.putClientProperty("FlatLaf.style", "arc: 8; margin: 8,14,8,14; background: #111111; foreground: #F3E5AB");
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (!cardName.equals(activeCard)) {
+                    button.setBackground(ViewConstants.COLOR_SIDEBAR_BG);
+                    button.setForeground(ViewConstants.COLOR_TEXT_SIDEBAR);
+                    button.putClientProperty("FlatLaf.style", "arc: 8; margin: 8,14,8,14; background: #000000; foreground: #A1A1AA");
+                }
+            }
         });
 
         this.navButtons.put(cardName, button);
@@ -117,6 +146,18 @@ public class SidebarPanel extends JPanel {
         }
     }
 
+    public JButton getNavButton(String cardName) {
+        return this.navButtons.get(cardName);
+    }
+
+    public JLabel getBrandLabel() {
+        return this.brandLabel;
+    }
+
+    public JLabel getSubtitleLabel() {
+        return this.subtitleLabel;
+    }
+
     private void updateActiveButtonStyles() {
         for (Map.Entry<String, JButton> entry : this.navButtons.entrySet()) {
             boolean isActive = entry.getKey().equals(this.activeCard);
@@ -125,15 +166,14 @@ public class SidebarPanel extends JPanel {
                 btn.setBackground(ViewConstants.COLOR_SIDEBAR_ACTIVE);
                 btn.setForeground(ViewConstants.COLOR_TEXT_ACTIVE);
                 btn.setFont(ViewConstants.FONT_NAV_ACTIVE);
-                btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(0, 4, 0, 0, ViewConstants.COLOR_SIDEBAR_ACCENT),
-                        BorderFactory.createEmptyBorder(10, 12, 10, 16)));
+                btn.putClientProperty("FlatLaf.style", "arc: 8; margin: 8,14,8,14; background: #14120B; foreground: #E5C07B; borderColor: rgba(212,175,55,64)");
             } else {
                 btn.setBackground(ViewConstants.COLOR_SIDEBAR_BG);
                 btn.setForeground(ViewConstants.COLOR_TEXT_SIDEBAR);
                 btn.setFont(ViewConstants.FONT_NAV);
-                btn.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
+                btn.putClientProperty("FlatLaf.style", "arc: 8; margin: 8,14,8,14; background: #000000; foreground: #A1A1AA; borderColor: #000000");
             }
+            btn.repaint();
         }
     }
 }

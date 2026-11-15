@@ -14,7 +14,7 @@ import java.util.Locale;
 
 /**
  * Thanh trạng thái thông tin hệ thống (BorderLayout.SOUTH).
- * Hiển thị tệp lưu trữ đang làm việc và tổng số dư khả dụng toàn hệ thống.
+ * Hiển thị tệp lưu trữ đang làm việc theo chuẩn giao diện Luxury Black & Gold.
  */
 public class StatusBarPanel extends JPanel {
 
@@ -46,12 +46,13 @@ public class StatusBarPanel extends JPanel {
         updateTotalBalance(BigDecimal.ZERO, ViewConstants.CURRENCY_DEFAULT);
 
         add(this.dataPathLabel, BorderLayout.WEST);
-        add(this.totalBalanceLabel, BorderLayout.EAST);
+        // Lưu ý: Không add totalBalanceLabel vào panel layout để không hiển thị tổng số dư ở thanh trạng thái.
+        // Vẫn duy trì totalBalanceLabel và các phương thức cập nhật phục vụ tương thích ngược 100% với callers và test suites.
     }
 
     public void updateDataFilePath(String path) {
         String displayPath = (path != null && !path.trim().isEmpty()) ? path.trim() : "Chưa kết nối tệp";
-        this.dataPathLabel.setText("Tệp dữ liệu: " + displayPath);
+        this.dataPathLabel.setText("● Tệp dữ liệu: " + displayPath);
     }
 
     public void updateTotalBalance(BigDecimal amount, String currency) {
@@ -66,5 +67,13 @@ public class StatusBarPanel extends JPanel {
 
     public String getTotalBalanceText() {
         return this.totalBalanceLabel.getText();
+    }
+
+    public JLabel getDataPathLabel() {
+        return this.dataPathLabel;
+    }
+
+    public JLabel getTotalBalanceLabel() {
+        return this.totalBalanceLabel;
     }
 }
