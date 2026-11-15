@@ -1,9 +1,7 @@
 package com.pfms.presentation.common;
 
-import com.pfms.presentation.common.MainController;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.category.CategoryPanel;
-import com.pfms.presentation.common.ViewConstants;
 import com.pfms.presentation.common.component.SidebarPanel;
 import com.pfms.presentation.common.component.StatusBarPanel;
 import com.pfms.presentation.dashboard.DashboardPanel;
@@ -23,7 +21,8 @@ import java.util.Objects;
 
 /**
  * Cửa sổ chính (MainFrame) của ứng dụng đồ họa PFMS (1024x680).
- * Bố cục ba vùng BorderLayout: SidebarPanel (WEST), contentPanel (CENTER, CardLayout), StatusBarPanel (SOUTH).
+ * Bố cục ba vùng BorderLayout: SidebarPanel (WEST), contentPanel (CENTER,
+ * CardLayout), StatusBarPanel (SOUTH).
  */
 public class MainFrame extends JFrame {
 

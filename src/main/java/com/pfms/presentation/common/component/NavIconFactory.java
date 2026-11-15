@@ -193,15 +193,25 @@ public final class NavIconFactory {
         }
 
         private void paintBrand(Graphics2D g2) {
-            // Khung logo hình thoi kim cương PFMS
+            // Hộp huy hiệu bo góc 6px (28x28px trong tỉ lệ 24x24) viền vàng kim theo bản preview HTML
+            g2.setColor(new Color(212, 175, 55, 30));
+            g2.fill(new RoundRectangle2D.Float(1f, 1f, 22f, 22f, 6f, 6f));
+
+            g2.setColor(new Color(212, 175, 55, 64));
+            g2.setStroke(new BasicStroke(1.0f));
+            g2.draw(new RoundRectangle2D.Float(1f, 1f, 22f, 22f, 6f, 6f));
+
+            // Biểu tượng đa giác kim cương vàng PFMS bên trong
+            Color iconColor = (this.fixedColor != null) ? this.fixedColor : new Color(229, 192, 123);
+            g2.setColor(iconColor);
+            g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             Path2D.Float diamond = new Path2D.Float();
-            diamond.moveTo(12, 2);
-            diamond.lineTo(22, 12);
-            diamond.lineTo(12, 22);
-            diamond.lineTo(2, 12);
+            diamond.moveTo(12f, 4.5f);
+            diamond.lineTo(19.5f, 12f);
+            diamond.lineTo(12f, 19.5f);
+            diamond.lineTo(4.5f, 12f);
             diamond.closePath();
             g2.draw(diamond);
-            g2.drawOval(10, 10, 4, 4);
         }
     }
 }
