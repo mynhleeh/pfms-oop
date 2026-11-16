@@ -44,6 +44,37 @@ class SpendingStructureRowNodeTest {
             assertTrue(node.getCurrentAmountLabel().getText().contains("2,223,590"));
             assertTrue(node.getPrevAmountLabel().getText().contains("3,450,000"));
             assertTrue(node.getDiffLabel().getText().contains("1,226,410"));
+
+            // Xác thực quy chuẩn màu sắc: hiện tại màu vàng (#E5C07B), kỳ trước màu trắng (#FAFAFA), chênh lệch âm màu đỏ (#FB7185)
+            assertTrue(node.getCurrentAmountLabel().getStyle().contains("#E5C07B"));
+            assertTrue(node.getPrevAmountLabel().getStyle().contains("#FAFAFA"));
+            assertTrue(node.getDiffLabel().getStyle().contains("#FB7185"));
+        });
+    }
+
+    @Test
+    @DisplayName("Chênh lệch dương hiển thị màu xanh và tiền tố cộng")
+    void testSpendingStructureWithPositiveDiff() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            NeedGroupShareResponseDTO item = new NeedGroupShareResponseDTO(
+                    UUID.randomUUID(),
+                    "Thu Nhập Khác",
+                    "ACTIVE",
+                    new BigDecimal("5000000"),
+                    new BigDecimal("50.0"),
+                    new BigDecimal("3000000"),
+                    new BigDecimal("2000000"),
+                    new BigDecimal("66.7"),
+                    false,
+                    Collections.emptyList()
+            );
+
+            SpendingStructureRowNode node = new SpendingStructureRowNode(item, "INCOME");
+
+            assertTrue(node.getDiffLabel().getText().startsWith("+"));
+            assertTrue(node.getDiffLabel().getStyle().contains("#4ADE80")); // Chênh lệch dương màu xanh
+            assertTrue(node.getCurrentAmountLabel().getStyle().contains("#E5C07B")); // Kỳ này màu vàng
+            assertTrue(node.getPrevAmountLabel().getStyle().contains("#FAFAFA")); // Kỳ trước màu trắng
         });
     }
 

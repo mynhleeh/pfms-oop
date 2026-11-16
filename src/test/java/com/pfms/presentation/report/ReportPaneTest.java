@@ -64,7 +64,7 @@ class ReportPaneTest {
     }
 
     @Test
-    @DisplayName("Khởi tạo ReportPane nạp thành công dữ liệu BarChart, PieChart và 2 bảng dữ liệu")
+    @DisplayName("Khởi tạo ReportPane nạp thành công 2 bảng dữ liệu dòng tiền, cơ cấu và hiển thị tóm tắt")
     void testInitialDataLoaded() {
         JavaFxTestHelper.runOnFxThread(() -> {
             assertNotNull(pane.getTabPane());
@@ -73,13 +73,11 @@ class ReportPaneTest {
             assertEquals(1, pane.getCashFlowTableData().size());
             assertEquals("2026-10", pane.getCashFlowTableData().get(0).getYearMonth());
             assertEquals(1, pane.getCashFlowStreamBox().getChildren().size());
-            assertEquals(3, pane.getCashFlowChart().getData().size()); // 3 series: Thu, Chi, Net
             assertTrue(pane.getCashFlowSummaryText().contains("Thu nhập BQ: 20,000,000 VNĐ"));
 
             assertEquals(1, pane.getStructureTableData().size());
             assertEquals("Thiết yếu", pane.getStructureTableData().get(0).getName());
             assertEquals(1, pane.getStructureStreamBox().getChildren().size());
-            assertEquals(1, pane.getStructurePieChart().getData().size());
             assertTrue(pane.getStructureSummaryText().contains("Tổng số tiền: 10,000,000 VNĐ"));
         });
     }
@@ -113,5 +111,77 @@ class ReportPaneTest {
 
         pane.showError("Lỗi hệ thống");
         assertEquals("Lỗi hệ thống", errRef.get());
+    }
+
+    @Test
+    @DisplayName("Hàng thẻ KPI hiển thị chuẩn xác số liệu định lượng và tự động cập nhật khi chuyển đổi Tab")
+    void testKpiOverviewCardsRenderingAndTabSwitch() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            // Khi ở Tab 0 (Báo cáo Dòng tiền 12 tháng)
+            assertEquals(0, pane.getTabPane().getSelectionModel().getSelectedIndex());
+            assertEquals("THU NHẬP BÌNH QUÂN (12T)", pane.getKpiLabel1().getText());
+            assertTrue(pane.getKpiValue1().getText().contains("20,000,000"));
+            assertEquals("CHI TIÊU BÌNH QUÂN (12T)", pane.getKpiLabel2().getText());
+            assertTrue(pane.getKpiValue2().getText().contains("12,000,000"));
+            assertEquals("TIẾT KIỆM BÌNH QUÂN (12T)", pane.getKpiLabel3().getText());
+            assertTrue(pane.getKpiValue3().getText().contains("8,000,000"));
+
+            // Chuyển sang Tab 1 (Cơ cấu Thu Chi)
+            pane.getTabPane().getSelectionModel().select(1);
+            assertEquals("TỔNG SỐ TIỀN KỲ NÀY", pane.getKpiLabel1().getText());
+            assertTrue(pane.getKpiValue1().getText().contains("10,000,000"));
+            assertTrue(pane.getKpiValue1().getStyleClass().contains("kpi-value-gold"));
+            assertEquals("KỲ SO SÁNH LIỀN TRƯỚC", pane.getKpiLabel2().getText());
+            assertTrue(pane.getKpiValue2().getStyleClass().contains("kpi-value-white"));
+            assertEquals("CHÊNH LỆCH SO VỚI KỲ TRƯỚC", pane.getKpiLabel3().getText());
+
+            // Chuyển ngược lại Tab 0
+            pane.getTabPane().getSelectionModel().select(0);
+            assertEquals("THU NHẬP BÌNH QUÂN (12T)", pane.getKpiLabel1().getText());
+            assertTrue(pane.getKpiValue1().getText().contains("20,000,000"));
+        });
+    }
+
+    @Test
+    @DisplayName("Các nút Quick Preset khoảng thời gian cập nhật đúng DatePicker và gọi lại loadStructure")
+    void testQuickDatePresets() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            LocalDate now = LocalDate.now();
+
+            // Nhấn chip "Năm nay"
+            pane.getChipYear().fire();
+            assertEquals(LocalDate.of(now.getYear(), 1, 1), pane.getStartDatePicker().getValue());
+            assertEquals(now, pane.getEndDatePicker().getValue());
+            assertTrue(pane.getChipYear().getStyleClass().contains("quick-chip-active"));
+
+            // Nhấn chip "Tháng này"
+            pane.getChipMonth().fire();
+            assertEquals(now.withDayOfMonth(1), pane.getStartDatePicker().getValue());
+            assertEquals(now, pane.getEndDatePicker().getValue());
+            assertTrue(pane.getChipMonth().getStyleClass().contains("quick-chip-active"));
+            assertFalse(pane.getChipYear().getStyleClass().contains("quick-chip-active"));
+        });
+    }
+
+    @Test
+    @DisplayName("Nút chuyển đổi phân loại (EXPENSE / INCOME) đồng bộ chính xác với typeBox")
+    void testTypeSwitcherButtons() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            // Mặc định là EXPENSE
+            assertEquals("EXPENSE", pane.getTypeBox().getValue());
+            assertTrue(pane.getBtnTypeExpense().getStyleClass().contains("type-switch-active"));
+            assertFalse(pane.getBtnTypeIncome().getStyleClass().contains("type-switch-active"));
+
+            // Nhấn nút INCOME
+            pane.getBtnTypeIncome().fire();
+            assertEquals("INCOME", pane.getTypeBox().getValue());
+            assertTrue(pane.getBtnTypeIncome().getStyleClass().contains("type-switch-active"));
+            assertFalse(pane.getBtnTypeExpense().getStyleClass().contains("type-switch-active"));
+
+            // Nhấn lại EXPENSE
+            pane.getBtnTypeExpense().fire();
+            assertEquals("EXPENSE", pane.getTypeBox().getValue());
+            assertTrue(pane.getBtnTypeExpense().getStyleClass().contains("type-switch-active"));
+        });
     }
 }

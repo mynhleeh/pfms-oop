@@ -22,6 +22,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -120,19 +121,26 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
     private void buildUI() {
         DialogPane pane = getDialogPane();
         pane.getStyleClass().add("pfms-dialog");
+        pane.setPrefWidth(520);
+        pane.setMinWidth(520);
 
         var cssResource = getClass().getResource("/css/pfms-theme.css");
         if (cssResource != null) {
             pane.getStylesheets().add(cssResource.toExternalForm());
         }
 
-        VBox contentBox = new VBox(14);
-        contentBox.setPadding(new Insets(16, 20, 16, 20));
-        contentBox.setPrefWidth(480);
+        VBox contentBox = new VBox(12);
+        contentBox.setPadding(new Insets(18, 22, 18, 22));
+        contentBox.setStyle("-fx-background-color: #141414;");
 
         // Header Title
+        VBox headerBox = new VBox(4);
+        headerBox.setPadding(new Insets(0, 0, 6, 0));
         Label headerTitle = new Label("Điều Chuyển Tiền Giữa Các Ví");
-        headerTitle.setStyle("-fx-text-fill: -color-primary; -fx-font-size: 16px; -fx-font-weight: bold;");
+        headerTitle.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
+        Label headerSubtitle = new Label("Thực hiện chuyển quỹ nội bộ giữa hai ví tài chính và ghi nhận phụ phí");
+        headerSubtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
+        headerBox.getChildren().addAll(headerTitle, headerSubtitle);
 
         // 1. Wallets selection section
         VBox sourceBox = new VBox(4);
@@ -176,24 +184,24 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
         noteField.setPromptText("Nội dung chuyển khoản (tùy chọn)");
         noteBox.getChildren().addAll(lblNote, noteField);
 
-        // 4. Fee Section (Accordion Card)
+        // 4. Fee Section (Accordion Card đồng bộ RecordTransactionDialog)
         VBox feeSectionBox = new VBox(8);
-        feeSectionBox.getStyleClass().add("pfms-card");
-        feeSectionBox.setStyle("-fx-border-color: -color-border; -fx-border-radius: 6px; -fx-padding: 10px;");
+        feeSectionBox.setStyle("-fx-background-color: #0E0E0E; -fx-border-color: -color-border; " +
+                "-fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 12px 14px;");
 
-        feeCheckBox.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
+        feeCheckBox.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold; -fx-font-size: 12px;");
 
-        Label lblFeeAmount = new Label("Số tiền phí:");
-        lblFeeAmount.getStyleClass().add("form-label");
+        Label lblFeeAmount = new Label("Số tiền phụ phí:");
+        lblFeeAmount.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
         feeAmountField.setMaxWidth(Double.MAX_VALUE);
 
-        Label lblFeeGroup = new Label("Nhóm chi phí:");
-        lblFeeGroup.getStyleClass().add("form-label");
+        Label lblFeeGroup = new Label("Nhóm phụ phí:");
+        lblFeeGroup.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
         feeGroupCombo.setMaxWidth(Double.MAX_VALUE);
         setupFeeGroupComboRenderer();
 
         Label lblFeeCat = new Label("Danh mục phụ phí:");
-        lblFeeCat.getStyleClass().add("form-label");
+        lblFeeCat.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
         feeCategoryCombo.setMaxWidth(Double.MAX_VALUE);
         setupFeeCategoryComboRenderer();
 
@@ -211,8 +219,15 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
 
         feeSectionBox.getChildren().addAll(feeCheckBox, feeDetailsPanel);
 
-        contentBox.getChildren().addAll(headerTitle, sourceBox, destBox, amountBox, dateBox, noteBox, feeSectionBox);
-        pane.setContent(contentBox);
+        contentBox.getChildren().addAll(headerBox, sourceBox, destBox, amountBox, dateBox, noteBox, feeSectionBox);
+
+        ScrollPane scrollPane = new ScrollPane(contentBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background: #141414; -fx-background-color: transparent; -fx-border-color: transparent;");
+
+        pane.setContent(scrollPane);
 
         // Buttons
         ButtonType transferButtonType = new ButtonType("Xác nhận chuyển tiền", ButtonBar.ButtonData.OK_DONE);

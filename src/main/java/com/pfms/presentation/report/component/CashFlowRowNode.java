@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -77,7 +78,7 @@ public class CashFlowRowNode extends HBox {
 
         // 5. Cột TỶ LỆ TIẾT KIỆM (Priority.ALWAYS, right-aligned)
         BigDecimal rate = item.getSavingsRate() != null ? item.getSavingsRate() : BigDecimal.ZERO;
-        this.rateLabel = new Label(String.format("%.1f%%", rate));
+        this.rateLabel = new Label(String.format(Locale.US, "%.1f%%", rate));
         this.rateLabel.setStyle("-fx-background-color: rgba(229, 192, 123, 0.12); -fx-text-fill: #E5C07B; " +
                 "-fx-background-radius: 4px; -fx-border-color: rgba(229, 192, 123, 0.25); -fx-border-radius: 4px; " +
                 "-fx-padding: 2px 10px; -fx-font-size: 12px; -fx-font-weight: 700;");

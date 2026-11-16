@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -24,7 +25,12 @@ public class SpendingStructureRowNode extends HBox {
     private final Label diffLabel;
 
     public SpendingStructureRowNode(NeedGroupShareResponseDTO item) {
+        this(item, "EXPENSE");
+    }
+
+    public SpendingStructureRowNode(NeedGroupShareResponseDTO item, String transactionType) {
         this.item = Objects.requireNonNull(item, "NeedGroupShareResponseDTO không được để null");
+        boolean isIncome = "INCOME".equalsIgnoreCase(transactionType);
 
         this.setAlignment(Pos.CENTER_LEFT);
         this.setMaxWidth(Double.MAX_VALUE);
@@ -46,7 +52,7 @@ public class SpendingStructureRowNode extends HBox {
 
         // 2. Cột TỶ TRỌNG (%) (140px, right-aligned)
         BigDecimal share = item.getShare() != null ? item.getShare() : BigDecimal.ZERO;
-        this.shareLabel = new Label(String.format("%.1f%%", share));
+        this.shareLabel = new Label(String.format(Locale.US, "%.1f%%", share));
         this.shareLabel.setStyle("-fx-background-color: rgba(229, 192, 123, 0.12); -fx-text-fill: #E5C07B; " +
                 "-fx-background-radius: 4px; -fx-border-color: rgba(229, 192, 123, 0.25); -fx-border-radius: 4px; " +
                 "-fx-padding: 2px 8px; -fx-font-size: 11.5px; -fx-font-weight: 700;");
@@ -58,16 +64,16 @@ public class SpendingStructureRowNode extends HBox {
         shareWrapper.setMaxWidth(140);
         shareWrapper.setPadding(new javafx.geometry.Insets(0, 14, 0, 0));
 
-        // 3. Cột SỐ TIỀN HIỆN TẠI (190px, right-aligned)
+        // 3. Cột SỐ TIỀN HIỆN TẠI (190px, right-aligned) - Màu vàng theo chuẩn thiết kế
         BigDecimal total = item.getTotalAmount() != null ? item.getTotalAmount() : BigDecimal.ZERO;
         this.currentAmountLabel = new Label(ViewUtils.formatCurrency(total));
         this.currentAmountLabel.setPrefWidth(190);
         this.currentAmountLabel.setMinWidth(190);
         this.currentAmountLabel.setMaxWidth(190);
         this.currentAmountLabel.setAlignment(Pos.CENTER_RIGHT);
-        this.currentAmountLabel.setStyle("-fx-text-fill: #FB7185; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 0 14px 0 0;");
+        this.currentAmountLabel.setStyle("-fx-text-fill: #E5C07B; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 0 14px 0 0;");
 
-        // 4. Cột KỲ TRƯỚC (190px, right-aligned)
+        // 4. Cột KỲ TRƯỚC (190px, right-aligned) - Màu trắng
         BigDecimal prev = item.getPreviousTotalAmount();
         String prevText = (prev != null) ? ViewUtils.formatCurrency(prev) : "—";
         this.prevAmountLabel = new Label(prevText);
@@ -75,9 +81,9 @@ public class SpendingStructureRowNode extends HBox {
         this.prevAmountLabel.setMinWidth(190);
         this.prevAmountLabel.setMaxWidth(190);
         this.prevAmountLabel.setAlignment(Pos.CENTER_RIGHT);
-        this.prevAmountLabel.setStyle("-fx-text-fill: #A1A1AA; -fx-font-size: 13px; -fx-padding: 0 14px 0 0;");
+        this.prevAmountLabel.setStyle("-fx-text-fill: #FAFAFA; -fx-font-size: 13px; -fx-padding: 0 14px 0 0;");
 
-        // 5. Cột CHÊNH LỆCH (+/-) (Priority.ALWAYS, right-aligned)
+        // 5. Cột CHÊNH LỆCH (+/-) (Priority.ALWAYS, right-aligned) - Dương xanh, âm đỏ
         BigDecimal diff = item.getDifferenceAmount();
         String diffText;
         String diffColor;
@@ -86,10 +92,10 @@ public class SpendingStructureRowNode extends HBox {
             diffColor = "#A1A1AA";
         } else if (diff.compareTo(BigDecimal.ZERO) > 0) {
             diffText = "+" + ViewUtils.formatCurrency(diff);
-            diffColor = "#FB7185";
+            diffColor = "#4ADE80"; // Chênh lệch dương màu xanh
         } else {
             diffText = ViewUtils.formatCurrency(diff);
-            diffColor = "#4ADE80";
+            diffColor = "#FB7185"; // Chênh lệch âm màu đỏ
         }
 
         this.diffLabel = new Label(diffText);

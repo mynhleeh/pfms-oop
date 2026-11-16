@@ -10,18 +10,12 @@ import com.pfms.presentation.report.component.CashFlowRowNode;
 import com.pfms.presentation.report.component.SpendingStructureRowNode;
 import com.pfms.presentation.report.dialog.ExportReportDialog;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -42,13 +36,14 @@ import javafx.stage.Window;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
  * Bảng điều khiển phân hệ Báo cáo &amp; Thống kê Tài chính (Report Management Pane) sử dụng JavaFX.
  * Hiện thực hóa giao diện ReportView theo mô hình MVP (Passive View).
- * Trực quan hóa dữ liệu bằng JavaFX BarChart (Dòng tiền 12 tháng) và PieChart (Cơ cấu Thu Chi).
+ * Trực quan hóa dữ liệu bằng chuỗi thẻ số liệu phân cấp (Stream Rows) đồng bộ 100% với bản preview.
  */
 public class ReportPane extends BorderPane implements ReportView {
 
@@ -56,6 +51,18 @@ public class ReportPane extends BorderPane implements ReportView {
     private final ReportGUIController controller;
 
     private final TabPane tabPane = new TabPane();
+
+    // Cache dữ liệu báo cáo gần nhất để cập nhật hàng thẻ KPI tổng quan
+    private CashFlowReportResponseDTO lastCashFlowReport;
+    private SpendingStructureReportResponseDTO lastStructureReport;
+
+    // Hàng thẻ số liệu tổng quan KPI (3 thẻ định lượng chuẩn DTO)
+    private final Label kpiLabel1 = new Label("THU NHẬP BÌNH QUÂN (12T)");
+    private final Label kpiValue1 = new Label("0 VNĐ");
+    private final Label kpiLabel2 = new Label("CHI TIÊU BÌNH QUÂN (12T)");
+    private final Label kpiValue2 = new Label("0 VNĐ");
+    private final Label kpiLabel3 = new Label("TIẾT KIỆM BÌNH QUÂN (12T)");
+    private final Label kpiValue3 = new Label("0 VNĐ");
 
     // Tab 1: Cash Flow controls & data
     private final ComboBox<Integer> monthBox = new ComboBox<>();
@@ -70,14 +77,15 @@ public class ReportPane extends BorderPane implements ReportView {
     private final ScrollPane cashFlowScrollPane = new ScrollPane(cashFlowStreamBox);
     private HBox cashFlowStreamHeader;
 
-    private final CategoryAxis cfXAxis = new CategoryAxis();
-    private final NumberAxis cfYAxis = new NumberAxis();
-    private final BarChart<String, Number> cashFlowChart = new BarChart<>(cfXAxis, cfYAxis);
-
     // Tab 2: Spending Structure controls & data
     private final ComboBox<String> typeBox = new ComboBox<>();
+    private final Button btnTypeExpense = new Button("EXPENSE");
+    private final Button btnTypeIncome = new Button("INCOME");
     private final DatePicker startDatePicker = new DatePicker();
     private final DatePicker endDatePicker = new DatePicker();
+    private final Button chipMonth = new Button("Tháng này");
+    private final Button chipQuarter = new Button("Quý này");
+    private final Button chipYear = new Button("Năm nay");
     private final ComboBox<String> stFormatBox = new ComboBox<>();
     private final Label structureSummaryLabel = new Label("Tổng số tiền: 0 VNĐ");
 
@@ -88,8 +96,6 @@ public class ReportPane extends BorderPane implements ReportView {
     private final ScrollPane structureScrollPane = new ScrollPane(structureStreamBox);
     private HBox structureStreamHeader;
 
-    private final PieChart structurePieChart = new PieChart();
-
     private Consumer<String> messageConsumer;
     private Consumer<String> warningConsumer;
     private Consumer<String> errorConsumer;
@@ -99,13 +105,11 @@ public class ReportPane extends BorderPane implements ReportView {
         this.presenter = new ReportPresenter(this, reportController);
 
         setStyle("-fx-background-color: -color-bg-base;");
-        setPadding(new Insets(20));
 
         LocalDate now = LocalDate.now();
         for (int i = 1; i <= 12; i++) monthBox.getItems().add(i);
         monthBox.setValue(now.getMonthValue());
         yearField.setText(String.valueOf(now.getYear()));
-        yearField.setPrefWidth(80);
 
         typeBox.getItems().addAll("EXPENSE", "INCOME");
         typeBox.setValue("EXPENSE");
@@ -119,8 +123,8 @@ public class ReportPane extends BorderPane implements ReportView {
         stFormatBox.getItems().addAll("Bảng văn bản (.txt)", "Định dạng JSON (.json)");
         stFormatBox.setValue("Bảng văn bản (.txt)");
 
-        // Top Section: Header
-        setTop(createHeaderSection());
+        // Top Section: Header & KPI Overview Cards
+        setTop(createTopSection());
 
         // Center Section: TabPane
         setCenter(createTabPane());
@@ -129,62 +133,133 @@ public class ReportPane extends BorderPane implements ReportView {
         reloadReports();
     }
 
-    private Node createHeaderSection() {
-        VBox header = new VBox(4);
-        header.setPadding(new Insets(0, 0, 14, 0));
+    private Node createTopSection() {
+        VBox topContainer = new VBox(0);
 
+        // Thanh tiêu đề phía trên cùng (.pane-header)
+        HBox topBar = new HBox(12);
+        topBar.getStyleClass().add("pane-header");
+
+        VBox titleBox = new VBox(3);
         Label title = new Label("Báo Cáo & Thống Kê Tài Chính");
-        title.setStyle("-fx-text-fill: -color-text-main; -fx-font-size: 20px; -fx-font-weight: bold;");
+        title.getStyleClass().add("pane-title");
 
         Label subtitle = new Label("Phân tích chuỗi dòng tiền 12 tháng & Cơ cấu thu chi đa chiều");
-        subtitle.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 12px;");
+        subtitle.getStyleClass().add("pane-subtitle");
+        titleBox.getChildren().addAll(title, subtitle);
 
-        header.getChildren().addAll(title, subtitle);
-        return header;
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Cặp nút xuất đồng bộ tại header
+        HBox exportActions = new HBox(8);
+        exportActions.setAlignment(Pos.CENTER_RIGHT);
+
+        Button btnExportTxtTop = new Button("Xuất văn bản (.txt)");
+        btnExportTxtTop.getStyleClass().add("btn-export-action");
+        btnExportTxtTop.setOnAction(e -> exportCurrentActiveTab(false));
+
+        Button btnExportJsonTop = new Button("Xuất dữ liệu (.json)");
+        btnExportJsonTop.getStyleClass().add("btn-export-action");
+        btnExportJsonTop.setOnAction(e -> exportCurrentActiveTab(true));
+
+        exportActions.getChildren().addAll(btnExportTxtTop, btnExportJsonTop);
+        topBar.getChildren().addAll(titleBox, spacer, exportActions);
+
+        // Hàng thẻ số liệu định lượng KPI (.kpi-row)
+        HBox kpiRow = createKpiSection();
+
+        topContainer.getChildren().addAll(topBar, kpiRow);
+        return topContainer;
+    }
+
+    private HBox createKpiSection() {
+        HBox kpiRow = new HBox(14);
+        kpiRow.getStyleClass().add("kpi-row");
+
+        kpiRow.getChildren().addAll(
+                createKpiCard(kpiLabel1, kpiValue1, "kpi-value-income"),
+                createKpiCard(kpiLabel2, kpiValue2, "kpi-value-expense"),
+                createKpiCard(kpiLabel3, kpiValue3, "kpi-value-gold")
+        );
+        return kpiRow;
+    }
+
+    private Node createKpiCard(Label titleLabel, Label valueLabel, String initialColorClass) {
+        VBox card = new VBox(4);
+        card.getStyleClass().add("kpi-card");
+        titleLabel.getStyleClass().add("kpi-label");
+        valueLabel.getStyleClass().addAll("kpi-value", initialColorClass);
+
+        card.getChildren().addAll(titleLabel, valueLabel);
+        HBox.setHgrow(card, Priority.ALWAYS);
+        return card;
+    }
+
+    private void exportCurrentActiveTab(boolean isJson) {
+        if (tabPane.getSelectionModel().getSelectedIndex() == 0) {
+            this.presenter.onExportCashFlowClicked(isJson);
+        } else {
+            this.presenter.onExportSpendingStructureClicked(isJson);
+        }
     }
 
     private Node createTabPane() {
         tabPane.getStyleClass().add("tab-pane");
 
-        Tab tabCashFlow = new Tab("Báo cáo Dòng tiền 12 tháng", createCashFlowTabContent());
+        Tab tabCashFlow = new Tab("Báo Cáo Dòng Tiền 12 Tháng", createCashFlowTabContent());
         tabCashFlow.setClosable(false);
 
-        Tab tabStructure = new Tab("Cơ cấu Thu Chi", createStructureTabContent());
+        Tab tabStructure = new Tab("Cơ Cấu Thu Chi", createStructureTabContent());
         tabStructure.setClosable(false);
 
         tabPane.getTabs().addAll(tabCashFlow, tabStructure);
+        tabPane.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> updateKpiCards());
+
         return tabPane;
     }
 
     private Node createCashFlowTabContent() {
         VBox box = new VBox(12);
-        box.setPadding(new Insets(14, 0, 0, 0));
+        box.setPadding(new Insets(14, 24, 20, 24));
         VBox.setVgrow(box, Priority.ALWAYS);
 
         // Toolbar
-        HBox toolbar = new HBox(8);
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-        toolbar.getStyleClass().add("pfms-card");
-        toolbar.setPadding(new Insets(10, 14, 10, 14));
+        HBox toolbar = new HBox(12);
+        toolbar.getStyleClass().add("filter-card");
 
-        Label lblMonth = new Label("Tháng kết thúc:");
-        lblMonth.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
+        Label lblMonth = new Label("THÁNG KẾT THÚC:");
+        lblMonth.getStyleClass().add("filter-label");
+        lblMonth.setMinWidth(Region.USE_PREF_SIZE);
 
-        Label lblYear = new Label("Năm:");
-        lblYear.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
+        monthBox.setPrefWidth(100);
+        monthBox.setMinWidth(80);
+
+        Label lblYear = new Label("NĂM:");
+        lblYear.getStyleClass().add("filter-label");
+        lblYear.setMinWidth(Region.USE_PREF_SIZE);
+
+        yearField.setStyle("-fx-pref-width: 80px; -fx-min-width: 70px; -fx-background-color: #0E0E0E; -fx-border-color: -color-border; " +
+                "-fx-text-fill: -color-text-main; -fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 6px 10px;");
 
         Button btnView = new Button("Xem báo cáo");
         btnView.getStyleClass().add("btn-primary");
+        btnView.setMinWidth(Region.USE_PREF_SIZE);
         btnView.setOnAction(e -> loadCashFlow());
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label lblFormat = new Label("Định dạng:");
-        lblFormat.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
+        Label lblFormat = new Label("ĐỊNH DẠNG:");
+        lblFormat.getStyleClass().add("filter-label");
+        lblFormat.setMinWidth(Region.USE_PREF_SIZE);
+
+        cfFormatBox.setPrefWidth(170);
+        cfFormatBox.setMinWidth(150);
 
         Button btnExport = new Button("Xuất báo cáo");
-        btnExport.getStyleClass().add("btn-secondary");
+        btnExport.getStyleClass().add("btn-export-action");
+        btnExport.setMinWidth(Region.USE_PREF_SIZE);
         btnExport.setOnAction(e -> {
             boolean isJson = cfFormatBox.getSelectionModel().getSelectedIndex() == 1;
             this.presenter.onExportCashFlowClicked(isJson);
@@ -192,44 +267,31 @@ public class ReportPane extends BorderPane implements ReportView {
 
         toolbar.getChildren().addAll(lblMonth, monthBox, lblYear, yearField, btnView, spacer, lblFormat, cfFormatBox, btnExport);
 
-        // Chart section
-        cfXAxis.setLabel("Tháng");
-        cfYAxis.setLabel("Số tiền (VNĐ)");
-        cashFlowChart.setTitle("Biểu Đồ So Sánh Dòng Tiền 12 Tháng");
-        cashFlowChart.setPrefHeight(260);
-        cashFlowChart.setAnimated(false);
-
         // Setup legacy table for backward compatibility
         setupCashFlowLegacyTable();
 
         // Modern Stream section (Minimalist Guide Rows)
         this.cashFlowStreamHeader = createCashFlowStreamHeader();
 
-        this.cashFlowStreamBox.setPadding(new Insets(6, 0, 6, 0));
+        this.cashFlowStreamBox.setPadding(new Insets(6, 10, 6, 10));
         this.cashFlowStreamBox.setFillWidth(true);
 
         this.cashFlowScrollPane.setFitToWidth(true);
         this.cashFlowScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
         VBox.setVgrow(this.cashFlowScrollPane, Priority.ALWAYS);
 
-        VBox streamContainer = new VBox(4, this.cashFlowStreamHeader, this.cashFlowScrollPane);
-        streamContainer.getStyleClass().add("stream-container");
+        VBox streamContainer = new VBox(0, this.cashFlowStreamHeader, this.cashFlowScrollPane);
+        streamContainer.getStyleClass().addAll("report-stream-container", "stream-container");
         VBox.setVgrow(streamContainer, Priority.ALWAYS);
 
-        // Bottom summary
-        HBox bottomBox = new HBox(cashFlowSummaryLabel);
-        bottomBox.setPadding(new Insets(8, 0, 0, 0));
-        cashFlowSummaryLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 12px; -fx-font-weight: bold;");
-
-        box.getChildren().addAll(toolbar, cashFlowChart, streamContainer, bottomBox);
+        box.getChildren().addAll(toolbar, streamContainer);
         return box;
     }
 
     private HBox createCashFlowStreamHeader() {
         HBox header = new HBox();
-        header.getStyleClass().add("stream-header");
+        header.getStyleClass().add("report-stream-header");
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-padding: 8px 14px; -fx-border-color: transparent transparent #222222 transparent; -fx-border-width: 0 0 1px 0;");
 
         Label hMonth = new Label("THÁNG");
         hMonth.setPrefWidth(100); hMonth.setMinWidth(100); hMonth.setMaxWidth(100);
@@ -281,8 +343,8 @@ public class ReportPane extends BorderPane implements ReportView {
         colNet.setCellValueFactory(data -> new SimpleStringProperty(ViewUtils.formatCurrency(data.getValue().getNetCashFlow())));
         colNet.setStyle("-fx-alignment: CENTER-RIGHT; -fx-text-fill: -color-primary-light; -fx-font-weight: bold;");
 
-        TableColumn<MonthlyCashFlowResponseDTO, String> colRate = new TableColumn<>("Tỷ Lệ Tiết Kiệm");
-        colRate.setCellValueFactory(data -> new SimpleStringProperty(String.format("%.1f%%", data.getValue().getSavingsRate())));
+        TableColumn<MonthlyCashFlowResponseDTO, String> colRate = new TableColumn<>("Tỷ LỆ Tiết Kiệm");
+        colRate.setCellValueFactory(data -> new SimpleStringProperty(String.format(Locale.US, "%.1f%%", data.getValue().getSavingsRate())));
         colRate.setStyle("-fx-alignment: CENTER;");
 
         cashFlowTable.getColumns().addAll(List.of(colMonth, colIncome, colExpense, colNet, colRate));
@@ -290,50 +352,86 @@ public class ReportPane extends BorderPane implements ReportView {
 
     private Node createStructureTabContent() {
         VBox box = new VBox(12);
-        box.setPadding(new Insets(14, 0, 0, 0));
+        box.setPadding(new Insets(14, 24, 20, 24));
         VBox.setVgrow(box, Priority.ALWAYS);
 
-        // Toolbar
-        HBox toolbar = new HBox(8);
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-        toolbar.getStyleClass().add("pfms-card");
-        toolbar.setPadding(new Insets(10, 14, 10, 14));
+        // Filter Card: Thiết kế 2 tầng cân đối, chống tràn và không chồng chéo nút
+        VBox filterCard = new VBox(10);
+        filterCard.getStyleClass().add("filter-card");
 
-        Label lblType = new Label("Phân loại:");
-        lblType.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
+        // --- HÀNG 1: Phân loại, Thẻ chọn thời gian nhanh & Xuất báo cáo ---
+        HBox row1 = new HBox(12);
+        row1.setAlignment(Pos.CENTER_LEFT);
 
-        Label lblStart = new Label("Từ ngày:");
-        lblStart.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
+        Label lblType = new Label("PHÂN LOẠI:");
+        lblType.getStyleClass().add("filter-label");
+        lblType.setMinWidth(Region.USE_PREF_SIZE);
 
-        Label lblEnd = new Label("Đến ngày:");
-        lblEnd.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
+        HBox typeSwitcher = setupTypeSwitcher();
 
-        Button btnView = new Button("Xem báo cáo");
-        btnView.getStyleClass().add("btn-primary");
-        btnView.setOnAction(e -> loadStructure());
+        Region divider = new Region();
+        divider.setStyle("-fx-background-color: -color-border; -fx-pref-width: 1px; -fx-min-width: 1px; -fx-max-width: 1px; -fx-pref-height: 18px;");
+
+        Label lblPresets = new Label("KHOẢNG THỜI GIAN:");
+        lblPresets.getStyleClass().add("filter-label");
+        lblPresets.setMinWidth(Region.USE_PREF_SIZE);
+
+        setupDatePresetChips();
+        HBox chipsBox = new HBox(6, chipMonth, chipQuarter, chipYear);
+        chipsBox.setAlignment(Pos.CENTER_LEFT);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label lblFormat = new Label("Định dạng:");
-        lblFormat.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
+        Label lblFormat = new Label("ĐỊNH DẠNG:");
+        lblFormat.getStyleClass().add("filter-label");
+        lblFormat.setMinWidth(Region.USE_PREF_SIZE);
+
+        stFormatBox.setPrefWidth(170);
+        stFormatBox.setMinWidth(150);
 
         Button btnExport = new Button("Xuất báo cáo");
-        btnExport.getStyleClass().add("btn-secondary");
+        btnExport.getStyleClass().add("btn-export-action");
+        btnExport.setMinWidth(Region.USE_PREF_SIZE);
         btnExport.setOnAction(e -> {
             boolean isJson = stFormatBox.getSelectionModel().getSelectedIndex() == 1;
             this.presenter.onExportSpendingStructureClicked(isJson);
         });
 
-        toolbar.getChildren().addAll(lblType, typeBox, lblStart, startDatePicker, lblEnd, endDatePicker, btnView, spacer, lblFormat, stFormatBox, btnExport);
+        row1.getChildren().addAll(
+                lblType, typeSwitcher,
+                divider,
+                lblPresets, chipsBox,
+                spacer,
+                lblFormat, stFormatBox, btnExport
+        );
 
-        // Center split: PieChart (Left) + TableView/Stream (Right)
-        HBox centerBox = new HBox(14);
-        VBox.setVgrow(centerBox, Priority.ALWAYS);
+        // --- HÀNG 2: Chọn khoảng ngày chi tiết & Nút thực thi chính ---
+        HBox row2 = new HBox(12);
+        row2.setAlignment(Pos.CENTER_LEFT);
 
-        structurePieChart.setTitle("Cơ Cấu Tỷ Trọng Nhóm Nhu Cầu");
-        structurePieChart.setPrefWidth(380);
-        structurePieChart.setAnimated(false);
+        Label lblStart = new Label("TỪ NGÀY:");
+        lblStart.getStyleClass().add("filter-label");
+        lblStart.setMinWidth(Region.USE_PREF_SIZE);
+
+        startDatePicker.setPrefWidth(135);
+        startDatePicker.setMinWidth(125);
+
+        Label lblEnd = new Label("ĐẾN NGÀY:");
+        lblEnd.getStyleClass().add("filter-label");
+        lblEnd.setMinWidth(Region.USE_PREF_SIZE);
+
+        endDatePicker.setPrefWidth(135);
+        endDatePicker.setMinWidth(125);
+
+        Button btnView = new Button("Xem báo cáo");
+        btnView.getStyleClass().add("btn-primary");
+        btnView.setMinWidth(Region.USE_PREF_SIZE);
+        btnView.setOnAction(e -> loadStructure());
+
+        row2.getChildren().addAll(lblStart, startDatePicker, lblEnd, endDatePicker, btnView);
+
+        filterCard.getChildren().addAll(row1, row2);
 
         // Setup legacy table for backward compatibility
         setupStructureLegacyTable();
@@ -341,33 +439,118 @@ public class ReportPane extends BorderPane implements ReportView {
         // Modern Stream section (Minimalist Guide Rows)
         this.structureStreamHeader = createStructureStreamHeader();
 
-        this.structureStreamBox.setPadding(new Insets(6, 0, 6, 0));
+        this.structureStreamBox.setPadding(new Insets(6, 10, 6, 10));
         this.structureStreamBox.setFillWidth(true);
 
         this.structureScrollPane.setFitToWidth(true);
         this.structureScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
         VBox.setVgrow(this.structureScrollPane, Priority.ALWAYS);
 
-        VBox streamContainer = new VBox(4, this.structureStreamHeader, this.structureScrollPane);
-        streamContainer.getStyleClass().add("stream-container");
-        HBox.setHgrow(streamContainer, Priority.ALWAYS);
+        VBox streamContainer = new VBox(0, this.structureStreamHeader, this.structureScrollPane);
+        streamContainer.getStyleClass().addAll("report-stream-container", "stream-container");
+        VBox.setVgrow(streamContainer, Priority.ALWAYS);
 
-        centerBox.getChildren().addAll(structurePieChart, streamContainer);
-
-        // Bottom summary
-        HBox bottomBox = new HBox(structureSummaryLabel);
-        bottomBox.setPadding(new Insets(8, 0, 0, 0));
-        structureSummaryLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 12px; -fx-font-weight: bold;");
-
-        box.getChildren().addAll(toolbar, centerBox, bottomBox);
+        box.getChildren().addAll(filterCard, streamContainer);
         return box;
+    }
+
+    private HBox setupTypeSwitcher() {
+        HBox typeSwitcher = new HBox(2);
+        typeSwitcher.getStyleClass().add("type-switcher");
+
+        btnTypeExpense.getStyleClass().setAll("type-switch-btn", "type-switch-expense", "type-switch-active");
+        btnTypeExpense.setMinWidth(Region.USE_PREF_SIZE);
+
+        btnTypeIncome.getStyleClass().setAll("type-switch-btn", "type-switch-income");
+        btnTypeIncome.setMinWidth(Region.USE_PREF_SIZE);
+
+        btnTypeExpense.setOnAction(e -> {
+            if (!btnTypeExpense.getStyleClass().contains("type-switch-active")) {
+                btnTypeExpense.getStyleClass().add("type-switch-active");
+            }
+            btnTypeIncome.getStyleClass().remove("type-switch-active");
+            typeBox.setValue("EXPENSE");
+            loadStructure();
+        });
+
+        btnTypeIncome.setOnAction(e -> {
+            if (!btnTypeIncome.getStyleClass().contains("type-switch-active")) {
+                btnTypeIncome.getStyleClass().add("type-switch-active");
+            }
+            btnTypeExpense.getStyleClass().remove("type-switch-active");
+            typeBox.setValue("INCOME");
+            loadStructure();
+        });
+
+        typeBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if ("INCOME".equalsIgnoreCase(newVal)) {
+                if (!btnTypeIncome.getStyleClass().contains("type-switch-active")) {
+                    btnTypeIncome.getStyleClass().add("type-switch-active");
+                }
+                btnTypeExpense.getStyleClass().remove("type-switch-active");
+            } else {
+                if (!btnTypeExpense.getStyleClass().contains("type-switch-active")) {
+                    btnTypeExpense.getStyleClass().add("type-switch-active");
+                }
+                btnTypeIncome.getStyleClass().remove("type-switch-active");
+            }
+        });
+
+        typeSwitcher.getChildren().addAll(btnTypeExpense, btnTypeIncome);
+        return typeSwitcher;
+    }
+
+    private void setupDatePresetChips() {
+        chipMonth.getStyleClass().setAll("quick-chip", "quick-chip-active");
+        chipMonth.setMinWidth(Region.USE_PREF_SIZE);
+
+        chipQuarter.getStyleClass().setAll("quick-chip");
+        chipQuarter.setMinWidth(Region.USE_PREF_SIZE);
+
+        chipYear.getStyleClass().setAll("quick-chip");
+        chipYear.setMinWidth(Region.USE_PREF_SIZE);
+
+        chipMonth.setOnAction(e -> {
+            setActiveChip(chipMonth);
+            LocalDate now = LocalDate.now();
+            startDatePicker.setValue(now.withDayOfMonth(1));
+            endDatePicker.setValue(now);
+            loadStructure();
+        });
+
+        chipQuarter.setOnAction(e -> {
+            setActiveChip(chipQuarter);
+            LocalDate now = LocalDate.now();
+            int currentMonth = now.getMonthValue();
+            int quarterStartMonth = ((currentMonth - 1) / 3) * 3 + 1;
+            startDatePicker.setValue(LocalDate.of(now.getYear(), quarterStartMonth, 1));
+            endDatePicker.setValue(now);
+            loadStructure();
+        });
+
+        chipYear.setOnAction(e -> {
+            setActiveChip(chipYear);
+            LocalDate now = LocalDate.now();
+            startDatePicker.setValue(LocalDate.of(now.getYear(), 1, 1));
+            endDatePicker.setValue(now);
+            loadStructure();
+        });
+    }
+
+    private void setActiveChip(Button target) {
+        chipMonth.getStyleClass().remove("quick-chip-active");
+        chipQuarter.getStyleClass().remove("quick-chip-active");
+        chipYear.getStyleClass().remove("quick-chip-active");
+
+        if (target != null && !target.getStyleClass().contains("quick-chip-active")) {
+            target.getStyleClass().add("quick-chip-active");
+        }
     }
 
     private HBox createStructureStreamHeader() {
         HBox header = new HBox();
-        header.getStyleClass().add("stream-header");
+        header.getStyleClass().add("report-stream-header");
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-padding: 8px 14px; -fx-border-color: transparent transparent #222222 transparent; -fx-border-width: 0 0 1px 0;");
 
         Label hName = new Label("NHÓM NHU CẦU");
         hName.setPrefWidth(250); hName.setMinWidth(250); hName.setMaxWidth(250);
@@ -411,7 +594,7 @@ public class ReportPane extends BorderPane implements ReportView {
         colAmount.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold;");
 
         TableColumn<NeedGroupShareResponseDTO, String> colShare = new TableColumn<>("Tỷ Trọng (%)");
-        colShare.setCellValueFactory(data -> new SimpleStringProperty(String.format("%.1f%%", data.getValue().getShare())));
+        colShare.setCellValueFactory(data -> new SimpleStringProperty(String.format(Locale.US, "%.1f%%", data.getValue().getShare())));
         colShare.setStyle("-fx-alignment: CENTER; -fx-text-fill: -color-primary-light; -fx-font-weight: bold;");
 
         TableColumn<NeedGroupShareResponseDTO, String> colPrev = new TableColumn<>("Kỳ Trước");
@@ -449,35 +632,80 @@ public class ReportPane extends BorderPane implements ReportView {
         this.presenter.loadSpendingStructureReport(start, end, type);
     }
 
+    private void updateKpiCards() {
+        int selectedIndex = tabPane.getSelectionModel().getSelectedIndex();
+        if (selectedIndex == 0) {
+            // Tab 1: Dòng tiền 12 tháng
+            kpiLabel1.setText("THU NHẬP BÌNH QUÂN (12T)");
+            kpiLabel2.setText("CHI TIÊU BÌNH QUÂN (12T)");
+            kpiLabel3.setText("TIẾT KIỆM BÌNH QUÂN (12T)");
+
+            kpiValue1.getStyleClass().setAll("kpi-value", "kpi-value-income");
+            kpiValue2.getStyleClass().setAll("kpi-value", "kpi-value-expense");
+            kpiValue3.getStyleClass().setAll("kpi-value", "kpi-value-gold");
+
+            if (lastCashFlowReport != null) {
+                kpiValue1.setText(ViewUtils.formatCurrency(lastCashFlowReport.getAvgIncome()));
+                kpiValue2.setText(ViewUtils.formatCurrency(lastCashFlowReport.getAvgExpense()));
+                kpiValue3.setText(ViewUtils.formatCurrency(lastCashFlowReport.getAvgNetCashFlow()));
+            } else {
+                kpiValue1.setText("0 VNĐ");
+                kpiValue2.setText("0 VNĐ");
+                kpiValue3.setText("0 VNĐ");
+            }
+        } else {
+            // Tab 2: Cơ cấu Thu Chi (Cân đối thu chi)
+            kpiLabel1.setText("TỔNG SỐ TIỀN KỲ NÀY");
+            kpiLabel2.setText("KỲ SO SÁNH LIỀN TRƯỚC");
+            kpiLabel3.setText("CHÊNH LỆCH SO VỚI KỲ TRƯỚC");
+
+            // Màu sắc theo quy chuẩn: Tổng số tiền kỳ này màu vàng, kỳ trước màu trắng, chênh lệch dương xanh, âm đỏ
+            kpiValue1.getStyleClass().setAll("kpi-value", "kpi-value-gold");
+            kpiValue2.getStyleClass().setAll("kpi-value", "kpi-value-white");
+
+            if (lastStructureReport != null) {
+                BigDecimal diff = lastStructureReport.getDifferenceAmount();
+                if (diff != null && diff.compareTo(BigDecimal.ZERO) > 0) {
+                    kpiValue3.getStyleClass().setAll("kpi-value", "kpi-value-income");
+                } else if (diff != null && diff.compareTo(BigDecimal.ZERO) < 0) {
+                    kpiValue3.getStyleClass().setAll("kpi-value", "kpi-value-expense");
+                } else {
+                    kpiValue3.getStyleClass().setAll("kpi-value", "kpi-value-white");
+                }
+
+                kpiValue1.setText(ViewUtils.formatCurrency(lastStructureReport.getTotalAmount()));
+                kpiValue2.setText(lastStructureReport.getPreviousTotalAmount() != null
+                        ? ViewUtils.formatCurrency(lastStructureReport.getPreviousTotalAmount())
+                        : "-");
+
+                BigDecimal pct = lastStructureReport.getPercentageChange();
+                String pctStr = (pct != null) ? String.format(Locale.US, "%.1f%%", pct.doubleValue()) : "0.0%";
+                String sign = (diff != null && diff.compareTo(BigDecimal.ZERO) > 0) ? "+" : "";
+                kpiValue3.setText(sign + ViewUtils.formatCurrency(diff) + " (" + (diff != null && diff.compareTo(BigDecimal.ZERO) > 0 ? "+" : "") + pctStr + ")");
+            } else {
+                kpiValue3.getStyleClass().setAll("kpi-value", "kpi-value-white");
+                kpiValue1.setText("0 VNĐ");
+                kpiValue2.setText("0 VNĐ");
+                kpiValue3.setText("0 VNĐ (0.0%)");
+            }
+        }
+    }
+
     // region ReportView Implementation
     @Override
     public void renderCashFlowReport(CashFlowReportResponseDTO report, String summaryText) {
         runOnFx(() -> {
+            this.lastCashFlowReport = report;
             cashFlowSummaryLabel.setText(summaryText != null ? summaryText : "");
             cashFlowTableData.clear();
-            cashFlowChart.getData().clear();
             cashFlowStreamBox.getChildren().clear();
 
             if (report != null && report.getMonths() != null && !report.getMonths().isEmpty()) {
                 cashFlowTableData.addAll(report.getMonths());
 
-                XYChart.Series<String, Number> seriesIncome = new XYChart.Series<>();
-                seriesIncome.setName("Thu nhập");
-
-                XYChart.Series<String, Number> seriesExpense = new XYChart.Series<>();
-                seriesExpense.setName("Chi tiêu");
-
-                XYChart.Series<String, Number> seriesNet = new XYChart.Series<>();
-                seriesNet.setName("Dòng tiền ròng");
-
                 for (MonthlyCashFlowResponseDTO item : report.getMonths()) {
-                    seriesIncome.getData().add(new XYChart.Data<>(item.getYearMonth(), item.getTotalIncome()));
-                    seriesExpense.getData().add(new XYChart.Data<>(item.getYearMonth(), item.getTotalExpense()));
-                    seriesNet.getData().add(new XYChart.Data<>(item.getYearMonth(), item.getNetCashFlow()));
                     cashFlowStreamBox.getChildren().add(new CashFlowRowNode(item));
                 }
-
-                cashFlowChart.getData().addAll(List.of(seriesIncome, seriesExpense, seriesNet));
             } else {
                 Label emptyLabel = new Label("Chưa có dữ liệu dòng tiền trong khoảng thời gian đã chọn");
                 emptyLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-style: italic; -fx-padding: 24px;");
@@ -486,25 +714,24 @@ public class ReportPane extends BorderPane implements ReportView {
                 emptyBox.getStyleClass().add("stream-empty-card");
                 cashFlowStreamBox.getChildren().add(emptyBox);
             }
+            updateKpiCards();
         });
     }
 
     @Override
     public void renderSpendingStructureReport(SpendingStructureReportResponseDTO report, String summaryText) {
         runOnFx(() -> {
+            this.lastStructureReport = report;
             structureSummaryLabel.setText(summaryText != null ? summaryText : "");
             structureTableData.clear();
-            structurePieChart.getData().clear();
             structureStreamBox.getChildren().clear();
 
             if (report != null && report.getGroups() != null && !report.getGroups().isEmpty()) {
                 structureTableData.addAll(report.getGroups());
 
+                String currentType = report.getTransactionType() != null ? report.getTransactionType() : "EXPENSE";
                 for (NeedGroupShareResponseDTO item : report.getGroups()) {
-                    double val = item.getTotalAmount() != null ? item.getTotalAmount().doubleValue() : 0.0;
-                    String label = item.getName() + " (" + String.format("%.1f%%", item.getShare()) + ")";
-                    structurePieChart.getData().add(new PieChart.Data(label, val));
-                    structureStreamBox.getChildren().add(new SpendingStructureRowNode(item));
+                    structureStreamBox.getChildren().add(new SpendingStructureRowNode(item, currentType));
                 }
             } else {
                 Label emptyLabel = new Label("Chưa có dữ liệu cơ cấu chi tiêu trong khoảng thời gian đã chọn");
@@ -514,6 +741,7 @@ public class ReportPane extends BorderPane implements ReportView {
                 emptyBox.getStyleClass().add("stream-empty-card");
                 structureStreamBox.getChildren().add(emptyBox);
             }
+            updateKpiCards();
         });
     }
 
@@ -580,10 +808,27 @@ public class ReportPane extends BorderPane implements ReportView {
     public HBox getStructureStreamHeader() { return structureStreamHeader; }
     public ScrollPane getCashFlowScrollPane() { return cashFlowScrollPane; }
     public ScrollPane getStructureScrollPane() { return structureScrollPane; }
-    public BarChart<String, Number> getCashFlowChart() { return cashFlowChart; }
-    public PieChart getStructurePieChart() { return structurePieChart; }
     public String getCashFlowSummaryText() { return cashFlowSummaryLabel.getText(); }
     public String getStructureSummaryText() { return structureSummaryLabel.getText(); }
+
+    public Label getKpiLabel1() { return kpiLabel1; }
+    public Label getKpiValue1() { return kpiValue1; }
+    public Label getKpiLabel2() { return kpiLabel2; }
+    public Label getKpiValue2() { return kpiValue2; }
+    public Label getKpiLabel3() { return kpiLabel3; }
+    public Label getKpiValue3() { return kpiValue3; }
+    public Button getBtnTypeExpense() { return btnTypeExpense; }
+    public Button getBtnTypeIncome() { return btnTypeIncome; }
+    public Button getChipMonth() { return chipMonth; }
+    public Button getChipQuarter() { return chipQuarter; }
+    public Button getChipYear() { return chipYear; }
+    public DatePicker getStartDatePicker() { return startDatePicker; }
+    public DatePicker getEndDatePicker() { return endDatePicker; }
+    public ComboBox<String> getTypeBox() { return typeBox; }
+    public ComboBox<Integer> getMonthBox() { return monthBox; }
+    public TextField getYearField() { return yearField; }
+    public ComboBox<String> getCfFormatBox() { return cfFormatBox; }
+    public ComboBox<String> getStFormatBox() { return stFormatBox; }
 
     public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }
     public void setWarningConsumer(Consumer<String> consumer) { this.warningConsumer = consumer; }

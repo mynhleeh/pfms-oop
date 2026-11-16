@@ -11,6 +11,8 @@ import com.pfms.presentation.dto.transfer.TransferResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.testutil.JavaFxTestHelper;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -87,6 +89,20 @@ class TransferFundsDialogTest {
             assertTrue(dialog.getFeeAmountField().isDisable());
             assertTrue(dialog.getFeeGroupCombo().isDisable());
             assertTrue(dialog.getFeeCategoryCombo().isDisable());
+        });
+    }
+
+    @Test
+    @DisplayName("Nội dung hộp thoại phải được bọc trong ScrollPane có fitToWidth để cho phép cuộn khi có phụ phí")
+    void testContentWrappedInScrollPane() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            var content = dialog.getDialogPane().getContent();
+            assertTrue(content instanceof ScrollPane, "Nội dung hộp thoại phải là một ScrollPane để hỗ trợ cuộn");
+            ScrollPane scrollPane = (ScrollPane) content;
+            assertTrue(scrollPane.isFitToWidth(), "ScrollPane phải bật fitToWidth để co giãn chiều ngang");
+            assertEquals(ScrollPane.ScrollBarPolicy.NEVER, scrollPane.getHbarPolicy(), "Không hiển thị thanh cuộn ngang");
+            assertEquals(ScrollPane.ScrollBarPolicy.AS_NEEDED, scrollPane.getVbarPolicy(), "Thanh cuộn dọc phải hiển thị khi cần thiết");
+            assertTrue(scrollPane.getContent() instanceof VBox, "Nội dung bên trong ScrollPane phải là VBox form controls");
         });
     }
 
