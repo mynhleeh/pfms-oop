@@ -91,7 +91,6 @@ public class MainStage {
     private void navigateTo(String cardName) {
         this.mainController.navigateTo(cardName);
         showCard(cardName);
-        this.statusBar.setStatusMessage("Đang xem phân hệ: " + cardName);
     }
 
     private void initializeDefaultPlaceholders() {

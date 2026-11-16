@@ -26,7 +26,7 @@ public class StatusBar extends HBox {
         setPadding(new Insets(0, 16, 0, 16));
         setStyle("-fx-background-color: -color-sidebar-bg; -fx-border-color: -color-border transparent transparent transparent; -fx-border-width: 1px 0 0 0;");
 
-        statusLabel = new Label("Sẵn sàng");
+        statusLabel = new Label("● Tệp dữ liệu: data/pfms_data.json");
         statusLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
 
         Pane spacer = new Pane();
@@ -50,6 +50,11 @@ public class StatusBar extends HBox {
         } else {
             this.statusLabel.setText("Sẵn sàng");
         }
+    }
+
+    public void updateDataFilePath(String path) {
+        String displayPath = (path != null && !path.trim().isEmpty()) ? path.trim() : "data/pfms_data.json";
+        this.statusLabel.setText("● Tệp dữ liệu: " + displayPath);
     }
 
     public void setStorageStatus(String storageStatus) {

@@ -19,6 +19,7 @@ public final class ViewConstants {
     // region Hex Colors for JavaFX
     public static final String HEX_PRIMARY = "#D4AF37";
     public static final String HEX_PRIMARY_LIGHT = "#E5C07B";
+    public static final String HEX_GOLD_LIGHT = "#F3E5AB";
     public static final String HEX_BG_BASE = "#070707";
     public static final String HEX_CARD_BG = "#121212";
     public static final String HEX_SIDEBAR_BG = "#000000";
@@ -28,6 +29,7 @@ public final class ViewConstants {
     public static final String HEX_TEXT_DIM = "#71717A";
     public static final String HEX_INCOME = "#4ADE80";
     public static final String HEX_EXPENSE = "#FB7185";
+    public static final String HEX_WARNING = "#FBBF24";
     // endregion
 
     // region Application Strings
