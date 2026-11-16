@@ -42,6 +42,19 @@ public final class ViewConstants {
     public static final Color COLOR_EXPENSE = new Color(251, 113, 133); // Pastel Rose Coral (#FB7185)
     // endregion
 
+    // region Hex Colors for JavaFX
+    public static final String HEX_PRIMARY = "#D4AF37";
+    public static final String HEX_PRIMARY_LIGHT = "#E5C07B";
+    public static final String HEX_BG_BASE = "#070707";
+    public static final String HEX_CARD_BG = "#121212";
+    public static final String HEX_SIDEBAR_BG = "#000000";
+    public static final String HEX_BORDER = "#222222";
+    public static final String HEX_TEXT_MAIN = "#FAFAFA";
+    public static final String HEX_TEXT_MUTED = "#A1A1AA";
+    public static final String HEX_INCOME = "#4ADE80";
+    public static final String HEX_EXPENSE = "#FB7185";
+    // endregion
+
     // region Fonts
     public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 16);
     public static final Font FONT_SUBTITLE = new Font("Segoe UI", Font.PLAIN, 12);
