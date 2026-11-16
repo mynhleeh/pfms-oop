@@ -159,15 +159,17 @@ Giao diện đồ họa PFMS áp dụng chuẩn kết xuất bảng dữ liệu 
 
 1. Căn lề dữ liệu theo ngữ nghĩa: Căn trái cho dữ liệu chuỗi văn bản, tên ví, tên danh mục và ghi chú; căn giữa cho mã định danh, ngày tháng và trạng thái; căn phải cho số tiền và giá trị số học.
 2. Định dạng số tiền và màu sắc trực quan: Số tiền được định dạng theo mẫu phân tách hàng nghìn chuẩn Việt Nam (`#,##0 VNĐ`). Các khoản thu nhập được hiển thị với màu xanh lá cây kèm tiền tố dấu cộng, các khoản chi tiêu hiển thị với màu đỏ hoặc cam kèm tiền tố dấu trừ.
-3. Hộp thoại nhập liệu modal (`JDialog`): Mọi thao tác thêm mới hoặc sửa đổi dữ liệu đều mở cửa sổ hộp thoại có tính năng khóa màn hình cha (`setModal(true)`), giúp người dùng tập trung hoàn thành tác vụ nhập liệu trước khi quay lại màn hình chính.
+3. Bảng danh sách ví tối giản, đa dòng và tích hợp thao tác theo hàng: Bảng danh sách ví được thiết kế gồm 5 cột chuẩn (`Tên ví tài chính`, `Số dư khả dụng`, `Trạng thái`, `Ghi chú`, `Thao tác`). Cột tên ví hiển thị tên in đậm kết hợp nhãn `[Ví mặc định]` hoặc nút đặt mặc định bên dưới tên, cột ghi chú hỗ trợ hiển thị đa dòng tự động, và cột thao tác tích hợp các nút bấm hành động trực tiếp trên từng hàng (`Kiểm kê`, `Sửa`, `Lưu trữ/Kích hoạt`, `Xóa`). Ngoài ra, màn hình hỗ trợ chế độ hiển thị kép (Dual-View: Thẻ ví dạng lưới và Bảng dữ liệu) linh hoạt.
+4. Hộp thoại nhập liệu modal (`JDialog`): Mọi thao tác thêm mới hoặc sửa đổi dữ liệu đều mở cửa sổ hộp thoại có tính năng khóa màn hình cha (`setModal(true)`), giúp người dùng tập trung hoàn thành tác vụ nhập liệu trước khi quay lại màn hình chính.
 
 Mẫu giao diện bảng danh sách ví:
 
-| # | Mã ví | Tên ví | Đơn vị | Số dư khả dụng | Trạng thái |
-| :---: | :---: | :--- | :---: | ---: | :---: |
-| 1 | WAL-000001 | Tiền mặt sinh hoạt | VND | 4,500,000 VNĐ | Hoạt động |
-| 2 | WAL-000002 | Tài khoản MB Bank | VND | 28,350,000 VNĐ | Hoạt động |
-| 3 | WAL-000003 | Quỹ dự phòng sự cố | VND | 50,000,000 VNĐ | Hoạt động |
+| Tên ví tài chính | Số dư khả dụng | Trạng thái | Ghi chú | Thao tác |
+| :--- | ---: | :---: | :--- | :---: |
+| **Tài khoản MB Bank**<br/>`[Ví mặc định]` | 28,350,000 VNĐ | Hoạt động | Tài khoản thanh toán chính nhận lương hàng tháng | `[Kiểm kê]` `[Sửa]` |
+| **Tiền mặt sinh hoạt**<br/>`+ Đặt mặc định` | 4,500,000 VNĐ | Hoạt động | Tiền mặt chi tiêu ăn uống, sinh hoạt nhỏ lẻ | `[Kiểm kê]` `[Sửa]` `[Lưu trữ]` `[Xóa]` |
+| **Quỹ dự phòng sự cố**<br/>`+ Đặt mặc định` | 50,000,000 VNĐ | Hoạt động | Quỹ dự phòng rủi ro khẩn cấp | `[Kiểm kê]` `[Sửa]` `[Lưu trữ]` `[Xóa]` |
+| **Sổ tiết kiệm 6 tháng** | 100,000,000 VNĐ | Lưu trữ | Sổ gửi tiết kiệm kỳ hạn, tạm khóa phát sinh giao dịch | `[Kiểm kê]` `[Sửa]` `[Kích hoạt]` `[Xóa]` |
 
 ## 7.3 Thiết kế Biểu mẫu Nhập liệu và Bắt Sự kiện
 
