@@ -3,21 +3,16 @@ package com.pfms.presentation.common;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@DisplayName("ViewUtils Unit Tests")
+@DisplayName("Kiểm thử ViewUtils - Tiện ích định dạng tiền tệ và thời gian")
 class ViewUtilsTest {
 
     @Test
-    @DisplayName("formatCurrency formats positive and negative amounts correctly")
+    @DisplayName("formatCurrency định dạng đúng số tiền dương, âm và null")
     void testFormatCurrency() {
         assertEquals("0 VNĐ", ViewUtils.formatCurrency(null));
         assertEquals("0 VNĐ", ViewUtils.formatCurrency(BigDecimal.ZERO));
@@ -26,43 +21,17 @@ class ViewUtilsTest {
     }
 
     @Test
-    @DisplayName("formatDate formats LocalDate into dd/MM/yyyy pattern")
+    @DisplayName("formatAmount định dạng chuỗi số với dấu phẩy ngăn cách hàng nghìn")
+    void testFormatAmount() {
+        assertEquals("0", ViewUtils.formatAmount(null));
+        assertEquals("0", ViewUtils.formatAmount(BigDecimal.ZERO));
+        assertEquals("1,500,000", ViewUtils.formatAmount(new BigDecimal("1500000")));
+    }
+
+    @Test
+    @DisplayName("formatDate định dạng LocalDate thành mẫu dd/MM/yyyy")
     void testFormatDate() {
         assertEquals("", ViewUtils.formatDate(null));
         assertEquals("15/11/2026", ViewUtils.formatDate(LocalDate.of(2026, 11, 15)));
-    }
-
-    @Test
-    @DisplayName("createRenderers return proper Swing alignments")
-    void testCreateRenderers() {
-        DefaultTableCellRenderer right = ViewUtils.createRightAlignRenderer();
-        assertEquals(SwingConstants.RIGHT, right.getHorizontalAlignment());
-
-        DefaultTableCellRenderer center = ViewUtils.createCenterAlignRenderer();
-        assertEquals(SwingConstants.CENTER, center.getHorizontalAlignment());
-    }
-
-    @Test
-    @DisplayName("styleTable sets standard row height and styling")
-    void testStyleTable() {
-        JTable table = new JTable(new DefaultTableModel(2, 2));
-        ViewUtils.styleTable(table);
-        assertEquals(30, table.getRowHeight());
-        assertEquals(ViewConstants.COLOR_CARD_BG, table.getBackground());
-        assertEquals(ViewConstants.COLOR_TEXT_MAIN, table.getForeground());
-        assertEquals(ViewConstants.COLOR_BORDER, table.getGridColor());
-        assertNotNull(table.getTableHeader());
-        assertEquals(ViewConstants.COLOR_HEADER_BG, table.getTableHeader().getBackground());
-        assertEquals(ViewConstants.COLOR_PRIMARY_LIGHT, table.getTableHeader().getForeground());
-    }
-
-    @Test
-    @DisplayName("styleScrollPane applies dark card background and metallic border")
-    void testStyleScrollPane() {
-        javax.swing.JScrollPane sp = new javax.swing.JScrollPane();
-        ViewUtils.styleScrollPane(sp);
-        assertEquals(ViewConstants.COLOR_CARD_BG, sp.getViewport().getBackground());
-        assertEquals(ViewConstants.COLOR_CARD_BG, sp.getBackground());
-        assertNotNull(sp.getBorder());
     }
 }

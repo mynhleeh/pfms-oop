@@ -3,7 +3,6 @@ package com.pfms.presentation.common;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.awt.Color;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -11,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Kiểm thử ViewConstants - Hằng số giao diện người dùng")
+@DisplayName("Kiểm thử ViewConstants - Hằng số giao diện người dùng JavaFX")
 class ViewConstantsTest {
 
     @Test
@@ -24,27 +23,37 @@ class ViewConstantsTest {
     }
 
     @Test
-    @DisplayName("Các token màu Luxury Black & Gold phải khớp giá trị RGB chuẩn xác")
-    void testColorTokens() {
-        assertEquals(new Color(7, 7, 7), ViewConstants.COLOR_CONTENT_BG);
-        assertEquals(new Color(18, 18, 18), ViewConstants.COLOR_CARD_BG);
-        assertEquals(new Color(0, 0, 0), ViewConstants.COLOR_SIDEBAR_BG);
-        assertEquals(new Color(0, 0, 0), ViewConstants.COLOR_STATUS_BG);
-        assertEquals(new Color(34, 34, 34), ViewConstants.COLOR_BORDER);
-        assertEquals(new Color(212, 175, 55), ViewConstants.COLOR_PRIMARY);
-        assertEquals(new Color(229, 192, 123), ViewConstants.COLOR_PRIMARY_LIGHT);
-        assertEquals(new Color(243, 229, 171), ViewConstants.COLOR_GOLD_LIGHT);
-        assertEquals(new Color(212, 175, 55, 64), ViewConstants.COLOR_GOLD_BORDER);
-        assertEquals(new Color(113, 113, 122), ViewConstants.COLOR_TEXT_DIM);
-        assertEquals(new Color(74, 222, 128), ViewConstants.COLOR_INCOME);
-        assertEquals(new Color(251, 113, 133), ViewConstants.COLOR_EXPENSE);
-        assertEquals(new Color(250, 250, 250), ViewConstants.COLOR_TEXT_MAIN);
-        assertEquals(new Color(161, 161, 170), ViewConstants.COLOR_TEXT_MUTED);
+    @DisplayName("Các token màu HEX Luxury Black & Gold phải khớp giá trị chuẩn xác")
+    void testColorHexTokens() {
+        assertEquals("#D4AF37", ViewConstants.HEX_PRIMARY);
+        assertEquals("#E5C07B", ViewConstants.HEX_PRIMARY_LIGHT);
+        assertEquals("#070707", ViewConstants.HEX_BG_BASE);
+        assertEquals("#121212", ViewConstants.HEX_CARD_BG);
+        assertEquals("#000000", ViewConstants.HEX_SIDEBAR_BG);
+        assertEquals("#222222", ViewConstants.HEX_BORDER);
+        assertEquals("#FAFAFA", ViewConstants.HEX_TEXT_MAIN);
+        assertEquals("#A1A1AA", ViewConstants.HEX_TEXT_MUTED);
+        assertEquals("#71717A", ViewConstants.HEX_TEXT_DIM);
+        assertEquals("#4ADE80", ViewConstants.HEX_INCOME);
+        assertEquals("#FB7185", ViewConstants.HEX_EXPENSE);
+    }
+
+    @Test
+    @DisplayName("Kích thước tiêu chuẩn của cửa sổ ứng dụng")
+    void testDimensions() {
+        assertEquals(1560, ViewConstants.APP_WIDTH);
+        assertEquals(820, ViewConstants.APP_HEIGHT);
+        assertEquals(1024, ViewConstants.MIN_WIDTH);
+        assertEquals(680, ViewConstants.MIN_HEIGHT);
+        assertEquals(220, ViewConstants.SIDEBAR_WIDTH);
+        assertEquals(32, ViewConstants.STATUS_BAR_HEIGHT);
     }
 
     @Test
     @DisplayName("Tiêu đề ứng dụng phải là Personal Finance Management System")
     void testAppTitle() {
         assertEquals("Personal Finance Management System", ViewConstants.APP_TITLE);
+        assertEquals("PFMS", ViewConstants.APP_BRAND);
+        assertEquals("VNĐ", ViewConstants.CURRENCY_DEFAULT);
     }
 }

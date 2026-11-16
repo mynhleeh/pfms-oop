@@ -1,44 +1,25 @@
 package com.pfms;
 
 import com.pfms.presentation.common.MainController;
-import com.pfms.presentation.common.MainFrame;
+import com.pfms.presentation.common.MainStage;
+import com.pfms.testutil.JavaFxTestHelper;
+import javafx.stage.Stage;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("Kiểm thử App - Điểm khởi chạy và nạp chuỗi phụ thuộc ứng dụng")
+@DisplayName("Kiểm thử App - Điểm khởi chạy và nạp chuỗi phụ thuộc ứng dụng JavaFX")
 class AppTest {
 
-    @Test
-    @DisplayName("Khởi tạo ứng dụng thành công với đường dẫn tệp lưu trữ tạm")
-    void testCreateApplicationWithCustomPath(@TempDir Path tempDir) {
-        Path storageFile = tempDir.resolve("test_pfms_data.json");
-        MainFrame frame = App.createApplication(storageFile);
-
-        assertNotNull(frame);
-        assertNotNull(frame.getMainController());
-        assertNotNull(frame.getSidebarPanel());
-        assertNotNull(frame.getStatusBarPanel());
-
-        frame.dispose();
-    }
-
-    @Test
-    @DisplayName("Ném NullPointerException khi đường dẫn tệp bị null")
-    void testCreateApplicationNullPath() {
-        assertThrows(NullPointerException.class, () -> App.createApplication(null));
-    }
-
-    @Test
-    @DisplayName("Khởi tạo FlatLaf Look and Feel không ném ngoại lệ")
-    void testSetupLookAndFeel() {
-        assertDoesNotThrow(App::setupLookAndFeel);
+    @BeforeAll
+    static void initFx() {
+        JavaFxTestHelper.initPlatform();
     }
 
     @Test
@@ -54,6 +35,20 @@ class AppTest {
         assertNotNull(controller.getCategoryController());
         assertNotNull(controller.getReportController());
         assertNotNull(controller.getDataManagementController());
+    }
+
+    @Test
+    @DisplayName("createFxApplication khởi tạo ứng dụng JavaFX thành công với đường dẫn tệp")
+    void testCreateFxApplicationSuccess(@TempDir Path tempDir) {
+        Path storageFile = tempDir.resolve("test_fx_app.json");
+        JavaFxTestHelper.runOnFxThread(() -> {
+            Stage stage = new Stage();
+            MainStage mainStage = App.createFxApplication(storageFile, stage);
+            assertNotNull(mainStage);
+            assertNotNull(mainStage.getMainController());
+            assertNotNull(mainStage.getSidebarNav());
+            assertNotNull(mainStage.getStatusBar());
+        });
     }
 
     @Test

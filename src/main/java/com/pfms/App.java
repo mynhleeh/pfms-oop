@@ -14,7 +14,6 @@ import com.pfms.infrastructure.file.JsonTransactionRepository;
 import com.pfms.infrastructure.file.JsonWalletRepository;
 import com.pfms.infrastructure.file.support.JsonDataStore;
 import com.pfms.presentation.common.MainController;
-import com.pfms.presentation.common.MainFrame;
 import com.pfms.presentation.common.MainStage;
 import com.pfms.service.CategoryService;
 import com.pfms.service.DataManagementService;
@@ -94,33 +93,6 @@ public class App extends Application {
         mainStage.registerView(MainController.CARD_DATA_MANAGEMENT, dataPane);
 
         return mainStage;
-    }
-    // endregion
-
-    // region Swing Backward-Compatibility
-    public static MainFrame createApplication(Path storagePath) {
-        Objects.requireNonNull(storagePath, "Đường dẫn tệp lưu trữ không được để null");
-        MainController mainController = buildMainController(storagePath);
-        setupLookAndFeel();
-        return new MainFrame(mainController, storagePath.toString());
-    }
-
-    public static void setupLookAndFeel() {
-        try {
-            com.formdev.flatlaf.FlatDarkLaf.setup();
-            javax.swing.UIManager.put("Component.arc", 8);
-            javax.swing.UIManager.put("Button.arc", 8);
-            javax.swing.UIManager.put("TextComponent.arc", 8);
-            javax.swing.UIManager.put("ScrollBar.thumbArc", 6);
-            javax.swing.UIManager.put("ScrollBar.width", 10);
-            javax.swing.UIManager.put("Table.rowHeight", 30);
-            javax.swing.UIManager.put("Table.showHorizontalLines", true);
-            javax.swing.UIManager.put("Table.showVerticalLines", false);
-            javax.swing.UIManager.put("Table.intercellSpacing", new java.awt.Dimension(0, 1));
-            javax.swing.UIManager.put("TitlePane.useWindowDecorations", true);
-        } catch (Exception ignored) {
-            // An toàn trong môi trường test/headless
-        }
     }
     // endregion
 
