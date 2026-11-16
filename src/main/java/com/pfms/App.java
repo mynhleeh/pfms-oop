@@ -15,6 +15,7 @@ import com.pfms.infrastructure.file.JsonWalletRepository;
 import com.pfms.infrastructure.file.support.JsonDataStore;
 import com.pfms.presentation.common.MainController;
 import com.pfms.presentation.common.MainFrame;
+import com.pfms.presentation.common.MainStage;
 import com.pfms.service.CategoryService;
 import com.pfms.service.DataManagementService;
 import com.pfms.service.ReportService;
@@ -27,34 +28,69 @@ import com.pfms.service.impl.report.ReportServiceImpl;
 import com.pfms.service.impl.transaction.TransactionServiceImpl;
 import com.pfms.service.impl.transfer.TransferServiceImpl;
 import com.pfms.service.impl.wallet.WalletServiceImpl;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
-import javax.swing.SwingUtilities;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
 /**
- * Điểm khởi chạy ứng dụng máy tính để bàn PFMS (Personal Finance Management
- * System).
- * Thiết lập chuỗi tiêm phụ thuộc toàn hệ thống và hiển thị cửa sổ chính trên
- * luồng Swing EDT.
+ * Điểm khởi chạy ứng dụng máy tính để bàn PFMS (Personal Finance Management System).
+ * Hỗ trợ khởi chạy trên nền tảng JavaFX 17 (OpenJFX).
  */
-public final class App {
+public class App extends Application {
 
     // region Fields
-
     public static final String DEFAULT_DATA_PATH = "data/pfms_data.json";
     // endregion
 
-    // region Constructors
-    private App() {
-        // Chặn khởi tạo trực tiếp lớp tiện ích
+    // region JavaFX Application Bootstrap
+    @Override
+    public void start(Stage primaryStage) {
+        Path storagePath = Paths.get(DEFAULT_DATA_PATH);
+        MainStage stage = createFxApplication(storagePath, primaryStage);
+        stage.show();
+    }
+
+    public static MainStage createFxApplication(Path storagePath, Stage primaryStage) {
+        Objects.requireNonNull(storagePath, "Đường dẫn tệp lưu trữ không được để null");
+        Objects.requireNonNull(primaryStage, "Stage không được để null");
+
+        MainController mainController = buildMainController(storagePath);
+        return new MainStage(primaryStage, mainController);
     }
     // endregion
 
-    // region Actions
-
+    // region Swing Backward-Compatibility
     public static MainFrame createApplication(Path storagePath) {
+        Objects.requireNonNull(storagePath, "Đường dẫn tệp lưu trữ không được để null");
+        MainController mainController = buildMainController(storagePath);
+        setupLookAndFeel();
+        return new MainFrame(mainController, storagePath.toString());
+    }
+
+    public static void setupLookAndFeel() {
+        try {
+            com.formdev.flatlaf.FlatDarkLaf.setup();
+            javax.swing.UIManager.put("Component.arc", 8);
+            javax.swing.UIManager.put("Button.arc", 8);
+            javax.swing.UIManager.put("TextComponent.arc", 8);
+            javax.swing.UIManager.put("ScrollBar.thumbArc", 6);
+            javax.swing.UIManager.put("ScrollBar.width", 10);
+            javax.swing.UIManager.put("Table.rowHeight", 30);
+            javax.swing.UIManager.put("Table.showHorizontalLines", true);
+            javax.swing.UIManager.put("Table.showVerticalLines", false);
+            javax.swing.UIManager.put("Table.intercellSpacing", new java.awt.Dimension(0, 1));
+            javax.swing.UIManager.put("TitlePane.useWindowDecorations", true);
+        } catch (Exception ignored) {
+            // An toàn trong môi trường test/headless
+        }
+    }
+    // endregion
+
+    // region Shared Controller Builder
+    public static MainController buildMainController(Path storagePath) {
         Objects.requireNonNull(storagePath, "Đường dẫn tệp lưu trữ không được để null");
 
         JsonDataStore dataStore = new JsonDataStore(storagePath);
@@ -79,39 +115,11 @@ public final class App {
                 categoryService, reportService, dataManagementService);
 
         mainController.initializeSystem();
-
-        setupLookAndFeel();
-        return new MainFrame(mainController, storagePath.toString());
+        return mainController;
     }
+    // endregion
 
     public static void main(String[] args) {
-        setupLookAndFeel();
-        Path storagePath = Paths.get(DEFAULT_DATA_PATH);
-        SwingUtilities.invokeLater(() -> {
-            MainFrame frame = createApplication(storagePath);
-            frame.setVisible(true);
-        });
+        launch(args);
     }
-    // endregion
-
-    // region UI
-
-    public static void setupLookAndFeel() {
-        try {
-            com.formdev.flatlaf.FlatDarkLaf.setup();
-            javax.swing.UIManager.put("Component.arc", 8);
-            javax.swing.UIManager.put("Button.arc", 8);
-            javax.swing.UIManager.put("TextComponent.arc", 8);
-            javax.swing.UIManager.put("ScrollBar.thumbArc", 6);
-            javax.swing.UIManager.put("ScrollBar.width", 10);
-            javax.swing.UIManager.put("Table.rowHeight", 30);
-            javax.swing.UIManager.put("Table.showHorizontalLines", true);
-            javax.swing.UIManager.put("Table.showVerticalLines", false);
-            javax.swing.UIManager.put("Table.intercellSpacing", new java.awt.Dimension(0, 1));
-            javax.swing.UIManager.put("TitlePane.useWindowDecorations", true);
-        } catch (Exception ignored) {
-            // An toàn trong môi trường test/headless
-        }
-    }
-    // endregion
 }
