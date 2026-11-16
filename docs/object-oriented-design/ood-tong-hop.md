@@ -5,6 +5,8 @@ geometry:
   - bottom=20mm
   - left=20mm
   - right=20mm
+mainfont: "Times New Roman"
+monofont: "Courier New"
 header-includes: |
   \usepackage{longtable}
   \usepackage{tikz}
@@ -258,7 +260,7 @@ Hệ thống gồm 4 tầng chức năng độc lập (hướng tâm, đóng kí
 
 Sơ đồ khối cấu trúc phân tầng và luồng thực thi:
 
-![Sơ đồ Kiến trúc Phân tầng Hệ thống](docs/object-oriented-design/images/so-do-1.png){width=80%}
+![Sơ đồ Kiến trúc Phân tầng Hệ thống](docs/object-oriented-design/images/so-do-1.png){width=100%}
 
 
 Nguyên tắc phụ thuộc và luồng thực thi:
@@ -322,7 +324,7 @@ Hệ thống chuyển đổi dữ liệu qua từng tầng theo quy trình khép
 
 **Sơ đồ luồng dữ liệu hai chiều:**
 
-![Luồng xử lý và biến đổi dữ liệu - PFMS](docs/object-oriented-design/images/so-do-luong-xu-ly-du-lieu.png){width=80%}
+![Luồng xử lý và biến đổi dữ liệu - PFMS](docs/object-oriented-design/images/so-do-luong-xu-ly-du-lieu.png){width=100%}
 
 **Bảng đặc tả xử lý tại các ranh giới:**
 
@@ -349,7 +351,7 @@ Mục này trực quan hóa cấu trúc tĩnh của tầng nghiệp vụ, thể 
 
 Sơ đồ dưới đây mô hình hóa cấu trúc tĩnh của 8 lớp thực thể cốt lõi thuộc tầng nghiệp vụ. Sơ đồ tập trung thể hiện bốn loại quan hệ cấu trúc hướng đối tượng then chốt gồm kế thừa, hợp thành, kết tập và liên kết, định hình xương sống dòng tiền và phân cấp danh mục của toàn bộ hệ thống:
 
-![Sơ đồ lớp miền nghiệp vụ PFMS](docs/object-oriented-design/images/so-do-lop-mien-nghiep-vu.png){width=80%}
+![Sơ đồ lớp miền nghiệp vụ PFMS](docs/object-oriented-design/images/so-do-lop-mien-nghiep-vu.png){width=100%}
 
 Bản vẽ thiết lập bốn loại quan hệ cấu trúc hướng đối tượng cốt lõi trong mô hình miền:
 
@@ -1730,7 +1732,7 @@ Các cột đối tượng tham gia tương tác trên sơ đồ được sắp 
 
 Sơ đồ dưới đây minh họa luồng tương tác tổng quát qua bốn tầng kiến trúc:
 
-![Sơ đồ tuần tự luồng xử lý qua bốn tầng](docs/object-oriented-design/images/so-do-tuan-tu-bon-tang.png){width=80%}
+![Sơ đồ tuần tự luồng xử lý qua bốn tầng](docs/object-oriented-design/images/so-do-tuan-tu-bon-tang.png){width=100%}
 
 Mọi thông điệp trao đổi trên sơ đồ tuần tự bắt buộc phải khớp chính xác với chữ ký phương thức đã công bố trong các giao diện dịch vụ, thực thể miền và kho lưu trữ dữ liệu.
 
@@ -1752,7 +1754,8 @@ Luồng điều phối khởi tạo ví mới tiếp nhận yêu cầu từ giao
 - Mã lỗi xử lý: `ERR-NAM-001`, `ERR-NAM-002`
 
 **Sơ đồ tuần tự tương tác:**
-![Sơ đồ tuần tự thiết kế tạo ví](docs/object-oriented-design/images/so-do-tuan-tu-thiet-ke-tao-vi.png){width=80%}
+
+![Sơ đồ tuần tự thiết kế tạo ví](docs/object-oriented-design/images/so-do-tuan-tu-thiet-ke-tao-vi.png){width=100%}
 
 Toàn vẹn tài chính được bảo đảm tuyệt đối khi thực thể ví mới luôn được khởi tạo với số dư ban đầu bằng không thông qua đối tượng giá trị bất biến `Money.ZERO`, loại trừ hoàn toàn rủi ro gán số dư tùy tiện khi chưa qua thủ tục kiểm kê thực tế.
 
@@ -1769,7 +1772,7 @@ Luồng truy vấn danh sách ví trích xuất toàn bộ nguồn tiền khả 
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế xem tổng quan ví](docs/object-oriented-design/images/so-do-tuan-tu-thiet-ke-tong-quan-vi.png){width=80%}
+![Sơ đồ tuần tự thiết kế xem tổng quan ví](docs/object-oriented-design/images/so-do-tuan-tu-thiet-ke-tong-quan-vi.png){width=100%}
 
 Thao tác vận hành hoàn toàn ở chế độ chỉ đọc, truy xuất thông tin qua các phương thức đọc bất biến và không làm thay đổi trạng thái nội tại của bất kỳ thực thể ví nào trong hệ thống.
 
@@ -1786,7 +1789,7 @@ Luồng cập nhật thông tin ví tiếp nhận tên gọi và ghi chú mới 
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế cập nhật ví](docs/object-oriented-design/images/so-do-tuan-tu-thiet-ke-cap-nhat-vi.png){width=80%}
+![Sơ đồ tuần tự thiết kế cập nhật ví](docs/object-oriented-design/images/so-do-tuan-tu-thiet-ke-cap-nhat-vi.png){width=100%}
 
 Việc cập nhật thông tin định danh giữ nguyên mã định danh `walletId` và số dư khả dụng `currentBalance`, bảo đảm không làm đứt gãy tính toàn vẹn tham chiếu của các giao dịch lịch sử gắn liền với ví.
 
@@ -1803,7 +1806,7 @@ Luồng điều chỉnh số dư ví đồng bộ số dư trên hệ thống kh
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế điều chỉnh số dư ví](docs/object-oriented-design/images/so-do-tuan-tu-thiet-ke-dieu-chinh-so-du.png){width=80%}
+![Sơ đồ tuần tự thiết kế điều chỉnh số dư ví](docs/object-oriented-design/images/so-do-tuan-tu-thiet-ke-dieu-chinh-so-du.png){width=100%}
 
 Mọi chênh lệch kiểm kê bắt buộc khởi tạo bản ghi kiểm kê bất biến `BalanceAdjustmentRecord` để lưu giữ vết kiểm toán độc lập, bảo đảm số dư khả dụng mới luôn duy trì giá trị không âm và không làm xáo trộn các số liệu thu chi nguyên thủy.
 
@@ -1824,7 +1827,7 @@ Luồng điều phối ghi nhận giao dịch thu chi tiếp nhận thông tin t
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế ghi nhận giao dịch thu chi](docs/object-oriented-design/images/so-do-tuan-tu-ghi-nhan-giao-dich-thu-chi.png){width=80%}
+![Sơ đồ tuần tự thiết kế ghi nhận giao dịch thu chi](docs/object-oriented-design/images/so-do-tuan-tu-ghi-nhan-giao-dich-thu-chi.png){width=100%}
 
 Mọi giao dịch chi tiêu và chi phí liên kết bắt buộc kiểm soát số dư khả dụng không âm trước khi ghi nhận, bảo đảm dữ liệu luôn nhất quán giữa sổ giao dịch và số dư ví.
 
@@ -1840,7 +1843,8 @@ Luồng tra cứu và trích xuất lịch sử giao dịch vận hành hoàn to
 - Mã lỗi xử lý: `ERR-FIN-001`
 
 **Sơ đồ tuần tự tương tác:**
-![Sơ đồ tuần tự thiết kế lọc giao dịch](docs/object-oriented-design/images/so-do-tuan-tu-loc-giao-dich.png){width=80%}
+
+![Sơ đồ tuần tự thiết kế lọc giao dịch](docs/object-oriented-design/images/so-do-tuan-tu-loc-giao-dich.png){width=100%}
 
 Thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi dữ liệu hay trạng thái của các thực thể giao dịch và số dư nguồn tiền trong hệ thống.
 
@@ -1857,7 +1861,7 @@ Luồng chỉnh sửa giao dịch điều phối việc cập nhật thông tin 
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế chỉnh sửa giao dịch](docs/object-oriented-design/images/so-do-tuan-tu-chinh-sua-giao-dich.png){width=80%}
+![Sơ đồ tuần tự thiết kế chỉnh sửa giao dịch](docs/object-oriented-design/images/so-do-tuan-tu-chinh-sua-giao-dich.png){width=100%}
 
 Quy trình kiểm soát hai pha bảo đảm giao dịch chỉ được chấp nhận cập nhật khi trạng thái số dư ví sau điều chỉnh duy trì không âm, loại trừ nguy cơ xuất quỹ vượt quá khả năng tài chính.
 
@@ -1874,7 +1878,7 @@ Luồng xóa giao dịch loại bỏ bản ghi thu chi khỏi hệ thống, thu 
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế xóa giao dịch](docs/object-oriented-design/images/so-do-tuan-tu-xoa-giao-dich.png){width=80%}
+![Sơ đồ tuần tự thiết kế xóa giao dịch](docs/object-oriented-design/images/so-do-tuan-tu-xoa-giao-dich.png){width=100%}
 
 Việc xóa giao dịch đồng thời thu hồi hoặc hoàn trả số dư ví và loại bỏ hoàn toàn các bản ghi chi phí phụ thuộc liên kết, triệt tiêu nguy cơ phát sinh dữ liệu chi phí mồ côi và bảo đảm số dư không âm.
 
@@ -1896,6 +1900,8 @@ Luồng điều phối chuyển tiền từ ví nguồn sang ví đích kiểm t
 - Mã lỗi xử lý: `ERR-TRF-001`, `ERR-TRF-002`, `ERR-WAL-001`, `ERR-FIN-001`, `ERR-FEE-001`, `ERR-FEE-002`, `ERR-FEE-003`
 
 **Sơ đồ tuần tự tương tác:**
+
+
 ![Sơ đồ tuần tự thiết kế chuyển tiền giữa hai ví](docs/object-oriented-design/images/so-do-tuan-tu-chuyen-tien.png){width=80%}
 
 Giao dịch chuyển tiền được thực hiện theo cơ chế nguyên tử bảo đảm tổng tài sản toàn hệ thống được bảo toàn (trừ phần chi phí phát sinh thực tế), đồng thời số dư ví nguồn luôn duy trì không âm.
@@ -1913,7 +1919,7 @@ Luồng truy vấn và trích xuất lịch sử chuyển tiền vận hành ho�
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế lọc giao dịch chuyển tiền](docs/object-oriented-design/images/so-do-tuan-tu-loc-chuyen-tien.png){width=80%}
+![Sơ đồ tuần tự thiết kế lọc giao dịch chuyển tiền](docs/object-oriented-design/images/so-do-tuan-tu-loc-chuyen-tien.png){width=100%}
 
 Thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm thay đổi trạng thái của các thực thể giao dịch hay số dư của bất kỳ ví nào trong hệ thống.
 
@@ -1930,7 +1936,7 @@ Luồng hủy giao dịch chuyển tiền thực hiện thu hồi tiền chuyể
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế xóa giao dịch chuyển tiền](docs/object-oriented-design/images/so-do-tuan-tu-xoa-chuyen-tien.png){width=80%}
+![Sơ đồ tuần tự thiết kế xóa giao dịch chuyển tiền](docs/object-oriented-design/images/so-do-tuan-tu-xoa-chuyen-tien.png){width=100%}
 
 Cơ chế hoàn nguyên hai pha bảo đảm thu hồi đồng thời số dư cả hai ví và xóa sạch các bản ghi chi phí phụ thuộc, ngăn chặn tuyệt đối tình trạng âm số dư ví nhận.
 
@@ -1953,7 +1959,7 @@ Luồng tương tác mô tả quá trình tiếp nhận yêu cầu bổ sung dan
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế tạo danh mục mới](docs/object-oriented-design/images/so-do-tuan-tu-tao-danh-muc.png){width=80%}
+![Sơ đồ tuần tự thiết kế tạo danh mục mới](docs/object-oriented-design/images/so-do-tuan-tu-tao-danh-muc.png){width=100%}
 
 Danh mục mới luôn được gắn kết vào một nhóm cha hợp lệ đang hoạt động và kế thừa loại giao dịch cố định, bảo đảm tính toàn vẹn của cấu trúc phân cấp ba tầng.
 
@@ -1970,7 +1976,7 @@ Luồng tương tác mô tả quy trình tiếp nhận yêu cầu cập nhật t
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế đổi tên danh mục](docs/object-oriented-design/images/so-do-tuan-tu-doi-ten-danh-muc.png){width=80%}
+![Sơ đồ tuần tự thiết kế đổi tên danh mục](docs/object-oriented-design/images/so-do-tuan-tu-doi-ten-danh-muc.png){width=100%}
 
 Việc đổi tên bảo toàn tuyệt đối mã định danh và loại thu chi của danh mục, không làm đứt gãy hoặc sai lệch dữ liệu lịch sử của các giao dịch đã ghi nhận trong quá khứ theo quy tắc đặt tên bất biến của định danh.
 
@@ -1987,7 +1993,7 @@ Luồng tương tác mô tả quy trình phục hồi danh mục đã xóa mềm
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế khôi phục danh mục](docs/object-oriented-design/images/so-do-tuan-tu-khoi-phuc-danh-muc.png){width=80%}
+![Sơ đồ tuần tự thiết kế khôi phục danh mục](docs/object-oriented-design/images/so-do-tuan-tu-khoi-phuc-danh-muc.png){width=100%}
 
 Thao tác khôi phục chỉ được phép khi nhóm cha đang hoạt động và không xảy ra xung đột định danh, đưa danh mục trở lại danh sách lựa chọn mà không làm xáo trộn số liệu báo cáo lịch sử.
 
@@ -2004,7 +2010,7 @@ Luồng tương tác mô tả quy trình tiếp nhận yêu cầu loại bỏ da
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế xóa danh mục](docs/object-oriented-design/images/so-do-tuan-tu-xoa-danh-muc.png){width=80%}
+![Sơ đồ tuần tự thiết kế xóa danh mục](docs/object-oriented-design/images/so-do-tuan-tu-xoa-danh-muc.png){width=100%}
 
 Cơ chế xóa mềm bảo toàn tuyệt đối tính toàn vẹn tham chiếu lịch sử của mọi giao dịch liên kết và duy trì tối thiểu một nhóm nhu cầu hoạt động cho mỗi loại thu chi theo quy định tài chính.
 
@@ -2027,7 +2033,7 @@ Luồng tương tác mô tả quy trình truy vấn và tổng hợp dòng tiề
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế lập báo cáo dòng tiền](docs/object-oriented-design/images/so-do-tuan-tu-bao-cao-dong-tien.png){width=80%}
+![Sơ đồ tuần tự thiết kế lập báo cáo dòng tiền](docs/object-oriented-design/images/so-do-tuan-tu-bao-cao-dong-tien.png){width=100%}
 
 Thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể hay số dư tài chính nào trong hệ thống.
 
@@ -2044,7 +2050,7 @@ Luồng tương tác mô tả quy trình trích xuất và phân tích cơ cấu
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế lập báo cáo cơ cấu thu chi](docs/object-oriented-design/images/so-do-tuan-tu-bao-cao-co-cau-thu-chi.png){width=80%}
+![Sơ đồ tuần tự thiết kế lập báo cáo cơ cấu thu chi](docs/object-oriented-design/images/so-do-tuan-tu-bao-cao-co-cau-thu-chi.png){width=100%}
 
 Thao tác trích xuất và tính toán tỷ trọng phân bổ thu chi ở chế độ chỉ đọc, bảo toàn tính toàn vẹn của dữ liệu danh mục và số liệu lịch sử.
 
@@ -2061,7 +2067,7 @@ Luồng tương tác mô tả quy trình trích xuất dữ liệu tài chính t
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế xuất dữ liệu sao lưu](docs/object-oriented-design/images/so-do-tuan-tu-xuat-sao-luu.png){width=80%}
+![Sơ đồ tuần tự thiết kế xuất dữ liệu sao lưu](docs/object-oriented-design/images/so-do-tuan-tu-xuat-sao-luu.png){width=100%}
 
 Việc xuất dữ liệu sao lưu là thao tác chỉ đọc dữ liệu nghiệp vụ, tạo bản chụp trạng thái nhất quán và giữ nguyên độ chính xác số học của mọi giá trị tiền tệ.
 
@@ -2078,7 +2084,7 @@ Luồng tương tác mô tả quy trình nạp dữ liệu từ tệp sao lưu J
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế phục hồi dữ liệu từ tệp sao lưu](docs/object-oriented-design/images/so-do-tuan-tu-phuc-hoi-sao-luu.png){width=80%}
+![Sơ đồ tuần tự thiết kế phục hồi dữ liệu từ tệp sao lưu](docs/object-oriented-design/images/so-do-tuan-tu-phuc-hoi-sao-luu.png){width=100%}
 
 Hệ thống bảo lưu nguyên vẹn dữ liệu hiện tại nếu phát hiện bất kỳ sai phạm nào trong quá trình kiểm định và chỉ ghi đè khi toàn bộ tệp sao lưu hợp lệ.
 
@@ -2095,7 +2101,7 @@ Luồng tương tác mô tả quy trình quét kiểm tra độc lập bốn đi
 
 **Sơ đồ tuần tự tương tác:**
 
-![Sơ đồ tuần tự thiết kế đối soát toàn vẹn dữ liệu hệ thống](docs/object-oriented-design/images/so-do-tuan-tu-doi-soat-du-lieu.png){width=80%}
+![Sơ đồ tuần tự thiết kế đối soát toàn vẹn dữ liệu hệ thống](docs/object-oriented-design/images/so-do-tuan-tu-doi-soat-du-lieu.png){width=100%}
 
 Thao tác đối soát vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi bất kỳ bản ghi tài chính nào và cung cấp báo cáo minh bạch về mức độ nhất quán của sổ cái.
 
@@ -2159,7 +2165,7 @@ Lớp `TransactionFactory` được định vị tại tầng nghiệp vụ (`co
 
 Sơ đồ lớp dưới đây mô tả cấu trúc lớp `TransactionFactory` cùng mối quan hệ giữa tầng dịch vụ và các lớp thực thể giao dịch:
 
-![Sơ đồ lớp thiết kế TransactionFactory và các loại giao dịch](docs/object-oriented-design/images/so-do-lop-transaction-factory.png){width=80%}
+![Sơ đồ lớp thiết kế TransactionFactory và các loại giao dịch](docs/object-oriented-design/images/so-do-lop-transaction-factory.png){width=100%}
 
 **Cơ chế khởi tạo và giá trị kỹ thuật:**
 
@@ -2188,7 +2194,7 @@ Giải pháp là tách hẳn trách nhiệm định dạng ra khỏi `ReportServ
 
 Sơ đồ lớp dưới đây mô tả cấu trúc tách biệt giữa `ReportServiceImpl` (tổng hợp số liệu thuần) và mẫu Strategy tại `ReportExporter` (kết xuất định dạng):
 
-![Sơ đồ lớp thiết kế báo cáo và chiến lược xuất báo cáo](docs/object-oriented-design/images/so-do-lop-report-export-strategy.png){width=80%}
+![Sơ đồ lớp thiết kế báo cáo và chiến lược xuất báo cáo](docs/object-oriented-design/images/so-do-lop-report-export-strategy.png){width=100%}
 
 **Cơ chế chuyển đổi và giá trị kỹ thuật:**
 
@@ -2218,7 +2224,7 @@ Giải pháp là áp dụng mẫu State: đóng gói các quy tắc hành vi c�
 
 Sơ đồ lớp dưới đây mô tả cấu trúc mẫu State áp dụng cho thực thể Ví tiền:
 
-![Sơ đồ lớp thiết kế trạng thái ví (State Pattern)](docs/object-oriented-design/images/so-do-lop-wallet-state.png){width=80%}
+![Sơ đồ lớp thiết kế trạng thái ví (State Pattern)](docs/object-oriented-design/images/so-do-lop-wallet-state.png){width=100%}
 
 **Cơ chế chuyển đổi và giá trị kỹ thuật:**
 
@@ -2246,7 +2252,7 @@ Giải pháp là áp dụng mẫu Observer theo cơ chế hướng sự kiện n
 
 Sơ đồ lớp dưới đây mô tả cấu trúc mẫu Observer trong luồng xử lý sự kiện giao dịch:
 
-![Sơ đồ lớp thiết kế phát và lắng nghe sự kiện giao dịch (Observer Pattern)](docs/object-oriented-design/images/so-do-lop-transaction-event-observer.png){width=80%}
+![Sơ đồ lớp thiết kế phát và lắng nghe sự kiện giao dịch (Observer Pattern)](docs/object-oriented-design/images/so-do-lop-transaction-event-observer.png){width=100%}
 
 **Cơ chế phát sự kiện và giá trị kỹ thuật:**
 
@@ -2277,7 +2283,7 @@ Mã nguồn tầng trình diễn nằm trong không gian tên `com.pfms.presenta
 - Gói Điều phối (`com.pfms.presentation.controller`): Chứa các bộ điều khiển giao diện (`MainController`, `WalletGUIController`, `TransactionGUIController`, `TransferGUIController`, `CategoryGUIController`, `ReportGUIController`, `DataManagementGUIController`). Các lớp này đăng ký lắng nghe sự kiện (`ActionListener`, `DocumentListener`), thực hiện kiểm tra sơ bộ dữ liệu biểu mẫu qua lớp tiện ích, đóng gói dữ liệu vào DTO yêu cầu và gọi phương thức tương ứng trên tầng dịch vụ qua giao diện trừu tượng.
 - Gói Truyền Dữ liệu (`com.pfms.presentation.dto`): Chứa các đối tượng dữ liệu thô bất biến (`RequestDTO` và `ResponseDTO`) dùng để trao đổi dữ liệu hai chiều giữa tầng trình diễn và tầng dịch vụ.
 
-![Sơ đồ Kiến trúc Tầng trình diễn](docs/object-oriented-design/images/so-do-7.png){width=80%}
+![Sơ đồ Kiến trúc Tầng trình diễn](docs/object-oriented-design/images/so-do-7.png){width=100%}
 
 Bảng phân định trách nhiệm nội bộ tầng trình diễn:
 
@@ -2301,7 +2307,7 @@ Lợi ích kỹ thuật của kiến trúc phân tách:
 
 Sơ đồ tuần tự xử lý sự kiện giao diện:
 
-![Luồng xử lý sự kiện giao diện đồ họa khi tạo ví mới](docs/object-oriented-design/images/so-do-tuan-tu-su-kien-gui-tao-vi.png){width=80%}
+![Luồng xử lý sự kiện giao diện đồ họa khi tạo ví mới](docs/object-oriented-design/images/so-do-tuan-tu-su-kien-gui-tao-vi.png){width=100%}
 
 ## 7.2 Bố cục cửa sổ chính và màn hình phân hệ
 
@@ -2317,7 +2323,7 @@ Cửa sổ chính `MainFrame` áp dụng bố cục vùng `BorderLayout` chia th
 
 Sơ đồ phân vùng không gian cửa sổ chính:
 
-![Sơ đồ phân vùng không gian cửa sổ chính](docs/object-oriented-design/images/so-do-7.png){width=80%}
+![Sơ đồ phân vùng không gian cửa sổ chính](docs/object-oriented-design/images/so-do-7.png){width=100%}
 
 ### 7.2.2 Ánh xạ màn hình chức năng và ca sử dụng
 
@@ -2518,7 +2524,7 @@ Mục này thiết lập cấu trúc phân cấp các lớp ngoại lệ theo ng
 
 Cây phân cấp ngoại lệ của hệ thống bắt đầu từ lớp trừu tượng gốc `PfmsException`, kế thừa trực tiếp từ `java.lang.RuntimeException`. Cấu trúc được phân nhánh thành hai họ ngoại lệ độc lập gồm ngoại lệ nghiệp vụ và ngoại lệ kỹ thuật:
 
-![Sơ đồ phân cấp lớp ngoại lệ](docs/object-oriented-design/images/so-do-phan-cap-lop-ngoai-le.png){width=80%}
+![Sơ đồ phân cấp lớp ngoại lệ](docs/object-oriented-design/images/so-do-phan-cap-lop-ngoai-le.png){width=100%}
 
 Đặc điểm kiến trúc của cây phân cấp:
 - Lớp cơ sở `PfmsException` đóng gói thuộc tính `errorCode` (mã định danh nghiệp vụ) và `timestamp` (thời điểm phát sinh lỗi UTC), bảo đảm mọi ngoại lệ khi được ném ra đều mang đầy đủ ngữ cảnh phục vụ việc hiển thị và kiểm toán.
