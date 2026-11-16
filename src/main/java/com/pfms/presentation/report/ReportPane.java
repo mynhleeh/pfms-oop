@@ -45,7 +45,6 @@ import java.util.Objects;
 public class ReportPane extends AbstractBasePane implements ReportView {
 
     private final ReportPresenter presenter;
-    private final ReportGUIController controller;
 
     private final TabPane tabPane = new TabPane();
 
@@ -96,7 +95,7 @@ public class ReportPane extends AbstractBasePane implements ReportView {
     public ReportPane(ReportGUIController reportController) {
         super(false);
         setPadding(Insets.EMPTY);
-        this.controller = Objects.requireNonNull(reportController, "ReportGUIController không được để null");
+        Objects.requireNonNull(reportController, "ReportGUIController không được để null");
         this.presenter = new ReportPresenter(this, reportController);
 
         setStyle("-fx-background-color: -color-bg-base;");
@@ -724,9 +723,8 @@ public class ReportPane extends AbstractBasePane implements ReportView {
             if (report != null && report.getGroups() != null && !report.getGroups().isEmpty()) {
                 structureTableData.addAll(report.getGroups());
 
-                String currentType = report.getTransactionType() != null ? report.getTransactionType() : "EXPENSE";
                 for (NeedGroupShareResponseDTO item : report.getGroups()) {
-                    structureStreamBox.getChildren().add(new SpendingStructureRowNode(item, currentType));
+                    structureStreamBox.getChildren().add(new SpendingStructureRowNode(item));
                 }
             } else {
                 Label emptyLabel = new Label("Chưa có dữ liệu cơ cấu chi tiêu trong khoảng thời gian đã chọn");

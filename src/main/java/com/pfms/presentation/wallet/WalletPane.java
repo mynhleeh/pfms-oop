@@ -28,6 +28,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
@@ -136,12 +137,12 @@ public class WalletPane extends AbstractBasePane implements WalletView {
         btnRefresh.getStyleClass().add("btn-secondary");
         btnRefresh.setOnAction(e -> this.presenter.loadData());
 
-        toolbar.getChildren().addAll(btnAdd, statusLabel, statusFilterBox, searchField, spacer, btnReset, btnRefresh);
+        toolbar.getChildren().addAll(btnAdd, statusLabel, statusFilterBox, searchField, spacer, viewModeSwitcher, btnReset, btnRefresh);
         return toolbar;
     }
 
     private Node createCenterSection() {
-        // Setup Card Grid ScrollPane (Chế độ xem thẻ ví dạng lưới duy nhất)
+        // Setup Card Grid ScrollPane
         cardGridPane.setHgap(18);
         cardGridPane.setVgap(18);
         cardGridPane.setPadding(new Insets(16, 4, 16, 4));
@@ -158,7 +159,10 @@ public class WalletPane extends AbstractBasePane implements WalletView {
             }
         });
 
-        return cardGridScroll;
+        Node tableNode = createTableSection();
+        tableView.setVisible(false);
+
+        return new StackPane(tableNode, cardGridScroll);
     }
 
     private void updateCardGridWidth(double availableWidth) {

@@ -69,7 +69,7 @@ class SpendingStructureRowNodeTest {
                     Collections.emptyList()
             );
 
-            SpendingStructureRowNode node = new SpendingStructureRowNode(item, "INCOME");
+            SpendingStructureRowNode node = new SpendingStructureRowNode(item);
 
             assertTrue(node.getDiffLabel().getText().startsWith("+"));
             assertTrue(node.getDiffLabel().getStyle().contains("#4ADE80")); // Chênh lệch dương màu xanh

@@ -7,10 +7,8 @@
     -color-primary: #D4AF37;
     -color-primary-light: #E5C07B;
     -color-gold-border: rgba(212, 175, 55, 0.28);
-    -color-gold-glow: rgba(212, 175, 55, 0.16);
     -color-bg-base: #070707;
     -color-card-bg: #121212;
-    -color-card-hover: #171717;
     -color-sidebar-bg: #000000;
     -color-header-bg: #0E0E0E;
     -color-border: #222222;
@@ -89,21 +87,6 @@
 }
 .btn-danger:hover {
     -fx-background-color: #881337;
-}
-
-.btn-income {
-    -fx-background-color: #052E16;
-    -fx-text-fill: #BBF7D0;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 6px;
-    -fx-border-color: rgba(74, 222, 128, 0.3);
-    -fx-border-radius: 6px;
-    -fx-padding: 7px 14px;
-    -fx-cursor: hand;
-}
-.btn-income:hover {
-    -fx-background-color: #14532D;
 }
 
 .btn-action-sm {
@@ -283,21 +266,6 @@
     -fx-padding: 2px 7px;
     -fx-background-radius: 4px;
 }
-.btn-set-default {
-    -fx-background-color: rgba(212, 175, 55, 0.08);
-    -fx-text-fill: -color-primary-light;
-    -fx-font-size: 10px;
-    -fx-font-weight: 600;
-    -fx-padding: 2px 6px;
-    -fx-background-radius: 4px;
-    -fx-border-color: -color-gold-border;
-    -fx-border-radius: 4px;
-    -fx-cursor: hand;
-}
-.btn-set-default:hover {
-    -fx-background-color: -color-primary;
-    -fx-text-fill: #000000;
-}
 
 .badge-status {
     -fx-font-size: 10px;
@@ -357,15 +325,6 @@
     -fx-fill: -color-text-main;
 }
 
-.amount-income {
-    -fx-text-fill: -color-income;
-    -fx-font-weight: bold;
-}
-.amount-expense {
-    -fx-text-fill: -color-expense;
-    -fx-font-weight: bold;
-}
-
 /* ==========================================================================
    Bộ lọc Thẻ ngày nhanh & Phân trang
    ========================================================================== */
@@ -398,7 +357,7 @@
     -fx-text-fill: -color-text-muted;
     -fx-font-size: 13px;
     -fx-alignment: BASELINE_LEFT;
-    -fx-padding: 9px 16px;
+    -fx-padding: 9px 12px;
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
     -fx-border-color: transparent;
@@ -406,9 +365,9 @@
     -fx-cursor: hand;
 }
 .nav-button:hover {
-    -fx-background-color: #111111;
-    -fx-text-fill: -color-gold-light;
-    -fx-border-color: #1a1a1a;
+    -fx-background-color: #1A1A1A;
+    -fx-text-fill: -color-primary-light;
+    -fx-border-color: rgba(212, 175, 55, 0.20);
 }
 .nav-button-active {
     -fx-background-color: #14120B;
@@ -417,11 +376,16 @@
     -fx-border-width: 1px;
     -fx-font-weight: bold;
 }
+.nav-button-active:hover {
+    -fx-background-color: #18150D;
+    -fx-border-color: rgba(212, 175, 55, 0.40);
+    -fx-text-fill: -color-primary-light;
+}
 .nav-button .nav-icon {
     -fx-stroke: -color-text-muted;
 }
 .nav-button:hover .nav-icon {
-    -fx-stroke: -color-gold-light;
+    -fx-stroke: -color-primary-light;
 }
 .nav-button-active .nav-icon {
     -fx-stroke: -color-primary-light;
@@ -702,25 +666,6 @@
 }
 .kpi-value-white {
     -fx-text-fill: -color-text-main;
-}
-.kpi-value-muted {
-    -fx-text-fill: -color-text-muted;
-}
-
-.stream-footer-summary {
-    -fx-background-color: #0E0E0E;
-    -fx-background-radius: 0 0 8px 8px;
-    -fx-border-color: -color-border transparent transparent transparent;
-    -fx-border-width: 1px 0 0 0;
-    -fx-padding: 0 18px;
-    -fx-alignment: CENTER_LEFT;
-    -fx-pref-height: 44px;
-    -fx-min-height: 44px;
-}
-.summary-text-line {
-    -fx-text-fill: -color-primary-light;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
 }
 
 /* ==========================================================================

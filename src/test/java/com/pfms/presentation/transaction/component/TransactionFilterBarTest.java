@@ -53,6 +53,7 @@ class TransactionFilterBarTest {
             assertNull(filterBar.getStartDatePicker().getValue());
             assertNull(filterBar.getEndDatePicker().getValue());
             assertEquals("", filterBar.getKeywordField().getText());
+            assertEquals("ALL", filterBar.getCurrentQuickTag());
         });
     }
 

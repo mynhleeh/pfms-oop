@@ -25,12 +25,7 @@ public class SpendingStructureRowNode extends HBox {
     private final Label diffLabel;
 
     public SpendingStructureRowNode(NeedGroupShareResponseDTO item) {
-        this(item, "EXPENSE");
-    }
-
-    public SpendingStructureRowNode(NeedGroupShareResponseDTO item, String transactionType) {
         this.item = Objects.requireNonNull(item, "NeedGroupShareResponseDTO không được để null");
-        boolean isIncome = "INCOME".equalsIgnoreCase(transactionType);
 
         this.setAlignment(Pos.CENTER_LEFT);
         this.setMaxWidth(Double.MAX_VALUE);

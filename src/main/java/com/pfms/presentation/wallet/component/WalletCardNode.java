@@ -23,13 +23,11 @@ public class WalletCardNode extends VBox {
     private final Consumer<WalletItemViewModel> onEdit;
     private final Consumer<WalletItemViewModel> onToggleStatus;
     private final Consumer<WalletItemViewModel> onDelete;
-    private final Consumer<WalletItemViewModel> onSetDefault;
 
     private Button btnAdjust;
     private Button btnEdit;
     private Button btnToggleStatus;
     private Button btnDelete;
-    private Button btnSetDefault;
 
     public WalletCardNode(
             WalletItemViewModel item,
@@ -37,25 +35,21 @@ public class WalletCardNode extends VBox {
             Consumer<WalletItemViewModel> onEdit,
             Consumer<WalletItemViewModel> onToggleStatus,
             Consumer<WalletItemViewModel> onDelete) {
-        this(item, onAdjust, onEdit, onToggleStatus, onDelete, it -> {});
-    }
-
-    public WalletCardNode(
-            WalletItemViewModel item,
-            Consumer<WalletItemViewModel> onAdjust,
-            Consumer<WalletItemViewModel> onEdit,
-            Consumer<WalletItemViewModel> onToggleStatus,
-            Consumer<WalletItemViewModel> onDelete,
-            Consumer<WalletItemViewModel> onSetDefault) {
 
         this.item = Objects.requireNonNull(item, "WalletItemViewModel không được để null");
         this.onAdjust = Objects.requireNonNull(onAdjust, "onAdjust không được để null");
         this.onEdit = Objects.requireNonNull(onEdit, "onEdit không được để null");
         this.onToggleStatus = Objects.requireNonNull(onToggleStatus, "onToggleStatus không được để null");
         this.onDelete = Objects.requireNonNull(onDelete, "onDelete không được để null");
-        this.onSetDefault = Objects.requireNonNull(onSetDefault, "onSetDefault không được để null");
 
         getStyleClass().add("wallet-card");
+        if (!item.isActive()) {
+            if (item.statusText() != null && item.statusText().contains("Lưu trữ")) {
+                getStyleClass().add("status-archived");
+            } else {
+                getStyleClass().add("status-deleted");
+            }
+        }
         setSpacing(12);
         setMinWidth(280);
         setMaxWidth(Double.MAX_VALUE);
@@ -192,10 +186,6 @@ public class WalletCardNode extends VBox {
 
     public void triggerDeleteAction() {
         if (btnDelete != null) btnDelete.fire();
-    }
-
-    public void triggerSetDefaultAction() {
-        if (btnSetDefault != null) btnSetDefault.fire();
     }
     // endregion
 }

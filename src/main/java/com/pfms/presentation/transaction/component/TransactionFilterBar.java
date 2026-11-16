@@ -366,6 +366,10 @@ public class TransactionFilterBar extends VBox {
         isUpdating = true;
         try {
             currentQuickTag = "ALL";
+            btnQuickAll.getStyleClass().remove("filter-chip-active");
+            btnQuickMonth.getStyleClass().remove("filter-chip-active");
+            btnQuick7Days.getStyleClass().remove("filter-chip-active");
+            btnQuickAll.getStyleClass().add("filter-chip-active");
             typeFilterBox.setValue("Tất cả");
             walletFilterBox.setValue("Tất cả ví");
             updateGroupOptions();
@@ -463,6 +467,7 @@ public class TransactionFilterBar extends VBox {
     public DatePicker getStartDatePicker() { return startDatePicker; }
     public DatePicker getEndDatePicker() { return endDatePicker; }
     public TextField getKeywordField() { return keywordField; }
+    public String getCurrentQuickTag() { return currentQuickTag; }
 
     public void setOnAddAction(Runnable onAddAction) { this.onAddAction = onAddAction; }
     public void setOnFilterAction(Runnable onFilterAction) { this.onFilterAction = onFilterAction; }

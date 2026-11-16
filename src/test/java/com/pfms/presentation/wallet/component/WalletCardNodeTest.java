@@ -33,11 +33,28 @@ class WalletCardNodeTest {
                     "Đang hoạt động", "Chi tiêu hàng ngày", true, true);
 
             WalletCardNode card = new WalletCardNode(vm,
-                    item -> {}, item -> {}, item -> {}, item -> {}, item -> {});
+                    item -> {}, item -> {}, item -> {}, item -> {});
 
             assertNotNull(card);
             assertEquals(vm, card.getItem());
             assertTrue(card.getStyleClass().contains("wallet-card"));
+        });
+    }
+
+    @Test
+    @DisplayName("Khởi tạo WalletCardNode cho ví lưu trữ gắn class CSS status-archived")
+    void testWalletCardNodeArchivedStatus() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            WalletItemViewModel vm = new WalletItemViewModel(
+                    UUID.randomUUID(), 1, "Ví Cũ",
+                    BigDecimal.ZERO, "0 VNĐ",
+                    "Lưu trữ", "Ví không dùng nữa", false, false);
+
+            WalletCardNode card = new WalletCardNode(vm,
+                    item -> {}, item -> {}, item -> {}, item -> {});
+
+            assertTrue(card.getStyleClass().contains("wallet-card"));
+            assertTrue(card.getStyleClass().contains("status-archived"));
         });
     }
 
@@ -54,7 +71,6 @@ class WalletCardNodeTest {
             AtomicBoolean editClicked = new AtomicBoolean(false);
             AtomicBoolean toggleClicked = new AtomicBoolean(false);
             AtomicBoolean deleteClicked = new AtomicBoolean(false);
-            AtomicBoolean defaultClicked = new AtomicBoolean(false);
 
             WalletCardNode card = new WalletCardNode(vm,
                     item -> adjustClicked.set(true),
@@ -73,9 +89,6 @@ class WalletCardNodeTest {
 
             card.triggerDeleteAction();
             assertTrue(deleteClicked.get(), "Nút xóa ví phải được kích hoạt");
-
-            card.triggerSetDefaultAction(); // Không có button đặt mặc định nên không lỗi
-            assertFalse(defaultClicked.get(), "Nút đặt mặc định đã được loại bỏ");
         });
     }
 }
