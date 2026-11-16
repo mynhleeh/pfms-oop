@@ -5,20 +5,28 @@ import com.pfms.domain.exception.ErrorCode;
 import com.pfms.presentation.category.CategoryGUIController;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
+import com.pfms.testutil.JavaFxTestHelper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.swing.JFrame;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Kiểm thử UpdateCategoryDialog - Hộp thoại sửa và chuyển nhóm cha danh mục con (UC-CAT-02)")
 class UpdateCategoryDialogTest {
@@ -29,6 +37,11 @@ class UpdateCategoryDialogTest {
     private UUID group2Id;
     private UUID incomeGroupId;
     private UpdateCategoryDialog dialog;
+
+    @BeforeAll
+    static void initJfx() {
+        JavaFxTestHelper.initPlatform();
+    }
 
     @BeforeEach
     void setUp() {
@@ -47,24 +60,27 @@ class UpdateCategoryDialogTest {
 
         when(categoryController.loadCategoryHierarchy()).thenReturn(List.of(group1, group2, groupInc));
 
-        dialog = new UpdateCategoryDialog(
-                (JFrame) null,
-                categoryController,
-                categoryId,
-                "Ăn uống",
-                group1Id,
-                "EXPENSE"
-        );
-        dialog.setErrorConsumer(msg -> {});
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog = new UpdateCategoryDialog(
+                    categoryController,
+                    categoryId,
+                    "Ăn uống",
+                    group1Id,
+                    "EXPENSE"
+            );
+            dialog.setErrorConsumer(msg -> {});
+        });
     }
 
     @Test
     @DisplayName("Khởi tạo hộp thoại nạp sẵn tên cũ, chọn nhóm cha ban đầu và chỉ lọc nhóm cùng loại EXPENSE")
     void testInitialDialogState() {
-        assertFalse(dialog.isSuccess());
-        assertNull(dialog.getUpdatedCategory());
-        assertEquals("Ăn uống", dialog.getNameInputValue());
-        assertEquals(group1Id, dialog.getSelectedParentGroupId());
+        JavaFxTestHelper.runOnFxThread(() -> {
+            assertFalse(dialog.isSuccess());
+            assertNull(dialog.getUpdatedCategory());
+            assertEquals("Ăn uống", dialog.getNameInputValue());
+            assertEquals(group1Id, dialog.getSelectedParentGroupId());
+        });
     }
 
     @Test
@@ -75,12 +91,14 @@ class UpdateCategoryDialogTest {
 
         when(categoryController.handleRenameCategory(categoryId, "Ăn ngoài", group2Id)).thenReturn(response);
 
-        dialog.setNameInputValue("Ăn ngoài");
-        dialog.setSelectedParentGroupId(group2Id);
-        dialog.triggerSave();
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.setNameInputValue("Ăn ngoài");
+            dialog.setSelectedParentGroupId(group2Id);
+            dialog.triggerSave();
 
-        assertTrue(dialog.isSuccess());
-        assertSame(response, dialog.getUpdatedCategory());
+            assertTrue(dialog.isSuccess());
+            assertSame(response, dialog.getUpdatedCategory());
+        });
         verify(categoryController).handleRenameCategory(categoryId, "Ăn ngoài", group2Id);
     }
 
@@ -91,23 +109,27 @@ class UpdateCategoryDialogTest {
                 .thenThrow(new BusinessException(ErrorCode.ERR_NAM_002, "Tên danh mục đã tồn tại trong nhóm"));
 
         AtomicReference<String> errorCapture = new AtomicReference<>();
-        dialog.setErrorConsumer(errorCapture::set);
 
-        dialog.setNameInputValue("Đã tồn tại");
-        dialog.triggerSave();
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.setErrorConsumer(errorCapture::set);
+            dialog.setNameInputValue("Đã tồn tại");
+            dialog.triggerSave();
 
-        assertFalse(dialog.isSuccess());
-        assertNull(dialog.getUpdatedCategory());
-        assertNotNull(errorCapture.get());
-        assertTrue(errorCapture.get().contains("Tên danh mục đã tồn tại"));
+            assertFalse(dialog.isSuccess());
+            assertNull(dialog.getUpdatedCategory());
+            assertNotNull(errorCapture.get());
+            assertTrue(errorCapture.get().contains("Tên danh mục đã tồn tại"));
+        });
     }
 
     @Test
     @DisplayName("Ném NullPointerException khi tham số bắt buộc bị null")
     void testNullArgsThrowsException() {
-        assertThrows(NullPointerException.class, () -> new UpdateCategoryDialog(
-                (JFrame) null, null, categoryId, "Ăn uống", group1Id, "EXPENSE"));
-        assertThrows(NullPointerException.class, () -> new UpdateCategoryDialog(
-                (JFrame) null, categoryController, null, "Ăn uống", group1Id, "EXPENSE"));
+        JavaFxTestHelper.runOnFxThread(() -> {
+            assertThrows(NullPointerException.class, () -> new UpdateCategoryDialog(
+                    null, categoryId, "Ăn uống", group1Id, "EXPENSE"));
+            assertThrows(NullPointerException.class, () -> new UpdateCategoryDialog(
+                    categoryController, null, "Ăn uống", group1Id, "EXPENSE"));
+        });
     }
 }

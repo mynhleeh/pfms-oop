@@ -3,145 +3,121 @@ package com.pfms.presentation.category.dialog;
 import com.pfms.presentation.category.CategoryGUIController;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
-import com.pfms.presentation.common.ViewConstants;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Hộp thoại modal tạo Danh mục phân loại con chi tiết mới (UC-CAT-03).
+ * Hộp thoại modal tạo Danh mục phân loại con chi tiết mới (UC-CAT-03) sử dụng JavaFX.
  */
-public class CreateCategoryDialog extends JDialog {
+public class CreateCategoryDialog extends Dialog<ButtonType> {
 
     private final CategoryGUIController categoryController;
-
-    private final JComboBox<NeedGroupComboItem> parentGroupBox;
-    private final JTextField nameField;
+    private final ComboBox<NeedGroupComboItem> parentGroupBox;
+    private final TextField nameField;
 
     private boolean success = false;
     private CategoryResponseDTO createdCategory = null;
 
     private Consumer<String> errorConsumer = msg -> {
-        JOptionPane.showMessageDialog(this, msg, "Lỗi tạo danh mục", JOptionPane.ERROR_MESSAGE);
+        try {
+            if (Platform.isFxApplicationThread()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Lỗi tạo danh mục");
+                alert.setHeaderText(null);
+                alert.setContentText(msg);
+                alert.showAndWait();
+            }
+        } catch (Exception ignored) {
+        }
     };
 
-    public CreateCategoryDialog(JFrame parent, CategoryGUIController categoryController) {
-        super(parent, "Thêm Danh mục Con Mới", true);
+    public CreateCategoryDialog(Window owner, CategoryGUIController categoryController) {
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được để null");
 
-        setSize(420, 260);
-        setMinimumSize(new Dimension(380, 220));
-        setLocationRelativeTo(parent);
-        setLayout(new BorderLayout());
+        setTitle("Thêm Danh mục Con Mới");
+        if (owner != null) {
+            initOwner(owner);
+        }
 
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
-        formPanel.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        this.parentGroupBox = new ComboBox<>();
+        this.parentGroupBox.setMaxWidth(Double.MAX_VALUE);
+        this.nameField = new TextField();
+        this.nameField.setPromptText("Nhập tên danh mục con...");
 
-        // Nhóm nhu cầu cha
-        JLabel parentLabel = new JLabel("Nhóm nhu cầu cha (*):");
-        parentLabel.setFont(ViewConstants.FONT_BODY);
-        parentLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        loadNeedGroups();
 
-        this.parentGroupBox = new JComboBox<>();
-        this.parentGroupBox.setFont(ViewConstants.FONT_BODY);
-        this.parentGroupBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.parentGroupBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        setupParentGroupRenderer();
-        loadParentGroups();
+        VBox form = new VBox(8);
+        form.setPadding(new Insets(16, 20, 16, 20));
+        form.setStyle("-fx-background-color: #121212;");
 
-        // Tên danh mục con
-        JLabel nameLabel = new JLabel("Tên danh mục con (*):");
-        nameLabel.setFont(ViewConstants.FONT_BODY);
-        nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label parentLabel = new Label("Nhóm nhu cầu cha (*):");
+        parentLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        this.nameField = new JTextField();
-        this.nameField.setFont(ViewConstants.FONT_BODY);
-        this.nameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.nameField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label nameLabel = new Label("Tên danh mục con (*):");
+        nameLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        formPanel.add(parentLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.parentGroupBox);
-        formPanel.add(Box.createVerticalStrut(12));
-        formPanel.add(nameLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.nameField);
+        form.getChildren().addAll(parentLabel, parentGroupBox, nameLabel, nameField);
 
-        // Nút bấm
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
-        buttonPanel.setBackground(ViewConstants.COLOR_STATUS_BG);
-        buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
+        DialogPane pane = getDialogPane();
+        pane.setContent(form);
+        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        var cssResource = getClass().getResource("/css/pfms-theme.css");
+        if (cssResource != null) {
+            pane.getStylesheets().add(cssResource.toExternalForm());
+        }
 
-        JButton cancelButton = new JButton("Hủy bỏ");
-        cancelButton.setFont(ViewConstants.FONT_BODY);
-        cancelButton.addActionListener(e -> dispose());
-
-        JButton saveButton = new JButton("Lưu danh mục");
-        saveButton.setFont(ViewConstants.FONT_BODY);
-        saveButton.setBackground(ViewConstants.COLOR_PRIMARY_LIGHT);
-        saveButton.setForeground(ViewConstants.COLOR_STATUS_BG);
-        saveButton.addActionListener(e -> triggerSave());
-
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(saveButton);
-
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
-    }
-
-    private void setupParentGroupRenderer() {
-        this.parentGroupBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(
-                    JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof NeedGroupComboItem item) {
-                    setText(item.name() + " [" + item.type() + "]");
+        final var okButton = pane.lookupButton(ButtonType.OK);
+        if (okButton != null) {
+            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                triggerSave();
+                if (!isSuccess()) {
+                    event.consume();
                 }
-                return this;
-            }
-        });
+            });
+        }
     }
 
-    private void loadParentGroups() {
+    public CreateCategoryDialog(CategoryGUIController categoryController) {
+        this((Window) null, categoryController);
+    }
+
+    public CreateCategoryDialog(Object dummyParent, CategoryGUIController categoryController) {
+        this((Window) (dummyParent instanceof Window ? (Window) dummyParent : null), categoryController);
+    }
+
+    private void loadNeedGroups() {
         try {
             List<CategoryHierarchyResponseDTO> hierarchy = this.categoryController.loadCategoryHierarchy();
-            this.parentGroupBox.removeAllItems();
-            if (hierarchy != null) {
-                for (CategoryHierarchyResponseDTO group : hierarchy) {
-                    this.parentGroupBox.addItem(
-                            new NeedGroupComboItem(group.getNeedGroupId(), group.getNeedGroupName(), group.getTransactionType()));
+            for (CategoryHierarchyResponseDTO group : hierarchy) {
+                if ("ACTIVE".equalsIgnoreCase(group.getNeedGroupStatus())) {
+                    this.parentGroupBox.getItems().add(new NeedGroupComboItem(
+                            group.getNeedGroupId(), group.getNeedGroupName(), group.getTransactionType()));
                 }
             }
-        } catch (Exception ex) {
-            // bỏ qua hoặc ghi nhận lỗi nạp nhóm
+            if (!this.parentGroupBox.getItems().isEmpty()) {
+                this.parentGroupBox.getSelectionModel().selectFirst();
+            }
+        } catch (Exception ignored) {
         }
     }
 
     public void triggerSave() {
         try {
-            NeedGroupComboItem selected = (NeedGroupComboItem) this.parentGroupBox.getSelectedItem();
+            NeedGroupComboItem selected = this.parentGroupBox.getValue();
             if (selected == null) {
                 throw new IllegalArgumentException("Vui lòng chọn nhóm nhu cầu cha");
             }
@@ -153,7 +129,21 @@ public class CreateCategoryDialog extends JDialog {
         } catch (Exception ex) {
             this.success = false;
             this.createdCategory = null;
-            this.errorConsumer.accept(ex.getMessage());
+            if (this.errorConsumer != null) {
+                this.errorConsumer.accept(ex.getMessage());
+            }
+        }
+    }
+
+    public void dispose() {
+        close();
+    }
+
+    public void setVisible(boolean visible) {
+        if (visible) {
+            showAndWait();
+        } else {
+            close();
         }
     }
 
@@ -166,25 +156,22 @@ public class CreateCategoryDialog extends JDialog {
     }
 
     public UUID getSelectedParentGroupId() {
-        NeedGroupComboItem selected = (NeedGroupComboItem) this.parentGroupBox.getSelectedItem();
+        NeedGroupComboItem selected = this.parentGroupBox.getValue();
         return selected != null ? selected.id() : null;
     }
 
     public void setSelectedParentGroupId(UUID groupId) {
-        if (groupId == null) {
-            return;
-        }
-        for (int i = 0; i < this.parentGroupBox.getItemCount(); i++) {
-            NeedGroupComboItem item = this.parentGroupBox.getItemAt(i);
+        if (groupId == null) return;
+        for (NeedGroupComboItem item : this.parentGroupBox.getItems()) {
             if (item != null && groupId.equals(item.id())) {
-                this.parentGroupBox.setSelectedIndex(i);
+                this.parentGroupBox.setValue(item);
                 return;
             }
         }
     }
 
     public String getNameInputValue() {
-        return this.nameField.getText().trim();
+        return this.nameField.getText() != null ? this.nameField.getText().trim() : "";
     }
 
     public void setNameInputValue(String name) {

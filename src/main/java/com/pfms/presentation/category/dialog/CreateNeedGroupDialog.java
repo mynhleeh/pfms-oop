@@ -2,135 +2,119 @@ package com.pfms.presentation.category.dialog;
 
 import com.pfms.presentation.category.CategoryGUIController;
 import com.pfms.presentation.dto.category.NeedGroupResponseDTO;
-import com.pfms.presentation.common.ViewConstants;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Hộp thoại modal tạo Nhóm Nhu cầu mới (UC-CAT-02).
+ * Hộp thoại modal tạo Nhóm Nhu cầu mới (UC-CAT-02) sử dụng JavaFX.
  */
-public class CreateNeedGroupDialog extends JDialog {
+public class CreateNeedGroupDialog extends Dialog<ButtonType> {
 
     private final CategoryGUIController categoryController;
 
-    private final JComboBox<String> typeBox;
-    private final JTextField nameField;
-    private final JTextField iconField;
-    private final JTextField colorField;
+    private final ComboBox<String> typeBox;
+    private final TextField nameField;
+    private final TextField iconField;
+    private final TextField colorField;
 
     private boolean success = false;
     private NeedGroupResponseDTO createdNeedGroup = null;
 
     private Consumer<String> errorConsumer = msg -> {
-        JOptionPane.showMessageDialog(this, msg, "Lỗi tạo nhóm nhu cầu", JOptionPane.ERROR_MESSAGE);
+        try {
+            if (Platform.isFxApplicationThread()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Lỗi tạo nhóm nhu cầu");
+                alert.setHeaderText(null);
+                alert.setContentText(msg);
+                alert.showAndWait();
+            }
+        } catch (Exception ignored) {
+        }
     };
 
-    public CreateNeedGroupDialog(JFrame parent, CategoryGUIController categoryController) {
-        super(parent, "Thêm Nhóm Nhu cầu Mới", true);
+    public CreateNeedGroupDialog(Window owner, CategoryGUIController categoryController) {
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được để null");
 
-        setSize(420, 360);
-        setMinimumSize(new Dimension(380, 320));
-        setLocationRelativeTo(parent);
-        setLayout(new BorderLayout());
+        setTitle("Thêm Nhóm Nhu cầu Mới");
+        if (owner != null) {
+            initOwner(owner);
+        }
 
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
-        formPanel.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        this.typeBox = new ComboBox<>();
+        this.typeBox.getItems().addAll("EXPENSE", "INCOME");
+        this.typeBox.setValue("EXPENSE");
+        this.typeBox.setMaxWidth(Double.MAX_VALUE);
 
-        // Loại giao dịch
-        JLabel typeLabel = new JLabel("Loại giao dịch (*):");
-        typeLabel.setFont(ViewConstants.FONT_BODY);
-        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.nameField = new TextField();
+        this.nameField.setPromptText("Nhập tên nhóm nhu cầu...");
 
-        this.typeBox = new JComboBox<>(new String[]{"EXPENSE", "INCOME"});
-        this.typeBox.setFont(ViewConstants.FONT_BODY);
-        this.typeBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.typeBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.iconField = new TextField();
+        this.iconField.setPromptText("Mã icon (tùy chọn)...");
 
-        // Tên nhóm nhu cầu
-        JLabel nameLabel = new JLabel("Tên nhóm nhu cầu (*):");
-        nameLabel.setFont(ViewConstants.FONT_BODY);
-        nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.colorField = new TextField();
+        this.colorField.setPromptText("Mã màu Hex (tùy chọn, ví dụ #D4AF37)...");
 
-        this.nameField = new JTextField();
-        this.nameField.setFont(ViewConstants.FONT_BODY);
-        this.nameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.nameField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        VBox form = new VBox(8);
+        form.setPadding(new Insets(16, 20, 16, 20));
+        form.setStyle("-fx-background-color: #121212;");
 
-        // Biểu tượng gợi ý
-        JLabel iconLabel = new JLabel("Biểu tượng (Icon):");
-        iconLabel.setFont(ViewConstants.FONT_BODY);
-        iconLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label typeLabel = new Label("Loại giao dịch (*):");
+        typeLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        this.iconField = new JTextField();
-        this.iconField.setFont(ViewConstants.FONT_BODY);
-        this.iconField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.iconField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label nameLabel = new Label("Tên nhóm nhu cầu (*):");
+        nameLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        // Mã màu sắc
-        JLabel colorLabel = new JLabel("Mã màu sắc (Hex):");
-        colorLabel.setFont(ViewConstants.FONT_BODY);
-        colorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label iconLabel = new Label("Biểu tượng (Icon):");
+        iconLabel.setStyle("-fx-text-fill: -color-text-main;");
 
-        this.colorField = new JTextField();
-        this.colorField.setFont(ViewConstants.FONT_BODY);
-        this.colorField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.colorField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label colorLabel = new Label("Màu sắc (Color):");
+        colorLabel.setStyle("-fx-text-fill: -color-text-main;");
 
-        formPanel.add(typeLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.typeBox);
-        formPanel.add(Box.createVerticalStrut(10));
-        formPanel.add(nameLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.nameField);
-        formPanel.add(Box.createVerticalStrut(10));
-        formPanel.add(iconLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.iconField);
-        formPanel.add(Box.createVerticalStrut(10));
-        formPanel.add(colorLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.colorField);
+        form.getChildren().addAll(
+                typeLabel, typeBox,
+                nameLabel, nameField,
+                iconLabel, iconField,
+                colorLabel, colorField
+        );
 
-        // Nút bấm
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
-        buttonPanel.setBackground(ViewConstants.COLOR_STATUS_BG);
-        buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
+        DialogPane pane = getDialogPane();
+        pane.setContent(form);
+        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        var cssResource = getClass().getResource("/css/pfms-theme.css");
+        if (cssResource != null) {
+            pane.getStylesheets().add(cssResource.toExternalForm());
+        }
 
-        JButton cancelButton = new JButton("Hủy bỏ");
-        cancelButton.setFont(ViewConstants.FONT_BODY);
-        cancelButton.addActionListener(e -> dispose());
+        final var okButton = pane.lookupButton(ButtonType.OK);
+        if (okButton != null) {
+            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                triggerSave();
+                if (!isSuccess()) {
+                    event.consume();
+                }
+            });
+        }
+    }
 
-        JButton saveButton = new JButton("Lưu nhóm");
-        saveButton.setFont(ViewConstants.FONT_BODY);
-        saveButton.setBackground(ViewConstants.COLOR_PRIMARY_LIGHT);
-        saveButton.setForeground(ViewConstants.COLOR_STATUS_BG);
-        saveButton.addActionListener(e -> triggerSave());
+    public CreateNeedGroupDialog(CategoryGUIController categoryController) {
+        this((Window) null, categoryController);
+    }
 
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(saveButton);
-
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+    public CreateNeedGroupDialog(Object dummyParent, CategoryGUIController categoryController) {
+        this((Window) (dummyParent instanceof Window ? (Window) dummyParent : null), categoryController);
     }
 
     public void triggerSave() {
@@ -146,7 +130,21 @@ public class CreateNeedGroupDialog extends JDialog {
         } catch (Exception ex) {
             this.success = false;
             this.createdNeedGroup = null;
-            this.errorConsumer.accept(ex.getMessage());
+            if (this.errorConsumer != null) {
+                this.errorConsumer.accept(ex.getMessage());
+            }
+        }
+    }
+
+    public void dispose() {
+        close();
+    }
+
+    public void setVisible(boolean visible) {
+        if (visible) {
+            showAndWait();
+        } else {
+            close();
         }
     }
 
@@ -159,16 +157,17 @@ public class CreateNeedGroupDialog extends JDialog {
     }
 
     public String getTypeInputValue() {
-        Object item = this.typeBox.getSelectedItem();
-        return item != null ? item.toString() : "EXPENSE";
+        return this.typeBox.getValue();
     }
 
     public void setTypeInputValue(String type) {
-        this.typeBox.setSelectedItem(type);
+        if (type != null) {
+            this.typeBox.setValue(type);
+        }
     }
 
     public String getNameInputValue() {
-        return this.nameField.getText().trim();
+        return this.nameField.getText() != null ? this.nameField.getText().trim() : "";
     }
 
     public void setNameInputValue(String name) {
@@ -176,7 +175,7 @@ public class CreateNeedGroupDialog extends JDialog {
     }
 
     public String getIconInputValue() {
-        return this.iconField.getText().trim();
+        return this.iconField.getText() != null ? this.iconField.getText().trim() : "";
     }
 
     public void setIconInputValue(String icon) {
@@ -184,7 +183,7 @@ public class CreateNeedGroupDialog extends JDialog {
     }
 
     public String getColorInputValue() {
-        return this.colorField.getText().trim();
+        return this.colorField.getText() != null ? this.colorField.getText().trim() : "";
     }
 
     public void setColorInputValue(String color) {

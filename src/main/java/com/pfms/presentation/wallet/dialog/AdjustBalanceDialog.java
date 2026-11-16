@@ -158,6 +158,14 @@ public class AdjustBalanceDialog extends Dialog<ButtonType> {
         close();
     }
 
+    public void setVisible(boolean visible) {
+        if (visible) {
+            showAndWait();
+        } else {
+            close();
+        }
+    }
+
     public boolean isSuccess() {
         return this.success;
     }

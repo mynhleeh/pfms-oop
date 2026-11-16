@@ -64,6 +64,9 @@ public class App extends Application {
         com.pfms.presentation.wallet.WalletPane walletPane = new com.pfms.presentation.wallet.WalletPane(mainController.getWalletController());
         mainStage.registerView(MainController.CARD_WALLETS, walletPane);
 
+        com.pfms.presentation.category.CategoryPane categoryPane = new com.pfms.presentation.category.CategoryPane(mainController.getCategoryController());
+        mainStage.registerView(MainController.CARD_CATEGORIES, categoryPane);
+
         return mainStage;
     }
     // endregion
