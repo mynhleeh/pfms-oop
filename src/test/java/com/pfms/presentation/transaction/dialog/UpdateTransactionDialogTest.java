@@ -125,4 +125,27 @@ class UpdateTransactionDialogTest {
         assertNull(dialog.getUpdatedTransaction());
         assertEquals("Số tiền giao dịch phải là số dương lớn hơn 0", dialog.getErrorMessage());
     }
+
+    @Test
+    @DisplayName("Renderer của wallet combo chỉ hiển thị tên ví thuần túy không chứa số dư trong ngoặc")
+    void testWalletComboRendererPureName() {
+        javax.swing.ListCellRenderer<? super WalletResponseDTO> renderer = dialog.getWalletCombo().getRenderer();
+        assertNotNull(renderer);
+
+        java.awt.Component comp = renderer.getListCellRendererComponent(
+                new javax.swing.JList<>(), sampleWallet, 0, false, false);
+        assertTrue(comp instanceof javax.swing.JLabel);
+        javax.swing.JLabel label = (javax.swing.JLabel) comp;
+        assertEquals("Ví Tiền mặt", label.getText());
+        assertFalse(label.getText().contains("(5,000,000 VNĐ)"));
+        assertFalse(label.getText().contains("("));
+    }
+
+    @Test
+    @DisplayName("availableBalanceLabel hiển thị chính xác số dư khả dụng bên dưới ô dropdown")
+    void testAvailableBalanceLabelDisplaysBalance() {
+        assertNotNull(dialog.getAvailableBalanceLabel());
+        assertTrue(dialog.getAvailableBalanceLabel().isVisible());
+        assertTrue(dialog.getAvailableBalanceLabel().getText().contains("5,000,000 VNĐ"));
+    }
 }
