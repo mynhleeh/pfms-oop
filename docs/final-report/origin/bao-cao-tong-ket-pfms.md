@@ -7,43 +7,6 @@
 > Nhóm sinh viên thực hiện: Nhóm 3
 > Thành viên: Lê Anh Minh (B24DCCE180), Ứng Trọng Trình (B24DCCE271), Nguyễn Đình Tiến (B24DCCE264), Nguyễn Đinh Anh Quân (B24DCCE222)
 
-## Mục lục tổng quan
-
-- [1. Giới thiệu và yêu cầu phần mềm](#1-giới-thiệu-và-yêu-cầu-phần-mềm)
-  - [1.1 Bối cảnh và mục tiêu xây dựng hệ thống](#11-bối-cảnh-và-mục-tiêu-xây-dựng-hệ-thống)
-  - [1.2 Phạm vi hoạt động và ranh giới hệ thống](#12-phạm-vi-hoạt-động-và-ranh-giới-hệ-thống)
-  - [1.3 Các quy tắc nghiệp vụ tài chính cốt lõi](#13-các-quy-tắc-nghiệp-vụ-tài-chính-cốt-lõi)
-  - [1.4 Nhóm chức năng chính của phần mềm](#14-nhóm-chức-năng-chính-của-phần-mềm)
-  - [1.5 Danh sách các ca sử dụng](#15-danh-sách-các-ca-sử-dụng)
-  - [1.6 Yêu cầu chất lượng và ràng buộc kỹ thuật](#16-yêu-cầu-chất-lượng-và-ràng-buộc-kỹ-thuật)
-- [2. Phân tích hướng đối tượng](#2-phân-tích-hướng-đối-tượng)
-  - [2.1 Mô hình khái niệm và các đối tượng nghiệp vụ](#21-mô-hình-khái-niệm-và-các-đối-tượng-nghiệp-vụ)
-  - [2.2 Sơ đồ tương tác tuần tự cấp hệ thống](#22-sơ-đồ-tương-tác-tuần-tự-cấp-hệ-thống)
-  - [2.3 Ràng buộc thực hiện thao tác nghiệp vụ](#23-ràng-buộc-thực-hiện-thao-tác-nghiệp-vụ)
-  - [2.4 Vòng đời và trạng thái của các thực thể](#24-vòng-đời-và-trạng-thái-của-các-thực-thể)
-  - [2.5 Phân định trách nhiệm giữa các thành phần](#25-phân-định-trách-nhiệm-giữa-các-thành-phần)
-- [3. Thiết kế kiến trúc và mô hình lớp](#3-thiết-kế-kiến-trúc-và-mô-hình-lớp)
-  - [3.1 Mô hình kiến trúc phân tầng](#31-mô-hình-kiến-trúc-phân-tầng)
-  - [3.2 Thiết kế chi tiết các lớp dữ liệu và thực thể](#32-thiết-kế-chi-tiết-các-lớp-dữ-liệu-và-thực-thể)
-  - [3.3 Thiết kế các dịch vụ xử lý nghiệp vụ](#33-thiết-kế-các-dịch-vụ-xử-lý-nghiệp-vụ)
-  - [3.4 Thiết kế cơ chế lưu trữ và truy xuất dữ liệu](#34-thiết-kế-cơ-chế-lưu-trữ-và-truy-xuất-dữ-liệu)
-  - [3.5 Sơ đồ tương tác chi tiết giữa các đối tượng](#35-sơ-đồ-tương-tác-chi-tiết-giữa-các-đối-tượng)
-  - [3.6 Cơ chế kiểm soát lỗi và ngoại lệ](#36-cơ-chế-kiểm-soát-lỗi-và-ngoại-lệ)
-- [4. Cài đặt phần mềm và áp dụng mẫu thiết kế](#4-cài-đặt-phần-mềm-và-áp-dụng-mẫu-thiết-kế)
-  - [4.1 Áp dụng năm nguyên lý thiết kế hướng đối tượng](#41-áp-dụng-năm-nguyên-lý-thiết-kế-hướng-đối-tượng)
-  - [4.2 Cài đặt các mẫu thiết kế kinh điển](#42-cài-đặt-các-mẫu-thiết-kế-kinh-điển)
-    - [4.2.1 Mẫu phương thức nhà máy trong khởi tạo giao dịch](#421-mẫu-phương-thức-nhà-máy-trong-khởi-tạo-giao-dịch)
-    - [4.2.2 Mẫu chiến lược trong xuất báo cáo tài chính](#422-mẫu-chiến-lược-trong-xuất-báo-cáo-tài-chính)
-    - [4.2.3 Mẫu trạng thái trong quản lý vòng đời thực thể](#423-mẫu-trạng-thái-trong-quản-lý-vòng-đời-thực-thể)
-    - [4.2.4 Mẫu người quan sát trong theo dõi biến động dữ liệu](#424-mẫu-người-quan-sát-trong-theo-dõi-biến-động-dữ-liệu)
-  - [4.3 Xử lý tính toán tài chính chính xác và cấu trúc dữ liệu](#43-xử-lý-tính-toán-tài-chính-chính-xác-và-cấu-trúc-dữ-liệu)
-- [5. Kiểm thử, vận hành và đánh giá kết quả](#5-kiểm-thử-vận-hành-và-đánh-giá-kết-quả)
-  - [5.1 Chiến lược kiểm thử tự động](#51-chiến-lược-kiểm-thử-tự-động)
-  - [5.2 Kết quả kiểm thử thực tế trên hệ thống](#52-kết-quả-kiểm-thử-thực-tế-trên-hệ-thống)
-  - [5.3 Giao diện ứng dụng và kịch bản vận hành](#53-giao-diện-ứng-dụng-và-kịch-bản-vận-hành)
-  - [5.4 Đánh giá kết quả đạt được và hướng phát triển](#54-đánh-giá-kết-quả-đạt-được-và-hướng-phát-triển)
-- [6. Tài liệu tham khảo](#6-tài-liệu-tham-khảo)
-
 ## 1. Giới thiệu và yêu cầu phần mềm
 
 ### 1.1 Bối cảnh và mục tiêu xây dựng hệ thống

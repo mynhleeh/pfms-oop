@@ -1,0 +1,28 @@
+% --- Giữ nguyên Preamble từ dòng 1 đến 115 của ref/report.tex ---
+\documentclass[a4paper,12pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T5,T1]{fontenc}
+\usepackage[vietnamese,english]{babel}
+\usepackage{times}
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+...
+\begin{document}
+
+% --- Giữ nguyên Titlepage TikZ và Table of Contents từ dòng 121 đến 220 của ref/report.tex ---
+\begin{titlepage}
+...
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+
+% --- Điểm chèn nội dung Markdown được Pandoc biên dịch ---
+$body$
+
+\end{document}
