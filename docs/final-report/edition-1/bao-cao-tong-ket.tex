@@ -79,9 +79,17 @@
 % --- Hyperlinks ---
 \usepackage[hidelinks]{hyperref}
 \usepackage{url}
+\usepackage{xurl}
 
 % --- Section Formatting ---
 \usepackage{titlesec}
+\usepackage[titles]{tocloft}
+
+% --- Compact TOC configuration to guarantee single-page fit ---
+\setlength{\cftbeforetoctitleskip}{-15pt}
+\setlength{\cftaftertoctitleskip}{15pt}
+\setlength{\cftbeforechapskip}{4pt}
+\setlength{\cftbeforesecskip}{1pt}
 
 \titleformat{\chapter}[display]
   {\normalfont\fontsize{22}{26}\bfseries}
@@ -118,6 +126,7 @@
 % --- Indentation ---
 \usepackage{indentfirst}
 \setlength{\parindent}{1cm}
+\setlength{\emergencystretch}{3em}
 
 % --- TikZ for cover page decorations ---
 \usepackage{tikz}
@@ -169,14 +178,14 @@
 
 % --- Subject title ---
 {\fontsize{20}{26}\selectfont\bfseries\color{ptitblue}
-BÁO CÁO TỔNG KẾT ĐỒ ÁN\\[0.3cm]
-LẬP TRÌNH HƯỚNG ĐỐI TƯỢNG}\\[0.6cm]
+BÁO CÁO TỔNG KẾT}\\[0.4cm]
 
 {\fontsize{16}{20}\selectfont\bfseries
-HỆ THỐNG QUẢN LÝ TÀI CHÍNH CÁ NHÂN (PFMS)}\\[0.8cm]
+HỆ THỐNG QUẢN LÝ TÀI CHÍNH CÁ NHÂN (PFMS)}\\[0.85cm]
 
-% --- Group info ---
-{\large\textbf{Nhóm sinh viên thực hiện:} \textbf{Nhóm 3}}\\[0.6cm]
+% --- Subject course & Group info ---
+{\large\textbf{Học phần:} \textbf{Lập trình Hướng đối tượng}}\\[0.35cm]
+{\large\textbf{Nhóm sinh viên thực hiện:} \textbf{Nhóm 3}}\\[0.5cm]
 
 % --- Member table ---
 {\fontsize{11}{14}\selectfont
@@ -206,11 +215,11 @@ Nguyễn Đinh Anh Quân & B24DCCE222 & Thành viên \\[0.3cm]
 \end{titlepage}
 
 \newpage
+\begingroup
+\setlength{\parskip}{0pt}
+\linespread{1.0}\selectfont
 \tableofcontents
-\newpage
-\listoffigures
-\newpage
-\listoftables
+\endgroup
 \newpage
 
 \chapter{Giới thiệu và yêu cầu phần
