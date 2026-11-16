@@ -1,19 +1,34 @@
 package com.pfms.presentation.transaction.dialog;
 
 import com.pfms.presentation.category.CategoryGUIController;
-import com.pfms.presentation.transaction.TransactionGUIController;
-import com.pfms.presentation.wallet.WalletGUIController;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
-import com.pfms.presentation.common.ViewConstants;
+import com.pfms.presentation.transaction.TransactionGUIController;
+import com.pfms.presentation.wallet.WalletGUIController;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.Window;
+import javafx.util.StringConverter;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -25,565 +40,427 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Hộp thoại modal chỉnh sửa thông tin giao dịch Thu / Chi hiện có (UC-TRN-04).
- * Thiết kế đồng bộ chuẩn phong cách Luxury Black &amp; Gold với RecordTransactionDialog:
- * - Header màu than chì đậm tinh tế kèm tiêu đề vàng Champagne
- * - Nhãn Loại giao dịch hiển thị rõ ràng, chuyên nghiệp
- * - Live Currency format preview cạnh ô nhập số tiền
- * - Dropdown Ví chỉ hiển thị tên ví, số dư khả dụng hiển thị bên dưới
- * - Fee Box card bo tròn viền mịn dạng Accordion mở rộng linh hoạt
- * - JScrollPane cuộn mượt mà bảo vệ kích thước trên mọi màn hình.
+ * Hộp thoại modal chỉnh sửa thông tin giao dịch Thu / Chi hiện có (UC-TRN-04) sử dụng JavaFX.
+ * Hiện thực giao diện Code-First theo nhận diện Luxury Black & Gold.
  */
-public class UpdateTransactionDialog extends JDialog {
-
-    private static final long serialVersionUID = 1L;
+public class UpdateTransactionDialog extends Dialog<ButtonType> {
 
     private final TransactionGUIController transactionController;
     private final WalletGUIController walletController;
     private final CategoryGUIController categoryController;
     private final TransactionResponseDTO existingTxn;
 
-    private final JTextField amountField;
-    private final JLabel amountInWordsHint;
-    private final JComboBox<WalletResponseDTO> walletCombo;
-    private final JLabel availableBalanceLabel = new JLabel();
-    private final JComboBox<CategoryResponseDTO> categoryCombo;
-    private final JTextField dateField;
-    private final JTextField noteField;
+    private final TextField amountField = new TextField();
+    private final Label amountInWordsHint = new Label();
+    private final ComboBox<WalletResponseDTO> walletCombo = new ComboBox<>();
+    private final Label availableBalanceLabel = new Label();
+    private final ComboBox<CategoryResponseDTO> categoryCombo = new ComboBox<>();
+    private final TextField dateField = new TextField();
+    private final TextField noteField = new TextField();
 
-    private final JCheckBox feeCheckBox;
-    private final JPanel feeDetailsPanel;
-    private final JTextField feeAmountField;
-    private final JComboBox<CategoryHierarchyResponseDTO> feeGroupCombo;
-    private final JComboBox<CategoryResponseDTO> feeCategoryCombo;
+    private final FxCheckBox feeCheckBox = new FxCheckBox("Giao dịch phát sinh phụ phí");
+    private final VBox feeDetailsPanel = new VBox(8);
+    private final TextField feeAmountField = new TextField("0");
+    private final ComboBox<CategoryHierarchyResponseDTO> feeGroupCombo = new ComboBox<>();
+    private final ComboBox<CategoryResponseDTO> feeCategoryCombo = new ComboBox<>();
 
-    private final JButton cancelButton;
-    private final JButton saveButton;
+    private final FxButton saveButton = new FxButton("Lưu thay đổi");
+    private final FxButton cancelButton = new FxButton("Hủy bỏ");
 
     private final List<CategoryHierarchyResponseDTO> expenseGroups = new ArrayList<>();
     private final List<CategoryResponseDTO> availableCategories = new ArrayList<>();
+    private final DecimalFormat currencyFormatter;
 
     private boolean success = false;
     private TransactionResponseDTO updatedTransaction = null;
     private String errorMessage = null;
+
     private Consumer<String> errorConsumer = msg -> {
-        JOptionPane.showMessageDialog(this, msg, "Lỗi cập nhật giao dịch", JOptionPane.ERROR_MESSAGE);
+        try {
+            if (Platform.isFxApplicationThread()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Lỗi cập nhật giao dịch");
+                alert.setHeaderText(null);
+                alert.setContentText(msg);
+                alert.showAndWait();
+            }
+        } catch (Exception ignored) {
+        }
     };
 
     public UpdateTransactionDialog(
-            JFrame parent,
+            Window owner,
             TransactionGUIController transactionController,
             WalletGUIController walletController,
             CategoryGUIController categoryController,
             TransactionResponseDTO existingTxn) {
 
-        super(parent, "Chỉnh Sửa Thông Tin Giao Dịch", true);
         this.transactionController = Objects.requireNonNull(transactionController, "TransactionGUIController không được null");
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được null");
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được null");
         this.existingTxn = Objects.requireNonNull(existingTxn, "TransactionResponseDTO không được null");
 
-        setSize(520, 660);
-        setMinimumSize(new Dimension(480, 580));
-        setLocationRelativeTo(parent);
-        setLayout(new BorderLayout());
-        getContentPane().setBackground(ViewConstants.COLOR_CARD_BG);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        symbols.setGroupingSeparator(',');
+        this.currencyFormatter = new DecimalFormat("#,##0", symbols);
 
+        setTitle("Chỉnh Sửa Thông Tin Giao Dịch");
+        initOwner(owner);
+
+        buildUI();
         loadCategories();
+        loadWallets();
+        populateExistingValues();
+    }
 
-        // 1. Header Panel
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(14, 14, 14));
-        headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ViewConstants.COLOR_BORDER),
-                BorderFactory.createEmptyBorder(14, 22, 14, 22)
-        ));
-        JLabel titleLabel = new JLabel("✏️  Chỉnh Sửa Thông Tin Giao Dịch");
-        titleLabel.setFont(ViewConstants.FONT_TITLE);
-        titleLabel.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
-        headerPanel.add(titleLabel, BorderLayout.WEST);
-        add(headerPanel, BorderLayout.NORTH);
+    public UpdateTransactionDialog(
+            Object parent,
+            TransactionGUIController transactionController,
+            WalletGUIController walletController,
+            CategoryGUIController categoryController,
+            TransactionResponseDTO existingTxn) {
+        this((Window) null, transactionController, walletController, categoryController, existingTxn);
+    }
 
-        // 2. Form Body Panel
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(18, 22, 18, 22));
-        formPanel.setBackground(ViewConstants.COLOR_CARD_BG);
+    private void buildUI() {
+        DialogPane pane = getDialogPane();
+        pane.getStyleClass().add("pfms-dialog");
 
-        // Loại giao dịch (Chỉ đọc với Badge màu tương ứng)
+        var cssResource = getClass().getResource("/css/pfms-theme.css");
+        if (cssResource != null) {
+            pane.getStylesheets().add(cssResource.toExternalForm());
+        }
+
+        VBox contentBox = new VBox(14);
+        contentBox.setPadding(new Insets(16, 20, 16, 20));
+        contentBox.setPrefWidth(500);
+
+        // Header Title & Type Badge
+        Label headerTitle = new Label("Chỉnh Sửa Thông Tin Giao Dịch");
+        headerTitle.setStyle("-fx-text-fill: -color-primary; -fx-font-size: 16px; -fx-font-weight: bold;");
+
         boolean isIncome = "INCOME".equalsIgnoreCase(existingTxn.getTransactionType());
-        Color typeColor = isIncome ? ViewConstants.COLOR_INCOME : ViewConstants.COLOR_EXPENSE;
-        Color typeBg = isIncome ? new Color(74, 222, 128, 30) : new Color(251, 113, 133, 30);
+        Label typeBadge = new Label(isIncome ? "Khoản Thu Nhập" : "Khoản Chi Tiêu");
+        typeBadge.setPadding(new Insets(4, 12, 4, 12));
+        if (isIncome) {
+            typeBadge.setStyle("-fx-background-color: #143520; -fx-text-fill: #4ADE80; -fx-background-radius: 4px; -fx-font-weight: bold;");
+        } else {
+            typeBadge.setStyle("-fx-background-color: #381A20; -fx-text-fill: #FB7185; -fx-background-radius: 4px; -fx-font-weight: bold;");
+        }
 
-        JPanel typeBadge = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
-        typeBadge.setBackground(typeBg);
-        typeBadge.setBorder(BorderFactory.createLineBorder(new Color(typeColor.getRed(), typeColor.getGreen(), typeColor.getBlue(), 90), 1, true));
-        typeBadge.putClientProperty("FlatLaf.style", "arc: 8");
-        typeBadge.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        // 1. Amount input and hint
+        VBox amountBox = new VBox(4);
+        Label lblAmount = new Label("Số tiền giao dịch (*):");
+        lblAmount.getStyleClass().add("form-label");
+        amountField.setPromptText("Nhập số tiền");
+        amountInWordsHint.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 11px; -fx-font-style: italic;");
+        amountField.textProperty().addListener((obs, oldVal, newVal) -> updateAmountHint());
+        amountBox.getChildren().addAll(lblAmount, amountField, amountInWordsHint);
 
-        JLabel typeText = new JLabel(isIncome ? "🟢 THU NHẬP (INCOME)" : "🔴 CHI TIÊU (EXPENSE)");
-        typeText.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        typeText.setForeground(typeColor);
-        typeBadge.add(typeText);
+        // 2. Wallet selection
+        VBox walletBox = new VBox(4);
+        Label lblWallet = new Label("Ví tài khoản (*):");
+        lblWallet.getStyleClass().add("form-label");
+        walletCombo.setMaxWidth(Double.MAX_VALUE);
+        setupWalletComboRenderer();
+        availableBalanceLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 11px;");
+        walletCombo.valueProperty().addListener((obs, oldVal, newVal) -> updateAvailableBalance());
+        walletBox.getChildren().addAll(lblWallet, walletCombo, availableBalanceLabel);
 
-        formPanel.add(createFieldHeader("Phân loại giao dịch", false, null));
-        formPanel.add(Box.createVerticalStrut(6));
-        formPanel.add(typeBadge);
-        formPanel.add(Box.createVerticalStrut(14));
+        // 3. Category selection
+        VBox categoryBox = new VBox(4);
+        Label lblCategory = new Label("Danh mục thu chi (*):");
+        lblCategory.getStyleClass().add("form-label");
+        categoryCombo.setMaxWidth(Double.MAX_VALUE);
+        setupCategoryComboRenderer();
+        categoryBox.getChildren().addAll(lblCategory, categoryCombo);
 
-        // Amount Field with Live Preview Hint
-        this.amountInWordsHint = new JLabel("0 VNĐ");
-        this.amountInWordsHint.setFont(ViewConstants.FONT_STATUS);
-        this.amountInWordsHint.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+        // 4. Date & Note
+        VBox dateBox = new VBox(4);
+        Label lblDate = new Label("Ngày giao dịch (yyyy-MM-dd) (*):");
+        lblDate.getStyleClass().add("form-label");
+        dateBox.getChildren().addAll(lblDate, dateField);
 
-        this.amountField = new JTextField(existingTxn.getAmount() != null ? existingTxn.getAmount().toPlainString() : "");
-        styleInputField(this.amountField);
-        this.amountField.putClientProperty("JTextField.placeholderText", "Ví dụ: 150000");
-        this.amountField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e) { updateAmountHint(); }
-            @Override public void removeUpdate(DocumentEvent e) { updateAmountHint(); }
-            @Override public void changedUpdate(DocumentEvent e) { updateAmountHint(); }
-        });
-        updateAmountHint();
+        VBox noteBox = new VBox(4);
+        Label lblNote = new Label("Ghi chú nội dung:");
+        lblNote.getStyleClass().add("form-label");
+        noteField.setPromptText("Nội dung diễn giải giao dịch (tùy chọn)");
+        noteBox.getChildren().addAll(lblNote, noteField);
 
-        formPanel.add(createFieldHeader("Số tiền giao dịch (VNĐ)", true, this.amountInWordsHint));
-        formPanel.add(Box.createVerticalStrut(6));
-        formPanel.add(this.amountField);
-        formPanel.add(Box.createVerticalStrut(14));
+        // 5. Fee Section (Accordion Card)
+        VBox feeSectionBox = new VBox(8);
+        feeSectionBox.getStyleClass().add("pfms-card");
+        feeSectionBox.setStyle("-fx-border-color: -color-border; -fx-border-radius: 6px; -fx-padding: 10px;");
 
-        // Wallet Dropdown & Balance Hint
-        this.walletCombo = new JComboBox<>();
-        styleComboBox(this.walletCombo);
-        this.availableBalanceLabel.setFont(ViewConstants.FONT_STATUS);
-        this.availableBalanceLabel.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
-        this.availableBalanceLabel.setVisible(false);
+        feeCheckBox.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        JPanel balanceHintRow = new JPanel(new BorderLayout());
-        balanceHintRow.setOpaque(false);
-        balanceHintRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-        balanceHintRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
-        balanceHintRow.setBorder(BorderFactory.createEmptyBorder(3, 8, 0, 8));
-        balanceHintRow.add(this.availableBalanceLabel, BorderLayout.WEST);
-        configureWalletCombo();
+        Label lblFeeAmount = new Label("Số tiền phụ phí:");
+        lblFeeAmount.getStyleClass().add("form-label");
+        feeAmountField.setMaxWidth(Double.MAX_VALUE);
 
-        JPanel walletGroupPanel = new JPanel();
-        walletGroupPanel.setLayout(new BoxLayout(walletGroupPanel, BoxLayout.Y_AXIS));
-        walletGroupPanel.setOpaque(false);
-        walletGroupPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        walletGroupPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 64));
-        walletGroupPanel.add(this.walletCombo);
-        walletGroupPanel.add(balanceHintRow);
+        Label lblFeeGroup = new Label("Nhóm phụ phí:");
+        lblFeeGroup.getStyleClass().add("form-label");
+        feeGroupCombo.setMaxWidth(Double.MAX_VALUE);
+        setupFeeGroupComboRenderer();
 
-        formPanel.add(createFieldHeader("Ví tài chính thanh toán", true, null));
-        formPanel.add(Box.createVerticalStrut(6));
-        formPanel.add(walletGroupPanel);
-        formPanel.add(Box.createVerticalStrut(14));
+        Label lblFeeCat = new Label("Danh mục phụ phí:");
+        lblFeeCat.getStyleClass().add("form-label");
+        feeCategoryCombo.setMaxWidth(Double.MAX_VALUE);
+        setupFeeCategoryComboRenderer();
 
-        // Category Dropdown
-        this.categoryCombo = new JComboBox<>();
-        styleComboBox(this.categoryCombo);
-        configureCategoryCombo(this.categoryCombo);
-        populateCategories();
+        feeGroupCombo.valueProperty().addListener((obs, oldVal, newVal) -> onFeeGroupSelected(newVal));
 
-        formPanel.add(createFieldHeader("Danh mục thu chi", true, null));
-        formPanel.add(Box.createVerticalStrut(6));
-        formPanel.add(this.categoryCombo);
-        formPanel.add(Box.createVerticalStrut(14));
+        feeDetailsPanel.getChildren().addAll(lblFeeAmount, feeAmountField, lblFeeGroup, feeGroupCombo, lblFeeCat, feeCategoryCombo);
+        feeDetailsPanel.setVisible(false);
+        feeDetailsPanel.setManaged(false);
 
-        // Date Field
-        this.dateField = new JTextField(existingTxn.getTransactionDate() != null ? existingTxn.getTransactionDate().toString() : "");
-        styleInputField(this.dateField);
-        this.dateField.putClientProperty("JTextField.placeholderText", "yyyy-MM-dd");
+        feeAmountField.setDisable(true);
+        feeGroupCombo.setDisable(true);
+        feeCategoryCombo.setDisable(true);
 
-        formPanel.add(createFieldHeader("Ngày thực hiện giao dịch", true, null));
-        formPanel.add(Box.createVerticalStrut(6));
-        formPanel.add(this.dateField);
-        formPanel.add(Box.createVerticalStrut(14));
+        feeCheckBox.selectedProperty().addListener((obs, oldVal, isSelected) -> onFeeCheckBoxToggled(isSelected));
 
-        // Note Field
-        this.noteField = new JTextField(existingTxn.getNote() != null ? existingTxn.getNote() : "");
-        styleInputField(this.noteField);
-        this.noteField.putClientProperty("JTextField.placeholderText", "Ví dụ: Ăn trưa cùng đồng nghiệp, đổ xăng...");
+        feeSectionBox.getChildren().addAll(feeCheckBox, feeDetailsPanel);
 
-        formPanel.add(createFieldHeader("Ghi chú chi tiết", false, null));
-        formPanel.add(Box.createVerticalStrut(6));
-        formPanel.add(this.noteField);
-        formPanel.add(Box.createVerticalStrut(14));
+        contentBox.getChildren().addAll(headerTitle, typeBadge, amountBox, walletBox, categoryBox, dateBox, noteBox, feeSectionBox);
 
-        // Fee Box (Accordion Card with Rounded Border)
-        JPanel feeBox = new JPanel() {
+        ScrollPane scrollPane = new ScrollPane(contentBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background: -color-card-bg; -fx-background-color: transparent;");
+        pane.setContent(scrollPane);
+
+        // Buttons
+        ButtonType saveBtnType = new ButtonType("Lưu thay đổi", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelBtnType = new ButtonType("Hủy bỏ", ButtonBar.ButtonData.CANCEL_CLOSE);
+        pane.getButtonTypes().addAll(saveBtnType, cancelBtnType);
+
+        Button btnSave = (Button) pane.lookupButton(saveBtnType);
+        if (btnSave != null) {
+            btnSave.getStyleClass().add("btn-primary");
+            btnSave.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                event.consume();
+                triggerSave();
+            });
+        }
+
+        Button btnCancel = (Button) pane.lookupButton(cancelBtnType);
+        if (btnCancel != null) {
+            btnCancel.getStyleClass().add("btn-secondary");
+        }
+
+        saveButton.setOnAction(e -> triggerSave());
+        cancelButton.setOnAction(e -> close());
+    }
+
+    private void setupWalletComboRenderer() {
+        walletCombo.setConverter(new StringConverter<>() {
             @Override
-            public Dimension getMaximumSize() {
-                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            public String toString(WalletResponseDTO w) {
+                return w != null ? w.getName() : "-- Chọn ví tài chính --";
             }
-        };
-        feeBox.setLayout(new BoxLayout(feeBox, BoxLayout.Y_AXIS));
-        feeBox.setBackground(new Color(10, 10, 10));
-        feeBox.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true),
-                BorderFactory.createEmptyBorder(10, 14, 10, 14)
-        ));
-        feeBox.putClientProperty("FlatLaf.style", "arc: 12");
-        feeBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        this.feeCheckBox = new JCheckBox("Có phụ phí phát sinh");
-        this.feeCheckBox.setFont(ViewConstants.FONT_BODY);
-        this.feeCheckBox.setBackground(ViewConstants.COLOR_CARD_BG);
-        this.feeCheckBox.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        this.feeCheckBox.setOpaque(false);
-        this.feeCheckBox.setFocusPainted(false);
-        this.feeCheckBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.feeCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        this.feeCheckBox.setSelected(existingTxn.hasFee());
-
-        this.feeAmountField = new JTextField(existingTxn.hasFee() && existingTxn.getFeeAmount() != null
-                ? existingTxn.getFeeAmount().toPlainString()
-                : "0");
-        styleInputField(this.feeAmountField);
-        this.feeAmountField.setEnabled(existingTxn.hasFee());
-
-        this.feeGroupCombo = new JComboBox<>();
-        styleComboBox(this.feeGroupCombo);
-        this.feeGroupCombo.setEnabled(existingTxn.hasFee());
-        configureFeeGroupCombo();
-
-        this.feeCategoryCombo = new JComboBox<>();
-        styleComboBox(this.feeCategoryCombo);
-        this.feeCategoryCombo.setEnabled(existingTxn.hasFee());
-        configureCategoryCombo(this.feeCategoryCombo);
-        populateInitialFeeData();
-
-        this.feeDetailsPanel = new JPanel(new GridLayout(1, 3, 10, 0));
-        this.feeDetailsPanel.setOpaque(false);
-        this.feeDetailsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        this.feeDetailsPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER),
-                BorderFactory.createEmptyBorder(10, 0, 2, 0)
-        ));
-        this.feeDetailsPanel.setVisible(existingTxn.hasFee());
-
-        JPanel feeAmountCol = new JPanel();
-        feeAmountCol.setLayout(new BoxLayout(feeAmountCol, BoxLayout.Y_AXIS));
-        feeAmountCol.setOpaque(false);
-        JLabel feeAmtLabel = new JLabel("Số tiền phụ phí");
-        feeAmtLabel.setFont(ViewConstants.FONT_STATUS);
-        feeAmtLabel.setForeground(ViewConstants.COLOR_EXPENSE);
-        feeAmountCol.add(feeAmtLabel);
-        feeAmountCol.add(Box.createVerticalStrut(4));
-        feeAmountCol.add(this.feeAmountField);
-
-        JPanel feeGroupCol = new JPanel();
-        feeGroupCol.setLayout(new BoxLayout(feeGroupCol, BoxLayout.Y_AXIS));
-        feeGroupCol.setOpaque(false);
-        JLabel feeGrpLabel = new JLabel("Nhóm phụ phí (*)");
-        feeGrpLabel.setFont(ViewConstants.FONT_STATUS);
-        feeGrpLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
-        feeGroupCol.add(feeGrpLabel);
-        feeGroupCol.add(Box.createVerticalStrut(4));
-        feeGroupCol.add(this.feeGroupCombo);
-
-        JPanel feeCatCol = new JPanel();
-        feeCatCol.setLayout(new BoxLayout(feeCatCol, BoxLayout.Y_AXIS));
-        feeCatCol.setOpaque(false);
-        JLabel feeCatLabel = new JLabel("Danh mục phụ phí (*)");
-        feeCatLabel.setFont(ViewConstants.FONT_STATUS);
-        feeCatLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
-        feeCatCol.add(feeCatLabel);
-        feeCatCol.add(Box.createVerticalStrut(4));
-        feeCatCol.add(this.feeCategoryCombo);
-
-        this.feeDetailsPanel.add(feeAmountCol);
-        this.feeDetailsPanel.add(feeGroupCol);
-        this.feeDetailsPanel.add(feeCatCol);
-
-        this.feeCheckBox.addActionListener(e -> {
-            boolean enabled = this.feeCheckBox.isSelected();
-            this.feeAmountField.setEnabled(enabled);
-            this.feeGroupCombo.setEnabled(enabled);
-            this.feeDetailsPanel.setVisible(enabled);
-            if (!enabled) {
-                this.feeAmountField.setText("0");
-                this.feeCategoryCombo.setEnabled(false);
-            } else {
-                onFeeGroupChanged();
-            }
-            feeBox.revalidate();
-            feeBox.repaint();
-        });
-
-        feeBox.add(this.feeCheckBox);
-        feeBox.add(Box.createVerticalStrut(8));
-        feeBox.add(this.feeDetailsPanel);
-
-        formPanel.add(feeBox);
-        formPanel.add(Box.createVerticalGlue());
-
-        JScrollPane scrollPane = new JScrollPane(formPanel);
-        scrollPane.setBorder(null);
-        scrollPane.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        add(scrollPane, BorderLayout.CENTER);
-
-        // 3. Footer Button Panel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 14));
-        buttonPanel.setBackground(new Color(14, 14, 14));
-        buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
-
-        this.cancelButton = new JButton("Hủy bỏ");
-        this.cancelButton.setFont(ViewConstants.FONT_BODY);
-        this.cancelButton.setBackground(ViewConstants.COLOR_CARD_BG);
-        this.cancelButton.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        this.cancelButton.setFocusPainted(false);
-        this.cancelButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.cancelButton.putClientProperty("FlatLaf.style", "arc: 8");
-        this.cancelButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true),
-                BorderFactory.createEmptyBorder(8, 18, 8, 18)
-        ));
-        this.cancelButton.addActionListener(e -> dispose());
-
-        this.saveButton = new JButton("Lưu thay đổi");
-        this.saveButton.setFont(ViewConstants.FONT_NAV_ACTIVE);
-        this.saveButton.setBackground(ViewConstants.COLOR_PRIMARY);
-        this.saveButton.setForeground(Color.BLACK);
-        this.saveButton.setFocusPainted(false);
-        this.saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.saveButton.putClientProperty("FlatLaf.style", "arc: 8");
-        this.saveButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_PRIMARY, 1, true),
-                BorderFactory.createEmptyBorder(8, 22, 8, 22)
-        ));
-        this.saveButton.addActionListener(e -> triggerSave());
-
-        buttonPanel.add(this.cancelButton);
-        buttonPanel.add(this.saveButton);
-        add(buttonPanel, BorderLayout.SOUTH);
-    }
-
-    // region Styling Helpers
-    private JPanel createFieldHeader(String title, boolean required, JLabel rightHint) {
-        JPanel header = new JPanel(new BorderLayout());
-        header.setOpaque(false);
-        header.setMaximumSize(new Dimension(Integer.MAX_VALUE, 22));
-
-        JPanel leftPart = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        leftPart.setOpaque(false);
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(ViewConstants.FONT_BODY);
-        titleLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
-        leftPart.add(titleLabel);
-
-        if (required) {
-            JLabel star = new JLabel(" *");
-            star.setFont(ViewConstants.FONT_BODY);
-            star.setForeground(ViewConstants.COLOR_EXPENSE);
-            leftPart.add(star);
-        }
-        header.add(leftPart, BorderLayout.WEST);
-
-        if (rightHint != null) {
-            header.add(rightHint, BorderLayout.EAST);
-        }
-        return header;
-    }
-
-    private void styleInputField(JTextField field) {
-        field.setFont(ViewConstants.FONT_BODY);
-        field.setBackground(new Color(10, 10, 10));
-        field.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        field.setCaretColor(ViewConstants.COLOR_PRIMARY);
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
-        field.setPreferredSize(new Dimension(0, 38));
-        field.putClientProperty("FlatLaf.style", "arc: 8");
-        field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true),
-                BorderFactory.createEmptyBorder(6, 12, 6, 12)
-        ));
-    }
-
-    private <T> void styleComboBox(JComboBox<T> combo) {
-        combo.setFont(ViewConstants.FONT_BODY);
-        combo.setBackground(new Color(10, 10, 10));
-        combo.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        combo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
-        combo.setPreferredSize(new Dimension(0, 38));
-        combo.putClientProperty("FlatLaf.style", "arc: 8");
-    }
-
-    private void updateAmountHint() {
-        String text = this.amountField.getText();
-        if (text == null || text.isBlank()) {
-            this.amountInWordsHint.setText("0 VNĐ");
-            return;
-        }
-        try {
-            String clean = text.replace(",", "").trim();
-            BigDecimal val = new BigDecimal(clean);
-            if (val.compareTo(BigDecimal.ZERO) <= 0) {
-                this.amountInWordsHint.setText("0 VNĐ");
-            } else {
-                DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-                symbols.setGroupingSeparator(',');
-                DecimalFormat df = new DecimalFormat("#,##0", symbols);
-                this.amountInWordsHint.setText(df.format(val) + " VNĐ");
-            }
-        } catch (Exception ex) {
-            this.amountInWordsHint.setText("0 VNĐ");
-        }
-    }
-    // endregion
-
-    // region Data Loading & Binding
-    private void loadCategories() {
-        this.availableCategories.clear();
-        this.expenseGroups.clear();
-
-        List<CategoryHierarchyResponseDTO> hierarchies = this.categoryController.loadCategoryHierarchy();
-        if (hierarchies != null) {
-            for (CategoryHierarchyResponseDTO group : hierarchies) {
-                if ("EXPENSE".equalsIgnoreCase(group.getTransactionType())) {
-                    this.expenseGroups.add(group);
-                }
-                if (group.getTransactionType().equalsIgnoreCase(this.existingTxn.getTransactionType())) {
-                    this.availableCategories.addAll(group.getCategories());
-                }
-            }
-        }
-    }
-
-    private void configureWalletCombo() {
-        WalletsSummaryResponseDTO summary = this.walletController.loadWalletsSummary();
-        this.walletCombo.removeAllItems();
-        if (summary != null && summary.getWallets() != null) {
-            for (WalletResponseDTO w : summary.getWallets()) {
-                if ("ACTIVE".equalsIgnoreCase(w.getStatus())) {
-                    this.walletCombo.addItem(w);
-                    if (w.getWalletId().equals(this.existingTxn.getWalletId())) {
-                        this.walletCombo.setSelectedItem(w);
-                    }
-                }
-            }
-        }
-
-        this.walletCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof WalletResponseDTO w) {
-                    setText(w.getName());
-                }
-                return this;
+            public WalletResponseDTO fromString(String s) {
+                return null;
             }
         });
+        walletCombo.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(WalletResponseDTO item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
+            }
+        });
+    }
 
-        this.walletCombo.addActionListener(e -> updateAvailableBalance());
-        updateAvailableBalance();
+    private void setupCategoryComboRenderer() {
+        categoryCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(CategoryResponseDTO c) {
+                return c != null ? c.getName() + " [" + c.getParentGroupName() + "]" : "-- Chọn danh mục --";
+            }
+
+            @Override
+            public CategoryResponseDTO fromString(String s) {
+                return null;
+            }
+        });
+        categoryCombo.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(CategoryResponseDTO item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getName() + " [" + item.getParentGroupName() + "]");
+                }
+            }
+        });
+    }
+
+    private void setupFeeGroupComboRenderer() {
+        feeGroupCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(CategoryHierarchyResponseDTO g) {
+                return g != null ? g.getNeedGroupName() : "-- Chọn nhóm phụ phí --";
+            }
+
+            @Override
+            public CategoryHierarchyResponseDTO fromString(String s) {
+                return null;
+            }
+        });
+        feeGroupCombo.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(CategoryHierarchyResponseDTO item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getNeedGroupName());
+            }
+        });
+    }
+
+    private void setupFeeCategoryComboRenderer() {
+        feeCategoryCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(CategoryResponseDTO c) {
+                return c != null ? c.getName() : "-- Chọn danh mục phụ phí --";
+            }
+
+            @Override
+            public CategoryResponseDTO fromString(String s) {
+                return null;
+            }
+        });
+        feeCategoryCombo.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(CategoryResponseDTO item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
+            }
+        });
+    }
+
+    private void onFeeCheckBoxToggled(boolean isSelected) {
+        feeDetailsPanel.setVisible(isSelected);
+        feeDetailsPanel.setManaged(isSelected);
+        feeAmountField.setDisable(!isSelected);
+        feeGroupCombo.setDisable(!isSelected);
+
+        if (!isSelected) {
+            feeAmountField.setText("0");
+            feeGroupCombo.getSelectionModel().clearSelection();
+            feeCategoryCombo.getItems().clear();
+            feeCategoryCombo.setDisable(true);
+        } else {
+            if (!feeGroupCombo.getItems().isEmpty() && feeGroupCombo.getValue() == null) {
+                feeCategoryCombo.setDisable(true);
+            }
+        }
+    }
+
+    private void onFeeGroupSelected(CategoryHierarchyResponseDTO group) {
+        feeCategoryCombo.getItems().clear();
+        if (group != null && group.getCategories() != null && !group.getCategories().isEmpty()) {
+            feeCategoryCombo.getItems().addAll(group.getCategories());
+            feeCategoryCombo.setDisable(false);
+            feeCategoryCombo.getSelectionModel().selectFirst();
+        } else {
+            feeCategoryCombo.setDisable(true);
+        }
     }
 
     private void updateAvailableBalance() {
-        WalletResponseDTO w = (WalletResponseDTO) this.walletCombo.getSelectedItem();
+        WalletResponseDTO w = walletCombo.getValue();
         if (w != null && w.getBalance() != null) {
-            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-            symbols.setGroupingSeparator(',');
-            DecimalFormat formatter = new DecimalFormat("#,##0", symbols);
-            this.availableBalanceLabel.setText("Số dư khả dụng: " + formatter.format(w.getBalance()) + " VNĐ");
-            this.availableBalanceLabel.setVisible(true);
+            availableBalanceLabel.setText("Số dư khả dụng: " + currencyFormatter.format(w.getBalance()) + " VNĐ");
+            availableBalanceLabel.setVisible(true);
         } else {
-            this.availableBalanceLabel.setText("");
-            this.availableBalanceLabel.setVisible(false);
+            availableBalanceLabel.setText("");
+            availableBalanceLabel.setVisible(false);
         }
     }
 
-    private void configureCategoryCombo(JComboBox<CategoryResponseDTO> combo) {
-        combo.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof CategoryResponseDTO cat) {
-                    setText(cat.getName());
-                }
-                return this;
-            }
-        });
-    }
-
-    private void populateCategories() {
-        this.categoryCombo.removeAllItems();
-        for (CategoryResponseDTO cat : this.availableCategories) {
-            this.categoryCombo.addItem(cat);
-            if (cat.getCategoryId().equals(this.existingTxn.getCategoryId())) {
-                this.categoryCombo.setSelectedItem(cat);
-            }
+    private void updateAmountHint() {
+        String text = amountField.getText();
+        if (text == null || text.isBlank()) {
+            amountInWordsHint.setText("0 VNĐ");
+            return;
+        }
+        try {
+            BigDecimal val = new BigDecimal(text.trim());
+            amountInWordsHint.setText(currencyFormatter.format(val) + " VNĐ");
+        } catch (Exception e) {
+            amountInWordsHint.setText("0 VNĐ");
         }
     }
 
-    private void configureFeeGroupCombo() {
-        this.feeGroupCombo.removeAllItems();
-        this.feeGroupCombo.addItem(null);
-        for (CategoryHierarchyResponseDTO group : this.expenseGroups) {
-            this.feeGroupCombo.addItem(group);
-        }
-
-        this.feeGroupCombo.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof CategoryHierarchyResponseDTO g) {
-                    setText(g.getNeedGroupName());
-                } else {
-                    setText("-- Chọn nhóm phụ phí --");
-                }
-                return this;
-            }
-        });
-
-        this.feeGroupCombo.addActionListener(e -> onFeeGroupChanged());
-    }
-
-    private void onFeeGroupChanged() {
-        CategoryHierarchyResponseDTO selected = (CategoryHierarchyResponseDTO) this.feeGroupCombo.getSelectedItem();
-        this.feeCategoryCombo.removeAllItems();
-        if (selected != null && selected.getCategories() != null && !selected.getCategories().isEmpty()) {
-            for (CategoryResponseDTO cat : selected.getCategories()) {
-                if ("ACTIVE".equalsIgnoreCase(cat.getStatus())) {
-                    this.feeCategoryCombo.addItem(cat);
+    private void loadWallets() {
+        try {
+            WalletsSummaryResponseDTO summary = walletController.loadWalletsSummary();
+            if (summary != null && summary.getWallets() != null) {
+                List<WalletResponseDTO> active = summary.getWallets().stream()
+                        .filter(w -> "ACTIVE".equalsIgnoreCase(w.getStatus()))
+                        .toList();
+                walletCombo.getItems().setAll(active);
+                for (WalletResponseDTO w : active) {
+                    if (w.getWalletId().equals(existingTxn.getWalletId())) {
+                        walletCombo.setValue(w);
+                        break;
+                    }
                 }
             }
-            this.feeCategoryCombo.setEnabled(this.feeCheckBox.isSelected());
-        } else {
-            this.feeCategoryCombo.setEnabled(false);
+            updateAvailableBalance();
+        } catch (Exception ignored) {
         }
     }
 
-    private void populateInitialFeeData() {
-        if (this.existingTxn.hasFee() && this.existingTxn.getFeeCategoryId() != null) {
-            UUID feeCatId = this.existingTxn.getFeeCategoryId();
-            for (CategoryHierarchyResponseDTO group : this.expenseGroups) {
-                if (group.getCategories() != null) {
-                    for (CategoryResponseDTO cat : group.getCategories()) {
-                        if (cat.getCategoryId().equals(feeCatId)) {
-                            this.feeGroupCombo.setSelectedItem(group);
-                            onFeeGroupChanged();
-                            for (int i = 0; i < this.feeCategoryCombo.getItemCount(); i++) {
-                                CategoryResponseDTO c = this.feeCategoryCombo.getItemAt(i);
-                                if (c != null && c.getCategoryId().equals(feeCatId)) {
-                                    this.feeCategoryCombo.setSelectedIndex(i);
-                                    break;
-                                }
-                            }
-                            return;
+    private void loadCategories() {
+        try {
+            List<CategoryHierarchyResponseDTO> hierarchy = categoryController.loadCategoryHierarchy();
+            expenseGroups.clear();
+            availableCategories.clear();
+            String txnType = existingTxn.getTransactionType();
+            if (hierarchy != null) {
+                for (CategoryHierarchyResponseDTO g : hierarchy) {
+                    if ("ACTIVE".equalsIgnoreCase(g.getNeedGroupStatus())) {
+                        if ("EXPENSE".equalsIgnoreCase(g.getTransactionType())) {
+                            expenseGroups.add(g);
+                        }
+                        if (txnType.equalsIgnoreCase(g.getTransactionType()) && g.getCategories() != null) {
+                            availableCategories.addAll(g.getCategories());
                         }
                     }
                 }
             }
+            categoryCombo.getItems().setAll(availableCategories);
+            feeGroupCombo.getItems().setAll(expenseGroups);
+
+            for (CategoryResponseDTO c : availableCategories) {
+                if (c.getCategoryId().equals(existingTxn.getCategoryId())) {
+                    categoryCombo.setValue(c);
+                    break;
+                }
+            }
+        } catch (Exception ignored) {
         }
     }
-    // endregion
 
-    // region Action Handlers
+    private void populateExistingValues() {
+        if (existingTxn.getAmount() != null) {
+            amountField.setText(existingTxn.getAmount().toPlainString());
+        }
+        if (existingTxn.getTransactionDate() != null) {
+            dateField.setText(existingTxn.getTransactionDate().toString());
+        }
+        if (existingTxn.getNote() != null) {
+            noteField.setText(existingTxn.getNote());
+        }
+        updateAmountHint();
+    }
+
     public void triggerSave() {
-        WalletResponseDTO wallet = (WalletResponseDTO) this.walletCombo.getSelectedItem();
-        CategoryResponseDTO category = (CategoryResponseDTO) this.categoryCombo.getSelectedItem();
+        WalletResponseDTO wallet = walletCombo.getValue();
+        CategoryResponseDTO category = categoryCombo.getValue();
 
         if (wallet == null) {
             handleError("Vui lòng chọn ví tài chính.");
@@ -594,15 +471,15 @@ public class UpdateTransactionDialog extends JDialog {
             return;
         }
 
-        String rawAmount = this.amountField.getText();
-        String rawDate = this.dateField.getText();
-        String rawNote = this.noteField.getText();
+        String rawAmount = getAmountInputValue();
+        String rawDate = getDateInputValue();
+        String rawNote = getNoteInputValue();
 
         String rawFeeAmount = null;
         UUID feeCatId = null;
-        if (this.feeCheckBox.isSelected()) {
-            rawFeeAmount = this.feeAmountField.getText();
-            CategoryResponseDTO feeCat = (CategoryResponseDTO) this.feeCategoryCombo.getSelectedItem();
+        if (feeCheckBox.isSelected()) {
+            rawFeeAmount = feeAmountField.getText();
+            CategoryResponseDTO feeCat = feeCategoryCombo.getValue();
             if (feeCat != null) {
                 feeCatId = feeCat.getCategoryId();
             } else {
@@ -636,105 +513,66 @@ public class UpdateTransactionDialog extends JDialog {
             this.errorConsumer.accept(message);
         }
     }
-    // endregion
+
+    public void dispose() {
+        close();
+    }
+
+    public void setVisible(boolean visible) {
+        if (visible) {
+            showAndWait();
+        } else {
+            close();
+        }
+    }
 
     // region Getters & Setters
-    public boolean isSuccess() {
-        return this.success;
-    }
+    public boolean isSuccess() { return success; }
+    public TransactionResponseDTO getUpdatedTransaction() { return updatedTransaction; }
+    public String getErrorMessage() { return errorMessage; }
+    public void setErrorConsumer(Consumer<String> errorConsumer) { this.errorConsumer = errorConsumer; }
 
-    public TransactionResponseDTO getUpdatedTransaction() {
-        return this.updatedTransaction;
-    }
-
-    public String getErrorMessage() {
-        return this.errorMessage;
-    }
-
-    public void setErrorConsumer(Consumer<String> errorConsumer) {
-        this.errorConsumer = errorConsumer;
-    }
-
-    public String getAmountInputValue() {
-        return this.amountField.getText();
-    }
-
+    public String getAmountInputValue() { return amountField.getText() != null ? amountField.getText().trim() : ""; }
     public void setAmountInputValue(String amount) {
-        this.amountField.setText(amount);
+        amountField.setText(amount);
         updateAmountHint();
     }
 
-    public WalletResponseDTO getSelectedWallet() {
-        return (WalletResponseDTO) this.walletCombo.getSelectedItem();
-    }
-
+    public WalletResponseDTO getSelectedWallet() { return walletCombo.getValue(); }
     public void setSelectedWallet(WalletResponseDTO wallet) {
-        this.walletCombo.setSelectedItem(wallet);
+        walletCombo.setValue(wallet);
         updateAvailableBalance();
     }
 
-    public JLabel getAvailableBalanceLabel() {
-        return this.availableBalanceLabel;
+    public Label getAvailableBalanceLabel() { return availableBalanceLabel; }
+    public ComboBox<WalletResponseDTO> getWalletCombo() { return walletCombo; }
+    public ComboBox<CategoryResponseDTO> getCategoryCombo() { return categoryCombo; }
+    public CategoryResponseDTO getSelectedCategory() { return categoryCombo.getValue(); }
+    public void setSelectedCategory(CategoryResponseDTO category) { categoryCombo.setValue(category); }
+
+    public String getDateInputValue() { return dateField.getText() != null ? dateField.getText().trim() : ""; }
+    public void setDateInputValue(String date) { dateField.setText(date); }
+
+    public String getNoteInputValue() { return noteField.getText() != null ? noteField.getText().trim() : ""; }
+    public void setNoteInputValue(String note) { noteField.setText(note); }
+
+    public FxButton getCancelButton() { return cancelButton; }
+    public FxButton getSaveButton() { return saveButton; }
+    public FxCheckBox getFeeCheckBox() { return feeCheckBox; }
+    public TextField getFeeAmountField() { return feeAmountField; }
+    public ComboBox<CategoryHierarchyResponseDTO> getFeeGroupCombo() { return feeGroupCombo; }
+    public ComboBox<CategoryResponseDTO> getFeeCategoryCombo() { return feeCategoryCombo; }
+    public VBox getFeeDetailsPanel() { return feeDetailsPanel; }
+
+    public static class FxButton extends Button {
+        public FxButton(String text) { super(text); }
+        public void doClick() { fire(); }
     }
 
-    public JComboBox<WalletResponseDTO> getWalletCombo() {
-        return this.walletCombo;
+    public static class FxCheckBox extends CheckBox {
+        public FxCheckBox(String text) { super(text); }
+        public void doClick() {
+            fire();
+        }
     }
-
-    public JComboBox<CategoryResponseDTO> getCategoryCombo() {
-        return this.categoryCombo;
-    }
-
-    public CategoryResponseDTO getSelectedCategory() {
-        return (CategoryResponseDTO) this.categoryCombo.getSelectedItem();
-    }
-
-    public void setSelectedCategory(CategoryResponseDTO category) {
-        this.categoryCombo.setSelectedItem(category);
-    }
-
-    public String getDateInputValue() {
-        return this.dateField.getText();
-    }
-
-    public void setDateInputValue(String date) {
-        this.dateField.setText(date);
-    }
-
-    public String getNoteInputValue() {
-        return this.noteField.getText();
-    }
-
-    public void setNoteInputValue(String note) {
-        this.noteField.setText(note);
-    }
-
-    public JButton getCancelButton() {
-        return this.cancelButton;
-    }
-
-    public JButton getSaveButton() {
-        return this.saveButton;
-    }
-
-    public JCheckBox getFeeCheckBox() {
-        return this.feeCheckBox;
-    }
-
-    public JTextField getFeeAmountField() {
-        return this.feeAmountField;
-    }
-
-    public JComboBox<CategoryHierarchyResponseDTO> getFeeGroupCombo() {
-        return this.feeGroupCombo;
-    }
-
-    public JComboBox<CategoryResponseDTO> getFeeCategoryCombo() {
-        return this.feeCategoryCombo;
-    }
-
-    public JPanel getFeeDetailsPanel() {
-        return this.feeDetailsPanel;
-    }
-    // endregion
 }
