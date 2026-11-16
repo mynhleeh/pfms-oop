@@ -1,24 +1,19 @@
 package com.pfms.presentation.wallet.dialog;
 
-import com.pfms.presentation.wallet.WalletGUIController;
 import com.pfms.presentation.dto.wallet.BalanceAdjustmentResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
-import com.pfms.presentation.common.ViewConstants;
+import com.pfms.presentation.wallet.WalletGUIController;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -27,118 +22,112 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Hộp thoại modal kiểm kê điều chỉnh số dư ví thực tế (UC-WAL-04).
+ * Hộp thoại modal kiểm kê điều chỉnh số dư ví thực tế (UC-WAL-04) sử dụng JavaFX.
  */
-public class AdjustBalanceDialog extends JDialog {
+public class AdjustBalanceDialog extends Dialog<ButtonType> {
 
     private final WalletGUIController walletController;
     private final WalletResponseDTO wallet;
-    private final JTextField actualBalanceField;
-    private final JTextField reasonField;
-    private final JTextField dateField;
+    private final TextField actualBalanceField;
+    private final TextField reasonField;
+    private final TextField dateField;
     private boolean success = false;
     private BalanceAdjustmentResponseDTO adjustmentResponse = null;
     private String errorMessage = null;
     private Consumer<String> errorConsumer = msg -> {
-        JOptionPane.showMessageDialog(
-                this,
-                msg,
-                "Lỗi kiểm kê số dư",
-                JOptionPane.ERROR_MESSAGE);
+        try {
+            if (Platform.isFxApplicationThread()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Lỗi kiểm kê số dư");
+                alert.setHeaderText(null);
+                alert.setContentText(msg);
+                alert.showAndWait();
+            }
+        } catch (Exception ignored) {
+        }
     };
     private Consumer<String> infoConsumer = msg -> {
-        JOptionPane.showMessageDialog(
-                this,
-                msg,
-                "Kết quả kiểm kê",
-                JOptionPane.INFORMATION_MESSAGE);
+        try {
+            if (Platform.isFxApplicationThread()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Kết quả kiểm kê");
+                alert.setHeaderText(null);
+                alert.setContentText(msg);
+                alert.showAndWait();
+            }
+        } catch (Exception ignored) {
+        }
     };
 
-    public AdjustBalanceDialog(JFrame parent, WalletGUIController walletController, WalletResponseDTO wallet) {
-        super(parent, "Kiểm Kê Điều Chỉnh Số Dư Ví", true);
+    public AdjustBalanceDialog(Window owner, WalletGUIController walletController, WalletResponseDTO wallet) {
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được để null");
         this.wallet = Objects.requireNonNull(wallet, "WalletResponseDTO không được để null");
 
-        setSize(440, 320);
-        setMinimumSize(new Dimension(400, 280));
-        setLocationRelativeTo(parent);
-        setLayout(new BorderLayout());
+        setTitle("Kiểm Kê Điều Chỉnh Số Dư Ví");
+        if (owner != null) {
+            initOwner(owner);
+        }
 
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
         symbols.setGroupingSeparator(',');
         DecimalFormat formatter = new DecimalFormat("#,##0", symbols);
 
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
-        formPanel.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        Label currentBalanceLabel = new Label("Số dư hiện tại: " + formatter.format(wallet.getBalance()) + " " + wallet.getCurrency());
+        currentBalanceLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-weight: bold;");
 
-        JLabel currentInfoLabel = new JLabel("Ví: " + wallet.getName() +
-                " | Số dư sổ sách: " + formatter.format(wallet.getBalance()) + " VNĐ");
-        currentInfoLabel.setFont(ViewConstants.FONT_NAV_ACTIVE);
-        currentInfoLabel.setForeground(ViewConstants.COLOR_PRIMARY);
-        currentInfoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.actualBalanceField = new TextField();
+        this.actualBalanceField.setPromptText("Nhập số dư thực tế...");
 
-        JLabel actualBalanceLabel = new JLabel("Số dư thực tế quan sát được (*):");
-        actualBalanceLabel.setFont(ViewConstants.FONT_BODY);
-        actualBalanceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.reasonField = new TextField();
+        this.reasonField.setPromptText("Lý do điều chỉnh...");
 
-        this.actualBalanceField = new JTextField();
-        this.actualBalanceField.setFont(ViewConstants.FONT_BODY);
-        this.actualBalanceField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.actualBalanceField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.dateField = new TextField(LocalDate.now().toString());
 
-        JLabel reasonLabel = new JLabel("Lý do điều chỉnh (*):");
-        reasonLabel.setFont(ViewConstants.FONT_BODY);
-        reasonLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        VBox form = new VBox(8);
+        form.setPadding(new Insets(16, 20, 16, 20));
+        form.setStyle("-fx-background-color: #121212;");
 
-        this.reasonField = new JTextField();
-        this.reasonField.setFont(ViewConstants.FONT_BODY);
-        this.reasonField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.reasonField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label actualLabel = new Label("Số dư thực tế (*):");
+        actualLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        JLabel dateLabel = new JLabel("Ngày kiểm kê (dd/MM/yyyy hoặc yyyy-MM-dd):");
-        dateLabel.setFont(ViewConstants.FONT_BODY);
-        dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label reasonLabel = new Label("Lý do điều chỉnh (*):");
+        reasonLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        this.dateField = new JTextField(LocalDate.now().toString());
-        this.dateField.setFont(ViewConstants.FONT_BODY);
-        this.dateField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.dateField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label dateLabel = new Label("Ngày điều chỉnh (YYYY-MM-DD):");
+        dateLabel.setStyle("-fx-text-fill: -color-text-main;");
 
-        formPanel.add(currentInfoLabel);
-        formPanel.add(Box.createVerticalStrut(14));
-        formPanel.add(actualBalanceLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.actualBalanceField);
-        formPanel.add(Box.createVerticalStrut(10));
-        formPanel.add(reasonLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.reasonField);
-        formPanel.add(Box.createVerticalStrut(10));
-        formPanel.add(dateLabel);
-        formPanel.add(Box.createVerticalStrut(4));
-        formPanel.add(this.dateField);
+        form.getChildren().addAll(
+                currentBalanceLabel,
+                actualLabel, this.actualBalanceField,
+                reasonLabel, this.reasonField,
+                dateLabel, this.dateField
+        );
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
-        buttonPanel.setBackground(ViewConstants.COLOR_STATUS_BG);
-        buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
+        DialogPane pane = getDialogPane();
+        pane.setContent(form);
+        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        var cssResource = getClass().getResource("/css/pfms-theme.css");
+        if (cssResource != null) {
+            pane.getStylesheets().add(cssResource.toExternalForm());
+        }
 
-        JButton cancelButton = new JButton("Hủy bỏ");
-        cancelButton.setFont(ViewConstants.FONT_BODY);
-        cancelButton.addActionListener(e -> dispose());
+        final var okButton = pane.lookupButton(ButtonType.OK);
+        if (okButton != null) {
+            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                triggerAdjust();
+                if (!isSuccess()) {
+                    event.consume();
+                }
+            });
+        }
+    }
 
-        JButton adjustButton = new JButton("Xác nhận kiểm kê");
-        adjustButton.setFont(ViewConstants.FONT_BODY);
-        adjustButton.setBackground(ViewConstants.COLOR_PRIMARY_LIGHT);
-        adjustButton.setForeground(ViewConstants.COLOR_STATUS_BG);
-        adjustButton.addActionListener(e -> triggerAdjust());
+    public AdjustBalanceDialog(WalletGUIController walletController, WalletResponseDTO wallet) {
+        this((Window) null, walletController, wallet);
+    }
 
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(adjustButton);
-
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+    public AdjustBalanceDialog(Object dummyParent, WalletGUIController walletController, WalletResponseDTO wallet) {
+        this((Window) (dummyParent instanceof Window ? (Window) dummyParent : null), walletController, wallet);
     }
 
     public void triggerAdjust() {
@@ -163,6 +152,10 @@ public class AdjustBalanceDialog extends JDialog {
                 this.errorConsumer.accept(ex.getMessage());
             }
         }
+    }
+
+    public void dispose() {
+        close();
     }
 
     public boolean isSuccess() {

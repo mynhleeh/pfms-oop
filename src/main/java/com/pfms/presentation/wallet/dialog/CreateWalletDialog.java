@@ -1,103 +1,98 @@
 package com.pfms.presentation.wallet.dialog;
 
-import com.pfms.presentation.wallet.WalletGUIController;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
-import com.pfms.presentation.common.ViewConstants;
+import com.pfms.presentation.wallet.WalletGUIController;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
- * Hộp thoại modal tạo ví tài chính mới (UC-WAL-01).
+ * Hộp thoại modal tạo ví tài chính mới (UC-WAL-01) sử dụng JavaFX.
  */
-public class CreateWalletDialog extends JDialog {
+public class CreateWalletDialog extends Dialog<ButtonType> {
 
     private final WalletGUIController walletController;
-    private final JTextField nameField;
-    private final JTextField noteField;
+    private final TextField nameField;
+    private final TextArea noteField;
     private boolean success = false;
     private WalletResponseDTO createdWallet = null;
     private String errorMessage = null;
-    private java.util.function.Consumer<String> errorConsumer = msg -> {
-        JOptionPane.showMessageDialog(
-                this,
-                msg,
-                "Lỗi tạo ví",
-                JOptionPane.ERROR_MESSAGE);
+    private Consumer<String> errorConsumer = msg -> {
+        try {
+            if (Platform.isFxApplicationThread()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Lỗi tạo ví");
+                alert.setHeaderText(null);
+                alert.setContentText(msg);
+                alert.showAndWait();
+            }
+        } catch (Exception ignored) {
+        }
     };
 
-    public CreateWalletDialog(JFrame parent, WalletGUIController walletController) {
-        super(parent, "Thêm Ví Tài Chính Mới", true);
+    public CreateWalletDialog(Window owner, WalletGUIController walletController) {
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được để null");
 
-        setSize(420, 240);
-        setMinimumSize(new Dimension(380, 220));
-        setLocationRelativeTo(parent);
-        setLayout(new BorderLayout());
+        setTitle("Thêm Ví Tài Chính Mới");
+        if (owner != null) {
+            initOwner(owner);
+        }
 
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
-        formPanel.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        this.nameField = new TextField();
+        this.nameField.setPromptText("Nhập tên ví...");
 
-        JLabel nameLabel = new JLabel("Tên ví (*):");
-        nameLabel.setFont(ViewConstants.FONT_BODY);
-        nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.noteField = new TextArea();
+        this.noteField.setPromptText("Ghi chú tùy chọn...");
+        this.noteField.setPrefRowCount(3);
 
-        this.nameField = new JTextField();
-        this.nameField.setFont(ViewConstants.FONT_BODY);
-        this.nameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.nameField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        VBox form = new VBox(8);
+        form.setPadding(new Insets(16, 20, 16, 20));
+        form.setStyle("-fx-background-color: #121212;");
 
-        JLabel noteLabel = new JLabel("Ghi chú:");
-        noteLabel.setFont(ViewConstants.FONT_BODY);
-        noteLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label nameLabel = new Label("Tên ví (*):");
+        nameLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        this.noteField = new JTextField();
-        this.noteField.setFont(ViewConstants.FONT_BODY);
-        this.noteField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        this.noteField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Label noteLabel = new Label("Ghi chú:");
+        noteLabel.setStyle("-fx-text-fill: -color-text-main;");
 
-        formPanel.add(nameLabel);
-        formPanel.add(Box.createVerticalStrut(6));
-        formPanel.add(this.nameField);
-        formPanel.add(Box.createVerticalStrut(12));
-        formPanel.add(noteLabel);
-        formPanel.add(Box.createVerticalStrut(6));
-        formPanel.add(this.noteField);
+        form.getChildren().addAll(nameLabel, nameField, noteLabel, noteField);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
-        buttonPanel.setBackground(ViewConstants.COLOR_STATUS_BG);
-        buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
+        DialogPane pane = getDialogPane();
+        pane.setContent(form);
+        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        var cssResource = getClass().getResource("/css/pfms-theme.css");
+        if (cssResource != null) {
+            pane.getStylesheets().add(cssResource.toExternalForm());
+        }
 
-        JButton cancelButton = new JButton("Hủy bỏ");
-        cancelButton.setFont(ViewConstants.FONT_BODY);
-        cancelButton.addActionListener(e -> dispose());
+        final var okButton = pane.lookupButton(ButtonType.OK);
+        if (okButton != null) {
+            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                triggerSave();
+                if (!isSuccess()) {
+                    event.consume();
+                }
+            });
+        }
+    }
 
-        JButton saveButton = new JButton("Lưu ví");
-        saveButton.setFont(ViewConstants.FONT_BODY);
-        saveButton.setBackground(ViewConstants.COLOR_PRIMARY_LIGHT);
-        saveButton.setForeground(ViewConstants.COLOR_STATUS_BG);
-        saveButton.addActionListener(e -> triggerSave());
+    public CreateWalletDialog(WalletGUIController walletController) {
+        this((Window) null, walletController);
+    }
 
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(saveButton);
-
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+    public CreateWalletDialog(Object dummyParent, WalletGUIController walletController) {
+        this((Window) (dummyParent instanceof Window ? (Window) dummyParent : null), walletController);
     }
 
     public void triggerSave() {
@@ -118,7 +113,11 @@ public class CreateWalletDialog extends JDialog {
         }
     }
 
-    public void setErrorConsumer(java.util.function.Consumer<String> errorConsumer) {
+    public void dispose() {
+        close();
+    }
+
+    public void setErrorConsumer(Consumer<String> errorConsumer) {
         this.errorConsumer = errorConsumer;
     }
 

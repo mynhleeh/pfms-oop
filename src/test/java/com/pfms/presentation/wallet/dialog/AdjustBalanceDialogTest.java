@@ -5,19 +5,27 @@ import com.pfms.domain.exception.ErrorCode;
 import com.pfms.presentation.wallet.WalletGUIController;
 import com.pfms.presentation.dto.wallet.BalanceAdjustmentResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
+import com.pfms.testutil.JavaFxTestHelper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.swing.JFrame;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Kiểm thử AdjustBalanceDialog - Hộp thoại kiểm kê điều chỉnh số dư")
 class AdjustBalanceDialogTest {
@@ -26,22 +34,31 @@ class AdjustBalanceDialogTest {
     private WalletResponseDTO wallet;
     private AdjustBalanceDialog dialog;
 
+    @BeforeAll
+    static void initJfx() {
+        JavaFxTestHelper.initPlatform();
+    }
+
     @BeforeEach
     void setUp() {
         walletController = Mockito.mock(WalletGUIController.class);
         wallet = new WalletResponseDTO(
                 UUID.randomUUID(), "Ví Tiền mặt", new BigDecimal("2000000"), "VND", false, "ACTIVE", "Ghi chú", LocalDateTime.now());
-        dialog = new AdjustBalanceDialog((JFrame) null, walletController, wallet);
-        dialog.setErrorConsumer(msg -> {});
-        dialog.setInfoConsumer(msg -> {});
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog = new AdjustBalanceDialog(walletController, wallet);
+            dialog.setErrorConsumer(msg -> {});
+            dialog.setInfoConsumer(msg -> {});
+        });
     }
 
     @Test
     @DisplayName("Khởi tạo hiển thị số dư hiện tại và cờ thành công ban đầu là false")
     void testInitialState() {
-        assertFalse(dialog.isSuccess());
-        assertNull(dialog.getAdjustmentResponse());
-        assertNotNull(dialog.getDateInputValue());
+        JavaFxTestHelper.runOnFxThread(() -> {
+            assertFalse(dialog.isSuccess());
+            assertNull(dialog.getAdjustmentResponse());
+            assertNotNull(dialog.getDateInputValue());
+        });
     }
 
     @Test
@@ -56,12 +73,14 @@ class AdjustBalanceDialogTest {
                 eq(wallet.getWalletId()), eq("2500000"), eq("Kiểm đếm cuối tháng"), anyString()))
                 .thenReturn(response);
 
-        dialog.setActualBalanceInputValue("2500000");
-        dialog.setReasonInputValue("Kiểm đếm cuối tháng");
-        dialog.triggerAdjust();
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.setActualBalanceInputValue("2500000");
+            dialog.setReasonInputValue("Kiểm đếm cuối tháng");
+            dialog.triggerAdjust();
 
-        assertTrue(dialog.isSuccess());
-        assertSame(response, dialog.getAdjustmentResponse());
+            assertTrue(dialog.isSuccess());
+            assertSame(response, dialog.getAdjustmentResponse());
+        });
     }
 
     @Test
@@ -71,12 +90,14 @@ class AdjustBalanceDialogTest {
                 eq(wallet.getWalletId()), eq("-100"), eq("Lý do sai"), anyString()))
                 .thenThrow(new BusinessException(ErrorCode.ERR_FIN_001, "Số dư thực tế không được là số âm"));
 
-        dialog.setActualBalanceInputValue("-100");
-        dialog.setReasonInputValue("Lý do sai");
-        dialog.triggerAdjust();
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.setActualBalanceInputValue("-100");
+            dialog.setReasonInputValue("Lý do sai");
+            dialog.triggerAdjust();
 
-        assertFalse(dialog.isSuccess());
-        assertNull(dialog.getAdjustmentResponse());
-        assertEquals("Số dư thực tế không được là số âm", dialog.getErrorMessage());
+            assertFalse(dialog.isSuccess());
+            assertNull(dialog.getAdjustmentResponse());
+            assertEquals("Số dư thực tế không được là số âm", dialog.getErrorMessage());
+        });
     }
 }
