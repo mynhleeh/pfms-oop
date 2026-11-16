@@ -1,69 +1,33 @@
 package com.pfms.presentation.wallet.dialog;
 
+import com.pfms.presentation.common.dialog.BaseFormDialog;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.wallet.WalletGUIController;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Hộp thoại modal sửa đổi tên và ghi chú ví tài chính (UC-WAL-03) sử dụng JavaFX.
+ * Kế thừa BaseFormDialog theo mô hình Template Method, loại bỏ boilerplate lặp lại.
  */
-public class UpdateWalletDialog extends Dialog<ButtonType> {
+public class UpdateWalletDialog extends BaseFormDialog<WalletResponseDTO> {
 
     private final WalletGUIController walletController;
     private final WalletResponseDTO initialWallet;
     private final TextField nameField;
     private final TextArea noteField;
-    private boolean success = false;
-    private WalletResponseDTO updatedWallet = null;
-    private String errorMessage = null;
-    private Consumer<String> errorConsumer = msg -> {
-        try {
-            if (Platform.isFxApplicationThread()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Lỗi cập nhật ví");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
-            }
-        } catch (Exception ignored) {
-        }
-    };
 
     public UpdateWalletDialog(Window owner, WalletGUIController walletController, WalletResponseDTO initialWallet) {
+        super(owner, "Chỉnh Sửa Thông Tin Ví", 440);
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được để null");
         this.initialWallet = Objects.requireNonNull(initialWallet, "WalletResponseDTO không được để null");
 
-        setTitle("Chỉnh Sửa Thông Tin Ví");
-        if (owner != null) {
-            initOwner(owner);
-        }
+        var headerBox = createHeaderBox("Chỉnh Sửa Thông Tin Ví", "Cập nhật tên và ghi chú cho ví tài chính #" + this.initialWallet.getName());
 
-        // Header Section
-        VBox headerBox = new VBox(4);
-        headerBox.setPadding(new Insets(0, 0, 8, 0));
-
-        Label titleLabel = new Label("Chỉnh Sửa Thông Tin Ví");
-        titleLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
-
-        Label subtitleLabel = new Label("Cập nhật tên và ghi chú cho ví tài chính #" + this.initialWallet.getName());
-        subtitleLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
-        headerBox.getChildren().addAll(titleLabel, subtitleLabel);
-
-        // Fields
         this.nameField = new TextField(this.initialWallet.getName());
         this.nameField.setPromptText("Ví dụ: Ví Tiền Mặt, Thẻ VPBank...");
 
@@ -78,39 +42,10 @@ public class UpdateWalletDialog extends Dialog<ButtonType> {
         Label noteLabel = new Label("Ghi chú:");
         noteLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 12px;");
 
-        VBox form = new VBox(10);
-        form.setPadding(new Insets(18, 22, 18, 22));
-        form.setStyle("-fx-background-color: #141414;");
-        form.getChildren().addAll(headerBox, nameLabel, this.nameField, noteLabel, this.noteField);
+        var form = createFormBox(10, headerBox, nameLabel, this.nameField, noteLabel, this.noteField);
+        getDialogPane().setContent(form);
 
-        DialogPane pane = getDialogPane();
-        pane.setPrefWidth(440);
-        pane.setMinWidth(440);
-        pane.setContent(form);
-        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        var cssResource = getClass().getResource("/css/pfms-theme.css");
-        if (cssResource != null) {
-            pane.getStylesheets().add(cssResource.toExternalForm());
-        }
-
-        final var okButton = pane.lookupButton(ButtonType.OK);
-        if (okButton instanceof Button btn) {
-            btn.setText("Lưu thay đổi");
-            btn.setDefaultButton(true);
-        }
-        if (okButton != null) {
-            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-                triggerSave();
-                if (!isSuccess()) {
-                    event.consume();
-                }
-            });
-        }
-
-        final var cancelButton = pane.lookupButton(ButtonType.CANCEL);
-        if (cancelButton instanceof Button btn) {
-            btn.setText("Hủy bỏ");
-        }
+        setupButtons("Lưu thay đổi", "Hủy bỏ");
     }
 
     public UpdateWalletDialog(WalletGUIController walletController, WalletResponseDTO initialWallet) {
@@ -118,54 +53,18 @@ public class UpdateWalletDialog extends Dialog<ButtonType> {
     }
 
     public UpdateWalletDialog(Object dummyParent, WalletGUIController walletController, WalletResponseDTO initialWallet) {
-        this((Window) (dummyParent instanceof Window ? (Window) dummyParent : null), walletController, initialWallet);
+        this(dummyParent instanceof Window w ? w : null, walletController, initialWallet);
     }
 
-    public void triggerSave() {
+    @Override
+    protected WalletResponseDTO onExecuteSave() throws Exception {
         String name = this.nameField.getText();
         String note = this.noteField.getText();
-
-        try {
-            this.updatedWallet = this.walletController.handleUpdateWallet(
-                    this.initialWallet.getWalletId(), name, note);
-            this.success = true;
-            this.errorMessage = null;
-            dispose();
-        } catch (Exception ex) {
-            this.errorMessage = ex.getMessage();
-            this.success = false;
-            if (this.errorConsumer != null) {
-                this.errorConsumer.accept(ex.getMessage());
-            }
-        }
-    }
-
-    public void dispose() {
-        close();
-    }
-
-    public void setVisible(boolean visible) {
-        if (visible) {
-            showAndWait();
-        } else {
-            close();
-        }
-    }
-
-    public void setErrorConsumer(Consumer<String> errorConsumer) {
-        this.errorConsumer = errorConsumer;
-    }
-
-    public String getErrorMessage() {
-        return this.errorMessage;
-    }
-
-    public boolean isSuccess() {
-        return this.success;
+        return this.walletController.handleUpdateWallet(this.initialWallet.getWalletId(), name, note);
     }
 
     public WalletResponseDTO getUpdatedWallet() {
-        return this.updatedWallet;
+        return this.resultData;
     }
 
     public String getNameInputValue() {

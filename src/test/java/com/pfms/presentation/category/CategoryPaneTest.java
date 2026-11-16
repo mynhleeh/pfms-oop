@@ -3,6 +3,7 @@ package com.pfms.presentation.category;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.testutil.JavaFxTestHelper;
+import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -128,5 +129,18 @@ class CategoryPaneTest {
     @DisplayName("Presenter được gán hợp lệ và liên kết chính xác với view")
     void testPresenterAttached() {
         assertNotNull(pane.getPresenter());
+    }
+
+    @Test
+    @DisplayName("Nút làm mới khởi tạo đúng text, style và kích hoạt presenter.loadData()")
+    void testRefreshButtonTriggersLoadData() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            assertNotNull(pane.getBtnRefresh());
+            assertEquals("Làm mới", pane.getBtnRefresh().getText());
+            assertTrue(pane.getBtnRefresh().getStyleClass().contains("btn-secondary"));
+
+            pane.getBtnRefresh().fire();
+            Mockito.verify(categoryController, Mockito.atLeast(2)).loadCategoryHierarchy();
+        });
     }
 }

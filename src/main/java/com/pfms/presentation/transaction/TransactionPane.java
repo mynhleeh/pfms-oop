@@ -1,11 +1,10 @@
 package com.pfms.presentation.transaction;
 
 import com.pfms.presentation.category.CategoryGUIController;
-import com.pfms.presentation.common.util.FxAlertUtils;
+import com.pfms.presentation.common.AbstractBasePane;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
-import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.transaction.component.TransactionFilterBar;
 import com.pfms.presentation.transaction.component.TransactionRowNode;
@@ -13,8 +12,6 @@ import com.pfms.presentation.transaction.dialog.RecordTransactionDialog;
 import com.pfms.presentation.transaction.dialog.UpdateTransactionDialog;
 import com.pfms.presentation.transaction.viewmodel.TransactionItemViewModel;
 import com.pfms.presentation.wallet.WalletGUIController;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,7 +24,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -39,13 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 /**
  * Bảng điều khiển phân hệ Quản lý Giao dịch Thu &amp; Chi (Transaction Management Pane) sử dụng JavaFX.
- * Hiện thực hóa giao diện TransactionView theo mô hình MVP (Passive View).
+ * Hiện thực hóa giao diện TransactionView theo mô hình MVP (Passive View), kế thừa AbstractBasePane.
  */
-public class TransactionPane extends BorderPane implements TransactionView {
+public class TransactionPane extends AbstractBasePane implements TransactionView {
 
     private final TransactionGUIController transactionController;
     private final WalletGUIController walletController;
@@ -74,17 +69,13 @@ public class TransactionPane extends BorderPane implements TransactionView {
             new com.pfms.presentation.common.component.KpiPill("Dòng tiền thuần", "0 VNĐ", com.pfms.presentation.common.component.KpiPill.Variant.GOLD);
 
     private final Label pageInfoLabel = new Label("Trang 1 / 1 (Tổng 0 giao dịch)");
-    private final Label summaryFooterLabel = new Label("");
-
-    private Consumer<String> messageConsumer;
-    private Consumer<String> warningConsumer;
-    private Consumer<String> errorConsumer;
 
     public TransactionPane(
             TransactionGUIController transactionController,
             WalletGUIController walletController,
             CategoryGUIController categoryController) {
 
+        super();
         this.transactionController = Objects.requireNonNull(transactionController, "TransactionGUIController không được null");
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được null");
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được null");
@@ -95,9 +86,6 @@ public class TransactionPane extends BorderPane implements TransactionView {
                 this.filterBar.buildFilterRequest(this.presenter.getCurrentPage(), this.presenter.getPageSize())));
         this.filterBar.setOnResetAction(() -> this.presenter.loadTransactions(null));
         this.filterBar.setOnAddAction(this.presenter::onAddTransactionClicked);
-
-        setStyle("-fx-background-color: -color-bg-base;");
-        setPadding(new Insets(20));
 
         // Top Section: Header + KPI Summary Cards + FilterBar
         VBox topBox = new VBox(14);
@@ -397,6 +385,9 @@ public class TransactionPane extends BorderPane implements TransactionView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        if (summaryFooterLabel.getParent() instanceof javafx.scene.layout.Pane parentPane) {
+            parentPane.getChildren().remove(summaryFooterLabel);
+        }
         summaryFooterLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
 
         paginationBar.getChildren().addAll(btnPrev, pageInfoLabel, btnNext, spacer, summaryFooterLabel);
@@ -553,64 +544,50 @@ public class TransactionPane extends BorderPane implements TransactionView {
     public void setSelectedTypeFilter(String type) {
         this.filterBar.setSelectedTypeFilter(type);
     }
-
-    @Override
-    public void showMessage(String message) {
-        if (messageConsumer != null) {
-            messageConsumer.accept(message);
-        } else {
-            FxAlertUtils.showInfo("PFMS Thông báo", message);
-        }
-    }
-
-    @Override
-    public void showWarning(String message) {
-        if (warningConsumer != null) {
-            warningConsumer.accept(message);
-        } else {
-            FxAlertUtils.showWarning("PFMS Cảnh báo", message);
-        }
-    }
-
-    @Override
-    public void showError(String message) {
-        if (errorConsumer != null) {
-            errorConsumer.accept(message);
-        } else {
-            FxAlertUtils.showError("PFMS Lỗi", message);
-        }
-    }
-
-    @Override
-    public boolean confirmAction(String message) {
-        return FxAlertUtils.showConfirm("Xác nhận thao tác", message);
-    }
     // endregion
 
-    private void runOnFx(Runnable action) {
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-        } else {
-            Platform.runLater(action);
-        }
+    // Getters
+    public TransactionPresenter getPresenter() {
+        return presenter;
     }
 
-    // Getters
-    public TransactionPresenter getPresenter() { return presenter; }
-    public TableView<TransactionItemViewModel> getTableView() { return tableView; }
-    public ObservableList<TransactionItemViewModel> getTableData() { return tableData; }
-    public TransactionFilterBar getFilterBar() { return filterBar; }
-    public String getSummaryText() { return summaryFooterLabel.getText(); }
-    public String getPageInfoText() { return pageInfoLabel.getText(); }
-    public Label getStatTotalIncomeLabel() { return statTotalIncomeLabel; }
-    public Label getStatTotalExpenseLabel() { return statTotalExpenseLabel; }
-    public Label getStatNetCashFlowLabel() { return statNetCashFlowLabel; }
+    public TableView<TransactionItemViewModel> getTableView() {
+        return tableView;
+    }
 
-    public VBox getStreamItemsContainer() { return streamItemsContainer; }
-    public ScrollPane getStreamScrollPane() { return streamScrollPane; }
-    public HBox getStreamHeader() { return streamHeader; }
+    public ObservableList<TransactionItemViewModel> getTableData() {
+        return tableData;
+    }
 
-    public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }
-    public void setWarningConsumer(Consumer<String> consumer) { this.warningConsumer = consumer; }
-    public void setErrorConsumer(Consumer<String> consumer) { this.errorConsumer = consumer; }
+    public TransactionFilterBar getFilterBar() {
+        return filterBar;
+    }
+
+    public String getPageInfoText() {
+        return pageInfoLabel.getText();
+    }
+
+    public Label getStatTotalIncomeLabel() {
+        return statTotalIncomeLabel;
+    }
+
+    public Label getStatTotalExpenseLabel() {
+        return statTotalExpenseLabel;
+    }
+
+    public Label getStatNetCashFlowLabel() {
+        return statNetCashFlowLabel;
+    }
+
+    public VBox getStreamItemsContainer() {
+        return streamItemsContainer;
+    }
+
+    public ScrollPane getStreamScrollPane() {
+        return streamScrollPane;
+    }
+
+    public HBox getStreamHeader() {
+        return streamHeader;
+    }
 }

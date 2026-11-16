@@ -1,6 +1,8 @@
 package com.pfms.presentation.transaction.dialog;
 
 import com.pfms.presentation.category.CategoryGUIController;
+import com.pfms.presentation.common.dialog.BaseFormDialog;
+import com.pfms.presentation.common.util.FxControlUtils;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
@@ -8,27 +10,20 @@ import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.transaction.TransactionGUIController;
 import com.pfms.presentation.wallet.WalletGUIController;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
-import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -39,13 +34,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * Hộp thoại modal ghi nhận giao dịch thu chi mới (UC-TRN-03) sử dụng JavaFX.
- * Hiện thực giao diện Code-First theo nhận diện Luxury Black & Gold.
+ * Hiện thực giao diện Code-First theo nhận diện Luxury Black & Gold và kế thừa BaseFormDialog.
  */
-public class RecordTransactionDialog extends Dialog<ButtonType> {
+public class RecordTransactionDialog extends BaseFormDialog<TransactionResponseDTO> {
 
     private final TransactionGUIController transactionController;
     private final WalletGUIController walletController;
@@ -79,29 +73,13 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
     private final List<CategoryHierarchyResponseDTO> incomeGroups = new ArrayList<>();
     private final DecimalFormat currencyFormatter;
 
-    private boolean success = false;
-    private TransactionResponseDTO createdTransaction = null;
-    private String errorMessage = null;
-
-    private Consumer<String> errorConsumer = msg -> {
-        try {
-            if (Platform.isFxApplicationThread()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Lỗi ghi nhận giao dịch");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
-            }
-        } catch (Exception ignored) {
-        }
-    };
-
     public RecordTransactionDialog(
             Window owner,
             TransactionGUIController transactionController,
             WalletGUIController walletController,
             CategoryGUIController categoryController) {
 
+        super(owner, "Ghi Nhận Giao Dịch Thu Chi", 520);
         this.transactionController = Objects.requireNonNull(transactionController, "TransactionGUIController không được null");
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được null");
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được null");
@@ -109,9 +87,6 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
         symbols.setGroupingSeparator(',');
         this.currencyFormatter = new DecimalFormat("#,##0", symbols);
-
-        setTitle("Ghi Nhận Giao Dịch Thu Chi");
-        initOwner(owner);
 
         typeCombo.getItems().addAll("Chi tiêu", "Thu nhập");
         typeCombo.setValue("Chi tiêu");
@@ -134,26 +109,12 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
     private void buildUI() {
         DialogPane pane = getDialogPane();
         pane.getStyleClass().add("pfms-dialog");
-        pane.setPrefWidth(520);
-        pane.setMinWidth(520);
-
-        var cssResource = getClass().getResource("/css/pfms-theme.css");
-        if (cssResource != null) {
-            pane.getStylesheets().add(cssResource.toExternalForm());
-        }
 
         VBox contentBox = new VBox(12);
         contentBox.setPadding(new Insets(18, 22, 18, 22));
         contentBox.setStyle("-fx-background-color: #141414;");
 
-        // Header Title
-        VBox headerBox = new VBox(4);
-        headerBox.setPadding(new Insets(0, 0, 6, 0));
-        Label headerTitle = new Label("Ghi Nhận Giao Dịch Thu Chi Mới");
-        headerTitle.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
-        Label headerSubtitle = new Label("Nhập thông tin giao dịch thu chi cá nhân và phân loại danh mục");
-        headerSubtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
-        headerBox.getChildren().addAll(headerTitle, headerSubtitle);
+        var headerBox = createHeaderBox("Ghi Nhận Giao Dịch Thu Chi Mới", "Nhập thông tin giao dịch thu chi cá nhân và phân loại danh mục");
 
         // 1. Type Switcher (Chi tiêu vs Thu nhập)
         HBox typeSwitcher = new HBox(6);
@@ -317,115 +278,39 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
     }
 
     private void setupWalletComboRenderer() {
-        walletCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(WalletResponseDTO w) {
-                return w != null ? w.getName() : "-- Chọn ví tài chính --";
-            }
-
-            @Override
-            public WalletResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        walletCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(WalletResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getName());
-            }
-        });
+        FxControlUtils.configureComboBox(walletCombo, WalletResponseDTO::getName, "-- Chọn ví tài chính --");
     }
 
     private void setupGroupComboRenderer() {
-        groupCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryHierarchyResponseDTO g) {
-                return g != null ? g.getNeedGroupName() : "-- Chọn nhóm danh mục --";
-            }
-
-            @Override
-            public CategoryHierarchyResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        groupCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryHierarchyResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getNeedGroupName());
-            }
-        });
+        FxControlUtils.configureComboBox(groupCombo, CategoryHierarchyResponseDTO::getNeedGroupName, "-- Chọn nhóm danh mục --");
     }
 
     private void setupCategoryComboRenderer() {
-        categoryCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryResponseDTO c) {
-                return c != null ? c.getName() : "-- Chọn danh mục --";
-            }
-
-            @Override
-            public CategoryResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        categoryCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getName());
-            }
-        });
+        FxControlUtils.configureComboBox(categoryCombo, CategoryResponseDTO::getName, "-- Chọn danh mục --");
     }
 
     private void setupFeeGroupComboRenderer() {
-        feeGroupCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryHierarchyResponseDTO g) {
-                return g != null ? g.getNeedGroupName() : "-- Chọn nhóm phụ phí --";
-            }
-
-            @Override
-            public CategoryHierarchyResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        feeGroupCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryHierarchyResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getNeedGroupName());
-            }
-        });
+        FxControlUtils.configureComboBox(feeGroupCombo, CategoryHierarchyResponseDTO::getNeedGroupName, "-- Chọn nhóm phụ phí --");
     }
 
     private void setupFeeCategoryComboRenderer() {
-        feeCategoryCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryResponseDTO c) {
-                return c != null ? c.getName() : "-- Chọn danh mục phụ phí --";
-            }
+        FxControlUtils.configureComboBox(feeCategoryCombo, CategoryResponseDTO::getName, "-- Chọn danh mục phụ phí --");
+    }
 
-            @Override
-            public CategoryResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        feeCategoryCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getName());
-            }
-        });
+    private void updateGroupsForSelectedType() {
+        String selectedType = typeCombo.getValue();
+        List<CategoryHierarchyResponseDTO> targetList = "Thu nhập".equalsIgnoreCase(selectedType) ? incomeGroups : expenseGroups;
+        groupCombo.getItems().setAll(targetList);
+        groupCombo.setValue(null);
+        categoryCombo.getItems().clear();
+        categoryCombo.setDisable(true);
     }
 
     private void onGroupSelected() {
-        CategoryHierarchyResponseDTO group = groupCombo.getValue();
+        CategoryHierarchyResponseDTO selectedGroup = groupCombo.getValue();
         categoryCombo.getItems().clear();
-        if (group != null && group.getCategories() != null && !group.getCategories().isEmpty()) {
-            categoryCombo.getItems().addAll(group.getCategories());
+        if (selectedGroup != null && selectedGroup.getCategories() != null && !selectedGroup.getCategories().isEmpty()) {
+            categoryCombo.getItems().addAll(selectedGroup.getCategories());
             categoryCombo.setDisable(false);
             categoryCombo.getSelectionModel().selectFirst();
         } else {
@@ -433,14 +318,15 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
         }
     }
 
-    private void updateGroupsForSelectedType() {
-        groupCombo.getItems().clear();
-        String selectedType = getSelectedTransactionType();
-        List<CategoryHierarchyResponseDTO> target = "Thu nhập".equalsIgnoreCase(selectedType) ? incomeGroups : expenseGroups;
-        groupCombo.getItems().addAll(target);
-        groupCombo.setValue(null);
-        categoryCombo.getItems().clear();
-        categoryCombo.setDisable(true);
+    private void onFeeGroupSelected(CategoryHierarchyResponseDTO group) {
+        feeCategoryCombo.getItems().clear();
+        if (group != null && group.getCategories() != null && !group.getCategories().isEmpty()) {
+            feeCategoryCombo.getItems().addAll(group.getCategories());
+            feeCategoryCombo.setDisable(false);
+            feeCategoryCombo.getSelectionModel().selectFirst();
+        } else {
+            feeCategoryCombo.setDisable(true);
+        }
     }
 
     private void onFeeCheckBoxToggled(boolean isSelected) {
@@ -458,17 +344,6 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
             if (!feeGroupCombo.getItems().isEmpty() && feeGroupCombo.getValue() == null) {
                 feeCategoryCombo.setDisable(true);
             }
-        }
-    }
-
-    private void onFeeGroupSelected(CategoryHierarchyResponseDTO group) {
-        feeCategoryCombo.getItems().clear();
-        if (group != null && group.getCategories() != null && !group.getCategories().isEmpty()) {
-            feeCategoryCombo.getItems().addAll(group.getCategories());
-            feeCategoryCombo.setDisable(false);
-            feeCategoryCombo.getSelectionModel().selectFirst();
-        } else {
-            feeCategoryCombo.setDisable(true);
         }
     }
 
@@ -535,22 +410,20 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
         }
     }
 
-    public void triggerSave() {
+    @Override
+    protected TransactionResponseDTO onExecuteSave() throws Exception {
         WalletResponseDTO wallet = walletCombo.getValue();
         CategoryHierarchyResponseDTO group = getSelectedGroup();
         CategoryResponseDTO category = categoryCombo.getValue();
 
         if (wallet == null) {
-            handleError("Vui lòng chọn ví tài chính.");
-            return;
+            throw new IllegalArgumentException("Vui lòng chọn ví tài chính.");
         }
         if (group == null) {
-            handleError("Vui lòng chọn nhóm danh mục.");
-            return;
+            throw new IllegalArgumentException("Vui lòng chọn nhóm danh mục.");
         }
         if (category == null) {
-            handleError("Vui lòng chọn danh mục thu chi.");
-            return;
+            throw new IllegalArgumentException("Vui lòng chọn danh mục thu chi.");
         }
 
         String rawAmount = getAmountInputValue();
@@ -565,53 +438,23 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
             if (feeCat != null) {
                 feeCatId = feeCat.getCategoryId();
             } else {
-                handleError("Vui lòng chọn nhóm và danh mục phụ phí.");
-                return;
+                throw new IllegalArgumentException("Vui lòng chọn nhóm và danh mục phụ phí.");
             }
         }
 
-        try {
-            this.createdTransaction = this.transactionController.handleRecordTransaction(
-                    wallet.getWalletId(),
-                    category.getCategoryId(),
-                    rawAmount,
-                    rawDate,
-                    rawNote,
-                    rawFeeAmount,
-                    feeCatId);
-            this.success = true;
-            this.errorMessage = null;
-            dispose();
-        } catch (Exception ex) {
-            handleError(ex.getMessage());
-        }
+        return this.transactionController.handleRecordTransaction(
+                wallet.getWalletId(),
+                category.getCategoryId(),
+                rawAmount,
+                rawDate,
+                rawNote,
+                rawFeeAmount,
+                feeCatId);
     }
 
-    private void handleError(String message) {
-        this.errorMessage = message;
-        this.success = false;
-        if (this.errorConsumer != null) {
-            this.errorConsumer.accept(message);
-        }
+    public TransactionResponseDTO getCreatedTransaction() {
+        return this.resultData;
     }
-
-    public void dispose() {
-        close();
-    }
-
-    public void setVisible(boolean visible) {
-        if (visible) {
-            showAndWait();
-        } else {
-            close();
-        }
-    }
-
-    // region Getters & Setters
-    public boolean isSuccess() { return success; }
-    public TransactionResponseDTO getCreatedTransaction() { return createdTransaction; }
-    public String getErrorMessage() { return errorMessage; }
-    public void setErrorConsumer(Consumer<String> errorConsumer) { this.errorConsumer = errorConsumer; }
 
     public String getSelectedTransactionType() { return typeCombo.getValue(); }
     public void setSelectedTransactionType(String type) {
@@ -705,8 +548,6 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
 
     public static class FxCheckBox extends CheckBox {
         public FxCheckBox(String text) { super(text); }
-        public void doClick() {
-            fire();
-        }
+        public void doClick() { fire(); }
     }
 }

@@ -1,6 +1,6 @@
 package com.pfms.presentation.data;
 
-import com.pfms.presentation.common.util.FxAlertUtils;
+import com.pfms.presentation.common.AbstractBasePane;
 import com.pfms.presentation.dto.data.ExportBackupResponseDTO;
 import com.pfms.presentation.dto.data.ReconciliationIssueResponseDTO;
 import com.pfms.presentation.dto.data.ReconciliationReportResponseDTO;
@@ -20,7 +20,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -32,15 +31,13 @@ import javafx.util.StringConverter;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Bảng điều khiển phân hệ Quản trị &amp; An toàn Dữ liệu (Data Management Pane) sử dụng JavaFX.
- * Hiện thực hóa giao diện DataManagementView theo mô hình MVP (Passive View).
+ * Hiện thực hóa giao diện DataManagementView theo mô hình MVP (Passive View), kế thừa AbstractBasePane.
  * Hỗ trợ: Xuất sao lưu JSON (UC-DAT-01), Phục hồi dữ liệu (UC-DAT-02), Đối soát hệ thống (UC-DAT-03).
  */
-public class DataManagementPane extends BorderPane implements DataManagementView {
+public class DataManagementPane extends AbstractBasePane implements DataManagementView {
 
     // region Fields
     private final DataManagementPresenter presenter;
@@ -66,16 +63,11 @@ public class DataManagementPane extends BorderPane implements DataManagementView
 
     private final ObservableList<ReconciliationIssueResponseDTO> issueList = FXCollections.observableArrayList();
     private final TableView<ReconciliationIssueResponseDTO> issueTable = new TableView<>(issueList);
-
-    // Callbacks & Consumers
-    private Consumer<String> messageConsumer;
-    private Consumer<String> warningConsumer;
-    private Consumer<String> errorConsumer;
-    private Predicate<String> confirmConsumer;
     // endregion
 
     // region Constructors
     public DataManagementPane(DataManagementGUIController dataController, String storagePath) {
+        super(false);
         Objects.requireNonNull(dataController, "DataManagementGUIController không được để null");
         this.storagePath = (storagePath != null && !storagePath.isBlank()) ? storagePath : "data/pfms_data.json";
         this.presenter = new DataManagementPresenter(this, dataController);
@@ -495,42 +487,6 @@ public class DataManagementPane extends BorderPane implements DataManagementView
     // endregion
 
     // region Dialog & Message Helpers
-    @Override
-    public void showMessage(String message) {
-        if (messageConsumer != null) {
-            messageConsumer.accept(message);
-        } else {
-            FxAlertUtils.showInfo("PFMS Thông báo", message);
-        }
-    }
-
-    @Override
-    public void showWarning(String message) {
-        if (warningConsumer != null) {
-            warningConsumer.accept(message);
-        } else {
-            FxAlertUtils.showWarning("PFMS Cảnh báo", message);
-        }
-    }
-
-    @Override
-    public void showError(String message) {
-        if (errorConsumer != null) {
-            errorConsumer.accept(message);
-        } else {
-            FxAlertUtils.showError("PFMS Lỗi", message);
-        }
-    }
-
-    @Override
-    public boolean confirmAction(String message) {
-        if (confirmConsumer != null) {
-            return confirmConsumer.test(message);
-        }
-        return FxAlertUtils.showConfirm("Xác nhận thao tác", message);
-    }
-    // endregion
-
     // region Badges & Styling Helpers
     private Label createStatusBadge(String text, String colorHex) {
         Label badge = new Label(text);
@@ -553,14 +509,6 @@ public class DataManagementPane extends BorderPane implements DataManagementView
                 "-fx-text-fill: %s; -fx-background-color: %s; -fx-border-color: %s; -fx-border-width: 1px; " +
                 "-fx-border-radius: 12px; -fx-background-radius: 12px; -fx-padding: 4px 10px; -fx-font-size: 11px; -fx-font-weight: bold;",
                 colorHex, bgRgba, colorHex));
-    }
-
-    private void runOnFx(Runnable action) {
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-        } else {
-            Platform.runLater(action);
-        }
     }
     // endregion
 
@@ -587,22 +535,6 @@ public class DataManagementPane extends BorderPane implements DataManagementView
 
     public void setOnDataRestoredListener(Runnable listener) {
         this.presenter.setOnDataRestoredListener(listener);
-    }
-
-    public void setMessageConsumer(Consumer<String> consumer) {
-        this.messageConsumer = consumer;
-    }
-
-    public void setWarningConsumer(Consumer<String> consumer) {
-        this.warningConsumer = consumer;
-    }
-
-    public void setErrorConsumer(Consumer<String> consumer) {
-        this.errorConsumer = consumer;
-    }
-
-    public void setConfirmConsumer(Predicate<String> consumer) {
-        this.confirmConsumer = consumer;
     }
 
     public TextField getDestinationField() {

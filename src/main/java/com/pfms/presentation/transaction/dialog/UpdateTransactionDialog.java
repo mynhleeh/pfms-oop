@@ -1,6 +1,8 @@
 package com.pfms.presentation.transaction.dialog;
 
 import com.pfms.presentation.category.CategoryGUIController;
+import com.pfms.presentation.common.dialog.BaseFormDialog;
+import com.pfms.presentation.common.util.FxControlUtils;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
@@ -8,26 +10,18 @@ import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.transaction.TransactionGUIController;
 import com.pfms.presentation.wallet.WalletGUIController;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
-import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -37,13 +31,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * Hộp thoại modal chỉnh sửa thông tin giao dịch Thu / Chi hiện có (UC-TRN-04) sử dụng JavaFX.
- * Hiện thực giao diện Code-First theo nhận diện Luxury Black & Gold.
+ * Hiện thực giao diện Code-First theo nhận diện Luxury Black & Gold và kế thừa BaseFormDialog.
  */
-public class UpdateTransactionDialog extends Dialog<ButtonType> {
+public class UpdateTransactionDialog extends BaseFormDialog<TransactionResponseDTO> {
 
     private final TransactionGUIController transactionController;
     private final WalletGUIController walletController;
@@ -71,23 +64,6 @@ public class UpdateTransactionDialog extends Dialog<ButtonType> {
     private final List<CategoryResponseDTO> availableCategories = new ArrayList<>();
     private final DecimalFormat currencyFormatter;
 
-    private boolean success = false;
-    private TransactionResponseDTO updatedTransaction = null;
-    private String errorMessage = null;
-
-    private Consumer<String> errorConsumer = msg -> {
-        try {
-            if (Platform.isFxApplicationThread()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Lỗi cập nhật giao dịch");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
-            }
-        } catch (Exception ignored) {
-        }
-    };
-
     public UpdateTransactionDialog(
             Window owner,
             TransactionGUIController transactionController,
@@ -95,6 +71,7 @@ public class UpdateTransactionDialog extends Dialog<ButtonType> {
             CategoryGUIController categoryController,
             TransactionResponseDTO existingTxn) {
 
+        super(owner, "Chỉnh Sửa Giao Dịch Thu Chi", 520);
         this.transactionController = Objects.requireNonNull(transactionController, "TransactionGUIController không được null");
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được null");
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được null");
@@ -103,9 +80,6 @@ public class UpdateTransactionDialog extends Dialog<ButtonType> {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
         symbols.setGroupingSeparator(',');
         this.currencyFormatter = new DecimalFormat("#,##0", symbols);
-
-        setTitle("Chỉnh Sửa Thông Tin Giao Dịch");
-        initOwner(owner);
 
         buildUI();
         loadCategories();
@@ -125,39 +99,18 @@ public class UpdateTransactionDialog extends Dialog<ButtonType> {
     private void buildUI() {
         DialogPane pane = getDialogPane();
         pane.getStyleClass().add("pfms-dialog");
-        pane.setPrefWidth(520);
-        pane.setMinWidth(520);
-
-        var cssResource = getClass().getResource("/css/pfms-theme.css");
-        if (cssResource != null) {
-            pane.getStylesheets().add(cssResource.toExternalForm());
-        }
 
         VBox contentBox = new VBox(12);
         contentBox.setPadding(new Insets(18, 22, 18, 22));
         contentBox.setStyle("-fx-background-color: #141414;");
 
-        // Header Title & Type Badge
-        VBox headerBox = new VBox(6);
-        headerBox.setPadding(new Insets(0, 0, 6, 0));
-        Label headerTitle = new Label("Chỉnh Sửa Thông Tin Giao Dịch");
-        headerTitle.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
+        var headerBox = createHeaderBox("Chỉnh Sửa Giao Dịch Thu Chi", "Cập nhật số tiền, ngày giao dịch, ví thanh toán hoặc danh mục");
 
-        boolean isIncome = "INCOME".equalsIgnoreCase(existingTxn.getTransactionType());
-        Label typeBadge = new Label(isIncome ? "Khoản Thu Nhập" : "Khoản Chi Tiêu");
-        typeBadge.setPadding(new Insets(4, 12, 4, 12));
-        if (isIncome) {
-            typeBadge.setStyle("-fx-background-color: rgba(34, 197, 94, 0.22); -fx-text-fill: #4ADE80; -fx-background-radius: 4px; -fx-font-weight: bold; -fx-font-size: 12px;");
-        } else {
-            typeBadge.setStyle("-fx-background-color: rgba(225, 29, 72, 0.22); -fx-text-fill: #FB7185; -fx-background-radius: 4px; -fx-font-weight: bold; -fx-font-size: 12px;");
-        }
-        headerBox.getChildren().addAll(headerTitle, typeBadge);
-
-        // 1. Amount input and hint
+        // 1. Amount and live hint
         VBox amountBox = new VBox(4);
         Label lblAmount = new Label("SỐ TIỀN GIAO DỊCH (*):");
         lblAmount.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
-        amountField.setPromptText("Nhập số tiền");
+        amountField.setPromptText("Nhập số tiền (ví dụ: 150000)");
         amountField.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
         amountInWordsHint.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 11px; -fx-font-style: italic;");
         amountField.textProperty().addListener((obs, oldVal, newVal) -> updateAmountHint());
@@ -173,7 +126,7 @@ public class UpdateTransactionDialog extends Dialog<ButtonType> {
         walletCombo.valueProperty().addListener((obs, oldVal, newVal) -> updateAvailableBalance());
         walletBox.getChildren().addAll(lblWallet, walletCombo, availableBalanceLabel);
 
-        // 3. Category selection
+        // 3. Category
         VBox categoryBox = new VBox(4);
         Label lblCategory = new Label("DANH MỤC THU CHI (*):");
         lblCategory.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
@@ -262,91 +215,19 @@ public class UpdateTransactionDialog extends Dialog<ButtonType> {
     }
 
     private void setupWalletComboRenderer() {
-        walletCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(WalletResponseDTO w) {
-                return w != null ? w.getName() : "-- Chọn ví tài chính --";
-            }
-
-            @Override
-            public WalletResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        walletCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(WalletResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getName());
-            }
-        });
+        FxControlUtils.configureComboBox(walletCombo, WalletResponseDTO::getName, "-- Chọn ví tài chính --");
     }
 
     private void setupCategoryComboRenderer() {
-        categoryCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryResponseDTO c) {
-                return c != null ? c.getName() + " [" + c.getParentGroupName() + "]" : "-- Chọn danh mục --";
-            }
-
-            @Override
-            public CategoryResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        categoryCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getName() + " [" + item.getParentGroupName() + "]");
-                }
-            }
-        });
+        FxControlUtils.configureComboBox(categoryCombo, c -> c.getName() + " [" + c.getParentGroupName() + "]", "-- Chọn danh mục --");
     }
 
     private void setupFeeGroupComboRenderer() {
-        feeGroupCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryHierarchyResponseDTO g) {
-                return g != null ? g.getNeedGroupName() : "-- Chọn nhóm phụ phí --";
-            }
-
-            @Override
-            public CategoryHierarchyResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        feeGroupCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryHierarchyResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getNeedGroupName());
-            }
-        });
+        FxControlUtils.configureComboBox(feeGroupCombo, CategoryHierarchyResponseDTO::getNeedGroupName, "-- Chọn nhóm phụ phí --");
     }
 
     private void setupFeeCategoryComboRenderer() {
-        feeCategoryCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryResponseDTO c) {
-                return c != null ? c.getName() : "-- Chọn danh mục phụ phí --";
-            }
-
-            @Override
-            public CategoryResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        feeCategoryCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getName());
-            }
-        });
+        FxControlUtils.configureComboBox(feeCategoryCombo, CategoryResponseDTO::getName, "-- Chọn danh mục phụ phí --");
     }
 
     private void onFeeCheckBoxToggled(boolean isSelected) {
@@ -467,17 +348,16 @@ public class UpdateTransactionDialog extends Dialog<ButtonType> {
         updateAmountHint();
     }
 
-    public void triggerSave() {
+    @Override
+    protected TransactionResponseDTO onExecuteSave() throws Exception {
         WalletResponseDTO wallet = walletCombo.getValue();
         CategoryResponseDTO category = categoryCombo.getValue();
 
         if (wallet == null) {
-            handleError("Vui lòng chọn ví tài chính.");
-            return;
+            throw new IllegalArgumentException("Vui lòng chọn ví tài chính.");
         }
         if (category == null) {
-            handleError("Vui lòng chọn danh mục thu chi.");
-            return;
+            throw new IllegalArgumentException("Vui lòng chọn danh mục thu chi.");
         }
 
         String rawAmount = getAmountInputValue();
@@ -492,54 +372,24 @@ public class UpdateTransactionDialog extends Dialog<ButtonType> {
             if (feeCat != null) {
                 feeCatId = feeCat.getCategoryId();
             } else {
-                handleError("Vui lòng chọn nhóm và danh mục phụ phí.");
-                return;
+                throw new IllegalArgumentException("Vui lòng chọn nhóm và danh mục phụ phí.");
             }
         }
 
-        try {
-            this.updatedTransaction = this.transactionController.handleUpdateTransaction(
-                    this.existingTxn.getTransactionId(),
-                    wallet.getWalletId(),
-                    rawAmount,
-                    rawDate,
-                    category.getCategoryId(),
-                    rawNote,
-                    rawFeeAmount,
-                    feeCatId);
-            this.success = true;
-            this.errorMessage = null;
-            dispose();
-        } catch (Exception ex) {
-            handleError(ex.getMessage());
-        }
+        return this.transactionController.handleUpdateTransaction(
+                this.existingTxn.getTransactionId(),
+                wallet.getWalletId(),
+                rawAmount,
+                rawDate,
+                category.getCategoryId(),
+                rawNote,
+                rawFeeAmount,
+                feeCatId);
     }
 
-    private void handleError(String message) {
-        this.errorMessage = message;
-        this.success = false;
-        if (this.errorConsumer != null) {
-            this.errorConsumer.accept(message);
-        }
+    public TransactionResponseDTO getUpdatedTransaction() {
+        return this.resultData;
     }
-
-    public void dispose() {
-        close();
-    }
-
-    public void setVisible(boolean visible) {
-        if (visible) {
-            showAndWait();
-        } else {
-            close();
-        }
-    }
-
-    // region Getters & Setters
-    public boolean isSuccess() { return success; }
-    public TransactionResponseDTO getUpdatedTransaction() { return updatedTransaction; }
-    public String getErrorMessage() { return errorMessage; }
-    public void setErrorConsumer(Consumer<String> errorConsumer) { this.errorConsumer = errorConsumer; }
 
     public String getAmountInputValue() { return amountField.getText() != null ? amountField.getText().trim() : ""; }
     public void setAmountInputValue(String amount) {

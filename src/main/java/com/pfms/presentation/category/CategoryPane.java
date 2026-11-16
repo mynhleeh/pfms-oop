@@ -1,14 +1,12 @@
 package com.pfms.presentation.category;
 
 import com.pfms.presentation.category.component.CategoryGroupCardNode;
-import com.pfms.presentation.category.component.CategorySubRowNode;
 import com.pfms.presentation.category.dialog.CreateCategoryDialog;
 import com.pfms.presentation.category.dialog.CreateNeedGroupDialog;
 import com.pfms.presentation.category.dialog.UpdateCategoryDialog;
-import com.pfms.presentation.common.util.FxAlertUtils;
+import com.pfms.presentation.common.AbstractBasePane;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,14 +14,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -34,13 +28,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * Bảng điều khiển phân hệ Quản lý Danh mục (Category Management Pane) sử dụng JavaFX.
- * Hiện thực hóa giao diện CategoryView theo mô hình MVP (Passive View).
+ * Hiện thực hóa giao diện CategoryView theo mô hình MVP (Passive View), kế thừa AbstractBasePane.
  */
-public class CategoryPane extends BorderPane implements CategoryView {
+public class CategoryPane extends AbstractBasePane implements CategoryView {
 
     private final CategoryGUIController controller;
     private final CategoryPresenter presenter;
@@ -55,7 +48,6 @@ public class CategoryPane extends BorderPane implements CategoryView {
             new com.pfms.presentation.common.component.KpiPill("Nhóm nhu cầu", "0 nhóm", com.pfms.presentation.common.component.KpiPill.Variant.GOLD);
     private final com.pfms.presentation.common.component.KpiPill kpiTotalCategories =
             new com.pfms.presentation.common.component.KpiPill("Danh mục con", "0 danh mục", com.pfms.presentation.common.component.KpiPill.Variant.INCOME);
-    private final Label summaryFooterLabel = new Label("Sẵn sàng");
 
     // Two-Zone Stream Cards Layout (Horizontal Split: Income Left, Expense Right)
     private final VBox incomeColumn = new VBox(10);
@@ -70,17 +62,12 @@ public class CategoryPane extends BorderPane implements CategoryView {
     private final Button btnFilterAll = new Button("Song Song 2 Cột (Mặc định)");
     private final Button btnFilterIncome = new Button("Chỉ Xem Thu Nhập (Income Trái)");
     private final Button btnFilterExpense = new Button("Chỉ Xem Chi Tiêu (Expense Phải)");
-
-    private Consumer<String> messageConsumer;
-    private Consumer<String> warningConsumer;
-    private Consumer<String> errorConsumer;
+    private final Button btnRefresh = new Button("Làm mới");
 
     public CategoryPane(CategoryGUIController controller) {
+        super();
         this.controller = Objects.requireNonNull(controller, "CategoryGUIController không được để null");
         this.presenter = new CategoryPresenter(this, controller);
-
-        setStyle("-fx-background-color: -color-bg-base;");
-        setPadding(new Insets(20));
 
         // Top Section: Header + KPI Cards
         VBox topBox = new VBox(16);
@@ -89,12 +76,6 @@ public class CategoryPane extends BorderPane implements CategoryView {
 
         // Center Section: Two-Zone Stream Cards (Income Left, Expense Right)
         setCenter(createCenterSection());
-
-        // Bottom Section: Summary Footer
-        HBox bottomBox = new HBox(summaryFooterLabel);
-        bottomBox.setPadding(new Insets(10, 0, 0, 0));
-        summaryFooterLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
-        setBottom(bottomBox);
 
         // Nạp dữ liệu ban đầu
         this.presenter.loadData();
@@ -114,9 +95,12 @@ public class CategoryPane extends BorderPane implements CategoryView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox kpiBox = new HBox(8);
+        btnRefresh.getStyleClass().add("btn-secondary");
+        btnRefresh.setOnAction(e -> this.presenter.loadData());
+
+        HBox kpiBox = new HBox(10);
         kpiBox.setAlignment(Pos.CENTER_RIGHT);
-        kpiBox.getChildren().addAll(kpiTotalGroups, kpiTotalCategories);
+        kpiBox.getChildren().addAll(btnRefresh, kpiTotalGroups, kpiTotalCategories);
 
         header.getChildren().addAll(titleBox, spacer, kpiBox);
         return header;
@@ -434,63 +418,51 @@ public class CategoryPane extends BorderPane implements CategoryView {
         Optional<String> result = dialog.showAndWait();
         return result.orElse(null);
     }
-
-    @Override
-    public void showMessage(String message) {
-        if (messageConsumer != null) {
-            messageConsumer.accept(message);
-        } else {
-            FxAlertUtils.showInfo("PFMS Thông báo", message);
-        }
-    }
-
-    @Override
-    public void showWarning(String message) {
-        if (warningConsumer != null) {
-            warningConsumer.accept(message);
-        } else {
-            FxAlertUtils.showWarning("PFMS Cảnh báo", message);
-        }
-    }
-
-    @Override
-    public void showError(String message) {
-        if (errorConsumer != null) {
-            errorConsumer.accept(message);
-        } else {
-            FxAlertUtils.showError("PFMS Lỗi", message);
-        }
-    }
-
-    @Override
-    public boolean confirmAction(String message) {
-        return FxAlertUtils.showConfirm("Xác nhận thao tác", message);
-    }
     // endregion
 
-    private void runOnFx(Runnable action) {
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-        } else {
-            Platform.runLater(action);
-        }
+    public CategoryPresenter getPresenter() {
+        return presenter;
     }
 
-    public CategoryPresenter getPresenter() { return presenter; }
-    public TreeTableView<CategoryHierarchyItem> getTreeTableView() { return treeTableView; }
-    public HBox getTwoZonesContainer() { return twoZonesContainer; }
-    public VBox getIncomeColumn() { return incomeColumn; }
-    public VBox getExpenseColumn() { return expenseColumn; }
-    public VBox getIncomeCardsBox() { return incomeCardsBox; }
-    public VBox getExpenseCardsBox() { return expenseCardsBox; }
-    public Button getBtnFilterAll() { return btnFilterAll; }
-    public Button getBtnFilterIncome() { return btnFilterIncome; }
-    public Button getBtnFilterExpense() { return btnFilterExpense; }
-    public String getSummaryText() { return summaryFooterLabel.getText(); }
+    public TreeTableView<CategoryHierarchyItem> getTreeTableView() {
+        return treeTableView;
+    }
 
-    public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }
-    public void setWarningConsumer(Consumer<String> consumer) { this.warningConsumer = consumer; }
-    public void setErrorConsumer(Consumer<String> consumer) { this.errorConsumer = consumer; }
+    public HBox getTwoZonesContainer() {
+        return twoZonesContainer;
+    }
+
+    public VBox getIncomeColumn() {
+        return incomeColumn;
+    }
+
+    public VBox getExpenseColumn() {
+        return expenseColumn;
+    }
+
+    public VBox getIncomeCardsBox() {
+        return incomeCardsBox;
+    }
+
+    public VBox getExpenseCardsBox() {
+        return expenseCardsBox;
+    }
+
+    public Button getBtnFilterAll() {
+        return btnFilterAll;
+    }
+
+    public Button getBtnFilterIncome() {
+        return btnFilterIncome;
+    }
+
+    public Button getBtnFilterExpense() {
+        return btnFilterExpense;
+    }
+
+    public Button getBtnRefresh() {
+        return btnRefresh;
+    }
 
     public record CategoryHierarchyItem(
             UUID id,

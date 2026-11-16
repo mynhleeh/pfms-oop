@@ -1,6 +1,8 @@
 package com.pfms.presentation.transfer.dialog;
 
 import com.pfms.presentation.category.CategoryGUIController;
+import com.pfms.presentation.common.dialog.BaseFormDialog;
+import com.pfms.presentation.common.util.FxControlUtils;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transfer.TransferResponseDTO;
@@ -8,28 +10,18 @@ import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.transfer.TransferGUIController;
 import com.pfms.presentation.wallet.WalletGUIController;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
-import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -40,13 +32,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * Hộp thoại modal điều chuyển tiền giữa hai ví tài chính (UC-TRF-01) sử dụng JavaFX.
- * Hiện thực giao diện Code-First theo nhận diện Luxury Black & Gold.
+ * Hiện thực giao diện Code-First theo nhận diện Luxury Black & Gold và kế thừa BaseFormDialog.
  */
-public class TransferFundsDialog extends Dialog<ButtonType> {
+public class TransferFundsDialog extends BaseFormDialog<TransferResponseDTO> {
 
     private final TransferGUIController transferController;
     private final WalletGUIController walletController;
@@ -71,29 +62,13 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
     private final List<CategoryHierarchyResponseDTO> feeExpenseGroups = new ArrayList<>();
     private final DecimalFormat currencyFormatter;
 
-    private boolean success = false;
-    private TransferResponseDTO createdTransfer = null;
-    private String errorMessage = null;
-
-    private Consumer<String> errorConsumer = msg -> {
-        try {
-            if (Platform.isFxApplicationThread()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Lỗi chuyển tiền");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
-            }
-        } catch (Exception ignored) {
-        }
-    };
-
     public TransferFundsDialog(
             Window owner,
             TransferGUIController transferController,
             WalletGUIController walletController,
             CategoryGUIController categoryController) {
 
+        super(owner, "Chuyển Tiền Nội Bộ", 520);
         this.transferController = Objects.requireNonNull(transferController, "TransferGUIController không được null");
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được null");
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được null");
@@ -101,9 +76,6 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
         symbols.setGroupingSeparator(',');
         this.currencyFormatter = new DecimalFormat("#,##0", symbols);
-
-        setTitle("Chuyển Tiền Nội Bộ");
-        initOwner(owner);
 
         buildUI();
         loadFeeCategories();
@@ -121,26 +93,12 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
     private void buildUI() {
         DialogPane pane = getDialogPane();
         pane.getStyleClass().add("pfms-dialog");
-        pane.setPrefWidth(520);
-        pane.setMinWidth(520);
-
-        var cssResource = getClass().getResource("/css/pfms-theme.css");
-        if (cssResource != null) {
-            pane.getStylesheets().add(cssResource.toExternalForm());
-        }
 
         VBox contentBox = new VBox(12);
         contentBox.setPadding(new Insets(18, 22, 18, 22));
         contentBox.setStyle("-fx-background-color: #141414;");
 
-        // Header Title
-        VBox headerBox = new VBox(4);
-        headerBox.setPadding(new Insets(0, 0, 6, 0));
-        Label headerTitle = new Label("Điều Chuyển Tiền Giữa Các Ví");
-        headerTitle.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
-        Label headerSubtitle = new Label("Thực hiện chuyển quỹ nội bộ giữa hai ví tài chính và ghi nhận phụ phí");
-        headerSubtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
-        headerBox.getChildren().addAll(headerTitle, headerSubtitle);
+        var headerBox = createHeaderBox("Điều Chuyển Tiền Giữa Các Ví", "Thực hiện chuyển quỹ nội bộ giữa hai ví tài chính và ghi nhận phụ phí");
 
         // 1. Wallets selection section
         VBox sourceBox = new VBox(4);
@@ -184,7 +142,7 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
         noteField.setPromptText("Nội dung chuyển khoản (tùy chọn)");
         noteBox.getChildren().addAll(lblNote, noteField);
 
-        // 4. Fee Section (Accordion Card đồng bộ RecordTransactionDialog)
+        // 4. Fee Section (Accordion Card đồng bộ)
         VBox feeSectionBox = new VBox(8);
         feeSectionBox.setStyle("-fx-background-color: #0E0E0E; -fx-border-color: -color-border; " +
                 "-fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 12px 14px;");
@@ -198,12 +156,12 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
         Label lblFeeGroup = new Label("Nhóm phụ phí:");
         lblFeeGroup.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
         feeGroupCombo.setMaxWidth(Double.MAX_VALUE);
-        setupFeeGroupComboRenderer();
+        FxControlUtils.configureComboBox(feeGroupCombo, CategoryHierarchyResponseDTO::getNeedGroupName, "-- Chọn nhóm chi phí --");
 
         Label lblFeeCat = new Label("Danh mục phụ phí:");
         lblFeeCat.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
         feeCategoryCombo.setMaxWidth(Double.MAX_VALUE);
-        setupFeeCategoryComboRenderer();
+        FxControlUtils.configureComboBox(feeCategoryCombo, CategoryResponseDTO::getName, "-- Chọn danh mục chi tiết --");
 
         feeGroupCombo.valueProperty().addListener((obs, oldVal, newVal) -> onFeeGroupSelected(newVal));
 
@@ -250,72 +208,26 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
     }
 
     private void setupWalletComboRenderer(ComboBox<WalletResponseDTO> combo) {
-        StringConverter<WalletResponseDTO> converter = new StringConverter<>() {
-            @Override
-            public String toString(WalletResponseDTO w) {
-                if (w == null) return "-- Chọn ví tài chính --";
-                return w.getName() + " (" + formatCurrency(w.getBalance()) + ")";
-            }
-
-            @Override
-            public WalletResponseDTO fromString(String string) {
-                return null;
-            }
-        };
-        combo.setConverter(converter);
-        combo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(WalletResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getName() + " (" + formatCurrency(item.getBalance()) + ")");
-                }
-            }
-        });
+        FxControlUtils.configureComboBox(
+                combo,
+                w -> w.getName() + " (" + formatCurrency(w.getBalance()) + ")",
+                "-- Chọn ví tài chính --");
     }
 
-    private void setupFeeGroupComboRenderer() {
-        feeGroupCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryHierarchyResponseDTO g) {
-                return g == null ? "-- Chọn nhóm chi phí --" : g.getNeedGroupName();
+    private void onFeeGroupSelected(CategoryHierarchyResponseDTO selectedGroup) {
+        feeCategoryCombo.getItems().clear();
+        if (selectedGroup != null && selectedGroup.getCategories() != null) {
+            List<CategoryResponseDTO> activeCats = selectedGroup.getCategories().stream()
+                    .filter(c -> "ACTIVE".equalsIgnoreCase(c.getStatus()))
+                    .toList();
+            feeCategoryCombo.getItems().setAll(activeCats);
+            feeCategoryCombo.setDisable(activeCats.isEmpty());
+            if (!activeCats.isEmpty()) {
+                feeCategoryCombo.setValue(activeCats.get(0));
             }
-
-            @Override
-            public CategoryHierarchyResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        feeGroupCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryHierarchyResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getNeedGroupName());
-            }
-        });
-    }
-
-    private void setupFeeCategoryComboRenderer() {
-        feeCategoryCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryResponseDTO c) {
-                return c == null ? "-- Chọn danh mục chi tiết --" : c.getName();
-            }
-
-            @Override
-            public CategoryResponseDTO fromString(String s) {
-                return null;
-            }
-        });
-        feeCategoryCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(CategoryResponseDTO item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getName());
-            }
-        });
+        } else {
+            feeCategoryCombo.setDisable(true);
+        }
     }
 
     private void onFeeCheckBoxToggled(boolean isSelected) {
@@ -323,41 +235,12 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
         feeDetailsPanel.setManaged(isSelected);
         feeAmountField.setDisable(!isSelected);
         feeGroupCombo.setDisable(!isSelected);
+        feeCategoryCombo.setDisable(true);
 
         if (!isSelected) {
             feeAmountField.setText("0");
             feeGroupCombo.getSelectionModel().clearSelection();
             feeCategoryCombo.getItems().clear();
-            feeCategoryCombo.setDisable(true);
-        } else {
-            if (!feeGroupCombo.getItems().isEmpty() && feeGroupCombo.getValue() == null) {
-                // Keep not selected until user picks
-                feeCategoryCombo.setDisable(true);
-            }
-        }
-    }
-
-    private void onFeeGroupSelected(CategoryHierarchyResponseDTO group) {
-        feeCategoryCombo.getItems().clear();
-        if (group != null && group.getCategories() != null && !group.getCategories().isEmpty()) {
-            feeCategoryCombo.getItems().addAll(group.getCategories());
-            feeCategoryCombo.setDisable(false);
-            feeCategoryCombo.getSelectionModel().selectFirst();
-        } else {
-            feeCategoryCombo.setDisable(true);
-        }
-    }
-
-    private void updateAmountHint(String text) {
-        if (text == null || text.isBlank()) {
-            amountInWordsHint.setText("");
-            return;
-        }
-        try {
-            BigDecimal val = new BigDecimal(text.trim());
-            amountInWordsHint.setText(currencyFormatter.format(val) + " VNĐ");
-        } catch (Exception e) {
-            amountInWordsHint.setText("");
         }
     }
 
@@ -369,11 +252,24 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
             sourceBalanceHintLabel.setText("Số dư: 0 VNĐ");
         }
 
-        WalletResponseDTO dst = destWalletCombo.getValue();
-        if (dst != null && dst.getBalance() != null) {
-            destBalanceHintLabel.setText("Số dư hiện tại: " + formatCurrency(dst.getBalance()));
+        WalletResponseDTO dest = destWalletCombo.getValue();
+        if (dest != null && dest.getBalance() != null) {
+            destBalanceHintLabel.setText("Số dư hiện tại: " + formatCurrency(dest.getBalance()));
         } else {
             destBalanceHintLabel.setText("Số dư: 0 VNĐ");
+        }
+    }
+
+    private void updateAmountHint(String text) {
+        if (text == null || text.isBlank()) {
+            amountInWordsHint.setText("");
+            return;
+        }
+        try {
+            BigDecimal val = new BigDecimal(text.trim());
+            amountInWordsHint.setText(currencyFormatter.format(val) + " VNĐ");
+        } catch (Exception ex) {
+            amountInWordsHint.setText("");
         }
     }
 
@@ -424,18 +320,17 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
         }
     }
 
-    public void triggerTransfer() {
+    @Override
+    protected TransferResponseDTO onExecuteSave() throws Exception {
         WalletResponseDTO sourceWallet = sourceWalletCombo.getValue();
         WalletResponseDTO destWallet = destWalletCombo.getValue();
 
         if (sourceWallet == null || destWallet == null) {
-            handleError("Vui lòng chọn ví nguồn và ví đích.");
-            return;
+            throw new IllegalArgumentException("Vui lòng chọn ví nguồn và ví đích.");
         }
 
         if (sourceWallet.getWalletId().equals(destWallet.getWalletId())) {
-            handleError("Ví nguồn và ví đích không được trùng nhau.");
-            return;
+            throw new IllegalArgumentException("Ví nguồn và ví đích không được trùng nhau.");
         }
 
         String rawAmount = getAmountInputValue();
@@ -450,63 +345,26 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
             if (feeCat != null) {
                 feeCatId = feeCat.getCategoryId();
             } else {
-                handleError("Vui lòng chọn nhóm và danh mục phụ phí.");
-                return;
+                throw new IllegalArgumentException("Vui lòng chọn nhóm và danh mục phụ phí.");
             }
         }
 
-        try {
-            this.createdTransfer = this.transferController.handleTransferFunds(
-                    sourceWallet.getWalletId(),
-                    destWallet.getWalletId(),
-                    rawAmount,
-                    rawDate,
-                    rawNote,
-                    rawFeeAmount,
-                    feeCatId);
-            this.success = true;
-            this.errorMessage = null;
-            dispose();
-        } catch (Exception ex) {
-            handleError(ex.getMessage());
-        }
+        return this.transferController.handleTransferFunds(
+                sourceWallet.getWalletId(),
+                destWallet.getWalletId(),
+                rawAmount,
+                rawDate,
+                rawNote,
+                rawFeeAmount,
+                feeCatId);
     }
 
-    private void handleError(String message) {
-        this.errorMessage = message;
-        this.success = false;
-        if (this.errorConsumer != null) {
-            this.errorConsumer.accept(message);
-        }
-    }
-
-    public void dispose() {
-        close();
-    }
-
-    public void setVisible(boolean visible) {
-        if (visible) {
-            showAndWait();
-        } else {
-            close();
-        }
-    }
-
-    // region Getters & Setters
-    public boolean isSuccess() {
-        return this.success;
+    public void triggerTransfer() {
+        triggerSave();
     }
 
     public TransferResponseDTO getCreatedTransfer() {
-        return this.createdTransfer;
-    }
-
-    public String getErrorMessage() {
-        return this.errorMessage;
-    }
-
-    public void setErrorConsumer(Consumer<String> errorConsumer) {
-        this.errorConsumer = errorConsumer;
+        return this.resultData;
     }
 
     public WalletResponseDTO getSourceWallet() {
@@ -601,5 +459,4 @@ public class TransferFundsDialog extends Dialog<ButtonType> {
             this.feeCategoryCombo.setDisable(true);
         }
     }
-    // endregion
 }

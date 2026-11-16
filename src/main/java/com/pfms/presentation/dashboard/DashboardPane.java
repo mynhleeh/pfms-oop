@@ -1,13 +1,12 @@
 package com.pfms.presentation.dashboard;
 
-import com.pfms.presentation.common.util.FxAlertUtils;
+import com.pfms.presentation.common.AbstractBasePane;
 import com.pfms.presentation.dashboard.component.DashboardTransactionRowNode;
 import com.pfms.presentation.dashboard.viewmodel.DashboardKpiViewModel;
 import com.pfms.presentation.dashboard.viewmodel.RecentTransactionViewModel;
 import com.pfms.presentation.report.ReportGUIController;
 import com.pfms.presentation.transaction.TransactionGUIController;
 import com.pfms.presentation.wallet.WalletGUIController;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,10 +14,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -28,15 +25,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Bảng Điều Khiển Tổng Quan (DashboardPane - Passive View) sử dụng JavaFX.
  * Hiển thị 4 thẻ KPI tài chính chủ chốt và Bảng Giao dịch gần nhất theo chủ đề Luxury Black &amp; Gold.
- * 100% tuân thủ mô hình MVP, tách biệt giao diện thụ động khỏi logic nghiệp vụ.
+ * 100% tuân thủ mô hình MVP, tách biệt giao diện thụ động khỏi logic nghiệp vụ, kế thừa AbstractBasePane.
  */
-public class DashboardPane extends BorderPane implements DashboardView {
+public class DashboardPane extends AbstractBasePane implements DashboardView {
 
     // region Fields
     private final DashboardPresenter presenter;
@@ -66,12 +61,6 @@ public class DashboardPane extends BorderPane implements DashboardView {
     private final VBox streamItemsContainer = new VBox(8);
     private final ScrollPane streamScrollPane = new ScrollPane(streamItemsContainer);
     private HBox streamHeader;
-
-    // Callbacks & Consumers for Testability
-    private Consumer<String> messageConsumer;
-    private Consumer<String> warningConsumer;
-    private Consumer<String> errorConsumer;
-    private Predicate<String> confirmConsumer;
     // endregion
 
     // region Constructors
@@ -80,6 +69,7 @@ public class DashboardPane extends BorderPane implements DashboardView {
             TransactionGUIController transactionController,
             ReportGUIController reportController) {
 
+        super(false);
         Objects.requireNonNull(walletController, "WalletGUIController không được để null");
         Objects.requireNonNull(transactionController, "TransactionGUIController không được để null");
         this.reportController = Objects.requireNonNull(reportController, "ReportGUIController không được để null");
@@ -94,6 +84,7 @@ public class DashboardPane extends BorderPane implements DashboardView {
             WalletGUIController walletController,
             TransactionGUIController transactionController) {
 
+        super(false);
         Objects.requireNonNull(walletController, "WalletGUIController không được để null");
         Objects.requireNonNull(transactionController, "TransactionGUIController không được để null");
         this.reportController = null;
@@ -330,51 +321,6 @@ public class DashboardPane extends BorderPane implements DashboardView {
     }
     // endregion
 
-    // region Dialog & Message Helpers
-    @Override
-    public void showMessage(String message) {
-        if (messageConsumer != null) {
-            messageConsumer.accept(message);
-        } else {
-            FxAlertUtils.showInfo("PFMS Thông báo", message);
-        }
-    }
-
-    @Override
-    public void showWarning(String message) {
-        if (warningConsumer != null) {
-            warningConsumer.accept(message);
-        } else {
-            FxAlertUtils.showWarning("PFMS Cảnh báo", message);
-        }
-    }
-
-    @Override
-    public void showError(String message) {
-        if (errorConsumer != null) {
-            errorConsumer.accept(message);
-        } else {
-            FxAlertUtils.showError("PFMS Lỗi", message);
-        }
-    }
-
-    @Override
-    public boolean confirmAction(String message) {
-        if (confirmConsumer != null) {
-            return confirmConsumer.test(message);
-        }
-        return FxAlertUtils.showConfirm("Xác nhận thao tác", message);
-    }
-
-    private void runOnFx(Runnable action) {
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-        } else {
-            Platform.runLater(action);
-        }
-    }
-    // endregion
-
     // region Getters & Test Hooks
     public Label getHeaderTitleLabel() {
         return headerTitleLabel;
@@ -442,22 +388,6 @@ public class DashboardPane extends BorderPane implements DashboardView {
 
     public ScrollPane getStreamScrollPane() {
         return streamScrollPane;
-    }
-
-    public void setMessageConsumer(Consumer<String> consumer) {
-        this.messageConsumer = consumer;
-    }
-
-    public void setWarningConsumer(Consumer<String> consumer) {
-        this.warningConsumer = consumer;
-    }
-
-    public void setErrorConsumer(Consumer<String> consumer) {
-        this.errorConsumer = consumer;
-    }
-
-    public void setConfirmConsumer(Predicate<String> consumer) {
-        this.confirmConsumer = consumer;
     }
     // endregion
 }

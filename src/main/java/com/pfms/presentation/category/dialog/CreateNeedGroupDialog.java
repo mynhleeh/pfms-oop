@@ -1,16 +1,10 @@
 package com.pfms.presentation.category.dialog;
 
 import com.pfms.presentation.category.CategoryGUIController;
+import com.pfms.presentation.common.dialog.BaseFormDialog;
 import com.pfms.presentation.dto.category.NeedGroupResponseDTO;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -19,13 +13,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Hộp thoại modal tạo Nhóm Nhu cầu mới (UC-CAT-02) sử dụng JavaFX.
- * Tích hợp Type Switcher phẳng 2 nút đồng bộ phân loại thu/chi và tối giản trường nhập liệu.
+ * Kế thừa BaseFormDialog theo mô hình Template Method, loại bỏ boilerplate lặp lại.
  */
-public class CreateNeedGroupDialog extends Dialog<ButtonType> {
+public class CreateNeedGroupDialog extends BaseFormDialog<NeedGroupResponseDTO> {
 
     private final CategoryGUIController categoryController;
 
@@ -36,29 +29,9 @@ public class CreateNeedGroupDialog extends Dialog<ButtonType> {
     private final TextField iconField;
     private final TextField colorField;
 
-    private boolean success = false;
-    private NeedGroupResponseDTO createdNeedGroup = null;
-
-    private Consumer<String> errorConsumer = msg -> {
-        try {
-            if (Platform.isFxApplicationThread()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Lỗi tạo nhóm nhu cầu");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
-            }
-        } catch (Exception ignored) {
-        }
-    };
-
     public CreateNeedGroupDialog(Window owner, CategoryGUIController categoryController, String defaultType) {
+        super(owner, "Tạo Nhóm Nhu Cầu Mới", 480);
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được để null");
-
-        setTitle("Tạo Nhóm Nhu Cầu Mới");
-        if (owner != null) {
-            initOwner(owner);
-        }
 
         String initialType = (defaultType != null && "INCOME".equalsIgnoreCase(defaultType.trim())) ? "INCOME" : "EXPENSE";
 
@@ -85,20 +58,9 @@ public class CreateNeedGroupDialog extends Dialog<ButtonType> {
         this.iconField = new TextField();
         this.colorField = new TextField();
 
-        VBox form = new VBox(12);
-        form.setPadding(new Insets(18, 22, 18, 22));
-        form.setStyle("-fx-background-color: #141414;");
+        var headerBox = createHeaderBox("Tạo Nhóm Nhu Cầu Mới", "Phân loại danh mục theo nhu cầu tài chính cá nhân");
 
-        // Header Title
-        VBox headerBox = new VBox(4);
-        headerBox.setPadding(new Insets(0, 0, 6, 0));
-        Label headerTitle = new Label("Tạo Nhóm Nhu Cầu Mới");
-        headerTitle.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
-        Label headerSubtitle = new Label("Phân loại danh mục theo nhu cầu tài chính cá nhân");
-        headerSubtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
-        headerBox.getChildren().addAll(headerTitle, headerSubtitle);
-
-        // 1. Phân loại giao dịch (Type Switcher đồng bộ RecordTransactionDialog, không icon dot)
+        // 1. Phân loại giao dịch (Type Switcher đồng bộ phẳng 2 nút)
         VBox typeBoxContainer = new VBox(4);
         Label typeLabel = new Label("Phân loại giao dịch (*):");
         typeLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
@@ -115,32 +77,10 @@ public class CreateNeedGroupDialog extends Dialog<ButtonType> {
         nameLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
         nameBoxContainer.getChildren().addAll(nameLabel, nameField);
 
-        form.getChildren().addAll(headerBox, typeBoxContainer, nameBoxContainer);
+        var form = createFormBox(12, headerBox, typeBoxContainer, nameBoxContainer);
+        getDialogPane().setContent(form);
 
-        DialogPane pane = getDialogPane();
-        pane.setPrefWidth(480);
-        pane.setMinWidth(480);
-        pane.setContent(form);
-
-        ButtonType saveBtnType = new ButtonType("Lưu Nhóm", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelBtnType = new ButtonType("Hủy bỏ", ButtonBar.ButtonData.CANCEL_CLOSE);
-        pane.getButtonTypes().addAll(saveBtnType, cancelBtnType);
-
-        var cssResource = getClass().getResource("/css/pfms-theme.css");
-        if (cssResource != null) {
-            pane.getStylesheets().add(cssResource.toExternalForm());
-        }
-
-        final var okButton = pane.lookupButton(saveBtnType);
-        if (okButton != null) {
-            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-                triggerSave();
-                if (!isSuccess()) {
-                    event.consume();
-                }
-            });
-        }
-
+        setupButtons("Lưu Nhóm", "Hủy bỏ");
         updateTypeSwitcherUI();
     }
 
@@ -153,7 +93,7 @@ public class CreateNeedGroupDialog extends Dialog<ButtonType> {
     }
 
     public CreateNeedGroupDialog(Object dummyParent, CategoryGUIController categoryController) {
-        this((Window) (dummyParent instanceof Window ? (Window) dummyParent : null), categoryController, "EXPENSE");
+        this(dummyParent instanceof Window w ? w : null, categoryController, "EXPENSE");
     }
 
     private void updateTypeSwitcherUI() {
@@ -175,43 +115,17 @@ public class CreateNeedGroupDialog extends Dialog<ButtonType> {
         }
     }
 
-    public void triggerSave() {
-        try {
-            String type = getTypeInputValue();
-            String name = getNameInputValue();
-            String icon = getIconInputValue();
-            String color = getColorInputValue();
-
-            this.createdNeedGroup = this.categoryController.handleCreateNeedGroup(type, name, icon, color);
-            this.success = true;
-            dispose();
-        } catch (Exception ex) {
-            this.success = false;
-            this.createdNeedGroup = null;
-            if (this.errorConsumer != null) {
-                this.errorConsumer.accept(ex.getMessage());
-            }
-        }
-    }
-
-    public void dispose() {
-        close();
-    }
-
-    public void setVisible(boolean visible) {
-        if (visible) {
-            showAndWait();
-        } else {
-            close();
-        }
-    }
-
-    public boolean isSuccess() {
-        return this.success;
+    @Override
+    protected NeedGroupResponseDTO onExecuteSave() throws Exception {
+        String type = getTypeInputValue();
+        String name = getNameInputValue();
+        String icon = getIconInputValue();
+        String color = getColorInputValue();
+        return this.categoryController.handleCreateNeedGroup(type, name, icon, color);
     }
 
     public NeedGroupResponseDTO getCreatedNeedGroup() {
-        return this.createdNeedGroup;
+        return this.resultData;
     }
 
     public String getTypeInputValue() {
@@ -248,9 +162,5 @@ public class CreateNeedGroupDialog extends Dialog<ButtonType> {
 
     public void setColorInputValue(String color) {
         this.colorField.setText(color != null ? color : "");
-    }
-
-    public void setErrorConsumer(Consumer<String> errorConsumer) {
-        this.errorConsumer = Objects.requireNonNull(errorConsumer);
     }
 }

@@ -1,12 +1,11 @@
 package com.pfms.presentation.transfer;
 
 import com.pfms.presentation.category.CategoryGUIController;
-import com.pfms.presentation.common.util.FxAlertUtils;
+import com.pfms.presentation.common.AbstractBasePane;
 import com.pfms.presentation.transfer.component.TransferRowNode;
 import com.pfms.presentation.transfer.dialog.TransferFundsDialog;
 import com.pfms.presentation.transfer.viewmodel.TransferItemViewModel;
 import com.pfms.presentation.wallet.WalletGUIController;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -20,7 +19,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -29,13 +27,12 @@ import javafx.stage.Window;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Bảng điều khiển phân hệ Chuyển tiền Nội bộ (Transfer Management Pane) sử dụng JavaFX.
- * Hiện thực hóa giao diện TransferView theo mô hình MVP (Passive View).
+ * Hiện thực hóa giao diện TransferView theo mô hình MVP (Passive View), kế thừa AbstractBasePane.
  */
-public class TransferPane extends BorderPane implements TransferView {
+public class TransferPane extends AbstractBasePane implements TransferView {
 
     private final TransferGUIController transferController;
     private final WalletGUIController walletController;
@@ -62,24 +59,17 @@ public class TransferPane extends BorderPane implements TransferView {
             new com.pfms.presentation.common.component.KpiPill("Số lượt chuyển", "0 giao dịch", com.pfms.presentation.common.component.KpiPill.Variant.NEUTRAL);
 
     private final Label pageInfoLabel = new Label("Trang 1 / 1 (Tổng 0 giao dịch)");
-    private final Label summaryFooterLabel = new Label("Tổng tiền chuyển: 0 VNĐ | Tổng phí: 0 VNĐ");
-
-    private Consumer<String> messageConsumer;
-    private Consumer<String> warningConsumer;
-    private Consumer<String> errorConsumer;
 
     public TransferPane(
             TransferGUIController transferController,
             WalletGUIController walletController,
             CategoryGUIController categoryController) {
 
+        super();
         this.transferController = Objects.requireNonNull(transferController, "TransferGUIController không được null");
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được null");
         this.categoryController = Objects.requireNonNull(categoryController, "CategoryGUIController không được null");
         this.presenter = new TransferPresenter(this, transferController);
-
-        setStyle("-fx-background-color: -color-bg-base;");
-        setPadding(new Insets(20));
 
         // Top Section: Header + KPI Summary Cards + Toolbar
         VBox topBox = new VBox(14);
@@ -303,6 +293,9 @@ public class TransferPane extends BorderPane implements TransferView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        if (summaryFooterLabel.getParent() instanceof javafx.scene.layout.Pane parentPane) {
+            parentPane.getChildren().remove(summaryFooterLabel);
+        }
         summaryFooterLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
 
         paginationBar.getChildren().addAll(btnPrev, pageInfoLabel, btnNext, spacer, summaryFooterLabel);
@@ -378,62 +371,45 @@ public class TransferPane extends BorderPane implements TransferView {
         });
     }
 
-    @Override
-    public void showMessage(String message) {
-        if (messageConsumer != null) {
-            messageConsumer.accept(message);
-        } else {
-            FxAlertUtils.showInfo("PFMS Thông báo", message);
-        }
-    }
-
-    @Override
-    public void showWarning(String message) {
-        if (warningConsumer != null) {
-            warningConsumer.accept(message);
-        } else {
-            FxAlertUtils.showWarning("PFMS Cảnh báo", message);
-        }
-    }
-
-    @Override
-    public void showError(String message) {
-        if (errorConsumer != null) {
-            errorConsumer.accept(message);
-        } else {
-            FxAlertUtils.showError("PFMS Lỗi", message);
-        }
-    }
-
-    @Override
-    public boolean confirmAction(String message) {
-        return FxAlertUtils.showConfirm("Xác nhận thao tác", message);
-    }
-    // endregion
-
-    private void runOnFx(Runnable action) {
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-        } else {
-            Platform.runLater(action);
-        }
-    }
-
     // region Getters & Helpers
-    public TransferPresenter getPresenter() { return this.presenter; }
-    public TableView<TransferItemViewModel> getTableView() { return this.tableView; }
-    public ObservableList<TransferItemViewModel> getTableData() { return this.tableData; }
-    public HBox getStreamHeader() { return this.streamHeader; }
-    public VBox getStreamItemsContainer() { return this.streamItemsContainer; }
-    public ScrollPane getStreamScrollPane() { return this.streamScrollPane; }
-    public String getSummaryText() { return this.summaryFooterLabel.getText(); }
-    public String getPageInfoText() { return this.pageInfoLabel.getText(); }
-    public Label getStatTotalTransferredLabel() { return this.statTotalTransferredLabel; }
-    public Label getStatTotalFeesLabel() { return this.statTotalFeesLabel; }
-    public Label getStatCountLabel() { return this.statCountLabel; }
+    public TransferPresenter getPresenter() {
+        return this.presenter;
+    }
 
-    public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }
-    public void setWarningConsumer(Consumer<String> consumer) { this.warningConsumer = consumer; }
-    public void setErrorConsumer(Consumer<String> consumer) { this.errorConsumer = consumer; }
+    public TableView<TransferItemViewModel> getTableView() {
+        return this.tableView;
+    }
+
+    public ObservableList<TransferItemViewModel> getTableData() {
+        return this.tableData;
+    }
+
+    public HBox getStreamHeader() {
+        return this.streamHeader;
+    }
+
+    public VBox getStreamItemsContainer() {
+        return this.streamItemsContainer;
+    }
+
+    public ScrollPane getStreamScrollPane() {
+        return this.streamScrollPane;
+    }
+
+    public String getPageInfoText() {
+        return this.pageInfoLabel.getText();
+    }
+
+    public Label getStatTotalTransferredLabel() {
+        return this.statTotalTransferredLabel;
+    }
+
+    public Label getStatTotalFeesLabel() {
+        return this.statTotalFeesLabel;
+    }
+
+    public Label getStatCountLabel() {
+        return this.statCountLabel;
+    }
     // endregion
 }

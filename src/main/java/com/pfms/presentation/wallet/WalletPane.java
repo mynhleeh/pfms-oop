@@ -1,7 +1,7 @@
 package com.pfms.presentation.wallet;
 
+import com.pfms.presentation.common.AbstractBasePane;
 import com.pfms.presentation.common.component.KpiPill;
-import com.pfms.presentation.common.util.FxAlertUtils;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.wallet.component.ViewModeSwitcher;
 import com.pfms.presentation.wallet.component.WalletCardNode;
@@ -10,7 +10,6 @@ import com.pfms.presentation.wallet.dialog.CreateWalletDialog;
 import com.pfms.presentation.wallet.dialog.UpdateWalletDialog;
 import com.pfms.presentation.wallet.viewmodel.WalletItemViewModel;
 import com.pfms.presentation.wallet.viewmodel.WalletsSummaryViewModel;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,12 +24,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
@@ -38,14 +35,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Bảng điều khiển phân hệ Quản lý Ví (Wallet Management Pane) sử dụng JavaFX.
- * Hiện thực hóa giao diện WalletView theo mô hình MVP (Passive View) và hỗ trợ
- * chế độ hiển thị kép: Thẻ ví dạng lưới (Card Grid) và Bảng dữ liệu (Table View).
+ * Hiện thực hóa giao diện WalletView theo mô hình MVP (Passive View), kế thừa AbstractBasePane.
  */
-public class WalletPane extends BorderPane implements WalletView {
+public class WalletPane extends AbstractBasePane implements WalletView {
 
     private final WalletGUIController controller;
     private final WalletPresenter presenter;
@@ -54,27 +49,20 @@ public class WalletPane extends BorderPane implements WalletView {
 
     private final FlowPane cardGridPane = new FlowPane();
     private final ScrollPane cardGridScroll = new ScrollPane(cardGridPane);
-    private final StackPane centerContainer = new StackPane();
 
     private final KpiPill kpiTotalBalance = new KpiPill("Tổng số dư", "0 ₫", KpiPill.Variant.GOLD);
     private final KpiPill kpiActiveCount = new KpiPill("Đang hoạt động", "0 ví", KpiPill.Variant.INCOME);
     private final KpiPill kpiArchivedCount = new KpiPill("Lưu trữ", "0 ví", KpiPill.Variant.WARNING);
-    private final Label summaryFooterLabel = new Label("Sẵn sàng");
     private final ComboBox<String> statusFilterBox = new ComboBox<>();
     private final TextField searchField = new TextField();
     private final ViewModeSwitcher viewModeSwitcher = new ViewModeSwitcher(this::switchViewMode);
 
     private List<WalletItemViewModel> allWallets = new ArrayList<>();
-    private Consumer<String> messageConsumer;
-    private Consumer<String> warningConsumer;
-    private Consumer<String> errorConsumer;
 
     public WalletPane(WalletGUIController controller) {
+        super();
         this.controller = Objects.requireNonNull(controller, "WalletGUIController không được để null");
         this.presenter = new WalletPresenter(this, controller);
-
-        setStyle("-fx-background-color: -color-bg-base;");
-        setPadding(new Insets(20));
 
         // Top Section: Header + Toolbar
         VBox topBox = new VBox(14);
@@ -83,12 +71,6 @@ public class WalletPane extends BorderPane implements WalletView {
 
         // Center Section: Dual-View Container (Card Grid + Table)
         setCenter(createCenterSection());
-
-        // Bottom Section: Summary Footer
-        HBox bottomBox = new HBox(summaryFooterLabel);
-        bottomBox.setPadding(new Insets(10, 0, 0, 0));
-        summaryFooterLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px;");
-        setBottom(bottomBox);
 
         // Nạp dữ liệu ban đầu
         this.presenter.loadData();
@@ -465,56 +447,25 @@ public class WalletPane extends BorderPane implements WalletView {
             }
         });
     }
-
-    @Override
-    public void showMessage(String message) {
-        if (messageConsumer != null) {
-            messageConsumer.accept(message);
-        } else {
-            FxAlertUtils.showInfo("PFMS Thông báo", message);
-        }
-    }
-
-    @Override
-    public void showWarning(String message) {
-        if (warningConsumer != null) {
-            warningConsumer.accept(message);
-        } else {
-            FxAlertUtils.showWarning("PFMS Cảnh báo", message);
-        }
-    }
-
-    @Override
-    public void showError(String message) {
-        if (errorConsumer != null) {
-            errorConsumer.accept(message);
-        } else {
-            FxAlertUtils.showError("PFMS Lỗi", message);
-        }
-    }
-
-    @Override
-    public boolean confirmAction(String message) {
-        return FxAlertUtils.showConfirm("Xác nhận thao tác", message);
-    }
     // endregion
 
-    private void runOnFx(Runnable action) {
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-        } else {
-            Platform.runLater(action);
-        }
+    public WalletPresenter getPresenter() {
+        return presenter;
     }
 
-    public WalletPresenter getPresenter() { return presenter; }
-    public ObservableList<WalletItemViewModel> getTableData() { return tableData; }
-    public TableView<WalletItemViewModel> getTableView() { return tableView; }
-    public FlowPane getCardGridPane() { return cardGridPane; }
-    public ViewModeSwitcher getViewModeSwitcher() { return viewModeSwitcher; }
-    public String getSummaryText() { return summaryFooterLabel.getText(); }
+    public ObservableList<WalletItemViewModel> getTableData() {
+        return tableData;
+    }
 
-    public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }
-    public void setWarningConsumer(Consumer<String> consumer) { this.warningConsumer = consumer; }
-    public void setErrorConsumer(Consumer<String> consumer) { this.errorConsumer = consumer; }
+    public TableView<WalletItemViewModel> getTableView() {
+        return tableView;
+    }
+
+    public FlowPane getCardGridPane() {
+        return cardGridPane;
+    }
+
+    public ViewModeSwitcher getViewModeSwitcher() {
+        return viewModeSwitcher;
+    }
 }

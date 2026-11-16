@@ -1,22 +1,16 @@
 package com.pfms.presentation.wallet.dialog;
 
+import com.pfms.presentation.common.dialog.BaseFormDialog;
 import com.pfms.presentation.dto.wallet.BalanceAdjustmentResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.wallet.WalletGUIController;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 import java.text.DecimalFormat;
@@ -28,61 +22,23 @@ import java.util.function.Consumer;
 
 /**
  * Hộp thoại modal kiểm kê điều chỉnh số dư ví thực tế (UC-WAL-04) sử dụng JavaFX.
+ * Kế thừa BaseFormDialog theo mô hình Template Method, loại bỏ boilerplate lặp lại.
  */
-public class AdjustBalanceDialog extends Dialog<ButtonType> {
+public class AdjustBalanceDialog extends BaseFormDialog<BalanceAdjustmentResponseDTO> {
 
     private final WalletGUIController walletController;
     private final WalletResponseDTO wallet;
     private final TextField actualBalanceField;
     private final TextField reasonField;
     private final TextField dateField;
-    private boolean success = false;
-    private BalanceAdjustmentResponseDTO adjustmentResponse = null;
-    private String errorMessage = null;
-    private Consumer<String> errorConsumer = msg -> {
-        try {
-            if (Platform.isFxApplicationThread()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Lỗi kiểm kê số dư");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
-            }
-        } catch (Exception ignored) {
-        }
-    };
-    private Consumer<String> infoConsumer = msg -> {
-        try {
-            if (Platform.isFxApplicationThread()) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Kết quả kiểm kê");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
-            }
-        } catch (Exception ignored) {
-        }
-    };
+    private Consumer<String> infoConsumer;
 
     public AdjustBalanceDialog(Window owner, WalletGUIController walletController, WalletResponseDTO wallet) {
+        super(owner, "Kiểm Kê Điều Chỉnh Số Dư Ví", 440);
         this.walletController = Objects.requireNonNull(walletController, "WalletGUIController không được để null");
         this.wallet = Objects.requireNonNull(wallet, "WalletResponseDTO không được để null");
 
-        setTitle("Kiểm Kê Điều Chỉnh Số Dư Ví");
-        if (owner != null) {
-            initOwner(owner);
-        }
-
-        // Header Section
-        VBox headerBox = new VBox(4);
-        headerBox.setPadding(new Insets(0, 0, 8, 0));
-
-        Label titleLabel = new Label("Kiểm Kê & Điều Chỉnh Số Dư");
-        titleLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
-
-        Label subtitleLabel = new Label("Cập nhật số dư thực tế cho ví " + wallet.getName());
-        subtitleLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
-        headerBox.getChildren().addAll(titleLabel, subtitleLabel);
+        var headerBox = createHeaderBox("Kiểm Kê & Điều Chỉnh Số Dư", "Cập nhật số dư thực tế cho ví " + wallet.getName());
 
         // Khối hiển thị số dư sổ sách hiện tại
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
@@ -123,45 +79,16 @@ public class AdjustBalanceDialog extends Dialog<ButtonType> {
         Label dateLabel = new Label("Ngày điều chỉnh (YYYY-MM-DD):");
         dateLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 12px;");
 
-        VBox form = new VBox(10);
-        form.setPadding(new Insets(18, 22, 18, 22));
-        form.setStyle("-fx-background-color: #141414;");
-        form.getChildren().addAll(
+        var form = createFormBox(10,
                 headerBox,
                 balanceCard,
                 actualLabel, this.actualBalanceField,
                 reasonLabel, this.reasonField,
                 dateLabel, this.dateField
         );
+        getDialogPane().setContent(form);
 
-        DialogPane pane = getDialogPane();
-        pane.setPrefWidth(440);
-        pane.setMinWidth(440);
-        pane.setContent(form);
-        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        var cssResource = getClass().getResource("/css/pfms-theme.css");
-        if (cssResource != null) {
-            pane.getStylesheets().add(cssResource.toExternalForm());
-        }
-
-        final var okButton = pane.lookupButton(ButtonType.OK);
-        if (okButton instanceof Button btn) {
-            btn.setText("Xác nhận điều chỉnh");
-            btn.setDefaultButton(true);
-        }
-        if (okButton != null) {
-            okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-                triggerAdjust();
-                if (!isSuccess()) {
-                    event.consume();
-                }
-            });
-        }
-
-        final var cancelButton = pane.lookupButton(ButtonType.CANCEL);
-        if (cancelButton instanceof Button btn) {
-            btn.setText("Hủy bỏ");
-        }
+        setupButtons("Xác nhận điều chỉnh", "Hủy bỏ");
     }
 
     public AdjustBalanceDialog(WalletGUIController walletController, WalletResponseDTO wallet) {
@@ -169,51 +96,31 @@ public class AdjustBalanceDialog extends Dialog<ButtonType> {
     }
 
     public AdjustBalanceDialog(Object dummyParent, WalletGUIController walletController, WalletResponseDTO wallet) {
-        this((Window) (dummyParent instanceof Window ? (Window) dummyParent : null), walletController, wallet);
+        this(dummyParent instanceof Window w ? w : null, walletController, wallet);
     }
 
-    public void triggerAdjust() {
+    @Override
+    protected BalanceAdjustmentResponseDTO onExecuteSave() throws Exception {
         String rawBalance = this.actualBalanceField.getText();
         String reason = this.reasonField.getText();
         String date = this.dateField.getText();
 
-        try {
-            this.adjustmentResponse = this.walletController.handleAdjustBalance(
-                    this.wallet.getWalletId(), rawBalance, reason, date);
-            this.success = true;
-            this.errorMessage = null;
-            if (this.infoConsumer != null) {
-                this.infoConsumer.accept("Kiểm kê số dư thành công!\nChênh lệch điều chỉnh: " +
-                        this.adjustmentResponse.getDifference() + " VNĐ");
-            }
-            dispose();
-        } catch (Exception ex) {
-            this.errorMessage = ex.getMessage();
-            this.success = false;
-            if (this.errorConsumer != null) {
-                this.errorConsumer.accept(ex.getMessage());
-            }
+        BalanceAdjustmentResponseDTO res = this.walletController.handleAdjustBalance(
+                this.wallet.getWalletId(), rawBalance, reason, date);
+
+        if (this.infoConsumer != null) {
+            this.infoConsumer.accept("Kiểm kê số dư thành công!\nChênh lệch điều chỉnh: " +
+                    res.getDifference() + " VNĐ");
         }
+        return res;
     }
 
-    public void dispose() {
-        close();
-    }
-
-    public void setVisible(boolean visible) {
-        if (visible) {
-            showAndWait();
-        } else {
-            close();
-        }
-    }
-
-    public boolean isSuccess() {
-        return this.success;
+    public void triggerAdjust() {
+        triggerSave();
     }
 
     public BalanceAdjustmentResponseDTO getAdjustmentResponse() {
-        return this.adjustmentResponse;
+        return this.resultData;
     }
 
     public void setActualBalanceInputValue(String balance) {
@@ -228,15 +135,7 @@ public class AdjustBalanceDialog extends Dialog<ButtonType> {
         return this.dateField.getText();
     }
 
-    public void setErrorConsumer(Consumer<String> errorConsumer) {
-        this.errorConsumer = errorConsumer;
-    }
-
     public void setInfoConsumer(Consumer<String> infoConsumer) {
         this.infoConsumer = infoConsumer;
-    }
-
-    public String getErrorMessage() {
-        return this.errorMessage;
     }
 }

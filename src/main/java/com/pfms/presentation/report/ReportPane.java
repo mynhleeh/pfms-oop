@@ -1,7 +1,7 @@
 package com.pfms.presentation.report;
 
+import com.pfms.presentation.common.AbstractBasePane;
 import com.pfms.presentation.common.ViewUtils;
-import com.pfms.presentation.common.util.FxAlertUtils;
 import com.pfms.presentation.dto.report.CashFlowReportResponseDTO;
 import com.pfms.presentation.dto.report.MonthlyCashFlowResponseDTO;
 import com.pfms.presentation.dto.report.NeedGroupShareResponseDTO;
@@ -9,7 +9,6 @@ import com.pfms.presentation.dto.report.SpendingStructureReportResponseDTO;
 import com.pfms.presentation.report.component.CashFlowRowNode;
 import com.pfms.presentation.report.component.SpendingStructureRowNode;
 import com.pfms.presentation.report.dialog.ExportReportDialog;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,7 +25,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -38,14 +36,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Bảng điều khiển phân hệ Báo cáo &amp; Thống kê Tài chính (Report Management Pane) sử dụng JavaFX.
- * Hiện thực hóa giao diện ReportView theo mô hình MVP (Passive View).
+ * Hiện thực hóa giao diện ReportView theo mô hình MVP (Passive View), kế thừa AbstractBasePane.
  * Trực quan hóa dữ liệu bằng chuỗi thẻ số liệu phân cấp (Stream Rows) đồng bộ 100% với bản preview.
  */
-public class ReportPane extends BorderPane implements ReportView {
+public class ReportPane extends AbstractBasePane implements ReportView {
 
     private final ReportPresenter presenter;
     private final ReportGUIController controller;
@@ -96,11 +93,9 @@ public class ReportPane extends BorderPane implements ReportView {
     private final ScrollPane structureScrollPane = new ScrollPane(structureStreamBox);
     private HBox structureStreamHeader;
 
-    private Consumer<String> messageConsumer;
-    private Consumer<String> warningConsumer;
-    private Consumer<String> errorConsumer;
-
     public ReportPane(ReportGUIController reportController) {
+        super(false);
+        setPadding(Insets.EMPTY);
         this.controller = Objects.requireNonNull(reportController, "ReportGUIController không được để null");
         this.presenter = new ReportPresenter(this, reportController);
 
@@ -753,47 +748,7 @@ public class ReportPane extends BorderPane implements ReportView {
             dialog.showAndWait();
         });
     }
-
-    @Override
-    public void showMessage(String message) {
-        if (messageConsumer != null) {
-            messageConsumer.accept(message);
-        } else {
-            FxAlertUtils.showInfo("PFMS Thông báo", message);
-        }
-    }
-
-    @Override
-    public void showWarning(String message) {
-        if (warningConsumer != null) {
-            warningConsumer.accept(message);
-        } else {
-            FxAlertUtils.showWarning("PFMS Cảnh báo", message);
-        }
-    }
-
-    @Override
-    public void showError(String message) {
-        if (errorConsumer != null) {
-            errorConsumer.accept(message);
-        } else {
-            FxAlertUtils.showError("PFMS Lỗi", message);
-        }
-    }
-
-    @Override
-    public boolean confirmAction(String message) {
-        return FxAlertUtils.showConfirm("Xác nhận thao tác", message);
-    }
     // endregion
-
-    private void runOnFx(Runnable action) {
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-        } else {
-            Platform.runLater(action);
-        }
-    }
 
     // Getters
     public ReportPresenter getPresenter() { return presenter; }
@@ -829,8 +784,4 @@ public class ReportPane extends BorderPane implements ReportView {
     public TextField getYearField() { return yearField; }
     public ComboBox<String> getCfFormatBox() { return cfFormatBox; }
     public ComboBox<String> getStFormatBox() { return stFormatBox; }
-
-    public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }
-    public void setWarningConsumer(Consumer<String> consumer) { this.warningConsumer = consumer; }
-    public void setErrorConsumer(Consumer<String> consumer) { this.errorConsumer = consumer; }
 }
