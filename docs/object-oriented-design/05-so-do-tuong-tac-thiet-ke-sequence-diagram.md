@@ -1,14 +1,14 @@
-# 05. Sơ đồ Tuần tự Thiết kế
+# 05. Sơ đồ tuần tự thiết kế
 
-Tài liệu này đặc tả luồng tương tác động giữa các đối tượng trong hệ thống nhằm hiện thực hóa các ca sử dụng trên môi trường giao diện đồ họa người dùng. Các kịch bản tương tác phân rã luồng xử lý từ sự kiện đầu vào của người dùng qua các tầng kiến trúc: tiếp nhận lệnh tại tầng trình diễn, điều phối nghiệp vụ tại tầng dịch vụ, thực thi quy tắc nghiệp vụ tại tầng miền và ghi nhận dữ liệu bền vững tại tầng hạ tầng.
+Tài liệu này đặc tả luồng tương tác động giữa các đối tượng trong hệ thống để hiện thực hóa các ca sử dụng qua 4 tầng kiến trúc: tầng trình diễn tiếp nhận sự kiện, tầng dịch vụ điều phối ca sử dụng, tầng nghiệp vụ thực thi quy tắc miền và tầng hạ tầng lưu trữ dữ liệu bền vững.
 
-Các sơ đồ tuần tự xác định trình tự gọi phương thức đồng bộ, quy chuẩn truyền nhận đối tượng truyền dữ liệu và cơ chế biến đổi trạng thái nội tại của thực thể. Mọi thông điệp trao đổi trên sơ đồ đều khớp với cấu trúc lớp tĩnh đã thiết kế, đồng thời mô hình hóa đầy đủ các nhánh ngoại lệ nghiệp vụ phát sinh trong quá trình vận hành để duy trì tính nhất quán của dữ liệu tài chính.
+Các sơ đồ tuần tự xác định trình tự gọi phương thức đồng bộ, quy chuẩn trao đổi DTO và cơ chế biến đổi trạng thái của thực thể. Mọi thông điệp trao đổi khớp chính xác chữ ký phương thức đã thiết kế, mô hình hóa đầy đủ các nhánh ngoại lệ (`alt`) và khối giao dịch nguyên tử (`critical`) nhằm bảo toàn tính nhất quán dữ liệu tài chính.
 
-## 5.1 Nguyên tắc Thiết kế Sơ đồ Tuần tự Chi tiết
+## 5.1 Nguyên tắc thiết kế sơ đồ tuần tự chi tiết
 
-Mục này xác lập các nguyên tắc thiết kế và quy chuẩn mô hình hóa tương tác động cho toàn bộ hệ thống. Các quy định tại đây thiết lập khung kỹ thuật thống nhất, bảo đảm tính nhất quán trong cách biểu diễn luồng dữ liệu và lời gọi phương thức xuyên suốt các ca sử dụng.
+Mục này xác lập nguyên tắc thiết kế và quy chuẩn mô hình hóa tương tác động, bảo đảm tính nhất quán trong biểu diễn luồng dữ liệu và lời gọi phương thức.
 
-Trong giai đoạn phân tích, sơ đồ tuần tự hệ thống mô tả phần mềm dưới dạng hộp đen: toàn bộ hệ thống được xem như một đối tượng duy nhất, chỉ thể hiện sự kiện người dùng gửi vào và phản hồi nhận lại mà không bộc lộ cấu trúc bên trong. Khi chuyển sang giai đoạn thiết kế, sơ đồ tuần tự chi tiết mở rộng hộp đen thành chuỗi tương tác cụ thể giữa các đối tượng phân bổ trên bốn tầng kiến trúc: tầng trình diễn tiếp nhận dữ liệu và điều hướng hiển thị, tầng dịch vụ điều phối luồng nghiệp vụ và quản lý giao dịch, tầng miền thực thi các quy tắc nghiệp vụ và biến đổi trạng thái, tầng hạ tầng đảm nhận việc lưu trữ dữ liệu bền vững.
+Nếu sơ đồ tuần tự hệ thống (ở giai đoạn phân tích) xem phần mềm như một "hộp đen" chỉ nhận sự kiện và trả phản hồi, thì sơ đồ tuần tự thiết kế mở rộng thành "hộp trắng" phân rã luồng gọi hàm qua 4 tầng kiến trúc: tầng trình diễn (tiếp nhận sự kiện/hiển thị), tầng dịch vụ (điều phối ca sử dụng), tầng nghiệp vụ (thực thi quy tắc miền) và tầng hạ tầng (lưu trữ bền vững).
 
 Bảng so sánh đặc điểm giữa sơ đồ tuần tự hệ thống và sơ đồ tuần tự thiết kế:
 
@@ -23,11 +23,11 @@ Bảng so sánh đặc điểm giữa sơ đồ tuần tự hệ thống và sơ
 
 Các cột đối tượng tham gia tương tác trên sơ đồ được sắp xếp theo thứ tự cố định từ trái qua phải, phản ánh chiều phụ thuộc và luồng điều khiển của kiến trúc:
 
-1. Tác nhân ngoài: Người dùng thực hiện thao tác chuột và phím trên giao diện đồ họa.
-2. Tầng Trình diễn: Lớp giao diện đồ họa đọc dữ liệu biểu mẫu, kiểm tra định dạng và đóng gói đối tượng truyền dữ liệu.
-3. Tầng Dịch vụ: Lớp dịch vụ ứng dụng tiếp nhận yêu cầu, nạp dữ liệu và điều phối quy trình xử lý ca sử dụng.
-4. Tầng Nghiệp vụ: Các thực thể và đối tượng giá trị thực hiện tính toán, kiểm tra ràng buộc và cập nhật trạng thái.
-5. Tầng Hạ tầng: Kho lưu trữ dữ liệu thực hiện các thao tác truy xuất hoặc lưu trữ bền vững.
+1. **Tác nhân ngoài**: Người dùng thực hiện thao tác chuột và phím trên giao diện đồ họa.
+2. **Tầng trình diễn**: Lớp giao diện đồ họa đọc dữ liệu biểu mẫu, kiểm tra định dạng và đóng gói đối tượng truyền dữ liệu.
+3. **Tầng dịch vụ**: Lớp dịch vụ ứng dụng tiếp nhận yêu cầu, nạp dữ liệu và điều phối quy trình xử lý ca sử dụng.
+4. **Tầng nghiệp vụ**: Các thực thể và đối tượng giá trị thực hiện tính toán, kiểm tra ràng buộc và cập nhật trạng thái.
+5. **Tầng hạ tầng**: Kho lưu trữ dữ liệu thực hiện các thao tác truy xuất hoặc lưu trữ bền vững.
 
 Sơ đồ dưới đây minh họa luồng tương tác tổng quát qua bốn tầng kiến trúc:
 
@@ -54,15 +54,13 @@ sequenceDiagram
 
 Mọi thông điệp trao đổi trên sơ đồ tuần tự bắt buộc phải khớp chính xác với chữ ký phương thức đã công bố trong các giao diện dịch vụ, thực thể miền và kho lưu trữ dữ liệu.
 
-Bên cạnh luồng thực thi chuẩn, mọi sơ đồ tuần tự trong tài liệu bắt buộc phải mô hình hóa tường minh các nhánh ngoại lệ nghiệp vụ thông qua khung rẽ nhánh điều kiện `alt`. Thiết kế phải bao phủ đầy đủ các điểm kiểm tra ràng buộc tài chính kèm mã lỗi định danh tương ứng, loại bỏ các sơ đồ chỉ biểu diễn kịch bản thành công đơn lẻ. Đối với các giao dịch tác động đồng thời lên nhiều nguồn tiền như chuyển tiền nội bộ, luồng tương tác được bao bọc trong khung thực thi cô lập `critical` nhằm bảo đảm nguyên tắc toàn vẹn: toàn bộ thao tác cập nhật số dư các ví phải cùng thành công hoặc hoàn tác về trạng thái ban đầu nếu phát sinh sự cố.
+Mọi sơ đồ tuần tự mô hình hóa tường minh các nhánh ngoại lệ qua khung điều kiện `alt` kèm mã lỗi định danh tương ứng. Đối với các giao dịch tác động đồng thời lên nhiều ví (như chuyển tiền nội bộ), luồng tương tác được bao bọc trong khung `critical` để bảo đảm tính nguyên tử: toàn bộ thao tác cập nhật số dư phải cùng thành công hoặc hoàn tác toàn bộ khi phát sinh lỗi.
 
-## 5.2 Sơ đồ Tuần tự Nhóm Quản lý Ví
+## 5.2 Sơ đồ tuần tự nhóm quản lý ví
 
-Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ quản lý nguồn tiền trong hệ thống. Chuỗi tương tác mô tả quy trình điều phối vòng đời của ví thanh toán: khởi tạo nguồn tiền, cập nhật thông tin nhận diện, chuyển đổi trạng thái lưu trữ và ghi nhận chênh lệch kiểm kê thực tế.
+Mục này mô hình hóa các luồng tương tác quản lý vòng đời ví: khởi tạo nguồn tiền, cập nhật thông tin, chuyển đổi trạng thái lưu trữ và kiểm kê số dư thực tế. Các kịch bản làm rõ sự phối hợp giữa `WalletServiceImpl` với thực thể `Wallet` và kho lưu trữ, đảm bảo tính duy nhất của tên ví, duy trì số dư không âm và lưu vết kiểm toán kiểm kê.
 
-Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với thực thể ví và kho lưu trữ dữ liệu, bảo đảm thực thi quy tắc kiểm tra tính duy nhất của tên ví, kiểm soát điều kiện số dư không âm và lưu vết kiểm toán đối soát khi phát sinh chênh lệch kiểm kê.
-
-### 5.2.1 Sơ đồ Tạo Mới Ví
+### 5.2.1 Sơ đồ tạo mới ví
 
 Luồng điều phối khởi tạo ví mới tiếp nhận yêu cầu từ giao diện, xác thực chuẩn định dạng tên ví và kiểm tra tính duy nhất trên toàn hệ thống trước khi khởi tạo thực thể ví với số dư ban đầu bằng không. Dữ liệu thực thể được ghi nhận bền vững xuống kho lưu trữ và chuyển đổi sang đối tượng truyền dữ liệu phản hồi về tầng trình diễn.
 
@@ -108,7 +106,7 @@ sequenceDiagram
 
 Toàn vẹn tài chính được bảo đảm tuyệt đối khi thực thể ví mới luôn được khởi tạo với số dư ban đầu bằng không thông qua đối tượng giá trị bất biến `Money.ZERO`, loại trừ hoàn toàn rủi ro gán số dư tùy tiện khi chưa qua thủ tục kiểm kê thực tế.
 
-### 5.2.2 Sơ đồ Xem Tổng hợp Số dư và Cơ cấu Ví
+### 5.2.2 Sơ đồ xem tổng hợp số dư và cơ cấu ví
 
 Luồng truy vấn danh sách ví trích xuất toàn bộ nguồn tiền khả dụng, tính toán tổng tài sản tức thời và xác định tỷ trọng phân bổ tài sản toàn hệ thống ở chế độ chỉ đọc. Cơ chế tính toán áp dụng nguyên tắc làm tròn nửa chẵn và kiểm soát giá trị mẫu số triệt tiêu nhằm chống lỗi số học chia cho không.
 
@@ -150,7 +148,7 @@ sequenceDiagram
 
 Thao tác vận hành hoàn toàn ở chế độ chỉ đọc, truy xuất thông tin qua các phương thức đọc bất biến và không làm thay đổi trạng thái nội tại của bất kỳ thực thể ví nào trong hệ thống.
 
-### 5.2.3 Sơ đồ Cập nhật Thông tin Ví
+### 5.2.3 Sơ đồ cập nhật thông tin ví
 
 Luồng cập nhật thông tin ví tiếp nhận tên gọi và ghi chú mới từ giao diện người dùng, kiểm tra sự tồn tại của nguồn tiền, xác thực quy chuẩn định dạng và kiểm tra tính duy nhất trước khi ủy quyền thực thể cập nhật thuộc tính. Mã định danh và số dư khả dụng hiện hành được bảo toàn nguyên vẹn xuyên suốt quá trình xử lý.
 
@@ -205,7 +203,7 @@ sequenceDiagram
 
 Việc cập nhật thông tin định danh giữ nguyên mã định danh `walletId` và số dư khả dụng `currentBalance`, bảo đảm không làm đứt gãy tính toàn vẹn tham chiếu của các giao dịch lịch sử gắn liền với ví.
 
-### 5.2.4 Sơ đồ Điều chỉnh Số dư Ví Thực tế
+### 5.2.4 Sơ đồ điều chỉnh số dư ví thực tế
 
 Luồng điều chỉnh số dư ví đồng bộ số dư trên hệ thống khớp với kết quả kiểm kê thực tế của người dùng. Chuỗi tương tác xác thực tính hợp lệ của số dư thực tế, kiểm tra trạng thái hoạt động của ví, cập nhật số dư mới và khởi tạo bản ghi kiểm kê bất biến để lưu vết kiểm toán tài chính cố định.
 
@@ -259,13 +257,11 @@ sequenceDiagram
 
 Mọi chênh lệch kiểm kê bắt buộc khởi tạo bản ghi kiểm kê bất biến `BalanceAdjustmentRecord` để lưu giữ vết kiểm toán độc lập, bảo đảm số dư khả dụng mới luôn duy trì giá trị không âm và không làm xáo trộn các số liệu thu chi nguyên thủy.
 
-## 5.3 Sơ đồ Tuần tự Nhóm Ghi nhận Thu Chi
+## 5.3 Sơ đồ tuần tự nhóm ghi nhận thu chi
 
-Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ ghi nhận biến động dòng tiền thu chi hàng ngày trong hệ thống. Chuỗi tương tác mô tả quy trình tiếp nhận sự kiện tài chính, phân loại theo danh mục chi tiết, kiểm soát chi phí giao dịch liên kết và điều phối cập nhật số dư ví tức thời.
+Mục này mô hình hóa luồng ghi nhận biến động thu chi: tiếp nhận giao dịch, phân loại danh mục, tính phụ phí và cập nhật số dư ví tức thời. Các kịch bản làm rõ sự phối hợp giữa `TransactionServiceImpl` với `IncomeExpenseTransaction`, `Wallet` và các repository, đảm bảo số dư không âm, tính hợp lệ của danh mục và cơ chế hoàn nguyên hai pha khi sửa/xóa giao dịch.
 
-Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với các thực thể giao dịch, thực thể ví và các kho lưu trữ tương ứng, bảo đảm thực thi quy tắc kiểm tra số dư khả dụng không âm, kiểm soát tính hợp lệ của cây danh mục phân loại và thực hiện cơ chế hoàn nguyên hai pha khi chỉnh sửa hoặc xóa giao dịch.
-
-### 5.3.1 Sơ đồ Ghi nhận Giao dịch Thu Chi
+### 5.3.1 Sơ đồ ghi nhận giao dịch thu chi
 
 Luồng điều phối ghi nhận giao dịch thu chi tiếp nhận thông tin thu nhập hoặc chi tiêu kèm chi phí phát sinh (nếu có), xác thực tính hợp lệ của nguồn tiền và danh mục chi tiết, kiểm soát số dư ví khả dụng không âm trước khi khởi tạo thực thể và lưu trữ đồng thời vào kho dữ liệu.
 
@@ -337,7 +333,7 @@ sequenceDiagram
 
 Mọi giao dịch chi tiêu và chi phí liên kết bắt buộc kiểm soát số dư khả dụng không âm trước khi ghi nhận, bảo đảm dữ liệu luôn nhất quán giữa sổ giao dịch và số dư ví.
 
-### 5.3.2 Sơ đồ Tra cứu và Lọc Lịch sử Giao dịch
+### 5.3.2 Sơ đồ tra cứu và lọc lịch sử giao dịch
 
 Luồng tra cứu và trích xuất lịch sử giao dịch vận hành hoàn toàn ở chế độ chỉ đọc. Chuỗi tương tác tiếp nhận các tiêu chí lọc thời gian, nguồn tiền, danh mục, kiểm tra tính hợp lệ của khoảng ngày, nạp dữ liệu và tính toán tổng dòng tiền trước khi đóng gói phản hồi về tầng trình diễn.
 
@@ -374,7 +370,7 @@ sequenceDiagram
 
 Thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm biến đổi dữ liệu hay trạng thái của các thực thể giao dịch và số dư nguồn tiền trong hệ thống.
 
-### 5.3.3 Sơ đồ Chỉnh sửa Giao dịch Thu Chi
+### 5.3.3 Sơ đồ chỉnh sửa giao dịch thu chi
 
 Luồng chỉnh sửa giao dịch điều phối việc cập nhật thông tin khoản thu chi đã ghi nhận, áp dụng quy trình kiểm soát hoàn nguyên an toàn nhằm bảo đảm số dư ví sau điều chỉnh luôn thỏa mãn ràng buộc không âm.
 
@@ -438,7 +434,7 @@ sequenceDiagram
 
 Quy trình kiểm soát hai pha bảo đảm giao dịch chỉ được chấp nhận cập nhật khi trạng thái số dư ví sau điều chỉnh duy trì không âm, loại trừ nguy cơ xuất quỹ vượt quá khả năng tài chính.
 
-### 5.3.4 Sơ đồ Xóa Giao dịch Thu Chi
+### 5.3.4 Sơ đồ xóa giao dịch thu chi
 
 Luồng xóa giao dịch loại bỏ bản ghi thu chi khỏi hệ thống, thu hồi khoản chi tiêu hoặc hoàn trả khoản thu nhập về ví nguồn, đồng thời xóa sạch bản ghi chi phí phụ thuộc liên kết.
 
@@ -490,13 +486,13 @@ sequenceDiagram
 
 Việc xóa giao dịch đồng thời thu hồi hoặc hoàn trả số dư ví và loại bỏ hoàn toàn các bản ghi chi phí phụ thuộc liên kết, triệt tiêu nguy cơ phát sinh dữ liệu chi phí mồ côi và bảo đảm số dư không âm.
 
-## 5.4 Sơ đồ Tuần tự Nhóm Chuyển tiền Nội bộ
+## 5.4 Sơ đồ tuần tự nhóm chuyển tiền nội bộ
 
 Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ điều chuyển tiền giữa các ví trong hệ thống. Chuỗi tương tác mô tả quy trình tiếp nhận sự kiện chuyển tiền, kiểm tra tính phân biệt giữa ví nguồn và ví đích, hạch toán chi phí phát sinh liên kết và điều phối cập nhật đồng thời số dư của cả hai ví.
 
 Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với các thực thể giao dịch chuyển tiền, thực thể ví và các kho lưu trữ tương ứng, bảo đảm thực thi quy tắc bảo toàn tổng tài sản trừ chi phí phát sinh, kiểm soát số dư ví nguồn và ví đích luôn không âm và thực hiện cơ chế hoàn nguyên hai pha khi xóa giao dịch chuyển tiền.
 
-### 5.4.1 Sơ đồ Chuyển tiền giữa Hai Ví
+### 5.4.1 Sơ đồ chuyển tiền giữa hai ví
 
 Luồng điều phối chuyển tiền từ ví nguồn sang ví đích kiểm tra tính phân biệt của cặp ví, xác thực số tiền chuyển và chi phí hợp lệ, kiểm tra số dư ví nguồn đủ thanh toán tổng tiền chuyển cùng phí trước khi cập nhật đồng thời số dư hai ví và lưu vết giao dịch.
 
@@ -569,7 +565,7 @@ sequenceDiagram
 
 Giao dịch chuyển tiền được thực hiện theo cơ chế nguyên tử bảo đảm tổng tài sản toàn hệ thống được bảo toàn (trừ phần chi phí phát sinh thực tế), đồng thời số dư ví nguồn luôn duy trì không âm.
 
-### 5.4.2 Sơ đồ Tra cứu Lịch sử Chuyển tiền
+### 5.4.2 Sơ đồ tra cứu lịch sử chuyển tiền
 
 Luồng truy vấn và trích xuất lịch sử chuyển tiền vận hành hoàn toàn ở chế độ chỉ đọc. Chuỗi tương tác nạp các giao dịch chuyển tiền theo khoảng thời gian và cặp ví liên quan, tính tổng tiền chuyển và chi phí phát sinh trước khi đóng gói phản hồi về tầng trình diễn.
 
@@ -611,7 +607,7 @@ sequenceDiagram
 
 Thao tác tra cứu vận hành thuần túy ở chế độ chỉ đọc, không làm thay đổi trạng thái của các thực thể giao dịch hay số dư của bất kỳ ví nào trong hệ thống.
 
-### 5.4.3 Sơ đồ Xóa và Hoàn tác Giao dịch Chuyển tiền
+### 5.4.3 Sơ đồ xóa và hoàn tác giao dịch chuyển tiền
 
 Luồng hủy giao dịch chuyển tiền thực hiện thu hồi tiền chuyển từ ví đích, hoàn trả tiền chuyển cùng khoản phí về ví nguồn, đồng thời xóa sạch bản ghi chuyển tiền và chi phí phát sinh liên kết.
 
@@ -670,13 +666,13 @@ sequenceDiagram
 
 Cơ chế hoàn nguyên hai pha bảo đảm thu hồi đồng thời số dư cả hai ví và xóa sạch các bản ghi chi phí phụ thuộc, ngăn chặn tuyệt đối tình trạng âm số dư ví nhận.
 
-## 5.5 Sơ đồ Tuần tự Nhóm Danh mục Phân loại
+## 5.5 Sơ đồ tuần tự nhóm danh mục phân loại
 
 Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ quản lý hệ thống danh mục phân loại thu chi trong hệ thống. Chuỗi tương tác mô tả quy trình tiếp nhận thao tác bổ sung danh mục mới, đổi tên hiển thị, khôi phục danh mục đã ẩn và thực hiện cơ chế xóa mềm nhằm bảo đảm tính liên tục của dữ liệu tài chính.
 
-Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với thực thể danh mục, kho lưu trữ danh mục và kho lưu trữ giao dịch, bảo đảm tuân thủ nghiêm ngặt quy tắc cấu trúc phân cấp ba tầng, kiểm soát tính duy nhất của tên gọi trong cùng phạm vi cha và bảo toàn toàn vẹn tham chiếu cho các giao dịch lịch sử đã ghi nhận.
+Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối với thực thể danh mục, kho lưu trữ danh mục và kho lưu trữ giao dịch, bảo đảm tuân thủ nghiêm ngặt quy tắc cấu trúc phân cấp ba tầng, kiểm soát tính duy nhất của tên gọi trong cùng phạm vi cha và bảo toàn tính toàn vẹn tham chiếu cho các giao dịch lịch sử đã ghi nhận.
 
-### 5.5.1 Sơ đồ Thêm mới Danh mục Chi tiết
+### 5.5.1 Sơ đồ thêm mới danh mục chi tiết
 
 Luồng tương tác mô tả quá trình tiếp nhận yêu cầu bổ sung danh mục chi tiết cấp ba vào một nhóm nhu cầu cha đang hoạt động, thực hiện kiểm tra tính hợp lệ của định danh và tính khả dụng của nhóm cha trước khi khởi tạo thực thể. Dịch vụ ứng dụng kiểm soát tính duy nhất của tên trong phạm vi nhóm cha và lưu trữ thực thể danh mục mới vào kho dữ liệu.
 
@@ -732,7 +728,7 @@ sequenceDiagram
 
 Danh mục mới luôn được gắn kết vào một nhóm cha hợp lệ đang hoạt động và kế thừa loại giao dịch cố định, bảo đảm tính toàn vẹn của cấu trúc phân cấp ba tầng.
 
-### 5.5.2 Sơ đồ Đổi tên Danh mục
+### 5.5.2 Sơ đồ đổi tên danh mục
 
 Luồng tương tác mô tả quy trình tiếp nhận yêu cầu cập nhật tên hiển thị của danh mục hiện có, kiểm tra định dạng tên mới và kiểm soát tính duy nhất trong phạm vi nhóm cha trực thuộc. Dịch vụ ứng dụng nạp thực thể danh mục, cập nhật tên mới và lưu trữ vào kho dữ liệu mà không làm biến động mã định danh hay lịch sử giao dịch liên kết.
 
@@ -785,7 +781,7 @@ sequenceDiagram
 
 Việc đổi tên bảo toàn tuyệt đối mã định danh và loại thu chi của danh mục, không làm đứt gãy hoặc sai lệch dữ liệu lịch sử của các giao dịch đã ghi nhận trong quá khứ theo quy tắc đặt tên bất biến của định danh.
 
-### 5.5.3 Sơ đồ Khôi phục Danh mục Đã xóa
+### 5.5.3 Sơ đồ khôi phục danh mục đã xóa
 
 Luồng tương tác mô tả quy trình phục hồi danh mục đã xóa mềm trở lại trạng thái hoạt động, đồng thời xác thực trạng thái hoạt động của nhóm cha và kiểm soát xung đột tên gọi trong nhóm. Dịch vụ ứng dụng cập nhật trạng thái của thực thể sang hoạt động và lưu vào kho dữ liệu, đưa danh mục tái xuất hiện trên các biểu mẫu giao dịch.
 
@@ -840,7 +836,7 @@ sequenceDiagram
 
 Thao tác khôi phục chỉ được phép khi nhóm cha đang hoạt động và không xảy ra xung đột định danh, đưa danh mục trở lại danh sách lựa chọn mà không làm xáo trộn số liệu báo cáo lịch sử.
 
-### 5.5.4 Sơ đồ Xóa Danh mục (Xóa cứng và Xóa mềm)
+### 5.5.4 Sơ đồ xóa danh mục (xóa cứng và xóa mềm)
 
 Luồng tương tác mô tả quy trình tiếp nhận yêu cầu loại bỏ danh mục phân loại, kiểm tra ràng buộc duy trì tối thiểu nhóm nhu cầu hoạt động và kiểm tra lịch sử giao dịch tham chiếu. Dịch vụ ứng dụng tự động phân nhánh thực hiện xóa cứng nếu danh mục chưa từng phát sinh giao dịch hoặc xóa mềm chuyển trạng thái để bảo toàn tính toàn vẹn dòng tiền.
 
@@ -898,13 +894,13 @@ sequenceDiagram
 
 Cơ chế xóa mềm bảo toàn tuyệt đối tính toàn vẹn tham chiếu lịch sử của mọi giao dịch liên kết và duy trì tối thiểu một nhóm nhu cầu hoạt động cho mỗi loại thu chi theo quy định tài chính.
 
-## 5.6 Sơ đồ Tuần tự Nhóm Báo cáo và Quản trị Dữ liệu
+## 5.6 Sơ đồ tuần tự nhóm báo cáo và quản trị dữ liệu
 
 Mục này mô hình hóa các luồng tương tác thực thi nghiệp vụ kết xuất báo cáo phân tích tài chính và quản trị dữ liệu an toàn của hệ thống. Chuỗi tương tác mô tả quy trình tổng hợp dòng tiền đa chiều, đo lường cơ cấu thu chi, trích xuất tệp sao lưu định dạng chuẩn, phục hồi dữ liệu có kiểm định bốn bước và đối soát độc lập các điều kiện cân bằng tài chính.
 
 Các kịch bản làm rõ sự phối hợp giữa lớp dịch vụ điều phối báo cáo và quản trị dữ liệu với toàn bộ các kho lưu trữ thực thể trong hệ thống, bảo đảm nguyên tắc vận hành chỉ đọc đối với các luồng thống kê đối soát, kiểm soát tính toàn vẹn của tệp JSON sao lưu và duy trì tính nhất quán tuyệt đối của sổ cái tài chính.
 
-### 5.6.1 Sơ đồ Lập Báo cáo Dòng tiền Định kỳ
+### 5.6.1 Sơ đồ lập báo cáo dòng tiền định kỳ
 
 Luồng tương tác mô tả quy trình truy vấn và tổng hợp dòng tiền định kỳ trong chuỗi 12 tháng liên tục lùi tính từ mốc tháng/năm kết thúc ở chế độ chỉ đọc, tính toán dòng tiền ròng và tỷ lệ tiết kiệm từng tháng. Dịch vụ ứng dụng nạp các giao dịch từ kho lưu trữ theo khoảng ngày, tính toán các chỉ số tài chính, áp dụng tỷ lệ tiết kiệm mặc định khi tổng thu bằng không để tránh lỗi số học và đóng gói kết quả báo cáo.
 
@@ -950,7 +946,7 @@ sequenceDiagram
 
 Thao tác vận hành hoàn toàn ở chế độ chỉ đọc, không làm biến đổi trạng thái của bất kỳ thực thể hay số dư tài chính nào trong hệ thống.
 
-### 5.6.2 Sơ đồ Lập Báo cáo Cơ cấu Thu chi
+### 5.6.2 Sơ đồ lập báo cáo cơ cấu thu chi
 
 Luồng tương tác mô tả quy trình trích xuất và phân tích cơ cấu thu chi theo nhóm nhu cầu và danh mục chi tiết trong khoảng thời gian xác định ở chế độ chỉ đọc. Dịch vụ ứng dụng kiểm tra tính hợp lệ của tham số thời gian cùng loại luồng tiền, truy vấn giao dịch (gồm cả phí giao dịch liên kết khi phân tích chi tiêu) và thông tin phân cấp danh mục, gom cụm số liệu, tính toán tỷ trọng phân bổ chính xác và đối chiếu biến động với kỳ liền kề cùng độ dài.
 
@@ -1005,7 +1001,7 @@ sequenceDiagram
 
 Thao tác trích xuất và tính toán tỷ trọng phân bổ thu chi ở chế độ chỉ đọc, bảo toàn tính toàn vẹn của dữ liệu danh mục và số liệu lịch sử.
 
-### 5.6.3 Sơ đồ Xuất Dữ liệu Sao lưu Hệ thống
+### 5.6.3 Sơ đồ xuất dữ liệu sao lưu hệ thống
 
 Luồng tương tác mô tả quy trình trích xuất dữ liệu tài chính theo phạm vi chỉ định và đóng gói thành tệp sao lưu JSON chuẩn hóa. Dịch vụ ứng dụng kiểm tra phạm vi xuất hợp lệ, xác thực đường dẫn thư mục đích để tự sinh tên tệp `pfms_export_{scope}_{yyyyMMdd_HHmmss}.json`, nạp ảnh chụp từ các kho lưu trữ rồi tuần tự hóa và ghi an toàn xuống đĩa cục bộ.
 
@@ -1083,7 +1079,7 @@ sequenceDiagram
 
 Việc xuất dữ liệu sao lưu là thao tác chỉ đọc dữ liệu nghiệp vụ, tạo bản chụp trạng thái nhất quán và giữ nguyên độ chính xác số học của mọi giá trị tiền tệ.
 
-### 5.6.4 Sơ đồ Phục hồi Dữ liệu Hệ thống
+### 5.6.4 Sơ đồ phục hồi dữ liệu hệ thống
 
 Luồng tương tác mô tả quy trình nạp dữ liệu từ tệp sao lưu JSON, giải tuần tự hóa thành thực thể lịch sử và thực thi quy trình kiểm định toàn vẹn nghiêm ngặt theo nguyên tắc tất cả hoặc không trước khi thay thế dữ liệu vào các kho lưu trữ. Nếu phát sinh lỗi ghi khi thay thế, dịch vụ tự động hoàn nguyên bản chụp qua `RollbackSupport` để bảo toàn nguyên vẹn dữ liệu hiện tại.
 
@@ -1166,7 +1162,7 @@ sequenceDiagram
 
 Hệ thống bảo lưu nguyên vẹn dữ liệu hiện tại nếu phát hiện bất kỳ sai phạm nào trong quá trình kiểm định và chỉ ghi đè khi toàn bộ tệp sao lưu hợp lệ.
 
-### 5.6.5 Sơ đồ Đối soát Toàn vẹn Dữ liệu Tài chính
+### 5.6.5 Sơ đồ đối soát toàn vẹn dữ liệu tài chính
 
 Luồng tương tác mô tả quy trình quét kiểm tra độc lập bốn điều kiện cân bằng tài chính của toàn bộ hệ thống và xuất báo cáo đối soát chi tiết ở chế độ chỉ đọc. Dịch vụ ứng dụng nạp dữ liệu từ các kho lưu trữ, đánh giá tính nhất quán của số dư ví, cân bằng chuyển tiền, phân cấp danh mục và kiểm tra tính toàn vẹn của các khoản chi phí gắn liền với giao dịch chứa phí (theo quan hệ hợp thành mà không cần kho lưu trữ phí riêng biệt), phân loại cảnh báo theo các cấp độ mà không làm biến đổi dữ liệu.
 

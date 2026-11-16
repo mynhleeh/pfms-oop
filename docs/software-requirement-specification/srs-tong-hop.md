@@ -1,4 +1,11 @@
 ---
+papersize: a4
+geometry:
+  - top=20mm
+  - bottom=20mm
+  - left=20mm
+  - right=20mm
+mainfont: "Times New Roman"
 header-includes: |
   \usepackage{longtable}
   \usepackage{tikz}
@@ -13,11 +20,24 @@ header-includes: |
   \usepackage{colortbl}
   \usepackage{xcolor}
   \setlength{\arrayrulewidth}{0.5pt}
-  \setlength{\tabcolsep}{5pt}
+  \setlength{\tabcolsep}{4pt}
   \setlength{\emergencystretch}{3em}
-  \setlength{\LTpre}{8pt}
-  \setlength{\LTpost}{8pt}
+  \setlength{\LTpre}{6pt}
+  \setlength{\LTpost}{6pt}
   \usepackage{etoolbox}
+  \usepackage{xparse}
+  \ExplSyntaxOn
+  \NewDocumentCommand{\normalcode}{m}
+   {
+    \tl_set:Nn \l_tmpa_tl { #1 }
+    \regex_replace_all:nnN { ([a-z])([A-Z]) } { \1\c{-}\2 } \l_tmpa_tl
+    \regex_replace_all:nnN { (\.) } { \1\c{allowbreak} } \l_tmpa_tl
+    \regex_replace_all:nnN { (_) } { \c{textunderscore}\c{allowbreak} } \l_tmpa_tl
+    \tl_use:N \l_tmpa_tl
+   }
+  \ExplSyntaxOff
+  \renewcommand{\texttt}[1]{\normalcode{#1}}
+  \AtBeginDocument{\let\passthrough\normalcode}
   \ifPDFTeX\else\newfontfamily\tablefont{Times New Roman}\AtBeginEnvironment{longtable}{\tablefont}\fi
   \usepackage{enumitem}
   \setlist[itemize,1]{label={}}
@@ -25,13 +45,13 @@ header-includes: |
   \setlist[itemize,3]{label={}}
 ---
 
+\thispagestyle{empty}
 
 \begin{center}
   {\LARGE\bfseries HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG\par}
 \end{center}
 
-
-\vspace*{1cm}
+\vspace*{0.5cm}
 
 \begin{tikzpicture}[remember picture, overlay]
   % Viền ngoài
@@ -48,25 +68,26 @@ header-includes: |
 
 ```{=latex}
 \begin{center}
-  \includegraphics[width=0.2\textwidth]{docs/images/logo.jpg}
+  \includegraphics[width=0.18\textwidth]{docs/software-requirement-specification/images/logo.jpg}
 \end{center}
-
 ```
 
-\vspace*{1cm}
+\vspace*{0.6cm}
 
 \begin{center}
   {\LARGE\bfseries HỆ THỐNG QUẢN LÝ TÀI CHÍNH CÁ NHÂN\par}
+  \vspace*{0.4cm}
+  {\Large\bfseries ĐẶC TẢ YÊU CẦU PHẦN MỀM (SRS)\par}
 \end{center}
 
-\vspace*{1.5cm}
+\vspace*{0.8cm}
 
 ```{=latex}
 \newcommand{\cell}[1]{\begin{tabular}[t]{@{}l@{}}#1\end{tabular}}
 
 \begin{center}
 {\large
-\renewcommand{\arraystretch}{1.8}
+\renewcommand{\arraystretch}{1.4}
 \begin{tabular}{@{}>{\bfseries}l@{\hspace{2em}}l@{}}
 Khoa & Công nghệ Thông tin 1 \\
 Học phần & Lập trình Hướng đối tượng \\
@@ -742,7 +763,7 @@ quản trị cơ sở dữ liệu bên ngoài. \\ \hline
 \endgroup
 ```
 
-![Sơ đồ phân rã mức cao các khối nghiệp vụ tài chính của hệ thống](docs/images/so-do-tong-quan.png){width=90%}
+![Sơ đồ phân rã mức cao các khối nghiệp vụ tài chính của hệ thống](docs/software-requirement-specification/images/so-do-tong-quan.png){width=90%}
 
 ### 2.2 Mục tiêu hệ thống
 
@@ -7296,7 +7317,7 @@ Sao lưu, phục hồi, kiểm tra dữ liệu &
 
 Sơ đồ tổng quan xác lập khung kiến trúc của hệ thống: Người dùng tương tác với hệ thống thông qua hai ca sử dụng tóm lược, mỗi ca đại diện cho một gói nghiệp vụ độc lập.
 
-![](docs/images/so-do-uc-tong-quan.png){width=80%}
+![](docs/software-requirement-specification/images/so-do-uc-tong-quan.png){width=80%}
 
 Bảng phân loại chi tiết 20 ca sử dụng theo mục tiêu tương tác của Người dùng và các quy tắc nghiệp vụ tài chính chi phối thuộc hai gói chức năng:
 
@@ -7362,7 +7383,7 @@ Nhóm chức năng này gồm 15 ca sử dụng, được phân rã thành bốn
 
 ##### 7.2.1a Nhóm Ví (WAL)
 
-![Sơ đồ ca sử dụng nhóm Ví](docs/images/so-do-uc-wal.png){width=80%}
+![Sơ đồ ca sử dụng nhóm Ví](docs/software-requirement-specification/images/so-do-uc-wal.png){width=80%}
 
 - `UC-WAL-01`: Tạo ví mới với số dư ban đầu 0.00 VNĐ.
 - `UC-WAL-02`: Xem số dư khả dụng theo thời gian thực và tỷ lệ cơ cấu phân bổ giữa các ví.
@@ -7373,7 +7394,7 @@ Quy tắc nghiệp vụ chi phối: số tiền dùng số thập phân chính x
 
 ##### 7.2.1b Nhóm ghi nhận thu chi (TXN)
 
-![Sơ đồ ca sử dụng nhóm ghi nhận thu chi](docs/images/so-do-uc-txn.png){width=80%}
+![Sơ đồ ca sử dụng nhóm ghi nhận thu chi](docs/software-requirement-specification/images/so-do-uc-txn.png){width=80%}
 
 - `UC-TXN-01`: Ghi nhận giao dịch thu nhập hoặc chi tiêu, kèm chi phí liên kết (nếu có) và gán danh mục 3 cấp.
 - `UC-TXN-02`: Tra cứu và lọc lịch sử giao dịch theo khoảng thời gian, ví và danh mục.
@@ -7384,7 +7405,7 @@ Quy tắc nghiệp vụ chi phối: số thập phân chính xác theo Quy tắc
 
 ##### 7.2.1c Nhóm Chuyển tiền nội bộ (TRF)
 
-![Sơ đồ ca sử dụng nhóm chuyển tiền](docs/images/so-do-uc-trf.png){width=80%}
+![Sơ đồ ca sử dụng nhóm chuyển tiền](docs/software-requirement-specification/images/so-do-uc-trf.png){width=80%}
 
 - `UC-TRF-01`: Chuyển tiền giữa hai ví nội bộ; chi phí chuyển tiền (nếu có) được ghi nhận thành phí liên kết trong cùng giao dịch.
 - `UC-TRF-02`: Tra cứu lịch sử các giao dịch chuyển tiền nội bộ đã thực hiện.
@@ -7400,7 +7421,7 @@ Quy tắc nghiệp vụ chi phối:
 
 Nhóm chức năng này quản lý cấu trúc danh mục 3 cấp: loại thu chi → nhóm nhu cầu → danh mục chi tiết.
 
-![Sơ đồ ca sử dụng Nhóm Danh mục](docs/images/so-do-uc-cat.png){width=80%}
+![Sơ đồ ca sử dụng Nhóm Danh mục](docs/software-requirement-specification/images/so-do-uc-cat.png){width=80%}
 
 - `UC-CAT-01`: Bổ sung nhóm hoặc danh mục mới trong cấu trúc phân cấp 3 cấp.
 - `UC-CAT-02`: Đổi tên hiển thị của nhóm hoặc danh mục, và chuyển danh mục sang nhóm khác cùng loại thu chi.
@@ -7415,7 +7436,7 @@ Nhóm chức năng này gồm 5 ca sử dụng, được phân rã thành hai s�
 
 ##### 7.2.2a Nhóm Thống kê và báo cáo (REP)
 
-![Sơ đồ ca sử dụng nhóm thống kê và báo cáo](docs/images/so-do-uc-rep.png){width=80%}
+![Sơ đồ ca sử dụng nhóm thống kê và báo cáo](docs/software-requirement-specification/images/so-do-uc-rep.png){width=80%}
 
 - `UC-REP-01`: Thống kê xu hướng dòng tiền 12 tháng liên tục gần nhất.
 - `UC-REP-02`: Phân tích tỷ lệ cơ cấu thu chi theo nhóm nhu cầu và danh mục chi tiết.
@@ -7431,7 +7452,7 @@ Yêu cầu chức năng liên quan:
 
 Nhóm chức năng này xuất dữ liệu tài chính, phục hồi từ bản sao lưu và kiểm tra độc lập các quy tắc toàn vẹn hệ thống.
 
-![Sơ đồ ca sử dụng nhóm lưu trữ và sao lưu dữ liệu](docs/images/so-do-uc-dat.png){width=80%}
+![Sơ đồ ca sử dụng nhóm lưu trữ và sao lưu dữ liệu](docs/software-requirement-specification/images/so-do-uc-dat.png){width=80%}
 
 - `UC-DAT-01`: Xuất toàn bộ dữ liệu tài chính ra tệp JSON chuẩn hóa.
 - `UC-DAT-02`: Phục hồi dữ liệu từ tệp sao lưu qua quy trình kiểm tra 4 bước và tự động sao lưu trước khi thay thế.
