@@ -61,6 +61,12 @@ public class App extends Application {
         MainStage mainStage = new MainStage(primaryStage, mainController);
 
         // Đăng ký các phân hệ JavaFX hoàn thiện
+        com.pfms.presentation.dashboard.DashboardPane dashboardPane = new com.pfms.presentation.dashboard.DashboardPane(
+                mainController.getWalletController(),
+                mainController.getTransactionController(),
+                mainController.getReportController());
+        mainStage.registerView(MainController.CARD_DASHBOARD, dashboardPane);
+
         com.pfms.presentation.wallet.WalletPane walletPane = new com.pfms.presentation.wallet.WalletPane(mainController.getWalletController());
         mainStage.registerView(MainController.CARD_WALLETS, walletPane);
 
