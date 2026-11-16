@@ -1,49 +1,10 @@
-# Báo cáo Kỹ thuật Nghiệm thu Mã nguồn Cốt lõi Hệ thống PFMS
-## Giai đoạn: Hiện thực hóa Cốt lõi Hệ thống
+# Báo cáo Cài đặt Hệ thống
 
 > **Hệ thống Quản lý Tài chính Cá nhân (PFMS)**  
-> Tài liệu kỹ thuật: Nghiệm thu cài đặt mã nguồn cốt lõi  
-> Nhóm kỹ sư phát triển: Lê Anh Minh, Ứng Trọng Trình, Nguyễn Đình Tiến, Nguyễn Đinh Anh Quân  
+> Học phần: Lập trình Hướng đối tượng  
+> Nhóm sinh viên thực hiện: Nhóm 3 (Lê Anh Minh, Ứng Trọng Trình, Nguyễn Đình Tiến, Nguyễn Đinh Anh Quân)  
 > Nền tảng công nghệ: Java 17 LTS, JavaFX 17, Apache Maven  
 > Trạng thái kiểm chứng: Toàn bộ các ca kiểm thử tự động đạt trạng thái không lỗi
-
----
-
-## Mục lục Tổng quan
-
-- [1. Tổng quan Kiến trúc và Môi trường Cài đặt](#1-tổng-quan-kiến-trúc-và-môi-trường-cài-đặt)
-  - [1.1 Bối cảnh chuyển giao từ thiết kế sang cài đặt](#11-bối-cảnh-chuyển-giao-từ-thiết-kế-sang-cài-đặt)
-  - [1.2 Môi trường thực thi và thư viện công nghệ](#12-môi-trường-thực-thi-và-thư-viện-công-nghệ)
-- [2. Thiết kế Bao gói và Đối tượng Giá trị Bất biến](#2-thiết-kế-bao-gói-và-đối-tượng-giá-trị-bất-biến)
-  - [2.1 Nguyên lý bao gói và che giấu trạng thái nội tại](#21-nguyên-lý-bao-gói-và-che-giấu-trạng-thái-nội-tại)
-  - [2.2 Cài đặt các đối tượng giá trị bất biến và số học tài chính chính xác](#22-cài-đặt-các-đối-tượng-giá-trị-bất-biến-và-số-học-tài-chính-chính-xác)
-  - [2.3 Kiểm soát tiền điều kiện bảo vệ trạng thái hệ thống](#23-kiểm-soát-tiền-điều-kiện-bảo-vệ-trạng-thái-hệ-thống)
-- [3. Kế thừa, Đa hình và Quan hệ Cấu trúc giữa các Thực thể](#3-kế-thừa-đa-hình-và-quan-hệ-cấu-trúc-giữa-các-thực-thể)
-  - [3.1 Cây kế thừa giao dịch tài chính](#31-cây-kế-thừa-giao-dịch-tài-chính)
-  - [3.2 Hiện thực hóa tính đa hình trong hạch toán và tính toán dòng tiền](#32-hiện-thực-hóa-tính-đa-hình-trong-hạch-toán-và-tính-toán-dòng-tiền)
-  - [3.3 Quan hệ hợp thành giữa giao dịch chuyển tiền và phí giao dịch](#33-quan-hệ-hợp-thành-giữa-giao-dịch-chuyển-tiền-và-phí-giao-dịch)
-  - [3.4 Quan hệ kết tập trong cây danh mục thu chi ba cấp](#34-quan-hệ-kết-tập-trong-cây-danh-mục-thu-chi-ba-cấp)
-- [4. Giao diện Trừu tượng và Kho Lưu trữ Tổng quát](#4-giao-diện-trừu-tượng-và-kho-lưu-trữ-tổng-quát)
-  - [4.1 Thiết kế giao diện kho lưu trữ tổng quát với kiểu dữ liệu tham số hóa](#41-thiết-kế-giao-diện-kho-lưu-trữ-tổng-quát-với-kiểu-dữ-liệu-tham-số-hóa)
-  - [4.2 Các giao diện kho lưu trữ nghiệp vụ chuyên biệt](#42-các-giao-diện-kho-lưu-trữ-nghiệp-vụ-chuyên-biệt)
-  - [4.3 Hiện thực hóa cơ chế lưu trữ tệp an toàn và lưu trữ bộ nhớ kiểm thử](#43-hiện-thực-hóa-cơ-chế-lưu-trữ-tệp-an-toàn-và-lưu-trữ-bộ-nhớ-kiểm-thử)
-- [5. Cấu trúc Dữ liệu Tập hợp và Bảo vệ Dữ liệu](#5-cấu-trúc-dữ-liệu-tập-hợp-và-bảo-vệ-dữ-liệu)
-  - [5.1 Ứng dụng khung tập hợp dữ liệu trong quản lý và truy xuất thực thể](#51-ứng-dụng-khung-tập-hợp-dữ-liệu-trong-quản-lý-và-truy-xuất-thực-thể)
-  - [5.2 Kỹ thuật bảo vệ dữ liệu với danh sách bất biến và sao chép phòng thủ](#52-kỹ-thuật-bảo-vệ-dữ-liệu-với-danh-sách-bất-biến-và-sao-chép-phòng-thủ)
-- [6. Cây Phân cấp Ngoại lệ và Cơ chế Kiểm soát Lỗi](#6-cây-phân-cấp-ngoại-lệ-và-cơ-chế-kiểm-soát-lỗi)
-  - [6.1 Chiến lược quản lý ngoại lệ toàn hệ thống](#61-chiến-lược-quản-lý-ngoại-lệ-toàn-hệ-thống)
-  - [6.2 Cây phân cấp ngoại lệ nghiệp vụ](#62-cây-phân-cấp-ngoại-lệ-nghiệp-vụ)
-  - [6.3 Quy chuẩn mã lỗi và chuyển đổi thông điệp cảnh báo](#63-quy-chuẩn-mã-lỗi-và-chuyển-đổi-thông-điệp-cảnh-báo)
-- [7. Tầng Dịch vụ Ứng dụng và Giao diện Người dùng](#7-tầng-dịch-vụ-ứng-dụng-và-giao-diện-người-dùng)
-  - [7.1 Điều phối nghiệp vụ và bảo toàn giao dịch hai pha](#71-điều-phối-nghiệp-vụ-và-bảo-toàn-giao-dịch-hai-pha)
-  - [7.2 Giao diện đồ họa người dùng theo kiến trúc phân tách hiển thị](#72-giao-diện-đồ-họa-người-dùng-theo-kiến-trúc-phân-tách-hiển-thị)
-  - [7.3 Đối tượng truyền dữ liệu và ranh giới phân tầng](#73-đối-tượng-truyền-dữ-liệu-và-ranh-giới-phân-tầng)
-- [8. Kiểm thử Đơn vị Tự động và Đối soát Nghiệm thu](#8-kiểm-thử-đơn-vị-tự-động-và-đối-soát-nghiệm-thu)
-  - [8.1 Chiến lược kiểm thử đơn vị và ma trận giá trị biên tài chính](#81-chiến-lược-kiểm-thử-đơn-vị-và-ma-trận-giá-trị-biên-tài-chính)
-  - [8.2 Bằng chứng thực thi bộ kiểm thử tự động](#82-bằng-chứng-thực-thi-bộ-kiểm-thử-tự-động)
-  - [8.3 Ma trận đối soát ca sử dụng sang mã nguồn dịch vụ](#83-ma-trận-đối-soát-ca-sử-dụng-sang-mã-nguồn-dịch-vụ)
-- [9. Đánh giá Mức độ Hoàn thiện Hệ thống](#9-đánh-giá-mức-độ-hoàn-thiện-hệ-thống)
-- [10. Tài liệu Tham khảo](#10-tài-liệu-tham-khảo)
 
 ---
 
@@ -434,4 +395,4 @@ Fowler, M. (2002). *Patterns of Enterprise Application Architecture*. Addison-We
 
 Martin, R. C. (2018). *Clean Architecture: A Craftsman's Guide to Software Structure and Design*. Prentice Hall.
 
-Oracle Corporation. (2021). *Java Platform, Standard Edition & Java Development Kit Version 17 API Specification*. Oracle. https://docs.oracle.com/en/java/javase/17/docs/api/
+Oracle Corporation. (2021). *Java Platform, Standard Edition & Java Development Kit Version 17 API Specification*. Oracle. <https://docs.oracle.com/en/java/javase/17/docs/api/>
