@@ -9,24 +9,30 @@ import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Mô hình bảng dữ liệu hiển thị danh sách giao dịch thu chi (UC-TRN-03).
+ * Cấu trúc 9 cột chuẩn hóa: Ngày | Loại | Nhóm | Danh mục | Số tiền | Ví | Phụ phí | Ghi chú | Thao tác.
  */
 public class TransactionTableModel extends AbstractTableModel {
 
     private static final String[] COLUMN_NAMES = {
-            "STT", "Ngày", "Loại", "Danh mục", "Số tiền", "Ví", "Phụ phí", "Ghi chú"
+            "Ngày", "Loại", "Nhóm", "Danh mục", "Số tiền", "Ví", "Phụ phí", "Ghi chú", "Thao tác"
     };
 
     private final List<TransactionResponseDTO> transactions;
+    private final Map<UUID, String> categoryGroupMap;
     private final DecimalFormat currencyFormatter;
     private final DateTimeFormatter dateFormatter;
 
     public TransactionTableModel() {
         this.transactions = new ArrayList<>();
+        this.categoryGroupMap = new HashMap<>();
 
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
         symbols.setGroupingSeparator(',');
@@ -38,6 +44,14 @@ public class TransactionTableModel extends AbstractTableModel {
         this.transactions.clear();
         if (transactions != null) {
             this.transactions.addAll(transactions);
+        }
+        fireTableDataChanged();
+    }
+
+    public void setCategoryGroupMap(Map<UUID, String> groupMap) {
+        this.categoryGroupMap.clear();
+        if (groupMap != null) {
+            this.categoryGroupMap.putAll(groupMap);
         }
         fireTableDataChanged();
     }
@@ -84,18 +98,42 @@ public class TransactionTableModel extends AbstractTableModel {
 
         TransactionResponseDTO txn = this.transactions.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> rowIndex + 1;
-            case 1 -> (txn.getTransactionDate() != null) ? this.dateFormatter.format(txn.getTransactionDate()) : "-";
-            case 2 -> mapTransactionType(txn.getTransactionType());
+            case 0 -> (txn.getTransactionDate() != null) ? this.dateFormatter.format(txn.getTransactionDate()) : "-";
+            case 1 -> mapTransactionType(txn.getTransactionType());
+            case 2 -> resolveGroupName(txn.getCategoryId());
             case 3 -> (txn.getCategoryName() != null) ? txn.getCategoryName() : "-";
-            case 4 -> formatCurrency(txn.getAmount());
+            case 4 -> formatSignedAmount(txn.getAmount(), txn.getTransactionType());
             case 5 -> (txn.getWalletName() != null) ? txn.getWalletName() : "-";
             case 6 -> (txn.hasFee() && txn.getFeeAmount() != null && txn.getFeeAmount().compareTo(BigDecimal.ZERO) > 0)
-                    ? formatCurrency(txn.getFeeAmount())
+                    ? "-" + formatCurrency(txn.getFeeAmount())
                     : "-";
             case 7 -> (txn.getNote() != null) ? txn.getNote() : "";
+            case 8 -> txn;
             default -> null;
         };
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 8;
+    }
+
+    private String resolveGroupName(UUID categoryId) {
+        if (categoryId == null) {
+            return "-";
+        }
+        String group = this.categoryGroupMap.get(categoryId);
+        return (group != null && !group.isBlank()) ? group : "-";
+    }
+
+    private String formatSignedAmount(BigDecimal amount, String type) {
+        String base = formatCurrency(amount);
+        if ("INCOME".equalsIgnoreCase(type)) {
+            return "+" + base;
+        } else if ("EXPENSE".equalsIgnoreCase(type)) {
+            return "-" + base;
+        }
+        return base;
     }
 
     private String formatCurrency(BigDecimal amount) {

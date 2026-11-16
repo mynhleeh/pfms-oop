@@ -67,7 +67,27 @@ class TransactionPanelTest {
         assertEquals("Ăn uống", panel.getTableModel().getValueAt(0, 3));
         assertTrue(panel.getSummaryText().contains("Tổng chi: 100,000 VNĐ"));
         assertTrue(panel.getPageInfoText().contains("Trang 1 / 1"));
+        assertTrue(panel.getStatExpenseLabel().getText().contains("100,000 VNĐ"));
+        assertTrue(panel.getStatCountLabel().getText().contains("1 giao dịch"));
         assertNotNull(panel.getTable());
+    }
+
+    @Test
+    @DisplayName("Nạp cấu trúc phân cấp danh mục tự động ánh xạ nhóm vào cột Nhóm trong bảng")
+    void testCategoryHierarchyPopulatesGroupColumn() {
+        UUID needGroupId = UUID.randomUUID();
+        UUID catId = txn1.getCategoryId();
+        com.pfms.presentation.dto.category.CategoryResponseDTO catDto = new com.pfms.presentation.dto.category.CategoryResponseDTO(
+                catId, "Ăn uống", needGroupId, "Nhu cầu thiết yếu", "EXPENSE", "ACTIVE", LocalDateTime.now());
+        com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO hierarchyDto = new com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO(
+                "EXPENSE", needGroupId, "Nhu cầu thiết yếu", "ACTIVE", List.of(catDto));
+
+        when(categoryController.loadCategoryHierarchy()).thenReturn(List.of(hierarchyDto));
+
+        TransactionPanel panelWithHierarchy = new TransactionPanel(transactionController, walletController, categoryController);
+        assertEquals(1, panelWithHierarchy.getTableModel().getRowCount());
+        assertEquals("Nhu cầu thiết yếu", panelWithHierarchy.getTableModel().getValueAt(0, 2));
+        assertEquals("Ăn uống", panelWithHierarchy.getTableModel().getValueAt(0, 3));
     }
 
     @Test

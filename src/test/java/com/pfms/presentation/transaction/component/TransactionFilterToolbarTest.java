@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Kiểm thử TransactionFilterToolbar - Thanh công cụ lọc giao dịch")
+@DisplayName("Kiểm thử TransactionFilterToolbar - Thanh công cụ lọc giao dịch 2 tầng")
 class TransactionFilterToolbarTest {
 
     private TransactionFilterToolbar toolbar;
@@ -38,6 +38,7 @@ class TransactionFilterToolbarTest {
     void testInitialState() {
         assertEquals("Tất cả", toolbar.getTypeFilterBox().getSelectedItem());
         assertEquals("Tất cả ví", toolbar.getWalletFilterBox().getSelectedItem());
+        assertEquals("Tất cả nhóm", toolbar.getGroupFilterBox().getSelectedItem());
         assertEquals("Tất cả danh mục", toolbar.getCategoryFilterBox().getSelectedItem());
         assertEquals("", toolbar.getStartDateField().getText());
         assertEquals("", toolbar.getEndDateField().getText());
@@ -45,27 +46,31 @@ class TransactionFilterToolbarTest {
     }
 
     @Test
-    @DisplayName("Nạp danh sách ví và danh mục thành công")
+    @DisplayName("Nạp danh sách ví và danh mục thành công, tự động trích xuất các nhóm nhu cầu")
     void testPopulateWalletsAndCategories() {
         UUID walletId = UUID.randomUUID();
         WalletResponseDTO wallet = new WalletResponseDTO(
                 walletId, "Ví Tiết Kiệm", new BigDecimal("10000000"), "VND", false, "ACTIVE", "Tiết kiệm", LocalDateTime.now());
 
-        UUID categoryId = UUID.randomUUID();
-        CategoryResponseDTO category = new CategoryResponseDTO(
-                categoryId, "Ăn uống", UUID.randomUUID(), "Chi tiêu thiết yếu", "EXPENSE", "ACTIVE", LocalDateTime.now());
+        UUID categoryId1 = UUID.randomUUID();
+        CategoryResponseDTO category1 = new CategoryResponseDTO(
+                categoryId1, "Ăn uống", UUID.randomUUID(), "Chi tiêu thiết yếu", "EXPENSE", "ACTIVE", LocalDateTime.now());
+
+        UUID categoryId2 = UUID.randomUUID();
+        CategoryResponseDTO category2 = new CategoryResponseDTO(
+                categoryId2, "Lương", UUID.randomUUID(), "Thu nhập cố định", "INCOME", "ACTIVE", LocalDateTime.now());
 
         toolbar.populateWallets(List.of(wallet));
-        toolbar.populateCategories(List.of(category));
+        toolbar.populateCategories(List.of(category1, category2));
 
         assertEquals(2, toolbar.getWalletFilterBox().getItemCount());
-        assertEquals(2, toolbar.getCategoryFilterBox().getItemCount());
+        assertEquals(3, toolbar.getGroupFilterBox().getItemCount()); // "Tất cả nhóm", "Chi tiêu thiết yếu", "Thu nhập cố định"
+        assertEquals(3, toolbar.getCategoryFilterBox().getItemCount()); // "Tất cả danh mục", "Ăn uống", "Lương"
         assertEquals(wallet, toolbar.getWalletFilterBox().getItemAt(1));
-        assertEquals(category, toolbar.getCategoryFilterBox().getItemAt(1));
     }
 
     @Test
-    @DisplayName("Tạo FilterTransactionsRequestDTO chính xác khi chọn ví, danh mục và ngày")
+    @DisplayName("Tạo FilterTransactionsRequestDTO chính xác khi chọn ví, danh mục cụ thể và ngày")
     void testBuildFilterRequest() {
         UUID walletId = UUID.randomUUID();
         WalletResponseDTO wallet = new WalletResponseDTO(
@@ -100,6 +105,48 @@ class TransactionFilterToolbarTest {
     }
 
     @Test
+    @DisplayName("Lọc theo nhóm tự động thu thập toàn bộ categoryId thuộc nhóm đó khi để Tất cả danh mục")
+    void testFilterByGroupCollectsAllCategoryIdsInGroup() {
+        UUID cat1 = UUID.randomUUID();
+        CategoryResponseDTO c1 = new CategoryResponseDTO(
+                cat1, "Ăn uống", UUID.randomUUID(), "Chi tiêu thiết yếu", "EXPENSE", "ACTIVE", LocalDateTime.now());
+        UUID cat2 = UUID.randomUUID();
+        CategoryResponseDTO c2 = new CategoryResponseDTO(
+                cat2, "Đi lại", UUID.randomUUID(), "Chi tiêu thiết yếu", "EXPENSE", "ACTIVE", LocalDateTime.now());
+        UUID cat3 = UUID.randomUUID();
+        CategoryResponseDTO c3 = new CategoryResponseDTO(
+                cat3, "Du lịch", UUID.randomUUID(), "Chi tiêu tùy ý", "EXPENSE", "ACTIVE", LocalDateTime.now());
+
+        toolbar.populateCategories(List.of(c1, c2, c3));
+
+        toolbar.getGroupFilterBox().setSelectedItem("Chi tiêu thiết yếu");
+        FilterTransactionsRequestDTO request = toolbar.buildFilterRequest(1, 20);
+
+        assertNotNull(request.getCategoryIds());
+        assertEquals(2, request.getCategoryIds().size());
+        assertTrue(request.getCategoryIds().contains(cat1));
+        assertTrue(request.getCategoryIds().contains(cat2));
+        assertFalse(request.getCategoryIds().contains(cat3));
+    }
+
+    @Test
+    @DisplayName("Thao tác chọn thẻ ngày nhanh (setQuickDate) cập nhật chính xác ngày và kích hoạt lọc")
+    void testQuickDateOptions() {
+        filterTriggered.set(false);
+        toolbar.setQuickDate("MONTH");
+
+        assertTrue(filterTriggered.get());
+        assertFalse(toolbar.getStartDateField().getText().isEmpty());
+        assertFalse(toolbar.getEndDateField().getText().isEmpty());
+
+        filterTriggered.set(false);
+        toolbar.setQuickDate("ALL");
+        assertTrue(filterTriggered.get());
+        assertEquals("", toolbar.getStartDateField().getText());
+        assertEquals("", toolbar.getEndDateField().getText());
+    }
+
+    @Test
     @DisplayName("Đặt lại bộ lọc đưa mọi trường về giá trị mặc định")
     void testResetFilters() {
         toolbar.getTypeFilterBox().setSelectedItem("INCOME");
@@ -112,6 +159,7 @@ class TransactionFilterToolbarTest {
         assertTrue(resetTriggered.get());
         assertEquals("Tất cả", toolbar.getTypeFilterBox().getSelectedItem());
         assertEquals("Tất cả ví", toolbar.getWalletFilterBox().getSelectedItem());
+        assertEquals("Tất cả nhóm", toolbar.getGroupFilterBox().getSelectedItem());
         assertEquals("Tất cả danh mục", toolbar.getCategoryFilterBox().getSelectedItem());
         assertEquals("", toolbar.getStartDateField().getText());
         assertEquals("", toolbar.getEndDateField().getText());
