@@ -10,12 +10,13 @@ import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transfer.TransferResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
+import com.pfms.testutil.JavaFxTestHelper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.swing.JFrame;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@DisplayName("Kiểm thử TransferFundsDialog - Hộp thoại chuyển tiền nội bộ giữa hai ví")
+@DisplayName("Kiểm thử TransferFundsDialog - Hộp thoại chuyển tiền nội bộ giữa hai ví JavaFX")
 class TransferFundsDialogTest {
 
     private TransferGUIController transferController;
@@ -37,6 +38,11 @@ class TransferFundsDialogTest {
     private WalletResponseDTO walletDest;
     private CategoryResponseDTO sampleFeeCategory;
     private TransferFundsDialog dialog;
+
+    @BeforeAll
+    static void initJfx() {
+        JavaFxTestHelper.initPlatform();
+    }
 
     @BeforeEach
     void setUp() {
@@ -58,66 +64,60 @@ class TransferFundsDialogTest {
                 "EXPENSE", UUID.randomUUID(), "Phí giao dịch", "ACTIVE", List.of(sampleFeeCategory));
         when(categoryController.loadCategoryHierarchy()).thenReturn(List.of(feeGroup));
 
-        dialog = new TransferFundsDialog((JFrame) null, transferController, walletController, categoryController);
-        dialog.setErrorConsumer(msg -> {});
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog = new TransferFundsDialog(null, transferController, walletController, categoryController);
+            dialog.setErrorConsumer(msg -> {});
+        });
     }
 
     @Test
     @DisplayName("Khởi tạo hộp thoại có ví nguồn, ví đích và cờ thành công là false")
     void testInitialState() {
-        assertFalse(dialog.isSuccess());
-        assertNull(dialog.getCreatedTransfer());
-        assertNotNull(dialog.getDateInputValue());
-        assertEquals("", dialog.getAmountInputValue());
-        assertEquals("", dialog.getNoteInputValue());
-        assertNotNull(dialog.getSourceWallet());
-        assertNotNull(dialog.getDestinationWallet());
-        assertTrue(dialog.getSourceBalanceHintLabel().getText().contains("5,000,000 VNĐ"));
-        assertTrue(dialog.getDestBalanceHintLabel().getText().contains("10,000,000 VNĐ"));
-        assertFalse(dialog.getFeeCheckBox().isSelected());
-        assertFalse(dialog.getFeeAmountField().isEnabled());
-        assertFalse(dialog.getFeeGroupCombo().isEnabled());
-        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
+        JavaFxTestHelper.runOnFxThread(() -> {
+            assertFalse(dialog.isSuccess());
+            assertNull(dialog.getCreatedTransfer());
+            assertNotNull(dialog.getDateInputValue());
+            assertEquals("", dialog.getAmountInputValue());
+            assertEquals("", dialog.getNoteInputValue());
+            assertNotNull(dialog.getSourceWallet());
+            assertNotNull(dialog.getDestinationWallet());
+            assertTrue(dialog.getSourceBalanceHintLabel().getText().contains("5,000,000 VNĐ"));
+            assertTrue(dialog.getDestBalanceHintLabel().getText().contains("10,000,000 VNĐ"));
+            assertFalse(dialog.getFeeCheckBox().isSelected());
+            assertTrue(dialog.getFeeAmountField().isDisable());
+            assertTrue(dialog.getFeeGroupCombo().isDisable());
+            assertTrue(dialog.getFeeCategoryCombo().isDisable());
+        });
     }
 
     @Test
     @DisplayName("Bật checkbox phụ phí thì mở khóa nhóm, chọn nhóm thì mở khóa danh mục phụ phí tương ứng")
     void testFeeSectionToggling() {
-        dialog.getFeeCheckBox().setSelected(true);
-        // trigger action listeners
-        for (var al : dialog.getFeeCheckBox().getActionListeners()) {
-            al.actionPerformed(null);
-        }
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.getFeeCheckBox().setSelected(true);
 
-        assertTrue(dialog.getFeeAmountField().isEnabled());
-        assertTrue(dialog.getFeeGroupCombo().isEnabled());
-        // Bắt buộc phải chọn nhóm trước mới mở khóa danh mục
-        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
+            assertFalse(dialog.getFeeAmountField().isDisable());
+            assertFalse(dialog.getFeeGroupCombo().isDisable());
+            // Bắt buộc phải chọn nhóm trước mới mở khóa danh mục
+            assertTrue(dialog.getFeeCategoryCombo().isDisable());
 
-        // Chọn nhóm chi phí hợp lệ
-        dialog.getFeeGroupCombo().setSelectedIndex(1);
-        assertTrue(dialog.getFeeCategoryCombo().isEnabled());
-        assertEquals(1, dialog.getFeeCategoryCombo().getItemCount());
+            // Chọn nhóm chi phí hợp lệ
+            dialog.getFeeGroupCombo().getSelectionModel().select(0);
+            assertFalse(dialog.getFeeCategoryCombo().isDisable());
+            assertEquals(1, dialog.getFeeCategoryCombo().getItems().size());
 
-        dialog.getFeeCheckBox().setSelected(false);
-        for (var al : dialog.getFeeCheckBox().getActionListeners()) {
-            al.actionPerformed(null);
-        }
+            dialog.getFeeCheckBox().setSelected(false);
 
-        assertFalse(dialog.getFeeAmountField().isEnabled());
-        assertFalse(dialog.getFeeGroupCombo().isEnabled());
-        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
-        assertEquals("0", dialog.getFeeAmountField().getText());
+            assertTrue(dialog.getFeeAmountField().isDisable());
+            assertTrue(dialog.getFeeGroupCombo().isDisable());
+            assertTrue(dialog.getFeeCategoryCombo().isDisable());
+            assertEquals("0", dialog.getFeeAmountField().getText());
+        });
     }
 
     @Test
     @DisplayName("Chuyển tiền thành công giữa hai ví khác nhau và gọi đúng controller")
     void testTransferFundsSuccess() {
-        dialog.setSourceWallet(walletSource);
-        dialog.setDestinationWallet(walletDest);
-        dialog.setAmountInputValue("1000000");
-        dialog.setNoteInputValue("Nạp tiền ngân hàng");
-
         TransferResponseDTO response = new TransferResponseDTO(
                 UUID.randomUUID(), walletSource.getWalletId(), "Ví Tiền mặt",
                 walletDest.getWalletId(), "Ví MB Bank", new BigDecimal("1000000"),
@@ -134,10 +134,18 @@ class TransferFundsDialogTest {
                 isNull()))
                 .thenReturn(response);
 
-        dialog.triggerTransfer();
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.setSourceWallet(walletSource);
+            dialog.setDestinationWallet(walletDest);
+            dialog.setAmountInputValue("1000000");
+            dialog.setNoteInputValue("Nạp tiền ngân hàng");
 
-        assertTrue(dialog.isSuccess());
-        assertSame(response, dialog.getCreatedTransfer());
+            dialog.triggerTransfer();
+
+            assertTrue(dialog.isSuccess());
+            assertSame(response, dialog.getCreatedTransfer());
+        });
+
         verify(transferController).handleTransferFunds(
                 eq(walletSource.getWalletId()),
                 eq(walletDest.getWalletId()),
@@ -151,32 +159,37 @@ class TransferFundsDialogTest {
     @Test
     @DisplayName("Báo lỗi khi ví nguồn và ví đích trùng nhau mà không gọi controller")
     void testSameSourceAndDestWalletError() {
-        dialog.setSourceWallet(walletSource);
-        dialog.setDestinationWallet(walletSource);
-        dialog.setAmountInputValue("500000");
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.setSourceWallet(walletSource);
+            dialog.setDestinationWallet(walletSource);
+            dialog.setAmountInputValue("500000");
 
-        dialog.triggerTransfer();
+            dialog.triggerTransfer();
 
-        assertFalse(dialog.isSuccess());
-        assertNull(dialog.getCreatedTransfer());
-        assertEquals("Ví nguồn và ví đích không được trùng nhau.", dialog.getErrorMessage());
+            assertFalse(dialog.isSuccess());
+            assertNull(dialog.getCreatedTransfer());
+            assertEquals("Ví nguồn và ví đích không được trùng nhau.", dialog.getErrorMessage());
+        });
+
         verifyNoInteractions(transferController);
     }
 
     @Test
     @DisplayName("Bắt giữ BusinessException khi số tiền vượt quá số dư hoặc không hợp lệ")
     void testTransferFundsBusinessExceptionHandled() {
-        dialog.setSourceWallet(walletSource);
-        dialog.setDestinationWallet(walletDest);
-        dialog.setAmountInputValue("999999999");
-
         when(transferController.handleTransferFunds(any(), any(), eq("999999999"), any(), any(), any(), any()))
                 .thenThrow(new BusinessException(ErrorCode.ERR_WAL_001, "Số dư ví nguồn không đủ"));
 
-        dialog.triggerTransfer();
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.setSourceWallet(walletSource);
+            dialog.setDestinationWallet(walletDest);
+            dialog.setAmountInputValue("999999999");
 
-        assertFalse(dialog.isSuccess());
-        assertNull(dialog.getCreatedTransfer());
-        assertEquals("Số dư ví nguồn không đủ", dialog.getErrorMessage());
+            dialog.triggerTransfer();
+
+            assertFalse(dialog.isSuccess());
+            assertNull(dialog.getCreatedTransfer());
+            assertEquals("Số dư ví nguồn không đủ", dialog.getErrorMessage());
+        });
     }
 }
