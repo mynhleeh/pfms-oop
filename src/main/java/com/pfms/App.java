@@ -83,6 +83,10 @@ public class App extends Application {
                 mainController.getReportController());
         mainStage.registerView(MainController.CARD_REPORTS, reportPane);
 
+        com.pfms.presentation.data.DataManagementPane dataPane = new com.pfms.presentation.data.DataManagementPane(
+                mainController.getDataManagementController(), storagePath.toString());
+        mainStage.registerView(MainController.CARD_DATA_MANAGEMENT, dataPane);
+
         return mainStage;
     }
     // endregion
