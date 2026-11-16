@@ -118,11 +118,7 @@ public class CategoryPane extends BorderPane implements CategoryView {
         kpiBox.setAlignment(Pos.CENTER_RIGHT);
         kpiBox.getChildren().addAll(kpiTotalGroups, kpiTotalCategories);
 
-        Button btnAddCategory = new Button("+ Thêm danh mục con");
-        btnAddCategory.getStyleClass().add("btn-primary");
-        btnAddCategory.setOnAction(e -> this.presenter.onAddCategoryClicked());
-
-        header.getChildren().addAll(titleBox, spacer, kpiBox, btnAddCategory);
+        header.getChildren().addAll(titleBox, spacer, kpiBox);
         return header;
     }
 
@@ -182,21 +178,6 @@ public class CategoryPane extends BorderPane implements CategoryView {
         centerBox.setPadding(new Insets(12, 0, 0, 0));
         VBox.setVgrow(centerBox, Priority.ALWAYS);
 
-        // Filter Bar (3 Buttons)
-        HBox filterBar = new HBox(8);
-        filterBar.setAlignment(Pos.CENTER_LEFT);
-
-        btnFilterAll.getStyleClass().add("tab-btn");
-        btnFilterIncome.getStyleClass().add("tab-btn");
-        btnFilterExpense.getStyleClass().add("tab-btn");
-
-        btnFilterAll.setOnAction(e -> setFilterMode("ALL"));
-        btnFilterIncome.setOnAction(e -> setFilterMode("INCOME"));
-        btnFilterExpense.setOnAction(e -> setFilterMode("EXPENSE"));
-
-        filterBar.getChildren().addAll(btnFilterAll, btnFilterIncome, btnFilterExpense);
-        setFilterMode("ALL");
-
         // Income Column (Left)
         VBox incomeHeader = new VBox(4);
         HBox incomeTitleRow = new HBox(10);
@@ -209,7 +190,21 @@ public class CategoryPane extends BorderPane implements CategoryView {
         Region incomeSpacer = new Region();
         HBox.setHgrow(incomeSpacer, Priority.ALWAYS);
 
-        incomeTitleRow.getChildren().addAll(incomeZoneTag, incomeCountLabel, incomeSpacer);
+        Button btnAddIncomeGroup = new Button("+ Thêm nhóm");
+        btnAddIncomeGroup.getStyleClass().addAll("btn-action-sm");
+        btnAddIncomeGroup.setStyle("-fx-padding: 4px 10px; -fx-font-size: 11.5px; -fx-border-color: rgba(74, 222, 128, 0.4); " +
+                "-fx-text-fill: #4ADE80; -fx-font-weight: 700; -fx-background-color: rgba(74, 222, 128, 0.08);");
+        btnAddIncomeGroup.setOnAction(e -> this.presenter.onAddNeedGroupClicked("INCOME"));
+
+        Button btnAddIncomeCategory = new Button("+ Thêm danh mục");
+        btnAddIncomeCategory.getStyleClass().addAll("btn-primary");
+        btnAddIncomeCategory.setStyle("-fx-padding: 4px 12px; -fx-font-size: 11.5px; -fx-font-weight: 700;");
+        btnAddIncomeCategory.setOnAction(e -> this.presenter.onAddCategoryClicked("INCOME"));
+
+        HBox incomeActions = new HBox(8, btnAddIncomeGroup, btnAddIncomeCategory);
+        incomeActions.setAlignment(Pos.CENTER_RIGHT);
+
+        incomeTitleRow.getChildren().addAll(incomeZoneTag, incomeCountLabel, incomeSpacer, incomeActions);
         incomeHeader.getChildren().addAll(incomeTitleRow);
         incomeHeader.setStyle("-fx-border-color: transparent transparent #222222 transparent; -fx-border-width: 0 0 1px 0; -fx-padding: 0 0 8px 0;");
 
@@ -229,7 +224,21 @@ public class CategoryPane extends BorderPane implements CategoryView {
         Region expenseSpacer = new Region();
         HBox.setHgrow(expenseSpacer, Priority.ALWAYS);
 
-        expenseTitleRow.getChildren().addAll(expenseZoneTag, expenseCountLabel, expenseSpacer);
+        Button btnAddExpenseGroup = new Button("+ Thêm nhóm");
+        btnAddExpenseGroup.getStyleClass().addAll("btn-action-sm");
+        btnAddExpenseGroup.setStyle("-fx-padding: 4px 10px; -fx-font-size: 11.5px; -fx-border-color: rgba(251, 113, 133, 0.4); " +
+                "-fx-text-fill: #FB7185; -fx-font-weight: 700; -fx-background-color: rgba(251, 113, 133, 0.08);");
+        btnAddExpenseGroup.setOnAction(e -> this.presenter.onAddNeedGroupClicked("EXPENSE"));
+
+        Button btnAddExpenseCategory = new Button("+ Thêm danh mục");
+        btnAddExpenseCategory.getStyleClass().addAll("btn-primary");
+        btnAddExpenseCategory.setStyle("-fx-padding: 4px 12px; -fx-font-size: 11.5px; -fx-font-weight: 700;");
+        btnAddExpenseCategory.setOnAction(e -> this.presenter.onAddCategoryClicked("EXPENSE"));
+
+        HBox expenseActions = new HBox(8, btnAddExpenseGroup, btnAddExpenseCategory);
+        expenseActions.setAlignment(Pos.CENTER_RIGHT);
+
+        expenseTitleRow.getChildren().addAll(expenseZoneTag, expenseCountLabel, expenseSpacer, expenseActions);
         expenseHeader.getChildren().addAll(expenseTitleRow);
         expenseHeader.setStyle("-fx-border-color: transparent transparent #222222 transparent; -fx-border-width: 0 0 1px 0; -fx-padding: 0 0 8px 0;");
 
@@ -367,9 +376,14 @@ public class CategoryPane extends BorderPane implements CategoryView {
 
     @Override
     public void openCreateNeedGroupDialog() {
+        openCreateNeedGroupDialog("EXPENSE");
+    }
+
+    @Override
+    public void openCreateNeedGroupDialog(String defaultType) {
         runOnFx(() -> {
             Window owner = getScene() != null ? getScene().getWindow() : null;
-            CreateNeedGroupDialog dialog = new CreateNeedGroupDialog(owner, this.controller);
+            CreateNeedGroupDialog dialog = new CreateNeedGroupDialog(owner, this.controller, defaultType);
             dialog.showAndWait();
             if (dialog.isSuccess()) {
                 this.presenter.loadData();
@@ -379,9 +393,14 @@ public class CategoryPane extends BorderPane implements CategoryView {
 
     @Override
     public void openCreateCategoryDialog() {
+        openCreateCategoryDialog("EXPENSE");
+    }
+
+    @Override
+    public void openCreateCategoryDialog(String defaultType) {
         runOnFx(() -> {
             Window owner = getScene() != null ? getScene().getWindow() : null;
-            CreateCategoryDialog dialog = new CreateCategoryDialog(owner, this.controller);
+            CreateCategoryDialog dialog = new CreateCategoryDialog(owner, this.controller, defaultType);
             dialog.showAndWait();
             if (dialog.isSuccess()) {
                 this.presenter.loadData();

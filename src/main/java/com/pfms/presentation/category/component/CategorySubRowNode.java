@@ -34,14 +34,7 @@ public class CategorySubRowNode extends HBox {
         this.setAlignment(Pos.CENTER_LEFT);
         this.setSpacing(8);
         this.setMaxWidth(Double.MAX_VALUE);
-        this.setStyle("-fx-background-color: #1A1A1A; -fx-background-radius: 6px; " +
-                "-fx-border-color: #242424; -fx-border-radius: 6px; -fx-padding: 6px 10px;");
-
-        // Hover effect
-        this.setOnMouseEntered(e -> this.setStyle("-fx-background-color: #222222; -fx-background-radius: 6px; " +
-                "-fx-border-color: #2E2E2E; -fx-border-radius: 6px; -fx-padding: 6px 10px; -fx-cursor: hand;"));
-        this.setOnMouseExited(e -> this.setStyle("-fx-background-color: #1A1A1A; -fx-background-radius: 6px; " +
-                "-fx-border-color: #242424; -fx-border-radius: 6px; -fx-padding: 6px 10px;"));
+        this.getStyleClass().add("subcat-row");
 
         // 1. Icon phân cấp (16px)
         this.indentLabel = new Label("└");
@@ -84,7 +77,7 @@ public class CategorySubRowNode extends HBox {
 
         // 5. Thao Tác (102px: 2 nút 48px + 6px gap)
         this.btnEdit = new Button("Sửa");
-        this.btnEdit.getStyleClass().addAll("btn-action-sm", "btn-secondary");
+        this.btnEdit.getStyleClass().add("btn-action-sm");
         this.btnEdit.setPrefWidth(48);
         this.btnEdit.setMinWidth(48);
         this.btnEdit.setMaxWidth(48);

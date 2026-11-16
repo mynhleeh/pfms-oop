@@ -26,9 +26,29 @@ public class CategoryPresenter {
     // endregion
 
     // region Actions
-    public void onAddNeedGroupClicked() { this.view.openCreateNeedGroupDialog(); }
+    public void onAddNeedGroupClicked() {
+        this.view.openCreateNeedGroupDialog();
+    }
 
-    public void onAddCategoryClicked() { this.view.openCreateCategoryDialog(); }
+    public void onAddNeedGroupClicked(String defaultType) {
+        if (defaultType != null && !defaultType.isBlank()) {
+            this.view.openCreateNeedGroupDialog(defaultType);
+        } else {
+            this.view.openCreateNeedGroupDialog();
+        }
+    }
+
+    public void onAddCategoryClicked() {
+        this.view.openCreateCategoryDialog();
+    }
+
+    public void onAddCategoryClicked(String defaultType) {
+        if (defaultType != null && !defaultType.isBlank()) {
+            this.view.openCreateCategoryDialog(defaultType);
+        } else {
+            this.view.openCreateCategoryDialog();
+        }
+    }
 
     public void createNeedGroup(String type, String name) { createNeedGroup(type, name, "", ""); }
 

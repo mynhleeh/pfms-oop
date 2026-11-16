@@ -92,6 +92,12 @@ class CategoryPresenterTest {
 
         presenter.onAddCategoryClicked();
         verify(view).openCreateCategoryDialog();
+
+        presenter.onAddNeedGroupClicked("INCOME");
+        verify(view).openCreateNeedGroupDialog("INCOME");
+
+        presenter.onAddCategoryClicked("INCOME");
+        verify(view).openCreateCategoryDialog("INCOME");
     }
 
     @Test

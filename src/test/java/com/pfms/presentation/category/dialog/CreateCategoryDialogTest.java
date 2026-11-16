@@ -114,4 +114,50 @@ class CreateCategoryDialogTest {
             assertThrows(NullPointerException.class, () -> new CreateCategoryDialog(null));
         });
     }
+
+    @Test
+    @DisplayName("Cascading dropdown nhóm cha lọc động theo Transaction Type")
+    void testCascadingNeedGroupsByType() {
+        UUID expGroupId = UUID.randomUUID();
+        UUID incGroupId = UUID.randomUUID();
+
+        CategoryHierarchyResponseDTO expGroup = new CategoryHierarchyResponseDTO(
+                "EXPENSE", expGroupId, "Nhóm Chi Tiêu", "ACTIVE", Collections.emptyList());
+        CategoryHierarchyResponseDTO incGroup = new CategoryHierarchyResponseDTO(
+                "INCOME", incGroupId, "Nhóm Thu Nhập", "ACTIVE", Collections.emptyList());
+
+        when(categoryController.loadCategoryHierarchy()).thenReturn(List.of(expGroup, incGroup));
+
+        JavaFxTestHelper.runOnFxThread(() -> {
+            CreateCategoryDialog d = new CreateCategoryDialog(categoryController);
+            assertEquals("EXPENSE", d.getTypeInputValue());
+            assertEquals(expGroupId, d.getSelectedParentGroupId());
+
+            // Chuyển sang INCOME
+            d.setTypeInputValue("INCOME");
+            assertEquals("INCOME", d.getTypeInputValue());
+            assertEquals(incGroupId, d.getSelectedParentGroupId());
+
+            // Chuyển lại EXPENSE
+            d.setTypeInputValue("EXPENSE");
+            assertEquals("EXPENSE", d.getTypeInputValue());
+            assertEquals(expGroupId, d.getSelectedParentGroupId());
+        });
+    }
+
+    @Test
+    @DisplayName("Khởi tạo hộp thoại với defaultType INCOME nạp và chọn nhóm thu nhập")
+    void testConstructorWithDefaultTypeIncome() {
+        UUID incGroupId = UUID.randomUUID();
+        CategoryHierarchyResponseDTO incGroup = new CategoryHierarchyResponseDTO(
+                "INCOME", incGroupId, "Nhóm Thu Nhập", "ACTIVE", Collections.emptyList());
+
+        when(categoryController.loadCategoryHierarchy()).thenReturn(List.of(incGroup));
+
+        JavaFxTestHelper.runOnFxThread(() -> {
+            CreateCategoryDialog d = new CreateCategoryDialog(null, categoryController, "INCOME");
+            assertEquals("INCOME", d.getTypeInputValue());
+            assertEquals(incGroupId, d.getSelectedParentGroupId());
+        });
+    }
 }

@@ -16,7 +16,15 @@ public interface CategoryView extends BaseView {
 
     void openCreateNeedGroupDialog();
 
+    default void openCreateNeedGroupDialog(String defaultType) {
+        openCreateNeedGroupDialog();
+    }
+
     void openCreateCategoryDialog();
+
+    default void openCreateCategoryDialog(String defaultType) {
+        openCreateCategoryDialog();
+    }
 
     void openUpdateCategoryDialog(java.util.UUID categoryId, String currentName, java.util.UUID currentParentGroupId, String transactionType);
 

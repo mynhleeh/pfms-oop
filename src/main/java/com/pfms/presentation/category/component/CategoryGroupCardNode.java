@@ -83,14 +83,14 @@ public class CategoryGroupCardNode extends VBox {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         this.btnAddSub = new Button("+ Con");
-        this.btnAddSub.getStyleClass().addAll("btn-action-sm", "btn-secondary");
+        this.btnAddSub.getStyleClass().add("btn-action-sm");
         this.btnAddSub.setStyle("-fx-font-size: 10.5px; -fx-padding: 2px 7px;");
         if (onAddSubCategory != null) {
             this.btnAddSub.setOnAction(e -> onAddSubCategory.accept(group));
         }
 
         this.btnRename = new Button("Đổi tên");
-        this.btnRename.getStyleClass().addAll("btn-action-sm", "btn-secondary");
+        this.btnRename.getStyleClass().add("btn-action-sm");
         this.btnRename.setStyle("-fx-font-size: 10.5px; -fx-padding: 2px 7px;");
         if (onRenameGroup != null) {
             this.btnRename.setOnAction(e -> onRenameGroup.accept(group));
@@ -106,6 +106,7 @@ public class CategoryGroupCardNode extends VBox {
         HBox actionsBox = new HBox(5, this.btnAddSub, this.btnRename, this.btnDelete);
         actionsBox.setAlignment(Pos.CENTER_RIGHT);
         actionsBox.setMinWidth(Region.USE_PREF_SIZE);
+        actionsBox.setMaxWidth(Region.USE_PREF_SIZE);
 
         header.getChildren().addAll(iconLabel, this.titleLabel, this.typeBadge, this.countBadge, spacer, actionsBox);
 

@@ -108,4 +108,25 @@ class CreateNeedGroupDialogTest {
             assertThrows(NullPointerException.class, () -> new CreateNeedGroupDialog(null));
         });
     }
+
+    @Test
+    @DisplayName("Khởi tạo hộp thoại với defaultType INCOME thiết lập chính xác loại thu nhập")
+    void testConstructorWithDefaultTypeIncome() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            CreateNeedGroupDialog d = new CreateNeedGroupDialog(null, categoryController, "INCOME");
+            assertEquals("INCOME", d.getTypeInputValue());
+        });
+    }
+
+    @Test
+    @DisplayName("Thay đổi type thông qua setTypeInputValue cập nhật phân loại chính xác")
+    void testSwitchTypeUpdatesValue() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            dialog.setTypeInputValue("INCOME");
+            assertEquals("INCOME", dialog.getTypeInputValue());
+
+            dialog.setTypeInputValue("EXPENSE");
+            assertEquals("EXPENSE", dialog.getTypeInputValue());
+        });
+    }
 }

@@ -70,38 +70,65 @@ public class UpdateCategoryDialog extends Dialog<ButtonType> {
         this.parentGroupBox = new ComboBox<>();
         this.parentGroupBox.setMaxWidth(Double.MAX_VALUE);
         this.nameField = new TextField(currentName != null ? currentName : "");
+        this.nameField.setStyle("-fx-font-size: 13px;");
 
         loadCompatibleNeedGroups();
 
-        VBox form = new VBox(8);
-        form.setPadding(new Insets(16, 20, 16, 20));
-        form.setStyle("-fx-background-color: #121212;");
+        VBox form = new VBox(12);
+        form.setPadding(new Insets(18, 22, 18, 22));
+        form.setStyle("-fx-background-color: #141414;");
 
-        Label typeHeader = new Label("Phân loại thu chi:");
-        typeHeader.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
+        // Header Title
+        VBox headerBox = new VBox(4);
+        headerBox.setPadding(new Insets(0, 0, 6, 0));
+        Label headerTitle = new Label("Chỉnh Sửa Danh Mục Con");
+        headerTitle.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
+        Label headerSubtitle = new Label("Cập nhật tên hoặc chuyển đổi nhóm nhu cầu cha");
+        headerSubtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
+        headerBox.getChildren().addAll(headerTitle, headerSubtitle);
+
+        // 1. Phân loại giao dịch (Badge sạch sẽ)
+        VBox typeBoxContainer = new VBox(4);
+        Label typeHeader = new Label("Phân loại giao dịch:");
+        typeHeader.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
 
         boolean isIncome = "INCOME".equalsIgnoreCase(this.transactionType);
-        Label typeBadge = new Label(isIncome ? "INCOME (Thu nhập)" : "EXPENSE (Chi tiêu)");
+        Label typeBadge = new Label(isIncome ? "INCOME" : "EXPENSE");
         typeBadge.setStyle("-fx-background-color: " + (isIncome ? "rgba(74, 222, 128, 0.15)" : "rgba(251, 113, 133, 0.15)") + "; " +
-                "-fx-text-fill: " + (isIncome ? "#4ADE80" : "#FB7185") + "; -fx-font-weight: bold; -fx-padding: 3px 8px; -fx-background-radius: 4px; -fx-font-size: 11px;");
+                "-fx-text-fill: " + (isIncome ? "#4ADE80" : "#FB7185") + "; -fx-font-weight: 800; -fx-padding: 4px 12px; -fx-background-radius: 4px; -fx-font-size: 11px;");
+        typeBoxContainer.getChildren().addAll(typeHeader, typeBadge);
 
+        // 2. Nhóm nhu cầu cha
+        VBox groupBoxContainer = new VBox(4);
         Label parentLabel = new Label("Nhóm nhu cầu cha (*):");
-        parentLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
+        parentLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+        groupBoxContainer.getChildren().addAll(parentLabel, parentGroupBox);
 
+        // 3. Tên danh mục con
+        VBox nameBoxContainer = new VBox(4);
         Label nameLabel = new Label("Tên danh mục con (*):");
-        nameLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
+        nameLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+        nameBoxContainer.getChildren().addAll(nameLabel, nameField);
 
-        form.getChildren().addAll(typeHeader, typeBadge, parentLabel, parentGroupBox, nameLabel, nameField);
+        form.getChildren().addAll(headerBox, typeBoxContainer, groupBoxContainer, nameBoxContainer);
 
         DialogPane pane = getDialogPane();
+        pane.setPrefWidth(500);
+        pane.setMinWidth(500);
         pane.setContent(form);
-        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        javafx.scene.control.ButtonBar.ButtonData okData = javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
+        javafx.scene.control.ButtonBar.ButtonData cancelData = javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE;
+        ButtonType saveBtnType = new ButtonType("Lưu Danh Mục", okData);
+        ButtonType cancelBtnType = new ButtonType("Hủy bỏ", cancelData);
+        pane.getButtonTypes().addAll(saveBtnType, cancelBtnType);
+
         var cssResource = getClass().getResource("/css/pfms-theme.css");
         if (cssResource != null) {
             pane.getStylesheets().add(cssResource.toExternalForm());
         }
 
-        final var okButton = pane.lookupButton(ButtonType.OK);
+        final var okButton = pane.lookupButton(saveBtnType);
         if (okButton != null) {
             okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
                 triggerSave();
