@@ -112,6 +112,19 @@ class TransactionPaneTest {
 
             assertNotNull(pane.getFilterBar());
             assertNotNull(pane.getPresenter());
+
+            assertEquals(7, pane.getTableView().getColumns().size());
+            assertEquals("Ngày Giao Dịch", pane.getTableView().getColumns().get(0).getText());
+            assertEquals("Số Tiền", pane.getTableView().getColumns().get(1).getText());
+            assertEquals("Ví Tài Khoản", pane.getTableView().getColumns().get(2).getText());
+            assertEquals("Nhóm Nhu Cầu", pane.getTableView().getColumns().get(3).getText());
+            assertEquals("Danh Mục", pane.getTableView().getColumns().get(4).getText());
+            assertEquals("Ghi Chú", pane.getTableView().getColumns().get(5).getText());
+            assertEquals("Thao Tác", pane.getTableView().getColumns().get(6).getText());
+
+            assertNotNull(pane.getStreamHeader());
+            assertNotNull(pane.getStreamItemsContainer());
+            assertEquals(2, pane.getStreamItemsContainer().getChildren().size());
         });
     }
 
@@ -132,9 +145,25 @@ class TransactionPaneTest {
             assertEquals("Tiền điện", pane.getTableData().get(0).categoryName());
             assertFalse(pane.getTableData().get(0).isIncome());
 
+            assertEquals(1, pane.getStreamItemsContainer().getChildren().size());
+            assertTrue(pane.getStreamItemsContainer().getChildren().get(0) instanceof com.pfms.presentation.transaction.component.TransactionRowNode);
+
             assertTrue(pane.getStatTotalIncomeLabel().getText().contains("0 VNĐ"));
             assertTrue(pane.getStatTotalExpenseLabel().getText().contains("500,000 VNĐ"));
             assertTrue(pane.getStatNetCashFlowLabel().getText().contains("-500,000 VNĐ"));
+        });
+    }
+
+    @Test
+    @DisplayName("renderTransactions với danh sách rỗng hiển thị thẻ thông báo rỗng phù hợp")
+    void testRenderEmptyTransactions() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            pane.renderTransactions(
+                    List.of(),
+                    "Tổng thu: 0 VNĐ | Tổng chi: 0 VNĐ | Dòng tiền thuần: 0 VNĐ",
+                    "Trang 1 / 1 (Tổng 0 giao dịch)");
+            assertEquals(0, pane.getTableData().size());
+            assertEquals(1, pane.getStreamItemsContainer().getChildren().size());
         });
     }
 

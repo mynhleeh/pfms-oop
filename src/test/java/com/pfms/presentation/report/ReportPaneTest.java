@@ -72,11 +72,13 @@ class ReportPaneTest {
 
             assertEquals(1, pane.getCashFlowTableData().size());
             assertEquals("2026-10", pane.getCashFlowTableData().get(0).getYearMonth());
+            assertEquals(1, pane.getCashFlowStreamBox().getChildren().size());
             assertEquals(3, pane.getCashFlowChart().getData().size()); // 3 series: Thu, Chi, Net
             assertTrue(pane.getCashFlowSummaryText().contains("Thu nhập BQ: 20,000,000 VNĐ"));
 
             assertEquals(1, pane.getStructureTableData().size());
             assertEquals("Thiết yếu", pane.getStructureTableData().get(0).getName());
+            assertEquals(1, pane.getStructureStreamBox().getChildren().size());
             assertEquals(1, pane.getStructurePieChart().getData().size());
             assertTrue(pane.getStructureSummaryText().contains("Tổng số tiền: 10,000,000 VNĐ"));
         });

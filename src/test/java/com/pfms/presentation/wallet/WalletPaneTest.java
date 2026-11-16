@@ -113,4 +113,21 @@ class WalletPaneTest {
         assertEquals("Cảnh báo", warnRef.get());
         assertEquals("Báo lỗi", errRef.get());
     }
+
+    @Test
+    @DisplayName("Chuyển đổi chế độ xem ViewModeSwitcher và kết xuất Card Grid View thành công")
+    void testDualViewSwitchingAndCardGridRendering() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            assertNotNull(pane.getCardGridPane());
+            assertEquals(2, pane.getCardGridPane().getChildren().size());
+
+            pane.getViewModeSwitcher().setMode(com.pfms.presentation.wallet.component.ViewModeSwitcher.ViewMode.TABLE);
+            assertEquals(com.pfms.presentation.wallet.component.ViewModeSwitcher.ViewMode.TABLE,
+                    pane.getViewModeSwitcher().getCurrentMode());
+
+            pane.getViewModeSwitcher().setMode(com.pfms.presentation.wallet.component.ViewModeSwitcher.ViewMode.CARD_GRID);
+            assertEquals(com.pfms.presentation.wallet.component.ViewModeSwitcher.ViewMode.CARD_GRID,
+                    pane.getViewModeSwitcher().getCurrentMode());
+        });
+    }
 }
