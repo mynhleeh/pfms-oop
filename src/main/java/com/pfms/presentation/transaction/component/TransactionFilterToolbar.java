@@ -39,6 +39,8 @@ import java.util.UUID;
  */
 public class TransactionFilterToolbar extends JPanel {
 
+    private static final long serialVersionUID = 1L;
+
     // region Fields
     private final JButton addButton = createActionButton("+ Thêm giao dịch", ViewConstants.COLOR_PRIMARY_LIGHT, Color.BLACK, true);
     private final JButton refreshButton = createActionButton("Làm mới", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MUTED, false);

@@ -148,4 +148,25 @@ class UpdateTransactionDialogTest {
         assertTrue(dialog.getAvailableBalanceLabel().isVisible());
         assertTrue(dialog.getAvailableBalanceLabel().getText().contains("5,000,000 VNĐ"));
     }
+
+    @Test
+    @DisplayName("Phụ phí yêu cầu chọn nhóm chi phí trước khi mở khóa danh mục")
+    void testFeeSectionRequiresGroup() {
+        assertFalse(dialog.getFeeCheckBox().isSelected());
+        assertFalse(dialog.getFeeAmountField().isEnabled());
+        assertFalse(dialog.getFeeGroupCombo().isEnabled());
+        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
+
+        dialog.getFeeCheckBox().doClick();
+        assertTrue(dialog.getFeeCheckBox().isSelected());
+        assertTrue(dialog.getFeeAmountField().isEnabled());
+        assertTrue(dialog.getFeeGroupCombo().isEnabled());
+        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
+
+        // Chọn nhóm phụ phí
+        CategoryHierarchyResponseDTO group = dialog.getFeeGroupCombo().getItemAt(1);
+        dialog.getFeeGroupCombo().setSelectedItem(group);
+        assertTrue(dialog.getFeeCategoryCombo().isEnabled());
+        assertEquals(1, dialog.getFeeCategoryCombo().getItemCount());
+    }
 }

@@ -24,5 +24,6 @@
         }
     ],
     "latex-workshop.view.pdf.viewer": "tab",
-    "terminal.integrated.suggest.suggestOnTriggerCharacters": false
+    "terminal.integrated.suggest.suggestOnTriggerCharacters": false,
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

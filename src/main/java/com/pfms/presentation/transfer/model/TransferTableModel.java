@@ -17,8 +17,10 @@ import java.util.Locale;
  */
 public class TransferTableModel extends AbstractTableModel {
 
+    private static final long serialVersionUID = 1L;
+
     private static final String[] COLUMN_NAMES = {
-            "STT", "Ngày", "Ví nguồn", "Ví đích", "Số tiền", "Phụ phí", "Ghi chú"
+            "Ngày", "Ví nguồn", "Ví đích", "Số tiền", "Phụ phí", "Ghi chú", "Thao tác"
     };
 
     private final List<TransferResponseDTO> transfers;
@@ -77,6 +79,19 @@ public class TransferTableModel extends AbstractTableModel {
     }
 
     @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 6;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        if (columnIndex == 6) {
+            return Object.class;
+        }
+        return String.class;
+    }
+
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (rowIndex < 0 || rowIndex >= this.transfers.size()) {
             return null;
@@ -84,15 +99,15 @@ public class TransferTableModel extends AbstractTableModel {
 
         TransferResponseDTO trf = this.transfers.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> rowIndex + 1;
-            case 1 -> (trf.getTransferDate() != null) ? this.dateFormatter.format(trf.getTransferDate()) : "-";
-            case 2 -> (trf.getSourceWalletName() != null) ? trf.getSourceWalletName() : "-";
-            case 3 -> (trf.getDestinationWalletName() != null) ? trf.getDestinationWalletName() : "-";
-            case 4 -> formatCurrency(trf.getAmount());
-            case 5 -> (trf.hasFee() && trf.getFeeAmount() != null && trf.getFeeAmount().compareTo(BigDecimal.ZERO) > 0)
+            case 0 -> (trf.getTransferDate() != null) ? this.dateFormatter.format(trf.getTransferDate()) : "-";
+            case 1 -> (trf.getSourceWalletName() != null) ? trf.getSourceWalletName() : "-";
+            case 2 -> (trf.getDestinationWalletName() != null) ? trf.getDestinationWalletName() : "-";
+            case 3 -> formatCurrency(trf.getAmount());
+            case 4 -> (trf.hasFee() && trf.getFeeAmount() != null && trf.getFeeAmount().compareTo(BigDecimal.ZERO) > 0)
                     ? formatCurrency(trf.getFeeAmount())
                     : "-";
-            case 6 -> (trf.getNote() != null) ? trf.getNote() : "";
+            case 5 -> (trf.getNote() != null) ? trf.getNote() : "";
+            case 6 -> trf;
             default -> null;
         };
     }

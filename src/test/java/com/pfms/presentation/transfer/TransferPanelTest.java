@@ -67,11 +67,15 @@ class TransferPanelTest {
     @DisplayName("Khởi tạo nạp dữ liệu danh sách chuyển tiền ban đầu và tóm tắt thành công")
     void testInitialDataLoaded() {
         assertEquals(1, panel.getTableModel().getRowCount());
-        assertEquals("Ví Tiền mặt", panel.getTableModel().getValueAt(0, 2));
-        assertEquals("Ví MB Bank", panel.getTableModel().getValueAt(0, 3));
+        assertEquals("Ví Tiền mặt", panel.getTableModel().getValueAt(0, 1));
+        assertEquals("Ví MB Bank", panel.getTableModel().getValueAt(0, 2));
         assertTrue(panel.getSummaryText().contains("Tổng tiền chuyển: 1,000,000 VNĐ"));
         assertTrue(panel.getPageInfoText().contains("Trang 1 / 1"));
         assertNotNull(panel.getTable());
+        assertTrue(panel.getStatTotalTransferredLabel().getText().contains("1,000,000 VNĐ"));
+        assertTrue(panel.getStatTotalFeesLabel().getText().contains("0 VNĐ"));
+        assertTrue(panel.getStatCountLabel().getText().contains("1 giao dịch"));
+        assertNotNull(panel.getSearchField());
     }
 
     @Test

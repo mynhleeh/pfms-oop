@@ -30,6 +30,8 @@ import java.util.function.Predicate;
  * Đã tối ưu hóa giao diện Luxury Rounded, bảng dữ liệu 8 cột có phân nhóm và cho phép ghi chú xuống dòng.
  */
 public class TransactionPanel extends JPanel implements TransactionView {
+    private static final long serialVersionUID = 1L;
+
     // region Fields
     private final TransactionPresenter presenter;
     private final WalletGUIController walletController;
@@ -437,10 +439,7 @@ public class TransactionPanel extends JPanel implements TransactionView {
         ));
         return b;
     }
-    private JButton createBtn(String txt, Color bg, Color fg) {
-        JButton b = new JButton(txt); b.setFont(ViewConstants.FONT_BODY); b.setBackground(bg); b.setForeground(fg); b.setFocusPainted(false);
-        b.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER), BorderFactory.createEmptyBorder(6, 14, 6, 14))); return b;
-    }
+
     private TransactionResponseDTO toTransactionDto(TransactionItemViewModel vm) {
         LocalDate d = null;
         if (vm.dateFormatted() != null && !vm.dateFormatted().isBlank() && !"-".equals(vm.dateFormatted())) {

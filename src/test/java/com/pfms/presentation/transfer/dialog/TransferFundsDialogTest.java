@@ -72,6 +72,42 @@ class TransferFundsDialogTest {
         assertEquals("", dialog.getNoteInputValue());
         assertNotNull(dialog.getSourceWallet());
         assertNotNull(dialog.getDestinationWallet());
+        assertTrue(dialog.getSourceBalanceHintLabel().getText().contains("5,000,000 VNĐ"));
+        assertTrue(dialog.getDestBalanceHintLabel().getText().contains("10,000,000 VNĐ"));
+        assertFalse(dialog.getFeeCheckBox().isSelected());
+        assertFalse(dialog.getFeeAmountField().isEnabled());
+        assertFalse(dialog.getFeeGroupCombo().isEnabled());
+        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
+    }
+
+    @Test
+    @DisplayName("Bật checkbox phụ phí thì mở khóa nhóm, chọn nhóm thì mở khóa danh mục phụ phí tương ứng")
+    void testFeeSectionToggling() {
+        dialog.getFeeCheckBox().setSelected(true);
+        // trigger action listeners
+        for (var al : dialog.getFeeCheckBox().getActionListeners()) {
+            al.actionPerformed(null);
+        }
+
+        assertTrue(dialog.getFeeAmountField().isEnabled());
+        assertTrue(dialog.getFeeGroupCombo().isEnabled());
+        // Bắt buộc phải chọn nhóm trước mới mở khóa danh mục
+        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
+
+        // Chọn nhóm chi phí hợp lệ
+        dialog.getFeeGroupCombo().setSelectedIndex(1);
+        assertTrue(dialog.getFeeCategoryCombo().isEnabled());
+        assertEquals(1, dialog.getFeeCategoryCombo().getItemCount());
+
+        dialog.getFeeCheckBox().setSelected(false);
+        for (var al : dialog.getFeeCheckBox().getActionListeners()) {
+            al.actionPerformed(null);
+        }
+
+        assertFalse(dialog.getFeeAmountField().isEnabled());
+        assertFalse(dialog.getFeeGroupCombo().isEnabled());
+        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
+        assertEquals("0", dialog.getFeeAmountField().getText());
     }
 
     @Test

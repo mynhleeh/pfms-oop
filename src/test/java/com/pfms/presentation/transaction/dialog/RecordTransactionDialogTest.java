@@ -295,23 +295,32 @@ class RecordTransactionDialogTest {
     }
 
     @Test
-    @DisplayName("Fee Box tự động mở rộng theo Accordion khi tích chọn Có phụ phí phát sinh")
+    @DisplayName("Fee Box tự động mở rộng theo Accordion khi tích chọn Có phụ phí phát sinh và yêu cầu chọn nhóm")
     void testFeeBoxAccordionToggle() {
         assertFalse(dialog.getFeeCheckBox().isSelected());
         assertFalse(dialog.getFeeDetailsPanel().isVisible());
         assertFalse(dialog.getFeeAmountField().isEnabled());
+        assertFalse(dialog.getFeeGroupCombo().isEnabled());
         assertFalse(dialog.getFeeCategoryCombo().isEnabled());
 
         dialog.getFeeCheckBox().doClick();
         assertTrue(dialog.getFeeCheckBox().isSelected());
         assertTrue(dialog.getFeeDetailsPanel().isVisible());
         assertTrue(dialog.getFeeAmountField().isEnabled());
+        assertTrue(dialog.getFeeGroupCombo().isEnabled());
+        // Chưa chọn nhóm phụ phí -> danh mục bị disabled
+        assertFalse(dialog.getFeeCategoryCombo().isEnabled());
+
+        // Chọn nhóm phụ phí -> mở khóa danh mục phụ phí
+        dialog.getFeeGroupCombo().setSelectedItem(expenseGroup);
         assertTrue(dialog.getFeeCategoryCombo().isEnabled());
+        assertEquals(1, dialog.getFeeCategoryCombo().getItemCount());
 
         dialog.getFeeCheckBox().doClick();
         assertFalse(dialog.getFeeCheckBox().isSelected());
         assertFalse(dialog.getFeeDetailsPanel().isVisible());
         assertFalse(dialog.getFeeAmountField().isEnabled());
+        assertFalse(dialog.getFeeGroupCombo().isEnabled());
         assertFalse(dialog.getFeeCategoryCombo().isEnabled());
         assertEquals("0", dialog.getFeeAmountField().getText());
     }

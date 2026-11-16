@@ -59,13 +59,17 @@ class TransferTableModelTest {
     void testInitialEmptyTable() {
         assertEquals(0, model.getRowCount());
         assertEquals(7, model.getColumnCount());
-        assertEquals("STT", model.getColumnName(0));
-        assertEquals("Ngày", model.getColumnName(1));
-        assertEquals("Ví nguồn", model.getColumnName(2));
-        assertEquals("Ví đích", model.getColumnName(3));
-        assertEquals("Số tiền", model.getColumnName(4));
-        assertEquals("Phụ phí", model.getColumnName(5));
-        assertEquals("Ghi chú", model.getColumnName(6));
+        assertEquals("Ngày", model.getColumnName(0));
+        assertEquals("Ví nguồn", model.getColumnName(1));
+        assertEquals("Ví đích", model.getColumnName(2));
+        assertEquals("Số tiền", model.getColumnName(3));
+        assertEquals("Phụ phí", model.getColumnName(4));
+        assertEquals("Ghi chú", model.getColumnName(5));
+        assertEquals("Thao tác", model.getColumnName(6));
+        assertTrue(model.isCellEditable(0, 6));
+        assertFalse(model.isCellEditable(0, 0));
+        assertEquals(Object.class, model.getColumnClass(6));
+        assertEquals(String.class, model.getColumnClass(0));
     }
 
     @Test
@@ -76,22 +80,22 @@ class TransferTableModelTest {
         assertEquals(2, model.getRowCount());
 
         // Row 0 - Không phí
-        assertEquals(1, model.getValueAt(0, 0));
-        assertEquals("15/11/2026", model.getValueAt(0, 1));
-        assertEquals("Ví Tiền mặt", model.getValueAt(0, 2));
-        assertEquals("Ví MB Bank", model.getValueAt(0, 3));
-        assertEquals("1,000,000 VNĐ", model.getValueAt(0, 4));
-        assertEquals("-", model.getValueAt(0, 5));
-        assertEquals("Nạp tiền ngân hàng", model.getValueAt(0, 6));
+        assertEquals("15/11/2026", model.getValueAt(0, 0));
+        assertEquals("Ví Tiền mặt", model.getValueAt(0, 1));
+        assertEquals("Ví MB Bank", model.getValueAt(0, 2));
+        assertEquals("1,000,000 VNĐ", model.getValueAt(0, 3));
+        assertEquals("-", model.getValueAt(0, 4));
+        assertEquals("Nạp tiền ngân hàng", model.getValueAt(0, 5));
+        assertSame(transfer1, model.getValueAt(0, 6));
 
         // Row 1 - Có phí
-        assertEquals(2, model.getValueAt(1, 0));
-        assertEquals("16/11/2026", model.getValueAt(1, 1));
-        assertEquals("Ví MB Bank", model.getValueAt(1, 2));
-        assertEquals("Ví Tiết kiệm", model.getValueAt(1, 3));
-        assertEquals("500,000 VNĐ", model.getValueAt(1, 4));
-        assertEquals("2,200 VNĐ", model.getValueAt(1, 5));
-        assertEquals("Gửi tiết kiệm", model.getValueAt(1, 6));
+        assertEquals("16/11/2026", model.getValueAt(1, 0));
+        assertEquals("Ví MB Bank", model.getValueAt(1, 1));
+        assertEquals("Ví Tiết kiệm", model.getValueAt(1, 2));
+        assertEquals("500,000 VNĐ", model.getValueAt(1, 3));
+        assertEquals("2,200 VNĐ", model.getValueAt(1, 4));
+        assertEquals("Gửi tiết kiệm", model.getValueAt(1, 5));
+        assertSame(transferWithFee, model.getValueAt(1, 6));
 
         assertSame(transfer1, model.getTransferAt(0));
         assertSame(transferWithFee, model.getTransferAt(1));

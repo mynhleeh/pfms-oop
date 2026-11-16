@@ -21,6 +21,8 @@ import java.util.UUID;
  */
 public class TransactionTableModel extends AbstractTableModel {
 
+    private static final long serialVersionUID = 1L;
+
     private static final String[] COLUMN_NAMES = {
             "Ngày", "Loại", "Nhóm", "Danh mục", "Số tiền", "Ví", "Phụ phí", "Ghi chú", "Thao tác"
     };

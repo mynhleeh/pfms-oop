@@ -229,8 +229,6 @@ class TransactionPresenterTest {
                 List.of(txnIncome), new BigDecimal("15000000"), BigDecimal.ZERO, new BigDecimal("15000000"), 1, 20, 50L, 3);
         TransactionListResponseDTO page2Response = new TransactionListResponseDTO(
                 List.of(txnExpense), BigDecimal.ZERO, new BigDecimal("200000"), new BigDecimal("-200000"), 2, 20, 50L, 3);
-        TransactionListResponseDTO page3Response = new TransactionListResponseDTO(
-                List.of(txnExpense), BigDecimal.ZERO, new BigDecimal("200000"), new BigDecimal("-200000"), 3, 20, 50L, 3);
 
         when(controller.loadTransactions(any())).thenReturn(page1Response);
         presenter.loadTransactions(new FilterTransactionsRequestDTO());

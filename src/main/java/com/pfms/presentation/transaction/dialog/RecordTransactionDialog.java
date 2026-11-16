@@ -38,6 +38,8 @@ import java.util.function.Consumer;
  */
 public class RecordTransactionDialog extends JDialog {
 
+    private static final long serialVersionUID = 1L;
+
     private final TransactionGUIController transactionController;
     private final WalletGUIController walletController;
     private final CategoryGUIController categoryController;
@@ -60,6 +62,7 @@ public class RecordTransactionDialog extends JDialog {
     private final JCheckBox feeCheckBox;
     private final JPanel feeDetailsPanel;
     private final JTextField feeAmountField;
+    private final JComboBox<CategoryHierarchyResponseDTO> feeGroupCombo;
     private final JComboBox<CategoryResponseDTO> feeCategoryCombo;
 
     private final JButton cancelButton;
@@ -67,7 +70,6 @@ public class RecordTransactionDialog extends JDialog {
 
     private final List<CategoryHierarchyResponseDTO> expenseGroups = new ArrayList<>();
     private final List<CategoryHierarchyResponseDTO> incomeGroups = new ArrayList<>();
-    private final List<CategoryResponseDTO> expenseCategories = new ArrayList<>();
 
     private boolean success = false;
     private TransactionResponseDTO createdTransaction = null;
@@ -263,12 +265,17 @@ public class RecordTransactionDialog extends JDialog {
         styleInputField(this.feeAmountField);
         this.feeAmountField.setEnabled(false);
 
+        this.feeGroupCombo = new JComboBox<>();
+        styleComboBox(this.feeGroupCombo);
+        this.feeGroupCombo.setEnabled(false);
+        configureFeeGroupCombo();
+
         this.feeCategoryCombo = new JComboBox<>();
         styleComboBox(this.feeCategoryCombo);
         this.feeCategoryCombo.setEnabled(false);
         configureCategoryCombo(this.feeCategoryCombo);
 
-        this.feeDetailsPanel = new JPanel(new GridLayout(1, 2, 12, 0));
+        this.feeDetailsPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         this.feeDetailsPanel.setOpaque(false);
         this.feeDetailsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.feeDetailsPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -287,10 +294,20 @@ public class RecordTransactionDialog extends JDialog {
         feeAmountCol.add(Box.createVerticalStrut(4));
         feeAmountCol.add(this.feeAmountField);
 
+        JPanel feeGroupCol = new JPanel();
+        feeGroupCol.setLayout(new BoxLayout(feeGroupCol, BoxLayout.Y_AXIS));
+        feeGroupCol.setOpaque(false);
+        JLabel feeGrpLabel = new JLabel("Nhóm phụ phí (*)");
+        feeGrpLabel.setFont(ViewConstants.FONT_STATUS);
+        feeGrpLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+        feeGroupCol.add(feeGrpLabel);
+        feeGroupCol.add(Box.createVerticalStrut(4));
+        feeGroupCol.add(this.feeGroupCombo);
+
         JPanel feeCatCol = new JPanel();
         feeCatCol.setLayout(new BoxLayout(feeCatCol, BoxLayout.Y_AXIS));
         feeCatCol.setOpaque(false);
-        JLabel feeCatLabel = new JLabel("Danh mục phụ phí");
+        JLabel feeCatLabel = new JLabel("Danh mục phụ phí (*)");
         feeCatLabel.setFont(ViewConstants.FONT_STATUS);
         feeCatLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
         feeCatCol.add(feeCatLabel);
@@ -298,15 +315,19 @@ public class RecordTransactionDialog extends JDialog {
         feeCatCol.add(this.feeCategoryCombo);
 
         this.feeDetailsPanel.add(feeAmountCol);
+        this.feeDetailsPanel.add(feeGroupCol);
         this.feeDetailsPanel.add(feeCatCol);
 
         this.feeCheckBox.addActionListener(e -> {
             boolean enabled = this.feeCheckBox.isSelected();
             this.feeAmountField.setEnabled(enabled);
-            this.feeCategoryCombo.setEnabled(enabled);
+            this.feeGroupCombo.setEnabled(enabled);
             this.feeDetailsPanel.setVisible(enabled);
             if (!enabled) {
                 this.feeAmountField.setText("0");
+                this.feeCategoryCombo.setEnabled(false);
+            } else {
+                onFeeGroupChanged();
             }
             feeBox.revalidate();
             feeBox.repaint();
@@ -361,7 +382,6 @@ public class RecordTransactionDialog extends JDialog {
 
         // Khởi tạo trạng thái mặc định
         setSelectedTransactionType("Chi tiêu");
-        populateFeeCategories();
     }
 
     // region Styling Helpers
@@ -473,7 +493,6 @@ public class RecordTransactionDialog extends JDialog {
     private void loadCategories() {
         this.expenseGroups.clear();
         this.incomeGroups.clear();
-        this.expenseCategories.clear();
 
         List<CategoryHierarchyResponseDTO> hierarchies = this.categoryController.loadCategoryHierarchy();
         if (hierarchies != null) {
@@ -482,9 +501,6 @@ public class RecordTransactionDialog extends JDialog {
                     this.incomeGroups.add(group);
                 } else {
                     this.expenseGroups.add(group);
-                    if (group.getCategories() != null) {
-                        this.expenseCategories.addAll(group.getCategories());
-                    }
                 }
             }
         }
@@ -602,10 +618,41 @@ public class RecordTransactionDialog extends JDialog {
         this.categoryCombo.setEnabled(false);
     }
 
-    private void populateFeeCategories() {
+    private void configureFeeGroupCombo() {
+        this.feeGroupCombo.removeAllItems();
+        this.feeGroupCombo.addItem(null);
+        for (CategoryHierarchyResponseDTO group : this.expenseGroups) {
+            this.feeGroupCombo.addItem(group);
+        }
+
+        this.feeGroupCombo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof CategoryHierarchyResponseDTO g) {
+                    setText(g.getNeedGroupName());
+                } else {
+                    setText("-- Chọn nhóm phụ phí --");
+                }
+                return this;
+            }
+        });
+
+        this.feeGroupCombo.addActionListener(e -> onFeeGroupChanged());
+    }
+
+    private void onFeeGroupChanged() {
+        CategoryHierarchyResponseDTO selected = (CategoryHierarchyResponseDTO) this.feeGroupCombo.getSelectedItem();
         this.feeCategoryCombo.removeAllItems();
-        for (CategoryResponseDTO cat : this.expenseCategories) {
-            this.feeCategoryCombo.addItem(cat);
+        if (selected != null && selected.getCategories() != null && !selected.getCategories().isEmpty()) {
+            for (CategoryResponseDTO cat : selected.getCategories()) {
+                if ("ACTIVE".equalsIgnoreCase(cat.getStatus())) {
+                    this.feeCategoryCombo.addItem(cat);
+                }
+            }
+            this.feeCategoryCombo.setEnabled(this.feeCheckBox.isSelected());
+        } else {
+            this.feeCategoryCombo.setEnabled(false);
         }
     }
 
@@ -656,6 +703,9 @@ public class RecordTransactionDialog extends JDialog {
             CategoryResponseDTO feeCat = (CategoryResponseDTO) this.feeCategoryCombo.getSelectedItem();
             if (feeCat != null) {
                 feeCatId = feeCat.getCategoryId();
+            } else {
+                handleError("Vui lòng chọn nhóm và danh mục phụ phí.");
+                return;
             }
         }
 
@@ -802,14 +852,28 @@ public class RecordTransactionDialog extends JDialog {
     public void setFeeData(boolean hasFee, String feeAmount, CategoryResponseDTO feeCategory) {
         this.feeCheckBox.setSelected(hasFee);
         this.feeAmountField.setEnabled(hasFee);
-        this.feeCategoryCombo.setEnabled(hasFee);
+        this.feeGroupCombo.setEnabled(hasFee);
         this.feeDetailsPanel.setVisible(hasFee);
         this.feeAmountField.setText(feeAmount != null ? feeAmount : "0");
-        if (feeCategory != null) {
+        if (hasFee && feeCategory != null) {
+            for (int i = 0; i < this.feeGroupCombo.getItemCount(); i++) {
+                CategoryHierarchyResponseDTO g = this.feeGroupCombo.getItemAt(i);
+                if (g != null && g.getNeedGroupId().equals(feeCategory.getParentGroupId())) {
+                    this.feeGroupCombo.setSelectedItem(g);
+                    break;
+                }
+            }
             this.feeCategoryCombo.setSelectedItem(feeCategory);
+            this.feeCategoryCombo.setEnabled(true);
+        } else {
+            this.feeCategoryCombo.setEnabled(false);
         }
         revalidate();
         repaint();
+    }
+
+    public JComboBox<CategoryHierarchyResponseDTO> getFeeGroupCombo() {
+        return this.feeGroupCombo;
     }
 
     public JButton getExpenseTypeBtn() {
