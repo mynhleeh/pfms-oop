@@ -285,22 +285,22 @@ Cấu trúc gói định hình không gian tên vật lý trong mã nguồn Java
 
 ```text
 com.pfms
-├── common                  # Tầng nền tảng dùng chung: Tiện ích kỹ thuật phi nghiệp vụ
-│   └── util                # Tiền điều kiện kỹ thuật (Preconditions)
-├── presentation            # Tầng trình diễn: Giao diện đồ họa (GUI)
-│   ├── controller          # Điều phối luồng màn hình và xử lý sự kiện giao diện
-│   ├── view                # Cửa sổ chính, biểu mẫu và bảng hiển thị
-│   └── dto                 # Đối tượng truyền dữ liệu (DTO) giữa giao diện và dịch vụ
-├── service                 # Tầng dịch vụ: Interface điều phối ca sử dụng nghiệp vụ
-│   └── impl                # Cài đặt dịch vụ và lớp hỗ trợ điều phối nội bộ
-├── domain                  # Tầng nghiệp vụ: Thực thể, quy tắc và hợp đồng repository
-│   ├── model               # Thực thể và đối tượng giá trị bất biến
+├── common                  # Tiện ích kỹ thuật dùng chung
+│   └── util                # Kiểm tra tiền điều kiện (Preconditions)
+├── presentation            # Tầng trình diễn (GUI)
+│   ├── controller          # Điều phối màn hình và sự kiện
+│   ├── view                # Cửa sổ, biểu mẫu và bảng dữ liệu
+│   └── dto                 # Đối tượng truyền dữ liệu (DTO)
+├── service                 # Tầng dịch vụ: Giao diện ca sử dụng
+│   └── impl                # Thực thi dịch vụ nghiệp vụ
+├── domain                  # Tầng nghiệp vụ cốt lõi
+│   ├── model               # Thực thể và đối tượng giá trị
 │   ├── repository          # Giao diện kho lưu trữ trừu tượng
-│   ├── service             # Dịch vụ miền xử lý quy tắc đa thực thể
-│   └── exception           # Ngoại lệ nghiệp vụ tài chính
-└── infrastructure          # Tầng hạ tầng: Bộ điều hợp tệp cục bộ và bộ nhớ kiểm thử
-    ├── file                # Hiện thực hóa repository bằng đọc/ghi tệp JSON
-    └── memory              # Hiện thực hóa repository trong RAM phục vụ kiểm thử
+│   ├── service             # Dịch vụ miền đa thực thể
+│   └── exception           # Ngoại lệ nghiệp vụ
+└── infrastructure          # Tầng hạ tầng lưu trữ
+    ├── file                # Lưu trữ tệp JSON cục bộ
+    └── memory              # Lưu trữ RAM phục vụ kiểm thử
 ```
 
 **Ma trận quyền truy cập và phụ thuộc gói:**
@@ -2664,6 +2664,8 @@ Kết quả kiểm toán ma trận truy vết xác nhận toàn bộ các ca s�
 
 Hồ sơ thiết kế này là căn cứ kỹ thuật đường cơ sở để đội ngũ phát triển bước vào giai đoạn cài đặt mã nguồn. Quá trình lập trình được triển khai theo nguyên tắc từ dưới lên: ưu tiên xây dựng các đối tượng giá trị và cây ngoại lệ, tiếp tục với các thực thể miền và quy tắc nghiệp vụ, cài đặt tầng dịch vụ và kho lưu trữ, cuối cùng hoàn thiện tầng trình diễn giao diện đồ họa. Toàn bộ các lớp nghiệp vụ được kiểm thử tự động bằng các bộ kiểm thử đơn vị nhằm chứng minh độ chính xác trước khi ghép nối hệ thống hoàn chỉnh.
 
+
+\newpage
 
 # 11. Tài liệu tham khảo
 

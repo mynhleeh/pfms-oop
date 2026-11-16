@@ -5,6 +5,8 @@ geometry:
   - bottom=20mm
   - left=20mm
   - right=20mm
+mainfont: "Times New Roman"
+monofont: "Courier New"
 header-includes: |
   \usepackage{longtable}
   \usepackage{tikz}
@@ -1623,6 +1625,7 @@ Người dùng kết xuất toàn bộ dữ liệu tài chính ra tệp JSON mã
 | Thực thể | `FinancialDataStore` | Đại diện tập hợp các thực thể tài chính (`Wallet`, `NeedGroup`, `Category`, `IncomeExpenseTransaction`, `TransferTransaction`, `TransactionFee`, `BalanceAdjustmentRecord`); cung cấp ảnh chụp dữ liệu nhất quán ở chế độ chỉ đọc. |
 
 **Sơ đồ Robustness**
+
 ![Sơ đồ robustness xuất dữ liệu sao lưu](docs/object-oriented-analysis/images/so-do-robustness-xuat-sao-luu.png){width=80%}
 
 ## 6.2 Thẻ CRC
@@ -1790,10 +1793,12 @@ Bảng dưới đây xác lập mối liên kết giữa 5 quy tắc nghiệp v�
 | `BR-NAM-01` | Quy tắc đặt tên ví, nhóm nhu cầu và danh mục | `Wallet`, `NeedGroup`, `Category` | `ERR-NAM-001`, `ERR-NAM-002` | Chuẩn hóa `trim`, giới hạn 1–50 ký tự; kiểm tra tính duy nhất không phân biệt hoa thường theo phạm vi (toàn hệ thống với `Wallet`, cùng `TransactionType` với `NeedGroup`, cùng `NeedGroup` với `Category`); giải phóng tên khi xóa vĩnh viễn. |
 
 \newpage
+
 # 8. Tổng kết
 
 Giai đoạn phân tích đã hoàn tất việc mô hình hóa các yêu cầu nghiệp vụ của Hệ thống Quản lý Tài chính Cá nhân thành cấu trúc dữ liệu và hành vi hệ thống độc lập với công nghệ cài đặt. Hệ thống ma trận truy vết và kiểm toán xác nhận toàn bộ yêu cầu chức năng, ca sử dụng cùng các quy tắc nghiệp vụ tài chính đều đã được ánh xạ vào mô hình, không còn thành phần dư thừa hay mồ côi. Kết quả phân tích trong tài liệu này là cơ sở kỹ thuật để chuyển sang giai đoạn thiết kế kiến trúc, xây dựng mô hình lớp và triển khai kiểm thử tự động.
 
+\newpage
 
 # 9. Tài liệu Trích dẫn
 
