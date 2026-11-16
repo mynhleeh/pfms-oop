@@ -58,6 +58,10 @@ public class TransactionFilterBar extends VBox {
     private Runnable onResetAction;
     private boolean isUpdating = false;
 
+    public TransactionFilterBar() {
+        this(null, null);
+    }
+
     public TransactionFilterBar(Runnable onFilterAction, Runnable onResetAction) {
         this.onFilterAction = onFilterAction;
         this.onResetAction = onResetAction;
@@ -418,6 +422,10 @@ public class TransactionFilterBar extends VBox {
         String kw = keywordField.getText() != null ? keywordField.getText().trim() : "";
 
         return new FilterTransactionsRequestDTO(start, end, walletIds, type, categoryIds, kw, page, pageSize);
+    }
+
+    public String getSelectedTypeFilter() {
+        return typeFilterBox.getValue();
     }
 
     public void setSelectedTypeFilter(String type) {

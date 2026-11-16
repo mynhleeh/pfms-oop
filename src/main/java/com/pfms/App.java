@@ -73,6 +73,12 @@ public class App extends Application {
                 mainController.getCategoryController());
         mainStage.registerView(MainController.CARD_TRANSFERS, transferPane);
 
+        com.pfms.presentation.transaction.TransactionPane transactionPane = new com.pfms.presentation.transaction.TransactionPane(
+                mainController.getTransactionController(),
+                mainController.getWalletController(),
+                mainController.getCategoryController());
+        mainStage.registerView(MainController.CARD_TRANSACTIONS, transactionPane);
+
         return mainStage;
     }
     // endregion
