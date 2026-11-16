@@ -621,3 +621,396 @@
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
 }
+.subcat-row {
+    -fx-background-color: #1A1A1A;
+    -fx-background-radius: 6px;
+    -fx-border-color: #242424;
+    -fx-border-radius: 6px;
+    -fx-padding: 6px 10px;
+}
+.subcat-row:hover {
+    -fx-background-color: #202020;
+    -fx-border-color: #2E2E2E;
+}
+
+/* ==========================================================================
+   Report & Analytics Redesign (ReportPane.java)
+   ========================================================================== */
+.btn-export-action {
+    -fx-background-color: #141414;
+    -fx-text-fill: -color-text-main;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 14px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+.btn-export-action:hover {
+    -fx-background-color: #1F1F1F;
+    -fx-border-color: -color-gold-border;
+    -fx-text-fill: -color-primary-light;
+}
+
+.quick-chip {
+    -fx-background-color: #1A1A1A;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-padding: 4px 10px;
+    -fx-cursor: hand;
+}
+.quick-chip:hover {
+    -fx-background-color: #242424;
+    -fx-text-fill: -color-text-main;
+}
+.quick-chip-active {
+    -fx-background-color: rgba(212, 175, 55, 0.12);
+    -fx-border-color: rgba(212, 175, 55, 0.4);
+    -fx-text-fill: -color-primary-light;
+    -fx-font-weight: bold;
+}
+
+.kpi-card {
+    -fx-background-color: #141414;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 16px;
+}
+.kpi-label {
+    -fx-text-fill: -color-text-dim;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+.kpi-value {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.kpi-value-income {
+    -fx-text-fill: -color-income;
+}
+.kpi-value-expense {
+    -fx-text-fill: -color-expense;
+}
+.kpi-value-gold {
+    -fx-text-fill: -color-primary-light;
+}
+.kpi-value-white {
+    -fx-text-fill: -color-text-main;
+}
+.kpi-value-muted {
+    -fx-text-fill: -color-text-muted;
+}
+
+.stream-footer-summary {
+    -fx-background-color: #0E0E0E;
+    -fx-background-radius: 0 0 8px 8px;
+    -fx-border-color: -color-border transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 0 18px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-height: 44px;
+    -fx-min-height: 44px;
+}
+.summary-text-line {
+    -fx-text-fill: -color-primary-light;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* ==========================================================================
+   TabPane Flat Luxury Black & Gold Theme (Khớp preview-report.html)
+   ========================================================================== */
+.tab-pane {
+    -fx-tab-min-height: 40px;
+    -fx-tab-max-height: 40px;
+    -fx-background-color: transparent;
+}
+.tab-pane > .tab-header-area {
+    -fx-padding: 0 24px;
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent transparent transparent;
+    -fx-border-width: 0 0 2px 0;
+    -fx-padding: 10px 18px;
+    -fx-cursor: hand;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab:hover > .tab-container > .tab-label {
+    -fx-text-fill: -color-text-main;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -color-primary transparent;
+    -fx-border-width: 0 0 2px 0;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {
+    -fx-text-fill: -color-primary-light;
+    -fx-font-weight: bold;
+}
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+.tab-pane > .tab-content-area {
+    -fx-background-color: transparent;
+    -fx-padding: 14px 24px 20px 24px;
+}
+
+/* ==========================================================================
+   DatePicker Dark Luxury Black & Gold Theme
+   ========================================================================== */
+.date-picker {
+    -fx-background-color: transparent;
+}
+.date-picker > .text-field {
+    -fx-background-color: #0E0E0E;
+    -fx-text-fill: -color-text-main;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 6px 0 0 6px;
+    -fx-background-radius: 6px 0 0 6px;
+    -fx-padding: 6px 10px;
+    -fx-font-size: 12px;
+}
+.date-picker > .text-field:focused {
+    -fx-border-color: -color-primary-light;
+}
+.date-picker > .arrow-button {
+    -fx-background-color: #161616;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px 1px 1px 0;
+    -fx-border-radius: 0 6px 6px 0;
+    -fx-background-radius: 0 6px 6px 0;
+    -fx-cursor: hand;
+}
+.date-picker > .arrow-button:hover {
+    -fx-background-color: #222222;
+}
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: -color-primary-light;
+}
+.date-picker-popup {
+    -fx-background-color: #121212;
+    -fx-border-color: -color-gold-border;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px;
+}
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: #0E0E0E;
+}
+.date-picker-popup > .month-year-pane > .label {
+    -fx-text-fill: -color-text-main;
+    -fx-font-weight: bold;
+}
+.date-picker-popup > .calendar-grid {
+    -fx-background-color: #121212;
+}
+.date-picker-popup > .calendar-grid > .day-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-main;
+}
+.date-picker-popup > .calendar-grid > .day-cell:hover {
+    -fx-background-color: #222222;
+    -fx-text-fill: -color-primary-light;
+}
+.date-picker-popup > .calendar-grid > .selected {
+    -fx-background-color: -color-primary;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}
+
+/* ==========================================================================
+   Type Switcher Segmented Control (EXPENSE / INCOME)
+   ========================================================================== */
+.type-switcher {
+    -fx-background-color: #0E0E0E;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 2px;
+    -fx-spacing: 2px;
+    -fx-alignment: CENTER_LEFT;
+}
+.type-switch-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 600;
+    -fx-padding: 4px 12px;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+.type-switch-btn:hover {
+    -fx-text-fill: -color-text-main;
+}
+.type-switch-active.type-switch-expense {
+    -fx-background-color: -color-expense-bg;
+    -fx-text-fill: -color-expense;
+    -fx-border-color: -color-expense-border;
+    -fx-font-weight: bold;
+}
+.type-switch-active.type-switch-income {
+    -fx-background-color: -color-income-bg;
+    -fx-text-fill: -color-income;
+    -fx-border-color: -color-income-border;
+    -fx-font-weight: bold;
+}
+
+/* ==========================================================================
+   Report View Components (Header, Toolbar, Stream Cards)
+   ========================================================================== */
+.pane-header {
+    -fx-padding: 16px 24px;
+    -fx-background-color: -color-header-bg;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-alignment: CENTER_LEFT;
+}
+.pane-title {
+    -fx-text-fill: -color-text-main;
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+}
+.pane-subtitle {
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 12px;
+}
+
+.kpi-row {
+    -fx-padding: 14px 24px 10px 24px;
+    -fx-background-color: -color-bg-base;
+    -fx-spacing: 14px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.filter-card {
+    -fx-background-color: #141414;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 18px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 12px;
+}
+.filter-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-text-dim;
+    -fx-font-weight: bold;
+}
+
+.report-stream-container {
+    -fx-background-color: #121212;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.report-stream-header {
+    -fx-padding: 9px 16px;
+    -fx-background-color: #161616;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-alignment: CENTER_LEFT;
+}
+.report-stream-header .label {
+    -fx-text-fill: -color-text-dim;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* ==========================================================================
+   Khung phân tách (SplitPane) & Khối Quản trị Dữ liệu
+   ========================================================================== */
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-box-border: transparent;
+    -fx-padding: 0;
+}
+.split-pane:horizontal > .split-pane-divider {
+    -fx-background-color: transparent;
+    -fx-padding: 0 4px;
+}
+.split-pane:vertical > .split-pane-divider {
+    -fx-background-color: transparent;
+    -fx-padding: 4px 0;
+}
+
+.data-card-block {
+    -fx-background-color: #18181B;
+    -fx-border-color: #27272A;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 12px;
+}
+
+.status-badge {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 4px 10px;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+.status-badge-untested {
+    -fx-background-color: rgba(113, 113, 122, 0.15);
+    -fx-text-fill: #71717A;
+    -fx-border-color: #71717A;
+}
+.status-badge-valid {
+    -fx-background-color: rgba(74, 222, 128, 0.15);
+    -fx-text-fill: #4ADE80;
+    -fx-border-color: #4ADE80;
+}
+.status-badge-invalid {
+    -fx-background-color: rgba(251, 113, 133, 0.15);
+    -fx-text-fill: #FB7185;
+    -fx-border-color: #FB7185;
+}
+
+.cell-code {
+    -fx-font-family: "Consolas", monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-primary-light;
+}
+.cell-entity {
+    -fx-font-family: "Consolas", monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-text-muted;
+}
+.severity-tag {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+.severity-tag-error {
+    -fx-text-fill: #FB7185;
+}
+.severity-tag-warning {
+    -fx-text-fill: #F59E0B;
+}
+.severity-tag-info {
+    -fx-text-fill: #38BDF8;
+}
+

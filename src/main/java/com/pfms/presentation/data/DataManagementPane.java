@@ -14,7 +14,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -25,6 +27,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.StringConverter;
 
 import java.io.File;
 import java.util.List;
@@ -88,36 +91,44 @@ public class DataManagementPane extends BorderPane implements DataManagementView
     // region UI Setup
     private void initUI() {
         setPadding(new Insets(20, 24, 20, 24));
-        setStyle("-fx-background-color: #070707;");
+        setStyle("-fx-background-color: -color-bg-base;");
 
         // 1. Header (North)
         VBox headerBox = new VBox(4);
         headerBox.setPadding(new Insets(0, 0, 16, 0));
-        Label titleLabel = new Label("Quản trị & An toàn Dữ liệu (Backup, Restore & Integrity Audit)");
-        titleLabel.setStyle("-fx-text-fill: #FAFAFA; -fx-font-size: 20px; -fx-font-weight: bold;");
-        Label subtitleLabel = new Label("Sao lưu JSON định kỳ, phục hồi hệ thống và kiểm tra tính toàn vẹn 4 tầng số liệu tài chính");
-        subtitleLabel.setStyle("-fx-text-fill: #A1A1AA; -fx-font-size: 13px;");
+        Label titleLabel = new Label("Quản trị dữ liệu");
+        titleLabel.setStyle("-fx-text-fill: #E5C07B; -fx-font-size: 20px; -fx-font-weight: bold;");
+        Label subtitleLabel = new Label("Sao lưu dữ liệu định kỳ, phục hồi hệ thống an toàn và đối soát tính toàn vẹn số liệu tài chính");
+        subtitleLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 13px;");
         headerBox.getChildren().addAll(titleLabel, subtitleLabel);
         setTop(headerBox);
 
         // 2. Content Center (SplitPane: Left = Backup & Restore, Right = Reconciliation)
         SplitPane splitPane = new SplitPane();
-        splitPane.setStyle("-fx-background-color: transparent; -fx-box-border: transparent;");
+        splitPane.getStyleClass().add("split-pane");
+        splitPane.setStyle("-fx-background-color: transparent; -fx-box-border: transparent; -fx-padding: 0;");
 
         VBox leftPane = createBackupRestoreCard();
         VBox rightPane = createReconciliationCard();
 
+        leftPane.setMinWidth(380);
+        leftPane.setPrefWidth(420);
+        rightPane.setMinWidth(480);
+        SplitPane.setResizableWithParent(leftPane, false);
+        SplitPane.setResizableWithParent(rightPane, true);
+
         splitPane.getItems().addAll(leftPane, rightPane);
-        splitPane.setDividerPositions(0.42);
+        splitPane.setDividerPositions(0.40);
         VBox.setVgrow(splitPane, Priority.ALWAYS);
         setCenter(splitPane);
+        Platform.runLater(() -> splitPane.setDividerPositions(0.40));
 
         // 3. Footer (South)
         HBox footerBox = new HBox(8);
         footerBox.setPadding(new Insets(12, 0, 0, 0));
         footerBox.setAlignment(Pos.CENTER_LEFT);
         Label storageInfo = new Label("Tệp cơ sở dữ liệu hệ thống: " + this.storagePath);
-        storageInfo.setStyle("-fx-text-fill: #71717A; -fx-font-size: 12px;");
+        storageInfo.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 12px; -fx-font-family: 'Consolas', monospace;");
         footerBox.getChildren().add(storageInfo);
         setBottom(footerBox);
     }
@@ -126,15 +137,16 @@ public class DataManagementPane extends BorderPane implements DataManagementView
         VBox card = new VBox(16);
         card.getStyleClass().add("pfms-card");
         card.setPadding(new Insets(16));
-        card.setStyle("-fx-background-color: #121212; -fx-border-color: #222222; -fx-border-radius: 8px; -fx-background-radius: 8px;");
+        card.setStyle("-fx-background-color: -color-card-bg; -fx-border-color: -color-border; -fx-border-radius: 8px; -fx-background-radius: 8px;");
 
         // --- Block 1: Export Backup ---
-        Label exportSectionTitle = new Label("Xuất Bản Sao lưu JSON (UC-DAT-01)");
+        Label exportSectionTitle = new Label("Xuất bản sao lưu dữ liệu");
         exportSectionTitle.setStyle("-fx-text-fill: #E5C07B; -fx-font-size: 14px; -fx-font-weight: bold;");
 
         Label destLabel = new Label("Thư mục đích:");
-        destLabel.setStyle("-fx-text-fill: #A1A1AA; -fx-font-size: 12px;");
+        destLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
         destinationField.setPromptText("backups");
+        destinationField.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 12px;");
         HBox.setHgrow(destinationField, Priority.ALWAYS);
 
         Button chooseDirBtn = new Button("Chọn...");
@@ -145,12 +157,13 @@ public class DataManagementPane extends BorderPane implements DataManagementView
         destRow.setAlignment(Pos.CENTER_LEFT);
 
         Label scopeLabel = new Label("Phạm vi sao lưu:");
-        scopeLabel.setStyle("-fx-text-fill: #A1A1AA; -fx-font-size: 12px;");
+        scopeLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
 
         scopeBox.getItems().setAll("FULL", "TRANSACTIONS");
         scopeBox.setValue("FULL");
         scopeBox.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(scopeBox, Priority.ALWAYS);
+        setupScopeBoxLocalization();
 
         exportButton.getStyleClass().add("btn-primary");
         exportButton.setOnAction(e -> triggerExportBackup(destinationField.getText(), scopeBox.getValue()));
@@ -158,36 +171,39 @@ public class DataManagementPane extends BorderPane implements DataManagementView
         HBox scopeRow = new HBox(8, scopeBox, exportButton);
         scopeRow.setAlignment(Pos.CENTER_LEFT);
 
-        exportResultLabel.setStyle("-fx-text-fill: #A1A1AA; -fx-font-size: 12px;");
+        exportResultLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
         exportResultLabel.setWrapText(true);
 
         VBox exportBlock = new VBox(8, exportSectionTitle, destLabel, destRow, scopeLabel, scopeRow, exportResultLabel);
+        exportBlock.getStyleClass().add("data-card-block");
         exportBlock.setPadding(new Insets(12));
         exportBlock.setStyle("-fx-background-color: #18181B; -fx-border-color: #27272A; -fx-border-radius: 6px; -fx-background-radius: 6px;");
 
         // --- Block 2: Restore Backup ---
-        Label restoreSectionTitle = new Label("Phục hồi Dữ liệu từ Sao lưu (UC-DAT-02)");
-        restoreSectionTitle.setStyle("-fx-text-fill: #FB7185; -fx-font-size: 14px; -fx-font-weight: bold;");
+        Label restoreSectionTitle = new Label("Phục hồi dữ liệu từ sao lưu");
+        restoreSectionTitle.setStyle("-fx-text-fill: #E5C07B; -fx-font-size: 14px; -fx-font-weight: bold;");
 
-        Label restoreFileLabel = new Label("Tệp sao lưu (.json):");
-        restoreFileLabel.setStyle("-fx-text-fill: #A1A1AA; -fx-font-size: 12px;");
+        Label restoreFileLabel = new Label("Tệp sao lưu:");
+        restoreFileLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
         restoreFileField.setPromptText("backups/pfms_backup_xxx.json");
+        restoreFileField.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 12px;");
         HBox.setHgrow(restoreFileField, Priority.ALWAYS);
 
         Button chooseFileBtn = new Button("Chọn...");
         chooseFileBtn.getStyleClass().add("btn-secondary");
         chooseFileBtn.setOnAction(e -> chooseRestoreFile());
 
-        restoreButton.getStyleClass().add("btn-danger");
+        restoreButton.getStyleClass().add("btn-primary");
         restoreButton.setOnAction(e -> triggerRestoreBackup(restoreFileField.getText()));
 
         HBox restoreRow = new HBox(8, restoreFileField, chooseFileBtn, restoreButton);
         restoreRow.setAlignment(Pos.CENTER_LEFT);
 
-        restoreResultLabel.setStyle("-fx-text-fill: #A1A1AA; -fx-font-size: 12px;");
+        restoreResultLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
         restoreResultLabel.setWrapText(true);
 
         VBox restoreBlock = new VBox(8, restoreSectionTitle, restoreFileLabel, restoreRow, restoreResultLabel);
+        restoreBlock.getStyleClass().add("data-card-block");
         restoreBlock.setPadding(new Insets(12));
         restoreBlock.setStyle("-fx-background-color: #18181B; -fx-border-color: #27272A; -fx-border-radius: 6px; -fx-background-radius: 6px;");
 
@@ -195,14 +211,60 @@ public class DataManagementPane extends BorderPane implements DataManagementView
         return card;
     }
 
+    private void setupScopeBoxLocalization() {
+        scopeBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(String object) {
+                if ("TRANSACTIONS".equals(object)) {
+                    return "Chỉ dữ liệu giao dịch";
+                }
+                return "Toàn bộ cơ sở dữ liệu";
+            }
+
+            @Override
+            public String fromString(String string) {
+                if ("Chỉ dữ liệu giao dịch".equals(string)) {
+                    return "TRANSACTIONS";
+                }
+                return "FULL";
+            }
+        });
+        scopeBox.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else if ("TRANSACTIONS".equals(item)) {
+                    setText("Chỉ dữ liệu giao dịch");
+                } else {
+                    setText("Toàn bộ cơ sở dữ liệu");
+                }
+            }
+        });
+        scopeBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else if ("TRANSACTIONS".equals(item)) {
+                    setText("Chỉ dữ liệu giao dịch");
+                } else {
+                    setText("Toàn bộ cơ sở dữ liệu");
+                }
+            }
+        });
+    }
+
     private VBox createReconciliationCard() {
         VBox card = new VBox(12);
         card.getStyleClass().add("pfms-card");
         card.setPadding(new Insets(16));
-        card.setStyle("-fx-background-color: #121212; -fx-border-color: #222222; -fx-border-radius: 8px; -fx-background-radius: 8px;");
+        card.setStyle("-fx-background-color: -color-card-bg; -fx-border-color: -color-border; -fx-border-radius: 8px; -fx-background-radius: 8px;");
 
         // Header Section
-        Label reconcileTitle = new Label("Đối soát Tính Toàn vẹn Hệ thống (UC-DAT-03)");
+        Label reconcileTitle = new Label("Đối soát tính toàn vẹn hệ thống");
         reconcileTitle.setStyle("-fx-text-fill: #E5C07B; -fx-font-size: 14px; -fx-font-weight: bold;");
 
         reconcileButton.getStyleClass().add("btn-primary");
@@ -227,10 +289,48 @@ public class DataManagementPane extends BorderPane implements DataManagementView
     private void setupIssueTable() {
         TableColumn<ReconciliationIssueResponseDTO, String> severityCol = new TableColumn<>("Mức độ");
         severityCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSeverity()));
-        severityCol.setPrefWidth(80);
+        severityCol.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Label badge = new Label(item);
+                    badge.getStyleClass().add("severity-tag");
+                    if ("ERROR".equalsIgnoreCase(item)) {
+                        badge.getStyleClass().add("severity-tag-error");
+                        badge.setStyle("-fx-text-fill: #FB7185; -fx-font-weight: bold; -fx-font-size: 11px;");
+                    } else if ("WARNING".equalsIgnoreCase(item)) {
+                        badge.getStyleClass().add("severity-tag-warning");
+                        badge.setStyle("-fx-text-fill: #F59E0B; -fx-font-weight: bold; -fx-font-size: 11px;");
+                    } else {
+                        badge.getStyleClass().add("severity-tag-info");
+                        badge.setStyle("-fx-text-fill: #38BDF8; -fx-font-weight: bold; -fx-font-size: 11px;");
+                    }
+                    setGraphic(badge);
+                    setAlignment(Pos.CENTER_LEFT);
+                }
+            }
+        });
+        severityCol.setPrefWidth(85);
 
         TableColumn<ReconciliationIssueResponseDTO, String> ruleCodeCol = new TableColumn<>("Mã quy tắc");
         ruleCodeCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getRuleCode()));
+        ruleCodeCol.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    getStyleClass().add("cell-code");
+                    setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px; -fx-text-fill: #E5C07B;");
+                }
+            }
+        });
         ruleCodeCol.setPrefWidth(110);
 
         TableColumn<ReconciliationIssueResponseDTO, String> typeCol = new TableColumn<>("Loại sự cố");
@@ -239,18 +339,69 @@ public class DataManagementPane extends BorderPane implements DataManagementView
 
         TableColumn<ReconciliationIssueResponseDTO, String> messageCol = new TableColumn<>("Nội dung sai lệch");
         messageCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getMessage()));
+        messageCol.setCellFactory(col -> new TableCell<>() {
+            private final Label label = new Label();
+            {
+                label.setWrapText(true);
+                label.setStyle("-fx-text-fill: -color-text-main; -fx-font-size: 12px;");
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    label.setText(item);
+                    setGraphic(label);
+                }
+            }
+        });
         messageCol.setPrefWidth(220);
 
         TableColumn<ReconciliationIssueResponseDTO, String> entityCol = new TableColumn<>("Mã đối tượng");
         entityCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAffectedEntityId()));
+        entityCol.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    getStyleClass().add("cell-entity");
+                    setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px; -fx-text-fill: -color-text-muted;");
+                }
+            }
+        });
         entityCol.setPrefWidth(110);
 
         TableColumn<ReconciliationIssueResponseDTO, String> recCol = new TableColumn<>("Khuyến nghị khắc phục");
         recCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getRecommendation()));
+        recCol.setCellFactory(col -> new TableCell<>() {
+            private final Label label = new Label();
+            {
+                label.setWrapText(true);
+                label.setStyle("-fx-text-fill: -color-text-main; -fx-font-size: 12px;");
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    label.setText(item);
+                    setGraphic(label);
+                }
+            }
+        });
         recCol.setPrefWidth(160);
 
         issueTable.getColumns().setAll(severityCol, ruleCodeCol, typeCol, messageCol, entityCol, recCol);
-        issueTable.setPlaceholder(new Label("Không có sai lệch dữ liệu nào. Hệ thống đạt trạng thái toàn vẹn 100%."));
+        issueTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        Label placeholder = new Label("Không phát hiện vi phạm tính toàn vẹn số liệu. Hệ thống ở trạng thái nhất quán 100%.");
+        placeholder.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 13px; -fx-padding: 40px;");
+        issueTable.setPlaceholder(placeholder);
     }
     // endregion
 
@@ -383,21 +534,25 @@ public class DataManagementPane extends BorderPane implements DataManagementView
     // region Badges & Styling Helpers
     private Label createStatusBadge(String text, String colorHex) {
         Label badge = new Label(text);
-        badge.setStyle(String.format(
-                "-fx-text-fill: %s; -fx-border-color: %s; -fx-border-width: 1px; -fx-border-radius: 4px; " +
-                        "-fx-padding: 3px 8px; -fx-font-size: 11px; -fx-font-weight: bold;",
-                colorHex, colorHex));
+        badge.getStyleClass().addAll("status-badge", "status-badge-untested");
+        badge.setStyle(
+                "-fx-text-fill: #71717A; -fx-background-color: rgba(113, 113, 122, 0.15); " +
+                "-fx-border-color: #71717A; -fx-border-width: 1px; -fx-border-radius: 12px; " +
+                "-fx-background-radius: 12px; -fx-padding: 4px 10px; -fx-font-size: 11px; -fx-font-weight: bold;");
         return badge;
     }
 
     private void updateBadge(Label badge, String prefix, boolean passed) {
-        String statusText = passed ? "HỢP LỆ" : "SAI LỆCH";
+        String statusText = passed ? "Hợp lệ" : "Sai lệch";
         String colorHex = passed ? "#4ADE80" : "#FB7185";
+        String bgRgba = passed ? "rgba(74, 222, 128, 0.15)" : "rgba(251, 113, 133, 0.15)";
         badge.setText(prefix + ": " + statusText);
+        badge.getStyleClass().removeAll("status-badge-untested", "status-badge-valid", "status-badge-invalid");
+        badge.getStyleClass().addAll("status-badge", passed ? "status-badge-valid" : "status-badge-invalid");
         badge.setStyle(String.format(
-                "-fx-text-fill: %s; -fx-border-color: %s; -fx-border-width: 1px; -fx-border-radius: 4px; " +
-                        "-fx-padding: 3px 8px; -fx-font-size: 11px; -fx-font-weight: bold;",
-                colorHex, colorHex));
+                "-fx-text-fill: %s; -fx-background-color: %s; -fx-border-color: %s; -fx-border-width: 1px; " +
+                "-fx-border-radius: 12px; -fx-background-radius: 12px; -fx-padding: 4px 10px; -fx-font-size: 11px; -fx-font-weight: bold;",
+                colorHex, bgRgba, colorHex));
     }
 
     private void runOnFx(Runnable action) {
