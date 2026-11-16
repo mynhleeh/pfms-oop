@@ -1,18 +1,16 @@
-# 02. Thiết kế Lớp Thực thể và Đối tượng Giá trị
+# 02. Thiết kế lớp thực thể và đối tượng giá trị
 
-Tài liệu này xác lập bản vẽ thiết kế chi tiết cho toàn bộ các lớp nghiệp vụ thuộc Tầng Nghiệp vụ cốt lõi của Hệ thống Quản lý Tài chính Cá nhân PFMS. Nội dung văn bản thực hiện chuyển đổi các thực thể miền và đối tượng giá trị đã được xác thực trong hồ sơ Phân tích Hướng đối tượng sang cấu trúc lớp cài đặt hoàn chỉnh trên nền tảng ngôn ngữ Java.
+Tài liệu này xác lập thiết kế chi tiết cho các lớp thuộc tầng nghiệp vụ cốt lõi (`com.pfms.domain.model`) của hệ thống Quản lý Tài chính Cá nhân (PFMS), chuyển đổi các thực thể miền và đối tượng giá trị từ mô hình phân tích sang cấu trúc cài đặt Java hoàn chỉnh.
 
-Bản vẽ thiết kế tập trung giải quyết ba mục tiêu kỹ thuật trọng tâm: bảo toàn độ chính xác số học thông qua việc xây dựng đối tượng giá trị tiền tệ bất biến kèm quy tắc làm tròn ngân hàng; kiểm soát chặt chẽ tính đóng gói nhằm bảo vệ trạng thái nội tại và duy trì số dư khả dụng không âm tại mọi thời điểm; và tổ chức cấu trúc phân cấp giao dịch kế thừa từ lớp cơ sở trừu tượng nhằm hiện thực hóa tính đa hình trong luồng hạch toán dòng tiền mà không cần sử dụng các cấu trúc điều kiện rẽ nhánh thủ công.
+Thiết kế tập trung vào ba mục tiêu kỹ thuật trọng tâm: bảo toàn độ chính xác số học qua đối tượng giá trị tiền tệ bất biến với quy tắc làm tròn ngân hàng (`HALF_EVEN`); đóng gói chặt chẽ để bảo vệ trạng thái nội tại và duy trì số dư khả dụng không âm; và hiện thực hóa tính đa hình trong luồng hạch toán dòng tiền qua lớp cơ sở trừu tượng mà không dùng rẽ nhánh thủ công.
 
-## 2.1 Sơ đồ Lớp Tổng quan
+## 2.1 Sơ đồ lớp tổng quan
 
-Mục này cung cấp góc nhìn toàn cảnh về cấu trúc tĩnh của Tầng Nghiệp vụ cốt lõi trước khi đi vào đặc tả chi tiết từng thành phần. Bản vẽ trực quan hóa mối quan hệ cấu trúc giữa các lớp thực thể quản trị trạng thái và các lớp đối tượng giá trị bất biến, làm nổi bật các liên kết kế thừa, hợp thành, kết tập và phụ thuộc trong toàn bộ không gian miền tài chính.
+Mục này trực quan hóa cấu trúc tĩnh của tầng nghiệp vụ, thể hiện mối quan hệ giữa các lớp thực thể quản trị trạng thái và các đối tượng giá trị bất biến (kế thừa, hợp thành, kết tập và liên kết). Bảng danh mục đi kèm tổng hợp trách nhiệm kỹ thuật của từng thành phần, đảm bảo tính truy vết hai chiều với mô hình phân tích.
 
-Đi kèm với sơ đồ lớp, bảng danh mục lớp và kiểu dữ liệu xác lập bản chỉ mục định danh hoàn chỉnh, tổng hợp đầy đủ trách nhiệm kỹ thuật của từng thành phần và bảo đảm tính truy vết hai chiều nhất quán giữa mô hình phân tích nghiệp vụ và cấu trúc mã nguồn phần mềm.
+### 2.1.1 Sơ đồ cấu trúc các lớp thực thể
 
-### 2.1.1 Sơ đồ Cấu trúc các Lớp Thực thể
-
-Sơ đồ dưới đây mô hình hóa cấu trúc tĩnh của 8 lớp thực thể cốt lõi thuộc Tầng Nghiệp vụ. Sơ đồ tập trung thể hiện bốn loại quan hệ cấu trúc hướng đối tượng then chốt gồm kế thừa, hợp thành, kết tập và liên kết, định hình xương sống dòng tiền và phân cấp danh mục của toàn bộ hệ thống:
+Sơ đồ dưới đây mô hình hóa cấu trúc tĩnh của 8 lớp thực thể cốt lõi thuộc tầng nghiệp vụ. Sơ đồ tập trung thể hiện bốn loại quan hệ cấu trúc hướng đối tượng then chốt gồm kế thừa, hợp thành, kết tập và liên kết, định hình xương sống dòng tiền và phân cấp danh mục của toàn bộ hệ thống:
 
 ```mermaid
 classDiagram
@@ -29,18 +27,18 @@ classDiagram
     class NeedGroup
     class BalanceAdjustmentRecord
 
-    %% Ke thua - Inheritance
+    %% Kế thừa - Inheritance
     Transaction <|-- IncomeExpenseTransaction
     Transaction <|-- TransferTransaction
 
-    %% Quan he Hop thanh - Composition
+    %% Hợp thành - Composition
     IncomeExpenseTransaction "1" *-- "0..1" TransactionFee : chi phí kèm
     TransferTransaction "1" *-- "0..1" TransactionFee : chi phí kèm
 
-    %% Ket tap - Aggregation
+    %% Kết tập - Aggregation
     NeedGroup "1" o-- "*" Category : chứa
 
-    %% Lien ket - Association
+    %% Liên kết - Association
     Category "1" <-- "*" IncomeExpenseTransaction : phân loại
     Category "1" <-- "*" TransactionFee : danh mục chi
     Wallet "1" <-- "*" IncomeExpenseTransaction : tác động số dư
@@ -51,16 +49,16 @@ classDiagram
 
 Bản vẽ thiết lập bốn loại quan hệ cấu trúc hướng đối tượng cốt lõi trong mô hình miền:
 
-1. Quan hệ Kế thừa: Áp dụng để trừu tượng hóa các thuộc tính và hành vi chung của dòng tiền, cho phép các lớp giao dịch cụ thể đa hình hóa việc hạch toán số dư mà không phụ thuộc vào các cấu trúc điều kiện rẽ nhánh thủ công.
-2. Quan hệ Hợp thành: Áp dụng cho các thành phần tài chính có sự ràng buộc sinh tử, bảo đảm các khoản chi phí liên kết luôn gắn liền với vòng đời của giao dịch gốc và loại trừ hoàn toàn nguy cơ phát sinh dữ liệu mồ côi.
-3. Quan hệ Kết tập: Áp dụng để tổ chức cấu trúc phân cấp danh mục nhiều cấp, cho phép nhóm phân loại cấp trên gom cụm các danh mục chi tiết cấp dưới mà vẫn duy trì tính độc lập của từng phần tử.
-4. Quan hệ Liên kết: Thể hiện sự tương tác nghiệp vụ giữa các thực thể có định danh và vòng đời độc lập, bảo đảm mọi biến động tài chính luôn truy nguyên được nguồn tiền chịu tác động và mục đích phân loại.
+1. **Quan hệ kế thừa**: Áp dụng để trừu tượng hóa các thuộc tính và hành vi chung của dòng tiền, cho phép các lớp giao dịch cụ thể đa hình hóa việc hạch toán số dư mà không phụ thuộc vào các cấu trúc điều kiện rẽ nhánh thủ công.
+2. **Quan hệ hợp thành**: Áp dụng cho các thành phần tài chính có sự ràng buộc sinh tử, bảo đảm các khoản chi phí liên kết luôn gắn liền với vòng đời của giao dịch gốc và loại trừ hoàn toàn nguy cơ phát sinh dữ liệu mồ côi.
+3. **Quan hệ kết tập**: Áp dụng để tổ chức cấu trúc phân cấp danh mục nhiều cấp, cho phép nhóm phân loại cấp trên gom cụm các danh mục chi tiết cấp dưới mà vẫn duy trì tính độc lập của từng phần tử.
+4. **Quan hệ liên kết**: Thể hiện sự tương tác nghiệp vụ giữa các thực thể có định danh và vòng đời độc lập, bảo đảm mọi biến động tài chính luôn truy nguyên được nguồn tiền chịu tác động và mục đích phân loại.
 
 Các đối tượng giá trị bất biến và kiểu liệt kê nghiệp vụ đóng vai trò là kiểu dữ liệu cấu thành trạng thái của các thực thể trên, được tra cứu tổng hợp tại bảng danh mục ở Mục 2.1.2 và đặc tả chi tiết tại Mục 2.3.
 
-### 2.1.2 Danh mục Lớp và Kiểu Dữ liệu
+### 2.1.2 Danh mục lớp và kiểu dữ liệu
 
-Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể, lớp khởi tạo, đối tượng giá trị và kiểu liệt kê trong Tầng Nghiệp vụ cốt lõi. Toàn bộ các thành phần này được định vị vật lý trong gói mã nguồn `com.pfms.domain.model` và được phân loại theo các nhóm nghiệp vụ tương ứng của hệ thống:
+Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể, lớp khởi tạo, đối tượng giá trị và kiểu liệt kê trong tầng nghiệp vụ cốt lõi. Toàn bộ các thành phần này được định vị vật lý trong gói mã nguồn `com.pfms.domain.model` và được phân loại theo các nhóm nghiệp vụ tương ứng của hệ thống:
 
 | Tên lớp / Kiểu dữ liệu | Phân loại OOP | Trách nhiệm kỹ thuật chính |
 | :--- | :--- | :--- |
@@ -79,7 +77,7 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | `NeedGroup` | Thực thể | Quản lý nhóm nhu cầu cấp 2 gom cụm các danh mục chi tiết, trực thuộc một nhánh loại thu chi cố định. |
 | `Category` | Thực thể | Quản lý danh mục chi tiết cấp 3 gán nhãn mục đích cho giao dịch thu chi, áp dụng cơ chế xóa mềm bảo toàn lịch sử. |
 | **5. Nhóm Thống kê, Báo cáo (REP) và Đối tượng Giá trị Dùng chung** |  |  |
-| `EntityStatus` | Kiểu liệt kê | Trạng thái vòng đời dùng chung cho các thực thể miền (Ví, Danh mục, Nhóm nhu cầu), gồm Đang hoạt động (`ACTIVE`), Đã lưu trữ (`ARCHIVED`) và Đã xóa (`DELETED`). |
+| `EntityStatus` | Kiểu liệt kê | Trạng thái vòng đời dùng chung cho các thực thể miền (Ví, Danh mục, Nhóm nhu cầu), gồm Đang hoạt động (`ACTIVE`), Đã lưu trữ (`ARCHIVED`), Đã xóa (`DELETED`). |
 | `EntityName` | Đối tượng giá trị | Bọc tên định danh cho Ví và Danh mục, chuẩn hóa khoảng trắng và bảo đảm độ dài 1 đến 50 ký tự theo quy tắc đặt tên `BR-NAM-01`. |
 | `Note` | Đối tượng giá trị | Bọc chuỗi ghi chú diễn giải cho Ví và Giao dịch, giới hạn tối đa 255 ký tự kèm cơ chế đối tượng rỗng an toàn (`Null Object`). |
 | `Money` | Đối tượng giá trị | Bọc giá trị tiền tệ bằng `BigDecimal` kèm quy tắc làm tròn nửa chẵn, loại trừ hoàn toàn sai số dấu chấm động. |
@@ -89,18 +87,18 @@ Bảng dưới đây tổng hợp danh mục toàn bộ các lớp thực thể,
 | `SpendingStructureShare` | Đối tượng giá trị | Đo lường tỷ trọng phần trăm đóng góp của từng nhóm nhu cầu trên tổng kỳ hoặc của từng danh mục chi tiết trên tổng kỳ và tổng nhóm cha (`EXPENSE` gồm phí liên kết hoặc `INCOME`). |
 
 > [!NOTE]
-> **Nhóm Lưu trữ và Quản trị Dữ liệu (DAT):** Các chức năng sao lưu dữ liệu, khôi phục và nạp dữ liệu mẫu được hiện thực hóa thông qua các dịch vụ thuộc Tầng Dịch vụ (`com.pfms.service`) và các bộ điều hợp tệp thuộc Tầng Hạ tầng (`com.pfms.infrastructure`). Tầng Nghiệp vụ cốt lõi không định nghĩa lớp thực thể riêng cho nhóm này nhằm bảo đảm tính độc lập hoàn toàn khỏi hệ thống tệp cục bộ theo nguyên lý Nghịch đảo Phụ thuộc.
+> **Nhóm Lưu trữ và Quản trị Dữ liệu (DAT):** Các chức năng sao lưu dữ liệu, khôi phục và nạp dữ liệu mẫu được hiện thực hóa thông qua các dịch vụ thuộc tầng dịch vụ (`com.pfms.service`) và các bộ điều hợp tệp thuộc tầng hạ tầng (`com.pfms.infrastructure`). tầng nghiệp vụ cốt lõi không định nghĩa lớp thực thể riêng cho nhóm này nhằm bảo đảm tính độc lập hoàn toàn khỏi hệ thống tệp cục bộ theo nguyên lý nghịch đảo phụ thuộc.
 
-## 2.2 Thiết kế các Lớp Thực thể
+## 2.2 Thiết kế các lớp thực thể
 
-Mục này đặc tả chi tiết cấu trúc phần mềm cho các lớp thực thể thuộc Tầng Nghiệp vụ cốt lõi. Toàn bộ các lớp thực thể trong mục này được tổ chức thống nhất trong gói `com.pfms.domain.model`. Mỗi thực thể đại diện cho một đối tượng nghiệp vụ có mã định danh duy nhất và duy trì vòng đời biến đổi trạng thái xuyên suốt quá trình vận hành của hệ thống.
+Mục này đặc tả chi tiết cấu trúc cho các lớp thực thể thuộc gói `com.pfms.domain.model`. Mỗi thực thể đại diện cho một đối tượng nghiệp vụ có mã định danh duy nhất (`UUID`) và duy trì vòng đời biến đổi trạng thái xuyên suốt quá trình vận hành.
 
-Để bảo đảm tính chặt chẽ trong thiết kế hướng đối tượng, mỗi lớp thực thể được quy chuẩn cấu trúc đồng nhất qua ba nội dung:
-1. Cấu trúc thuộc tính: Xác định tên trường dữ liệu, kiểu dữ liệu cụ thể, phạm vi truy cập nội bộ và ràng buộc hợp lệ.
-2. Phương thức nghiệp vụ: Đặc tả chữ ký phương thức gồm tên hàm, danh sách tham số, kiểu dữ liệu trả về, ngoại lệ ném ra và tóm tắt mô tả nghiệp vụ.
-3. Cơ chế đóng gói và quy tắc bất biến: Làm rõ logic kiểm soát tính toàn vẹn dữ liệu, kiểm tra điều kiện tiên quyết trong phương thức khởi tạo và loại bỏ hoàn toàn các hàm gán giá trị tự do nhằm bảo vệ trạng thái nội tại của đối tượng.
+Mỗi lớp thực thể được quy chuẩn cấu trúc đồng nhất qua ba nội dung:
+1. **Cấu trúc thuộc tính**: Tên trường dữ liệu, kiểu dữ liệu, phạm vi truy cập nội bộ (`private`/`protected`) và ràng buộc hợp lệ.
+2. **Phương thức nghiệp vụ**: Chữ ký phương thức, danh sách tham số, kiểu trả về, ngoại lệ và tóm tắt xử lý nghiệp vụ.
+3. **Cơ chế đóng gói và quy tắc bất biến**: Logic bảo vệ toàn vẹn dữ liệu, kiểm tra điều kiện tiên quyết và loại bỏ setter tự do nhằm bảo vệ trạng thái nội tại.
 
-### 2.2.1 Lớp Ví
+### 2.2.1 Lớp Ví (Wallet)
 
 Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng, tiếp nhận biến động dòng tiền và giữ số dư khả dụng không âm. Hệ thống dùng lớp này cho ví tiền mặt mặc định cùng các ví tạo thêm để tính cơ cấu phân bổ tài sản.
 
@@ -133,17 +131,17 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 | `updateInfo` | `String newName, String newNote` | `void` | `BusinessException, IllegalArgumentException` | Chuẩn hóa và đóng gói `newName` vào `EntityName` (1-50 ký tự theo `ERR_NAM_001`) và `newNote` vào `Note` (tối đa 255 ký tự); cập nhật tên cùng ghi chú mà giữ nguyên số dư. |
 | `archive` | `Không` | `void` | `IllegalStateException, BusinessException` | Kiểm tra `isDefault == false` và ví đang `ACTIVE`, sau đó chuyển `status` sang `ARCHIVED`. |
 | `activate` | `Không` | `void` | `IllegalStateException, BusinessException` | Kiểm tra ví đang `ARCHIVED` rồi chuyển `status` về `ACTIVE` để ví tiếp nhận lại giao dịch mới. |
-| `getWalletId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất của ví để làm khóa lưu trữ trên kho dữ liệu và đối chiếu giao dịch liên kết. |
-| `getName` | `Không` | `String` | `Không` | Trả về chuỗi tên ví hiện tại phục vụ kiểm tra trùng tên không phân biệt hoa thường tại kho lưu trữ và hiển thị. |
-| `getEntityName` | `Không` | `EntityName` | `Không` | Trả về đối tượng giá trị tên ví phục vụ thao tác định danh và so sánh khóa chuẩn hóa. |
-| `getNote` | `Không` | `String` | `Không` | Trả về chuỗi nội dung ghi chú diễn giải của ví phục vụ hiển thị trên giao diện người dùng. |
-| `getNoteValue` | `Không` | `Note` | `Không` | Trả về đối tượng giá trị ghi chú diễn giải của ví phục vụ truy xuất an toàn. |
-| `getStatus` | `Không` | `EntityStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví để lọc danh sách và thống kê số lượng ví theo trạng thái. |
-| `isDefault` | `Không` | `boolean` | `Không` | Trả về `true` nếu đây là ví tiền mặt mặc định, giúp tầng dịch vụ chặn thao tác xóa hoặc lưu trữ ví mặc định. |
-| `isActive` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.ACTIVE`, phục vụ kiểm tra trạng thái hoạt động trước khi hạch toán giao dịch. |
-| `isArchived` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.ARCHIVED`, phục vụ kiểm tra trạng thái lưu trữ của ví. |
-| `isDeleted` | `Không` | `boolean` | `Không` | Trả về `true` khi `status` bằng `EntityStatus.DELETED`, phục vụ kiểm tra trạng thái đã xóa của ví. |
-| `getCurrentBalance` | `Không` | `Money` | `Không` | Trả về số dư khả dụng hiện tại phục vụ hiển thị và tính cơ cấu phân bổ tài sản mà không mở hàm gán trực tiếp. |
+| `getWalletId` | `Không` | `UUID` | `Không` | Trả về mã định danh duy nhất của ví. |
+| `getName` | `Không` | `String` | `Không` | Trả về chuỗi tên ví hiện tại. |
+| `getEntityName` | `Không` | `EntityName` | `Không` | Trả về đối tượng giá trị tên ví. |
+| `getNote` | `Không` | `String` | `Không` | Trả về chuỗi ghi chú diễn giải của ví. |
+| `getNoteValue` | `Không` | `Note` | `Không` | Trả về đối tượng giá trị ghi chú của ví. |
+| `getStatus` | `Không` | `EntityStatus` | `Không` | Trả về trạng thái vòng đời hiện tại của ví. |
+| `isDefault` | `Không` | `boolean` | `Không` | Trả về `true` nếu đây là ví tiền mặt mặc định. |
+| `isActive` | `Không` | `boolean` | `Không` | Kiểm tra ví có đang ở trạng thái `ACTIVE` hay không. |
+| `isArchived` | `Không` | `boolean` | `Không` | Kiểm tra ví có đang ở trạng thái `ARCHIVED` hay không. |
+| `isDeleted` | `Không` | `boolean` | `Không` | Kiểm tra ví có đang ở trạng thái `DELETED` hay không. |
+| `getCurrentBalance` | `Không` | `Money` | `Không` | Trả về số dư khả dụng hiện tại của ví. |
 | `hasSufficientBalance` | `Money amount` | `boolean` | `NullPointerException` | Kiểm tra tham số khác `null` và trả về `true` khi `currentBalance` lớn hơn hoặc bằng `amount`. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
@@ -152,7 +150,7 @@ Lớp `Wallet` đại diện cho nguồn tiền thanh toán của người dùng
 - Lớp `Wallet` đóng kín các trường nội tại, chỉ mở các phương thức đọc chỉ đọc và loại bỏ mọi phương thức gán giá trị tự do như `setCurrentBalance`. Số dư chỉ thay đổi qua `credit`, `debit` hoặc `adjustBalance` để duy trì số dư khả dụng không âm và chặn mọi khoản chi vượt số dư.
 - Từ khóa `final` khóa cố định thuộc tính `isDefault` ngay khi tạo ví "Tiền mặt" mặc định, giúp phương thức `archive` và tầng dịch vụ chặn thao tác lưu trữ hoặc xóa nguồn tiền mặc định.
 
-### 2.2.2 Lớp Giao dịch Cơ sở và Giao dịch Thu Chi
+### 2.2.2 Lớp giao dịch cơ sở và giao dịch thu chi
 
 Lớp trừu tượng `Transaction` định nghĩa các thuộc tính cốt lõi chung và cặp phương thức hợp đồng đa hình cho mọi biến động dòng tiền trong hệ thống. Lớp con cụ thể `IncomeExpenseTransaction` hiện thực hóa giao dịch thu nhập hoặc chi tiêu phát sinh tại một ví xác định, liên kết trực tiếp với danh mục cấp 3 và hạch toán số dư ví kèm theo phụ phí hợp thành nếu có.
 
@@ -185,16 +183,16 @@ Lớp trừu tượng `Transaction` định nghĩa các thuộc tính cốt lõi
 | `applyToWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Lớp con kiểm tra `wallet.isActive()` và tính toán số dư ròng; thực hiện `wallet.credit(amount)` nếu là `INCOME` hoặc `wallet.debit(amount)` nếu là `EXPENSE`, sau đó gọi `fee.applyFee()` nếu có phí. |
 | `revertFromWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Lớp con kiểm tra số dư đủ điều kiện hoàn nguyên; gọi `fee.revertFee()` nếu có phí, sau đó gọi `wallet.debit(amount)` nếu là `INCOME` hoặc `wallet.credit(amount)` nếu là `EXPENSE`. |
 | `updateDetails` | `Wallet newWallet, Category newCategory, Money newAmount, TransactionDate newDate, String newNote, TransactionFee newFee` | `void` | `BusinessException` | Kiểm tra tham số hợp lệ; hoàn nguyên giao dịch cũ thông qua `revertFromWallet()`, cập nhật thông tin mới và thực thi hạch toán lại qua `applyToWallet()`. |
-| `getTransactionId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của giao dịch để làm khóa tra cứu và đối soát liên kết. |
-| `getAmount` | Không có | `Money` | Không có | Trả về đối tượng giá trị số tiền của giao dịch phục vụ tính toán dòng tiền. |
-| `getTransactionDate` | Không có | `TransactionDate` | Không có | Trả về mốc ngày ghi nhận giao dịch phục vụ bộ lọc thời gian và báo cáo chuỗi thời gian. |
-| `getCreatedAt` | Không có | `LocalDateTime` | Không có | Trả về thời điểm tạo bản ghi giao dịch bất biến trong hệ thống. |
-| `getFee` | Không có | `Optional<TransactionFee>` | Không có | Bọc trường `fee` trong `Optional` để truy xuất an toàn khi giao dịch không có chi phí đi kèm. |
-| `getNote` | Không có | `String` | Không có | Trả về chuỗi nội dung ghi chú diễn giải của giao dịch. |
-| `getNoteValue` | Không có | `Note` | Không có | Trả về đối tượng giá trị ghi chú của giao dịch phục vụ truy xuất an toàn. |
-| `getWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví thanh toán chịu tác động tại `IncomeExpenseTransaction`. |
-| `getCategory` | Không có | `Category` | Không có | Trả về thực thể danh mục phân loại mục đích chi tiêu tại `IncomeExpenseTransaction`. |
-| `getTransactionType` | Không có | `TransactionType` | Không có | Trả về chiều dòng tiền (`INCOME` hoặc `EXPENSE`) cố định của giao dịch. |
+| `getTransactionId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của giao dịch. |
+| `getAmount` | Không có | `Money` | Không có | Trả về đối tượng giá trị số tiền của giao dịch. |
+| `getTransactionDate` | Không có | `TransactionDate` | Không có | Trả về mốc ngày ghi nhận giao dịch. |
+| `getCreatedAt` | Không có | `LocalDateTime` | Không có | Trả về thời điểm tạo bản ghi giao dịch. |
+| `getFee` | Không có | `Optional<TransactionFee>` | Không có | Trả về phụ phí giao dịch dạng `Optional`. |
+| `getNote` | Không có | `String` | Không có | Trả về chuỗi ghi chú của giao dịch. |
+| `getNoteValue` | Không có | `Note` | Không có | Trả về đối tượng giá trị ghi chú của giao dịch. |
+| `getWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví thanh toán chịu tác động. |
+| `getCategory` | Không có | `Category` | Không có | Trả về thực thể danh mục phân loại chi tiêu/thu nhập. |
+| `getTransactionType` | Không có | `TransactionType` | Không có | Trả về loại thu chi (`INCOME` hoặc `EXPENSE`) của giao dịch. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
@@ -202,7 +200,7 @@ Lớp trừu tượng `Transaction` định nghĩa các thuộc tính cốt lõi
 - Đa hình hóa hạch toán dòng tiền (Polymorphism): Cặp phương thức trừu tượng `applyToWallet()` và `revertFromWallet()` chuyển giao toàn bộ logic tác động số dư cho các lớp con cụ thể, loại bỏ hoàn toàn các cấu trúc điều kiện rẽ nhánh thủ công (`if-else` trên loại giao dịch) theo nguyên lý Đóng/Mở (OCP).
 - Kiểm soát tương thích danh mục và phí liên kết: Tại `IncomeExpenseTransaction`, thuộc tính `category` bắt buộc phải đang hoạt động (`ACTIVE`) và có loại thu chi tương thích tuyệt đối với `transactionType`, ngăn chặn hoàn toàn việc phân loại nhầm thu nhập vào danh mục chi tiêu theo `BR-FIN-04`. Nếu giao dịch có kèm theo `fee`, bản ghi phí bắt buộc phải có `parentTransactionId` trùng khớp với `transactionId` của giao dịch chủ.
 
-### 2.2.3 Lớp Giao dịch Chuyển tiền
+### 2.2.3 Lớp giao dịch chuyển tiền
 
 Lớp `TransferTransaction` kế thừa từ lớp trừu tượng `Transaction` nhằm điều chuyển dòng tiền nội bộ giữa hai ví độc lập trong hệ thống. Mọi giao dịch chuyển tiền đều thực thi cơ chế hạch toán kép: trích nợ ví nguồn và ghi có ví đích đồng thời trong cùng một thao tác nghiệp vụ, bảo toàn tổng tài sản của người dùng trước khi tính chi phí chuyển tiền phát sinh nếu có.
 
@@ -216,14 +214,14 @@ Lớp `TransferTransaction` kế thừa từ lớp trừu tượng `Transaction`
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `transactionId` | `UUID` | `protected final` | Mã định danh duy nhất của giao dịch chuyển tiền kế thừa từ `Transaction`, sinh tự động khi tạo mới và giữ cố định suốt vòng đời. |
+| `transactionId` | `UUID` | `protected final` | Mã định danh duy nhất của giao dịch, kế thừa từ `Transaction`. |
 | `sourceWallet` | `Wallet` | `private final` | Tham chiếu thực thể `Wallet` nguồn trích tiền, bắt buộc đang hoạt động (`ACTIVE`) và có mã định danh khác với `destinationWallet`. |
 | `destinationWallet` | `Wallet` | `private final` | Tham chiếu thực thể `Wallet` đích nhận tiền, bắt buộc đang hoạt động (`ACTIVE`) và có mã định danh khác với `sourceWallet`. |
-| `amount` | `Money` | `protected` | Số tiền điều chuyển kế thừa từ `Transaction`, có đúng 2 chữ số thập phân và bắt buộc lớn hơn `0.00 VNĐ`. |
-| `transactionDate` | `TransactionDate` | `protected` | Ngày phát sinh giao dịch kế thừa từ `Transaction`, không được vượt quá ngày hiện tại từ đồng hồ hệ thống. |
-| `fee` | `TransactionFee` | `protected` | Thực thể chi phí giao dịch hợp thành (`0..1`) kế thừa từ `Transaction`, trích từ `sourceWallet` khi có phát sinh phí. |
-| `note` | `Note` | `protected` | Đối tượng giá trị bọc chuỗi ghi chú diễn giải tùy chọn kế thừa từ `Transaction`, dài tối đa 255 ký tự sau khi cắt tỉa khoảng trắng hai đầu, áp dụng đối tượng rỗng an toàn (`Note.EMPTY`). |
-| `createdAt` | `LocalDateTime` | `protected final` | Mốc thời gian tạo bản ghi bất biến kế thừa từ `Transaction`, phục vụ sắp xếp lịch sử giao dịch thứ cấp khi trùng ngày. |
+| `amount` | `Money` | `protected` | Số tiền điều chuyển (> 0.00 VNĐ), kế thừa từ `Transaction`. |
+| `transactionDate` | `TransactionDate` | `protected` | Ngày phát sinh giao dịch (không vượt quá ngày hiện tại), kế thừa từ `Transaction`. |
+| `fee` | `TransactionFee` | `protected` | Phụ phí giao dịch hợp thành (`0..1`), kế thừa từ `Transaction`. |
+| `note` | `Note` | `protected` | Ghi chú diễn giải tùy chọn (tối đa 255 ký tự), kế thừa từ `Transaction`. |
+| `createdAt` | `LocalDateTime` | `protected final` | Thời điểm tạo bản ghi giao dịch, kế thừa từ `Transaction`. |
 
 **Phương thức nghiệp vụ**
 
@@ -233,8 +231,8 @@ Lớp `TransferTransaction` kế thừa từ lớp trừu tượng `Transaction`
 | `applyToWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình: Kiểm tra hai ví đang `ACTIVE`, kiểm tra `sourceWallet` đủ trả tổng số tiền `amount` cùng phụ phí `fee`, thực hiện `sourceWallet.debit(amount)`, gọi `fee.applyFee()` nếu có và gọi `destinationWallet.credit(amount)`. |
 | `revertFromWallet` | Không có | `void` | `BusinessException` | Phương thức trừu tượng đa hình khi xóa giao dịch: Kiểm tra hai ví đang `ACTIVE`, kiểm tra `destinationWallet` có số dư tối thiểu bằng `amount`, thực hiện `destinationWallet.debit(amount)`, gọi `fee.revertFee()` nếu có và gọi `sourceWallet.credit(amount)`. |
 | `getTotalSourceDeduction` | Không có | `Money` | Không có | Tính tổng số tiền bị trừ khỏi `sourceWallet` bao gồm tiền chuyển `amount` cộng số tiền của phụ phí `fee` nếu có. |
-| `getSourceWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví nguồn phục vụ tra cứu thông tin và đối soát lịch sử dòng tiền. |
-| `getDestinationWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví đích phục vụ tra cứu thông tin và đối soát lịch sử dòng tiền. |
+| `getSourceWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví nguồn. |
+| `getDestinationWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví đích. |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
@@ -242,7 +240,7 @@ Lớp `TransferTransaction` kế thừa từ lớp trừu tượng `Transaction`
 - Đảm bảo tính nguyên tử trong hạch toán dòng tiền: Phương thức `applyToWallet()` kiểm tra số dư khả dụng tổng thể của ví nguồn (`amount + fee.amount`) trước khi biến đổi trạng thái, sau đó trích nợ ví nguồn và ghi có ví đích trong cùng một khối lệnh, loại trừ nguy cơ ví nguồn bị trừ tiền nhưng ví đích chưa nhận được hoặc thiếu tiền thanh toán phụ phí theo `BR-FIN-02`.
 - Kiểm soát điều kiện biên khi hoàn nguyên giao dịch: Giao dịch chuyển tiền không hỗ trợ sửa đổi trực tiếp; khi người dùng thực hiện xóa giao dịch, phương thức `revertFromWallet()` chỉ cho phép hoàn nguyên khi số dư hiện tại của `destinationWallet` tối thiểu bằng khoản tiền đã nhận (`amount`), bảo đảm ví đích không bị rơi vào trạng thái số dư âm theo quy tắc bảo toàn số dư không âm `BR-FIN-02`.
 
-### 2.2.4 Lớp Chi phí Giao dịch
+### 2.2.4 Lớp chi phí giao dịch
 
 Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh phụ thuộc sinh tử kèm theo giao dịch thu chi hoặc chuyển tiền nội bộ. Khoản phí này mang bản chất chi tiêu và gắn kết hợp thành với giao dịch gốc nhằm bảo đảm tính toàn vẹn dữ liệu và loại trừ nguy cơ phát sinh bản ghi chi phí mồ côi.
 
@@ -270,11 +268,11 @@ Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh phụ thu
 | `applyFee` | Không có | `void` | `BusinessException` | Gọi `wallet.debit(amount)` để trích tiền phí khỏi ví thanh toán; ném `ERR_WAL_001` nếu số dư ví không đủ chi trả. |
 | `revertFee` | Không có | `void` | `BusinessException` | Gọi `wallet.credit(amount)` để hoàn lại tiền phí vào ví khi giao dịch gốc bị hủy hoặc hoàn nguyên. |
 | `updateFee` | `Money newAmount, Category newCategory, Wallet newWallet` | `void` | `BusinessException` | Kiểm tra tham số hợp lệ, ví và danh mục mới đang `ACTIVE` thuộc nhánh `EXPENSE` trước khi cập nhật lại số tiền, danh mục hoặc ví trích phí. |
-| `getFeeId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của bản ghi phí giao dịch. |
-| `getParentTransactionId` | Không có | `UUID` | Không có | Trả về mã định danh giao dịch chủ quản để phục vụ kiểm tra toàn vẹn liên kết. |
-| `getAmount` | Không có | `Money` | Không có | Trả về đối tượng giá trị số tiền phí phục vụ tổng hợp dòng tiền ra và báo cáo chi phí. |
-| `getWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví thanh toán đang chịu khoản trích phí. |
-| `getCategory` | Không có | `Category` | Không có | Trả về danh mục phân loại chi phí cấp 3 thuộc nhánh `EXPENSE`. |
+| `getFeeId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của phụ phí. |
+| `getParentTransactionId` | Không có | `UUID` | Không có | Trả về mã định danh giao dịch chủ quản. |
+| `getAmount` | Không có | `Money` | Không có | Trả về số tiền phụ phí. |
+| `getWallet` | Không có | `Wallet` | Không có | Trả về thực thể ví trích phụ phí. |
+| `getCategory` | Không có | `Category` | Không có | Trả về danh mục phân loại chi phí (`EXPENSE`). |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
@@ -282,7 +280,7 @@ Lớp `TransactionFee` đại diện cho khoản phụ phí phát sinh phụ thu
 - Ràng buộc phân loại và số dư tài chính: Mức phí bắt buộc phải mang giá trị dương (`amount > 0.00 VNĐ`) và gắn cố định với một `Category` chi tiêu đang hoạt động (`ACTIVE`). Giao dịch chủ quản chịu trách nhiệm kiểm tra số dư khả dụng tổng thể của ví trước khi thực thi nhằm bảo đảm bất biến số dư không âm theo `BR-FIN-02`.
 - Cơ chế hạch toán dòng tiền: Phương thức `applyFee()` và `revertFee()` thực thi trích xuất và hoàn nguyên trực tiếp trên đối tượng `Wallet` thông qua các hành vi `debit()` và `credit()`, bảo đảm dữ liệu số dư ví luôn đồng bộ với sổ nhật ký giao dịch.
 
-### 2.2.5 Lớp Danh mục Chi tiết
+### 2.2.5 Lớp danh mục chi tiết
 
 Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 3 trong cấu trúc cây danh mục của hệ thống, đóng vai trò gán nhãn mục đích tài chính cho các giao dịch thu chi và chi phí giao dịch. Lớp này chịu trách nhiệm duy trì tính toàn vẹn tham chiếu phân cấp với nhóm nhu cầu cha và thực thi cơ chế xóa mềm nhằm bảo toàn lịch sử sổ sách tài chính.
 
@@ -296,13 +294,13 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `categoryId` | `UUID` | `private final` | Mã định danh duy nhất của danh mục, sinh tự động khi khởi tạo, bất biến và không bao giờ tái sử dụng (theo quy tắc cấu trúc danh mục ba cấp và yêu cầu tùy biến danh mục). |
-| `name` | `EntityName` | `private` | Đối tượng giá trị bọc tên gọi danh mục từ 1 đến 50 ký tự sau khi chuẩn hóa khoảng trắng hai đầu theo quy tắc đặt tên `BR-NAM-01`; duy nhất trong cùng nhóm nhu cầu cha đang hoạt động theo cơ chế so sánh không phân biệt hoa thường. |
-| `needGroupId` | `UUID` | `private` | Mã định danh tham chiếu đến nhóm nhu cầu cha cấp 2 trực thuộc; bắt buộc trỏ tới một `NeedGroup` đang hoạt động (`ACTIVE`), loại trừ hoàn toàn danh mục mồ côi hoặc thuộc nhóm đã xóa theo quy tắc cấu trúc danh mục ba cấp. |
-| `transactionType` | `TransactionType` | `private final` | Nhánh loại thu chi (`INCOME` hoặc `EXPENSE`) kế thừa từ nhóm nhu cầu cha; mang tính bất biến tuyệt đối sau khởi tạo nhằm bảo vệ tính toàn vẹn dữ liệu lịch sử theo quy tắc cấu trúc danh mục ba cấp, ngăn chặn đổi loại thu chi. |
-| `status` | `EntityStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
-| `icon` | `String` | `private` | Ký hiệu hoặc mã biểu tượng đồ họa đại diện trên giao diện người dùng; tùy chọn, độ dài tối đa 50 ký tự phục vụ tùy biến hiển thị. |
-| `color` | `String` | `private` | Chuỗi mã màu định dạng Hex (ví dụ `#4CAF50`) phục vụ hiển thị trực quan; tùy chọn, độ dài tối đa 10 ký tự. |
+| `categoryId` | `UUID` | `private final` | Mã định danh duy nhất của danh mục, sinh tự động khi khởi tạo và bất biến. |
+| `name` | `EntityName` | `private` | Bọc tên danh mục từ 1–50 ký tự (`BR-NAM-01`), duy nhất trong cùng nhóm cha đang hoạt động. |
+| `needGroupId` | `UUID` | `private` | Mã định danh nhóm cha cấp 2 (`NeedGroup` đang `ACTIVE`), cấm danh mục mồ côi. |
+| `transactionType` | `TransactionType` | `private final` | Loại thu chi (`INCOME`/`EXPENSE`) kế thừa từ nhóm cha, bất biến sau khởi tạo. |
+| `status` | `EntityStatus` | `private` | Trạng thái vòng đời (`ACTIVE` hoặc `DELETED`), mặc định là `ACTIVE` khi tạo mới. |
+| `icon` | `String` | `private` | Biểu tượng đồ họa đại diện (tùy chọn, tối đa 50 ký tự). |
+| `color` | `String` | `private` | Mã màu Hex hiển thị (ví dụ `#4CAF50`, tối đa 10 ký tự). |
 
 **Phương thức nghiệp vụ**
 
@@ -331,7 +329,7 @@ Lớp `Category` đại diện cho đơn vị phân loại chi tiết ở cấp 
 - Quy tắc kiểm soát định danh và tính duy nhất: Thuộc tính `name` được bọc trong đối tượng giá trị `EntityName` và bảo vệ đóng gói chặt chẽ qua phương thức `rename()`, bắt buộc chuẩn hóa cắt tỉa khoảng trắng ở hai đầu (`trim`) với độ dài từ 1 đến 50 ký tự theo `BR-NAM-01`, không được để trống hoặc vượt quá độ dài quy định. Tên danh mục là duy nhất trong phạm vi cùng nhóm nhu cầu cha đang hoạt động, so sánh không phân biệt chữ hoa chữ thường qua `normalizedKey` theo quy tắc đặt tên và kiểm tra trùng lặp. Hai danh mục thuộc hai nhóm cha khác nhau được phép trùng tên.
 - Cơ chế xóa mềm bảo toàn lịch sử và điều kiện khôi phục: Khi thực hiện xóa danh mục đã phát sinh giao dịch lịch sử, thực thể chuyển sang trạng thái xóa mềm (`DELETED`) thông qua `markDeleted()`. Danh mục bị ẩn khỏi danh sách lựa chọn khi tạo giao dịch mới, nhưng liên kết tham chiếu trong sổ giao dịch và báo cáo tài chính được giữ nguyên vẹn kèm nhãn "(đã xóa)" theo quy tắc xóa mềm bảo toàn dữ liệu lịch sử. Thao tác khôi phục (`restore()`) chỉ được kích hoạt khi nhóm cha trực thuộc đang ở trạng thái `ACTIVE` (không bị xóa) và tên danh mục không bị trùng lặp với một danh mục đang dùng khác trong cùng nhóm cha.
 
-### 2.2.6 Lớp Nhóm Nhu cầu
+### 2.2.6 Lớp nhóm nhu cầu
 
 Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp 2 trong cấu trúc phân cấp danh mục của hệ thống, quản lý việc gom cụm các danh mục chi tiết cấp 3 có cùng tính chất tài chính. Lớp này đóng vai trò điều phối tập hợp danh mục con, làm căn cứ tổng hợp cơ cấu thu chi trên báo cáo và bảo toàn ranh giới phân loại theo nhánh thu chi gốc.
 
@@ -345,13 +343,13 @@ Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp
 
 | Thuộc tính | Kiểu dữ liệu | Phạm vi truy cập | Ràng buộc |
 | :--- | :--- | :--- | :--- |
-| `needGroupId` | `UUID` | `private final` | Mã định danh duy nhất của nhóm nhu cầu, sinh tự động khi khởi tạo, bất biến và không bao giờ tái sử dụng (theo quy tắc cấu trúc danh mục ba cấp và yêu cầu tùy biến danh mục). |
-| `name` | `String` | `private` | Tên gọi nhóm nhu cầu từ 1 đến 50 ký tự sau khi cắt tỉa khoảng trắng (`trim`), không được để trống; duy nhất trong cùng nhánh `TransactionType` đang hoạt động theo cơ chế so sánh không phân biệt hoa thường theo quy tắc đặt tên và kiểm tra trùng lặp. Không được dùng làm điều kiện cứng trong logic xử lý theo quy tắc cấu trúc danh mục. |
-| `transactionType` | `TransactionType` | `private final` | Nhánh loại thu chi gốc cấp 1 (`INCOME` hoặc `EXPENSE`); bất biến tuyệt đối sau khi khởi tạo, nghiêm cấm đổi loại thu chi theo quy tắc cấu trúc danh mục ba cấp. |
-| `status` | `GroupStatus` | `private` | Trạng thái vòng đời nhận giá trị Đang hoạt động (`ACTIVE`) hoặc Đã xóa mềm (`DELETED`); mặc định là `ACTIVE` khi tạo mới theo quy tắc cấu trúc danh mục ba cấp và kiểm soát toàn vẹn khi cập nhật. |
-| `icon` | `String` | `private` | Ký hiệu hoặc biểu tượng đồ họa đại diện của nhóm trên giao diện; tùy chọn, độ dài tối đa 50 ký tự. |
-| `color` | `String` | `private` | Chuỗi mã màu định dạng Hex (tối đa 10 ký tự) dùng để phân biệt các nhóm trên biểu đồ tròn cơ cấu thu chi phục vụ hiển thị và phân tích cơ cấu thu chi. |
-| `categories` | `List<Category>` | `private final` | Tập hợp các danh mục chi tiết cấp 3 trực thuộc trong quan hệ kết tập (`aggregation`); khởi tạo danh sách rỗng, bảo vệ đóng gói không mở setter tự do theo quy tắc cấu trúc danh mục ba cấp. |
+| `needGroupId` | `UUID` | `private final` | Mã định danh duy nhất của nhóm nhu cầu, sinh tự động khi khởi tạo và bất biến. |
+| `name` | `String` | `private` | Tên nhóm nhu cầu từ 1–50 ký tự, duy nhất trong cùng nhánh `TransactionType` đang hoạt động. |
+| `transactionType` | `TransactionType` | `private final` | Nhánh loại thu chi (`INCOME`/`EXPENSE`), bất biến tuyệt đối sau khởi tạo. |
+| `status` | `GroupStatus` | `private` | Trạng thái vòng đời (`ACTIVE` hoặc `DELETED`), mặc định là `ACTIVE` khi tạo mới. |
+| `icon` | `String` | `private` | Biểu tượng đại diện (tùy chọn, tối đa 50 ký tự). |
+| `color` | `String` | `private` | Mã màu Hex trên biểu đồ cơ cấu (tối đa 10 ký tự). |
+| `categories` | `List<Category>` | `private final` | Tập hợp danh mục chi tiết trực thuộc (kết tập), bảo vệ đóng gói không mở setter. |
 
 **Phương thức nghiệp vụ**
 
@@ -380,7 +378,7 @@ Lớp `NeedGroup` đại diện cho đơn vị phân loại trung gian ở cấp
 - Bảo vệ nhóm nhu cầu duy nhất còn lại: Mỗi nhánh Loại thu chi (`INCOME`, `EXPENSE`) bắt buộc phải duy trì tối thiểu một nhóm nhu cầu ở trạng thái hoạt động (`ACTIVE`). Phương thức `markDeleted()` kiểm tra số lượng nhóm đang hoạt động trong cùng loại; nếu là nhóm hoạt động cuối cùng, hệ thống từ chối xóa và ném ngoại lệ theo quy tắc duy trì tối thiểu một nhóm hoạt động cho mỗi nhánh thu chi.
 - Quản lý danh mục con và hiệu ứng xóa lan truyền: Tập hợp `categories` được đóng gói an toàn, chỉ truy xuất qua bản sao hoặc danh sách không thể sửa đổi (`unmodifiableList`). Khi xóa nhóm nhu cầu (`markDeleted`), hệ thống áp dụng cơ chế xóa lan truyền (`cascade`): toàn bộ danh mục con đã có giao dịch được chuyển sang xóa mềm (`DELETED`), còn các danh mục con chưa phát sinh giao dịch được loại bỏ vĩnh viễn khỏi hệ thống theo quy tắc phân cấp danh mục. Khi nhóm được khôi phục (`restore()`), nhóm chuyển về `ACTIVE` nhưng các danh mục con vẫn giữ trạng thái đã xóa để người dùng khôi phục riêng lẻ từng mục theo nhu cầu theo quy tắc cấu trúc danh mục và quy trình khôi phục độc lập.
 
-### 2.2.7 Lớp Bản ghi Điều chỉnh Số dư
+### 2.2.7 Lớp bản ghi điều chỉnh số dư
 
 Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê đối soát nhằm đưa số dư khả dụng của ví về khớp với số tiền thực tế quan sát được. Bản ghi giữ trạng thái bất biến tuyệt đối sau khi tạo để bảo toàn vết kiểm toán và tách biệt khoản chênh lệch khỏi dòng tiền thu chi định kỳ.
 
@@ -408,14 +406,14 @@ Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê đối soát n
 | :--- | :--- | :--- | :--- | :--- |
 | `BalanceAdjustmentRecord` *(Constructor)* | `UUID recordId, UUID walletId, Money previousBalance, Money actualBalance, TransactionDate adjustedAt, String reason` | Không có | `BusinessException`, `IllegalArgumentException` | Kiểm tra các trường bắt buộc khác `null`; `actualBalance` không âm (`ERR_WAL_001`); `difference` khác `0.00 VNĐ` (`ERR_FIN_001`); chuẩn hóa `reason` tối đa 255 ký tự; tính tự động `difference = actualBalance.subtract(previousBalance)`. |
 | `getRecordId` | Không có | `UUID` | Không có | Trả về mã định danh duy nhất của bản ghi kiểm kê phục vụ lưu trữ và tra cứu vết kiểm toán. |
-| `getWalletId` | Không có | `UUID` | Không có | Trả về mã định danh của ví được kiểm kê phục vụ lọc lịch sử điều chỉnh theo từng ví. |
-| `getPreviousBalance` | Không có | `Money` | Không có | Trả về số dư của ví trước thời điểm kiểm kê phục vụ đối chiếu lịch sử. |
-| `getActualBalance` | Không có | `Money` | Không có | Trả về số dư thực tế sau kiểm kê để đồng bộ với số dư khả dụng của ví. |
-| `getDifference` | Không có | `Money` | Không có | Trả về giá trị chênh lệch đại số có dấu để đối soát biến động tổng tài sản. |
-| `getAbsoluteDifference` | Không có | `Money` | Không có | Trả về trị tuyệt đối của `difference` (`difference.abs()`) phục vụ hiển thị và thống kê quy mô điều chỉnh. |
-| `getAdjustedAt` | Không có | `TransactionDate` | Không có | Trả về mốc ngày ghi nhận kiểm kê phục vụ sắp xếp dòng thời gian đối soát. |
-| `getReason` | Không có | `String` | Không có | Trả về lý do diễn giải điều chỉnh số dư. |
-| `isSurplus` | Không có | `boolean` | Không có | Trả về `true` khi `difference` lớn hơn `0.00 VNĐ` (khoản điều chỉnh làm tăng số dư ví). |
+| `getWalletId` | Không có | `UUID` | Không có | Trả về mã định danh của ví được kiểm kê. |
+| `getPreviousBalance` | Không có | `Money` | Không có | Trả về số dư ví trước thời điểm kiểm kê. |
+| `getActualBalance` | Không có | `Money` | Không có | Trả về số dư thực tế sau kiểm kê. |
+| `getDifference` | Không có | `Money` | Không có | Trả về giá trị chênh lệch đại số có dấu. |
+| `getAbsoluteDifference` | Không có | `Money` | Không có | Trả về trị tuyệt đối của chênh lệch (`difference.abs()`). |
+| `getAdjustedAt` | Không có | `TransactionDate` | Không có | Trả về mốc ngày ghi nhận kiểm kê. |
+| `getReason` | Không có | `String` | Không có | Trả về lý do điều chỉnh số dư. |
+| `isSurplus` | Không có | `boolean` | Không có | Trả về `true` khi chênh lệch dương (tăng số dư ví). |
 
 **Cơ chế đóng gói và quy tắc bất biến**
 
@@ -423,16 +421,16 @@ Lớp `BalanceAdjustmentRecord` lưu lại sự kiện kiểm kê đối soát n
 - Tự động tính chênh lệch và kiểm tra điều kiện biên: Hàm khởi tạo tự động tính toán `difference = actualBalance.subtract(previousBalance)`. Bắt buộc `actualBalance >= 0.00 VNĐ` (không cho phép ví âm tiền theo `BR-FIN-02`) và `difference != 0.00 VNĐ` (từ chối tạo bản ghi kiểm kê rỗng khi số dư thực tế trùng số dư sổ sách).
 - Phân lập hoàn toàn khỏi giao dịch thu chi: Biến động chênh lệch kiểm kê được ghi nhận riêng biệt, không đi qua `IncomeExpenseTransaction`, giữ cho báo cáo phân tích thu chi định kỳ theo danh mục không bị sai lệch cấu trúc dòng tiền.
 
-## 2.3 Thiết kế các Đối tượng Giá trị
+## 2.3 Thiết kế các đối tượng giá trị
 
-Mục này đặc tả chi tiết cấu trúc phần mềm cho các đối tượng giá trị và kiểu liệt kê thuộc Tầng Nghiệp vụ cốt lõi. Toàn bộ các lớp trong mục này được tổ chức thống nhất trong gói `com.pfms.domain.model`. Khác với thực thể, đối tượng giá trị không có mã định danh độc lập, được định danh duy nhất dựa trên giá trị của các thuộc tính thành phần và duy trì tính bất biến tuyệt đối xuyên suốt vòng đời.
+Mục này đặc tả chi tiết các đối tượng giá trị và kiểu liệt kê thuộc gói `com.pfms.domain.model`. Đối tượng giá trị không có định danh độc lập, được định danh dựa trên giá trị của các thuộc tính thành phần và duy trì tính bất biến tuyệt đối xuyên suốt vòng đời.
 
-Để bảo đảm tính chặt chẽ trong thiết kế hướng đối tượng, mỗi đối tượng giá trị được quy chuẩn cấu trúc đồng nhất qua ba nội dung:
-1. Cấu trúc thuộc tính: Xác định các trường dữ liệu nội bộ được đóng gói cố định (`private final`), kiểu dữ liệu Java bọc bên trong và điều kiện ràng buộc hợp lệ.
-2. Phương thức nghiệp vụ: Đặc tả chữ ký phương thức tính toán số học, phép so sánh logic, hàm định dạng kết xuất và cơ chế luôn trả về một thể hiện mới thay vì thay đổi trạng thái hiện tại.
-3. Tính bất biến và cơ chế so sánh: Làm rõ logic tự kiểm tra tính hợp lệ ngay khi khởi tạo, loại bỏ hoàn toàn các hàm sửa đổi giá trị và quy tắc ghi đè các phương thức so sánh bình đẳng theo giá trị.
+Mỗi đối tượng giá trị được quy chuẩn cấu trúc đồng nhất qua ba nội dung:
+1. **Cấu trúc thuộc tính**: Các trường dữ liệu nội bộ đóng gói cố định (`private final`), kiểu dữ liệu Java và ràng buộc hợp lệ.
+2. **Phương thức nghiệp vụ**: Phương thức tính toán số học, so sánh logic, định dạng kết xuất và cơ chế luôn trả về thể hiện mới.
+3. **Tính bất biến và cơ chế so sánh**: Logic tự kiểm tra hợp lệ khi khởi tạo, loại bỏ hàm sửa đổi giá trị và ghi đè `equals`/`hashCode`/`compareTo`.
 
-### 2.3.1 Tiền tệ
+### 2.3.1 Tiền tệ (Money)
 
 Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất biến với 2 chữ số thập phân và làm tròn nửa chẵn `RoundingMode.HALF_EVEN`, loại bỏ sai số dấu chấm động. Đối tượng thực hiện các phép toán số học và kiểm tra biên giá trị cho số dư ví, giao dịch thu chi, chuyển tiền cùng kiểm kê đối soát.
 
@@ -463,9 +461,9 @@ Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất 
 | `isPositive` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` lớn hơn `0.00`, dùng để kiểm tra số tiền giao dịch thu chi và chuyển tiền phải dương. |
 | `isNegative` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` nhỏ hơn `0.00`, dùng để phát hiện và chặn thao tác làm âm số dư ví. |
 | `isZero` | `Không` | `boolean` | `Không` | Trả về `true` khi `amount` bằng `0.00`, dùng để kiểm tra chênh lệch kiểm kê bằng không hoặc mẫu số bằng không khi tính tỷ lệ. |
-| `getAmount` | `Không` | `BigDecimal` | `Không` | Trả về giá trị `BigDecimal` bất biến chuẩn 2 chữ số thập phân để tính tỷ trọng báo cáo và tuần tự hóa lưu trữ JSON. |
-| `compareTo` | `Money other` | `int` | `NullPointerException` | Kiểm tra `other` khác `null` và so sánh thứ tự đại số qua `this.amount.compareTo(other.amount)`, trả về số âm, `0` hoặc số dương. |
-| `formatDisplay` | `Không` | `String` | `Không` | Định dạng số tiền thành chuỗi số nguyên đồng (0 chữ số thập phân) có dấu phân cách hàng nghìn kèm đơn vị `"VNĐ"` để hiển thị trên giao diện người dùng. |
+| `getAmount` | `Không` | `BigDecimal` | `Không` | Trả về giá trị `BigDecimal` chuẩn 2 chữ số thập phân. |
+| `compareTo` | `Money other` | `int` | `NullPointerException` | So sánh thứ tự đại số giữa hai giá trị tiền tệ. |
+| `formatDisplay` | `Không` | `String` | `Không` | Định dạng chuỗi số nguyên đồng có phân cách hàng nghìn kèm đơn vị `"VNĐ"`. |
 
 **Tính bất biến và cơ chế so sánh**
 
@@ -473,7 +471,7 @@ Lớp `Money` bọc kiểu `BigDecimal` để lưu giá trị tiền tệ bất 
 - Phương thức `equals` và `hashCode` so sánh trực tiếp trên cặp thuộc tính `amount` (đã chuẩn hóa `scale = 2` khi khởi tạo) và `currency`, bảo đảm hai đối tượng `Money` có cùng giá trị đại số thực luôn bằng nhau và sinh cùng mã băm.
 - Lớp cài đặt giao diện `Comparable<Money>` và hiện thực hóa `compareTo` bằng phép so sánh đại số của `BigDecimal`, giúp các thực thể miền kiểm tra điều kiện đủ số dư ví và sắp xếp danh sách theo quy mô tiền tệ.
 
-### 2.3.2 Ngày Giao dịch
+### 2.3.2 Ngày giao dịch (TransactionDate)
 
 Lớp `TransactionDate` là đối tượng giá trị bất biến bọc kiểu `LocalDate` của Java, kiểm soát tính hợp lệ lịch pháp và bảo đảm mọi mốc thời gian giao dịch không vượt quá ngày hiện tại, đồng thời cung cấp các phép so sánh thứ tự thời gian và trích xuất chu kỳ báo cáo tháng phục vụ tổng hợp chuỗi 12 tháng.
 
@@ -496,13 +494,13 @@ Lớp `TransactionDate` là đối tượng giá trị bất biến bọc kiểu
 | :--- | :--- | :--- | :--- | :--- |
 | `TransactionDate` *(Constructor)* | `LocalDate date` | Không có | `BusinessException` | Khởi tạo đối tượng giá trị ngày giao dịch; kiểm tra `date` không được `null` và không được sau ngày hiện tại; ném ngoại lệ nếu vi phạm. |
 | `of` *(Factory method)* | `int year, int month, int day` | `TransactionDate` | `BusinessException` | Phương thức tạo thể hiện từ bộ ba số nguyên; kiểm tra tính hợp lệ lịch pháp (tháng 1–12, ngày khớp số ngày thực tế của tháng bao gồm năm nhuận) và ràng buộc không vượt quá ngày hiện tại. |
-| `getDate` | Không có | `LocalDate` | Không có | Trả về đối tượng `LocalDate` nội tại phục vụ truy xuất và so sánh thời gian. |
-| `getIsoString` | Không có | `String` | Không có | Trả về chuỗi ngày chuẩn `YYYY-MM-DD` phục vụ hiển thị bảng giao dịch và lưu trữ JSON. |
-| `getYearMonth` | Không có | `String` | Không có | Trả về chuỗi chu kỳ tháng dạng `YYYY-MM` phục vụ gom cụm giao dịch theo tháng để tổng hợp chuỗi báo cáo 12 tháng liên tục. |
-| `isBefore` | `TransactionDate other` | `boolean` | Không có | Kiểm tra ngày này có trước ngày `other` hay không; phục vụ kiểm tra điều kiện khoảng ngày lọc giao dịch (`startDate ≤ endDate`). |
-| `isAfter` | `TransactionDate other` | `boolean` | Không có | Kiểm tra ngày này có sau ngày `other` hay không; phục vụ kiểm tra ràng buộc ngày phát sinh không vượt quá hiện tại. |
-| `isEqual` | `TransactionDate other` | `boolean` | Không có | Kiểm tra hai đối tượng `TransactionDate` có cùng ngày tháng năm hay không phục vụ so sánh và phân nhóm theo ngày. |
-| `compareTo` | `TransactionDate other` | `int` | Không có | So sánh thứ tự thời gian tự nhiên giữa hai ngày; trả về số âm, 0 hoặc dương; phục vụ sắp xếp danh sách giao dịch theo thứ tự ngày giảm dần. |
+| `getDate` | Không có | `LocalDate` | Không có | Trả về đối tượng `LocalDate` nội tại. |
+| `getIsoString` | Không có | `String` | Không có | Trả về chuỗi ngày chuẩn `YYYY-MM-DD`. |
+| `getYearMonth` | Không có | `String` | Không có | Trả về chuỗi chu kỳ tháng dạng `YYYY-MM`. |
+| `isBefore` | `TransactionDate other` | `boolean` | Không có | Kiểm tra ngày này có trước ngày `other` hay không. |
+| `isAfter` | `TransactionDate other` | `boolean` | Không có | Kiểm tra ngày này có sau ngày `other` hay không. |
+| `isEqual` | `TransactionDate other` | `boolean` | Không có | Kiểm tra hai ngày có trùng nhau hay không. |
+| `compareTo` | `TransactionDate other` | `int` | Không có | So sánh thứ tự thời gian chuẩn giữa hai ngày; trả về số âm, 0 hoặc dương; phục vụ sắp xếp danh sách giao dịch theo thứ tự ngày giảm dần. |
 | `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên giá trị `date` nội tại theo ngữ nghĩa đối tượng giá trị. |
 | `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên giá trị `date` phục vụ lưu trữ trong tập hợp. |
 | `toString` | Không có | `String` | Không có | Trả về chuỗi biểu diễn ngày chuẩn `YYYY-MM-DD` tương đương `isoString`. |
@@ -511,9 +509,9 @@ Lớp `TransactionDate` là đối tượng giá trị bất biến bọc kiểu
 
 - Tính bất biến và kiểm tra ràng buộc thời gian: Thuộc tính `date` được khai báo `private final`; toàn bộ trạng thái được thiết lập duy nhất một lần trong hàm khởi tạo và không có phương thức sửa đổi. Mọi thay đổi ngày giao dịch tương đương với việc tạo một thể hiện `TransactionDate` mới độc lập. Hàm khởi tạo thực thi kiểm tra bắt buộc: (1) ngày phải tồn tại thực tế trên lịch Gregory; (2) ngày không được vượt quá ngày hiện tại do đồng hồ hệ thống cung cấp tại thời điểm khởi tạo; vi phạm bất kỳ điều kiện nào sẽ ném ngoại lệ `BusinessException`.
 - Cơ chế so sánh bằng nhau: Phương thức `equals` được ghi đè để so sánh hai đối tượng `TransactionDate` dựa trên giá trị `date` nội tại; `hashCode` được ghi đè nhất quán với `equals` đảm bảo tính đúng đắn khi sử dụng trong `HashSet` hoặc `HashMap`.
-- Cài đặt `Comparable` để so sánh thứ tự thời gian: Lớp cài đặt giao diện `Comparable<TransactionDate>`; phương thức `compareTo` ủy quyền cho `LocalDate.compareTo` để so sánh thứ tự thời gian tự nhiên; phục vụ sắp xếp danh sách giao dịch theo ngày giảm dần và kiểm tra điều kiện khoảng ngày lọc trong báo cáo tài chính.
+- Cài đặt `Comparable` để so sánh thứ tự thời gian: Lớp cài đặt giao diện `Comparable<TransactionDate>`; phương thức `compareTo` ủy quyền cho `LocalDate.compareTo` để so sánh thứ tự thời gian chuẩn; phục vụ sắp xếp danh sách giao dịch theo ngày giảm dần và kiểm tra điều kiện khoảng ngày lọc trong báo cáo tài chính.
 
-### 2.3.3 Kiểu Liệt kê Loại Giao dịch
+### 2.3.3 Kiểu liệt kê loại giao dịch (TransactionType)
 
 Kiểu liệt kê `TransactionType` xác lập tập giá trị đóng gồm đúng hai hằng số `INCOME` và `EXPENSE`, đại diện cho hai chiều thu chi cố định; đây đồng thời là ranh giới phân cấp danh mục cấp 1 bất biến vĩnh viễn, định hướng kiểm tra tính tương thích giữa giao dịch và danh mục trong toàn bộ hệ thống.
 
@@ -535,10 +533,10 @@ Kiểu liệt kê `TransactionType` xác lập tập giá trị đóng gồm đ�
 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
-| `getDisplayLabel` | Không có | `String` | Không có | Trả về nhãn hiển thị tiếng Việt của loại thu chi phục vụ kết xuất bảng danh sách giao dịch và phân tích cơ cấu báo cáo. |
-| `isCompatibleWith` | `TransactionType categoryType` | `boolean` | Không có | Kiểm tra loại thu chi của giao dịch có tương thích với loại thu chi của danh mục phân loại hay không; trả về `true` khi cùng loại theo quy tắc cấu trúc danh mục ba cấp; phục vụ kiểm tra trước khi tạo hoặc cập nhật giao dịch. |
-| `fromString` | `String value` | `TransactionType` | `BusinessException` | Chuyển đổi an toàn chuỗi ký tự (`"INCOME"` hoặc `"EXPENSE"`) sang hằng số tương ứng; ném ngoại lệ `BusinessException` nếu giá trị chuỗi không hợp lệ; phục vụ phân tích cú pháp dữ liệu từ tệp JSON khi phục hồi sao lưu. |
-| `opposite` | Không có | `TransactionType` | Không có | Trả về loại thu chi đối lập: `INCOME` trả về `EXPENSE` và ngược lại; phục vụ kiểm tra chéo tính tương thích khi chuyển nhóm danh mục. |
+| `getDisplayLabel` | Không có | `String` | Không có | Trả về nhãn hiển thị tiếng Việt (`"Thu nhập"` hoặc `"Chi tiêu"`). |
+| `isCompatibleWith` | `TransactionType categoryType` | `boolean` | Không có | Kiểm tra loại thu chi có tương thích với danh mục phân loại hay không. |
+| `fromString` | `String value` | `TransactionType` | `BusinessException` | Chuyển đổi chuỗi ký tự (`"INCOME"`/`"EXPENSE"`) sang hằng số tương ứng. |
+| `opposite` | Không có | `TransactionType` | Không có | Trả về loại thu chi đối lập (`INCOME` ↔ `EXPENSE`). |
 
 **Tính bất biến và cơ chế so sánh**
 
@@ -546,7 +544,7 @@ Kiểu liệt kê `TransactionType` xác lập tập giá trị đóng gồm đ�
 - Cơ chế so sánh bằng nhau: Vì là kiểu `enum`, phép so sánh tham chiếu `==` và phương thức `equals()` đều cho kết quả đồng nhất; hai hằng số cùng tên luôn là cùng một thể hiện theo đảm bảo của JVM. Không cần ghi đè `hashCode()` vì `enum` đã cung cấp cơ chế mã băm nhất quán theo bản sắc thể hiện.
 - Vai trò định hướng kiểm tra tính tương thích giữa giao dịch và danh mục: Mỗi lần ghi nhận hoặc cập nhật giao dịch thu chi, hệ thống sử dụng `isCompatibleWith()` để bảo đảm danh mục phân loại thuộc đúng nhánh loại thu chi tương ứng; vi phạm sẽ bị từ chối và ném ngoại lệ. Khi phân tích cơ cấu báo cáo, `TransactionType` xác định chiều luồng tiền được gom cụm (chi tiêu hay thu nhập) để tính `SpendingStructureShare`.
 
-### 2.3.4 Dòng Tiền Thuần
+### 2.3.4 Dòng tiền thuần (NetCashFlow)
 
 Lớp `NetCashFlow` là đối tượng giá trị tiền tệ bất biến đại diện cho dòng tiền ròng có dấu đại số, đo lường mức thặng dư hoặc thâm hụt tài chính thuần của người dùng trong một kỳ quan sát xác định bằng công thức tổng thu nhập trừ tổng chi tiêu (gồm phí giao dịch liên kết theo quy tắc bảo toàn số dư ví BR-FIN-02).
 
@@ -568,14 +566,14 @@ Lớp `NetCashFlow` là đối tượng giá trị tiền tệ bất biến đ�
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
 | `NetCashFlow` *(Constructor)* | `BigDecimal amount` | Không có | `BusinessException` | Khởi tạo đối tượng giá trị dòng tiền thuần; kiểm tra `amount` không được `null` và phải đúng định dạng số thập phân; thiết lập quy mô 2 chữ số thập phân với quy tắc làm tròn ngân hàng. |
-| `of` *(Factory method)* | `BigDecimal totalIncome, BigDecimal totalExpense` | `NetCashFlow` | `BusinessException` | Tính và khởi tạo dòng tiền thuần từ tổng thu nhập và tổng chi tiêu theo công thức $\text{NetCashFlow} = \text{TotalIncome} - \text{TotalExpense}$; áp dụng quy tắc làm tròn ngân hàng. |
-| `getAmount` | Không có | `BigDecimal` | Không có | Trả về giá trị số tiền ròng có dấu phục vụ hiển thị bảng thống kê dòng tiền 12 tháng. |
+| `of` *(Factory method)* | `BigDecimal totalIncome, BigDecimal totalExpense` | `NetCashFlow` | `BusinessException` | Tính và khởi tạo dòng tiền thuần từ tổng thu nhập và tổng chi tiêu theo công thức NetCashFlow = TotalIncome - TotalExpense; áp dụng quy tắc làm tròn ngân hàng. |
+| `getAmount` | Không có | `BigDecimal` | Không có | Trả về giá trị số tiền ròng có dấu. |
 | `getCurrency` | Không có | `String` | Không có | Trả về đơn vị tiền tệ của dòng tiền thuần. |
-| `isPositive` | Không có | `boolean` | Không có | Kiểm tra dòng tiền thuần có dương hay không (thặng dư tài chính trong kỳ); phục vụ định dạng hiển thị kèm dấu `+` trên bảng báo cáo. |
-| `isNegative` | Không có | `boolean` | Không có | Kiểm tra dòng tiền thuần có âm hay không (thâm hụt tài chính, chi vượt thu); phục vụ định dạng hiển thị kèm dấu `-` và cảnh báo thâm hụt. |
-| `isZero` | Không có | `boolean` | Không có | Kiểm tra dòng tiền thuần có bằng 0 hay không (trạng thái cân bằng thu chi trong kỳ). |
-| `format` | Không có | `String` | Không có | Định dạng kết xuất có dấu dạng `+12,000,000 VNĐ` hoặc `-5,000,000 VNĐ` theo quy cách hiển thị số nguyên đồng trên giao diện. |
-| `compareTo` | `NetCashFlow other` | `int` | Không có | So sánh thứ tự tự nhiên giữa hai dòng tiền thuần dựa trên giá trị `amount`; phục vụ đánh giá biến động thặng dư tài chính giữa các tháng trong chuỗi 12 tháng. |
+| `isPositive` | Không có | `boolean` | Không có | Kiểm tra dòng tiền thuần có dương (thặng dư) hay không. |
+| `isNegative` | Không có | `boolean` | Không có | Kiểm tra dòng tiền thuần có âm (thâm hụt) hay không. |
+| `isZero` | Không có | `boolean` | Không có | Kiểm tra dòng tiền thuần có bằng 0 (cân bằng) hay không. |
+| `format` | Không có | `String` | Không có | Định dạng kết xuất có dấu (ví dụ `+12,000,000 VNĐ` hoặc `-5,000,000 VNĐ`). |
+| `compareTo` | `NetCashFlow other` | `int` | Không có | So sánh thứ tự giữa hai dòng tiền thuần dựa trên `amount`. |
 | `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên giá trị `amount` và `currency` theo ngữ nghĩa đối tượng giá trị. |
 | `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên `amount` và `currency`. |
 
@@ -585,7 +583,7 @@ Lớp `NetCashFlow` là đối tượng giá trị tiền tệ bất biến đ�
 - Cơ chế so sánh bằng nhau: Phương thức `equals` được ghi đè để so sánh hai đối tượng `NetCashFlow` dựa trên giá trị `amount` đại số và `currency`; `hashCode` được ghi đè nhất quán với `equals` đảm bảo tính đúng đắn khi sử dụng trong tập hợp.
 - Cài đặt `Comparable` để đánh giá và so sánh mức thặng dư qua các kỳ: Lớp cài đặt giao diện `Comparable<NetCashFlow>`; phương thức `compareTo` ủy quyền cho `BigDecimal.compareTo` trên `amount`; phục vụ sắp xếp và so sánh mức thặng dư/thâm hụt tài chính giữa các tháng trong chuỗi 12 tháng của báo cáo dòng tiền.
 
-### 2.3.5 Tỷ lệ Tiết kiệm
+### 2.3.5 Tỷ lệ tiết kiệm (SavingsRate)
 
 Lớp `SavingsRate` là đối tượng giá trị tỷ lệ phần trăm bất biến đo lường mức độ tích lũy tài chính trong kỳ bằng cách tính dòng tiền thuần chia cho tổng thu nhập, với cơ chế xử lý biên an toàn trả về 0.00% khi thu nhập bằng không để loại trừ hoàn toàn lỗi chia cho số không.
 
@@ -607,12 +605,12 @@ Lớp `SavingsRate` là đối tượng giá trị tỷ lệ phần trăm bất 
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
 | `SavingsRate` *(Constructor)* | `BigDecimal rate` | Không có | `BusinessException` | Khởi tạo đối tượng giá trị tỷ lệ tiết kiệm từ giá trị tỷ lệ đã tính toán sẵn; kiểm tra `rate` không được `null`. |
-| `of` *(Factory method)* | `BigDecimal netCashFlow, BigDecimal totalIncome` | `SavingsRate` | `BusinessException` | Tính và khởi tạo tỷ lệ tiết kiệm theo công thức: khi `totalIncome > 0` áp dụng $\text{SavingsRate} = (\text{NetCashFlow} / \text{TotalIncome}) \times 100\%$; khi `totalIncome ≤ 0` gán mặc định `0.00%` tránh lỗi chia cho 0; bước tính trung gian duy trì tối thiểu 4 chữ số thập phân rồi làm tròn ngân hàng về 2 chữ số thập phân. |
-| `getRate` | Không có | `BigDecimal` | Không có | Trả về giá trị tỷ lệ tiết kiệm phần trăm phục vụ hiển thị bảng thống kê dòng tiền 12 tháng. |
+| `of` *(Factory method)* | `BigDecimal netCashFlow, BigDecimal totalIncome` | `SavingsRate` | `BusinessException` | Tính và khởi tạo tỷ lệ tiết kiệm theo công thức: khi `totalIncome > 0` áp dụng SavingsRate = (NetCashFlow / TotalIncome) × 100%; khi `totalIncome ≤ 0` gán mặc định `0.00%` tránh lỗi chia cho 0; bước tính trung gian duy trì tối thiểu 4 chữ số thập phân rồi làm tròn ngân hàng về 2 chữ số thập phân. |
+| `getRate` | Không có | `BigDecimal` | Không có | Trả về giá trị tỷ lệ tiết kiệm phần trăm. |
 | `getUnit` | Không có | `String` | Không có | Trả về ký hiệu đơn vị phần trăm phục vụ định dạng kết xuất. |
-| `isNegative` | Không có | `boolean` | Không có | Kiểm tra tỷ lệ tiết kiệm có âm hay không (thâm hụt khi chi vượt thu trong kỳ); phục vụ hiển thị cảnh báo tài chính trên bảng báo cáo. |
-| `format` | Không có | `String` | Không có | Định dạng kết xuất dạng `"40.00%"` hoặc `"-10.00%"` với đúng 2 chữ số thập phân và ký hiệu `%` theo chuẩn hiển thị độ chính xác tài chính. |
-| `compareTo` | `SavingsRate other` | `int` | Không có | So sánh thứ tự tự nhiên giữa hai tỷ lệ tiết kiệm dựa trên giá trị `rate`; phục vụ đánh giá biến động hiệu quả tiết kiệm giữa các kỳ trong chuỗi 12 tháng. |
+| `isNegative` | Không có | `boolean` | Không có | Kiểm tra tỷ lệ tiết kiệm có âm hay không. |
+| `format` | Không có | `String` | Không có | Định dạng chuỗi phần trăm với đúng 2 chữ số thập phân (ví dụ `"40.00%"`). |
+| `compareTo` | `SavingsRate other` | `int` | Không có | So sánh thứ tự giữa hai tỷ lệ tiết kiệm dựa trên `rate`. |
 | `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên giá trị `rate` theo ngữ nghĩa đối tượng giá trị. |
 | `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên `rate`. |
 
@@ -622,7 +620,7 @@ Lớp `SavingsRate` là đối tượng giá trị tỷ lệ phần trăm bất 
 - Cơ chế so sánh bằng nhau: Phương thức `equals` được ghi đè để so sánh hai đối tượng `SavingsRate` dựa trên giá trị đại số của `rate` (`BigDecimal.compareTo` = 0); phương thức `hashCode` được ghi đè nhất quán với `equals` để đảm bảo an toàn khi lưu trữ trong cấu trúc dữ liệu bảng băm.
 - Cài đặt `Comparable` để so sánh hiệu quả tiết kiệm giữa các kỳ: Lớp cài đặt giao diện `Comparable<SavingsRate>`; phương thức `compareTo` ủy quyền so sánh giá trị cho `BigDecimal.compareTo` trên thuộc tính `rate`; phục vụ phân tích biến động và so sánh tỷ lệ tiết kiệm tháng-trên-tháng trong chuỗi 12 tháng của báo cáo dòng tiền.
 
-### 2.3.6 Tỷ trọng Cơ cấu Thu chi
+### 2.3.6 Tỷ trọng cơ cấu thu chi (SpendingStructureShare)
 
 Lớp `SpendingStructureShare` là đối tượng giá trị tỷ trọng bất biến đo lường phần trăm đóng góp của từng nhóm nhu cầu (cấp 2, phạm vi `"NeedGroup"`) trên tổng kỳ, hoặc từng danh mục chi tiết (cấp 3, phạm vi `"Category"`) trên tổng kỳ và tổng nhóm cha cho cả luồng `EXPENSE` (bao gồm phí giao dịch liên kết) lẫn `INCOME`, với ràng buộc giá trị trong đoạn [0.00, 100.00] và cơ chế bảo vệ mẫu số bằng không trả về 0.00%.
 
@@ -645,23 +643,23 @@ Lớp `SpendingStructureShare` là đối tượng giá trị tỷ trọng bất
 | Phương thức | Tham số | Kiểu trả về | Ngoại lệ | Mô tả nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- |
 | `SpendingStructureShare` *(Constructor)* | `BigDecimal share, String scope` | Không có | `BusinessException` | Khởi tạo đối tượng giá trị tỷ trọng cơ cấu; kiểm tra `share` không được `null`, phải nằm trong đoạn [0.00, 100.00]; kiểm tra `scope` hợp lệ; thiết lập làm tròn ngân hàng 2 chữ số thập phân. |
-| `of` *(Factory method)* | `BigDecimal itemAmount, BigDecimal totalAmount, String scope` | `SpendingStructureShare` | `BusinessException` | Tính và khởi tạo tỷ trọng cơ cấu: khi `totalAmount > 0` áp dụng $\text{Share} = (\text{ItemAmount} / \text{TotalAmount}) \times 100\%$; khi `totalAmount = 0` gán mặc định `0.00%` tránh lỗi chia cho 0; tính toán duy trì tối thiểu 4 chữ số thập phân trung gian rồi làm tròn ngân hàng về 2 chữ số thập phân. |
-| `getShare` | Không có | `BigDecimal` | Không có | Trả về giá trị tỷ trọng phần trăm phục vụ hiển thị bảng phân tích cơ cấu thu chi. |
+| `of` *(Factory method)* | `BigDecimal itemAmount, BigDecimal totalAmount, String scope` | `SpendingStructureShare` | `BusinessException` | Tính và khởi tạo tỷ trọng cơ cấu: khi `totalAmount > 0` áp dụng Share = (ItemAmount / TotalAmount) × 100%; khi `totalAmount = 0` gán mặc định `0.00%` tránh lỗi chia cho 0; tính toán duy trì tối thiểu 4 chữ số thập phân trung gian rồi làm tròn ngân hàng về 2 chữ số thập phân. |
+| `getShare` | Không có | `BigDecimal` | Không có | Trả về giá trị tỷ trọng phần trăm. |
 | `getUnit` | Không có | `String` | Không có | Trả về ký hiệu đơn vị phần trăm (`"%"`) phục vụ định dạng kết xuất. |
 | `getScope` | Không có | `String` | Không có | Trả về phạm vi phân loại cấp 2 (`"NeedGroup"`) hoặc cấp 3 (`"Category"`). |
-| `isZero` | Không có | `boolean` | Không có | Kiểm tra tỷ trọng có bằng 0.00% hay không (khoản mục không phát sinh giao dịch trong kỳ). |
-| `format` | Không có | `String` | Không có | Định dạng kết xuất chuỗi tỷ trọng dạng `"40.00%"` hoặc `"0.00%"` với đúng 2 chữ số thập phân và ký hiệu `%` theo chuẩn hiển thị độ chính xác tài chính. |
-| `compareTo` | `SpendingStructureShare other` | `int` | Không có | So sánh thứ tự giữa hai tỷ trọng theo chiều giảm dần (tỷ trọng lớn hơn đứng trước); phục vụ yêu cầu sắp xếp danh sách cơ cấu thu chi giảm dần. |
+| `isZero` | Không có | `boolean` | Không có | Kiểm tra tỷ trọng có bằng 0.00% hay không. |
+| `format` | Không có | `String` | Không có | Định dạng chuỗi tỷ trọng với 2 chữ số thập phân (ví dụ `"40.00%"`). |
+| `compareTo` | `SpendingStructureShare other` | `int` | Không có | So sánh thứ tự giữa hai tỷ trọng theo chiều giảm dần. |
 | `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên giá trị đại số của `share` (`compareTo` = 0) và thuộc tính `scope` theo ngữ nghĩa đối tượng giá trị. |
 | `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên `share` và `scope`. |
 
 **Tính bất biến và cơ chế so sánh**
 
-- Tính bất biến và ràng buộc giá trị tỷ trọng nằm trong khoảng từ không đến một trăm phần trăm: Tất cả thuộc tính được khai báo `private final`; không cung cấp phương thức thay đổi trạng thái. Ràng buộc bất biến $0.00 \le \text{share} \le 100.00$ được kiểm tra nghiêm ngặt ngay tại constructor và factory method. Khi tổng số tiền phân tích bằng 0, phương thức factory gán mặc định $0.00\%$ nhằm loại trừ lỗi chia cho số không. Tổng tỷ trọng của n thành phần trong cùng cấp phân loại có thể lệch tối đa trong khoảng $\pm 0.005\% \times n$ do mỗi thành phần được làm tròn ngân hàng độc lập theo quy tắc độ chính xác tài chính.
+- Tính bất biến và ràng buộc giá trị tỷ trọng nằm trong khoảng từ không đến một trăm phần trăm: Tất cả thuộc tính được khai báo `private final`; không cung cấp phương thức thay đổi trạng thái. Ràng buộc bất biến 0.00 ≤ share ≤ 100.00 được kiểm tra nghiêm ngặt ngay tại constructor và factory method. Khi tổng số tiền phân tích bằng 0, phương thức factory gán mặc định 0.00% nhằm loại trừ lỗi chia cho số không. Tổng tỷ trọng của n thành phần trong cùng cấp phân loại có thể lệch tối đa trong khoảng ± 0.005% × n do mỗi thành phần được làm tròn ngân hàng độc lập theo quy tắc độ chính xác tài chính.
 - Cơ chế so sánh bằng nhau qua equals và hashCode: Phương thức `equals` được ghi đè để so sánh hai đối tượng `SpendingStructureShare` dựa trên giá trị tỷ trọng `share` (so sánh bằng `compareTo` trên `BigDecimal` để bỏ qua khác biệt về scale hiển thị) kết hợp với phạm vi phân cấp `scope`; phương thức `hashCode` được sinh nhất quán từ các trường tương ứng.
 - Cài đặt Comparable để sắp xếp tỷ trọng thu chi giảm dần: Lớp cài đặt giao diện `Comparable<SpendingStructureShare>`; phương thức `compareTo` thực hiện so sánh đảo ngược (`other.share.compareTo(this.share)`) để tự động sắp xếp danh sách nhóm nhu cầu và danh mục theo thứ tự tỷ trọng giảm dần từ cao xuống thấp khi kết xuất bảng báo cáo cơ cấu thu chi.
 
-### 2.3.7 Tên Định danh Thực thể
+### 2.3.7 Tên định danh thực thể (EntityName)
 
 Lớp `EntityName` là đối tượng giá trị bất biến đại diện cho tên gọi định danh của các thực thể cốt lõi trong hệ thống (`Wallet`, `Category` và `NeedGroup`). Lớp này đóng gói quy tắc cắt tỉa khoảng trắng, kiểm soát độ dài hợp lệ từ 1 đến 50 ký tự theo quy tắc đặt tên `BR-NAM-01`, tạo khóa chuẩn hóa chữ thường phục vụ kiểm tra trùng lặp không phân biệt hoa thường và loại bỏ hoàn toàn mã lặp tại các thực thể.
 
@@ -685,10 +683,10 @@ Lớp `EntityName` là đối tượng giá trị bất biến đại diện cho
 | `EntityName` *(Constructor)* | `String rawName, String fieldLabel` | Không có | `BusinessException` | Cắt tỉa khoảng trắng hai đầu; kiểm tra `rawName` không được `null` hoặc rỗng và độ dài từ 1 đến 50 ký tự theo `BR-NAM-01`; ném `BusinessException(ErrorCode.ERR_NAM_001)` nếu vi phạm; khởi tạo `value` và `normalizedKey`. |
 | `of` *(Factory method)* | `String rawName` | `EntityName` | `BusinessException` | Phương thức tĩnh thuận tiện tạo thể hiện `EntityName` với nhãn mặc định `"Tên"`. |
 | `of` *(Factory method)* | `String rawName, String fieldLabel` | `EntityName` | `BusinessException` | Phương thức tĩnh tạo thể hiện `EntityName` kèm theo nhãn trường tùy biến phục vụ thông báo lỗi chi tiết. |
-| `getValue` | Không có | `String` | Không có | Trả về chuỗi tên nguyên bản đã cắt khoảng trắng phục vụ hiển thị trên giao diện người dùng. |
-| `getNormalizedKey` | Không có | `String` | Không có | Trả về khóa chuẩn hóa chữ thường phục vụ kiểm tra trùng lặp tại kho lưu trữ. |
+| `getValue` | Không có | `String` | Không có | Trả về chuỗi tên đã chuẩn hóa khoảng trắng. |
+| `getNormalizedKey` | Không có | `String` | Không có | Trả về khóa chuẩn hóa chữ thường. |
 | `length` | Không có | `int` | Không có | Trả về độ dài chuỗi ký tự của tên đã chuẩn hóa. |
-| `compareTo` | `EntityName other` | `int` | Không có | So sánh thứ tự tự nhiên giữa hai tên dựa trên `value` theo thứ tự từ điển; phục vụ sắp xếp danh sách ví và danh mục. |
+| `compareTo` | `EntityName other` | `int` | Không có | So sánh thứ tự từ điển tự nhiên giữa hai tên theo `value`. |
 | `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên `normalizedKey` theo ngữ nghĩa đối tượng giá trị không phân biệt hoa thường. |
 | `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên `normalizedKey` phục vụ tìm kiếm và quản lý trong tập hợp `Set` hoặc `Map`. |
 | `toString` | Không có | `String` | Không có | Trả về chuỗi giá trị tên `value` tương đương với phương thức `getValue()`. |
@@ -697,9 +695,9 @@ Lớp `EntityName` là đối tượng giá trị bất biến đại diện cho
 
 - Tính bất biến tuyệt đối và đóng gói quy tắc đặt tên: Tất cả thuộc tính được khai báo `private final`; lớp không cung cấp bất kỳ phương thức setter nào. Mọi thao tác đổi tên thực thể đều thực hiện bằng cách tạo một thể hiện `EntityName` mới thay thế. Quy tắc kiểm tra độ dài 1 đến 50 ký tự và cắt tỉa khoảng trắng theo `BR-NAM-01` được tập trung hoàn toàn tại đây, giải phóng các thực thể `Wallet` và `Category` khỏi việc trùng lặp mã kiểm tra.
 - Cơ chế so sánh bằng nhau không phân biệt chữ hoa chữ thường: Phương thức `equals()` so sánh trực tiếp thuộc tính `normalizedKey` (`value.toLowerCase(Locale.ROOT)`), bảo đảm các chuỗi chỉ khác nhau về cách viết hoa thường (ví dụ `"Tiền mặt"` và `"TIỀN MẶT"`) được hệ thống định danh là cùng một giá trị, ngăn chặn triệt để hiện tượng trùng tên logic tại kho lưu trữ.
-- Cài đặt Comparable và Serializable: Lớp cài đặt giao diện `Comparable<EntityName>` ủy quyền so sánh thứ tự từ điển tự nhiên cho `value.compareTo(other.value)` và cài đặt `java.io.Serializable` bảo đảm an toàn khi lưu trữ dữ liệu hoặc truyền tải giữa các thành phần phần mềm.
+- Cài đặt Comparable và Serializable: Lớp cài đặt giao diện `Comparable<EntityName>` ủy quyền so sánh thứ tự từ điển tự nhiên cho `value.compareTo(other.value)` và cài đặt `java.io.Serializable` bảo đảm an toàn khi lưu trữ dữ liệu hoặc truyền tải giữa các thành phần của phần mềm.
 
-### 2.3.8 Ghi chú Diễn giải
+### 2.3.8 Ghi chú diễn giải (Note)
 
 Lớp `Note` là đối tượng giá trị bất biến đại diện cho nội dung ghi chú diễn giải tùy chọn đi kèm theo các thực thể tài chính (`Wallet`, `Transaction` và các lớp con giao dịch). Lớp này đóng gói quy tắc cắt tỉa khoảng trắng, giới hạn độ dài tối đa 255 ký tự, loại bỏ hoàn toàn giá trị `null` thông qua mô hình Đối tượng Rỗng (`Null Object Pattern`) và cung cấp hằng số rỗng dùng chung `Note.EMPTY`.
 
@@ -725,11 +723,11 @@ Lớp `Note` là đối tượng giá trị bất biến đại diện cho nội
 | `empty` *(Factory method)* | Không có | `Note` | Không có | Trả về thể hiện đối tượng rỗng `Note.EMPTY`. |
 | `of` *(Factory method)* | `String rawNote` | `Note` | `BusinessException` | Phương thức tĩnh tạo thể hiện `Note` với nhãn mặc định `"Ghi chú"`; tự động trả về `Note.EMPTY` nếu đầu vào là `null` hoặc rỗng. |
 | `of` *(Factory method)* | `String rawNote, String fieldLabel` | `Note` | `BusinessException` | Phương thức tĩnh tạo thể hiện `Note` kèm nhãn trường tùy biến phục vụ thông báo lỗi chi tiết; tự động trả về `Note.EMPTY` nếu rỗng. |
-| `getValue` | Không có | `String` | Không có | Trả về chuỗi nội dung ghi chú đã chuẩn hóa; bảo đảm không bao giờ trả về `null`. |
+| `getValue` | Không có | `String` | Không có | Trả về chuỗi ghi chú đã chuẩn hóa (không bao giờ `null`). |
 | `length` | Không có | `int` | Không có | Trả về số lượng ký tự của chuỗi ghi chú nội tại. |
 | `isEmpty` | Không có | `boolean` | Không có | Kiểm tra ghi chú có rỗng hay không; trả về `true` khi `value.isEmpty()`. |
 | `isPresent` | Không có | `boolean` | Không có | Kiểm tra ghi chú có chứa nội dung hay không; tương đương `!isEmpty()`. |
-| `compareTo` | `Note other` | `int` | Không có | So sánh thứ tự tự nhiên giữa hai ghi chú dựa trên giá trị chuỗi `value`; phục vụ sắp xếp danh sách nhật ký giao dịch. |
+| `compareTo` | `Note other` | `int` | Không có | So sánh thứ tự từ điển giữa hai ghi chú dựa trên `value`. |
 | `equals` | `Object obj` | `boolean` | Không có | Ghi đè so sánh bằng nhau dựa trên thuộc tính `value` theo ngữ nghĩa đối tượng giá trị. |
 | `hashCode` | Không có | `int` | Không có | Ghi đè mã băm nhất quán với `equals` dựa trên `value` phục vụ lưu trữ trong tập hợp. |
 | `toString` | Không có | `String` | Không có | Trả về chuỗi nội dung ghi chú `value` tương đương với phương thức `getValue()`. |

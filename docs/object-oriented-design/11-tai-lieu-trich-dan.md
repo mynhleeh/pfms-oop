@@ -1,4 +1,4 @@
-# 11. Tài liệu Tham khảo
+# 11. Tài liệu tham khảo
 
 - Ambler, S. W. (2004). *The object primer: Agile model-driven development with UML 2.0* (3rd ed.). Cambridge University Press.
 - Bloch, J. (2018). *Effective Java* (3rd ed.). Addison-Wesley Professional.
