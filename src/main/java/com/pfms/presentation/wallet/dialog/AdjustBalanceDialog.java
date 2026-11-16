@@ -5,12 +5,17 @@ import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.wallet.WalletGUIController;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
@@ -68,13 +73,39 @@ public class AdjustBalanceDialog extends Dialog<ButtonType> {
             initOwner(owner);
         }
 
+        // Header Section
+        VBox headerBox = new VBox(4);
+        headerBox.setPadding(new Insets(0, 0, 8, 0));
+
+        Label titleLabel = new Label("Kiểm Kê & Điều Chỉnh Số Dư");
+        titleLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
+
+        Label subtitleLabel = new Label("Cập nhật số dư thực tế cho ví " + wallet.getName());
+        subtitleLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
+        headerBox.getChildren().addAll(titleLabel, subtitleLabel);
+
+        // Khối hiển thị số dư sổ sách hiện tại
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
         symbols.setGroupingSeparator(',');
         DecimalFormat formatter = new DecimalFormat("#,##0", symbols);
 
-        Label currentBalanceLabel = new Label("Số dư hiện tại: " + formatter.format(wallet.getBalance()) + " " + wallet.getCurrency());
-        currentBalanceLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-weight: bold;");
+        HBox balanceCard = new HBox(8);
+        balanceCard.setAlignment(Pos.CENTER_LEFT);
+        balanceCard.setPadding(new Insets(10, 14, 10, 14));
+        balanceCard.setStyle("-fx-background-color: rgba(212, 175, 55, 0.08); " +
+                "-fx-border-color: -color-gold-border; -fx-border-radius: 6px; -fx-background-radius: 6px;");
 
+        Label balanceTitle = new Label("Số dư sổ sách hiện tại:");
+        balanceTitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label currentBalanceLabel = new Label(formatter.format(wallet.getBalance()) + " " + wallet.getCurrency());
+        currentBalanceLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-weight: bold; -fx-font-size: 13px;");
+        balanceCard.getChildren().addAll(balanceTitle, spacer, currentBalanceLabel);
+
+        // Trường nhập liệu
         this.actualBalanceField = new TextField();
         this.actualBalanceField.setPromptText("Nhập số dư thực tế...");
 
@@ -83,27 +114,29 @@ public class AdjustBalanceDialog extends Dialog<ButtonType> {
 
         this.dateField = new TextField(LocalDate.now().toString());
 
-        VBox form = new VBox(8);
-        form.setPadding(new Insets(16, 20, 16, 20));
-        form.setStyle("-fx-background-color: #121212;");
-
         Label actualLabel = new Label("Số dư thực tế (*):");
-        actualLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
+        actualLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold; -fx-font-size: 12px;");
 
         Label reasonLabel = new Label("Lý do điều chỉnh (*):");
-        reasonLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
+        reasonLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold; -fx-font-size: 12px;");
 
         Label dateLabel = new Label("Ngày điều chỉnh (YYYY-MM-DD):");
-        dateLabel.setStyle("-fx-text-fill: -color-text-main;");
+        dateLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 12px;");
 
+        VBox form = new VBox(10);
+        form.setPadding(new Insets(18, 22, 18, 22));
+        form.setStyle("-fx-background-color: #141414;");
         form.getChildren().addAll(
-                currentBalanceLabel,
+                headerBox,
+                balanceCard,
                 actualLabel, this.actualBalanceField,
                 reasonLabel, this.reasonField,
                 dateLabel, this.dateField
         );
 
         DialogPane pane = getDialogPane();
+        pane.setPrefWidth(440);
+        pane.setMinWidth(440);
         pane.setContent(form);
         pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         var cssResource = getClass().getResource("/css/pfms-theme.css");
@@ -112,6 +145,10 @@ public class AdjustBalanceDialog extends Dialog<ButtonType> {
         }
 
         final var okButton = pane.lookupButton(ButtonType.OK);
+        if (okButton instanceof Button btn) {
+            btn.setText("Xác nhận điều chỉnh");
+            btn.setDefaultButton(true);
+        }
         if (okButton != null) {
             okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
                 triggerAdjust();
@@ -119,6 +156,11 @@ public class AdjustBalanceDialog extends Dialog<ButtonType> {
                     event.consume();
                 }
             });
+        }
+
+        final var cancelButton = pane.lookupButton(ButtonType.CANCEL);
+        if (cancelButton instanceof Button btn) {
+            btn.setText("Hủy bỏ");
         }
     }
 

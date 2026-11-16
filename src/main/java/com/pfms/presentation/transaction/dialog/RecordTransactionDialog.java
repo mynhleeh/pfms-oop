@@ -134,22 +134,31 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
     private void buildUI() {
         DialogPane pane = getDialogPane();
         pane.getStyleClass().add("pfms-dialog");
+        pane.setPrefWidth(520);
+        pane.setMinWidth(520);
 
         var cssResource = getClass().getResource("/css/pfms-theme.css");
         if (cssResource != null) {
             pane.getStylesheets().add(cssResource.toExternalForm());
         }
 
-        VBox contentBox = new VBox(14);
-        contentBox.setPadding(new Insets(16, 20, 16, 20));
-        contentBox.setPrefWidth(500);
+        VBox contentBox = new VBox(12);
+        contentBox.setPadding(new Insets(18, 22, 18, 22));
+        contentBox.setStyle("-fx-background-color: #141414;");
 
         // Header Title
+        VBox headerBox = new VBox(4);
+        headerBox.setPadding(new Insets(0, 0, 6, 0));
         Label headerTitle = new Label("Ghi Nhận Giao Dịch Thu Chi Mới");
-        headerTitle.setStyle("-fx-text-fill: -color-primary; -fx-font-size: 16px; -fx-font-weight: bold;");
+        headerTitle.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 16px; -fx-font-weight: bold;");
+        Label headerSubtitle = new Label("Nhập thông tin giao dịch thu chi cá nhân và phân loại danh mục");
+        headerSubtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
+        headerBox.getChildren().addAll(headerTitle, headerSubtitle);
 
         // 1. Type Switcher (Chi tiêu vs Thu nhập)
-        HBox typeSwitcher = new HBox(8);
+        HBox typeSwitcher = new HBox(6);
+        typeSwitcher.setStyle("-fx-background-color: #0E0E0E; -fx-padding: 4px; -fx-border-color: -color-border; " +
+                "-fx-border-radius: 8px; -fx-background-radius: 8px;");
         expenseTypeBtn.setMaxWidth(Double.MAX_VALUE);
         incomeTypeBtn.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(expenseTypeBtn, Priority.ALWAYS);
@@ -172,8 +181,8 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
 
         // 2. Wallet selection
         VBox walletBox = new VBox(4);
-        Label lblWallet = new Label("Ví tài khoản (*):");
-        lblWallet.getStyleClass().add("form-label");
+        Label lblWallet = new Label("VÍ TÀI KHOẢN (*):");
+        lblWallet.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
         walletCombo.setMaxWidth(Double.MAX_VALUE);
         setupWalletComboRenderer();
         availableBalanceLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 11px;");
@@ -182,16 +191,16 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
 
         // 3. Category Group & Detail Category (Cascading)
         VBox groupBox = new VBox(4);
-        Label lblGroup = new Label("Nhóm nhu cầu / phân loại (*):");
-        lblGroup.getStyleClass().add("form-label");
+        Label lblGroup = new Label("NHÓM PHÂN LOẠI / NHU CẦU (*):");
+        lblGroup.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
         groupCombo.setMaxWidth(Double.MAX_VALUE);
         setupGroupComboRenderer();
         groupCombo.valueProperty().addListener((obs, oldVal, newVal) -> onGroupSelected());
         groupBox.getChildren().addAll(lblGroup, groupCombo);
 
         VBox categoryBox = new VBox(4);
-        Label lblCategory = new Label("Danh mục chi tiết (*):");
-        lblCategory.getStyleClass().add("form-label");
+        Label lblCategory = new Label("DANH MỤC CHI TIẾT (*):");
+        lblCategory.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
         categoryCombo.setMaxWidth(Double.MAX_VALUE);
         setupCategoryComboRenderer();
         categoryCombo.setDisable(true);
@@ -199,44 +208,45 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
 
         // 4. Amount and live hint
         VBox amountBox = new VBox(4);
-        Label lblAmount = new Label("Số tiền giao dịch (*):");
-        lblAmount.getStyleClass().add("form-label");
+        Label lblAmount = new Label("SỐ TIỀN GIAO DỊCH (*):");
+        lblAmount.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
         amountField.setPromptText("Nhập số tiền (ví dụ: 150000)");
+        amountField.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
         amountInWordsHint.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 11px; -fx-font-style: italic;");
         amountField.textProperty().addListener((obs, oldVal, newVal) -> updateAmountHint());
         amountBox.getChildren().addAll(lblAmount, amountField, amountInWordsHint);
 
         // 5. Date & Note
         VBox dateBox = new VBox(4);
-        Label lblDate = new Label("Ngày giao dịch (yyyy-MM-dd) (*):");
-        lblDate.getStyleClass().add("form-label");
+        Label lblDate = new Label("NGÀY GIAO DỊCH (YYYY-MM-DD) (*):");
+        lblDate.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
         dateField.setText(LocalDate.now().toString());
         dateBox.getChildren().addAll(lblDate, dateField);
 
         VBox noteBox = new VBox(4);
-        Label lblNote = new Label("Ghi chú nội dung:");
-        lblNote.getStyleClass().add("form-label");
+        Label lblNote = new Label("GHI CHÚ / DIỄN GIẢI:");
+        lblNote.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
         noteField.setPromptText("Nội dung diễn giải giao dịch (tùy chọn)");
         noteBox.getChildren().addAll(lblNote, noteField);
 
         // 6. Fee Section (Accordion Card)
         VBox feeSectionBox = new VBox(8);
-        feeSectionBox.getStyleClass().add("pfms-card");
-        feeSectionBox.setStyle("-fx-border-color: -color-border; -fx-border-radius: 6px; -fx-padding: 10px;");
+        feeSectionBox.setStyle("-fx-background-color: #0E0E0E; -fx-border-color: -color-border; " +
+                "-fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 12px 14px;");
 
-        feeCheckBox.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
+        feeCheckBox.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold; -fx-font-size: 12px;");
 
         Label lblFeeAmount = new Label("Số tiền phụ phí:");
-        lblFeeAmount.getStyleClass().add("form-label");
+        lblFeeAmount.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
         feeAmountField.setMaxWidth(Double.MAX_VALUE);
 
         Label lblFeeGroup = new Label("Nhóm phụ phí:");
-        lblFeeGroup.getStyleClass().add("form-label");
+        lblFeeGroup.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
         feeGroupCombo.setMaxWidth(Double.MAX_VALUE);
         setupFeeGroupComboRenderer();
 
         Label lblFeeCat = new Label("Danh mục phụ phí:");
-        lblFeeCat.getStyleClass().add("form-label");
+        lblFeeCat.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
         feeCategoryCombo.setMaxWidth(Double.MAX_VALUE);
         setupFeeCategoryComboRenderer();
 
@@ -254,11 +264,13 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
 
         feeSectionBox.getChildren().addAll(feeCheckBox, feeDetailsPanel);
 
-        contentBox.getChildren().addAll(headerTitle, typeSwitcher, walletBox, groupBox, categoryBox, amountBox, dateBox, noteBox, feeSectionBox);
+        contentBox.getChildren().addAll(headerBox, typeSwitcher, walletBox, groupBox, categoryBox, amountBox, dateBox, noteBox, feeSectionBox);
 
         ScrollPane scrollPane = new ScrollPane(contentBox);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background: -color-card-bg; -fx-background-color: transparent;");
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background: #141414; -fx-background-color: transparent; -fx-border-color: transparent;");
         pane.setContent(scrollPane);
 
         // Buttons
@@ -268,7 +280,8 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
 
         Button btnSave = (Button) pane.lookupButton(saveBtnType);
         if (btnSave != null) {
-            btnSave.getStyleClass().add("btn-primary");
+            btnSave.setText("Lưu giao dịch");
+            btnSave.setDefaultButton(true);
             btnSave.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
                 event.consume();
                 triggerSave();
@@ -277,7 +290,7 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
 
         Button btnCancel = (Button) pane.lookupButton(cancelBtnType);
         if (btnCancel != null) {
-            btnCancel.getStyleClass().add("btn-secondary");
+            btnCancel.setText("Hủy bỏ");
         }
 
         saveButton.setOnAction(e -> triggerSave());
@@ -287,15 +300,19 @@ public class RecordTransactionDialog extends Dialog<ButtonType> {
     private void updateTypeSwitcherUI() {
         boolean isIncome = "Thu nhập".equalsIgnoreCase(typeCombo.getValue());
         if (isIncome) {
-            incomeTypeBtn.getStyleClass().removeAll("btn-secondary");
-            incomeTypeBtn.getStyleClass().add("btn-primary");
-            expenseTypeBtn.getStyleClass().removeAll("btn-primary");
-            expenseTypeBtn.getStyleClass().add("btn-secondary");
+            incomeTypeBtn.setStyle("-fx-background-color: rgba(34, 197, 94, 0.22); -fx-text-fill: #4ADE80; " +
+                    "-fx-font-weight: bold; -fx-font-size: 13px; -fx-border-color: rgba(34, 197, 94, 0.5); " +
+                    "-fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 8px 16px; -fx-cursor: hand;");
+            expenseTypeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: -color-text-muted; " +
+                    "-fx-font-weight: normal; -fx-font-size: 13px; -fx-border-color: transparent; " +
+                    "-fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 8px 16px; -fx-cursor: hand;");
         } else {
-            expenseTypeBtn.getStyleClass().removeAll("btn-secondary");
-            expenseTypeBtn.getStyleClass().add("btn-primary");
-            incomeTypeBtn.getStyleClass().removeAll("btn-primary");
-            incomeTypeBtn.getStyleClass().add("btn-secondary");
+            expenseTypeBtn.setStyle("-fx-background-color: rgba(225, 29, 72, 0.22); -fx-text-fill: #FB7185; " +
+                    "-fx-font-weight: bold; -fx-font-size: 13px; -fx-border-color: rgba(225, 29, 72, 0.5); " +
+                    "-fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 8px 16px; -fx-cursor: hand;");
+            incomeTypeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: -color-text-muted; " +
+                    "-fx-font-weight: normal; -fx-font-size: 13px; -fx-border-color: transparent; " +
+                    "-fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 8px 16px; -fx-cursor: hand;");
         }
     }
 

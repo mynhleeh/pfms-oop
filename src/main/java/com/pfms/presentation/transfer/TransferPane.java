@@ -2,6 +2,7 @@ package com.pfms.presentation.transfer;
 
 import com.pfms.presentation.category.CategoryGUIController;
 import com.pfms.presentation.common.util.FxAlertUtils;
+import com.pfms.presentation.transfer.component.TransferRowNode;
 import com.pfms.presentation.transfer.dialog.TransferFundsDialog;
 import com.pfms.presentation.transfer.viewmodel.TransferItemViewModel;
 import com.pfms.presentation.wallet.WalletGUIController;
@@ -15,6 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -43,9 +45,21 @@ public class TransferPane extends BorderPane implements TransferView {
     private final ObservableList<TransferItemViewModel> tableData = FXCollections.observableArrayList();
     private final TableView<TransferItemViewModel> tableView = new TableView<>(tableData);
 
+    // Stream Cards Layout
+    private final VBox streamItemsContainer = new VBox(8);
+    private final ScrollPane streamScrollPane = new ScrollPane(streamItemsContainer);
+    private HBox streamHeader;
+
     private final Label statTotalTransferredLabel = new Label("0 VNĐ");
     private final Label statTotalFeesLabel = new Label("0 VNĐ");
     private final Label statCountLabel = new Label("0 giao dịch");
+
+    private final com.pfms.presentation.common.component.KpiPill kpiTransferred =
+            new com.pfms.presentation.common.component.KpiPill("Tổng tiền chuyển", "0 VNĐ", com.pfms.presentation.common.component.KpiPill.Variant.GOLD);
+    private final com.pfms.presentation.common.component.KpiPill kpiFees =
+            new com.pfms.presentation.common.component.KpiPill("Tổng phí", "0 VNĐ", com.pfms.presentation.common.component.KpiPill.Variant.EXPENSE);
+    private final com.pfms.presentation.common.component.KpiPill kpiCount =
+            new com.pfms.presentation.common.component.KpiPill("Số lượt chuyển", "0 giao dịch", com.pfms.presentation.common.component.KpiPill.Variant.NEUTRAL);
 
     private final Label pageInfoLabel = new Label("Trang 1 / 1 (Tổng 0 giao dịch)");
     private final Label summaryFooterLabel = new Label("Tổng tiền chuyển: 0 VNĐ | Tổng phí: 0 VNĐ");
@@ -67,9 +81,9 @@ public class TransferPane extends BorderPane implements TransferView {
         setStyle("-fx-background-color: -color-bg-base;");
         setPadding(new Insets(20));
 
-        // Top Section: Header + KPI Summary Cards
-        VBox topBox = new VBox(16);
-        topBox.getChildren().addAll(createHeaderSection(), createKpiCardsSection());
+        // Top Section: Header + KPI Summary Cards + Toolbar
+        VBox topBox = new VBox(14);
+        topBox.getChildren().addAll(createHeaderSection(), createKpiCardsSection(), createToolbarSection());
         setTop(topBox);
 
         // Center Section: TableView
@@ -83,25 +97,47 @@ public class TransferPane extends BorderPane implements TransferView {
     }
 
     private Node createHeaderSection() {
-        HBox header = new HBox(12);
+        HBox header = new HBox(16);
         header.setAlignment(Pos.CENTER_LEFT);
 
+        VBox titleBox = new VBox(2);
         Label title = new Label("Quản Lý Chuyển Tiền Giữa Các Ví");
-        title.setStyle("-fx-text-fill: -color-text-main; -fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 20px; -fx-font-weight: bold;");
+        Label subtitle = new Label("Theo dõi luồng điều chuyển số dư qua lại an toàn giữa các tài khoản và ví");
+        subtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
+        titleBox.getChildren().addAll(title, subtitle);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button btnRefresh = new Button("Làm mới");
-        btnRefresh.getStyleClass().add("btn-secondary");
-        btnRefresh.setOnAction(e -> this.presenter.loadTransfers(this.presenter.getCurrentFilter()));
+        HBox kpiBox = new HBox(8);
+        kpiBox.setAlignment(Pos.CENTER_RIGHT);
+        kpiBox.getChildren().addAll(kpiTransferred, kpiFees, kpiCount);
+
+        header.getChildren().addAll(titleBox, spacer, kpiBox);
+        return header;
+    }
+
+    private Node createToolbarSection() {
+        HBox toolbar = new HBox(10);
+        toolbar.setAlignment(Pos.CENTER_LEFT);
 
         Button btnNewTransfer = new Button("+ Chuyển tiền mới");
         btnNewTransfer.getStyleClass().add("btn-primary");
         btnNewTransfer.setOnAction(e -> this.presenter.onNewTransferClicked());
 
-        header.getChildren().addAll(title, spacer, btnRefresh, btnNewTransfer);
-        return header;
+        Button btnRefresh = new Button("Làm mới");
+        btnRefresh.getStyleClass().add("btn-secondary");
+        btnRefresh.setOnAction(e -> this.presenter.loadTransfers(this.presenter.getCurrentFilter()));
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label hintLabel = new Label("Tự động ghi nhận phụ phí và bảo toàn số dư hai ví");
+        hintLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11.5px;");
+
+        toolbar.getChildren().addAll(btnNewTransfer, btnRefresh, spacer, hintLabel);
+        return toolbar;
     }
 
     private Node createKpiCardsSection() {
@@ -132,11 +168,19 @@ public class TransferPane extends BorderPane implements TransferView {
         return card;
     }
 
-    private Node createTableSection() {
-        VBox box = new VBox(10);
-        box.setPadding(new Insets(12, 0, 0, 0));
-        VBox.setVgrow(box, Priority.ALWAYS);
+    private Label createHeaderLabel(String text, double width, Pos alignment) {
+        Label label = new Label(text);
+        label.setPrefWidth(width);
+        label.setMinWidth(width);
+        label.setMaxWidth(width);
+        label.setAlignment(alignment);
+        String alignStyle = (alignment == Pos.CENTER_RIGHT) ? " -fx-alignment: CENTER-RIGHT;" :
+                ((alignment == Pos.CENTER) ? " -fx-alignment: CENTER;" : "");
+        label.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;" + alignStyle);
+        return label;
+    }
 
+    private void setupLegacyTable() {
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableView.getStyleClass().add("table-view");
 
@@ -196,8 +240,46 @@ public class TransferPane extends BorderPane implements TransferView {
         });
 
         tableView.getColumns().addAll(List.of(colOrder, colDate, colFrom, colTo, colAmount, colNote, colActions));
-        VBox.setVgrow(tableView, Priority.ALWAYS);
-        box.getChildren().add(tableView);
+    }
+
+    private Node createTableSection() {
+        VBox box = new VBox(0);
+        box.setPadding(new Insets(12, 0, 0, 0));
+        VBox.setVgrow(box, Priority.ALWAYS);
+
+        // Minimalist Guides Stream Header (6 Columns matching TransferRowNode)
+        this.streamHeader = new HBox(12);
+        this.streamHeader.getStyleClass().add("stream-header");
+        this.streamHeader.setAlignment(Pos.CENTER_LEFT);
+        this.streamHeader.setStyle("-fx-padding: 8px 16px; -fx-background-color: transparent; " +
+                "-fx-border-color: transparent transparent #242424 transparent; -fx-border-width: 0 0 1px 0;");
+
+        Label hDate = createHeaderLabel("NGÀY CHUYỂN", 100, Pos.CENTER_LEFT);
+        Label hFrom = createHeaderLabel("VÍ NGUỒN (CHUYỂN)", 140, Pos.CENTER_LEFT);
+        Label hTo = createHeaderLabel("VÍ ĐÍCH (NHẬN)", 140, Pos.CENTER_LEFT);
+        Label hAmount = createHeaderLabel("SỐ TIỀN & PHỤ PHÍ", 165, Pos.CENTER_RIGHT);
+
+        Label hNote = new Label("GHI CHÚ / DIỄN GIẢI");
+        hNote.setMinWidth(0);
+        hNote.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(hNote, Priority.ALWAYS);
+        hNote.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hActions = createHeaderLabel("THAO TÁC", 115, Pos.CENTER);
+
+        this.streamHeader.getChildren().addAll(hDate, hFrom, hTo, hAmount, hNote, hActions);
+
+        this.streamItemsContainer.setFillWidth(true);
+        this.streamItemsContainer.setStyle("-fx-background-color: transparent; -fx-padding: 8px 0 8px 0;");
+
+        this.streamScrollPane.setFitToWidth(true);
+        this.streamScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
+        VBox.setVgrow(this.streamScrollPane, Priority.ALWAYS);
+
+        // Setup legacy TableView for tests
+        setupLegacyTable();
+
+        box.getChildren().addAll(this.streamHeader, this.streamScrollPane);
         return box;
     }
 
@@ -236,6 +318,22 @@ public class TransferPane extends BorderPane implements TransferView {
             summaryFooterLabel.setText(summaryText != null ? summaryText : "");
             pageInfoLabel.setText(pageInfoText != null ? pageInfoText : "");
             updateKpiStats(summaryText, pageInfoText);
+
+            streamItemsContainer.getChildren().clear();
+            if (transfers == null || transfers.isEmpty()) {
+                VBox emptyCard = new VBox(8);
+                emptyCard.setAlignment(Pos.CENTER);
+                emptyCard.setStyle("-fx-background-color: #121212; -fx-background-radius: 8px; " +
+                        "-fx-border-color: #1E1E1E; -fx-border-radius: 8px; -fx-padding: 36px 20px;");
+                Label emptyText = new Label("Không có giao dịch chuyển tiền nào trong chu kỳ này.");
+                emptyText.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 13px;");
+                emptyCard.getChildren().add(emptyText);
+                streamItemsContainer.getChildren().add(emptyCard);
+            } else {
+                for (TransferItemViewModel item : transfers) {
+                    streamItemsContainer.getChildren().add(new TransferRowNode(item, presenter::deleteTransfer));
+                }
+            }
         });
     }
 
@@ -245,9 +343,13 @@ public class TransferPane extends BorderPane implements TransferView {
             for (String part : parts) {
                 String trimmed = part.trim();
                 if (trimmed.startsWith("Tổng tiền chuyển:")) {
-                    statTotalTransferredLabel.setText(trimmed.replace("Tổng tiền chuyển:", "").trim());
+                    String val = trimmed.replace("Tổng tiền chuyển:", "").trim();
+                    statTotalTransferredLabel.setText(val);
+                    kpiTransferred.setValue(val);
                 } else if (trimmed.startsWith("Tổng phí:")) {
-                    statTotalFeesLabel.setText(trimmed.replace("Tổng phí:", "").trim());
+                    String val = trimmed.replace("Tổng phí:", "").trim();
+                    statTotalFeesLabel.setText(val);
+                    kpiFees.setValue(val);
                 }
             }
         }
@@ -255,7 +357,9 @@ public class TransferPane extends BorderPane implements TransferView {
             int idx = pageInfoText.indexOf("Tổng");
             int endIdx = pageInfoText.indexOf(")", idx);
             if (idx != -1 && endIdx != -1) {
-                statCountLabel.setText(pageInfoText.substring(idx + 4, endIdx).trim());
+                String countVal = pageInfoText.substring(idx + 4, endIdx).trim();
+                statCountLabel.setText(countVal);
+                kpiCount.setValue(countVal);
             }
         }
     }
@@ -319,6 +423,9 @@ public class TransferPane extends BorderPane implements TransferView {
     public TransferPresenter getPresenter() { return this.presenter; }
     public TableView<TransferItemViewModel> getTableView() { return this.tableView; }
     public ObservableList<TransferItemViewModel> getTableData() { return this.tableData; }
+    public HBox getStreamHeader() { return this.streamHeader; }
+    public VBox getStreamItemsContainer() { return this.streamItemsContainer; }
+    public ScrollPane getStreamScrollPane() { return this.streamScrollPane; }
     public String getSummaryText() { return this.summaryFooterLabel.getText(); }
     public String getPageInfoText() { return this.pageInfoLabel.getText(); }
     public Label getStatTotalTransferredLabel() { return this.statTotalTransferredLabel; }

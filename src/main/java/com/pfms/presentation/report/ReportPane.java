@@ -6,6 +6,8 @@ import com.pfms.presentation.dto.report.CashFlowReportResponseDTO;
 import com.pfms.presentation.dto.report.MonthlyCashFlowResponseDTO;
 import com.pfms.presentation.dto.report.NeedGroupShareResponseDTO;
 import com.pfms.presentation.dto.report.SpendingStructureReportResponseDTO;
+import com.pfms.presentation.report.component.CashFlowRowNode;
+import com.pfms.presentation.report.component.SpendingStructureRowNode;
 import com.pfms.presentation.report.dialog.ExportReportDialog;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -24,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -63,6 +66,10 @@ public class ReportPane extends BorderPane implements ReportView {
     private final ObservableList<MonthlyCashFlowResponseDTO> cashFlowTableData = FXCollections.observableArrayList();
     private final TableView<MonthlyCashFlowResponseDTO> cashFlowTable = new TableView<>(cashFlowTableData);
 
+    private final VBox cashFlowStreamBox = new VBox(6);
+    private final ScrollPane cashFlowScrollPane = new ScrollPane(cashFlowStreamBox);
+    private HBox cashFlowStreamHeader;
+
     private final CategoryAxis cfXAxis = new CategoryAxis();
     private final NumberAxis cfYAxis = new NumberAxis();
     private final BarChart<String, Number> cashFlowChart = new BarChart<>(cfXAxis, cfYAxis);
@@ -76,6 +83,11 @@ public class ReportPane extends BorderPane implements ReportView {
 
     private final ObservableList<NeedGroupShareResponseDTO> structureTableData = FXCollections.observableArrayList();
     private final TableView<NeedGroupShareResponseDTO> structureTable = new TableView<>(structureTableData);
+
+    private final VBox structureStreamBox = new VBox(6);
+    private final ScrollPane structureScrollPane = new ScrollPane(structureStreamBox);
+    private HBox structureStreamHeader;
+
     private final PieChart structurePieChart = new PieChart();
 
     private Consumer<String> messageConsumer;
@@ -187,7 +199,69 @@ public class ReportPane extends BorderPane implements ReportView {
         cashFlowChart.setPrefHeight(260);
         cashFlowChart.setAnimated(false);
 
-        // Table section
+        // Setup legacy table for backward compatibility
+        setupCashFlowLegacyTable();
+
+        // Modern Stream section (Minimalist Guide Rows)
+        this.cashFlowStreamHeader = createCashFlowStreamHeader();
+
+        this.cashFlowStreamBox.setPadding(new Insets(6, 0, 6, 0));
+        this.cashFlowStreamBox.setFillWidth(true);
+
+        this.cashFlowScrollPane.setFitToWidth(true);
+        this.cashFlowScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
+        VBox.setVgrow(this.cashFlowScrollPane, Priority.ALWAYS);
+
+        VBox streamContainer = new VBox(4, this.cashFlowStreamHeader, this.cashFlowScrollPane);
+        streamContainer.getStyleClass().add("stream-container");
+        VBox.setVgrow(streamContainer, Priority.ALWAYS);
+
+        // Bottom summary
+        HBox bottomBox = new HBox(cashFlowSummaryLabel);
+        bottomBox.setPadding(new Insets(8, 0, 0, 0));
+        cashFlowSummaryLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 12px; -fx-font-weight: bold;");
+
+        box.getChildren().addAll(toolbar, cashFlowChart, streamContainer, bottomBox);
+        return box;
+    }
+
+    private HBox createCashFlowStreamHeader() {
+        HBox header = new HBox();
+        header.getStyleClass().add("stream-header");
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setStyle("-fx-padding: 8px 14px; -fx-border-color: transparent transparent #222222 transparent; -fx-border-width: 0 0 1px 0;");
+
+        Label hMonth = new Label("THÁNG");
+        hMonth.setPrefWidth(100); hMonth.setMinWidth(100); hMonth.setMaxWidth(100);
+        hMonth.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hIncome = new Label("THU NHẬP");
+        hIncome.setPrefWidth(180); hIncome.setMinWidth(180); hIncome.setMaxWidth(180);
+        hIncome.setAlignment(Pos.CENTER_RIGHT);
+        hIncome.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 14px 0 0;");
+
+        Label hExpense = new Label("CHI TIÊU");
+        hExpense.setPrefWidth(180); hExpense.setMinWidth(180); hExpense.setMaxWidth(180);
+        hExpense.setAlignment(Pos.CENTER_RIGHT);
+        hExpense.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 14px 0 0;");
+
+        Label hNet = new Label("DÒNG TIỀN RÒNG");
+        hNet.setPrefWidth(190); hNet.setMinWidth(190); hNet.setMaxWidth(190);
+        hNet.setAlignment(Pos.CENTER_RIGHT);
+        hNet.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 14px 0 0;");
+
+        Label hRate = new Label("TỶ LỆ TIẾT KIỆM");
+        hRate.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+        HBox rateWrapper = new HBox(hRate);
+        rateWrapper.setAlignment(Pos.CENTER_RIGHT);
+        rateWrapper.setPadding(new Insets(0, 10, 0, 0));
+        HBox.setHgrow(rateWrapper, Priority.ALWAYS);
+
+        header.getChildren().addAll(hMonth, hIncome, hExpense, hNet, rateWrapper);
+        return header;
+    }
+
+    private void setupCashFlowLegacyTable() {
         cashFlowTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         cashFlowTable.getStyleClass().add("table-view");
 
@@ -212,15 +286,6 @@ public class ReportPane extends BorderPane implements ReportView {
         colRate.setStyle("-fx-alignment: CENTER;");
 
         cashFlowTable.getColumns().addAll(List.of(colMonth, colIncome, colExpense, colNet, colRate));
-        VBox.setVgrow(cashFlowTable, Priority.ALWAYS);
-
-        // Bottom summary
-        HBox bottomBox = new HBox(cashFlowSummaryLabel);
-        bottomBox.setPadding(new Insets(8, 0, 0, 0));
-        cashFlowSummaryLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 12px; -fx-font-weight: bold;");
-
-        box.getChildren().addAll(toolbar, cashFlowChart, cashFlowTable, bottomBox);
-        return box;
     }
 
     private Node createStructureTabContent() {
@@ -262,7 +327,7 @@ public class ReportPane extends BorderPane implements ReportView {
 
         toolbar.getChildren().addAll(lblType, typeBox, lblStart, startDatePicker, lblEnd, endDatePicker, btnView, spacer, lblFormat, stFormatBox, btnExport);
 
-        // Center split: PieChart (Left) + TableView (Right)
+        // Center split: PieChart (Left) + TableView/Stream (Right)
         HBox centerBox = new HBox(14);
         VBox.setVgrow(centerBox, Priority.ALWAYS);
 
@@ -270,9 +335,73 @@ public class ReportPane extends BorderPane implements ReportView {
         structurePieChart.setPrefWidth(380);
         structurePieChart.setAnimated(false);
 
+        // Setup legacy table for backward compatibility
+        setupStructureLegacyTable();
+
+        // Modern Stream section (Minimalist Guide Rows)
+        this.structureStreamHeader = createStructureStreamHeader();
+
+        this.structureStreamBox.setPadding(new Insets(6, 0, 6, 0));
+        this.structureStreamBox.setFillWidth(true);
+
+        this.structureScrollPane.setFitToWidth(true);
+        this.structureScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
+        VBox.setVgrow(this.structureScrollPane, Priority.ALWAYS);
+
+        VBox streamContainer = new VBox(4, this.structureStreamHeader, this.structureScrollPane);
+        streamContainer.getStyleClass().add("stream-container");
+        HBox.setHgrow(streamContainer, Priority.ALWAYS);
+
+        centerBox.getChildren().addAll(structurePieChart, streamContainer);
+
+        // Bottom summary
+        HBox bottomBox = new HBox(structureSummaryLabel);
+        bottomBox.setPadding(new Insets(8, 0, 0, 0));
+        structureSummaryLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 12px; -fx-font-weight: bold;");
+
+        box.getChildren().addAll(toolbar, centerBox, bottomBox);
+        return box;
+    }
+
+    private HBox createStructureStreamHeader() {
+        HBox header = new HBox();
+        header.getStyleClass().add("stream-header");
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setStyle("-fx-padding: 8px 14px; -fx-border-color: transparent transparent #222222 transparent; -fx-border-width: 0 0 1px 0;");
+
+        Label hName = new Label("NHÓM NHU CẦU");
+        hName.setPrefWidth(250); hName.setMinWidth(250); hName.setMaxWidth(250);
+        hName.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hShare = new Label("TỶ TRỌNG (%)");
+        hShare.setPrefWidth(140); hShare.setMinWidth(140); hShare.setMaxWidth(140);
+        hShare.setAlignment(Pos.CENTER_RIGHT);
+        hShare.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 14px 0 0;");
+
+        Label hAmount = new Label("SỐ TIỀN HIỆN TẠI");
+        hAmount.setPrefWidth(190); hAmount.setMinWidth(190); hAmount.setMaxWidth(190);
+        hAmount.setAlignment(Pos.CENTER_RIGHT);
+        hAmount.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 14px 0 0;");
+
+        Label hPrev = new Label("KỲ TRƯỚC");
+        hPrev.setPrefWidth(190); hPrev.setMinWidth(190); hPrev.setMaxWidth(190);
+        hPrev.setAlignment(Pos.CENTER_RIGHT);
+        hPrev.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 14px 0 0;");
+
+        Label hDiff = new Label("CHÊNH LỆCH (+/-)");
+        hDiff.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+        HBox diffWrapper = new HBox(hDiff);
+        diffWrapper.setAlignment(Pos.CENTER_RIGHT);
+        diffWrapper.setPadding(new Insets(0, 10, 0, 0));
+        HBox.setHgrow(diffWrapper, Priority.ALWAYS);
+
+        header.getChildren().addAll(hName, hShare, hAmount, hPrev, diffWrapper);
+        return header;
+    }
+
+    private void setupStructureLegacyTable() {
         structureTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         structureTable.getStyleClass().add("table-view");
-        HBox.setHgrow(structureTable, Priority.ALWAYS);
 
         TableColumn<NeedGroupShareResponseDTO, String> colName = new TableColumn<>("Nhóm Nhu Cầu");
         colName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
@@ -296,16 +425,6 @@ public class ReportPane extends BorderPane implements ReportView {
         colDiff.setStyle("-fx-alignment: CENTER-RIGHT;");
 
         structureTable.getColumns().addAll(List.of(colName, colAmount, colShare, colPrev, colDiff));
-
-        centerBox.getChildren().addAll(structurePieChart, structureTable);
-
-        // Bottom summary
-        HBox bottomBox = new HBox(structureSummaryLabel);
-        bottomBox.setPadding(new Insets(8, 0, 0, 0));
-        structureSummaryLabel.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 12px; -fx-font-weight: bold;");
-
-        box.getChildren().addAll(toolbar, centerBox, bottomBox);
-        return box;
     }
 
     public void reloadReports() {
@@ -337,8 +456,9 @@ public class ReportPane extends BorderPane implements ReportView {
             cashFlowSummaryLabel.setText(summaryText != null ? summaryText : "");
             cashFlowTableData.clear();
             cashFlowChart.getData().clear();
+            cashFlowStreamBox.getChildren().clear();
 
-            if (report != null && report.getMonths() != null) {
+            if (report != null && report.getMonths() != null && !report.getMonths().isEmpty()) {
                 cashFlowTableData.addAll(report.getMonths());
 
                 XYChart.Series<String, Number> seriesIncome = new XYChart.Series<>();
@@ -354,9 +474,17 @@ public class ReportPane extends BorderPane implements ReportView {
                     seriesIncome.getData().add(new XYChart.Data<>(item.getYearMonth(), item.getTotalIncome()));
                     seriesExpense.getData().add(new XYChart.Data<>(item.getYearMonth(), item.getTotalExpense()));
                     seriesNet.getData().add(new XYChart.Data<>(item.getYearMonth(), item.getNetCashFlow()));
+                    cashFlowStreamBox.getChildren().add(new CashFlowRowNode(item));
                 }
 
                 cashFlowChart.getData().addAll(List.of(seriesIncome, seriesExpense, seriesNet));
+            } else {
+                Label emptyLabel = new Label("Chưa có dữ liệu dòng tiền trong khoảng thời gian đã chọn");
+                emptyLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-style: italic; -fx-padding: 24px;");
+                HBox emptyBox = new HBox(emptyLabel);
+                emptyBox.setAlignment(Pos.CENTER);
+                emptyBox.getStyleClass().add("stream-empty-card");
+                cashFlowStreamBox.getChildren().add(emptyBox);
             }
         });
     }
@@ -367,15 +495,24 @@ public class ReportPane extends BorderPane implements ReportView {
             structureSummaryLabel.setText(summaryText != null ? summaryText : "");
             structureTableData.clear();
             structurePieChart.getData().clear();
+            structureStreamBox.getChildren().clear();
 
-            if (report != null && report.getGroups() != null) {
+            if (report != null && report.getGroups() != null && !report.getGroups().isEmpty()) {
                 structureTableData.addAll(report.getGroups());
 
                 for (NeedGroupShareResponseDTO item : report.getGroups()) {
                     double val = item.getTotalAmount() != null ? item.getTotalAmount().doubleValue() : 0.0;
                     String label = item.getName() + " (" + String.format("%.1f%%", item.getShare()) + ")";
                     structurePieChart.getData().add(new PieChart.Data(label, val));
+                    structureStreamBox.getChildren().add(new SpendingStructureRowNode(item));
                 }
+            } else {
+                Label emptyLabel = new Label("Chưa có dữ liệu cơ cấu chi tiêu trong khoảng thời gian đã chọn");
+                emptyLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-style: italic; -fx-padding: 24px;");
+                HBox emptyBox = new HBox(emptyLabel);
+                emptyBox.setAlignment(Pos.CENTER);
+                emptyBox.getStyleClass().add("stream-empty-card");
+                structureStreamBox.getChildren().add(emptyBox);
             }
         });
     }
@@ -435,6 +572,14 @@ public class ReportPane extends BorderPane implements ReportView {
     public TabPane getTabPane() { return tabPane; }
     public ObservableList<MonthlyCashFlowResponseDTO> getCashFlowTableData() { return cashFlowTableData; }
     public ObservableList<NeedGroupShareResponseDTO> getStructureTableData() { return structureTableData; }
+    public TableView<MonthlyCashFlowResponseDTO> getCashFlowTable() { return cashFlowTable; }
+    public TableView<NeedGroupShareResponseDTO> getStructureTable() { return structureTable; }
+    public VBox getCashFlowStreamBox() { return cashFlowStreamBox; }
+    public VBox getStructureStreamBox() { return structureStreamBox; }
+    public HBox getCashFlowStreamHeader() { return cashFlowStreamHeader; }
+    public HBox getStructureStreamHeader() { return structureStreamHeader; }
+    public ScrollPane getCashFlowScrollPane() { return cashFlowScrollPane; }
+    public ScrollPane getStructureScrollPane() { return structureScrollPane; }
     public BarChart<String, Number> getCashFlowChart() { return cashFlowChart; }
     public PieChart getStructurePieChart() { return structurePieChart; }
     public String getCashFlowSummaryText() { return cashFlowSummaryLabel.getText(); }

@@ -1,5 +1,7 @@
 package com.pfms.presentation.category;
 
+import com.pfms.presentation.category.component.CategoryGroupCardNode;
+import com.pfms.presentation.category.component.CategorySubRowNode;
 import com.pfms.presentation.category.dialog.CreateCategoryDialog;
 import com.pfms.presentation.category.dialog.CreateNeedGroupDialog;
 import com.pfms.presentation.category.dialog.UpdateCategoryDialog;
@@ -13,6 +15,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
@@ -48,7 +51,25 @@ public class CategoryPane extends BorderPane implements CategoryView {
 
     private final Label kpiTotalGroupsLabel = new Label("0 nhóm");
     private final Label kpiTotalCategoriesLabel = new Label("0 danh mục");
+    private final com.pfms.presentation.common.component.KpiPill kpiTotalGroups =
+            new com.pfms.presentation.common.component.KpiPill("Nhóm nhu cầu", "0 nhóm", com.pfms.presentation.common.component.KpiPill.Variant.GOLD);
+    private final com.pfms.presentation.common.component.KpiPill kpiTotalCategories =
+            new com.pfms.presentation.common.component.KpiPill("Danh mục con", "0 danh mục", com.pfms.presentation.common.component.KpiPill.Variant.INCOME);
     private final Label summaryFooterLabel = new Label("Sẵn sàng");
+
+    // Two-Zone Stream Cards Layout (Horizontal Split: Income Left, Expense Right)
+    private final VBox incomeColumn = new VBox(10);
+    private final VBox expenseColumn = new VBox(10);
+    private final VBox incomeCardsBox = new VBox(12);
+    private final VBox expenseCardsBox = new VBox(12);
+    private final Label incomeCountLabel = new Label("0 Nhóm • 0 Danh mục");
+    private final Label expenseCountLabel = new Label("0 Nhóm • 0 Danh mục");
+    private final HBox twoZonesContainer = new HBox(20);
+    private final ScrollPane streamScrollPane = new ScrollPane(twoZonesContainer);
+
+    private final Button btnFilterAll = new Button("Song Song 2 Cột (Mặc định)");
+    private final Button btnFilterIncome = new Button("Chỉ Xem Thu Nhập (Income Trái)");
+    private final Button btnFilterExpense = new Button("Chỉ Xem Chi Tiêu (Expense Phải)");
 
     private Consumer<String> messageConsumer;
     private Consumer<String> warningConsumer;
@@ -66,8 +87,8 @@ public class CategoryPane extends BorderPane implements CategoryView {
         topBox.getChildren().addAll(createHeaderSection(), createKpiCardsSection());
         setTop(topBox);
 
-        // Center Section: TreeTableView
-        setCenter(createTreeTableSection());
+        // Center Section: Two-Zone Stream Cards (Income Left, Expense Right)
+        setCenter(createCenterSection());
 
         // Bottom Section: Summary Footer
         HBox bottomBox = new HBox(summaryFooterLabel);
@@ -80,24 +101,28 @@ public class CategoryPane extends BorderPane implements CategoryView {
     }
 
     private Node createHeaderSection() {
-        HBox header = new HBox(12);
+        HBox header = new HBox(16);
         header.setAlignment(Pos.CENTER_LEFT);
 
+        VBox titleBox = new VBox(2);
         Label title = new Label("Cấu Trúc Danh Mục & Nhóm Nhu Cầu");
-        title.setStyle("-fx-text-fill: -color-text-main; -fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 20px; -fx-font-weight: bold;");
+        Label subtitle = new Label("Hệ thống phân cấp chuẩn tài chính: Phân loại ➔ Nhóm nhu cầu ➔ Danh mục con");
+        subtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
+        titleBox.getChildren().addAll(title, subtitle);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button btnAddGroup = new Button("+ Thêm nhóm nhu cầu");
-        btnAddGroup.getStyleClass().add("btn-secondary");
-        btnAddGroup.setOnAction(e -> this.presenter.onAddNeedGroupClicked());
+        HBox kpiBox = new HBox(8);
+        kpiBox.setAlignment(Pos.CENTER_RIGHT);
+        kpiBox.getChildren().addAll(kpiTotalGroups, kpiTotalCategories);
 
         Button btnAddCategory = new Button("+ Thêm danh mục con");
         btnAddCategory.getStyleClass().add("btn-primary");
         btnAddCategory.setOnAction(e -> this.presenter.onAddCategoryClicked());
 
-        header.getChildren().addAll(title, spacer, btnAddGroup, btnAddCategory);
+        header.getChildren().addAll(titleBox, spacer, kpiBox, btnAddCategory);
         return header;
     }
 
@@ -128,58 +153,17 @@ public class CategoryPane extends BorderPane implements CategoryView {
     }
 
     @SuppressWarnings("unchecked")
-    private Node createTreeTableSection() {
+    private void setupLegacyTreeTable() {
         treeTableView.setShowRoot(false);
         treeTableView.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         treeTableView.getStyleClass().add("table-view");
 
         TreeTableColumn<CategoryHierarchyItem, String> colName = new TreeTableColumn<>("Tên Phân Cấp / Danh Mục");
         colName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getValue().name()));
-        colName.setCellFactory(col -> new TreeTableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    TreeTableRow<CategoryHierarchyItem> row = getTableRow();
-                    boolean isGroup = row != null && row.getTreeItem() != null 
-                            && row.getTreeItem().getValue() != null 
-                            && row.getTreeItem().getValue().isGroup();
-                    setText(item);
-                    if (isGroup) {
-                        setStyle("-fx-text-fill: -color-primary-light; -fx-font-weight: bold; -fx-font-size: 13px;");
-                    } else {
-                        setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: normal; -fx-padding: 0 0 0 10;");
-                    }
-                }
-            }
-        });
         colName.setPrefWidth(300);
 
         TreeTableColumn<CategoryHierarchyItem, String> colType = new TreeTableColumn<>("Loại Giao Dịch");
         colType.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getValue().type()));
-        colType.setCellFactory(col -> new TreeTableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    Label badge = new Label(item);
-                    badge.setPadding(new Insets(2, 8, 2, 8));
-                    if ("INCOME".equalsIgnoreCase(item)) {
-                        badge.setStyle("-fx-background-color: #143520; -fx-text-fill: #4ADE80; -fx-background-radius: 4px;");
-                    } else {
-                        badge.setStyle("-fx-background-color: #381A20; -fx-text-fill: #FB7185; -fx-background-radius: 4px;");
-                    }
-                    setGraphic(badge);
-                    setAlignment(Pos.CENTER);
-                }
-            }
-        });
         colType.setPrefWidth(140);
 
         TreeTableColumn<CategoryHierarchyItem, String> colStatus = new TreeTableColumn<>("Trạng Thái");
@@ -188,50 +172,120 @@ public class CategoryPane extends BorderPane implements CategoryView {
         colStatus.setPrefWidth(120);
 
         TreeTableColumn<CategoryHierarchyItem, Void> colActions = new TreeTableColumn<>("Thao Tác");
-        colActions.setCellFactory(col -> new TreeTableCell<>() {
-            private final Button btnAction1 = new Button();
-            private final Button btnAction2 = new Button("Xóa");
-            private final HBox box = new HBox(6, btnAction1, btnAction2);
-
-            {
-                btnAction1.getStyleClass().add("btn-secondary");
-                btnAction2.getStyleClass().add("btn-danger");
-                box.setAlignment(Pos.CENTER);
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                TreeTableRow<CategoryHierarchyItem> treeRow = getTableRow();
-                TreeItem<CategoryHierarchyItem> treeItem = treeRow != null ? treeRow.getTreeItem() : null;
-                if (empty || treeItem == null || treeItem.getValue() == null) {
-                    setGraphic(null);
-                } else {
-                    CategoryHierarchyItem nodeData = treeItem.getValue();
-                    if (nodeData.isGroup()) {
-                        btnAction1.setText("Đổi tên");
-                        btnAction1.setOnAction(e -> presenter.renameNeedGroup(nodeData.id(), nodeData.name()));
-                        btnAction2.setOnAction(e -> presenter.deleteNeedGroup(nodeData.id(), nodeData.name()));
-                    } else {
-                        btnAction1.setText("Sửa");
-                        btnAction1.setOnAction(e -> presenter.onEditCategoryClicked(
-                                nodeData.id(), nodeData.name(), nodeData.parentId(), nodeData.type()));
-                        btnAction2.setOnAction(e -> presenter.deleteCategory(nodeData.id(), nodeData.name()));
-                    }
-                    setGraphic(box);
-                }
-            }
-        });
         colActions.setPrefWidth(220);
 
-        treeTableView.getColumns().addAll(colName, colType, colStatus, colActions);
-        return treeTableView;
+        treeTableView.getColumns().setAll(colName, colType, colStatus, colActions);
+    }
+
+    private Node createCenterSection() {
+        VBox centerBox = new VBox(12);
+        centerBox.setPadding(new Insets(12, 0, 0, 0));
+        VBox.setVgrow(centerBox, Priority.ALWAYS);
+
+        // Filter Bar (3 Buttons)
+        HBox filterBar = new HBox(8);
+        filterBar.setAlignment(Pos.CENTER_LEFT);
+
+        btnFilterAll.getStyleClass().add("tab-btn");
+        btnFilterIncome.getStyleClass().add("tab-btn");
+        btnFilterExpense.getStyleClass().add("tab-btn");
+
+        btnFilterAll.setOnAction(e -> setFilterMode("ALL"));
+        btnFilterIncome.setOnAction(e -> setFilterMode("INCOME"));
+        btnFilterExpense.setOnAction(e -> setFilterMode("EXPENSE"));
+
+        filterBar.getChildren().addAll(btnFilterAll, btnFilterIncome, btnFilterExpense);
+        setFilterMode("ALL");
+
+        // Income Column (Left)
+        VBox incomeHeader = new VBox(4);
+        HBox incomeTitleRow = new HBox(10);
+        incomeTitleRow.setAlignment(Pos.CENTER_LEFT);
+        Label incomeZoneTag = new Label("INCOME");
+        incomeZoneTag.setStyle("-fx-background-color: rgba(74, 222, 128, 0.15); -fx-text-fill: #4ADE80; " +
+                "-fx-background-radius: 4px; -fx-padding: 3px 8px; -fx-font-size: 11px; -fx-font-weight: 800;");
+        incomeCountLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
+
+        Region incomeSpacer = new Region();
+        HBox.setHgrow(incomeSpacer, Priority.ALWAYS);
+
+        incomeTitleRow.getChildren().addAll(incomeZoneTag, incomeCountLabel, incomeSpacer);
+        incomeHeader.getChildren().addAll(incomeTitleRow);
+        incomeHeader.setStyle("-fx-border-color: transparent transparent #222222 transparent; -fx-border-width: 0 0 1px 0; -fx-padding: 0 0 8px 0;");
+
+        incomeCardsBox.setFillWidth(true);
+        incomeColumn.getChildren().addAll(incomeHeader, incomeCardsBox);
+        HBox.setHgrow(incomeColumn, Priority.ALWAYS);
+
+        // Expense Column (Right)
+        VBox expenseHeader = new VBox(4);
+        HBox expenseTitleRow = new HBox(10);
+        expenseTitleRow.setAlignment(Pos.CENTER_LEFT);
+        Label expenseZoneTag = new Label("EXPENSE");
+        expenseZoneTag.setStyle("-fx-background-color: rgba(251, 113, 133, 0.15); -fx-text-fill: #FB7185; " +
+                "-fx-background-radius: 4px; -fx-padding: 3px 8px; -fx-font-size: 11px; -fx-font-weight: 800;");
+        expenseCountLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
+
+        Region expenseSpacer = new Region();
+        HBox.setHgrow(expenseSpacer, Priority.ALWAYS);
+
+        expenseTitleRow.getChildren().addAll(expenseZoneTag, expenseCountLabel, expenseSpacer);
+        expenseHeader.getChildren().addAll(expenseTitleRow);
+        expenseHeader.setStyle("-fx-border-color: transparent transparent #222222 transparent; -fx-border-width: 0 0 1px 0; -fx-padding: 0 0 8px 0;");
+
+        expenseCardsBox.setFillWidth(true);
+        expenseColumn.getChildren().addAll(expenseHeader, expenseCardsBox);
+        HBox.setHgrow(expenseColumn, Priority.ALWAYS);
+
+        // Two-Zone Container (Horizontal Split - Always 2 columns)
+        twoZonesContainer.setAlignment(Pos.TOP_LEFT);
+        twoZonesContainer.setFillHeight(true);
+        twoZonesContainer.getChildren().addAll(incomeColumn, expenseColumn);
+
+        streamScrollPane.setFitToWidth(true);
+        streamScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
+        VBox.setVgrow(streamScrollPane, Priority.ALWAYS);
+
+        // Keep legacy treeTableView setup for tests
+        setupLegacyTreeTable();
+
+        centerBox.getChildren().addAll(streamScrollPane);
+        return centerBox;
+    }
+
+    public void setFilterMode(String mode) {
+        String activeStyle = "-fx-background-color: rgba(229, 192, 123, 0.2); -fx-text-fill: #FAFAFA; -fx-font-weight: bold; " +
+                "-fx-border-color: #E5C07B; -fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 4px 12px;";
+        String normalStyle = "-fx-background-color: #161616; -fx-text-fill: -color-text-muted; " +
+                "-fx-border-color: #242424; -fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 4px 12px;";
+
+        btnFilterAll.setStyle("ALL".equalsIgnoreCase(mode) ? activeStyle : normalStyle);
+        btnFilterIncome.setStyle("INCOME".equalsIgnoreCase(mode) ? activeStyle : normalStyle);
+        btnFilterExpense.setStyle("EXPENSE".equalsIgnoreCase(mode) ? activeStyle : normalStyle);
+
+        if ("ALL".equalsIgnoreCase(mode)) {
+            incomeColumn.setVisible(true);
+            incomeColumn.setManaged(true);
+            expenseColumn.setVisible(true);
+            expenseColumn.setManaged(true);
+        } else if ("INCOME".equalsIgnoreCase(mode)) {
+            incomeColumn.setVisible(true);
+            incomeColumn.setManaged(true);
+            expenseColumn.setVisible(false);
+            expenseColumn.setManaged(false);
+        } else if ("EXPENSE".equalsIgnoreCase(mode)) {
+            incomeColumn.setVisible(false);
+            incomeColumn.setManaged(false);
+            expenseColumn.setVisible(true);
+            expenseColumn.setManaged(true);
+        }
     }
 
     // region CategoryView Implementation
     @Override
     public void renderCategoryHierarchy(List<CategoryHierarchyResponseDTO> hierarchy, int totalGroups, int totalCategories) {
         runOnFx(() -> {
+            // 1. Đồng bộ treeRoot cho test hiện hữu
             treeRoot.getChildren().clear();
             if (hierarchy != null) {
                 for (CategoryHierarchyResponseDTO group : hierarchy) {
@@ -256,7 +310,58 @@ public class CategoryPane extends BorderPane implements CategoryView {
             }
             kpiTotalGroupsLabel.setText(totalGroups + " nhóm nhu cầu");
             kpiTotalCategoriesLabel.setText(totalCategories + " danh mục con");
+            kpiTotalGroups.setValue(totalGroups + " nhóm");
+            kpiTotalCategories.setValue(totalCategories + " danh mục");
             summaryFooterLabel.setText("Tổng số: " + totalGroups + " nhóm nhu cầu | " + totalCategories + " danh mục chi tiết");
+
+            // 2. Render thẻ khối vào 2 cột Income (Trái) & Expense (Phải)
+            incomeCardsBox.getChildren().clear();
+            expenseCardsBox.getChildren().clear();
+
+            int incomeGroupCount = 0;
+            int incomeCatCount = 0;
+            int expenseGroupCount = 0;
+            int expenseCatCount = 0;
+
+            if (hierarchy != null) {
+                for (CategoryHierarchyResponseDTO group : hierarchy) {
+                    boolean isIncome = "INCOME".equalsIgnoreCase(group.getTransactionType());
+                    int catCount = (group.getCategories() != null) ? group.getCategories().size() : 0;
+
+                    CategoryGroupCardNode cardNode = new CategoryGroupCardNode(
+                            group,
+                            g -> presenter.onAddCategoryClicked(),
+                            g -> presenter.renameNeedGroup(g.getNeedGroupId(), g.getNeedGroupName()),
+                            g -> presenter.deleteNeedGroup(g.getNeedGroupId(), g.getNeedGroupName()),
+                            cat -> presenter.onEditCategoryClicked(cat.getCategoryId(), cat.getName(), cat.getParentGroupId(), cat.getTransactionType()),
+                            cat -> presenter.deleteCategory(cat.getCategoryId(), cat.getName())
+                    );
+
+                    if (isIncome) {
+                        incomeGroupCount++;
+                        incomeCatCount += catCount;
+                        incomeCardsBox.getChildren().add(cardNode);
+                    } else {
+                        expenseGroupCount++;
+                        expenseCatCount += catCount;
+                        expenseCardsBox.getChildren().add(cardNode);
+                    }
+                }
+            }
+
+            incomeCountLabel.setText(incomeGroupCount + " Nhóm • " + incomeCatCount + " Danh mục");
+            expenseCountLabel.setText(expenseGroupCount + " Nhóm • " + expenseCatCount + " Danh mục");
+
+            if (incomeCardsBox.getChildren().isEmpty()) {
+                Label emptyInc = new Label("Chưa có nhóm thu nhập nào");
+                emptyInc.setStyle("-fx-text-fill: -color-text-dim; -fx-padding: 12px; -fx-font-style: italic;");
+                incomeCardsBox.getChildren().add(emptyInc);
+            }
+            if (expenseCardsBox.getChildren().isEmpty()) {
+                Label emptyExp = new Label("Chưa có nhóm chi tiêu nào");
+                emptyExp.setStyle("-fx-text-fill: -color-text-dim; -fx-padding: 12px; -fx-font-style: italic;");
+                expenseCardsBox.getChildren().add(emptyExp);
+            }
         });
     }
 
@@ -354,6 +459,14 @@ public class CategoryPane extends BorderPane implements CategoryView {
 
     public CategoryPresenter getPresenter() { return presenter; }
     public TreeTableView<CategoryHierarchyItem> getTreeTableView() { return treeTableView; }
+    public HBox getTwoZonesContainer() { return twoZonesContainer; }
+    public VBox getIncomeColumn() { return incomeColumn; }
+    public VBox getExpenseColumn() { return expenseColumn; }
+    public VBox getIncomeCardsBox() { return incomeCardsBox; }
+    public VBox getExpenseCardsBox() { return expenseCardsBox; }
+    public Button getBtnFilterAll() { return btnFilterAll; }
+    public Button getBtnFilterIncome() { return btnFilterIncome; }
+    public Button getBtnFilterExpense() { return btnFilterExpense; }
     public String getSummaryText() { return summaryFooterLabel.getText(); }
 
     public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }

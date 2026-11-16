@@ -1,7 +1,10 @@
 package com.pfms.presentation.wallet;
 
+import com.pfms.presentation.common.component.KpiPill;
 import com.pfms.presentation.common.util.FxAlertUtils;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
+import com.pfms.presentation.wallet.component.ViewModeSwitcher;
+import com.pfms.presentation.wallet.component.WalletCardNode;
 import com.pfms.presentation.wallet.dialog.AdjustBalanceDialog;
 import com.pfms.presentation.wallet.dialog.CreateWalletDialog;
 import com.pfms.presentation.wallet.dialog.UpdateWalletDialog;
@@ -17,14 +20,17 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
@@ -36,7 +42,8 @@ import java.util.function.Consumer;
 
 /**
  * Bảng điều khiển phân hệ Quản lý Ví (Wallet Management Pane) sử dụng JavaFX.
- * Hiện thực hóa giao diện WalletView theo mô hình MVP (Passive View).
+ * Hiện thực hóa giao diện WalletView theo mô hình MVP (Passive View) và hỗ trợ
+ * chế độ hiển thị kép: Thẻ ví dạng lưới (Card Grid) và Bảng dữ liệu (Table View).
  */
 public class WalletPane extends BorderPane implements WalletView {
 
@@ -45,12 +52,17 @@ public class WalletPane extends BorderPane implements WalletView {
     private final ObservableList<WalletItemViewModel> tableData = FXCollections.observableArrayList();
     private final TableView<WalletItemViewModel> tableView = new TableView<>(tableData);
 
-    private final Label kpiTotalBalance = new Label("0 ₫");
-    private final Label kpiActiveCount = new Label("0 ví đang dùng");
-    private final Label kpiArchivedCount = new Label("0 ví lưu trữ");
+    private final FlowPane cardGridPane = new FlowPane();
+    private final ScrollPane cardGridScroll = new ScrollPane(cardGridPane);
+    private final StackPane centerContainer = new StackPane();
+
+    private final KpiPill kpiTotalBalance = new KpiPill("Tổng số dư", "0 ₫", KpiPill.Variant.GOLD);
+    private final KpiPill kpiActiveCount = new KpiPill("Đang hoạt động", "0 ví", KpiPill.Variant.INCOME);
+    private final KpiPill kpiArchivedCount = new KpiPill("Lưu trữ", "0 ví", KpiPill.Variant.WARNING);
     private final Label summaryFooterLabel = new Label("Sẵn sàng");
     private final ComboBox<String> statusFilterBox = new ComboBox<>();
     private final TextField searchField = new TextField();
+    private final ViewModeSwitcher viewModeSwitcher = new ViewModeSwitcher(this::switchViewMode);
 
     private List<WalletItemViewModel> allWallets = new ArrayList<>();
     private Consumer<String> messageConsumer;
@@ -64,13 +76,13 @@ public class WalletPane extends BorderPane implements WalletView {
         setStyle("-fx-background-color: -color-bg-base;");
         setPadding(new Insets(20));
 
-        // Top Section: Header + KPI Cards + Toolbar
-        VBox topBox = new VBox(16);
-        topBox.getChildren().addAll(createHeaderSection(), createKpiCardsSection(), createToolbarSection());
+        // Top Section: Header + Toolbar
+        VBox topBox = new VBox(14);
+        topBox.getChildren().addAll(createHeaderSection(), createToolbarSection());
         setTop(topBox);
 
-        // Center Section: TableView
-        setCenter(createTableSection());
+        // Center Section: Dual-View Container (Card Grid + Table)
+        setCenter(createCenterSection());
 
         // Bottom Section: Summary Footer
         HBox bottomBox = new HBox(summaryFooterLabel);
@@ -83,58 +95,37 @@ public class WalletPane extends BorderPane implements WalletView {
     }
 
     private Node createHeaderSection() {
-        HBox header = new HBox();
+        HBox header = new HBox(16);
         header.setAlignment(Pos.CENTER_LEFT);
 
+        VBox titleBox = new VBox(2);
         Label title = new Label("Sổ Ví Tài Chính");
-        title.setStyle("-fx-text-fill: -color-text-main; -fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 20px; -fx-font-weight: bold;");
+        Label subtitle = new Label("Quản lý các nguồn tiền mặt, tài khoản ngân hàng và thẻ tín dụng cá nhân");
+        subtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
+        titleBox.getChildren().addAll(title, subtitle);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button btnAdd = new Button("+ Thêm ví mới");
-        btnAdd.getStyleClass().add("btn-primary");
-        btnAdd.setOnAction(e -> this.presenter.onAddWalletClicked());
+        HBox kpiBox = new HBox(10);
+        kpiBox.setAlignment(Pos.CENTER_RIGHT);
+        kpiBox.getChildren().addAll(kpiTotalBalance, kpiActiveCount, kpiArchivedCount);
 
-        header.getChildren().addAll(title, spacer, btnAdd);
+        header.getChildren().addAll(titleBox, spacer, kpiBox);
         return header;
-    }
-
-    private Node createKpiCardsSection() {
-        HBox kpiBox = new HBox(16);
-
-        VBox cardTotal = createKpiCard("TỔNG TÀI SẢN KHẢ DỤNG", kpiTotalBalance, "-color-primary");
-        VBox cardActive = createKpiCard("VÍ ĐANG HOẠT ĐỘNG", kpiActiveCount, "-color-income");
-        VBox cardArchived = createKpiCard("VÍ ĐANG LƯU TRỮ", kpiArchivedCount, "-color-text-muted");
-
-        HBox.setHgrow(cardTotal, Priority.ALWAYS);
-        HBox.setHgrow(cardActive, Priority.ALWAYS);
-        HBox.setHgrow(cardArchived, Priority.ALWAYS);
-
-        kpiBox.getChildren().addAll(cardTotal, cardActive, cardArchived);
-        return kpiBox;
-    }
-
-    private VBox createKpiCard(String subtitle, Label valueLabel, String colorVar) {
-        VBox card = new VBox(6);
-        card.getStyleClass().add("pfms-card");
-
-        Label sub = new Label(subtitle);
-        sub.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
-
-        valueLabel.setStyle("-fx-text-fill: " + colorVar + "; -fx-font-size: 18px; -fx-font-weight: bold;");
-
-        card.getChildren().addAll(sub, valueLabel);
-        return card;
     }
 
     private Node createToolbarSection() {
         HBox toolbar = new HBox(12);
         toolbar.setAlignment(Pos.CENTER_LEFT);
 
-        searchField.setPromptText("Tìm kiếm ví theo tên hoặc ghi chú...");
-        searchField.setPrefWidth(280);
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> applyClientFilter());
+        Button btnAdd = new Button("+ Thêm ví mới");
+        btnAdd.getStyleClass().add("btn-primary");
+        btnAdd.setOnAction(e -> this.presenter.onAddWalletClicked());
+
+        Label statusLabel = new Label("Trạng thái:");
+        statusLabel.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 12px;");
 
         statusFilterBox.getItems().addAll("Tất cả trạng thái", "ACTIVE", "ARCHIVED", "DELETED");
         statusFilterBox.setValue("Tất cả trạng thái");
@@ -144,8 +135,79 @@ public class WalletPane extends BorderPane implements WalletView {
             this.presenter.filterWallets(filter);
         });
 
-        toolbar.getChildren().addAll(searchField, statusFilterBox);
+        searchField.setPromptText("Tìm kiếm tên ví, ghi chú...");
+        searchField.setPrefWidth(240);
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> applyClientFilter());
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button btnReset = new Button("Đặt lại");
+        btnReset.getStyleClass().add("btn-secondary");
+        btnReset.setOnAction(e -> {
+            searchField.clear();
+            statusFilterBox.setValue("Tất cả trạng thái");
+            this.presenter.filterWallets(null);
+        });
+
+        Button btnRefresh = new Button("Làm mới");
+        btnRefresh.getStyleClass().add("btn-secondary");
+        btnRefresh.setOnAction(e -> this.presenter.loadData());
+
+        toolbar.getChildren().addAll(btnAdd, statusLabel, statusFilterBox, searchField, spacer, btnReset, btnRefresh);
         return toolbar;
+    }
+
+    private Node createCenterSection() {
+        // Setup Card Grid ScrollPane (Chế độ xem thẻ ví dạng lưới duy nhất)
+        cardGridPane.setHgap(18);
+        cardGridPane.setVgap(18);
+        cardGridPane.setPadding(new Insets(16, 4, 16, 4));
+        cardGridPane.setStyle("-fx-background-color: transparent;");
+
+        cardGridScroll.setFitToWidth(true);
+        cardGridScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        cardGridScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        cardGridScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+
+        cardGridScroll.viewportBoundsProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal.getWidth() > 0) {
+                updateCardGridWidth(newVal.getWidth() - 24);
+            }
+        });
+
+        return cardGridScroll;
+    }
+
+    private void updateCardGridWidth(double availableWidth) {
+        if (availableWidth <= 0) return;
+        double gap = 18.0;
+        int cols;
+        if (availableWidth < 700) {
+            cols = 1;
+        } else if (availableWidth < 1140) {
+            cols = 2;
+        } else {
+            cols = 3;
+        }
+        double cardWidth = Math.floor((availableWidth - (cols - 1) * gap) / cols);
+        for (Node node : cardGridPane.getChildren()) {
+            if (node instanceof Region card) {
+                card.setPrefWidth(cardWidth);
+                card.setMinWidth(cardWidth);
+                card.setMaxWidth(cardWidth);
+            }
+        }
+    }
+
+    private void switchViewMode(ViewModeSwitcher.ViewMode mode) {
+        if (mode == ViewModeSwitcher.ViewMode.CARD_GRID) {
+            cardGridScroll.setVisible(true);
+            tableView.setVisible(false);
+        } else {
+            cardGridScroll.setVisible(false);
+            tableView.setVisible(true);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -153,13 +215,43 @@ public class WalletPane extends BorderPane implements WalletView {
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableView.getStyleClass().add("table-view");
 
-        TableColumn<WalletItemViewModel, String> colName = new TableColumn<>("Tên ví");
+        TableColumn<WalletItemViewModel, String> colName = new TableColumn<>("Tên ví tài chính");
         colName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().name()));
-        colName.setPrefWidth(200);
+        colName.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    int idx = getIndex();
+                    if (idx < 0 || idx >= getTableView().getItems().size()) {
+                        setText(null);
+                        setGraphic(null);
+                        return;
+                    }
+                    WalletItemViewModel vm = getTableView().getItems().get(idx);
+                    VBox box = new VBox(3);
+                    Label nameLbl = new Label(vm.name());
+                    nameLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: -color-text-main;");
+
+                    if (vm.isDefault()) {
+                        Label defBadge = new Label("[Ví mặc định]");
+                        defBadge.setStyle("-fx-font-size: 10px; -fx-text-fill: -color-primary-light; -fx-font-weight: bold;");
+                        box.getChildren().addAll(nameLbl, defBadge);
+                    } else {
+                        box.getChildren().add(nameLbl);
+                    }
+                    setGraphic(box);
+                }
+            }
+        });
+        colName.setPrefWidth(220);
 
         TableColumn<WalletItemViewModel, String> colBalance = new TableColumn<>("Số dư khả dụng");
         colBalance.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().formattedBalance()));
-        colBalance.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold;");
+        colBalance.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: -color-primary-light;");
         colBalance.setPrefWidth(160);
 
         TableColumn<WalletItemViewModel, String> colStatus = new TableColumn<>("Trạng thái");
@@ -173,60 +265,99 @@ public class WalletPane extends BorderPane implements WalletView {
                     setGraphic(null);
                 } else {
                     Label badge = new Label(item);
-                    badge.setPadding(new Insets(2, 8, 2, 8));
+                    badge.getStyleClass().add("badge-status");
                     if ("ACTIVE".equalsIgnoreCase(item) || "Đang hoạt động".equalsIgnoreCase(item)) {
-                        badge.setStyle("-fx-background-color: #143520; -fx-text-fill: #4ADE80; -fx-background-radius: 4px;");
+                        badge.getStyleClass().add("badge-status-active");
+                    } else if ("ARCHIVED".equalsIgnoreCase(item) || "Lưu trữ".equalsIgnoreCase(item)) {
+                        badge.getStyleClass().add("badge-status-archived");
                     } else {
-                        badge.setStyle("-fx-background-color: #27272A; -fx-text-fill: #A1A1AA; -fx-background-radius: 4px;");
+                        badge.getStyleClass().add("badge-status-deleted");
                     }
                     setGraphic(badge);
                     setAlignment(Pos.CENTER);
                 }
             }
         });
-        colStatus.setPrefWidth(120);
+        colStatus.setPrefWidth(130);
 
         TableColumn<WalletItemViewModel, String> colNote = new TableColumn<>("Ghi chú");
         colNote.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().note() != null ? data.getValue().note() : ""));
+        colNote.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.isBlank()) {
+                    setText(null);
+                    Label dash = new Label("—");
+                    dash.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 12px;");
+                    setGraphic(dash);
+                } else {
+                    Label lbl = new Label(item);
+                    lbl.setWrapText(true);
+                    lbl.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
+                    setGraphic(lbl);
+                }
+            }
+        });
         colNote.setPrefWidth(220);
 
         TableColumn<WalletItemViewModel, Void> colActions = new TableColumn<>("Thao tác");
+        colActions.setSortable(false);
         colActions.setCellFactory(col -> new TableCell<>() {
+            private final Button btnAdjust = new Button("Nạp/Rút");
             private final Button btnEdit = new Button("Sửa");
-            private final Button btnAdjust = new Button("Kiểm kê");
-            private final Button btnToggle = new Button("Trạng thái");
+            private final Button btnToggle = new Button("Lưu trữ");
             private final Button btnDelete = new Button("Xóa");
-            private final HBox box = new HBox(6, btnEdit, btnAdjust, btnToggle, btnDelete);
+            private final HBox box = new HBox(6, btnAdjust, btnEdit, btnToggle, btnDelete);
 
             {
-                btnEdit.getStyleClass().add("btn-secondary");
-                btnAdjust.getStyleClass().add("btn-secondary");
-                btnToggle.getStyleClass().add("btn-secondary");
-                btnDelete.getStyleClass().add("btn-danger");
+                btnAdjust.getStyleClass().addAll("btn-action-sm", "btn-action-gold");
+                btnEdit.getStyleClass().add("btn-action-sm");
+                btnToggle.getStyleClass().add("btn-action-sm");
+                btnDelete.getStyleClass().addAll("btn-action-sm", "btn-danger");
                 box.setAlignment(Pos.CENTER);
 
-                btnEdit.setOnAction(e -> {
-                    WalletItemViewModel item = getTableView().getItems().get(getIndex());
-                    presenter.onEditWalletClicked(item);
-                });
                 btnAdjust.setOnAction(e -> {
-                    WalletItemViewModel item = getTableView().getItems().get(getIndex());
-                    presenter.onAdjustBalanceClicked(item);
+                    int idx = getIndex();
+                    if (idx >= 0 && idx < getTableView().getItems().size()) {
+                        presenter.onAdjustBalanceClicked(getTableView().getItems().get(idx));
+                    }
+                });
+                btnEdit.setOnAction(e -> {
+                    int idx = getIndex();
+                    if (idx >= 0 && idx < getTableView().getItems().size()) {
+                        presenter.onEditWalletClicked(getTableView().getItems().get(idx));
+                    }
                 });
                 btnToggle.setOnAction(e -> {
-                    WalletItemViewModel item = getTableView().getItems().get(getIndex());
-                    presenter.toggleStatus(item.id(), item.isActive());
+                    int idx = getIndex();
+                    if (idx >= 0 && idx < getTableView().getItems().size()) {
+                        WalletItemViewModel it = getTableView().getItems().get(idx);
+                        presenter.toggleStatus(it.id(), it.isActive());
+                    }
                 });
                 btnDelete.setOnAction(e -> {
-                    WalletItemViewModel item = getTableView().getItems().get(getIndex());
-                    presenter.deleteWallet(item.id(), item.name());
+                    int idx = getIndex();
+                    if (idx >= 0 && idx < getTableView().getItems().size()) {
+                        WalletItemViewModel it = getTableView().getItems().get(idx);
+                        presenter.deleteWallet(it.id(), it.name());
+                    }
                 });
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : box);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    int idx = getIndex();
+                    if (idx >= 0 && idx < getTableView().getItems().size()) {
+                        WalletItemViewModel it = getTableView().getItems().get(idx);
+                        btnToggle.setText(it.isActive() ? "Lưu trữ" : "Kích hoạt");
+                    }
+                    setGraphic(box);
+                }
             }
         });
         colActions.setPrefWidth(260);
@@ -237,15 +368,35 @@ public class WalletPane extends BorderPane implements WalletView {
 
     private void applyClientFilter() {
         String keyword = searchField.getText();
+        List<WalletItemViewModel> filtered;
         if (keyword == null || keyword.isBlank()) {
-            tableData.setAll(allWallets);
+            filtered = allWallets;
         } else {
             String lower = keyword.trim().toLowerCase();
-            List<WalletItemViewModel> filtered = allWallets.stream()
+            filtered = allWallets.stream()
                     .filter(w -> (w.name() != null && w.name().toLowerCase().contains(lower))
                             || (w.note() != null && w.note().toLowerCase().contains(lower)))
                     .toList();
-            tableData.setAll(filtered);
+        }
+
+        // Cập nhật Table View
+        tableData.setAll(filtered);
+
+        // Cập nhật Card Grid View
+        cardGridPane.getChildren().clear();
+        for (WalletItemViewModel item : filtered) {
+            WalletCardNode card = new WalletCardNode(
+                    item,
+                    presenter::onAdjustBalanceClicked,
+                    presenter::onEditWalletClicked,
+                    it -> presenter.toggleStatus(it.id(), it.isActive()),
+                    it -> presenter.deleteWallet(it.id(), it.name())
+            );
+            cardGridPane.getChildren().add(card);
+        }
+
+        if (cardGridScroll.getViewportBounds() != null && cardGridScroll.getViewportBounds().getWidth() > 0) {
+            updateCardGridWidth(cardGridScroll.getViewportBounds().getWidth() - 24);
         }
     }
 
@@ -262,9 +413,9 @@ public class WalletPane extends BorderPane implements WalletView {
     public void renderSummary(WalletsSummaryViewModel summary) {
         runOnFx(() -> {
             if (summary != null) {
-                kpiTotalBalance.setText(summary.formattedTotalBalance());
-                kpiActiveCount.setText(summary.activeCount() + " ví đang dùng");
-                kpiArchivedCount.setText(summary.archivedCount() + " ví lưu trữ");
+                kpiTotalBalance.setValue(summary.formattedTotalBalance());
+                kpiActiveCount.setValue(summary.activeCount() + " ví");
+                kpiArchivedCount.setValue(summary.archivedCount() + " ví");
                 summaryFooterLabel.setText("Tổng số ví: " + (summary.activeCount() + summary.archivedCount()) +
                         " | Tổng số dư khả dụng: " + summary.formattedTotalBalance());
             }
@@ -359,6 +510,8 @@ public class WalletPane extends BorderPane implements WalletView {
     public WalletPresenter getPresenter() { return presenter; }
     public ObservableList<WalletItemViewModel> getTableData() { return tableData; }
     public TableView<WalletItemViewModel> getTableView() { return tableView; }
+    public FlowPane getCardGridPane() { return cardGridPane; }
+    public ViewModeSwitcher getViewModeSwitcher() { return viewModeSwitcher; }
     public String getSummaryText() { return summaryFooterLabel.getText(); }
 
     public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }

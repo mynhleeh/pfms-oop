@@ -117,9 +117,11 @@ public class TransferPresenter {
         String date = dto.getTransferDate() != null ? ViewUtils.formatDate(dto.getTransferDate()) : "-";
         String from = dto.getSourceWalletName() != null ? dto.getSourceWalletName() : "-";
         String to = dto.getDestinationWalletName() != null ? dto.getDestinationWalletName() : "-";
+        boolean hasFee = dto.getFeeAmount() != null && dto.getFeeAmount().compareTo(java.math.BigDecimal.ZERO) > 0;
+        String feeFormatted = hasFee ? ViewUtils.formatCurrency(dto.getFeeAmount()) : "";
         return new TransferItemViewModel(dto.getTransferId(), order, date, from, to,
                 ViewUtils.formatCurrency(dto.getAmount()), dto.getAmount(), dto.getNote(),
-                dto.getSourceBalanceAfter(), dto.getDestinationBalanceAfter());
+                dto.getSourceBalanceAfter(), dto.getDestinationBalanceAfter(), hasFee, feeFormatted);
     }
     // endregion
 }

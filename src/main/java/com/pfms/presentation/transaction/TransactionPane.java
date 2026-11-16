@@ -8,6 +8,7 @@ import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.transaction.component.TransactionFilterBar;
+import com.pfms.presentation.transaction.component.TransactionRowNode;
 import com.pfms.presentation.transaction.dialog.RecordTransactionDialog;
 import com.pfms.presentation.transaction.dialog.UpdateTransactionDialog;
 import com.pfms.presentation.transaction.viewmodel.TransactionItemViewModel;
@@ -22,6 +23,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -34,7 +36,9 @@ import javafx.stage.Window;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
@@ -49,13 +53,25 @@ public class TransactionPane extends BorderPane implements TransactionView {
     private final TransactionPresenter presenter;
 
     private final TransactionFilterBar filterBar;
+    private final Map<String, String> categoryToGroupNameMap = new ConcurrentHashMap<>();
 
     private final ObservableList<TransactionItemViewModel> tableData = FXCollections.observableArrayList();
     private final TableView<TransactionItemViewModel> tableView = new TableView<>(tableData);
 
+    private final VBox streamItemsContainer = new VBox(8);
+    private final ScrollPane streamScrollPane = new ScrollPane(streamItemsContainer);
+    private HBox streamHeader;
+
     private final Label statTotalIncomeLabel = new Label("0 VNĐ");
     private final Label statTotalExpenseLabel = new Label("0 VNĐ");
     private final Label statNetCashFlowLabel = new Label("0 VNĐ");
+
+    private final com.pfms.presentation.common.component.KpiPill kpiTotalIncome =
+            new com.pfms.presentation.common.component.KpiPill("Tổng thu", "0 VNĐ", com.pfms.presentation.common.component.KpiPill.Variant.INCOME);
+    private final com.pfms.presentation.common.component.KpiPill kpiTotalExpense =
+            new com.pfms.presentation.common.component.KpiPill("Tổng chi", "0 VNĐ", com.pfms.presentation.common.component.KpiPill.Variant.EXPENSE);
+    private final com.pfms.presentation.common.component.KpiPill kpiNetCashFlow =
+            new com.pfms.presentation.common.component.KpiPill("Dòng tiền thuần", "0 VNĐ", com.pfms.presentation.common.component.KpiPill.Variant.GOLD);
 
     private final Label pageInfoLabel = new Label("Trang 1 / 1 (Tổng 0 giao dịch)");
     private final Label summaryFooterLabel = new Label("");
@@ -88,8 +104,9 @@ public class TransactionPane extends BorderPane implements TransactionView {
         topBox.getChildren().addAll(createHeaderSection(), createKpiCardsSection(), this.filterBar);
         setTop(topBox);
 
-        // Center Section: TableView
-        setCenter(createTableSection());
+        // Center Section: Minimalist Guide Rows Stream (Phương án 3)
+        createTableSection();
+        setCenter(createStreamSection());
 
         // Bottom Section: Pagination Bar & Summary
         setBottom(createBottomSection());
@@ -100,30 +117,24 @@ public class TransactionPane extends BorderPane implements TransactionView {
     }
 
     private Node createHeaderSection() {
-        HBox header = new HBox(12);
+        HBox header = new HBox(14);
         header.setAlignment(Pos.CENTER_LEFT);
 
+        VBox titleBox = new VBox(2);
         Label title = new Label("Sổ Giao Dịch Thu & Chi");
-        title.setStyle("-fx-text-fill: -color-text-main; -fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: -color-primary-light; -fx-font-size: 20px; -fx-font-weight: bold;");
+        Label subtitle = new Label("Ghi nhận dòng tiền thu nhập, chi phí sinh hoạt và các khoản mua sắm");
+        subtitle.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 12px;");
+        titleBox.getChildren().addAll(title, subtitle);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button btnAddIncome = new Button("+ Ghi thu nhập");
-        btnAddIncome.setStyle("-fx-background-color: #143520; -fx-text-fill: #4ADE80; -fx-font-weight: bold; -fx-background-radius: 6px; -fx-padding: 8 16;");
-        btnAddIncome.setOnAction(e -> {
-            setSelectedTypeFilter("INCOME");
-            this.presenter.onAddTransactionClicked();
-        });
+        HBox kpiBox = new HBox(8);
+        kpiBox.setAlignment(Pos.CENTER_RIGHT);
+        kpiBox.getChildren().addAll(kpiTotalIncome, kpiTotalExpense, kpiNetCashFlow);
 
-        Button btnAddExpense = new Button("- Ghi chi tiêu");
-        btnAddExpense.setStyle("-fx-background-color: #381A20; -fx-text-fill: #FB7185; -fx-font-weight: bold; -fx-background-radius: 6px; -fx-padding: 8 16;");
-        btnAddExpense.setOnAction(e -> {
-            setSelectedTypeFilter("EXPENSE");
-            this.presenter.onAddTransactionClicked();
-        });
-
-        header.getChildren().addAll(title, spacer, btnAddIncome, btnAddExpense);
+        header.getChildren().addAll(titleBox, spacer, kpiBox);
         return header;
     }
 
@@ -155,6 +166,77 @@ public class TransactionPane extends BorderPane implements TransactionView {
         return card;
     }
 
+    private Node createStreamSection() {
+        VBox container = new VBox(0);
+        container.setPadding(new Insets(10, 0, 0, 0));
+        VBox.setVgrow(container, Priority.ALWAYS);
+
+        this.streamHeader = new HBox(12);
+        this.streamHeader.getStyleClass().add("stream-header");
+        this.streamHeader.setAlignment(Pos.CENTER_LEFT);
+        this.streamHeader.setStyle("-fx-padding: 8px 16px; -fx-background-color: transparent; " +
+                "-fx-border-color: transparent transparent #242424 transparent; -fx-border-width: 0 0 1px 0;");
+
+        Label hDate = new Label("NGÀY");
+        hDate.setPrefWidth(100);
+        hDate.setMinWidth(100);
+        hDate.setMaxWidth(100);
+        hDate.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hAmount = new Label("SỐ TIỀN & PHỤ PHÍ");
+        hAmount.setAlignment(Pos.CENTER_RIGHT);
+        hAmount.setPrefWidth(165);
+        hAmount.setMinWidth(165);
+        hAmount.setMaxWidth(165);
+        hAmount.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
+
+        Label hWallet = new Label("VÍ TÀI KHOẢN");
+        hWallet.setPrefWidth(135);
+        hWallet.setMinWidth(135);
+        hWallet.setMaxWidth(135);
+        hWallet.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hGroup = new Label("NHÓM NHU CẦU");
+        hGroup.setPrefWidth(145);
+        hGroup.setMinWidth(145);
+        hGroup.setMaxWidth(145);
+        hGroup.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hCat = new Label("DANH MỤC");
+        hCat.setPrefWidth(140);
+        hCat.setMinWidth(140);
+        hCat.setMaxWidth(140);
+        hCat.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hNote = new Label("GHI CHÚ / DIỄN GIẢI");
+        hNote.setMinWidth(0);
+        hNote.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(hNote, Priority.ALWAYS);
+        hNote.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hActions = new Label("THAO TÁC");
+        hActions.setAlignment(Pos.CENTER);
+        hActions.setPrefWidth(115);
+        hActions.setMinWidth(115);
+        hActions.setMaxWidth(115);
+        hActions.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold; -fx-alignment: CENTER;");
+
+        this.streamHeader.getChildren().addAll(hDate, hAmount, hWallet, hGroup, hCat, hNote, hActions);
+
+        this.streamItemsContainer.setSpacing(8);
+        this.streamItemsContainer.setFillWidth(true);
+        this.streamItemsContainer.setStyle("-fx-background-color: transparent; -fx-padding: 8px 0 8px 0;");
+
+        this.streamScrollPane.setFitToWidth(true);
+        this.streamScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        this.streamScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        this.streamScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
+        VBox.setVgrow(this.streamScrollPane, Priority.ALWAYS);
+
+        container.getChildren().addAll(this.streamHeader, this.streamScrollPane);
+        return container;
+    }
+
     private Node createTableSection() {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10, 0, 0, 0));
@@ -163,87 +245,115 @@ public class TransactionPane extends BorderPane implements TransactionView {
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableView.getStyleClass().add("table-view");
 
-        TableColumn<TransactionItemViewModel, Integer> colOrder = new TableColumn<>("STT");
-        colOrder.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().displayOrder()));
-        colOrder.setStyle("-fx-alignment: CENTER;");
-        colOrder.setPrefWidth(45);
-        colOrder.setMaxWidth(55);
-
         TableColumn<TransactionItemViewModel, String> colDate = new TableColumn<>("Ngày Giao Dịch");
         colDate.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().dateFormatted()));
-        colDate.setStyle("-fx-alignment: CENTER;");
+        colDate.setStyle("-fx-alignment: CENTER; -fx-text-fill: -color-text-main;");
         colDate.setPrefWidth(110);
-
-        TableColumn<TransactionItemViewModel, Boolean> colType = new TableColumn<>("Phân Loại");
-        colType.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().isIncome()));
-        colType.setStyle("-fx-alignment: CENTER;");
-        colType.setPrefWidth(100);
-        colType.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(Boolean isIncome, boolean empty) {
-                super.updateItem(isIncome, empty);
-                if (empty || isIncome == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    Label badge = new Label(isIncome ? "Thu nhập" : "Chi tiêu");
-                    badge.setPadding(new Insets(2, 8, 2, 8));
-                    if (isIncome) {
-                        badge.setStyle("-fx-background-color: #143520; -fx-text-fill: #4ADE80; -fx-background-radius: 4px;");
-                    } else {
-                        badge.setStyle("-fx-background-color: #381A20; -fx-text-fill: #FB7185; -fx-background-radius: 4px;");
-                    }
-                    setGraphic(badge);
-                    setAlignment(Pos.CENTER);
-                }
-            }
-        });
 
         TableColumn<TransactionItemViewModel, String> colAmount = new TableColumn<>("Số Tiền");
         colAmount.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().formattedAmount()));
-        colAmount.setPrefWidth(140);
+        colAmount.setPrefWidth(150);
         colAmount.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
+                    setGraphic(null);
                 } else {
-                    setText(item);
-                    TransactionItemViewModel row = getTableView().getItems().get(getIndex());
-                    if (row != null && row.isIncome()) {
-                        setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #4ADE80;");
+                    int idx = getIndex();
+                    if (idx >= 0 && idx < getTableView().getItems().size()) {
+                        TransactionItemViewModel row = getTableView().getItems().get(idx);
+                        String prefix = row.isIncome() ? "+" : "-";
+                        String display = (item.startsWith("+") || item.startsWith("-")) ? item : prefix + item;
+                        setText(display);
+                        if (row.isIncome()) {
+                            setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #4ADE80;");
+                        } else {
+                            setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #FB7185;");
+                        }
                     } else {
-                        setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #FB7185;");
+                        setText(item);
                     }
                 }
             }
         });
 
         TableColumn<TransactionItemViewModel, String> colWallet = new TableColumn<>("Ví Tài Khoản");
-        colWallet.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().walletName()));
-        colWallet.setPrefWidth(150);
+        colWallet.setCellValueFactory(data -> {
+            String wName = data.getValue().walletName();
+            if (wName == null) {
+                return new SimpleStringProperty("");
+            }
+            return new SimpleStringProperty(wName.replaceFirst("^(?i)ví\\s+", ""));
+        });
+        colWallet.setStyle("-fx-alignment: CENTER-LEFT; -fx-text-fill: -color-text-main;");
+        colWallet.setPrefWidth(140);
+
+        TableColumn<TransactionItemViewModel, String> colGroup = new TableColumn<>("Nhóm Nhu Cầu");
+        colGroup.setCellValueFactory(data -> {
+            String grp = data.getValue().groupName();
+            if (grp != null && !grp.isBlank()) {
+                return new SimpleStringProperty(grp);
+            }
+            String resolved = categoryToGroupNameMap.getOrDefault(data.getValue().categoryName(), "");
+            return new SimpleStringProperty(resolved);
+        });
+        colGroup.setPrefWidth(145);
+        colGroup.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.isBlank()) {
+                    setText("—");
+                    setGraphic(null);
+                    setStyle("-fx-text-fill: -color-text-dim; -fx-alignment: CENTER-LEFT;");
+                } else {
+                    setText(null);
+                    Label badge = new Label(item);
+                    badge.setStyle("-fx-background-color: rgba(212, 175, 55, 0.12); -fx-text-fill: -color-primary-light; " +
+                            "-fx-background-radius: 4px; -fx-border-color: rgba(212, 175, 55, 0.25); -fx-border-radius: 4px; " +
+                            "-fx-padding: 2px 8px; -fx-font-size: 11px; -fx-font-weight: 600;");
+                    setGraphic(badge);
+                    setStyle("-fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
 
         TableColumn<TransactionItemViewModel, String> colCat = new TableColumn<>("Danh Mục");
         colCat.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().categoryName()));
+        colCat.setStyle("-fx-alignment: CENTER-LEFT; -fx-text-fill: -color-text-main; -fx-font-weight: 600;");
         colCat.setPrefWidth(150);
 
         TableColumn<TransactionItemViewModel, String> colNote = new TableColumn<>("Ghi Chú");
         colNote.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().note() != null ? data.getValue().note() : ""));
-        colNote.setPrefWidth(180);
+        colNote.setPrefWidth(200);
+        colNote.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.isBlank()) {
+                    setText("—");
+                    setStyle("-fx-text-fill: -color-text-dim; -fx-alignment: CENTER-LEFT;");
+                } else {
+                    setText(item);
+                    setStyle("-fx-text-fill: -color-text-muted; -fx-alignment: CENTER-LEFT;");
+                }
+            }
+        });
 
         TableColumn<TransactionItemViewModel, Void> colActions = new TableColumn<>("Thao Tác");
         colActions.setStyle("-fx-alignment: CENTER;");
-        colActions.setPrefWidth(140);
-        colActions.setMaxWidth(160);
+        colActions.setPrefWidth(120);
+        colActions.setMaxWidth(130);
         colActions.setCellFactory(col -> new TableCell<>() {
             private final Button btnEdit = new Button("Sửa");
             private final Button btnDelete = new Button("Xóa");
             private final HBox box = new HBox(6, btnEdit, btnDelete);
 
             {
-                btnEdit.getStyleClass().add("btn-secondary");
-                btnDelete.getStyleClass().add("btn-danger");
+                btnEdit.getStyleClass().addAll("btn-action-sm", "btn-secondary");
+                btnDelete.getStyleClass().addAll("btn-action-sm", "btn-danger");
                 box.setAlignment(Pos.CENTER);
             }
 
@@ -261,7 +371,7 @@ public class TransactionPane extends BorderPane implements TransactionView {
             }
         });
 
-        tableView.getColumns().addAll(List.of(colOrder, colDate, colType, colAmount, colWallet, colCat, colNote, colActions));
+        tableView.getColumns().addAll(List.of(colDate, colAmount, colWallet, colGroup, colCat, colNote, colActions));
         VBox.setVgrow(tableView, Priority.ALWAYS);
         box.getChildren().add(tableView);
         return box;
@@ -303,10 +413,16 @@ public class TransactionPane extends BorderPane implements TransactionView {
 
             List<CategoryHierarchyResponseDTO> hierarchy = this.categoryController.loadCategoryHierarchy();
             if (hierarchy != null) {
+                categoryToGroupNameMap.clear();
                 List<CategoryResponseDTO> categories = new ArrayList<>();
                 for (CategoryHierarchyResponseDTO g : hierarchy) {
                     if (g.getCategories() != null) {
-                        categories.addAll(g.getCategories());
+                        for (CategoryResponseDTO cat : g.getCategories()) {
+                            categories.add(cat);
+                            if (cat.getName() != null && g.getNeedGroupName() != null) {
+                                categoryToGroupNameMap.put(cat.getName(), g.getNeedGroupName());
+                            }
+                        }
                     }
                 }
                 this.filterBar.populateCategories(categories);
@@ -319,10 +435,43 @@ public class TransactionPane extends BorderPane implements TransactionView {
     @Override
     public void renderTransactions(List<TransactionItemViewModel> txns, String summaryText, String pageInfoText) {
         runOnFx(() -> {
-            tableData.setAll(txns != null ? txns : List.of());
+            List<TransactionItemViewModel> safeList = txns != null ? txns : List.of();
+            tableData.setAll(safeList);
             summaryFooterLabel.setText(summaryText != null ? summaryText : "");
             pageInfoLabel.setText(pageInfoText != null ? pageInfoText : "");
             updateKpiStats(summaryText);
+
+            streamItemsContainer.getChildren().clear();
+            if (safeList.isEmpty()) {
+                VBox emptyBox = new VBox(8);
+                emptyBox.setAlignment(Pos.CENTER);
+                emptyBox.getStyleClass().add("stream-empty-card");
+                emptyBox.setStyle("-fx-background-color: #141414; -fx-background-radius: 8px; " +
+                        "-fx-border-color: #1F1F1F; -fx-border-radius: 8px; -fx-padding: 36px 20px;");
+                Label emptyLabel = new Label("Không có giao dịch nào phù hợp với bộ lọc hiện tại");
+                emptyLabel.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 13px; -fx-font-weight: 500;");
+                emptyBox.getChildren().add(emptyLabel);
+                streamItemsContainer.getChildren().add(emptyBox);
+            } else {
+                for (TransactionItemViewModel item : safeList) {
+                    String resolvedGroup = item.groupName();
+                    if (resolvedGroup == null || resolvedGroup.isBlank()) {
+                        resolvedGroup = categoryToGroupNameMap.getOrDefault(item.categoryName(), "");
+                    }
+                    TransactionItemViewModel displayItem = new TransactionItemViewModel(
+                            item.id(), item.displayOrder(), item.dateFormatted(), resolvedGroup,
+                            item.categoryName(), item.walletName(), item.formattedAmount(),
+                            item.isIncome(), item.note(), item.balanceAfterFormatted(),
+                            item.hasFee(), item.feeFormatted()
+                    );
+                    TransactionRowNode row = new TransactionRowNode(
+                            displayItem,
+                            presenter::onEditTransactionClicked,
+                            presenter::deleteTransaction
+                    );
+                    streamItemsContainer.getChildren().add(row);
+                }
+            }
         });
     }
 
@@ -332,11 +481,17 @@ public class TransactionPane extends BorderPane implements TransactionView {
             for (String part : parts) {
                 String trimmed = part.trim();
                 if (trimmed.startsWith("Tổng thu:")) {
-                    statTotalIncomeLabel.setText(trimmed.replace("Tổng thu:", "").trim());
+                    String val = trimmed.replace("Tổng thu:", "").trim();
+                    statTotalIncomeLabel.setText(val);
+                    kpiTotalIncome.setValue(val);
                 } else if (trimmed.startsWith("Tổng chi:")) {
-                    statTotalExpenseLabel.setText(trimmed.replace("Tổng chi:", "").trim());
+                    String val = trimmed.replace("Tổng chi:", "").trim();
+                    statTotalExpenseLabel.setText(val);
+                    kpiTotalExpense.setValue(val);
                 } else if (trimmed.startsWith("Dòng tiền thuần:")) {
-                    statNetCashFlowLabel.setText(trimmed.replace("Dòng tiền thuần:", "").trim());
+                    String val = trimmed.replace("Dòng tiền thuần:", "").trim();
+                    statNetCashFlowLabel.setText(val);
+                    kpiNetCashFlow.setValue(val);
                 }
             }
         }
@@ -450,6 +605,10 @@ public class TransactionPane extends BorderPane implements TransactionView {
     public Label getStatTotalIncomeLabel() { return statTotalIncomeLabel; }
     public Label getStatTotalExpenseLabel() { return statTotalExpenseLabel; }
     public Label getStatNetCashFlowLabel() { return statNetCashFlowLabel; }
+
+    public VBox getStreamItemsContainer() { return streamItemsContainer; }
+    public ScrollPane getStreamScrollPane() { return streamScrollPane; }
+    public HBox getStreamHeader() { return streamHeader; }
 
     public void setMessageConsumer(Consumer<String> consumer) { this.messageConsumer = consumer; }
     public void setWarningConsumer(Consumer<String> consumer) { this.warningConsumer = consumer; }

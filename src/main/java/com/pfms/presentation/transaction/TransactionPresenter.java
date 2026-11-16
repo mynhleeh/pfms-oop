@@ -133,7 +133,9 @@ public class TransactionPresenter {
         boolean income = "INCOME".equalsIgnoreCase(dto.getTransactionType());
         String note = dto.getNote() != null ? dto.getNote() : "";
         String bal = dto.getWalletBalanceAfter() != null ? ViewUtils.formatCurrency(dto.getWalletBalanceAfter()) : "-";
-        return new TransactionItemViewModel(dto.getTransactionId(), order, date, cat, wallet, amt, income, note, bal);
+        boolean hasFee = dto.hasFee();
+        String feeFormatted = (hasFee && dto.getFeeAmount() != null) ? ViewUtils.formatCurrency(dto.getFeeAmount()) : "";
+        return new TransactionItemViewModel(dto.getTransactionId(), order, date, "", cat, wallet, amt, income, note, bal, hasFee, feeFormatted);
     }
     // endregion
 }

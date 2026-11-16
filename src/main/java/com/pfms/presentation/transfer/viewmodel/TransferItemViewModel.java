@@ -17,6 +17,23 @@ public record TransferItemViewModel(
         BigDecimal rawAmount,
         String note,
         BigDecimal fromBalanceAfter,
-        BigDecimal toBalanceAfter
+        BigDecimal toBalanceAfter,
+        boolean hasFee,
+        String feeFormatted
 ) {
+    public TransferItemViewModel(
+            UUID id,
+            int displayOrder,
+            String dateFormatted,
+            String fromWalletName,
+            String toWalletName,
+            String formattedAmount,
+            BigDecimal rawAmount,
+            String note,
+            BigDecimal fromBalanceAfter,
+            BigDecimal toBalanceAfter
+    ) {
+        this(id, displayOrder, dateFormatted, fromWalletName, toWalletName, formattedAmount,
+                rawAmount, note, fromBalanceAfter, toBalanceAfter, false, "");
+    }
 }

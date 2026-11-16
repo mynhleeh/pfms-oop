@@ -185,7 +185,7 @@ public class CreateCategoryDialog extends Dialog<ButtonType> {
     public record NeedGroupComboItem(UUID id, String name, String type) {
         @Override
         public String toString() {
-            return name + " [" + type + "]";
+            return name;
         }
     }
 }

@@ -77,13 +77,21 @@ public class UpdateCategoryDialog extends Dialog<ButtonType> {
         form.setPadding(new Insets(16, 20, 16, 20));
         form.setStyle("-fx-background-color: #121212;");
 
+        Label typeHeader = new Label("Phân loại thu chi:");
+        typeHeader.setStyle("-fx-text-fill: -color-text-muted; -fx-font-size: 11px;");
+
+        boolean isIncome = "INCOME".equalsIgnoreCase(this.transactionType);
+        Label typeBadge = new Label(isIncome ? "INCOME (Thu nhập)" : "EXPENSE (Chi tiêu)");
+        typeBadge.setStyle("-fx-background-color: " + (isIncome ? "rgba(74, 222, 128, 0.15)" : "rgba(251, 113, 133, 0.15)") + "; " +
+                "-fx-text-fill: " + (isIncome ? "#4ADE80" : "#FB7185") + "; -fx-font-weight: bold; -fx-padding: 3px 8px; -fx-background-radius: 4px; -fx-font-size: 11px;");
+
         Label parentLabel = new Label("Nhóm nhu cầu cha (*):");
         parentLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
         Label nameLabel = new Label("Tên danh mục con (*):");
         nameLabel.setStyle("-fx-text-fill: -color-text-main; -fx-font-weight: bold;");
 
-        form.getChildren().addAll(parentLabel, parentGroupBox, nameLabel, nameField);
+        form.getChildren().addAll(typeHeader, typeBadge, parentLabel, parentGroupBox, nameLabel, nameField);
 
         DialogPane pane = getDialogPane();
         pane.setContent(form);
@@ -222,7 +230,7 @@ public class UpdateCategoryDialog extends Dialog<ButtonType> {
     public record NeedGroupComboItem(UUID id, String name, String type) {
         @Override
         public String toString() {
-            return name + " [" + type + "]";
+            return name;
         }
     }
 }

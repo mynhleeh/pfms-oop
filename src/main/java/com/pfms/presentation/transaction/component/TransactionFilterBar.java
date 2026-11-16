@@ -90,13 +90,13 @@ public class TransactionFilterBar extends VBox {
         refreshButton.getStyleClass().add("btn-secondary");
         refreshButton.setOnAction(e -> triggerFilter());
 
-        btnQuickAll.getStyleClass().add("btn-secondary");
+        btnQuickAll.getStyleClass().add("filter-chip");
         btnQuickAll.setOnAction(e -> setQuickDate("ALL"));
 
-        btnQuickMonth.getStyleClass().add("btn-secondary");
+        btnQuickMonth.getStyleClass().add("filter-chip");
         btnQuickMonth.setOnAction(e -> setQuickDate("MONTH"));
 
-        btnQuick7Days.getStyleClass().add("btn-secondary");
+        btnQuick7Days.getStyleClass().add("filter-chip");
         btnQuick7Days.setOnAction(e -> setQuickDate("7DAYS"));
 
         keywordField.setPromptText("Tìm kiếm ghi chú...");
@@ -124,7 +124,7 @@ public class TransactionFilterBar extends VBox {
         endDatePicker.setPromptText("Đến ngày");
         endDatePicker.setPrefWidth(125);
 
-        filterButton.getStyleClass().add("btn-secondary");
+        filterButton.getStyleClass().add("btn-primary");
         filterButton.setOnAction(e -> triggerFilter());
     }
 
@@ -334,6 +334,13 @@ public class TransactionFilterBar extends VBox {
 
     public void setQuickDate(String period) {
         this.currentQuickTag = period;
+        btnQuickAll.getStyleClass().remove("filter-chip-active");
+        btnQuickMonth.getStyleClass().remove("filter-chip-active");
+        btnQuick7Days.getStyleClass().remove("filter-chip-active");
+        if ("ALL".equals(period)) btnQuickAll.getStyleClass().add("filter-chip-active");
+        else if ("MONTH".equals(period)) btnQuickMonth.getStyleClass().add("filter-chip-active");
+        else if ("7DAYS".equals(period)) btnQuick7Days.getStyleClass().add("filter-chip-active");
+
         LocalDate today = LocalDate.now();
         switch (period) {
             case "ALL" -> {

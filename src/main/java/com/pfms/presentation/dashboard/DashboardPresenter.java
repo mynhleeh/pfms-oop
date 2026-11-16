@@ -124,14 +124,19 @@ public class DashboardPresenter {
             boolean isExpense = "EXPENSE".equalsIgnoreCase(dto.getTransactionType());
             String sign = isIncome ? "+" : (isExpense ? "-" : "");
             String amountFormatted = sign + ViewUtils.formatAmount(dto.getAmount());
+            boolean hasFee = dto.hasFee();
+            String feeFormatted = (hasFee && dto.getFeeAmount() != null) ? ViewUtils.formatCurrency(dto.getFeeAmount()) : "";
             result.add(new RecentTransactionViewModel(
                     dto.getTransactionId(),
                     dto.getTransactionDate() != null ? ViewUtils.formatDate(dto.getTransactionDate()) : "-",
                     dto.getTransactionType(),
+                    "",
                     dto.getCategoryName() != null ? dto.getCategoryName() : "-",
                     dto.getWalletName() != null ? dto.getWalletName() : "-",
                     amountFormatted, isIncome,
-                    dto.getNote() != null ? dto.getNote() : ""));
+                    dto.getNote() != null ? dto.getNote() : "",
+                    hasFee,
+                    feeFormatted));
         }
         return result;
     }

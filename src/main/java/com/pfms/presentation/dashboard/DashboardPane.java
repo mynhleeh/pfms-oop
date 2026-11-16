@@ -1,6 +1,7 @@
 package com.pfms.presentation.dashboard;
 
 import com.pfms.presentation.common.util.FxAlertUtils;
+import com.pfms.presentation.dashboard.component.DashboardTransactionRowNode;
 import com.pfms.presentation.dashboard.viewmodel.DashboardKpiViewModel;
 import com.pfms.presentation.dashboard.viewmodel.RecentTransactionViewModel;
 import com.pfms.presentation.report.ReportGUIController;
@@ -13,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -59,6 +61,11 @@ public class DashboardPane extends BorderPane implements DashboardView {
     // Recent Transactions Table
     private final ObservableList<RecentTransactionViewModel> recentTxnsList = FXCollections.observableArrayList();
     private final TableView<RecentTransactionViewModel> recentTable = new TableView<>(recentTxnsList);
+
+    // Recent Transactions Stream Cards Layout
+    private final VBox streamItemsContainer = new VBox(8);
+    private final ScrollPane streamScrollPane = new ScrollPane(streamItemsContainer);
+    private HBox streamHeader;
 
     // Callbacks & Consumers for Testability
     private Consumer<String> messageConsumer;
@@ -166,16 +173,20 @@ public class DashboardPane extends BorderPane implements DashboardView {
         return card;
     }
 
+    private Label createHeaderLabel(String text, double width, Pos alignment) {
+        Label label = new Label(text);
+        label.setPrefWidth(width);
+        label.setMinWidth(width);
+        label.setMaxWidth(width);
+        label.setAlignment(alignment);
+        String alignStyle = (alignment == Pos.CENTER_RIGHT) ? " -fx-alignment: CENTER-RIGHT;" :
+                ((alignment == Pos.CENTER) ? " -fx-alignment: CENTER;" : "");
+        label.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;" + alignStyle);
+        return label;
+    }
+
     @SuppressWarnings("unchecked")
-    private VBox createTableSection() {
-        VBox section = new VBox(10);
-        section.setPadding(new Insets(20, 0, 0, 0));
-        VBox.setVgrow(section, Priority.ALWAYS);
-
-        Label tableTitle = new Label("GIAO DỊCH GẦN NHẤT");
-        tableTitle.setStyle("-fx-text-fill: #FAFAFA; -fx-font-size: 13px; -fx-font-weight: bold;");
-
-        // Table setup
+    private void setupLegacyTable() {
         TableColumn<RecentTransactionViewModel, String> dateCol = new TableColumn<>("THỜI GIAN");
         dateCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().dateFormatted()));
         dateCol.setPrefWidth(120);
@@ -195,31 +206,58 @@ public class DashboardPane extends BorderPane implements DashboardView {
         TableColumn<RecentTransactionViewModel, String> amountCol = new TableColumn<>("SỐ TIỀN (VNĐ)");
         amountCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().amountFormatted()));
         amountCol.setPrefWidth(140);
-        amountCol.setCellFactory(col -> new TableCell<RecentTransactionViewModel, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item);
-                    setAlignment(Pos.CENTER_RIGHT);
-                    RecentTransactionViewModel rowData = getTableView().getItems().get(getIndex());
-                    if (rowData.isIncome()) {
-                        setStyle("-fx-text-fill: #4ADE80; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
-                    } else {
-                        setStyle("-fx-text-fill: #FB7185; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
-                    }
-                }
-            }
-        });
 
         recentTable.getColumns().setAll(dateCol, walletCol, catCol, noteCol, amountCol);
         recentTable.setPlaceholder(new Label("Chưa có giao dịch phát sinh trong chu kỳ này."));
-        VBox.setVgrow(recentTable, Priority.ALWAYS);
+    }
 
-        section.getChildren().addAll(tableTitle, recentTable);
+    private VBox createTableSection() {
+        VBox section = new VBox(10);
+        section.setPadding(new Insets(20, 0, 0, 0));
+        VBox.setVgrow(section, Priority.ALWAYS);
+
+        HBox sectionHeader = new HBox(12);
+        sectionHeader.setAlignment(Pos.CENTER_LEFT);
+        Label tableTitle = new Label("GIAO DỊCH GẦN NHẤT");
+        tableTitle.setStyle("-fx-text-fill: #FAFAFA; -fx-font-size: 13px; -fx-font-weight: bold;");
+        Label subtitle = new Label("Tự động cập nhật từ sổ giao dịch");
+        subtitle.setStyle("-fx-text-fill: #71717A; -fx-font-size: 11px;");
+        sectionHeader.getChildren().addAll(tableTitle, subtitle);
+
+        // Minimalist Guides Stream Header (7 Columns matching DashboardTransactionRowNode)
+        this.streamHeader = new HBox(12);
+        this.streamHeader.getStyleClass().add("stream-header");
+        this.streamHeader.setAlignment(Pos.CENTER_LEFT);
+        this.streamHeader.setStyle("-fx-padding: 8px 16px; -fx-background-color: transparent; " +
+                "-fx-border-color: transparent transparent #242424 transparent; -fx-border-width: 0 0 1px 0;");
+
+        Label hDate = createHeaderLabel("THỜI GIAN", 100, Pos.CENTER_LEFT);
+        Label hAmount = createHeaderLabel("SỐ TIỀN & PHỤ PHÍ", 165, Pos.CENTER_RIGHT);
+        Label hWallet = createHeaderLabel("TÀI KHOẢN VÍ", 135, Pos.CENTER_LEFT);
+        Label hGroup = createHeaderLabel("NHÓM NHU CẦU", 145, Pos.CENTER_LEFT);
+        Label hCat = createHeaderLabel("DANH MỤC", 140, Pos.CENTER_LEFT);
+
+        Label hNote = new Label("GHI CHÚ / NỘI DUNG");
+        hNote.setMinWidth(0);
+        hNote.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(hNote, Priority.ALWAYS);
+        hNote.setStyle("-fx-text-fill: -color-text-dim; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        Label hType = createHeaderLabel("PHÂN LOẠI", 100, Pos.CENTER);
+
+        this.streamHeader.getChildren().addAll(hDate, hAmount, hWallet, hGroup, hCat, hNote, hType);
+
+        this.streamItemsContainer.setFillWidth(true);
+        this.streamItemsContainer.setStyle("-fx-background-color: transparent; -fx-padding: 8px 0 8px 0;");
+
+        this.streamScrollPane.setFitToWidth(true);
+        this.streamScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
+        VBox.setVgrow(this.streamScrollPane, Priority.ALWAYS);
+
+        // Keep legacy TableView columns configured for test compatibility
+        setupLegacyTable();
+
+        section.getChildren().addAll(sectionHeader, this.streamHeader, this.streamScrollPane);
         return section;
     }
     // endregion
@@ -262,6 +300,22 @@ public class DashboardPane extends BorderPane implements DashboardView {
                 recentTxnsList.setAll(txns);
             } else {
                 recentTxnsList.clear();
+            }
+
+            streamItemsContainer.getChildren().clear();
+            if (txns == null || txns.isEmpty()) {
+                VBox emptyCard = new VBox(8);
+                emptyCard.setAlignment(Pos.CENTER);
+                emptyCard.setStyle("-fx-background-color: #121212; -fx-background-radius: 8px; " +
+                        "-fx-border-color: #1E1E1E; -fx-border-radius: 8px; -fx-padding: 36px 20px;");
+                Label emptyText = new Label("Chưa có giao dịch phát sinh trong chu kỳ này.");
+                emptyText.setStyle("-fx-text-fill: #71717A; -fx-font-size: 13px;");
+                emptyCard.getChildren().add(emptyText);
+                streamItemsContainer.getChildren().add(emptyCard);
+            } else {
+                for (RecentTransactionViewModel item : txns) {
+                    streamItemsContainer.getChildren().add(new DashboardTransactionRowNode(item));
+                }
             }
         });
     }
@@ -376,6 +430,18 @@ public class DashboardPane extends BorderPane implements DashboardView {
 
     public ReportGUIController getReportController() {
         return reportController;
+    }
+
+    public HBox getStreamHeader() {
+        return streamHeader;
+    }
+
+    public VBox getStreamItemsContainer() {
+        return streamItemsContainer;
+    }
+
+    public ScrollPane getStreamScrollPane() {
+        return streamScrollPane;
     }
 
     public void setMessageConsumer(Consumer<String> consumer) {
