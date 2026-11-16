@@ -1,86 +1,118 @@
 package com.pfms.presentation.report.dialog;
 
-import com.pfms.presentation.common.ViewConstants;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Hộp thoại modal hiển thị và sao chép văn bản báo cáo tài chính đã xuất (UC-REP-03).
+ * Hộp thoại modal hiển thị và sao chép văn bản báo cáo tài chính đã xuất (UC-REP-03) sử dụng JavaFX.
  */
-public class ExportReportDialog extends JDialog {
+public class ExportReportDialog extends Dialog<ButtonType> {
 
     private final String reportContent;
-    private final JTextArea reportTextArea;
+    private final TextArea reportTextArea = new TextArea();
 
     private Consumer<String> messageConsumer = msg -> {
-        JOptionPane.showMessageDialog(this, msg, "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        try {
+            if (Platform.isFxApplicationThread()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Thông báo");
+                alert.setHeaderText(null);
+                alert.setContentText(msg);
+                alert.showAndWait();
+            }
+        } catch (Exception ignored) {
+        }
     };
 
-    public ExportReportDialog(JFrame parent, String title, String reportContent) {
-        super(parent, title != null ? title : "Xuất Báo cáo Tài chính", true);
+    public ExportReportDialog(Window owner, String title, String reportContent) {
         this.reportContent = Objects.requireNonNull(reportContent, "Nội dung báo cáo không được để null");
 
-        setSize(720, 520);
-        setMinimumSize(new Dimension(500, 380));
-        setLocationRelativeTo(parent);
-        setLayout(new BorderLayout());
+        setTitle(title != null ? title : "Xuất Báo cáo Tài chính");
+        initOwner(owner);
 
-        this.reportTextArea = new JTextArea(this.reportContent);
-        this.reportTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        this.reportTextArea.setEditable(false);
-        this.reportTextArea.setBackground(ViewConstants.COLOR_STATUS_BG);
-        this.reportTextArea.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        this.reportTextArea.setCaretPosition(0);
+        buildUI();
+    }
 
-        JScrollPane scrollPane = new JScrollPane(this.reportTextArea);
-        scrollPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(15, 15, 10, 15),
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
-        add(scrollPane, BorderLayout.CENTER);
+    public ExportReportDialog(Object parent, String title, String reportContent) {
+        this((Window) null, title, reportContent);
+    }
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 10));
-        buttonPanel.setBackground(ViewConstants.COLOR_STATUS_BG);
-        buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
+    private void buildUI() {
+        DialogPane pane = getDialogPane();
+        pane.getStyleClass().add("pfms-dialog");
 
-        JButton copyButton = new JButton("Sao chép vào Clipboard");
-        copyButton.setFont(ViewConstants.FONT_BODY);
-        copyButton.setBackground(ViewConstants.COLOR_PRIMARY_LIGHT);
-        copyButton.setForeground(ViewConstants.COLOR_STATUS_BG);
-        copyButton.setFocusPainted(false);
-        copyButton.addActionListener(e -> triggerCopy());
+        var cssResource = getClass().getResource("/css/pfms-theme.css");
+        if (cssResource != null) {
+            pane.getStylesheets().add(cssResource.toExternalForm());
+        }
 
-        JButton closeButton = new JButton("Đóng");
-        closeButton.setFont(ViewConstants.FONT_BODY);
-        closeButton.addActionListener(e -> dispose());
+        VBox contentBox = new VBox(12);
+        contentBox.setPadding(new Insets(16));
+        contentBox.setPrefSize(700, 480);
 
-        buttonPanel.add(copyButton);
-        buttonPanel.add(closeButton);
-        add(buttonPanel, BorderLayout.SOUTH);
+        Label headerTitle = new Label("Nội Dung Báo Cáo Tài Chính Đã Xuất");
+        headerTitle.setStyle("-fx-text-fill: -color-primary; -fx-font-size: 15px; -fx-font-weight: bold;");
+
+        reportTextArea.setText(this.reportContent);
+        reportTextArea.setEditable(false);
+        reportTextArea.setStyle("-fx-font-family: 'Consolas', 'Courier New', monospace; -fx-font-size: 12px; -fx-text-fill: -color-text-main; -fx-control-inner-background: #0E0E0E;");
+        VBox.setVgrow(reportTextArea, Priority.ALWAYS);
+
+        HBox buttonBar = new HBox(10);
+        buttonBar.setAlignment(Pos.CENTER_RIGHT);
+
+        Button btnCopy = new Button("Sao chép vào Clipboard");
+        btnCopy.getStyleClass().add("btn-primary");
+        btnCopy.setOnAction(e -> triggerCopy());
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        buttonBar.getChildren().addAll(spacer, btnCopy);
+
+        contentBox.getChildren().addAll(headerTitle, reportTextArea, buttonBar);
+        pane.setContent(contentBox);
+
+        ButtonType closeButtonType = new ButtonType("Đóng", ButtonBar.ButtonData.CANCEL_CLOSE);
+        pane.getButtonTypes().add(closeButtonType);
+
+        Button btnClose = (Button) pane.lookupButton(closeButtonType);
+        if (btnClose != null) {
+            btnClose.getStyleClass().add("btn-secondary");
+        }
     }
 
     public void triggerCopy() {
         try {
-            StringSelection selection = new StringSelection(this.reportContent);
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putString(this.reportContent);
+            clipboard.setContent(content);
         } catch (Exception ignored) {
-            // bỏ qua lỗi clipboard trong môi trường headless
+            // bỏ qua lỗi clipboard trong môi trường test/headless
         }
-        this.messageConsumer.accept("Đã sao chép nội dung báo cáo vào bộ nhớ tạm (Clipboard)!");
+        if (this.messageConsumer != null) {
+            this.messageConsumer.accept("Đã sao chép nội dung báo cáo vào bộ nhớ tạm (Clipboard)!");
+        }
     }
 
     public String getReportText() {
@@ -89,5 +121,17 @@ public class ExportReportDialog extends JDialog {
 
     public void setMessageConsumer(Consumer<String> consumer) {
         this.messageConsumer = Objects.requireNonNull(consumer);
+    }
+
+    public void dispose() {
+        close();
+    }
+
+    public void setVisible(boolean visible) {
+        if (visible) {
+            showAndWait();
+        } else {
+            close();
+        }
     }
 }
