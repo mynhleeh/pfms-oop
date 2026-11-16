@@ -58,7 +58,13 @@ public class App extends Application {
         Objects.requireNonNull(primaryStage, "Stage không được để null");
 
         MainController mainController = buildMainController(storagePath);
-        return new MainStage(primaryStage, mainController);
+        MainStage mainStage = new MainStage(primaryStage, mainController);
+
+        // Đăng ký các phân hệ JavaFX hoàn thiện
+        com.pfms.presentation.wallet.WalletPane walletPane = new com.pfms.presentation.wallet.WalletPane(mainController.getWalletController());
+        mainStage.registerView(MainController.CARD_WALLETS, walletPane);
+
+        return mainStage;
     }
     // endregion
 
