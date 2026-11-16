@@ -82,4 +82,38 @@ class CategoryPanelTest {
     void testNullControllerThrowsException() {
         assertThrows(NullPointerException.class, () -> new CategoryPanel(null));
     }
+
+    @Test
+    @DisplayName("Tìm kiếm danh mục theo từ khóa lọc tức thì các dòng trên bảng")
+    void testSearchFilterMatchesCategoryNameAndGroupName() {
+        assertEquals(3, panel.getTable().getRowCount());
+
+        panel.getSearchField().setText("Ăn");
+        assertEquals(1, panel.getTable().getRowCount());
+        assertEquals("Ăn uống", panel.getTable().getValueAt(0, 2));
+
+        panel.getSearchField().setText("Thu nhập chính");
+        assertEquals(1, panel.getTable().getRowCount());
+        assertEquals("Tiền lương", panel.getTable().getValueAt(0, 2));
+
+        panel.getSearchField().setText("không có mục này");
+        assertEquals(0, panel.getTable().getRowCount());
+
+        panel.getSearchField().setText("");
+        assertEquals(3, panel.getTable().getRowCount());
+    }
+
+    @Test
+    @DisplayName("Cấu trúc bảng 5 cột chứa dữ liệu CategoryRowData tại cột Thao tác")
+    void testTableColumnsAndActionRowData() {
+        assertEquals(5, panel.getTable().getColumnCount());
+        assertEquals("Thao tác", panel.getTable().getColumnName(4));
+
+        Object rowDataObj = panel.getTable().getValueAt(0, 4);
+        assertInstanceOf(CategoryPanel.CategoryRowData.class, rowDataObj);
+        CategoryPanel.CategoryRowData rowData = (CategoryPanel.CategoryRowData) rowDataObj;
+        assertNotNull(rowData.id());
+        assertEquals("Ăn uống", rowData.name());
+        assertEquals("EXPENSE", rowData.type());
+    }
 }

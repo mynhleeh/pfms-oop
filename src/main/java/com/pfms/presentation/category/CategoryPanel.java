@@ -1,30 +1,63 @@
 package com.pfms.presentation.category;
 
+import com.pfms.presentation.category.component.CategoryTableActionRenderer;
 import com.pfms.presentation.category.component.CategoryTreeCellRenderer;
 import com.pfms.presentation.category.dialog.CreateCategoryDialog;
 import com.pfms.presentation.category.dialog.CreateNeedGroupDialog;
 import com.pfms.presentation.category.dialog.UpdateCategoryDialog;
 import com.pfms.presentation.common.ViewConstants;
+import com.pfms.presentation.common.component.RoundedBorder;
+import com.pfms.presentation.common.component.RoundedCardPanel;
+import com.pfms.presentation.common.component.SearchIcon;
 import com.pfms.presentation.dto.category.CategoryHierarchyResponseDTO;
 import com.pfms.presentation.dto.category.CategoryResponseDTO;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * Bảng điều khiển phân hệ Quản lý Danh mục Thu Chi (Passive View).
- * Trình diễn cấu trúc phân cấp đa tầng dạng cây (JTree) và bảng chi tiết danh mục con.
+ * Trình diễn cấu trúc phân cấp đa tầng (JTree), bảng chi tiết kèm thao tác nhanh trực tiếp (Inline Actions),
+ * khung bo tròn mềm mại và thanh tìm kiếm vector thời gian thực theo chuẩn thiết kế Luxury Black &amp; Gold.
  */
 public class CategoryPanel extends JPanel implements CategoryView {
 
@@ -33,11 +66,24 @@ public class CategoryPanel extends JPanel implements CategoryView {
     private final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Hệ thống Danh mục PFMS");
     private final DefaultTreeModel treeModel = new DefaultTreeModel(this.rootNode);
     private final JTree tree = new JTree(this.treeModel);
-    private final DefaultTableModel tableModel = new DefaultTableModel(new String[]{"Loại", "Nhóm Nhu cầu", "Tên Danh mục", "Trạng thái"}, 0) {
-        @Override public boolean isCellEditable(int r, int c) { return false; }
+
+    private final DefaultTableModel tableModel = new DefaultTableModel(
+            new String[]{"Loại", "Nhóm Nhu cầu", "Tên Danh mục", "Trạng thái", "Thao tác"}, 0) {
+        @Override
+        public boolean isCellEditable(int r, int c) {
+            return c == 4;
+        }
     };
     private final JTable detailTable = new JTable(this.tableModel);
+
     private final JLabel summaryLabel = new JLabel("Tổng số nhóm: 0 | Tổng số danh mục: 0");
+    private final JLabel statTotalGroups = createStatLabel("Tổng số nhóm: 0", ViewConstants.COLOR_TEXT_MAIN);
+    private final JLabel statTotalCats = createStatLabel("Tổng danh mục: 0", ViewConstants.COLOR_TEXT_MAIN);
+    private final JLabel statExpense = createStatLabel("Chi phí: 0", ViewConstants.COLOR_EXPENSE);
+    private final JLabel statIncome = createStatLabel("Thu nhập: 0", ViewConstants.COLOR_INCOME);
+
+    private final JTextField searchField = new JTextField(15);
+
     private List<CategoryHierarchyResponseDTO> cachedHierarchy = Collections.emptyList();
     private Runnable onCategoryChangedListener;
     private Consumer<String> messageConsumer, warningConsumer, errorConsumer;
@@ -49,105 +95,336 @@ public class CategoryPanel extends JPanel implements CategoryView {
     public CategoryPanel(CategoryGUIController categoryController) {
         Objects.requireNonNull(categoryController, "CategoryGUIController không được để null");
         this.presenter = new CategoryPresenter(this, categoryController);
-        initViews(); reloadCategories();
+        initViews();
+        reloadCategories();
     }
     // endregion
 
     // region UI
     private void initViews() {
-        setLayout(new BorderLayout(10, 10)); setBackground(ViewConstants.COLOR_CONTENT_BG);
+        setLayout(new BorderLayout(10, 10));
+        setBackground(ViewConstants.COLOR_CONTENT_BG);
+
         this.tree.setFont(ViewConstants.FONT_BODY);
         this.tree.setBackground(ViewConstants.COLOR_CARD_BG);
         this.tree.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.tree.setCellRenderer(new CategoryTreeCellRenderer());
         this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        this.tree.addTreeSelectionListener(e -> onTreeNodeSelected()); setupDetailTable();
-        this.summaryLabel.setFont(ViewConstants.FONT_NAV_ACTIVE); this.summaryLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.tree.addTreeSelectionListener(e -> onTreeNodeSelected());
+        setupTreeContextMenu();
 
-        JPanel north = new JPanel(); north.setLayout(new BoxLayout(north, BoxLayout.Y_AXIS));
-        north.setBackground(ViewConstants.COLOR_CONTENT_BG); north.setBorder(BorderFactory.createEmptyBorder(20, 24, 12, 24));
-        JLabel title = new JLabel("Quản lý Danh mục Thu Chi"); title.setFont(ViewConstants.FONT_PANEL_HEADER); title.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0)); bar.setBackground(ViewConstants.COLOR_CONTENT_BG);
-        for (JButton b : new JButton[]{
-                toolBtn("+ Thêm Nhóm cha", ViewConstants.COLOR_PRIMARY_LIGHT, Color.WHITE, e -> this.presenter.onAddNeedGroupClicked()),
-                toolBtn("+ Thêm Danh mục con", ViewConstants.COLOR_PRIMARY_LIGHT, Color.WHITE, e -> this.presenter.onAddCategoryClicked()),
-                toolBtn("Đổi tên", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN, e -> handleRenameSelected()),
-                toolBtn("Xóa", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_EXPENSE, e -> handleDeleteSelected()),
-                toolBtn("Làm mới", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN, e -> reloadCategories())
-        }) bar.add(b);
-        north.add(title); north.add(Box.createVerticalStrut(12)); north.add(bar); add(north, BorderLayout.NORTH);
+        setupDetailTable();
 
-        JScrollPane treeSp = new JScrollPane(this.tree), tblSp = new JScrollPane(this.detailTable);
+        this.summaryLabel.setFont(ViewConstants.FONT_NAV_ACTIVE);
+        this.summaryLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+
+        // North Header Area
+        JPanel north = new JPanel();
+        north.setLayout(new BoxLayout(north, BoxLayout.Y_AXIS));
+        north.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        north.setBorder(BorderFactory.createEmptyBorder(18, 24, 12, 24));
+
+        // Row 1: Title + Quick Stats Pills (Rounded Capsules)
+        JPanel headerTop = new JPanel(new BorderLayout(16, 0));
+        headerTop.setBackground(ViewConstants.COLOR_CONTENT_BG);
+
+        JLabel title = new JLabel("Quản lý Danh mục Thu Chi");
+        title.setFont(ViewConstants.FONT_PANEL_HEADER);
+        title.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        headerTop.add(title, BorderLayout.WEST);
+
+        JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        statsPanel.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        statsPanel.add(wrapStatPill(this.statTotalGroups));
+        statsPanel.add(wrapStatPill(this.statTotalCats));
+        statsPanel.add(wrapStatPill(this.statExpense));
+        statsPanel.add(wrapStatPill(this.statIncome));
+        headerTop.add(statsPanel, BorderLayout.EAST);
+
+        // Row 2: Action Toolbar (Buttons on Left, Rounded Vector Search on Right)
+        JPanel bar = new JPanel(new BorderLayout(16, 0));
+        bar.setBackground(ViewConstants.COLOR_CONTENT_BG);
+
+        JPanel btnGroupLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        btnGroupLeft.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        btnGroupLeft.add(toolBtn("+ Thêm Nhóm cha", ViewConstants.COLOR_PRIMARY_LIGHT, ViewConstants.COLOR_SIDEBAR_BG, e -> this.presenter.onAddNeedGroupClicked()));
+        btnGroupLeft.add(toolBtn("+ Thêm Danh mục con", ViewConstants.COLOR_PRIMARY_LIGHT, ViewConstants.COLOR_SIDEBAR_BG, e -> this.presenter.onAddCategoryClicked()));
+        bar.add(btnGroupLeft, BorderLayout.WEST);
+
+        // Rounded Search Capsule Box with Vector SearchIcon
+        RoundedCardPanel searchBox = new RoundedCardPanel(new BorderLayout(8, 0), 16, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
+        searchBox.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
+        searchBox.setPreferredSize(new Dimension(230, 34));
+
+        JLabel searchIconLabel = new JLabel(new SearchIcon(14, ViewConstants.COLOR_PRIMARY_LIGHT));
+
+        this.searchField.setFont(ViewConstants.FONT_BODY);
+        this.searchField.setBackground(ViewConstants.COLOR_CARD_BG);
+        this.searchField.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.searchField.setCaretColor(ViewConstants.COLOR_PRIMARY_LIGHT);
+        this.searchField.setBorder(null);
+        this.searchField.setOpaque(false);
+        this.searchField.putClientProperty("JTextField.placeholderText", "Tìm kiếm danh mục...");
+        this.searchField.setToolTipText("Tìm kiếm theo tên danh mục hoặc nhóm nhu cầu...");
+        this.searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent e) { onFilterChanged(); }
+            @Override public void removeUpdate(DocumentEvent e) { onFilterChanged(); }
+            @Override public void changedUpdate(DocumentEvent e) { onFilterChanged(); }
+        });
+
+        searchBox.add(searchIconLabel, BorderLayout.WEST);
+        searchBox.add(this.searchField, BorderLayout.CENTER);
+        bar.add(searchBox, BorderLayout.EAST);
+
+        north.add(headerTop);
+        north.add(Box.createVerticalStrut(14));
+        north.add(bar);
+        add(north, BorderLayout.NORTH);
+
+        // Center Split Pane with Rounded Card Frames
+        JScrollPane treeSp = new JScrollPane(this.tree);
         treeSp.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
         treeSp.setBackground(ViewConstants.COLOR_CARD_BG);
+        treeSp.setBorder(null);
+
+        RoundedCardPanel treeCard = new RoundedCardPanel(new BorderLayout(), 14, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
+        treeCard.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        treeCard.add(treeSp, BorderLayout.CENTER);
+
+        JPanel treeContainer = new JPanel(new BorderLayout());
+        treeContainer.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        treeContainer.setBorder(BorderFactory.createEmptyBorder(0, 24, 12, 6));
+        treeContainer.add(treeCard, BorderLayout.CENTER);
+
+        JScrollPane tblSp = new JScrollPane(this.detailTable);
         tblSp.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
         tblSp.setBackground(ViewConstants.COLOR_CARD_BG);
-        treeSp.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 24, 12, 6), BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
-        tblSp.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 6, 12, 24), BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER)));
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeSp, tblSp);
-        split.setDividerLocation(360); split.setResizeWeight(0.35); split.setBorder(null); split.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        tblSp.setBorder(null);
+
+        RoundedCardPanel tableCard = new RoundedCardPanel(new BorderLayout(), 14, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
+        tableCard.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        tableCard.add(tblSp, BorderLayout.CENTER);
+
+        JPanel tableContainer = new JPanel(new BorderLayout());
+        tableContainer.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        tableContainer.setBorder(BorderFactory.createEmptyBorder(0, 6, 12, 24));
+        tableContainer.add(tableCard, BorderLayout.CENTER);
+
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeContainer, tableContainer);
+        split.setDividerLocation(360);
+        split.setResizeWeight(0.32);
+        split.setBorder(null);
+        split.setBackground(ViewConstants.COLOR_CONTENT_BG);
         add(split, BorderLayout.CENTER);
 
-        JPanel south = new JPanel(new FlowLayout(FlowLayout.LEFT, 24, 10)); south.setBackground(ViewConstants.COLOR_STATUS_BG);
-        south.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER), BorderFactory.createEmptyBorder(4, 0, 4, 0)));
-        south.add(this.summaryLabel); add(south, BorderLayout.SOUTH);
+        // South Status Bar
+        JPanel south = new JPanel(new FlowLayout(FlowLayout.LEFT, 24, 10));
+        south.setBackground(ViewConstants.COLOR_STATUS_BG);
+        south.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER),
+                BorderFactory.createEmptyBorder(4, 0, 4, 0)));
+        south.add(this.summaryLabel);
+        add(south, BorderLayout.SOUTH);
     }
 
     private void setupDetailTable() {
         com.pfms.presentation.common.ViewUtils.styleTable(this.detailTable);
-        DefaultTableCellRenderer c = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.CENTER, ViewConstants.COLOR_TEXT_MUTED);
+
         DefaultTableCellRenderer l = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MAIN);
-        int[] w = {100, 180, 200, 110};
-        for (int i = 0; i < Math.min(4, this.detailTable.getColumnModel().getColumnCount()); i++) {
-            this.detailTable.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
-            if (i == 0 || i == 3) {
-                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(c);
-            } else {
-                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(l);
+        DefaultTableCellRenderer groupRenderer = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MUTED);
+
+        DefaultTableCellRenderer typeRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+                if (!isSelected) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    boolean isExpense = "EXPENSE".equalsIgnoreCase(String.valueOf(value));
+                    setForeground(isExpense ? ViewConstants.COLOR_EXPENSE : ViewConstants.COLOR_INCOME);
+                }
+                return this;
             }
+        };
+
+        DefaultTableCellRenderer statusRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+                if (!isSelected) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    setForeground(ViewConstants.COLOR_INCOME);
+                }
+                return this;
+            }
+        };
+
+        CategoryTableActionRenderer actionRenderer = new CategoryTableActionRenderer(
+                this::handleEditFromRow,
+                this::handleDeleteFromRow
+        );
+
+        int[] w = {90, 180, 220, 90, 130};
+        for (int i = 0; i < Math.min(5, this.detailTable.getColumnModel().getColumnCount()); i++) {
+            this.detailTable.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
+            if (i == 0) {
+                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(typeRenderer);
+            } else if (i == 1) {
+                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(groupRenderer);
+            } else if (i == 2) {
+                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(l);
+            } else if (i == 3) {
+                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(statusRenderer);
+            } else if (i == 4) {
+                this.detailTable.getColumnModel().getColumn(i).setCellRenderer(actionRenderer);
+                this.detailTable.getColumnModel().getColumn(i).setCellEditor(actionRenderer);
+            }
+        }
+
+        this.detailTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+                    int row = detailTable.getSelectedRow();
+                    if (row >= 0 && row < tableModel.getRowCount()) {
+                        Object obj = tableModel.getValueAt(row, 4);
+                        handleEditFromRow(obj);
+                    }
+                }
+            }
+        });
+    }
+
+    private void setupTreeContextMenu() {
+        this.tree.addMouseListener(new MouseAdapter() {
+            @Override public void mousePressed(MouseEvent e) { maybeShowPopup(e); }
+            @Override public void mouseReleased(MouseEvent e) { maybeShowPopup(e); }
+
+            private void maybeShowPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int selRow = tree.getClosestRowForLocation(e.getX(), e.getY());
+                    if (selRow >= 0) {
+                        tree.setSelectionRow(selRow);
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+                        if (node != null && !node.isRoot()) {
+                            showTreePopupMenu(e.getComponent(), e.getX(), e.getY(), node.getUserObject());
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void showTreePopupMenu(Component comp, int x, int y, Object userObj) {
+        JPopupMenu menu = new JPopupMenu();
+        if (userObj instanceof NeedGroupNode gn) {
+            JMenuItem addCat = new JMenuItem("+ Thêm Danh mục vào nhóm này");
+            addCat.setFont(ViewConstants.FONT_BODY);
+            addCat.addActionListener(e -> presenter.onAddCategoryClicked());
+
+            JMenuItem rename = new JMenuItem("Đổi tên nhóm...");
+            rename.setFont(ViewConstants.FONT_BODY);
+            rename.addActionListener(e -> presenter.renameNeedGroup(gn.id(), gn.name()));
+
+            JMenuItem delete = new JMenuItem("Xóa nhóm nhu cầu");
+            delete.setFont(ViewConstants.FONT_BODY);
+            delete.setForeground(ViewConstants.COLOR_EXPENSE);
+            delete.addActionListener(e -> presenter.deleteNeedGroup(gn.id(), gn.name()));
+
+            menu.add(addCat);
+            menu.add(rename);
+            menu.addSeparator();
+            menu.add(delete);
+            menu.show(comp, x, y);
+        } else if (userObj instanceof CategoryNode cn) {
+            UUID parentGroupId = findParentGroupId(cn.id());
+            JMenuItem edit = new JMenuItem("Chỉnh sửa danh mục...");
+            edit.setFont(ViewConstants.FONT_BODY);
+            edit.addActionListener(e -> presenter.onEditCategoryClicked(cn.id(), cn.name(), parentGroupId, cn.type()));
+
+            JMenuItem delete = new JMenuItem("Xóa danh mục");
+            delete.setFont(ViewConstants.FONT_BODY);
+            delete.setForeground(ViewConstants.COLOR_EXPENSE);
+            delete.addActionListener(e -> presenter.deleteCategory(cn.id(), cn.name()));
+
+            menu.add(edit);
+            menu.addSeparator();
+            menu.add(delete);
+            menu.show(comp, x, y);
         }
     }
 
+    private static JLabel createStatLabel(String text, Color fgColor) {
+        JLabel lbl = new JLabel(text);
+        lbl.setFont(ViewConstants.FONT_STATUS);
+        lbl.setForeground(fgColor);
+        return lbl;
+    }
+
+    private static RoundedCardPanel wrapStatPill(JLabel label) {
+        RoundedCardPanel pill = new RoundedCardPanel(new FlowLayout(FlowLayout.CENTER, 0, 0), 16, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
+        pill.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+        pill.add(label);
+        return pill;
+    }
+
     private JButton toolBtn(String text, Color bg, Color fg, ActionListener l) {
-        JButton b = new JButton(text); b.setFont(ViewConstants.FONT_BODY); b.setBackground(bg); b.setForeground(fg); b.setFocusPainted(false); b.addActionListener(l); return b;
+        JButton b = new JButton(text);
+        b.setFont(ViewConstants.FONT_NAV_ACTIVE);
+        b.setBackground(bg);
+        b.setForeground(fg);
+        b.setFocusPainted(false);
+        b.putClientProperty("Component.arc", 12);
+        b.putClientProperty("JButton.buttonType", "roundRect");
+        b.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(12, ViewConstants.COLOR_PRIMARY, new Insets(2, 4, 2, 4)),
+                BorderFactory.createEmptyBorder(6, 16, 6, 16)
+        ));
+        b.addActionListener(l);
+        return b;
     }
     // endregion
 
     // region Actions
-    private void handleRenameSelected() {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-        if (node == null || node.isRoot()) { showWarning("Vui lòng chọn một nhóm nhu cầu hoặc danh mục con trên cây để đổi tên!"); return; }
-        Object obj = node.getUserObject();
-        if (obj instanceof NeedGroupNode gn) {
-            this.presenter.renameNeedGroup(gn.id(), gn.name());
-        } else if (obj instanceof CategoryNode cn) {
-            UUID parentGroupId = findParentGroupId(cn.id());
-            this.presenter.onEditCategoryClicked(cn.id(), cn.name(), parentGroupId, cn.type());
-        } else {
-            showWarning("Không thể đổi tên nhánh cấp cao!");
+    private void handleEditFromRow(Object rowDataObj) {
+        if (rowDataObj instanceof CategoryRowData row) {
+            this.presenter.onEditCategoryClicked(row.id(), row.name(), row.parentGroupId(), row.type());
         }
     }
 
-    private void handleDeleteSelected() {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-        if (node == null || node.isRoot()) { showWarning("Vui lòng chọn một nhóm nhu cầu hoặc danh mục con để xóa!"); return; }
-        Object obj = node.getUserObject();
-        if (obj instanceof NeedGroupNode gn) this.presenter.deleteNeedGroup(gn.id(), gn.name());
-        else if (obj instanceof CategoryNode cn) this.presenter.deleteCategory(cn.id(), cn.name());
-        else showWarning("Không thể xóa nhánh phân loại cấp cao!");
+    private void handleDeleteFromRow(Object rowDataObj) {
+        if (rowDataObj instanceof CategoryRowData row) {
+            this.presenter.deleteCategory(row.id(), row.name());
+        }
     }
 
-    @Override public void openCreateNeedGroupDialog() {
+    @Override
+    public void openCreateNeedGroupDialog() {
         CreateNeedGroupDialog d = new CreateNeedGroupDialog((JFrame) SwingUtilities.getWindowAncestor(this), this.presenter.getController());
-        d.setVisible(true); if (d.isSuccess()) { showMessage("Đã tạo nhóm nhu cầu thành công!"); reloadCategories(); }
+        d.setVisible(true);
+        if (d.isSuccess()) {
+            showMessage("Đã tạo nhóm nhu cầu thành công!");
+            reloadCategories();
+        }
     }
 
-    @Override public void openCreateCategoryDialog() {
+    @Override
+    public void openCreateCategoryDialog() {
         CreateCategoryDialog d = new CreateCategoryDialog((JFrame) SwingUtilities.getWindowAncestor(this), this.presenter.getController());
-        d.setVisible(true); if (d.isSuccess()) { showMessage("Đã tạo danh mục con thành công!"); reloadCategories(); }
+        d.setVisible(true);
+        if (d.isSuccess()) {
+            showMessage("Đã tạo danh mục con thành công!");
+            reloadCategories();
+        }
     }
 
-    @Override public void openUpdateCategoryDialog(UUID categoryId, String currentName, UUID currentParentGroupId, String transactionType) {
+    @Override
+    public void openUpdateCategoryDialog(UUID categoryId, String currentName, UUID currentParentGroupId, String transactionType) {
         UpdateCategoryDialog d = new UpdateCategoryDialog(
                 (JFrame) SwingUtilities.getWindowAncestor(this),
                 this.presenter.getController(),
@@ -159,63 +436,157 @@ public class CategoryPanel extends JPanel implements CategoryView {
         }
     }
 
-    @Override public String openRenameDialog(String currentName, boolean isGroup) {
+    @Override
+    public String openRenameDialog(String currentName, boolean isGroup) {
         String prompt = "Nhập tên mới cho " + (isGroup ? "nhóm nhu cầu" : "danh mục con") + " (hiện tại: " + currentName + "):";
         return (this.inputSupplier != null) ? this.inputSupplier.apply(prompt) : JOptionPane.showInputDialog(this, prompt);
     }
     // endregion
 
-    // region Data
-    @Override public void renderCategoryHierarchy(List<CategoryHierarchyResponseDTO> hierarchy, int totalGroups, int totalCats) {
+    // region Data & Filtering
+    @Override
+    public void renderCategoryHierarchy(List<CategoryHierarchyResponseDTO> hierarchy, int totalGroups, int totalCats) {
         this.cachedHierarchy = (hierarchy != null) ? hierarchy : Collections.emptyList();
-        buildTreeNodes(); updateSummary(totalGroups, totalCats); onTreeNodeSelected();
-        if (this.onCategoryChangedListener != null) this.onCategoryChangedListener.run();
+        buildTreeNodes();
+        updateSummary(totalGroups, totalCats);
+        onTreeNodeSelected();
+        if (this.onCategoryChangedListener != null) {
+            this.onCategoryChangedListener.run();
+        }
     }
 
-    public void reloadCategories() { this.presenter.loadData(); }
+    public void reloadCategories() {
+        this.presenter.loadData();
+    }
 
     private void buildTreeNodes() {
         this.rootNode.removeAllChildren();
-        DefaultMutableTreeNode expBranch = new DefaultMutableTreeNode("Khoản Chi (EXPENSE)"), incBranch = new DefaultMutableTreeNode("Khoản Thu (INCOME)");
+        DefaultMutableTreeNode expBranch = new DefaultMutableTreeNode("Khoản Chi (EXPENSE)");
+        DefaultMutableTreeNode incBranch = new DefaultMutableTreeNode("Khoản Thu (INCOME)");
+
         for (CategoryHierarchyResponseDTO g : this.cachedHierarchy) {
-            DefaultMutableTreeNode gNode = new DefaultMutableTreeNode(new NeedGroupNode(g.getNeedGroupId(), g.getNeedGroupName(), g.getTransactionType(), g.getNeedGroupStatus()));
-            if (g.getCategories() != null) for (CategoryResponseDTO c : g.getCategories()) gNode.add(new DefaultMutableTreeNode(new CategoryNode(c.getCategoryId(), c.getName(), c.getTransactionType(), c.getStatus())));
-            if ("EXPENSE".equalsIgnoreCase(g.getTransactionType())) expBranch.add(gNode); else incBranch.add(gNode);
+            DefaultMutableTreeNode gNode = new DefaultMutableTreeNode(
+                    new NeedGroupNode(g.getNeedGroupId(), g.getNeedGroupName(), g.getTransactionType(), g.getNeedGroupStatus()));
+            if (g.getCategories() != null) {
+                for (CategoryResponseDTO c : g.getCategories()) {
+                    gNode.add(new DefaultMutableTreeNode(
+                            new CategoryNode(c.getCategoryId(), c.getName(), c.getTransactionType(), c.getStatus())));
+                }
+            }
+            if ("EXPENSE".equalsIgnoreCase(g.getTransactionType())) {
+                expBranch.add(gNode);
+            } else {
+                incBranch.add(gNode);
+            }
         }
-        this.rootNode.add(expBranch); this.rootNode.add(incBranch); this.treeModel.reload();
-        for (int i = 0; i < this.tree.getRowCount(); i++) this.tree.expandRow(i);
+        this.rootNode.add(expBranch);
+        this.rootNode.add(incBranch);
+        this.treeModel.reload();
+        for (int i = 0; i < this.tree.getRowCount(); i++) {
+            this.tree.expandRow(i);
+        }
     }
 
     private void updateSummary(int totalGroups, int totalCategories) {
-        int expCats = 0, incCats = 0;
+        int expCats = 0;
+        int incCats = 0;
         for (CategoryHierarchyResponseDTO g : this.cachedHierarchy) {
             int count = g.getCategoryCount();
-            if ("EXPENSE".equalsIgnoreCase(g.getTransactionType())) expCats += count; else incCats += count;
+            if ("EXPENSE".equalsIgnoreCase(g.getTransactionType())) {
+                expCats += count;
+            } else {
+                incCats += count;
+            }
         }
-        this.summaryLabel.setText(String.format("Tổng số nhóm: %d | Tổng số danh mục: %d (Chi phí: %d | Thu nhập: %d)", totalGroups, totalCategories, expCats, incCats));
+        this.statTotalGroups.setText("Tổng số nhóm: " + totalGroups);
+        this.statTotalCats.setText("Tổng danh mục: " + totalCategories);
+        this.statExpense.setText("Chi phí: " + expCats);
+        this.statIncome.setText("Thu nhập: " + incCats);
+        this.summaryLabel.setText(String.format("Tổng số nhóm: %d | Tổng số danh mục: %d (Chi phí: %d | Thu nhập: %d)",
+                totalGroups, totalCategories, expCats, incCats));
+    }
+
+    private void onFilterChanged() {
+        onTreeNodeSelected();
     }
 
     private void onTreeNodeSelected() {
         this.tableModel.setRowCount(0);
+        String keyword = (this.searchField != null) ? this.searchField.getText().trim().toLowerCase(Locale.ROOT) : "";
         DefaultMutableTreeNode sel = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-        if (sel == null || sel.isRoot()) { populateTable(g -> true); return; }
-        Object obj = sel.getUserObject();
-        if (obj instanceof NeedGroupNode gn) populateTable(g -> gn.id().equals(g.getNeedGroupId()));
-        else if (obj instanceof CategoryNode cn) this.tableModel.addRow(new Object[]{cn.type(), "-", cn.name(), cn.status()});
-        else if (obj instanceof String b) populateTable(g -> (b.contains("EXPENSE") ? "EXPENSE" : "INCOME").equalsIgnoreCase(g.getTransactionType()));
+
+        Predicate<CategoryHierarchyResponseDTO> treeGroupFilter;
+        Predicate<CategoryResponseDTO> catNodeFilter = null;
+
+        if (sel == null || sel.isRoot()) {
+            treeGroupFilter = g -> true;
+        } else {
+            Object obj = sel.getUserObject();
+            if (obj instanceof NeedGroupNode gn) {
+                treeGroupFilter = g -> gn.id().equals(g.getNeedGroupId());
+            } else if (obj instanceof CategoryNode cn) {
+                treeGroupFilter = g -> true;
+                catNodeFilter = c -> cn.id().equals(c.getCategoryId());
+            } else if (obj instanceof String b) {
+                String type = b.contains("EXPENSE") ? "EXPENSE" : "INCOME";
+                treeGroupFilter = g -> type.equalsIgnoreCase(g.getTransactionType());
+            } else {
+                treeGroupFilter = g -> true;
+            }
+        }
+
+        for (CategoryHierarchyResponseDTO g : this.cachedHierarchy) {
+            if (treeGroupFilter.test(g) && g.getCategories() != null) {
+                for (CategoryResponseDTO c : g.getCategories()) {
+                    if (catNodeFilter != null && !catNodeFilter.test(c)) {
+                        continue;
+                    }
+                    if (!keyword.isEmpty()) {
+                        boolean matchCatName = c.getName() != null && c.getName().toLowerCase(Locale.ROOT).contains(keyword);
+                        boolean matchGroupName = g.getNeedGroupName() != null && g.getNeedGroupName().toLowerCase(Locale.ROOT).contains(keyword);
+                        if (!matchCatName && !matchGroupName) {
+                            continue;
+                        }
+                    }
+                    CategoryRowData rowData = new CategoryRowData(
+                            c.getCategoryId(), c.getName(), g.getNeedGroupId(), g.getNeedGroupName(), c.getTransactionType(), c.getStatus());
+                    this.tableModel.addRow(new Object[]{
+                            c.getTransactionType(),
+                            g.getNeedGroupName(),
+                            c.getName(),
+                            c.getStatus(),
+                            rowData
+                    });
+                }
+            }
+        }
     }
     // endregion
 
-    // region Getters
-    public JTree getTree() { return this.tree; } public JTable getTable() { return this.detailTable; }
+    // region Getters & Records
+    public JTree getTree() { return this.tree; }
+    public JTable getTable() { return this.detailTable; }
+    public JTextField getSearchField() { return this.searchField; }
     public String getSummaryText() { return this.summaryLabel.getText(); }
-    public CategoryPresenter getPresenter() { return this.presenter; } public CategoryGUIController getCategoryController() { return this.presenter.getController(); }
+    public CategoryPresenter getPresenter() { return this.presenter; }
+    public CategoryGUIController getCategoryController() { return this.presenter.getController(); }
+
     public void setOnCategoryChangedListener(Runnable l) { this.onCategoryChangedListener = l; }
-    public void setMessageConsumer(Consumer<String> c) { this.messageConsumer = Objects.requireNonNull(c); } public void setWarningConsumer(Consumer<String> c) { this.warningConsumer = Objects.requireNonNull(c); }
-    public void setErrorConsumer(Consumer<String> c) { this.errorConsumer = Objects.requireNonNull(c); } public void setConfirmConsumer(Predicate<String> c) { this.confirmConsumer = Objects.requireNonNull(c); }
+    public void setMessageConsumer(Consumer<String> c) { this.messageConsumer = Objects.requireNonNull(c); }
+    public void setWarningConsumer(Consumer<String> c) { this.warningConsumer = Objects.requireNonNull(c); }
+    public void setErrorConsumer(Consumer<String> c) { this.errorConsumer = Objects.requireNonNull(c); }
+    public void setConfirmConsumer(Predicate<String> c) { this.confirmConsumer = Objects.requireNonNull(c); }
     public void setInputSupplier(Function<String, String> s) { this.inputSupplier = Objects.requireNonNull(s); }
-    public record NeedGroupNode(UUID id, String name, String type, String status) { @Override public String toString() { return name + " (" + status + ")"; } }
-    public record CategoryNode(UUID id, String name, String type, String status) { @Override public String toString() { return name; } }
+
+    public record NeedGroupNode(UUID id, String name, String type, String status) {
+        @Override public String toString() { return name + " (" + status + ")"; }
+    }
+
+    public record CategoryNode(UUID id, String name, String type, String status) {
+        @Override public String toString() { return name; }
+    }
+
+    public record CategoryRowData(UUID id, String name, UUID parentGroupId, String groupName, String type, String status) {}
     // endregion
 
     // region Helpers
@@ -238,14 +609,6 @@ public class CategoryPanel extends JPanel implements CategoryView {
             }
         }
         return null;
-    }
-
-    private void populateTable(Predicate<CategoryHierarchyResponseDTO> filter) {
-        for (CategoryHierarchyResponseDTO g : this.cachedHierarchy) {
-            if (filter.test(g) && g.getCategories() != null) {
-                for (CategoryResponseDTO c : g.getCategories()) this.tableModel.addRow(new Object[]{c.getTransactionType(), g.getNeedGroupName(), c.getName(), c.getStatus()});
-            }
-        }
     }
     // endregion
 }

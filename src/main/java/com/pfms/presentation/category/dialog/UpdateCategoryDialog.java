@@ -61,8 +61,8 @@ public class UpdateCategoryDialog extends JDialog {
         this.initialParentGroupId = currentParentGroupId;
         this.transactionType = transactionType;
 
-        setSize(440, 300);
-        setMinimumSize(new Dimension(380, 260));
+        setSize(440, 260);
+        setMinimumSize(new Dimension(380, 220));
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
 
@@ -71,14 +71,8 @@ public class UpdateCategoryDialog extends JDialog {
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
         formPanel.setBackground(ViewConstants.COLOR_CONTENT_BG);
 
-        // Thông tin loại giao dịch
-        JLabel typeInfoLabel = new JLabel("Loại luồng tiền: " + (transactionType != null ? transactionType : "Tất cả"));
-        typeInfoLabel.setFont(ViewConstants.FONT_NAV_ACTIVE);
-        typeInfoLabel.setForeground(ViewConstants.COLOR_PRIMARY);
-        typeInfoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Nhóm nhu cầu cha
-        JLabel parentLabel = new JLabel("Nhóm nhu cầu cha trực thuộc (*):");
+        // Nhóm nhu cầu
+        JLabel parentLabel = new JLabel("Nhóm nhu cầu (*):");
         parentLabel.setFont(ViewConstants.FONT_BODY);
         parentLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -99,8 +93,6 @@ public class UpdateCategoryDialog extends JDialog {
         this.nameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
         this.nameField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        formPanel.add(typeInfoLabel);
-        formPanel.add(Box.createVerticalStrut(10));
         formPanel.add(parentLabel);
         formPanel.add(Box.createVerticalStrut(4));
         formPanel.add(this.parentGroupBox);
@@ -138,7 +130,7 @@ public class UpdateCategoryDialog extends JDialog {
                     JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof NeedGroupComboItem item) {
-                    setText(item.name() + " [" + item.type() + "]");
+                    setText(item.name());
                 }
                 return this;
             }
@@ -226,7 +218,7 @@ public class UpdateCategoryDialog extends JDialog {
     public record NeedGroupComboItem(UUID id, String name, String type) {
         @Override
         public String toString() {
-            return name + " [" + type + "]";
+            return name;
         }
     }
 }
