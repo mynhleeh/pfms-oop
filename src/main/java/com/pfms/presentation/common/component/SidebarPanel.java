@@ -11,10 +11,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedHashMap;
@@ -45,6 +50,7 @@ public class SidebarPanel extends JPanel {
 
         add(createHeaderPanel(), BorderLayout.NORTH);
         add(createNavButtonsPanel(), BorderLayout.CENTER);
+        add(createFooterPanel(), BorderLayout.SOUTH);
 
         updateActiveButtonStyles();
     }
@@ -70,6 +76,27 @@ public class SidebarPanel extends JPanel {
         header.add(this.subtitleLabel);
 
         return header;
+    }
+
+    private JPanel createFooterPanel() {
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBackground(ViewConstants.COLOR_SIDEBAR_BG);
+        footer.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER),
+                BorderFactory.createEmptyBorder(10, 14, 10, 14)
+        ));
+
+        JLabel versionLabel = new JLabel("Phiên bản 1.0.0");
+        versionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        versionLabel.setForeground(ViewConstants.COLOR_TEXT_DIM);
+
+        JLabel techLabel = new JLabel("Swing FlatLaf");
+        techLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        techLabel.setForeground(ViewConstants.COLOR_TEXT_DIM);
+
+        footer.add(versionLabel, BorderLayout.WEST);
+        footer.add(techLabel, BorderLayout.EAST);
+        return footer;
     }
 
     private JPanel createNavButtonsPanel() {

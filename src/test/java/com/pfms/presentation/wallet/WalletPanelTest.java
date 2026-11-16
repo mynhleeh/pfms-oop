@@ -47,7 +47,7 @@ class WalletPanelTest {
     @DisplayName("Khởi tạo nạp danh sách ví ban đầu vào bảng thành công")
     void testInitialDataLoaded() {
         assertEquals(1, panel.getTableModel().getRowCount());
-        assertEquals("Ví MB Bank", panel.getTableModel().getValueAt(0, 1));
+        assertEquals("Ví MB Bank", panel.getTableModel().getValueAt(0, 0));
         assertTrue(panel.getSummaryText().contains("Tổng số ví: 1"));
         assertNotNull(panel.getTable());
     }
@@ -79,7 +79,7 @@ class WalletPanelTest {
     @DisplayName("Giao diện tổng thể tuân thủ bảng màu Luxury Black & Gold")
     void testOverallStylingTheme() {
         assertEquals(ViewConstants.COLOR_CONTENT_BG, panel.getBackground());
-        assertEquals(30, panel.getTable().getRowHeight());
+        assertEquals(54, panel.getTable().getRowHeight());
         assertEquals(ViewConstants.COLOR_STATUS_BG, panel.getBottomPanel().getBackground());
         assertEquals(ViewConstants.COLOR_TEXT_MUTED, panel.getSummaryLabel().getForeground());
     }
@@ -130,20 +130,34 @@ class WalletPanelTest {
         TableCellRenderer headerRenderer = panel.getTable().getTableHeader().getDefaultRenderer();
         assertNotNull(headerRenderer);
         Component headerComp = headerRenderer.getTableCellRendererComponent(
-                panel.getTable(), "Số dư khả dụng", false, false, -1, 2);
+                panel.getTable(), "Số dư khả dụng", false, false, -1, 1);
         assertEquals(new Color(14, 14, 14), headerComp.getBackground());
         assertEquals(ViewConstants.COLOR_PRIMARY_LIGHT, headerComp.getForeground());
         assertEquals(ViewConstants.FONT_NAV_ACTIVE, headerComp.getFont());
     }
 
     @Test
-    @DisplayName("Cột 2 (Số dư khả dụng) hiển thị màu Champagne Gold và căn phải")
-    void testBalanceColumnRenderer() {
-        TableCellRenderer renderer = panel.getTable().getColumnModel().getColumn(2).getCellRenderer();
+    @DisplayName("Cột 0 (Tên ví) hiển thị tên ví in đậm và nhãn [Ví mặc định] bên dưới")
+    void testWalletNameColumnRendererWithDefault() {
+        TableCellRenderer renderer = panel.getTable().getColumnModel().getColumn(0).getCellRenderer();
         assertNotNull(renderer);
 
         Component comp = renderer.getTableCellRendererComponent(
-                panel.getTable(), "15,000,000 VNĐ", false, false, 0, 2);
+                panel.getTable(), "Ví MB Bank", false, false, 0, 0);
+        assertTrue(comp instanceof JLabel);
+        JLabel label = (JLabel) comp;
+        assertTrue(label.getText().contains("Ví MB Bank"));
+        assertTrue(label.getText().contains("[Ví mặc định]"));
+    }
+
+    @Test
+    @DisplayName("Cột 1 (Số dư khả dụng) hiển thị màu Champagne Gold và căn phải")
+    void testBalanceColumnRenderer() {
+        TableCellRenderer renderer = panel.getTable().getColumnModel().getColumn(1).getCellRenderer();
+        assertNotNull(renderer);
+
+        Component comp = renderer.getTableCellRendererComponent(
+                panel.getTable(), "15,000,000 VNĐ", false, false, 0, 1);
         assertTrue(comp instanceof JLabel);
         JLabel label = (JLabel) comp;
         assertEquals(ViewConstants.COLOR_PRIMARY_LIGHT, label.getForeground());
@@ -151,15 +165,27 @@ class WalletPanelTest {
     }
 
     @Test
-    @DisplayName("Cột 6 (Ghi chú) hiển thị màu Zinc Muted")
+    @DisplayName("Cột 3 (Ghi chú) hiển thị màu Zinc Muted")
     void testNoteColumnRenderer() {
-        TableCellRenderer renderer = panel.getTable().getColumnModel().getColumn(6).getCellRenderer();
+        TableCellRenderer renderer = panel.getTable().getColumnModel().getColumn(3).getCellRenderer();
         assertNotNull(renderer);
 
         Component comp = renderer.getTableCellRendererComponent(
-                panel.getTable(), "Tài khoản chính", false, false, 0, 6);
+                panel.getTable(), "Tài khoản chính", false, false, 0, 3);
         assertTrue(comp instanceof JLabel);
         JLabel label = (JLabel) comp;
         assertEquals(ViewConstants.COLOR_TEXT_MUTED, label.getForeground());
+    }
+
+    @Test
+    @DisplayName("Cột 4 (Thao tác) thiết lập CellRenderer và CellEditor hỗ trợ tương tác hàng")
+    void testActionsColumnRendererAndEditor() {
+        assertEquals(5, panel.getTable().getColumnCount());
+        assertNotNull(panel.getTable().getColumnModel().getColumn(4).getCellRenderer());
+        assertNotNull(panel.getTable().getColumnModel().getColumn(4).getCellEditor());
+
+        Component comp = panel.getTable().getColumnModel().getColumn(4).getCellRenderer()
+                .getTableCellRendererComponent(panel.getTable(), wallet1, false, false, 0, 4);
+        assertNotNull(comp);
     }
 }

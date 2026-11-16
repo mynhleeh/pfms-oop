@@ -116,7 +116,7 @@ public class WalletPresenter {
         String statusText = active ? "Hoạt động" : ("ARCHIVED".equalsIgnoreCase(dto.getStatus()) ? "Lưu trữ"
                 : ("DELETED".equalsIgnoreCase(dto.getStatus()) ? "Đã xóa" : (dto.getStatus() == null ? "Không xác định" : dto.getStatus())));
         return new WalletItemViewModel(dto.getWalletId(), order, dto.getName(), dto.getBalance(),
-                ViewUtils.formatCurrency(dto.getBalance()), statusText, dto.getNote(), active);
+                ViewUtils.formatCurrency(dto.getBalance()), statusText, dto.getNote(), active, dto.isDefaultWallet());
     }
     // endregion
 }

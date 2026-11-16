@@ -5,6 +5,9 @@ import com.pfms.presentation.dto.transaction.FilterTransactionsRequestDTO;
 import com.pfms.presentation.dto.wallet.WalletResponseDTO;
 import com.pfms.presentation.common.InputValidator;
 import com.pfms.presentation.common.ViewConstants;
+import com.pfms.presentation.common.component.RoundedBorder;
+import com.pfms.presentation.common.component.RoundedCardPanel;
+import com.pfms.presentation.common.component.SearchIcon;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -16,11 +19,15 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Insets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -42,8 +49,9 @@ public class TransactionFilterToolbar extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // region Fields
-    private final JButton addButton = createActionButton("+ Thêm giao dịch", ViewConstants.COLOR_PRIMARY_LIGHT, Color.BLACK, true);
-    private final JButton refreshButton = createActionButton("Làm mới", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MUTED, false);
+    private final JButton addButton = createActionButton("+ Ghi nhận giao dịch mới", ViewConstants.COLOR_PRIMARY, Color.BLACK, true);
+    private final JButton resetButton = createActionButton("Đặt lại bộ lọc", new Color(23, 23, 23), ViewConstants.COLOR_TEXT_MAIN, false);
+    private final JButton refreshButton = createActionButton("Làm mới", new Color(23, 23, 23), ViewConstants.COLOR_TEXT_MUTED, false);
 
     private final JComboBox<String> typeFilterBox = new JComboBox<>(new String[]{"Tất cả", "INCOME", "EXPENSE"});
     private final JComboBox<Object> walletFilterBox = new JComboBox<>();
@@ -52,8 +60,12 @@ public class TransactionFilterToolbar extends JPanel {
     private final JTextField startDateField = new JTextField(8);
     private final JTextField endDateField = new JTextField(8);
     private final JTextField keywordField = new JTextField(16);
-    private final JButton filterButton = createActionButton("Lọc", ViewConstants.COLOR_PRIMARY_LIGHT, Color.BLACK, true);
-    private final JButton resetButton = createActionButton("Đặt lại", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MUTED, false);
+    private final JButton filterButton = createActionButton("Lọc", new Color(23, 23, 23), ViewConstants.COLOR_PRIMARY_LIGHT, false);
+
+    private final JButton btnQuickAll = createTagButton("Tất cả", "ALL");
+    private final JButton btnQuickMonth = createTagButton("Tháng này", "MONTH");
+    private final JButton btnQuick7Days = createTagButton("7 ngày qua", "7DAYS");
+    private String currentQuickTag = "ALL";
 
     private final List<CategoryResponseDTO> allCategories = new ArrayList<>();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -81,14 +93,16 @@ public class TransactionFilterToolbar extends JPanel {
         setBackground(ViewConstants.COLOR_CARD_BG);
         setAlignmentX(Component.LEFT_ALIGNMENT);
         setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true),
-                BorderFactory.createEmptyBorder(12, 16, 12, 16)
+                new RoundedBorder(14, ViewConstants.COLOR_BORDER, new Insets(14, 18, 14, 18)),
+                BorderFactory.createEmptyBorder(0, 0, 0, 0)
         ));
 
         // Styling type box (clean text, no broken emoji tofu)
         this.typeFilterBox.setFont(ViewConstants.FONT_BODY);
-        this.typeFilterBox.setBackground(ViewConstants.COLOR_STATUS_BG);
+        this.typeFilterBox.setBackground(new Color(13, 13, 13));
         this.typeFilterBox.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.typeFilterBox.setPreferredSize(new Dimension(135, 34));
+        this.typeFilterBox.putClientProperty("Component.arc", 8);
         this.typeFilterBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -113,8 +127,10 @@ public class TransactionFilterToolbar extends JPanel {
 
         // Styling wallet box (clean text, no broken emoji tofu)
         this.walletFilterBox.setFont(ViewConstants.FONT_BODY);
-        this.walletFilterBox.setBackground(ViewConstants.COLOR_STATUS_BG);
+        this.walletFilterBox.setBackground(new Color(13, 13, 13));
         this.walletFilterBox.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.walletFilterBox.setPreferredSize(new Dimension(140, 34));
+        this.walletFilterBox.putClientProperty("Component.arc", 8);
         this.walletFilterBox.addItem("Tất cả ví");
         this.walletFilterBox.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -132,8 +148,10 @@ public class TransactionFilterToolbar extends JPanel {
 
         // Styling group box (clean text, no broken emoji tofu)
         this.groupFilterBox.setFont(ViewConstants.FONT_BODY);
-        this.groupFilterBox.setBackground(ViewConstants.COLOR_STATUS_BG);
+        this.groupFilterBox.setBackground(new Color(13, 13, 13));
         this.groupFilterBox.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.groupFilterBox.setPreferredSize(new Dimension(140, 34));
+        this.groupFilterBox.putClientProperty("Component.arc", 8);
         this.groupFilterBox.addItem("Tất cả nhóm");
         this.groupFilterBox.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -152,8 +170,10 @@ public class TransactionFilterToolbar extends JPanel {
 
         // Styling category box (clean text, no broken emoji tofu)
         this.categoryFilterBox.setFont(ViewConstants.FONT_BODY);
-        this.categoryFilterBox.setBackground(ViewConstants.COLOR_STATUS_BG);
+        this.categoryFilterBox.setBackground(new Color(13, 13, 13));
         this.categoryFilterBox.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        this.categoryFilterBox.setPreferredSize(new Dimension(150, 34));
+        this.categoryFilterBox.putClientProperty("Component.arc", 8);
         this.categoryFilterBox.addItem("Tất cả danh mục");
         this.categoryFilterBox.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -170,21 +190,24 @@ public class TransactionFilterToolbar extends JPanel {
         this.categoryFilterBox.addActionListener(e -> triggerFilter());
 
         // Text fields styling with FlatLaf placeholders
-        styleTextField(this.startDateField, "dd/MM/yyyy");
-        styleTextField(this.endDateField, "dd/MM/yyyy");
-        styleTextField(this.keywordField, "Tìm kiếm ghi chú, danh mục, ví...");
+        styleDateField(this.startDateField, "dd/MM/yyyy");
+        styleDateField(this.endDateField, "dd/MM/yyyy");
+        styleSearchField(this.keywordField, "Tìm kiếm ghi chú, danh mục, ví...");
 
         this.filterButton.addActionListener(e -> triggerFilter());
         this.resetButton.addActionListener(e -> handleReset());
+
+        updateTagStyles();
 
         // --- HÀNG 1: Nhóm nút tác vụ (Trái) & Thẻ ngày nhanh + Tìm kiếm (Phải) ---
         JPanel row1 = new JPanel(new BorderLayout(16, 0));
         row1.setBackground(ViewConstants.COLOR_CARD_BG);
         row1.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         actionsPanel.setBackground(ViewConstants.COLOR_CARD_BG);
         actionsPanel.add(this.addButton);
+        actionsPanel.add(this.resetButton);
         actionsPanel.add(this.refreshButton);
 
         JPanel quickAndSearchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
@@ -193,14 +216,21 @@ public class TransactionFilterToolbar extends JPanel {
         quickDateLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
         quickAndSearchPanel.add(quickDateLabel);
 
-        JButton btnQuickAll = createTagButton("Tất cả", () -> setQuickDate("ALL"));
-        JButton btnQuickMonth = createTagButton("Tháng này", () -> setQuickDate("MONTH"));
-        JButton btnQuick7Days = createTagButton("7 ngày qua", () -> setQuickDate("7DAYS"));
-        quickAndSearchPanel.add(btnQuickAll);
-        quickAndSearchPanel.add(btnQuickMonth);
-        quickAndSearchPanel.add(btnQuick7Days);
+        quickAndSearchPanel.add(this.btnQuickAll);
+        quickAndSearchPanel.add(this.btnQuickMonth);
+        quickAndSearchPanel.add(this.btnQuick7Days);
         quickAndSearchPanel.add(Box.createHorizontalStrut(6));
-        quickAndSearchPanel.add(this.keywordField);
+
+        JPanel searchWrapper = new JPanel(new BorderLayout(6, 0));
+        searchWrapper.setBackground(new Color(13, 13, 13));
+        searchWrapper.setPreferredSize(new Dimension(230, 34));
+        JLabel searchIconLabel = new JLabel(new SearchIcon(14, ViewConstants.COLOR_PRIMARY_LIGHT));
+        searchIconLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        searchWrapper.add(searchIconLabel, BorderLayout.WEST);
+        searchWrapper.add(this.keywordField, BorderLayout.CENTER);
+        searchWrapper.setBorder(new RoundedBorder(17, ViewConstants.COLOR_BORDER, new Insets(1, 4, 1, 4)));
+
+        quickAndSearchPanel.add(searchWrapper);
         this.keywordField.addActionListener(e -> triggerFilter());
 
         row1.add(actionsPanel, BorderLayout.WEST);
@@ -226,12 +256,14 @@ public class TransactionFilterToolbar extends JPanel {
         row2.add(this.groupFilterBox);
         row2.add(createLabel("Danh mục:"));
         row2.add(this.categoryFilterBox);
-        row2.add(createLabel("Từ:"));
+        row2.add(createLabel("Khoảng ngày:"));
         row2.add(this.startDateField);
-        row2.add(createLabel("Đến:"));
+        JLabel arrowLabel = new JLabel("→");
+        arrowLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        arrowLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+        row2.add(arrowLabel);
         row2.add(this.endDateField);
         row2.add(this.filterButton);
-        row2.add(this.resetButton);
 
         add(row1);
         add(Box.createVerticalStrut(10));
@@ -240,19 +272,34 @@ public class TransactionFilterToolbar extends JPanel {
         add(row2);
     }
 
-    private void styleTextField(JTextField tf, String placeholder) {
+    private void styleDateField(JTextField tf, String placeholder) {
         tf.setFont(ViewConstants.FONT_BODY);
-        tf.setBackground(ViewConstants.COLOR_STATUS_BG);
+        tf.setBackground(new Color(13, 13, 13));
         tf.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         tf.setCaretColor(ViewConstants.COLOR_TEXT_MAIN);
+        tf.setHorizontalAlignment(SwingConstants.CENTER);
+        tf.setPreferredSize(new Dimension(100, 34));
         if (placeholder != null && !placeholder.isBlank()) {
             tf.putClientProperty("JTextField.placeholderText", placeholder);
             tf.putClientProperty("JTextField.showClearButton", true);
         }
         tf.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                new RoundedBorder(8, new Color(55, 55, 55), new Insets(1, 4, 1, 4)),
+                BorderFactory.createEmptyBorder(2, 6, 2, 6)
         ));
+    }
+
+    private void styleSearchField(JTextField tf, String placeholder) {
+        tf.setFont(ViewConstants.FONT_BODY);
+        tf.setBackground(new Color(13, 13, 13));
+        tf.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        tf.setCaretColor(ViewConstants.COLOR_TEXT_MAIN);
+        tf.setOpaque(true);
+        if (placeholder != null && !placeholder.isBlank()) {
+            tf.putClientProperty("JTextField.placeholderText", placeholder);
+            tf.putClientProperty("JTextField.showClearButton", true);
+        }
+        tf.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 8));
     }
     // endregion
 
@@ -353,6 +400,8 @@ public class TransactionFilterToolbar extends JPanel {
     }
 
     public void setQuickDate(String period) {
+        this.currentQuickTag = period;
+        updateTagStyles();
         LocalDate today = LocalDate.now();
         switch (period) {
             case "ALL" -> {
@@ -377,6 +426,8 @@ public class TransactionFilterToolbar extends JPanel {
     public void resetFilters() {
         this.isUpdating = true;
         try {
+            this.currentQuickTag = "ALL";
+            updateTagStyles();
             this.typeFilterBox.setSelectedIndex(0);
             this.walletFilterBox.setSelectedIndex(0);
             updateGroupOptions();
@@ -491,29 +542,52 @@ public class TransactionFilterToolbar extends JPanel {
 
     private JButton createActionButton(String text, Color bg, Color fg, boolean isPrimary) {
         JButton btn = new JButton(text);
-        btn.setFont(isPrimary ? ViewConstants.FONT_NAV_ACTIVE : ViewConstants.FONT_BODY);
+        btn.setFont(isPrimary ? new Font("Segoe UI", Font.BOLD, 12) : new Font("Segoe UI", Font.PLAIN, 12));
         btn.setBackground(bg);
         btn.setForeground(fg);
         btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.putClientProperty("Component.arc", 8);
         btn.putClientProperty("JButton.buttonType", "roundRect");
+        Color borderColor = isPrimary ? ViewConstants.COLOR_PRIMARY_LIGHT : ViewConstants.COLOR_BORDER;
         btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(isPrimary ? ViewConstants.COLOR_PRIMARY : ViewConstants.COLOR_BORDER),
-                BorderFactory.createEmptyBorder(6, 14, 6, 14)));
+                new RoundedBorder(8, borderColor, new Insets(1, 4, 1, 4)),
+                BorderFactory.createEmptyBorder(5, 14, 5, 14)));
         return btn;
     }
 
-    private JButton createTagButton(String text, Runnable action) {
+    private JButton createTagButton(String text, String period) {
         JButton btn = new JButton(text);
-        btn.setFont(ViewConstants.FONT_STATUS);
-        btn.setBackground(ViewConstants.COLOR_STATUS_BG);
-        btn.setForeground(ViewConstants.COLOR_TEXT_MUTED);
         btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.putClientProperty("Component.arc", 16);
         btn.putClientProperty("JButton.buttonType", "roundRect");
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER),
-                BorderFactory.createEmptyBorder(4, 10, 4, 10)));
-        btn.addActionListener(e -> action.run());
+        btn.addActionListener(e -> setQuickDate(period));
         return btn;
+    }
+
+    private void updateTagStyles() {
+        applyTagStyle(this.btnQuickAll, "ALL".equalsIgnoreCase(this.currentQuickTag));
+        applyTagStyle(this.btnQuickMonth, "MONTH".equalsIgnoreCase(this.currentQuickTag));
+        applyTagStyle(this.btnQuick7Days, "7DAYS".equalsIgnoreCase(this.currentQuickTag));
+    }
+
+    private void applyTagStyle(JButton btn, boolean isActive) {
+        if (isActive) {
+            btn.setBackground(ViewConstants.COLOR_SIDEBAR_ACTIVE);
+            btn.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+            btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                    new RoundedBorder(14, ViewConstants.COLOR_PRIMARY, new Insets(1, 4, 1, 4)),
+                    BorderFactory.createEmptyBorder(3, 10, 3, 10)));
+        } else {
+            btn.setBackground(ViewConstants.COLOR_STATUS_BG);
+            btn.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+            btn.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                    new RoundedBorder(14, ViewConstants.COLOR_BORDER, new Insets(1, 4, 1, 4)),
+                    BorderFactory.createEmptyBorder(3, 10, 3, 10)));
+        }
     }
     // endregion
 }

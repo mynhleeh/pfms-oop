@@ -7,7 +7,10 @@ import com.pfms.presentation.dto.category.CategoryResponseDTO;
 import com.pfms.presentation.dto.transaction.TransactionResponseDTO;
 import com.pfms.presentation.dto.wallet.WalletsSummaryResponseDTO;
 import com.pfms.presentation.common.ViewConstants;
+import com.pfms.presentation.common.component.RoundedBorder;
+import com.pfms.presentation.common.component.RoundedCardPanel;
 import com.pfms.presentation.transaction.component.TransactionFilterToolbar;
+import com.pfms.presentation.transaction.component.TransactionTableActionRenderer;
 import com.pfms.presentation.transaction.dialog.RecordTransactionDialog;
 import com.pfms.presentation.transaction.dialog.UpdateTransactionDialog;
 import com.pfms.presentation.transaction.model.TransactionTableModel;
@@ -45,6 +48,7 @@ public class TransactionPanel extends JPanel implements TransactionView {
     private final JLabel statExpenseLabel = new JLabel("Tổng chi: -0 VNĐ");
     private final JLabel statNetLabel = new JLabel("Dòng tiền: +0 VNĐ");
     private final JLabel statCountLabel = new JLabel("0 giao dịch");
+    private final JLabel tableCountLabel = new JLabel("0 kết quả");
     private final JButton prevButton = new JButton("< Trước"), nextButton = new JButton("Sau >");
     private List<TransactionItemViewModel> transactionViewModels = Collections.emptyList();
     private Runnable onTransactionChangedListener;
@@ -82,16 +86,16 @@ public class TransactionPanel extends JPanel implements TransactionView {
         headerRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel title = new JLabel("Ghi nhận Thu & Chi");
-        title.setFont(ViewConstants.FONT_PANEL_HEADER);
-        title.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        title.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         headerRow.add(title, BorderLayout.WEST);
 
         JPanel statsRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         statsRow.setBackground(ViewConstants.COLOR_CONTENT_BG);
-        statsRow.add(createStatPill(this.statIncomeLabel, ViewConstants.COLOR_INCOME));
-        statsRow.add(createStatPill(this.statExpenseLabel, ViewConstants.COLOR_EXPENSE));
-        statsRow.add(createStatPill(this.statNetLabel, ViewConstants.COLOR_PRIMARY_LIGHT));
-        statsRow.add(createStatPill(this.statCountLabel, ViewConstants.COLOR_TEXT_MUTED));
+        statsRow.add(createStatPill(this.statIncomeLabel, ViewConstants.COLOR_INCOME, null));
+        statsRow.add(createStatPill(this.statExpenseLabel, ViewConstants.COLOR_EXPENSE, null));
+        statsRow.add(createStatPill(this.statNetLabel, ViewConstants.COLOR_PRIMARY_LIGHT, ViewConstants.COLOR_GOLD_BORDER));
+        statsRow.add(createStatPill(this.statCountLabel, ViewConstants.COLOR_TEXT_MAIN, null));
         headerRow.add(statsRow, BorderLayout.EAST);
 
         north.add(headerRow);
@@ -104,37 +108,82 @@ public class TransactionPanel extends JPanel implements TransactionView {
         north.add(this.filterToolbar);
         add(north, BorderLayout.NORTH);
 
-        // Cấu hình bảng dữ liệu giao dịch
+        // Cấu hình bảng dữ liệu giao dịch bên trong Thẻ Bo Tròn (Rounded Table Card)
         configureTable();
+
+        JPanel centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        centerWrapper.setBorder(BorderFactory.createEmptyBorder(0, 20, 14, 20));
+
+        JPanel tableCard = new RoundedCardPanel(new BorderLayout(), 14, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
+
+        // Header bar của Card Bảng
+        JPanel tableHeaderBar = new JPanel(new BorderLayout());
+        tableHeaderBar.setOpaque(false);
+        tableHeaderBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ViewConstants.COLOR_BORDER),
+                BorderFactory.createEmptyBorder(10, 16, 10, 16)
+        ));
+        JLabel tableTitleLabel = new JLabel("BẢNG GIAO DỊCH CHI TIẾT");
+        tableTitleLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        tableTitleLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+
+        this.tableCountLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        this.tableCountLabel.setForeground(ViewConstants.COLOR_TEXT_DIM);
+
+        tableHeaderBar.add(tableTitleLabel, BorderLayout.WEST);
+        tableHeaderBar.add(this.tableCountLabel, BorderLayout.EAST);
+        tableCard.add(tableHeaderBar, BorderLayout.NORTH);
+
         JScrollPane scroll = new JScrollPane(this.table);
         scroll.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
         scroll.setBackground(ViewConstants.COLOR_CARD_BG);
-        scroll.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 20, 8, 20),
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true)));
-        add(scroll, BorderLayout.CENTER);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        tableCard.add(scroll, BorderLayout.CENTER);
 
-        // Footer phân trang gọn gàng (đã loại bỏ dòng tổng thu chi ở đáy theo yêu cầu)
-        JPanel south = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 8));
-        south.setBackground(ViewConstants.COLOR_STATUS_BG);
-        south.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER));
+        // Footer của Card Bảng
+        JPanel cardFooter = new JPanel(new BorderLayout(16, 0));
+        cardFooter.setOpaque(false);
+        cardFooter.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER),
+                BorderFactory.createEmptyBorder(8, 16, 8, 16)
+        ));
 
-        this.prevButton.setFont(ViewConstants.FONT_BODY);
-        this.nextButton.setFont(ViewConstants.FONT_BODY);
+        this.summaryLabel.setFont(ViewConstants.FONT_BODY);
+        this.summaryLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+        cardFooter.add(this.summaryLabel, BorderLayout.CENTER);
+
+        JPanel paginationBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        paginationBox.setOpaque(false);
+
+        stylePaginationButton(this.prevButton);
+        stylePaginationButton(this.nextButton);
         this.pageInfoLabel.setFont(ViewConstants.FONT_BODY);
+        this.pageInfoLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+
         this.prevButton.addActionListener(e -> this.presenter.prevPage());
         this.nextButton.addActionListener(e -> this.presenter.nextPage());
-        south.add(this.prevButton);
-        south.add(this.pageInfoLabel);
-        south.add(this.nextButton);
-        add(south, BorderLayout.SOUTH);
+
+        paginationBox.add(this.prevButton);
+        paginationBox.add(this.pageInfoLabel);
+        paginationBox.add(this.nextButton);
+        cardFooter.add(paginationBox, BorderLayout.EAST);
+
+        tableCard.add(cardFooter, BorderLayout.SOUTH);
+        centerWrapper.add(tableCard, BorderLayout.CENTER);
+        add(centerWrapper, BorderLayout.CENTER);
     }
 
     private void configureTable() {
         com.pfms.presentation.common.ViewUtils.styleTable(this.table);
-        this.table.setRowHeight(36);
+        this.table.setRowHeight(40);
 
-        int[] w = {90, 90, 120, 120, 110, 110, 90, 180, 130};
+        if (this.table.getTableHeader() != null) {
+            Dimension headerDim = this.table.getTableHeader().getPreferredSize();
+            this.table.getTableHeader().setPreferredSize(new Dimension(headerDim.width, 38));
+        }
+
+        int[] w = {100, 180, 200, 160, 160, 120, 240, 120};
         for (int i = 0; i < w.length; i++) {
             this.table.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
         }
@@ -143,38 +192,16 @@ public class TransactionPanel extends JPanel implements TransactionView {
         DefaultTableCellRenderer left = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MAIN);
         DefaultTableCellRenderer leftMuted = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MUTED);
 
-        this.table.getColumnModel().getColumn(0).setCellRenderer(center); // Ngày
+        this.table.getColumnModel().getColumn(0).setCellRenderer(center);    // Ngày
+        this.table.getColumnModel().getColumn(1).setCellRenderer(leftMuted); // Nhóm
+        this.table.getColumnModel().getColumn(2).setCellRenderer(left);      // Danh mục
 
-        // Cột 1 - Loại: Phân biệt rõ Thu nhập (Green) và Chi tiêu (Coral)
-        this.table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override public Component getTableCellRendererComponent(JTable t, Object v, boolean s, boolean f, int row, int col) {
-                super.getTableCellRendererComponent(t, v, s, f, row, col);
-                setHorizontalAlignment(SwingConstants.CENTER);
-                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
-                if (!s) {
-                    setBackground(ViewConstants.COLOR_CARD_BG);
-                    String val = (v != null) ? v.toString() : "";
-                    if ("Thu nhập".equals(val)) {
-                        setForeground(ViewConstants.COLOR_INCOME);
-                    } else if ("Chi tiêu".equals(val)) {
-                        setForeground(ViewConstants.COLOR_EXPENSE);
-                    } else {
-                        setForeground(ViewConstants.COLOR_TEXT_MAIN);
-                    }
-                }
-                return this;
-            }
-        });
-
-        this.table.getColumnModel().getColumn(2).setCellRenderer(leftMuted); // Nhóm
-        this.table.getColumnModel().getColumn(3).setCellRenderer(left);      // Danh mục
-        this.table.getColumnModel().getColumn(5).setCellRenderer(left);      // Ví
-
-        // Cột 4 - Số tiền: Xanh bạc hà cho thu nhập, hồng san hô cho chi tiêu
-        this.table.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
+        // Cột 3 - Số tiền: Xanh bạc hà cho thu nhập, hồng san hô cho chi tiêu, in đậm
+        this.table.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
             @Override public Component getTableCellRendererComponent(JTable t, Object v, boolean s, boolean f, int row, int col) {
                 super.getTableCellRendererComponent(t, v, s, f, row, col);
                 setHorizontalAlignment(SwingConstants.RIGHT);
+                setFont(new Font("Segoe UI", Font.BOLD, 12));
                 setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
                 if (!s) {
                     setBackground(ViewConstants.COLOR_CARD_BG);
@@ -191,8 +218,10 @@ public class TransactionPanel extends JPanel implements TransactionView {
             }
         });
 
-        // Cột 6 - Phụ phí: Luôn trừ tiền và hiển thị màu đỏ COLOR_EXPENSE
-        this.table.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
+        this.table.getColumnModel().getColumn(4).setCellRenderer(left);      // Ví
+
+        // Cột 5 - Phụ phí: Luôn trừ tiền và hiển thị màu đỏ COLOR_EXPENSE
+        this.table.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
             @Override public Component getTableCellRendererComponent(JTable t, Object v, boolean s, boolean f, int row, int col) {
                 super.getTableCellRendererComponent(t, v, s, f, row, col);
                 setHorizontalAlignment(SwingConstants.RIGHT);
@@ -210,8 +239,8 @@ public class TransactionPanel extends JPanel implements TransactionView {
             }
         });
 
-        // Cột 7 - Ghi chú: Cho phép tự động xuống dòng (Line wrap), các cột khác cố định 1 dòng
-        this.table.getColumnModel().getColumn(7).setCellRenderer(new TableCellRenderer() {
+        // Cột 6 - Ghi chú: Cho phép tự động xuống dòng (Line wrap)
+        this.table.getColumnModel().getColumn(6).setCellRenderer(new TableCellRenderer() {
             private final JTextArea textArea = new JTextArea();
             {
                 textArea.setLineWrap(true);
@@ -233,61 +262,13 @@ public class TransactionPanel extends JPanel implements TransactionView {
             }
         });
 
-        // Cột 8 - Thao tác: Nút Sửa và Xóa trực tiếp trên từng dòng
-        this.table.getColumnModel().getColumn(8).setCellRenderer(new TableCellRenderer() {
-            private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 2));
-            private final JButton editBtn = createTableActionButton("Sửa", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN);
-            private final JButton delBtn = createTableActionButton("Xóa", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_EXPENSE);
-            {
-                panel.setOpaque(true);
-                panel.setBackground(ViewConstants.COLOR_CARD_BG);
-                panel.add(editBtn);
-                panel.add(delBtn);
-            }
-            @Override public Component getTableCellRendererComponent(JTable t, Object v, boolean s, boolean f, int row, int col) {
-                panel.setBackground(s ? t.getSelectionBackground() : ViewConstants.COLOR_CARD_BG);
-                return panel;
-            }
-        });
-
-        this.table.getColumnModel().getColumn(8).setCellEditor(new DefaultCellEditor(new JCheckBox()) {
-            private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 2));
-            private final JButton editBtn = createTableActionButton("Sửa", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN);
-            private final JButton delBtn = createTableActionButton("Xóa", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_EXPENSE);
-            private int currentRow = -1;
-            {
-                panel.setOpaque(true);
-                panel.setBackground(ViewConstants.COLOR_CARD_BG);
-                panel.add(editBtn);
-                panel.add(delBtn);
-
-                editBtn.addActionListener(e -> {
-                    fireEditingStopped();
-                    if (currentRow >= 0 && currentRow < tableModel.getRowCount()) {
-                        TransactionResponseDTO dto = tableModel.getTransactionAt(currentRow);
-                        if (dto != null) openUpdateDialogForDto(dto);
-                    }
-                });
-
-                delBtn.addActionListener(e -> {
-                    fireEditingStopped();
-                    if (currentRow >= 0 && currentRow < tableModel.getRowCount()) {
-                        TransactionResponseDTO dto = tableModel.getTransactionAt(currentRow);
-                        if (dto != null) presenter.deleteTransaction(dto.getTransactionId());
-                    }
-                });
-            }
-
-            @Override public Component getTableCellEditorComponent(JTable t, Object v, boolean s, int row, int col) {
-                this.currentRow = row;
-                panel.setBackground(t.getSelectionBackground());
-                return panel;
-            }
-
-            @Override public Object getCellEditorValue() {
-                return "";
-            }
-        });
+        // Cột 7 - Thao tác: Nút Sửa và Xóa trực tiếp trên từng dòng qua TransactionTableActionRenderer
+        TransactionTableActionRenderer actionRenderer = new TransactionTableActionRenderer(
+                dto -> openUpdateDialogForDto(dto),
+                dto -> presenter.deleteTransaction(dto.getTransactionId())
+        );
+        this.table.getColumnModel().getColumn(7).setCellRenderer(actionRenderer);
+        this.table.getColumnModel().getColumn(7).setCellEditor(actionRenderer);
 
         this.table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -327,6 +308,7 @@ public class TransactionPanel extends JPanel implements TransactionView {
         this.tableModel.setTransactions(!this.presenter.getCurrentTransactions().isEmpty() ? this.presenter.getCurrentTransactions() : this.transactionViewModels.stream().map(this::toTransactionDto).toList());
         this.summaryLabel.setText(summaryText);
         this.pageInfoLabel.setText(pageInfoText);
+        this.tableCountLabel.setText(this.tableModel.getRowCount() + " kết quả");
         updateKPIStats(summaryText, pageInfoText);
         this.prevButton.setEnabled(this.presenter.getCurrentPage() > 1);
         this.nextButton.setEnabled(this.presenter.getCurrentPage() < this.presenter.getTotalPages());
@@ -406,18 +388,26 @@ public class TransactionPanel extends JPanel implements TransactionView {
     // endregion
 
     // region Helpers
-    private JPanel createStatPill(JLabel label, Color accentColor) {
-        label.setFont(ViewConstants.FONT_NAV_ACTIVE);
+    private JPanel createStatPill(JLabel label, Color accentColor, Color borderColor) {
+        label.setFont(new Font("Segoe UI", Font.BOLD, 11));
         label.setForeground(accentColor);
-        JPanel pill = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 4));
-        pill.setBackground(ViewConstants.COLOR_CARD_BG);
-        pill.putClientProperty("FlatLaf.style", "arc: 999");
-        pill.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(accentColor.getRed(), accentColor.getGreen(), accentColor.getBlue(), 90), 1, true),
-                BorderFactory.createEmptyBorder(2, 6, 2, 6)
-        ));
+        JPanel pill = new RoundedCardPanel(new FlowLayout(FlowLayout.CENTER, 8, 4), 16, ViewConstants.COLOR_CARD_BG, borderColor != null ? borderColor : ViewConstants.COLOR_BORDER);
         pill.add(label);
         return pill;
+    }
+
+    private void stylePaginationButton(JButton btn) {
+        btn.setFont(ViewConstants.FONT_STATUS);
+        btn.setBackground(ViewConstants.COLOR_STATUS_BG);
+        btn.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.putClientProperty("Component.arc", 6);
+        btn.putClientProperty("JButton.buttonType", "roundRect");
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(6, ViewConstants.COLOR_BORDER, new Insets(1, 4, 1, 4)),
+                BorderFactory.createEmptyBorder(3, 10, 3, 10)
+        ));
     }
     @Override public void showMessage(String m) { if (messageConsumer != null) messageConsumer.accept(m); else JOptionPane.showMessageDialog(this, m, "Thông báo", JOptionPane.INFORMATION_MESSAGE); }
     @Override public void showWarning(String m) { if (warningConsumer != null) warningConsumer.accept(m); else JOptionPane.showMessageDialog(this, m, "Cảnh báo", JOptionPane.WARNING_MESSAGE); }

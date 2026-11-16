@@ -41,6 +41,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -77,10 +78,11 @@ public class CategoryPanel extends JPanel implements CategoryView {
     private final JTable detailTable = new JTable(this.tableModel);
 
     private final JLabel summaryLabel = new JLabel("Tổng số nhóm: 0 | Tổng số danh mục: 0");
-    private final JLabel statTotalGroups = createStatLabel("Tổng số nhóm: 0", ViewConstants.COLOR_TEXT_MAIN);
+    private final JLabel statTotalGroups = createStatLabel("Tổng nhóm: 0", ViewConstants.COLOR_TEXT_MAIN);
     private final JLabel statTotalCats = createStatLabel("Tổng danh mục: 0", ViewConstants.COLOR_TEXT_MAIN);
     private final JLabel statExpense = createStatLabel("Chi phí: 0", ViewConstants.COLOR_EXPENSE);
     private final JLabel statIncome = createStatLabel("Thu nhập: 0", ViewConstants.COLOR_INCOME);
+    private final JLabel tableCountLabel = new JLabel("0 kết quả");
 
     private final JTextField searchField = new JTextField(15);
 
@@ -128,10 +130,22 @@ public class CategoryPanel extends JPanel implements CategoryView {
         JPanel headerTop = new JPanel(new BorderLayout(16, 0));
         headerTop.setBackground(ViewConstants.COLOR_CONTENT_BG);
 
-        JLabel title = new JLabel("Quản lý Danh mục Thu Chi");
+        JPanel titleBox = new JPanel();
+        titleBox.setLayout(new BoxLayout(titleBox, BoxLayout.Y_AXIS));
+        titleBox.setOpaque(false);
+
+        JLabel title = new JLabel("Danh mục Thu & Chi");
         title.setFont(ViewConstants.FONT_PANEL_HEADER);
-        title.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        headerTop.add(title, BorderLayout.WEST);
+        title.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+
+        JLabel subtitle = new JLabel("Hệ thống phân cấp 2 tầng: Nhóm nhu cầu (Cha) & Danh mục thu chi (Con)");
+        subtitle.setFont(ViewConstants.FONT_BODY);
+        subtitle.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+
+        titleBox.add(title);
+        titleBox.add(Box.createVerticalStrut(3));
+        titleBox.add(subtitle);
+        headerTop.add(titleBox, BorderLayout.WEST);
 
         JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         statsPanel.setBackground(ViewConstants.COLOR_CONTENT_BG);
@@ -147,8 +161,8 @@ public class CategoryPanel extends JPanel implements CategoryView {
 
         JPanel btnGroupLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         btnGroupLeft.setBackground(ViewConstants.COLOR_CONTENT_BG);
-        btnGroupLeft.add(toolBtn("+ Thêm Nhóm cha", ViewConstants.COLOR_PRIMARY_LIGHT, ViewConstants.COLOR_SIDEBAR_BG, e -> this.presenter.onAddNeedGroupClicked()));
-        btnGroupLeft.add(toolBtn("+ Thêm Danh mục con", ViewConstants.COLOR_PRIMARY_LIGHT, ViewConstants.COLOR_SIDEBAR_BG, e -> this.presenter.onAddCategoryClicked()));
+        btnGroupLeft.add(toolBtn("+ Thêm Nhóm cha", ViewConstants.COLOR_PRIMARY, Color.BLACK, ViewConstants.COLOR_PRIMARY_LIGHT, e -> this.presenter.onAddNeedGroupClicked()));
+        btnGroupLeft.add(toolBtn("+ Thêm Danh mục con", ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_TEXT_MAIN, ViewConstants.COLOR_BORDER, e -> this.presenter.onAddCategoryClicked()));
         bar.add(btnGroupLeft, BorderLayout.WEST);
 
         // Rounded Search Capsule Box with Vector SearchIcon
@@ -185,10 +199,28 @@ public class CategoryPanel extends JPanel implements CategoryView {
         JScrollPane treeSp = new JScrollPane(this.tree);
         treeSp.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
         treeSp.setBackground(ViewConstants.COLOR_CARD_BG);
-        treeSp.setBorder(null);
+        treeSp.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
 
         RoundedCardPanel treeCard = new RoundedCardPanel(new BorderLayout(), 14, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
-        treeCard.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        treeCard.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+
+        JPanel treeHeaderBar = new JPanel(new BorderLayout());
+        treeHeaderBar.setBackground(new Color(18, 18, 18));
+        treeHeaderBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ViewConstants.COLOR_BORDER),
+                BorderFactory.createEmptyBorder(10, 14, 10, 14)
+        ));
+        JLabel treeTitleLabel = new JLabel("CÂY PHÂN CẤP DANH MỤC");
+        treeTitleLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        treeTitleLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+
+        JLabel treeTagLabel = new JLabel("CẤU TRÚC 2 TẦNG");
+        treeTagLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        treeTagLabel.setForeground(ViewConstants.COLOR_TEXT_DIM);
+
+        treeHeaderBar.add(treeTitleLabel, BorderLayout.WEST);
+        treeHeaderBar.add(treeTagLabel, BorderLayout.EAST);
+        treeCard.add(treeHeaderBar, BorderLayout.NORTH);
         treeCard.add(treeSp, BorderLayout.CENTER);
 
         JPanel treeContainer = new JPanel(new BorderLayout());
@@ -202,7 +234,24 @@ public class CategoryPanel extends JPanel implements CategoryView {
         tblSp.setBorder(null);
 
         RoundedCardPanel tableCard = new RoundedCardPanel(new BorderLayout(), 14, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
-        tableCard.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        tableCard.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+
+        JPanel tableHeaderBar = new JPanel(new BorderLayout());
+        tableHeaderBar.setBackground(new Color(18, 18, 18));
+        tableHeaderBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ViewConstants.COLOR_BORDER),
+                BorderFactory.createEmptyBorder(10, 14, 10, 14)
+        ));
+        JLabel tableTitleLabel = new JLabel("BẢNG DANH MỤC CHI TIẾT");
+        tableTitleLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        tableTitleLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+
+        this.tableCountLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        this.tableCountLabel.setForeground(ViewConstants.COLOR_TEXT_DIM);
+
+        tableHeaderBar.add(tableTitleLabel, BorderLayout.WEST);
+        tableHeaderBar.add(this.tableCountLabel, BorderLayout.EAST);
+        tableCard.add(tableHeaderBar, BorderLayout.NORTH);
         tableCard.add(tblSp, BorderLayout.CENTER);
 
         JPanel tableContainer = new JPanel(new BorderLayout());
@@ -218,17 +267,27 @@ public class CategoryPanel extends JPanel implements CategoryView {
         add(split, BorderLayout.CENTER);
 
         // South Status Bar
-        JPanel south = new JPanel(new FlowLayout(FlowLayout.LEFT, 24, 10));
+        JPanel south = new JPanel(new BorderLayout());
         south.setBackground(ViewConstants.COLOR_STATUS_BG);
         south.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER),
-                BorderFactory.createEmptyBorder(4, 0, 4, 0)));
-        south.add(this.summaryLabel);
+                BorderFactory.createEmptyBorder(8, 24, 8, 24)));
+        south.add(this.summaryLabel, BorderLayout.WEST);
+
+        JLabel syncLabel = new JLabel("● Đã đồng bộ bộ nhớ | Chế độ: MVP Passive View");
+        syncLabel.setFont(ViewConstants.FONT_STATUS);
+        syncLabel.setForeground(ViewConstants.COLOR_TEXT_DIM);
+        south.add(syncLabel, BorderLayout.EAST);
         add(south, BorderLayout.SOUTH);
     }
 
     private void setupDetailTable() {
         com.pfms.presentation.common.ViewUtils.styleTable(this.detailTable);
+        this.detailTable.setRowHeight(42);
+        if (this.detailTable.getTableHeader() != null) {
+            Dimension headerDim = this.detailTable.getTableHeader().getPreferredSize();
+            this.detailTable.getTableHeader().setPreferredSize(new Dimension(headerDim.width, 36));
+        }
 
         DefaultTableCellRenderer l = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MAIN);
         DefaultTableCellRenderer groupRenderer = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MUTED);
@@ -269,7 +328,7 @@ public class CategoryPanel extends JPanel implements CategoryView {
                 this::handleDeleteFromRow
         );
 
-        int[] w = {90, 180, 220, 90, 130};
+        int[] w = {110, 200, 260, 110, 120};
         for (int i = 0; i < Math.min(5, this.detailTable.getColumnModel().getColumnCount()); i++) {
             this.detailTable.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
             if (i == 0) {
@@ -373,16 +432,16 @@ public class CategoryPanel extends JPanel implements CategoryView {
         return pill;
     }
 
-    private JButton toolBtn(String text, Color bg, Color fg, ActionListener l) {
+    private JButton toolBtn(String text, Color bg, Color fg, Color borderColor, ActionListener l) {
         JButton b = new JButton(text);
         b.setFont(ViewConstants.FONT_NAV_ACTIVE);
         b.setBackground(bg);
         b.setForeground(fg);
         b.setFocusPainted(false);
-        b.putClientProperty("Component.arc", 12);
+        b.putClientProperty("Component.arc", 10);
         b.putClientProperty("JButton.buttonType", "roundRect");
         b.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedBorder(12, ViewConstants.COLOR_PRIMARY, new Insets(2, 4, 2, 4)),
+                new RoundedBorder(10, borderColor, new Insets(1, 4, 1, 4)),
                 BorderFactory.createEmptyBorder(6, 16, 6, 16)
         ));
         b.addActionListener(l);
@@ -560,6 +619,7 @@ public class CategoryPanel extends JPanel implements CategoryView {
                 }
             }
         }
+        this.tableCountLabel.setText(this.tableModel.getRowCount() + " kết quả");
     }
     // endregion
 

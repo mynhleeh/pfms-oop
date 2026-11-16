@@ -62,19 +62,18 @@ class TransactionTableModelTest {
     }
 
     @Test
-    @DisplayName("Khởi tạo bảng rỗng ban đầu có 0 dòng và 9 cột chuẩn hóa kèm Thao tác")
+    @DisplayName("Khởi tạo bảng rỗng ban đầu có 0 dòng và 8 cột chuẩn hóa kèm Thao tác")
     void testInitialEmptyTable() {
         assertEquals(0, model.getRowCount());
-        assertEquals(9, model.getColumnCount());
+        assertEquals(8, model.getColumnCount());
         assertEquals("Ngày", model.getColumnName(0));
-        assertEquals("Loại", model.getColumnName(1));
-        assertEquals("Nhóm", model.getColumnName(2));
-        assertEquals("Danh mục", model.getColumnName(3));
-        assertEquals("Số tiền", model.getColumnName(4));
-        assertEquals("Ví", model.getColumnName(5));
-        assertEquals("Phụ phí", model.getColumnName(6));
-        assertEquals("Ghi chú", model.getColumnName(7));
-        assertEquals("Thao tác", model.getColumnName(8));
+        assertEquals("Nhóm", model.getColumnName(1));
+        assertEquals("Danh mục", model.getColumnName(2));
+        assertEquals("Số tiền", model.getColumnName(3));
+        assertEquals("Ví", model.getColumnName(4));
+        assertEquals("Phụ phí", model.getColumnName(5));
+        assertEquals("Ghi chú", model.getColumnName(6));
+        assertEquals("Thao tác", model.getColumnName(7));
     }
 
     @Test
@@ -90,30 +89,28 @@ class TransactionTableModelTest {
 
         // Row 0 - Thu nhập (+ tiền, phụ phí gạch ngang)
         assertEquals("15/11/2026", model.getValueAt(0, 0));
-        assertEquals("Thu nhập", model.getValueAt(0, 1));
-        assertEquals("Thu nhập cố định", model.getValueAt(0, 2));
-        assertEquals("Lương", model.getValueAt(0, 3));
-        assertEquals("+5,000,000 VNĐ", model.getValueAt(0, 4));
-        assertEquals("Ví MB Bank", model.getValueAt(0, 5));
-        assertEquals("-", model.getValueAt(0, 6));
-        assertEquals("Lương tháng 11", model.getValueAt(0, 7));
-        assertSame(txnIncome, model.getValueAt(0, 8));
+        assertEquals("Thu nhập cố định", model.getValueAt(0, 1));
+        assertEquals("Lương", model.getValueAt(0, 2));
+        assertEquals("+5,000,000 VNĐ", model.getValueAt(0, 3));
+        assertEquals("Ví MB Bank", model.getValueAt(0, 4));
+        assertEquals("-", model.getValueAt(0, 5));
+        assertEquals("Lương tháng 11", model.getValueAt(0, 6));
+        assertSame(txnIncome, model.getValueAt(0, 7));
 
         // Row 1 - Chi tiêu (- tiền, phụ phí có dấu trừ màu đỏ)
         assertEquals("16/11/2026", model.getValueAt(1, 0));
-        assertEquals("Chi tiêu", model.getValueAt(1, 1));
-        assertEquals("Nhu cầu thiết yếu", model.getValueAt(1, 2));
-        assertEquals("Ăn uống", model.getValueAt(1, 3));
-        assertEquals("-200,000 VNĐ", model.getValueAt(1, 4));
-        assertEquals("Ví Tiền mặt", model.getValueAt(1, 5));
-        assertEquals("-5,000 VNĐ", model.getValueAt(1, 6));
-        assertEquals("Ăn tối", model.getValueAt(1, 7));
-        assertSame(txnExpenseWithFee, model.getValueAt(1, 8));
+        assertEquals("Nhu cầu thiết yếu", model.getValueAt(1, 1));
+        assertEquals("Ăn uống", model.getValueAt(1, 2));
+        assertEquals("-200,000 VNĐ", model.getValueAt(1, 3));
+        assertEquals("Ví Tiền mặt", model.getValueAt(1, 4));
+        assertEquals("-5,000 VNĐ", model.getValueAt(1, 5));
+        assertEquals("Ăn tối", model.getValueAt(1, 6));
+        assertSame(txnExpenseWithFee, model.getValueAt(1, 7));
 
         assertSame(txnIncome, model.getTransactionAt(0));
         assertSame(txnExpenseWithFee, model.getTransactionAt(1));
 
-        assertTrue(model.isCellEditable(0, 8));
+        assertTrue(model.isCellEditable(0, 7));
         assertFalse(model.isCellEditable(0, 0));
     }
 
@@ -121,7 +118,7 @@ class TransactionTableModelTest {
     @DisplayName("Hiển thị dấu gạch ngang khi không tìm thấy nhóm danh mục tương ứng")
     void testFallbackWhenCategoryGroupNotMapped() {
         model.setTransactions(List.of(txnIncome));
-        assertEquals("-", model.getValueAt(0, 2));
+        assertEquals("-", model.getValueAt(0, 1));
     }
 
     @Test
@@ -132,7 +129,7 @@ class TransactionTableModelTest {
         assertNull(model.getValueAt(-1, 0));
         assertNull(model.getValueAt(1, 0));
         assertNull(model.getValueAt(0, -1));
-        assertNull(model.getValueAt(0, 9));
+        assertNull(model.getValueAt(0, 8));
         assertNull(model.getTransactionAt(-1));
         assertNull(model.getTransactionAt(5));
     }

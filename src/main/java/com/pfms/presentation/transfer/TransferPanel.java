@@ -6,6 +6,8 @@ import com.pfms.presentation.dto.transfer.*;
 import com.pfms.presentation.dto.wallet.*;
 import com.pfms.presentation.common.InputValidator;
 import com.pfms.presentation.common.ViewConstants;
+import com.pfms.presentation.common.component.RoundedBorder;
+import com.pfms.presentation.common.component.RoundedCardPanel;
 import com.pfms.presentation.transfer.component.TransferTableActionRenderer;
 import com.pfms.presentation.transfer.dialog.TransferFundsDialog;
 import com.pfms.presentation.transfer.model.TransferTableModel;
@@ -49,6 +51,7 @@ public class TransferPanel extends JPanel implements TransferView {
     private final JLabel statTotalTransferredLabel = new JLabel("Tổng chuyển: 0 VNĐ");
     private final JLabel statTotalFeesLabel = new JLabel("Tổng phí: 0 VNĐ");
     private final JLabel statCountLabel = new JLabel("0 giao dịch");
+    private final JLabel tableCountLabel = new JLabel("0 kết quả");
 
     // Filter controls
     private final JTextField searchField = new JTextField();
@@ -97,43 +100,38 @@ public class TransferPanel extends JPanel implements TransferView {
         headerRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel title = new JLabel("Chuyển tiền Nội bộ");
-        title.setFont(ViewConstants.FONT_PANEL_HEADER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
         title.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         headerRow.add(title, BorderLayout.WEST);
 
         JPanel statsRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         statsRow.setBackground(ViewConstants.COLOR_CONTENT_BG);
-        statsRow.add(createStatPill(this.statTotalTransferredLabel, ViewConstants.COLOR_PRIMARY_LIGHT));
-        statsRow.add(createStatPill(this.statTotalFeesLabel, ViewConstants.COLOR_EXPENSE));
-        statsRow.add(createStatPill(this.statCountLabel, ViewConstants.COLOR_TEXT_MUTED));
+        statsRow.add(createStatPill(this.statTotalTransferredLabel, ViewConstants.COLOR_PRIMARY_LIGHT, ViewConstants.COLOR_GOLD_BORDER));
+        statsRow.add(createStatPill(this.statTotalFeesLabel, ViewConstants.COLOR_EXPENSE, null));
+        statsRow.add(createStatPill(this.statCountLabel, ViewConstants.COLOR_TEXT_MAIN, null));
         headerRow.add(statsRow, BorderLayout.EAST);
 
         north.add(headerRow);
         north.add(Box.createVerticalStrut(12));
 
-        // 2. Thẻ Bộ Lọc (Filter Card) - Khung Card nền Obsidian đen viền tinh tế
-        JPanel filterCard = new JPanel(new BorderLayout(12, 0));
-        filterCard.setBackground(ViewConstants.COLOR_CARD_BG);
+        // 2. Thẻ Bộ Lọc (Filter Card) - Khung Card bo viền mịn màng chuẩn Luxury Black & Gold
+        JPanel filterCard = new RoundedCardPanel(new BorderLayout(12, 0), 12, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
         filterCard.setAlignmentX(Component.LEFT_ALIGNMENT);
-        filterCard.putClientProperty("FlatLaf.style", "arc: 12");
-        filterCard.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true),
-                BorderFactory.createEmptyBorder(8, 14, 8, 14)
-        ));
+        filterCard.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
 
         // Bộ điều khiển bên trái Toolbar
         JPanel leftFilters = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
         leftFilters.setOpaque(false);
 
         // Ô tìm kiếm nhanh từ khóa
-        this.searchField.setPreferredSize(new Dimension(170, 32));
+        this.searchField.setPreferredSize(new Dimension(190, 34));
         this.searchField.putClientProperty("JTextField.placeholderText", "Tìm theo ghi chú, tên ví...");
-        this.searchField.putClientProperty("FlatLaf.style", "arc: 8");
-        this.searchField.setBackground(ViewConstants.COLOR_STATUS_BG);
+        this.searchField.putClientProperty("Component.arc", 8);
+        this.searchField.setBackground(new Color(13, 13, 13));
         this.searchField.setForeground(ViewConstants.COLOR_TEXT_MAIN);
         this.searchField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true),
-                BorderFactory.createEmptyBorder(4, 8, 4, 8)
+                new RoundedBorder(8, ViewConstants.COLOR_BORDER, new Insets(1, 4, 1, 4)),
+                BorderFactory.createEmptyBorder(3, 8, 3, 8)
         ));
         this.searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override public void insertUpdate(DocumentEvent e) { applyClientSearchFilter(); }
@@ -149,13 +147,13 @@ public class TransferPanel extends JPanel implements TransferView {
         styleDateField(this.startDateField);
         styleDateField(this.endDateField);
 
-        JPanel dateRangeBox = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+        JPanel dateRangeBox = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         dateRangeBox.setOpaque(false);
-        JLabel lblTu = new JLabel("Từ:");
+        JLabel lblTu = new JLabel("Khoảng ngày:");
         lblTu.setFont(ViewConstants.FONT_STATUS);
         lblTu.setForeground(ViewConstants.COLOR_TEXT_MUTED);
-        JLabel lblDen = new JLabel("- Đến:");
-        lblDen.setFont(ViewConstants.FONT_STATUS);
+        JLabel lblDen = new JLabel("→");
+        lblDen.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblDen.setForeground(ViewConstants.COLOR_TEXT_MUTED);
         dateRangeBox.add(lblTu);
         dateRangeBox.add(this.startDateField);
@@ -163,8 +161,8 @@ public class TransferPanel extends JPanel implements TransferView {
         dateRangeBox.add(this.endDateField);
 
         // Nút Lọc và Đặt lại
-        JButton btnFilter = createBtn("Lọc", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN);
-        JButton btnReset = createBtn("Đặt lại", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MUTED);
+        JButton btnFilter = createBtn("Lọc", new Color(23, 23, 23), ViewConstants.COLOR_TEXT_MAIN);
+        JButton btnReset = createBtn("Đặt lại", new Color(23, 23, 23), ViewConstants.COLOR_TEXT_MUTED);
         btnFilter.addActionListener(e -> applyFilter());
         btnReset.addActionListener(e -> resetFilter());
 
@@ -189,17 +187,21 @@ public class TransferPanel extends JPanel implements TransferView {
         JPanel rightActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 2));
         rightActions.setOpaque(false);
 
-        JButton btnRefresh = createBtn("Làm mới", ViewConstants.COLOR_STATUS_BG, ViewConstants.COLOR_TEXT_MAIN);
+        JButton btnRefresh = createBtn("Làm mới", new Color(23, 23, 23), ViewConstants.COLOR_TEXT_MAIN);
         btnRefresh.addActionListener(e -> { loadWallets(); reloadTransfers(); });
 
         JButton btnNew = new JButton("+ Chuyển tiền mới");
-        btnNew.setFont(ViewConstants.FONT_NAV_ACTIVE);
-        btnNew.setBackground(ViewConstants.COLOR_PRIMARY_LIGHT);
+        btnNew.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnNew.setBackground(ViewConstants.COLOR_PRIMARY);
         btnNew.setForeground(Color.BLACK);
         btnNew.setFocusPainted(false);
         btnNew.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnNew.putClientProperty("FlatLaf.style", "arc: 8");
-        btnNew.setBorder(BorderFactory.createEmptyBorder(6, 16, 6, 16));
+        btnNew.putClientProperty("Component.arc", 8);
+        btnNew.putClientProperty("JButton.buttonType", "roundRect");
+        btnNew.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(8, ViewConstants.COLOR_PRIMARY_LIGHT, new Insets(1, 4, 1, 4)),
+                BorderFactory.createEmptyBorder(5, 14, 5, 14)
+        ));
         btnNew.addActionListener(e -> openTransferFundsDialog());
 
         rightActions.add(btnRefresh);
@@ -211,34 +213,58 @@ public class TransferPanel extends JPanel implements TransferView {
         north.add(filterCard);
         add(north, BorderLayout.NORTH);
 
-        // 3. Cấu hình bảng dữ liệu giao dịch
+        // 3. Cấu hình bảng dữ liệu giao dịch trong Thẻ Bo Tròn (Rounded Table Card)
         setupTable();
+
+        JPanel centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setBackground(ViewConstants.COLOR_CONTENT_BG);
+        centerWrapper.setBorder(BorderFactory.createEmptyBorder(0, 20, 14, 20));
+
+        JPanel tableCard = new RoundedCardPanel(new BorderLayout(), 14, ViewConstants.COLOR_CARD_BG, ViewConstants.COLOR_BORDER);
+
+        // Header bar của Card Bảng
+        JPanel tableHeaderBar = new JPanel(new BorderLayout());
+        tableHeaderBar.setOpaque(false);
+        tableHeaderBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ViewConstants.COLOR_BORDER),
+                BorderFactory.createEmptyBorder(10, 16, 10, 16)
+        ));
+        JLabel tableTitleLabel = new JLabel("LỊCH SỬ CHUYỂN TIỀN NỘI BỘ");
+        tableTitleLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        tableTitleLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+
+        this.tableCountLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        this.tableCountLabel.setForeground(ViewConstants.COLOR_TEXT_DIM);
+
+        tableHeaderBar.add(tableTitleLabel, BorderLayout.WEST);
+        tableHeaderBar.add(this.tableCountLabel, BorderLayout.EAST);
+        tableCard.add(tableHeaderBar, BorderLayout.NORTH);
+
         JScrollPane scroll = new JScrollPane(this.table);
         scroll.getViewport().setBackground(ViewConstants.COLOR_CARD_BG);
         scroll.setBackground(ViewConstants.COLOR_CARD_BG);
-        scroll.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 20, 8, 20),
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true)
-        ));
-        add(scroll, BorderLayout.CENTER);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        tableCard.add(scroll, BorderLayout.CENTER);
 
-        // 4. Footer phân trang & tóm tắt
-        JPanel south = new JPanel(new BorderLayout());
-        south.setBackground(ViewConstants.COLOR_STATUS_BG);
-        south.setBorder(BorderFactory.createCompoundBorder(
+        // 4. Footer của Card Bảng: phân trang & tóm tắt
+        JPanel cardFooter = new JPanel(new BorderLayout(16, 0));
+        cardFooter.setOpaque(false);
+        cardFooter.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 0, 0, 0, ViewConstants.COLOR_BORDER),
-                BorderFactory.createEmptyBorder(8, 20, 8, 20)
+                BorderFactory.createEmptyBorder(8, 16, 8, 16)
         ));
 
-        this.summaryLabel.setFont(ViewConstants.FONT_NAV_ACTIVE);
-        this.summaryLabel.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        south.add(this.summaryLabel, BorderLayout.WEST);
+        this.summaryLabel.setFont(ViewConstants.FONT_BODY);
+        this.summaryLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
+        cardFooter.add(this.summaryLabel, BorderLayout.CENTER);
 
-        JPanel pgn = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        pgn.setBackground(ViewConstants.COLOR_STATUS_BG);
-        this.prevButton.setFont(ViewConstants.FONT_BODY);
-        this.nextButton.setFont(ViewConstants.FONT_BODY);
+        JPanel pgn = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        pgn.setOpaque(false);
+
+        stylePaginationButton(this.prevButton);
+        stylePaginationButton(this.nextButton);
         this.pageInfoLabel.setFont(ViewConstants.FONT_BODY);
+        this.pageInfoLabel.setForeground(ViewConstants.COLOR_TEXT_MUTED);
         this.prevButton.setEnabled(false);
         this.nextButton.setEnabled(false);
         this.prevButton.addActionListener(e -> this.presenter.prevPage());
@@ -247,18 +273,39 @@ public class TransferPanel extends JPanel implements TransferView {
         pgn.add(this.prevButton);
         pgn.add(this.pageInfoLabel);
         pgn.add(this.nextButton);
-        south.add(pgn, BorderLayout.EAST);
-        add(south, BorderLayout.SOUTH);
+        cardFooter.add(pgn, BorderLayout.EAST);
+
+        tableCard.add(cardFooter, BorderLayout.SOUTH);
+        centerWrapper.add(tableCard, BorderLayout.CENTER);
+        add(centerWrapper, BorderLayout.CENTER);
     }
 
     private void setupTable() {
         com.pfms.presentation.common.ViewUtils.styleTable(this.table);
-        this.table.setRowHeight(36);
+        this.table.setRowHeight(40);
+
+        if (this.table.getTableHeader() != null) {
+            Dimension headerDim = this.table.getTableHeader().getPreferredSize();
+            this.table.getTableHeader().setPreferredSize(new Dimension(headerDim.width, 38));
+        }
 
         DefaultTableCellRenderer centerRenderer = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.CENTER, ViewConstants.COLOR_TEXT_MUTED);
         DefaultTableCellRenderer leftMainRenderer = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MAIN);
-        DefaultTableCellRenderer rightAmountRenderer = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.RIGHT, ViewConstants.COLOR_PRIMARY_LIGHT);
         DefaultTableCellRenderer leftMutedRenderer = com.pfms.presentation.common.ViewUtils.createCellRenderer(SwingConstants.LEFT, ViewConstants.COLOR_TEXT_MUTED);
+
+        DefaultTableCellRenderer rightAmountRenderer = new DefaultTableCellRenderer() {
+            @Override public Component getTableCellRendererComponent(JTable t, Object v, boolean s, boolean f, int row, int col) {
+                super.getTableCellRendererComponent(t, v, s, f, row, col);
+                setHorizontalAlignment(SwingConstants.RIGHT);
+                setFont(new Font("Segoe UI", Font.BOLD, 12));
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                if (!s) {
+                    setBackground(ViewConstants.COLOR_CARD_BG);
+                    setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
+                }
+                return this;
+            }
+        };
 
         // Renderer riêng cho Phụ phí: nếu có phí hiển thị màu đỏ Coral, không phí hiển thị xám
         DefaultTableCellRenderer feeRenderer = new DefaultTableCellRenderer() {
@@ -281,7 +328,7 @@ public class TransferPanel extends JPanel implements TransferView {
         };
 
         if (this.table.getColumnModel().getColumnCount() >= 7) {
-            int[] colWidths = {105, 160, 160, 130, 110, 220, 130};
+            int[] colWidths = {105, 165, 165, 140, 115, 230, 110};
             for (int i = 0; i < colWidths.length; i++) {
                 this.table.getColumnModel().getColumn(i).setPreferredWidth(colWidths[i]);
             }
@@ -311,37 +358,46 @@ public class TransferPanel extends JPanel implements TransferView {
         }
     }
 
-    private JPanel createStatPill(JLabel label, Color accentColor) {
-        label.setFont(ViewConstants.FONT_NAV_ACTIVE);
+    private JPanel createStatPill(JLabel label, Color accentColor, Color borderColor) {
+        label.setFont(new Font("Segoe UI", Font.BOLD, 11));
         label.setForeground(accentColor);
-        JPanel pill = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 4));
-        pill.setBackground(ViewConstants.COLOR_CARD_BG);
-        pill.putClientProperty("FlatLaf.style", "arc: 999");
-        pill.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(accentColor.getRed(), accentColor.getGreen(), accentColor.getBlue(), 90), 1, true),
-                BorderFactory.createEmptyBorder(2, 6, 2, 6)
-        ));
+        JPanel pill = new RoundedCardPanel(new FlowLayout(FlowLayout.CENTER, 8, 4), 16, ViewConstants.COLOR_CARD_BG, borderColor != null ? borderColor : ViewConstants.COLOR_BORDER);
         pill.add(label);
         return pill;
     }
 
+    private void stylePaginationButton(JButton btn) {
+        btn.setFont(ViewConstants.FONT_STATUS);
+        btn.setBackground(ViewConstants.COLOR_STATUS_BG);
+        btn.setForeground(ViewConstants.COLOR_TEXT_MAIN);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.putClientProperty("Component.arc", 6);
+        btn.putClientProperty("JButton.buttonType", "roundRect");
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(6, ViewConstants.COLOR_BORDER, new Insets(1, 4, 1, 4)),
+                BorderFactory.createEmptyBorder(3, 10, 3, 10)
+        ));
+    }
+
     private void styleDropdown(JComboBox<Object> combo) {
         combo.setFont(ViewConstants.FONT_BODY);
-        combo.setBackground(ViewConstants.COLOR_STATUS_BG);
+        combo.setBackground(new Color(13, 13, 13));
         combo.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        combo.setPreferredSize(new Dimension(140, 32));
-        combo.putClientProperty("FlatLaf.style", "arc: 8");
+        combo.setPreferredSize(new Dimension(140, 34));
+        combo.putClientProperty("Component.arc", 8);
     }
 
     private void styleDateField(JTextField field) {
         field.setFont(ViewConstants.FONT_BODY);
-        field.setBackground(ViewConstants.COLOR_STATUS_BG);
+        field.setBackground(new Color(13, 13, 13));
         field.setForeground(ViewConstants.COLOR_TEXT_MAIN);
-        field.setPreferredSize(new Dimension(84, 32));
+        field.setHorizontalAlignment(SwingConstants.CENTER);
+        field.setPreferredSize(new Dimension(95, 34));
         field.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
-        field.putClientProperty("FlatLaf.style", "arc: 8");
+        field.putClientProperty("Component.arc", 8);
         field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true),
+                new RoundedBorder(8, new Color(55, 55, 55), new Insets(1, 4, 1, 4)),
                 BorderFactory.createEmptyBorder(2, 6, 2, 6)
         ));
     }
@@ -410,6 +466,7 @@ public class TransferPanel extends JPanel implements TransferView {
             ).toList();
         }
         this.tableModel.setTransfers(filtered.stream().map(this::toTransferDto).toList());
+        this.tableCountLabel.setText(this.tableModel.getRowCount() + " kết quả");
     }
 
     private void updateKPIStats(String summaryText, String pageInfoText) {
@@ -512,10 +569,11 @@ public class TransferPanel extends JPanel implements TransferView {
         b.setForeground(fg);
         b.setFocusPainted(false);
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        b.putClientProperty("FlatLaf.style", "arc: 8");
+        b.putClientProperty("Component.arc", 8);
+        b.putClientProperty("JButton.buttonType", "roundRect");
         b.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ViewConstants.COLOR_BORDER, 1, true),
-                BorderFactory.createEmptyBorder(4, 12, 4, 12)
+                new RoundedBorder(8, ViewConstants.COLOR_BORDER, new Insets(1, 4, 1, 4)),
+                BorderFactory.createEmptyBorder(5, 14, 5, 14)
         ));
         return b;
     }

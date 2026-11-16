@@ -14,5 +14,18 @@ public record WalletItemViewModel(
         String formattedBalance,
         String statusText,
         String note,
-        boolean isActive
-) {}
+        boolean isActive,
+        boolean isDefault
+) {
+    public WalletItemViewModel(
+            UUID id,
+            int displayOrder,
+            String name,
+            BigDecimal rawBalance,
+            String formattedBalance,
+            String statusText,
+            String note,
+            boolean isActive) {
+        this(id, displayOrder, name, rawBalance, formattedBalance, statusText, note, isActive, false);
+    }
+}

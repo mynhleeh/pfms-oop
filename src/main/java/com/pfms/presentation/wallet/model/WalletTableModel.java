@@ -18,7 +18,7 @@ import java.util.Locale;
 public class WalletTableModel extends AbstractTableModel {
 
     private static final String[] COLUMN_NAMES = {
-            "#", "Tên ví", "Số dư khả dụng", "Đơn vị", "Trạng thái", "Ví mặc định", "Ghi chú"
+            "Tên ví tài chính", "Số dư khả dụng", "Trạng thái", "Ghi chú", "Thao tác"
     };
 
     private final List<WalletResponseDTO> wallets = new ArrayList<>();
@@ -68,6 +68,11 @@ public class WalletTableModel extends AbstractTableModel {
     }
 
     @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 4;
+    }
+
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (rowIndex < 0 || rowIndex >= this.wallets.size()) {
             return null;
@@ -75,13 +80,11 @@ public class WalletTableModel extends AbstractTableModel {
 
         WalletResponseDTO wallet = this.wallets.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> rowIndex + 1;
-            case 1 -> wallet.getName();
-            case 2 -> formatCurrency(wallet.getBalance());
-            case 3 -> wallet.getCurrency();
-            case 4 -> mapStatus(wallet.getStatus());
-            case 5 -> wallet.isDefaultWallet() ? "Mặc định" : "-";
-            case 6 -> wallet.getNote();
+            case 0 -> wallet.getName();
+            case 1 -> formatCurrency(wallet.getBalance());
+            case 2 -> mapStatus(wallet.getStatus());
+            case 3 -> wallet.getNote();
+            case 4 -> wallet;
             default -> null;
         };
     }

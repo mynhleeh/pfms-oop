@@ -34,17 +34,15 @@ class WalletTableModelTest {
     }
 
     @Test
-    @DisplayName("Khởi tạo bảng rỗng ban đầu có 0 dòng và 7 cột")
+    @DisplayName("Khởi tạo bảng rỗng ban đầu có 0 dòng và 5 cột chuẩn preview")
     void testInitialEmptyTable() {
         assertEquals(0, model.getRowCount());
-        assertEquals(7, model.getColumnCount());
-        assertEquals("#", model.getColumnName(0));
-        assertEquals("Tên ví", model.getColumnName(1));
-        assertEquals("Số dư khả dụng", model.getColumnName(2));
-        assertEquals("Đơn vị", model.getColumnName(3));
-        assertEquals("Trạng thái", model.getColumnName(4));
-        assertEquals("Ví mặc định", model.getColumnName(5));
-        assertEquals("Ghi chú", model.getColumnName(6));
+        assertEquals(5, model.getColumnCount());
+        assertEquals("Tên ví tài chính", model.getColumnName(0));
+        assertEquals("Số dư khả dụng", model.getColumnName(1));
+        assertEquals("Trạng thái", model.getColumnName(2));
+        assertEquals("Ghi chú", model.getColumnName(3));
+        assertEquals("Thao tác", model.getColumnName(4));
     }
 
     @Test
@@ -53,15 +51,23 @@ class WalletTableModelTest {
         model.setWallets(List.of(sampleWallet));
 
         assertEquals(1, model.getRowCount());
-        assertEquals(1, model.getValueAt(0, 0)); // STT
-        assertEquals("Ví Tiền mặt", model.getValueAt(0, 1));
-        assertEquals("5,000,000 VNĐ", model.getValueAt(0, 2));
-        assertEquals("VND", model.getValueAt(0, 3));
-        assertEquals("Hoạt động", model.getValueAt(0, 4));
-        assertEquals("Mặc định", model.getValueAt(0, 5));
-        assertEquals("Tiền chi tiêu hằng ngày", model.getValueAt(0, 6));
+        assertEquals("Ví Tiền mặt", model.getValueAt(0, 0));
+        assertEquals("5,000,000 VNĐ", model.getValueAt(0, 1));
+        assertEquals("Hoạt động", model.getValueAt(0, 2));
+        assertEquals("Tiền chi tiêu hằng ngày", model.getValueAt(0, 3));
+        assertSame(sampleWallet, model.getValueAt(0, 4));
 
         assertSame(sampleWallet, model.getWalletAt(0));
+    }
+
+    @Test
+    @DisplayName("Cột Thao tác (chỉ mục 4) cho phép chỉnh sửa tương tác để nhận sự kiện chuột")
+    void testCellEditableOnlyForActionsColumn() {
+        assertFalse(model.isCellEditable(0, 0));
+        assertFalse(model.isCellEditable(0, 1));
+        assertFalse(model.isCellEditable(0, 2));
+        assertFalse(model.isCellEditable(0, 3));
+        assertTrue(model.isCellEditable(0, 4));
     }
 
     @Test

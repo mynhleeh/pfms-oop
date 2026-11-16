@@ -17,14 +17,14 @@ import java.util.UUID;
 
 /**
  * Mô hình bảng dữ liệu hiển thị danh sách giao dịch thu chi (UC-TRN-03).
- * Cấu trúc 9 cột chuẩn hóa: Ngày | Loại | Nhóm | Danh mục | Số tiền | Ví | Phụ phí | Ghi chú | Thao tác.
+ * Cấu trúc 8 cột chuẩn hóa: Ngày | Nhóm | Danh mục | Số tiền | Ví | Phụ phí | Ghi chú | Thao tác.
  */
 public class TransactionTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
 
     private static final String[] COLUMN_NAMES = {
-            "Ngày", "Loại", "Nhóm", "Danh mục", "Số tiền", "Ví", "Phụ phí", "Ghi chú", "Thao tác"
+            "Ngày", "Nhóm", "Danh mục", "Số tiền", "Ví", "Phụ phí", "Ghi chú", "Thao tác"
     };
 
     private final List<TransactionResponseDTO> transactions;
@@ -101,23 +101,22 @@ public class TransactionTableModel extends AbstractTableModel {
         TransactionResponseDTO txn = this.transactions.get(rowIndex);
         return switch (columnIndex) {
             case 0 -> (txn.getTransactionDate() != null) ? this.dateFormatter.format(txn.getTransactionDate()) : "-";
-            case 1 -> mapTransactionType(txn.getTransactionType());
-            case 2 -> resolveGroupName(txn.getCategoryId());
-            case 3 -> (txn.getCategoryName() != null) ? txn.getCategoryName() : "-";
-            case 4 -> formatSignedAmount(txn.getAmount(), txn.getTransactionType());
-            case 5 -> (txn.getWalletName() != null) ? txn.getWalletName() : "-";
-            case 6 -> (txn.hasFee() && txn.getFeeAmount() != null && txn.getFeeAmount().compareTo(BigDecimal.ZERO) > 0)
+            case 1 -> resolveGroupName(txn.getCategoryId());
+            case 2 -> (txn.getCategoryName() != null) ? txn.getCategoryName() : "-";
+            case 3 -> formatSignedAmount(txn.getAmount(), txn.getTransactionType());
+            case 4 -> (txn.getWalletName() != null) ? txn.getWalletName() : "-";
+            case 5 -> (txn.hasFee() && txn.getFeeAmount() != null && txn.getFeeAmount().compareTo(BigDecimal.ZERO) > 0)
                     ? "-" + formatCurrency(txn.getFeeAmount())
                     : "-";
-            case 7 -> (txn.getNote() != null) ? txn.getNote() : "";
-            case 8 -> txn;
+            case 6 -> (txn.getNote() != null) ? txn.getNote() : "";
+            case 7 -> txn;
             default -> null;
         };
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == 8;
+        return columnIndex == 7;
     }
 
     private String resolveGroupName(UUID categoryId) {

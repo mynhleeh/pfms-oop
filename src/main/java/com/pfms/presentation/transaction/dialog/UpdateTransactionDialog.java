@@ -98,7 +98,7 @@ public class UpdateTransactionDialog extends JDialog {
                 BorderFactory.createMatteBorder(0, 0, 1, 0, ViewConstants.COLOR_BORDER),
                 BorderFactory.createEmptyBorder(14, 22, 14, 22)
         ));
-        JLabel titleLabel = new JLabel("Chỉnh Sửa Thông Tin Giao Dịch");
+        JLabel titleLabel = new JLabel("✏️  Chỉnh Sửa Thông Tin Giao Dịch");
         titleLabel.setFont(ViewConstants.FONT_TITLE);
         titleLabel.setForeground(ViewConstants.COLOR_PRIMARY_LIGHT);
         headerPanel.add(titleLabel, BorderLayout.WEST);
@@ -113,7 +113,7 @@ public class UpdateTransactionDialog extends JDialog {
         // Loại giao dịch (Chỉ đọc với Badge màu tương ứng)
         boolean isIncome = "INCOME".equalsIgnoreCase(existingTxn.getTransactionType());
         Color typeColor = isIncome ? ViewConstants.COLOR_INCOME : ViewConstants.COLOR_EXPENSE;
-        Color typeBg = isIncome ? new Color(74, 222, 128, 40) : new Color(251, 113, 133, 40);
+        Color typeBg = isIncome ? new Color(74, 222, 128, 30) : new Color(251, 113, 133, 30);
 
         JPanel typeBadge = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
         typeBadge.setBackground(typeBg);
@@ -121,8 +121,8 @@ public class UpdateTransactionDialog extends JDialog {
         typeBadge.putClientProperty("FlatLaf.style", "arc: 8");
         typeBadge.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
 
-        JLabel typeText = new JLabel("Phân loại: " + (isIncome ? "Khoản Thu Nhập" : "Khoản Chi Tiêu"));
-        typeText.setFont(ViewConstants.FONT_NAV_ACTIVE);
+        JLabel typeText = new JLabel(isIncome ? "🟢 THU NHẬP (INCOME)" : "🔴 CHI TIÊU (EXPENSE)");
+        typeText.setFont(new Font("Segoe UI", Font.BOLD, 12));
         typeText.setForeground(typeColor);
         typeBadge.add(typeText);
 

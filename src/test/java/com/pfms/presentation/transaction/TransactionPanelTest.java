@@ -64,7 +64,7 @@ class TransactionPanelTest {
     @DisplayName("Khởi tạo nạp dữ liệu danh sách giao dịch ban đầu và tóm tắt dòng tiền thành công")
     void testInitialDataLoaded() {
         assertEquals(1, panel.getTableModel().getRowCount());
-        assertEquals("Ăn uống", panel.getTableModel().getValueAt(0, 3));
+        assertEquals("Ăn uống", panel.getTableModel().getValueAt(0, 2));
         assertTrue(panel.getSummaryText().contains("Tổng chi: 100,000 VNĐ"));
         assertTrue(panel.getPageInfoText().contains("Trang 1 / 1"));
         assertTrue(panel.getStatExpenseLabel().getText().contains("100,000 VNĐ"));
@@ -86,8 +86,8 @@ class TransactionPanelTest {
 
         TransactionPanel panelWithHierarchy = new TransactionPanel(transactionController, walletController, categoryController);
         assertEquals(1, panelWithHierarchy.getTableModel().getRowCount());
-        assertEquals("Nhu cầu thiết yếu", panelWithHierarchy.getTableModel().getValueAt(0, 2));
-        assertEquals("Ăn uống", panelWithHierarchy.getTableModel().getValueAt(0, 3));
+        assertEquals("Nhu cầu thiết yếu", panelWithHierarchy.getTableModel().getValueAt(0, 1));
+        assertEquals("Ăn uống", panelWithHierarchy.getTableModel().getValueAt(0, 2));
     }
 
     @Test

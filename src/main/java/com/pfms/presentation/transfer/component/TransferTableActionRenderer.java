@@ -80,6 +80,9 @@ public class TransferTableActionRenderer extends AbstractCellEditor implements T
         } else {
             this.renderPanel.setBackground(ViewConstants.COLOR_CARD_BG);
         }
+        int colWidth = table.getColumnModel().getColumn(column).getWidth();
+        this.renderPanel.setSize(colWidth, table.getRowHeight());
+        this.renderPanel.doLayout();
         return this.renderPanel;
     }
 
@@ -92,6 +95,9 @@ public class TransferTableActionRenderer extends AbstractCellEditor implements T
         } else {
             this.editorPanel.setBackground(ViewConstants.COLOR_CARD_BG);
         }
+        int colWidth = table.getColumnModel().getColumn(column).getWidth();
+        this.editorPanel.setSize(colWidth, table.getRowHeight());
+        this.editorPanel.doLayout();
         return this.editorPanel;
     }
 
