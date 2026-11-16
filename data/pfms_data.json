@@ -1,0 +1,382 @@
+{
+  "wallets": [
+    {
+      "walletId": "6af0ab39-a593-45a0-a3e6-d5e313855960",
+      "name": "Tiền mặt",
+      "currentBalance": "3000.00",
+      "status": "ACTIVE",
+      "isDefault": true,
+      "note": "Ví mặc định hệ thống",
+      "createdAt": "2026-11-15T16:25:28.715921300"
+    },
+    {
+      "walletId": "9d4fd158-2493-4fb6-8678-5f21b5de6528",
+      "name": "vietcombank",
+      "currentBalance": "100000.00",
+      "status": "ACTIVE",
+      "isDefault": false,
+      "note": "",
+      "createdAt": "2026-11-16T01:29:23.796909"
+    },
+    {
+      "walletId": "068a3c5e-e8fa-47bf-b62c-7fcbe7189e80",
+      "name": "MOMO",
+      "currentBalance": "360000.00",
+      "status": "ACTIVE",
+      "isDefault": false,
+      "note": "ví điện tử",
+      "createdAt": "2026-11-16T09:07:01.569045800"
+    }
+  ],
+  "needGroups": [
+    {
+      "groupId": "03bbef22-67a6-4e91-bf47-284624f428c4",
+      "groupName": "Việc làm",
+      "flowType": "INCOME",
+      "groupStatus": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:12:58.801260"
+    },
+    {
+      "groupId": "44017112-367f-412e-9f1b-adc085070f34",
+      "groupName": "Tài sản",
+      "flowType": "INCOME",
+      "groupStatus": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:14:39.250214200"
+    },
+    {
+      "groupId": "bc71f80a-42e3-4349-8634-bac73d52b339",
+      "groupName": "Khác",
+      "flowType": "INCOME",
+      "groupStatus": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:18:03.407559200"
+    },
+    {
+      "groupId": "8a5b1072-8e4b-4b11-b52a-ae879239cd71",
+      "groupName": "Thiết yếu",
+      "flowType": "EXPENSE",
+      "groupStatus": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:20:47.412386800"
+    },
+    {
+      "groupId": "00cc7a45-4f74-4639-83a4-3a2f59736e8f",
+      "groupName": "Phát triển",
+      "flowType": "EXPENSE",
+      "groupStatus": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:22:07.878259100"
+    },
+    {
+      "groupId": "2e88c26a-9ddf-4141-8149-d281010d1280",
+      "groupName": "Giải trí",
+      "flowType": "EXPENSE",
+      "groupStatus": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:22:47.299736700"
+    },
+    {
+      "groupId": "6efa1d75-eaf4-455c-9d5f-9316933d7d27",
+      "groupName": "Phí",
+      "flowType": "EXPENSE",
+      "groupStatus": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T09:10:57.521482300"
+    }
+  ],
+  "categories": [
+    {
+      "categoryId": "de25a4b9-7213-42fc-a149-1fc6b67bae74",
+      "name": "Lương & Phụ cấp",
+      "groupId": "03bbef22-67a6-4e91-bf47-284624f428c4",
+      "flowType": "INCOME",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:13:20.990095400"
+    },
+    {
+      "categoryId": "f0df053e-7606-4562-885d-f0253e8bfde0",
+      "name": "Thưởng & Hoa hồng",
+      "groupId": "03bbef22-67a6-4e91-bf47-284624f428c4",
+      "flowType": "INCOME",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:14:20.770067500"
+    },
+    {
+      "categoryId": "7b045446-0f23-4b35-a60f-3139a4b47549",
+      "name": "Lãi & Trái phiếu",
+      "groupId": "44017112-367f-412e-9f1b-adc085070f34",
+      "flowType": "INCOME",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:15:13.633131900"
+    },
+    {
+      "categoryId": "04144611-b6ee-4308-be66-798de00e7a69",
+      "name": "Cổ tức & Lợi nhuận",
+      "groupId": "44017112-367f-412e-9f1b-adc085070f34",
+      "flowType": "INCOME",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:17:34.971353600"
+    },
+    {
+      "categoryId": "b8518666-e4d0-4e9f-898d-c95ea846a6e2",
+      "name": "Trợ cấp gia đình",
+      "groupId": "bc71f80a-42e3-4349-8634-bac73d52b339",
+      "flowType": "INCOME",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:18:12.105910500"
+    },
+    {
+      "categoryId": "a9ae19fa-088e-41cf-b161-6f4e55bfcf1c",
+      "name": "Hoàn tiền",
+      "groupId": "bc71f80a-42e3-4349-8634-bac73d52b339",
+      "flowType": "INCOME",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:18:52.790002900"
+    },
+    {
+      "categoryId": "f932107b-93eb-45ac-b0e1-0a1505d7e436",
+      "name": "Quà tặng",
+      "groupId": "bc71f80a-42e3-4349-8634-bac73d52b339",
+      "flowType": "INCOME",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:19:47.063067600"
+    },
+    {
+      "categoryId": "9a552467-6a90-4ea5-af1a-e937d0aae768",
+      "name": "Thanh lý",
+      "groupId": "bc71f80a-42e3-4349-8634-bac73d52b339",
+      "flowType": "INCOME",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:20:11.234636600"
+    },
+    {
+      "categoryId": "c103d12e-6ca6-4416-a739-721c37acfca9",
+      "name": "Nhà ở",
+      "groupId": "8a5b1072-8e4b-4b11-b52a-ae879239cd71",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:20:56.818740400"
+    },
+    {
+      "categoryId": "d1ded2d6-8c43-4038-8d11-06dc5696822e",
+      "name": "Hóa đơn",
+      "groupId": "8a5b1072-8e4b-4b11-b52a-ae879239cd71",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:21:05.237457"
+    },
+    {
+      "categoryId": "0efecabf-8ea4-4105-ad7f-e008983a0e82",
+      "name": "Thực phẩm",
+      "groupId": "8a5b1072-8e4b-4b11-b52a-ae879239cd71",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:21:15.735226100"
+    },
+    {
+      "categoryId": "04b5ef5d-1262-4dfb-958e-49a99d085fb1",
+      "name": "Đi lại cơ bản",
+      "groupId": "8a5b1072-8e4b-4b11-b52a-ae879239cd71",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:21:25.126548100"
+    },
+    {
+      "categoryId": "4a3ef007-82ab-4e76-a626-b5f21519d3df",
+      "name": "Y tế & Sức khỏe",
+      "groupId": "8a5b1072-8e4b-4b11-b52a-ae879239cd71",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:21:42.489115100"
+    },
+    {
+      "categoryId": "2279e7c7-0902-404f-9990-93cf413634c1",
+      "name": "Sửa chữa & Bảo trì",
+      "groupId": "8a5b1072-8e4b-4b11-b52a-ae879239cd71",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:21:53.424783600"
+    },
+    {
+      "categoryId": "983381f3-b697-455e-9636-56e6f99d2e02",
+      "name": "Giáo dục",
+      "groupId": "00cc7a45-4f74-4639-83a4-3a2f59736e8f",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:22:15.509232600"
+    },
+    {
+      "categoryId": "05880f38-2a85-4b25-9868-3f3e6d1a848c",
+      "name": "Sự nghiệp",
+      "groupId": "00cc7a45-4f74-4639-83a4-3a2f59736e8f",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:22:22.900129200"
+    },
+    {
+      "categoryId": "c9cad09f-dbfe-4da1-8451-34391b21b4b1",
+      "name": "Mối quan hệ",
+      "groupId": "00cc7a45-4f74-4639-83a4-3a2f59736e8f",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:22:30.606231300"
+    },
+    {
+      "categoryId": "e095815f-5294-4d0a-800a-e5789fa9e175",
+      "name": "Ăn ngoài",
+      "groupId": "2e88c26a-9ddf-4141-8149-d281010d1280",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:22:53.395317300"
+    },
+    {
+      "categoryId": "a61966e3-1063-48d2-8bb5-183e383fe20c",
+      "name": "Mua sắm",
+      "groupId": "2e88c26a-9ddf-4141-8149-d281010d1280",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:23:01.091315400"
+    },
+    {
+      "categoryId": "4e3934cd-37fb-4c1a-9efe-454c0f22174a",
+      "name": "Du lịch nghỉ dưỡng",
+      "groupId": "2e88c26a-9ddf-4141-8149-d281010d1280",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:23:12.824128900"
+    },
+    {
+      "categoryId": "14b6a6e5-3657-4594-b606-89f3d5d2d59f",
+      "name": "Trả nợ",
+      "groupId": "2e88c26a-9ddf-4141-8149-d281010d1280",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T05:24:37.932127700"
+    },
+    {
+      "categoryId": "6020e892-07e3-45ab-a207-dc6d5a7235ae",
+      "name": "Thuế",
+      "groupId": "6efa1d75-eaf4-455c-9d5f-9316933d7d27",
+      "flowType": "EXPENSE",
+      "status": "ACTIVE",
+      "icon": "",
+      "color": "",
+      "createdAt": "2026-11-16T09:11:33.973854"
+    }
+  ],
+  "transactions": [
+    {
+      "transactionId": "eef48e7f-a333-453c-be87-19f276268493",
+      "amount": "12000.00",
+      "transactionDate": "2026-11-14",
+      "note": "",
+      "createdAt": "2026-11-16T08:34:48.371270200",
+      "recordType": "INCOME_EXPENSE",
+      "transactionType": "EXPENSE",
+      "walletId": "6af0ab39-a593-45a0-a3e6-d5e313855960",
+      "categoryId": "0efecabf-8ea4-4105-ad7f-e008983a0e82",
+      "fee": null
+    },
+    {
+      "transactionId": "abb5f2b2-d9b5-4270-aeee-0991bfccef99",
+      "amount": "120000.00",
+      "transactionDate": "2026-11-16",
+      "note": "Mua gói Gehihi Pro",
+      "createdAt": "2026-11-16T09:20:43.494838700",
+      "recordType": "INCOME_EXPENSE",
+      "transactionType": "EXPENSE",
+      "walletId": "068a3c5e-e8fa-47bf-b62c-7fcbe7189e80",
+      "categoryId": "983381f3-b697-455e-9636-56e6f99d2e02",
+      "fee": {
+        "feeId": "4013a242-d88c-459a-a110-1958b0b18e44",
+        "parentTransactionId": "abb5f2b2-d9b5-4270-aeee-0991bfccef99",
+        "amount": "20000.00",
+        "walletId": "068a3c5e-e8fa-47bf-b62c-7fcbe7189e80",
+        "categoryId": "6020e892-07e3-45ab-a207-dc6d5a7235ae"
+      }
+    }
+  ],
+  "adjustments": [
+    {
+      "recordId": "1521092e-6d9c-47f5-854c-be4746f84afc",
+      "walletId": "9d4fd158-2493-4fb6-8678-5f21b5de6528",
+      "previousBalance": "0.00",
+      "actualBalance": "100000.00",
+      "difference": "100000.00",
+      "adjustedAt": "2026-11-16",
+      "reason": "khởi tạo",
+      "createdAt": "2026-11-16T07:18:24.768651"
+    },
+    {
+      "recordId": "731ea44b-9b8f-4de6-950c-f78851a7e966",
+      "walletId": "6af0ab39-a593-45a0-a3e6-d5e313855960",
+      "previousBalance": "0.00",
+      "actualBalance": "15000.00",
+      "difference": "15000.00",
+      "adjustedAt": "2026-11-16",
+      "reason": "khởi tạo",
+      "createdAt": "2026-11-16T07:19:35.855777300"
+    },
+    {
+      "recordId": "07595058-79c3-4f38-8abb-7242ee0e62e6",
+      "walletId": "068a3c5e-e8fa-47bf-b62c-7fcbe7189e80",
+      "previousBalance": "0.00",
+      "actualBalance": "500000.00",
+      "difference": "500000.00",
+      "adjustedAt": "2026-11-16",
+      "reason": "nạp tiền",
+      "createdAt": "2026-11-16T09:08:43.086031900"
+    }
+  ]
+}

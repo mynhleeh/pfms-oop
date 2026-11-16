@@ -40,6 +40,12 @@ import java.util.Objects;
  */
 public class App extends Application {
 
+    static {
+        // Tắt cảnh báo runtime của OpenJFX khi chạy trên Classpath (unnamed module)
+        java.util.logging.Logger.getLogger("javafx").setLevel(java.util.logging.Level.SEVERE);
+        java.util.logging.Logger.getLogger("com.sun.javafx").setLevel(java.util.logging.Level.SEVERE);
+    }
+
     // region Fields
     public static final String DEFAULT_DATA_PATH = "data/pfms_data.json";
     // endregion

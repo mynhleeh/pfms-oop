@@ -110,6 +110,7 @@ public class SidebarNav extends VBox {
             this.onTabSelected.accept(cardKey);
         });
 
+        VBox.setMargin(btn, new Insets(1, 10, 1, 10));
         navButtons.put(cardKey, btn);
         getChildren().add(btn);
     }

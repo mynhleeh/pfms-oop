@@ -1,14 +1,18 @@
 package com.pfms.presentation.common.util;
 
 import com.pfms.presentation.common.ViewConstants;
+import com.pfms.testutil.JavaFxTestHelper;
+import javafx.scene.control.Alert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,11 +52,17 @@ class FxAlertUtilsTest {
     }
 
     @Test
-    @DisplayName("Các hàm showInfo, showWarning, showError không ném ngoại lệ khi chạy headless")
-    void testHeadlessAlertSafety() {
-        // Không được ném ngoại lệ chưa bắt khi toolkit chưa khởi tạo
-        FxAlertUtils.showInfo("Title", "Message");
-        FxAlertUtils.showWarning("Title", "Message");
-        FxAlertUtils.showError("Title", "Message");
+    @DisplayName("createAlert tạo hộp thoại Alert đúng loại, tiêu đề và áp dụng stylesheet")
+    void testCreateAlertProperties() {
+        JavaFxTestHelper.runOnFxThread(() -> {
+            Alert alert = FxAlertUtils.createAlert(Alert.AlertType.WARNING, "Cảnh báo kiểm thử", "Nội dung kiểm thử");
+            assertNotNull(alert, "Đối tượng Alert không được null");
+            assertEquals(Alert.AlertType.WARNING, alert.getAlertType());
+            assertEquals("Cảnh báo kiểm thử", alert.getTitle());
+            assertEquals("Nội dung kiểm thử", alert.getContentText());
+            assertNull(alert.getHeaderText(), "HeaderText phải là null theo chuẩn thiết kế");
+            assertNotNull(alert.getDialogPane(), "DialogPane phải được khởi tạo");
+            assertFalse(alert.getDialogPane().getStylesheets().isEmpty(), "Phải áp dụng pfms-theme.css");
+        });
     }
 }

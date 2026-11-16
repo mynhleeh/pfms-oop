@@ -99,4 +99,26 @@ class SidebarNavTest {
             assertEquals(12.0, btn.getGraphicTextGap(), 0.01, "Khoảng cách icon và text phải là 12px");
         }
     }
+
+    @Test
+    @DisplayName("Các nút điều hướng có khoảng hở margin đối xứng hai bên so với khung viền sidebar")
+    void testNavButtonsHaveHorizontalMargins() {
+        String[] cardNames = {
+                MainController.CARD_DASHBOARD,
+                MainController.CARD_WALLETS,
+                MainController.CARD_TRANSACTIONS,
+                MainController.CARD_TRANSFERS,
+                MainController.CARD_CATEGORIES,
+                MainController.CARD_REPORTS,
+                MainController.CARD_DATA_MANAGEMENT
+        };
+
+        for (String cardName : cardNames) {
+            Button btn = sidebarNav.getNavButton(cardName);
+            javafx.geometry.Insets margin = javafx.scene.layout.VBox.getMargin(btn);
+            assertNotNull(margin, "Nút điều hướng " + cardName + " phải có margin để không đè viền khung");
+            assertEquals(10.0, margin.getLeft(), 0.01, "Margin trái của nút phải là 10px");
+            assertEquals(10.0, margin.getRight(), 0.01, "Margin phải của nút phải là 10px");
+        }
+    }
 }

@@ -125,5 +125,15 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>local-repo</id>
+            <url>file://${project.basedir}/../deploy-repo</url>
+        </repository>
+        <snapshotRepository>
+            <id>local-snapshot-repo</id>
+            <url>file://${project.basedir}/../deploy-repo</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
 

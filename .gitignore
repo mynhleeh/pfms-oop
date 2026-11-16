@@ -8,3 +8,11 @@ target/
 .project
 bin/
 dependency-reduced-pom.xml
+*.aux
+*.lot
+*.log
+*.out
+*.fdb_latexmk
+*fls
+*.toc
+*.lof
