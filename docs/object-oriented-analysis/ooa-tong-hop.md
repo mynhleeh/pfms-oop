@@ -1,4 +1,10 @@
 ---
+papersize: a4
+geometry:
+  - top=20mm
+  - bottom=20mm
+  - left=20mm
+  - right=20mm
 header-includes: |
   \usepackage{longtable}
   \usepackage{tikz}
@@ -13,10 +19,10 @@ header-includes: |
   \usepackage{colortbl}
   \usepackage{xcolor}
   \setlength{\arrayrulewidth}{0.5pt}
-  \setlength{\tabcolsep}{5pt}
+  \setlength{\tabcolsep}{4pt}
   \setlength{\emergencystretch}{3em}
-  \setlength{\LTpre}{8pt}
-  \setlength{\LTpost}{8pt}
+  \setlength{\LTpre}{6pt}
+  \setlength{\LTpost}{6pt}
   \usepackage{etoolbox}
   \usepackage{xparse}
   \ExplSyntaxOn
@@ -38,11 +44,13 @@ header-includes: |
   \setlist[itemize,3]{label={}}
 ---
 
+\thispagestyle{empty}
+
 \begin{center}
   {\LARGE\bfseries HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG\par}
 \end{center}
 
-\vspace*{1cm}
+\vspace*{0.5cm}
 
 \begin{tikzpicture}[remember picture, overlay]
   % Viền ngoài
@@ -59,24 +67,26 @@ header-includes: |
 
 ```{=latex}
 \begin{center}
-  \includegraphics[width=0.2\textwidth]{docs/object-oriented-analysis/images/logo.jpg}
+  \includegraphics[width=0.18\textwidth]{docs/object-oriented-analysis/images/logo.jpg}
 \end{center}
 ```
 
-\vspace*{1cm}
+\vspace*{0.6cm}
 
 \begin{center}
   {\LARGE\bfseries HỆ THỐNG QUẢN LÝ TÀI CHÍNH CÁ NHÂN\par}
+  \vspace*{0.4cm}
+  {\Large\bfseries PHÂN TÍCH HƯỚNG ĐỐI TƯỢNG\par}
 \end{center}
 
-\vspace*{1.5cm}
+\vspace*{0.8cm}
 
 ```{=latex}
 \newcommand{\cell}[1]{\begin{tabular}[t]{@{}l@{}}#1\end{tabular}}
 
 \begin{center}
 {\large
-\renewcommand{\arraystretch}{1.8}
+\renewcommand{\arraystretch}{1.4}
 \begin{tabular}{@{}>{\bfseries}l@{\hspace{2em}}l@{}}
 Khoa & Công nghệ Thông tin 1 \\
 Học phần & Lập trình Hướng đối tượng \\
