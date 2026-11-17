@@ -444,7 +444,7 @@ và 6 nhóm tính năng của hệ thống:
 \centering
 \includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio,alt={Sơ
 đồ ca sử dụng tổng quan hệ thống
-PFMS}]{imgs/bao-cao-tong-ket-pfms-1.png}
+PFMS}]{imgs/bao-cao-tong-ket-1.png}
 \caption{Sơ đồ ca sử dụng tổng quan hệ thống PFMS}
 \end{figure}
 
@@ -476,44 +476,68 @@ giữa hai nhóm khái niệm căn bản của miền tài chính: Thực thể 
 sắc định danh độc lập và Đối tượng giá trị đại diện cho các đại lượng đo
 lường bất biến.
 
-Danh mục các lớp thực thể: 1. \passthrough{\lstinline!Wallet!}: Đại diện
-cho ví tài chính cá nhân. Mỗi ví có mã định danh duy nhất (UUID), tên
-ví, ghi chú, trạng thái ví mặc định, thời điểm tạo và trạng thái vòng
-đời. 2. \passthrough{\lstinline!IncomeExpenseTransaction!}: Đại diện cho
-giao dịch thu nhập hoặc chi tiêu diễn ra tại một ví xác định, được gán
-với một danh mục phân loại chi tiết. 3.
-\passthrough{\lstinline!TransferTransaction!}: Đại diện cho giao dịch
-điều chuyển tiền giữa hai ví nội bộ, ghi nhận ví nguồn, ví đích và chi
-phí chuyển tiền đi kèm nếu có. 4.
-\passthrough{\lstinline!TransactionFee!}: Đại diện cho khoản phí phát
-sinh khi thực hiện chuyển tiền. Lớp này có quan hệ hợp thành sinh tử với
-giao dịch chuyển tiền gốc. 5. \passthrough{\lstinline!Category!}: Đại
-diện cho danh mục phân loại chi tiết cấp 3 (ví dụ: Ăn uống, Tiền thuê
-nhà, Tiền lương). 6. \passthrough{\lstinline!NeedGroup!}: Đại diện cho
-nhóm nhu cầu tài chính cấp 2 (Nhu cầu thiết yếu, Nhu cầu linh hoạt, Tích
-lũy đầu tư), đóng vai trò phân tầng chi tiêu. 7.
-\passthrough{\lstinline!BalanceAdjustmentRecord!}: Đại diện cho bản ghi
-kiểm kê thực tế khi phát sinh chênh lệch số dư giữa sổ sách và tiền mặt
-thực tế.
+Danh mục các lớp thực thể:
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \passthrough{\lstinline!Wallet!}: Đại diện cho ví tài chính cá nhân. Mỗi
+  ví có mã định danh duy nhất (UUID), tên ví, ghi chú, trạng thái ví mặc
+  định, thời điểm tạo và trạng thái vòng đời.
+\item
+  \passthrough{\lstinline!IncomeExpenseTransaction!}: Đại diện cho giao dịch
+  thu nhập hoặc chi tiêu diễn ra tại một ví xác định, được gán với một
+  danh mục phân loại chi tiết.
+\item
+  \passthrough{\lstinline!TransferTransaction!}: Đại diện cho giao dịch điều
+  chuyển tiền giữa hai ví nội bộ, ghi nhận ví nguồn, ví đích và chi phí
+  chuyển tiền đi kèm nếu có.
+\item
+  \passthrough{\lstinline!TransactionFee!}: Đại diện cho khoản phí phát
+  sinh khi thực hiện chuyển tiền. Lớp này có quan hệ hợp thành sinh tử với
+  giao dịch chuyển tiền gốc.
+\item
+  \passthrough{\lstinline!Category!}: Đại diện cho danh mục phân loại chi
+  tiết cấp 3 (ví dụ: Ăn uống, Tiền thuê nhà, Tiền lương).
+\item
+  \passthrough{\lstinline!NeedGroup!}: Đại diện cho nhóm nhu cầu tài chính
+  cấp 2 (Nhu cầu thiết yếu, Nhu cầu linh hoạt, Tích lũy đầu tư), đóng vai
+  trò phân tầng chi tiêu.
+\item
+  \passthrough{\lstinline!BalanceAdjustmentRecord!}: Đại diện cho bản ghi
+  kiểm kê thực tế khi phát sinh chênh lệch số dư giữa sổ sách và tiền mặt
+  thực tế.
+\end{enumerate}
 
-Danh mục các đối tượng giá trị: 1. \passthrough{\lstinline!Money!}: Bọc
-đại lượng tiền tệ với độ chính xác cao bằng
-\passthrough{\lstinline!BigDecimal!} và mã tiền tệ chuẩn hóa (mặc định
-VND). Lớp này hoàn toàn bất biến và cung cấp các phép toán cộng, trừ,
-nhân tỷ lệ an toàn. 2. \passthrough{\lstinline!TransactionDate!}: Đóng
-gói thời điểm diễn ra biến động tài chính, đảm bảo ngày giao dịch hợp lệ
-theo định dạng chuẩn ISO-8601 và không vượt quá thời gian thực tế. 3.
-\passthrough{\lstinline!TransactionType!}: Kiểu liệt kê phân định rõ bản
-chất biến động tài chính: \passthrough{\lstinline!INCOME!} (Thu nhập),
-\passthrough{\lstinline!EXPENSE!} (Chi phí),
-\passthrough{\lstinline!TRANSFER!} (Chuyển tiền),
-\passthrough{\lstinline!ADJUSTMENT!} (Điều chỉnh số dư). 4.
-\passthrough{\lstinline!NetCashFlow!}: Giá trị đại số thể hiện dòng tiền
-thuần trong kỳ, tính bằng tổng thu nhập trừ tổng chi phí. 5.
-\passthrough{\lstinline!SavingsRate!}: Tỷ lệ phần trăm tiết kiệm được
-trên tổng thu nhập, phản ánh hiệu quả tích lũy tài chính. 6.
-\passthrough{\lstinline!SpendingStructureShare!}: Tỷ trọng chi tiêu của
-một nhóm hoặc danh mục cụ thể trên tổng chi tiêu toàn hệ thống.
+Danh mục các đối tượng giá trị:
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \passthrough{\lstinline!Money!}: Bọc đại lượng tiền tệ với độ chính xác
+  cao bằng \passthrough{\lstinline!BigDecimal!} và mã tiền tệ chuẩn hóa
+  (mặc định VND). Lớp này hoàn toàn bất biến và cung cấp các phép toán cộng,
+  trừ, nhân tỷ lệ an toàn.
+\item
+  \passthrough{\lstinline!TransactionDate!}: Đóng gói thời điểm diễn ra
+  biến động tài chính, đảm bảo ngày giao dịch hợp lệ theo định dạng chuẩn
+  ISO-8601 và không vượt quá thời gian thực tế.
+\item
+  \passthrough{\lstinline!TransactionType!}: Kiểu liệt kê phân định rõ bản
+  chất biến động tài chính: \passthrough{\lstinline!INCOME!} (Thu nhập),
+  \passthrough{\lstinline!EXPENSE!} (Chi phí),
+  \passthrough{\lstinline!TRANSFER!} (Chuyển tiền),
+  \passthrough{\lstinline!ADJUSTMENT!} (Điều chỉnh số dư).
+\item
+  \passthrough{\lstinline!NetCashFlow!}: Giá trị đại số thể hiện dòng tiền
+  thuần trong kỳ, tính bằng tổng thu nhập trừ tổng chi phí.
+\item
+  \passthrough{\lstinline!SavingsRate!}: Tỷ lệ phần trăm tiết kiệm được trên
+  tổng thu nhập, phản ánh hiệu quả tích lũy tài chính.
+\item
+  \passthrough{\lstinline!SpendingStructureShare!}: Tỷ trọng chi tiêu của
+  một nhóm hoặc danh mục cụ thể trên tổng chi tiêu toàn hệ thống.
+\end{enumerate}
 
 Sơ đồ mô hình miền khái niệm dưới đây thể hiện mối quan hệ ngữ nghĩa
 giữa các thực thể và đối tượng giá trị:
@@ -522,7 +546,7 @@ giữa các thực thể và đối tượng giá trị:
 \centering
 \includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio,alt={Mô
 hình khái niệm và các thực thể nghiệp vụ cốt
-lõi}]{imgs/bao-cao-tong-ket-pfms-2.png}
+lõi}]{imgs/bao-cao-tong-ket-2.png}
 \caption{Mô hình khái niệm và các thực thể nghiệp vụ cốt lõi}
 \end{figure}
 
@@ -538,10 +562,10 @@ hai ví:
 \begin{figure}
 \centering
 \includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio,alt={Sơ
-đồ tương tác tuần tự cấp hệ thống cho nghiệp vụ ghi nhận giao dịch thu
-chi}]{imgs/bao-cao-tong-ket-pfms-3.png}
-\caption{Sơ đồ tương tác tuần tự cấp hệ thống cho nghiệp vụ ghi nhận
-giao dịch thu chi}
+đồ tương tác tuần tự cấp hệ thống cho nghiệp vụ chuyển tiền nội bộ giữa
+hai ví}]{imgs/bao-cao-tong-ket-3.png}
+\caption{Sơ đồ tương tác tuần tự cấp hệ thống cho nghiệp vụ chuyển tiền
+nội bộ giữa hai ví}
 \end{figure}
 
 \section{Ràng buộc thực hiện thao tác nghiệp
@@ -726,7 +750,7 @@ tắc phụ thuộc một chiều từ ngoài vào trong:
 \centering
 \includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio,alt={Mô
 hình kiến trúc phân tầng 4 lớp của hệ thống
-PFMS}]{imgs/bao-cao-tong-ket-pfms-4.png}
+PFMS}]{imgs/bao-cao-tong-ket-4.png}
 \caption{Mô hình kiến trúc phân tầng 4 lớp của hệ thống PFMS}
 \end{figure}
 
@@ -751,40 +775,204 @@ vụ kiểm thử.
 \section{Thiết kế chi tiết các lớp dữ liệu và thực
 thể}\label{thiux1ebft-kux1ebf-chi-tiux1ebft-cuxe1c-lux1edbp-dux1eef-liux1ec7u-vuxe0-thux1ef1c-thux1ec3}
 
-Hệ thống vận dụng sâu sắc các nguyên lý hướng đối tượng trong thiết kế
-lớp nhằm bảo vệ tối đa tính bao gói và tính toàn vẹn dữ liệu:
+Tầng nghiệp vụ cốt lõi (\passthrough{\lstinline!com.pfms.domain.model!}) đại diện cho hạt nhân kiến trúc của hệ thống PFMS, chịu trách nhiệm quản lý toàn bộ thực thể tài chính, bảo toàn các quy tắc bất biến số học và điều phối hành vi biến động dòng tiền độc lập hoàn toàn khỏi công nghệ giao diện và lưu trữ.
+
+\subsection{Sơ đồ lớp thiết kế và bảng đặc tả thành
+phần}\label{sux1a1-ux111ux1ed3-lux1edbp-thiux1ebft-kux1ebf-vuxe0-bux1ea3ng-ux111ux1eb7c-tux1ea3-thuxe0nh-phux1ea7n}
+
+Mô hình lớp thiết kế dưới đây mô tả cấu trúc tĩnh hoàn chỉnh của 8 thực thể miền, các đối tượng giá trị bất biến và các kiểu liệt kê, thể hiện chi tiết danh sách thuộc tính, phương thức nghiệp vụ và các loại quan hệ cấu trúc hướng đối tượng cốt lõi:
+
+\begin{figure}
+\centering
+\includegraphics[width=0.95\linewidth,height=\textheight,keepaspectratio,alt={Sơ
+đồ lớp thiết kế chi tiết các lớp dữ liệu và thực thể
+miền}]{imgs/bao-cao-tong-ket-5.png}
+\caption{Sơ đồ lớp thiết kế chi tiết các lớp dữ liệu và thực thể miền}
+\end{figure}
+
+Nhằm hiện thực hóa mô hình miền giàu hành vi và triệt tiêu hoàn toàn hiện tượng suy thoái dữ liệu, cấu trúc tĩnh trên được quy định vai trò nghiệp vụ, thuộc tính và phương thức tác vụ cụ thể cho từng thành phần như sau:
+
+{\def\LTcaptype{none} % do not increment counter
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\fontsize{9pt}{12pt}\selectfont
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2900}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Lớp}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuộc tính}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Phương thức}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Vai trò nghiệp vụ}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{\texttt{Wallet}} &
+\texttt{id: UUID}\newline
+\texttt{name: EntityName}\newline
+\texttt{currentBalance: Money}\newline
+\texttt{state: WalletState}\newline
+\texttt{defaultWallet: boolean} &
+\texttt{credit(Money)}\newline
+\texttt{debit(Money)}\newline
+\texttt{adjustBalance(...)}\newline
+\texttt{archive()}, \texttt{activate()},\newline
+\texttt{delete()} &
+Quản lý nguồn tiền khả dụng, trực tiếp thực thi biến động số dư và kiểm soát vòng đời ví. Luôn bảo toàn số dư không âm (\texttt{currentBalance >= 0}). \\
+\midrule\noalign{}
+\textbf{\texttt{Transaction}} &
+\texttt{transactionId: UUID}\newline
+\texttt{amount: Money}\newline
+\texttt{transactionDate: Date}\newline
+\texttt{note: Note}\newline
+\texttt{fee: TransactionFee} &
+\texttt{applyToWallet()}\newline
+\texttt{revertFromWallet()}\newline
+\texttt{getAmount()}\newline
+\texttt{getFee()} &
+Lớp trừu tượng đóng vai trò khuôn mẫu chung, quy định hợp đồng đa hình tác động và hoàn tác số dư cho mọi biến động dòng tiền. \\
+\midrule\noalign{}
+\textbf{\texttt{IncomeExpense-}}\newline
+\textbf{\texttt{Transaction}} &
+\texttt{transactionType:}\newline
+\texttt{\ \ TransactionType}\newline
+\texttt{wallet: Wallet}\newline
+\texttt{category: Category} &
+\texttt{applyToWallet()}\newline
+\texttt{revertFromWallet()}\newline
+\texttt{getWallet()}\newline
+\texttt{getCategory()} &
+Hiện thực hóa giao dịch thu chi gắn với một danh mục phân loại mục đích; tự động hạch toán chi phí phát sinh đi kèm nếu có. \\
+\midrule\noalign{}
+\textbf{\texttt{Transfer-}}\newline
+\textbf{\texttt{Transaction}} &
+\texttt{sourceWallet: Wallet}\newline
+\texttt{destinationWallet:}\newline
+\texttt{\ \ Wallet} &
+\texttt{applyToWallet()}\newline
+\texttt{revertFromWallet()}\newline
+\texttt{getSourceWallet()}\newline
+\texttt{getDestination-}\newline
+\texttt{\ \ Wallet()} &
+Hiện thực hóa chuyển tiền hai chiều giữa ví nguồn và ví đích theo cơ chế nguyên tử bảo toàn tổng tài sản; hỗ trợ phí chuyển tiền. \\
+\midrule\noalign{}
+\textbf{\texttt{TransactionFee}} &
+\texttt{feeId: UUID}\newline
+\texttt{parentTransactionId:}\newline
+\texttt{\ \ UUID}\newline
+\texttt{amount: Money}\newline
+\texttt{wallet: Wallet}\newline
+\texttt{category: Category} &
+\texttt{applyFee()}\newline
+\texttt{revertFee()}\newline
+\texttt{getAmount()}\newline
+\texttt{getFeeId()} &
+Đại diện cho khoản chi phí phát sinh gắn liền sinh tử với giao dịch gốc, được khấu trừ trực tiếp tại ví phát lệnh giao dịch. \\
+\midrule\noalign{}
+\textbf{\texttt{Category}} &
+\texttt{categoryId: UUID}\newline
+\texttt{name: EntityName}\newline
+\texttt{needGroupId: UUID}\newline
+\texttt{transactionType:}\newline
+\texttt{\ \ TransactionType}\newline
+\texttt{status: EntityStatus} &
+\texttt{rename(String)}\newline
+\texttt{markDeleted()}\newline
+\texttt{restore(boolean)}\newline
+\texttt{getCategoryId()} &
+Danh mục thu chi chi tiết cấp 3 gán nhãn mục đích cho từng giao dịch; áp dụng cơ chế xóa mềm nhằm bảo vệ tính toàn vẹn dữ liệu lịch sử. \\
+\midrule\noalign{}
+\textbf{\texttt{NeedGroup}} &
+\texttt{needGroupId: UUID}\newline
+\texttt{name: EntityName}\newline
+\texttt{transactionType:}\newline
+\texttt{\ \ TransactionType}\newline
+\texttt{status: EntityStatus}\newline
+\texttt{categories: List} &
+\texttt{addCategory(...)}\newline
+\texttt{removeCategory(...)}\newline
+\texttt{rename(String)} &
+Quản lý nhóm nhu cầu tài chính cấp 2 (Thiết yếu, Linh hoạt, Tích lũy) gom cụm các danh mục con phục vụ phân tích cơ cấu chi tiêu. \\
+\midrule\noalign{}
+\textbf{\texttt{Balance-}}\newline
+\textbf{\texttt{Adjustment-}}\newline
+\textbf{\texttt{Record}} &
+\texttt{recordId: UUID}\newline
+\texttt{walletId: UUID}\newline
+\texttt{previousBalance: Money}\newline
+\texttt{actualBalance: Money}\newline
+\texttt{difference: Money} &
+\texttt{getPreviousBalance()}\newline
+\texttt{getActualBalance()}\newline
+\texttt{getDifference()} &
+Lưu vết kiểm toán sự kiện đối soát kiểm kê tiền thực tế so với sổ sách; ghi nhận độ lệch đại số để điều chỉnh số dư về đúng thực tế. \\
+\midrule\noalign{}
+\textbf{\texttt{Money}} &
+\texttt{amount: BigDecimal}\newline
+\texttt{currency: Currency} &
+\texttt{add(Money)}\newline
+\texttt{subtract(Money)}\newline
+\texttt{multiply(BigDecimal)}\newline
+\texttt{isPositive()}, \texttt{isZero()} &
+Đối tượng giá trị bất biến bọc đại lượng tiền tệ độ chính xác cao; áp dụng làm tròn nửa chẵn (\texttt{HALF\_EVEN}), loại trừ sai số dấu phẩy động. \\
+\midrule\noalign{}
+\textbf{\texttt{TransactionDate}} &
+\texttt{date: LocalDate} &
+\texttt{getDate()}\newline
+\texttt{isBefore(...)}\newline
+\texttt{isAfter(...)} &
+Đối tượng giá trị bất biến bọc mốc ngày phát sinh giao dịch theo ISO-8601; chặn ngày vượt quá thời điểm hiện tại của hệ thống. \\
+\midrule\noalign{}
+\textbf{\texttt{EntityName}} \&\newline
+\textbf{\texttt{Note}} &
+\texttt{value: String} &
+\texttt{getValue()}\newline
+\texttt{Note.empty()} &
+Đối tượng giá trị chuẩn hóa chuỗi ký tự tên gọi (1--50 ký tự) và ghi chú diễn giải (tối đa 255 ký tự kèm cơ chế đối tượng rỗng). \\
+\end{longtable}
+\endgroup
+}
+
+\subsection{Phân tích các quan hệ cấu trúc giữa các lớp trong mô hình thiết
+kế}\label{phuxe2n-tuxedch-cuxe1c-quan-hux1ec7-cux1ea5u-truxe1c-giux1eefa-cuxe1c-lux1edbp-trong-muxf4-huxecnh-thiux1ebft-kux1ebf}
+
+Mô hình lớp miền nghiệp vụ của hệ thống PFMS hiện thực hóa 4 loại quan hệ cấu trúc chuẩn mực trong UML, định hình luồng tương tác và ràng buộc vòng đời giữa các thực thể:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Tính bao gói dữ liệu và đối tượng giá trị bất biến: Mọi thuộc tính của
-  các lớp thực thể và đối tượng giá trị đều được khai báo với phạm vi
-  truy cập \passthrough{\lstinline!private!}. Các đối tượng giá trị như
-  \passthrough{\lstinline!Money!} và
-  \passthrough{\lstinline!TransactionDate!} được thiết kế bất biến hoàn
-  toàn (\passthrough{\lstinline!immutable!}), không cung cấp bất kỳ
-  phương thức sửa đổi trạng thái nào sau khi khởi tạo. Mọi phép toán số
-  học như cộng hoặc trừ tiền tệ đều tạo ra và trả về một thể hiện
-  \passthrough{\lstinline!Money!} hoàn toàn mới, triệt tiêu nguy cơ phát
-  sinh tác dụng phụ (side-effects).
+  \textbf{Quan hệ kế thừa (Generalization/Inheritance):} Hai thực thể giao dịch cụ thể \passthrough{\lstinline!IncomeExpenseTransaction!} và \passthrough{\lstinline!TransferTransaction!} kế thừa trực tiếp từ lớp cơ sở trừu tượng \passthrough{\lstinline!Transaction!}. Mối quan hệ này cho phép trừu tượng hóa các trường trạng thái và hành vi chung của dòng tiền (\passthrough{\lstinline!transactionId!}, \passthrough{\lstinline!amount!}, \passthrough{\lstinline!transactionDate!}, \passthrough{\lstinline!note!}, \passthrough{\lstinline!fee!}), đồng thời quy định hợp đồng đa hình bắt buộc cho các lớp con.
 \item
-  Kế thừa và đa hình trong phân cấp giao dịch: Lớp trừu tượng
-  \passthrough{\lstinline!Transaction!} đóng vai trò lớp cha định nghĩa
-  các thuộc tính chung gồm mã định danh, số tiền, ngày giao dịch, loại
-  giao dịch và ghi chú. Hai lớp con cụ thể gồm
-  \passthrough{\lstinline!IncomeExpenseTransaction!} (bổ sung thuộc tính
-  danh mục phân loại) và \passthrough{\lstinline!TransferTransaction!}
-  (bổ sung liên kết ví nguồn và ví đích). Thiết kế này cho phép tầng lưu
-  trữ và các giải thuật tính toán báo cáo xử lý tập hợp các giao dịch
-  thông qua kiểu tham chiếu lớp cha mà không cần quan tâm đến chi tiết
-  riêng biệt của từng loại.
+  \textbf{Quan hệ hợp thành (Composition):} Lớp \passthrough{\lstinline!TransactionFee!} được liên kết với \passthrough{\lstinline!Transaction!} thông qua quan hệ hợp thành với bội số 1 đến 0..1 (mỗi giao dịch có thể phát sinh tối đa một bản ghi chi phí đi kèm). Bản ghi chi phí phụ thuộc hoàn toàn vào vòng đời của giao dịch chủ quản. Khi giao dịch chuyển tiền được tạo lập, bản ghi phí được sinh ra đồng thời; khi giao dịch bị hoàn tác hoặc hủy bỏ, bản ghi phí được xử lý đồng bộ, triệt tiêu nguy cơ phát sinh dữ liệu chi phí mồ côi.
 \item
-  Quan hệ hợp thành trong quản lý chi phí: Khoản phí giao dịch
-  (\passthrough{\lstinline!TransactionFee!}) được thiết kế theo quan hệ
-  hợp thành với \passthrough{\lstinline!TransferTransaction!}. Bản ghi
-  phí không thể tồn tại độc lập mà gắn liền sinh tử với giao dịch chuyển
-  tiền gốc. Khi một giao dịch chuyển tiền bị xóa hoặc hoàn tác, bản ghi
-  chi phí đi kèm cũng được tự động xử lý đồng bộ.
+  \textbf{Quan hệ kết tập (Aggregation):} Thực thể \passthrough{\lstinline!NeedGroup!} thiết lập quan hệ kết tập với tập hợp các \passthrough{\lstinline!Category!} cấp dưới thông qua bội số 1 đến * (một nhóm nhu cầu chứa danh sách nhiều danh mục con qua thuộc tính \passthrough{\lstinline!categories!}). Quan hệ này phân tách ranh giới rõ ràng: nhóm nhu cầu đóng vai trò gom cụm logic để tính toán tỷ trọng phân bổ dòng tiền, nhưng các danh mục con vẫn duy trì định danh và vòng đời độc lập, cho phép người dùng đổi tên hoặc xóa mềm từng danh mục mà không làm phá vỡ toàn bộ cấu trúc của nhóm cha.
+\item
+  \textbf{Quan hệ liên kết và chiều điều hướng (Association \& Navigability):} Giao dịch thu chi \passthrough{\lstinline!IncomeExpenseTransaction!} duy trì liên kết một chiều (* \(\to\) 1) tới \passthrough{\lstinline!Category!} để xác định mục đích chi tiêu và tới \passthrough{\lstinline!Wallet!} để xác định tài khoản phát sinh. Giao dịch chuyển tiền \passthrough{\lstinline!TransferTransaction!} duy trì liên kết tới hai ví độc lập: \passthrough{\lstinline!sourceWallet!} (ví trích tiền kèm phí) và \passthrough{\lstinline!destinationWallet!} (ví nhận tiền). Bản ghi \passthrough{\lstinline!BalanceAdjustmentRecord!} duy trì liên kết một chiều tới \passthrough{\lstinline!Wallet!} được kiểm kê để lưu vết đối soát.
+\end{enumerate}
+
+\subsection{Hiện thực hóa bốn tính chất cốt lõi của lập trình hướng đối
+tượng}\label{hiux1ec7n-thux1ef1c-huxf3a-bux1ed1n-tuxednh-chux1ea5t-cux1ed1t-luxf5i-cux1ee7a-lux1eadp-truxecnh-hux1b0ux1edbng-ux111ux1ed1i-tux1b0ux1ee3ng}
+
+Kiến trúc tầng miền của PFMS vận dụng sâu sắc 4 nguyên lý nền tảng của lập trình hướng đối tượng nhằm bảo vệ tối đa tính toàn vẹn nghiệp vụ tài chính:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Tính đóng gói (Encapsulation):} Toàn bộ trường dữ liệu của mọi thực thể đều được khai báo với phạm vi truy cập \passthrough{\lstinline!private!} hoặc \passthrough{\lstinline!protected!}, loại bỏ triệt để các phương thức setter tự do nhằm ngăn chặn việc biến đổi trạng thái tùy tiện từ bên ngoài. Các đại lượng tài chính và mốc thời gian được đóng gói vào các Đối tượng giá trị bất biến (\passthrough{\lstinline!Money!}, \passthrough{\lstinline!TransactionDate!}, \passthrough{\lstinline!EntityName!}, \passthrough{\lstinline!Note!}). Các phép toán số học trên \passthrough{\lstinline!Money!} luôn sinh ra một đối tượng mới hoàn toàn độc lập, áp dụng quy tắc làm tròn nửa chẵn (\passthrough{\lstinline!HALF_EVEN!}) với thang đo 4 chữ số thập phân, triệt tiêu hoàn toàn sai số dấu phẩy động và các tác dụng phụ ngoài ý muốn.
+\item
+  \textbf{Tính trừu tượng (Abstraction):} Lớp cơ sở trừu tượng \passthrough{\lstinline!Transaction!} chỉ quy định giao ước ``CÁI GÌ'' cần thực hiện thông qua chữ ký của hai phương thức trừu tượng \passthrough{\lstinline!applyToWallet()!} và \passthrough{\lstinline!revertFromWallet()!}, che giấu hoàn toàn chi tiết ``LÀM NHƯ THẾ NÀO''. Tính trừu tượng còn thể hiện ở mô hình máy trạng thái \passthrough{\lstinline!WalletState!}: các hành vi nạp tiền, chi tiền, chuyển đổi trạng thái của \passthrough{\lstinline!Wallet!} được trừu tượng hóa qua giao diện trạng thái, giải phóng thực thể ví khỏi các khối lệnh rẽ nhánh phức tạp.
+\item
+  \textbf{Tính kế thừa (Inheritance):} Triệt tiêu hoàn toàn sự trùng lặp mã nguồn (nguyên lý DRY): các lớp con \passthrough{\lstinline!IncomeExpenseTransaction!} và \passthrough{\lstinline!TransferTransaction!} tái sử dụng toàn bộ định danh, mốc thời gian, số tiền và các phương thức kiểm tra điều kiện biên từ lớp cha \passthrough{\lstinline!Transaction!}. Lớp con chỉ tập trung mở rộng các thuộc tính nghiệp vụ đặc thù: \passthrough{\lstinline!IncomeExpenseTransaction!} mở rộng thêm liên kết danh mục phân loại mục đích; \passthrough{\lstinline!TransferTransaction!} mở rộng thêm liên kết ví đích hai chiều.
+\item
+  \textbf{Tính đa hình (Polymorphism):} Hiện thực hóa cơ chế liên kết động: Cùng một lời gọi phương thức \passthrough{\lstinline!transaction.applyToWallet()!}, hệ thống tự động định tuyến hành vi tại thời điểm thực thi. Nếu là giao dịch thu chi, hệ thống tác động lên một ví duy nhất; nếu là chuyển tiền, hệ thống trích nợ ví nguồn và ghi có vào ví đích theo cơ chế nguyên tử. Nhờ tính đa hình, tầng dịch vụ (\passthrough{\lstinline!TransactionServiceImpl!}) và các thuật toán tổng hợp báo cáo chỉ cần tương tác qua kiểu tham chiếu cha \passthrough{\lstinline!Transaction!}. Khi hệ thống cần bổ sung loại giao dịch mới trong tương lai, mã nguồn điều phối hoàn toàn không phải thay đổi, thỏa mãn xuất sắc nguyên lý Đóng/Mở.
 \end{enumerate}
 
 \section{Thiết kế các dịch vụ xử lý nghiệp
@@ -899,10 +1087,10 @@ giữa các tầng khi người dùng thực hiện ghi nhận một khoản chi
 \begin{figure}
 \centering
 \includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio,alt={Sơ
-đồ tương tác chi tiết cho nghiệp vụ chuyển tiền giữa hai ví nội
-bộ}]{imgs/bao-cao-tong-ket-pfms-5.png}
-\caption{Sơ đồ tương tác chi tiết cho nghiệp vụ chuyển tiền giữa hai ví
-nội bộ}
+đồ tương tác chi tiết giữa các tầng khi ghi nhận một khoản chi tiêu
+mới}]{imgs/bao-cao-tong-ket-6.png}
+\caption{Sơ đồ tuần tự thiết kế cho nghiệp vụ ghi nhận một khoản chi
+tiêu mới}
 \end{figure}
 
 \section{Cơ chế kiểm soát lỗi và ngoại
@@ -917,7 +1105,7 @@ chẽ, kế thừa trực tiếp từ lớp ngoại lệ cơ sở
 \centering
 \includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio,alt={Sơ
 đồ phân cấp cấu trúc kiểm soát lỗi và ngoại lệ nghiệp
-vụ}]{imgs/bao-cao-tong-ket-pfms-6.png}
+vụ}]{imgs/bao-cao-tong-ket-7.png}
 \caption{Sơ đồ phân cấp cấu trúc kiểm soát lỗi và ngoại lệ nghiệp vụ}
 \end{figure}
 
@@ -1052,7 +1240,7 @@ gói toàn bộ quy trình tiếp nhận tham số, phân định đa hình và 
 \centering
 \includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio,alt={Cài
 đặt mẫu phương thức nhà máy (Factory Method Pattern) trong khởi tạo giao
-dịch}]{imgs/bao-cao-tong-ket-pfms-7.png}
+dịch}]{imgs/bao-cao-tong-ket-8.png}
 \caption{Cài đặt mẫu phương thức nhà máy (Factory Method Pattern) trong
 khởi tạo giao dịch}
 \end{figure}
@@ -1074,7 +1262,7 @@ dạng và xuất báo cáo tài chính ra nhiều định dạng khác nhau:
 \centering
 \includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio,alt={Cài
 đặt mẫu chiến lược (Strategy Pattern) trong xuất báo cáo tài
-chính}]{imgs/bao-cao-tong-ket-pfms-8.png}
+chính}]{imgs/bao-cao-tong-ket-9.png}
 \caption{Cài đặt mẫu chiến lược (Strategy Pattern) trong xuất báo cáo
 tài chính}
 \end{figure}

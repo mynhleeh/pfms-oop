@@ -1,6 +1,15 @@
-# Giới thiệu và yêu cầu phần mềm
+# Báo cáo tổng kết đồ án: Hệ thống quản lý tài chính cá nhân
 
-## Bối cảnh và mục tiêu xây dựng hệ thống
+> **HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG**
+> Khoa Công nghệ Thông tin 1
+> Học phần: Lập trình hướng đối tượng
+> Giảng viên hướng dẫn: TS. Phạm Hoàng Việt, ThS. Nguyễn Đình Quảng
+> Nhóm sinh viên thực hiện: Nhóm 3
+> Thành viên: Lê Anh Minh (B24DCCE180), Ứng Trọng Trình (B24DCCE271), Nguyễn Đình Tiến (B24DCCE264), Nguyễn Đinh Anh Quân (B24DCCE222)
+
+## 1. Giới thiệu và yêu cầu phần mềm
+
+### 1.1 Bối cảnh và mục tiêu xây dựng hệ thống
 
 Trong quản lý tài chính cá nhân và hộ gia đình, người dùng thường phân bổ dòng tiền trên nhiều kênh khác nhau như tài khoản ngân hàng, ví điện tử và tiền mặt. Việc theo dõi phân tán khiến việc kiểm soát chi tiêu, duy trì tỷ lệ tiết kiệm và lập kế hoạch tài chính dài hạn gặp nhiều khó khăn. Các phần mềm di động phổ biến hiện nay thường yêu cầu kết nối mạng liên tục, đồng bộ dữ liệu lên máy chủ đám mây của bên thứ ba, tiềm ẩn nguy cơ rò rỉ dữ liệu tài chính nhạy cảm hoặc phụ thuộc vào chính sách dịch vụ trực tuyến.
 
@@ -9,7 +18,7 @@ Hệ thống Quản lý Tài chính Cá nhân (PFMS) được xây dựng với 
 - Kiểm soát dòng tiền chính xác: Mọi biến động số dư đều được tính toán từ các bản ghi giao dịch lịch sử, ngăn chặn hoàn toàn sai lệch số học.
 - Hỗ trợ ra quyết định tài chính: Cung cấp mô hình phân loại đa tầng và các báo cáo phân tích trực quan về cơ cấu chi tiêu cũng như xu hướng dòng tiền thuần theo thời gian.
 
-## Phạm vi hoạt động và ranh giới hệ thống
+### 1.2 Phạm vi hoạt động và ranh giới hệ thống
 
 Hệ thống xác định rõ ranh giới chức năng và kỹ thuật nhằm tối ưu hóa tính tin cậy và sự tập trung vào nghiệp vụ cốt lõi:
 
@@ -26,7 +35,7 @@ Ranh giới ngoài hệ thống:
 - Không tự động trích xuất nội dung tin nhắn biến động số dư hoặc liên kết giao dịch thẻ tín dụng tự động.
 - Không tích hợp các thuật toán học máy hoặc trí tuệ nhân tạo để phán đoán thói quen chi tiêu mà dựa hoàn toàn vào dữ liệu thực tế do người dùng xác nhận.
 
-## Các quy tắc nghiệp vụ tài chính cốt lõi
+### 1.3 Các quy tắc nghiệp vụ tài chính cốt lõi
 
 Hệ thống tuân thủ 5 quy tắc nghiệp vụ bất biến nhằm duy trì tính toàn vẹn và chuẩn mực trong tính toán tài chính:
 
@@ -45,7 +54,7 @@ Mọi khoản thu chi đều được định tuyến theo cấu trúc phân c�
 5. Quy tắc chuẩn hóa và kiểm tra trùng lặp tên:
 Tên của ví tiền, nhóm nhu cầu và danh mục chi tiết phải có độ dài từ 1 đến 50 ký tự, tự động loại bỏ các khoảng trắng thừa ở hai đầu. Trong cùng một phạm vi quản lý, hệ thống không cho phép tồn tại hai tên trùng nhau (không phân biệt chữ hoa và chữ thường).
 
-## Nhóm chức năng chính của phần mềm
+### 1.4 Nhóm chức năng chính của phần mềm
 
 Các tính năng của hệ thống được tổ chức thành 6 phân hệ nghiệp vụ độc lập:
 
@@ -58,7 +67,7 @@ Các tính năng của hệ thống được tổ chức thành 6 phân hệ ngh
 | **Báo cáo và thống kê** | Phân tích sức khỏe tài chính và cấu trúc dòng tiền. | Báo cáo dòng tiền 12 tháng gần nhất, phân tích tỷ trọng chi tiêu theo nhóm và danh mục, tính tỷ lệ tiết kiệm ròng. |
 | **Quản trị dữ liệu** | Đảm bảo tính an toàn, bền vững và đối soát dữ liệu. | Xuất toàn bộ dữ liệu ra tệp JSON, phục hồi dữ liệu từ bản sao lưu, kiểm tra đối soát tính đúng đắn và tính toàn vẹn số dư hệ thống. |
 
-## Danh sách các ca sử dụng
+### 1.5 Danh sách các ca sử dụng
 
 Hệ thống thiết kế 20 ca sử dụng chuẩn hóa bao phủ toàn diện 6 nhóm chức năng, được mô tả tổng hợp trong bảng dưới đây:
 
@@ -87,9 +96,9 @@ Hệ thống thiết kế 20 ca sử dụng chuẩn hóa bao phủ toàn diện 
 
 Sơ đồ ca sử dụng tổng quan dưới đây thể hiện mối liên hệ giữa Người dùng và 6 nhóm tính năng của hệ thống:
 
-![Sơ đồ ca sử dụng tổng quan hệ thống PFMS](imgs/bao-cao-tong-ket-pfms-1.png){width=85%}
+![](./imgs/bao-cao-tong-ket-1.png)
 
-## Yêu cầu chất lượng và ràng buộc kỹ thuật
+### 1.6 Yêu cầu chất lượng và ràng buộc kỹ thuật
 
 Hệ thống thiết lập các tiêu chí định lượng về chất lượng phần mềm:
 - Độ chính xác số học: Dung sai tính toán số học bằng 0. Mọi phép toán nhân chia tỷ lệ đều tuân thủ làm tròn nửa chẵn với 4 chữ số thập phân trước khi chuyển về định dạng hiển thị.
@@ -98,9 +107,9 @@ Hệ thống thiết lập các tiêu chí định lượng về chất lượng
 - Khả năng bảo trì: Mã nguồn tuân thủ triệt để tính đóng gói, phân tách giao diện và trừu tượng hóa, cho phép thay thế cơ chế lưu trữ mà không ảnh hưởng đến tầng nghiệp vụ.
 - Môi trường vận hành: Ứng dụng chạy trên nền tảng Java 17 LTS, tương thích hoàn toàn trên các hệ điều hành Windows, macOS và Linux.
 
-# Phân tích hướng đối tượng
+## 2. Phân tích hướng đối tượng
 
-## Mô hình khái niệm và các đối tượng nghiệp vụ
+### 2.1 Mô hình khái niệm và các đối tượng nghiệp vụ
 
 Trong giai đoạn phân tích hướng đối tượng, hệ thống phân tách rõ ràng giữa hai nhóm khái niệm căn bản của miền tài chính: Thực thể mang bản sắc định danh độc lập và Đối tượng giá trị đại diện cho các đại lượng đo lường bất biến.
 
@@ -123,17 +132,17 @@ Danh mục các đối tượng giá trị:
 
 Sơ đồ mô hình miền khái niệm dưới đây thể hiện mối quan hệ ngữ nghĩa giữa các thực thể và đối tượng giá trị:
 
-![Mô hình khái niệm và các thực thể nghiệp vụ cốt lõi](imgs/bao-cao-tong-ket-pfms-2.png){width=85%}
+![](./imgs/bao-cao-tong-ket-2.png)
 
-## Sơ đồ tương tác tuần tự cấp hệ thống
+### 2.2 Sơ đồ tương tác tuần tự cấp hệ thống
 
 Sơ đồ tuần tự hệ thống mô tả cách người dùng gửi các thông điệp nghiệp vụ đến ranh giới hệ thống dạng hộp đen và nhận lại kết quả phản hồi.
 
 Sơ đồ dưới đây minh họa luồng thực hiện thao tác chuyển tiền nội bộ giữa hai ví:
 
-![Sơ đồ tương tác tuần tự cấp hệ thống cho nghiệp vụ ghi nhận giao dịch thu chi](imgs/bao-cao-tong-ket-pfms-3.png){width=85%}
+![](./imgs/bao-cao-tong-ket-3.png)
 
-## Ràng buộc thực hiện thao tác nghiệp vụ
+### 2.3 Ràng buộc thực hiện thao tác nghiệp vụ
 
 Mọi biến động dữ liệu trong hệ thống đều được kiểm soát bằng các hợp đồng thao tác định rõ điều kiện tiền đề (Pre-conditions) và kết quả bảo đảm sau thực thi (Post-conditions).
 
@@ -147,7 +156,7 @@ Hai hợp đồng thao tác đại diện cho các ca sử dụng then chốt:
 - Điều kiện tiền đề: Ví nguồn và ví đích phải cùng tồn tại trong hệ thống, đang hoạt động và có mã định danh khác nhau. Số tiền chuyển và số tiền phí (nếu có) phải lớn hơn hoặc bằng 0. Số dư hiện tại của ví nguồn phải đủ để chi trả tổng số tiền chuyển và phí phát sinh.
 - Kết quả sau thực thi: Một thể hiện `TransferTransaction` được tạo lập đồng thời với một thể hiện `TransactionFee` nếu có phí. Số dư ví nguồn giảm đi đúng bằng tổng số tiền chuyển và phí. Số dư ví đích tăng lên đúng bằng số tiền chuyển.
 
-## Vòng đời và trạng thái của các thực thể
+### 2.4 Vòng đời và trạng thái của các thực thể
 
 Hệ thống quản lý trạng thái của các thực thể thông qua các tập giá trị chuẩn mực nhằm bảo vệ tính toàn vẹn lịch sử:
 
@@ -157,7 +166,7 @@ Hệ thống quản lý trạng thái của các thực thể thông qua các t�
 | **Danh mục** | Đang hoạt động (`ACTIVE`), Đã xóa (`DELETED`). | Danh mục chỉ được xóa mềm khi không còn bất kỳ giao dịch nào đang tham chiếu tới. Nếu người dùng muốn sử dụng lại một danh mục đã xóa, hệ thống hỗ trợ khôi phục về trạng thái hoạt động mà không làm mất lịch sử cũ. |
 | **Giao dịch** | Đã ghi nhận (`RECORDED`), Đã hủy (`VOIDED`). | Giao dịch tài chính là bản ghi bất biến sau khi hoàn tất. Khi người dùng thực hiện xóa giao dịch, hệ thống không xóa vật lý ngay lập tức mà chuyển trạng thái sang đã hủy, đồng thời kích hoạt quy trình hoàn tác số dư đối soát an toàn. |
 
-## Phân định trách nhiệm giữa các thành phần
+### 2.5 Phân định trách nhiệm giữa các thành phần
 
 Hệ thống sử dụng kỹ thuật phân tích Robustness theo mô hình Ranh giới, Điều khiển và Thực thể kết hợp thẻ CRC để phân định rõ vai trò của từng cấu phần:
 
@@ -175,13 +184,13 @@ Bảng phân bổ trách nhiệm theo thẻ CRC cho các thành phần cốt lõ
 | `Category` | Định danh phân loại chi tiêu, kiểm soát tính hợp lệ theo nhóm nhu cầu. | `NeedGroup` |
 | `TransactionService` | Điều phối tiếp nhận yêu cầu, gọi kiểm tra nghiệp vụ, lưu trữ giao dịch và thông báo biến động. | `TransactionRepository`, `WalletRepository`, `TransactionFactory` |
 
-# Thiết kế kiến trúc và mô hình lớp
+## 3. Thiết kế kiến trúc và mô hình lớp
 
-## Mô hình kiến trúc phân tầng
+### 3.1 Mô hình kiến trúc phân tầng
 
 Hệ thống Quản lý Tài chính Cá nhân áp dụng mô hình kiến trúc phân tầng hướng tâm gồm 4 tầng phân định rõ ranh giới trách nhiệm, bảo đảm nguyên tắc phụ thuộc một chiều từ ngoài vào trong:
 
-![Mô hình kiến trúc phân tầng 4 lớp của hệ thống PFMS](imgs/bao-cao-tong-ket-pfms-4.png){width=85%}
+![](./imgs/bao-cao-tong-ket-4.png)
 
 Trách nhiệm cụ thể của từng tầng:
 - Tầng Trình diễn (`com.pfms.presentation`): Chịu trách nhiệm hiển thị dữ liệu trực quan qua các bảng biểu đồ họa, thu nhận thao tác người dùng, đóng gói dữ liệu vào các DTO và chuyển tiếp cho tầng dịch vụ xử lý. Tầng này không chứa logic tính toán tài chính.
@@ -189,20 +198,73 @@ Trách nhiệm cụ thể của từng tầng:
 - Tầng Nghiệp vụ cốt lõi (`com.pfms.domain`): Trái tim của hệ thống, chứa toàn bộ quy tắc nghiệp vụ tài chính, định nghĩa cấu trúc dữ liệu thực thể, đối tượng giá trị và giao diện kho lưu trữ. Tầng này hoàn toàn độc lập, không phụ thuộc vào bất kỳ thư viện giao diện hay công nghệ lưu trữ cụ thể nào.
 - Tầng Hạ tầng (`com.pfms.infrastructure`): Cung cấp cài đặt cụ thể cho các giao diện kho lưu trữ được định nghĩa ở tầng miền, đảm bảo lưu trữ tệp bền vững hoặc cung cấp bộ lưu trữ tạm thời trong bộ nhớ phục vụ kiểm thử.
 
-## Thiết kế chi tiết các lớp dữ liệu và thực thể
+### 3.2 Thiết kế chi tiết các lớp dữ liệu và thực thể
 
-Hệ thống vận dụng sâu sắc các nguyên lý hướng đối tượng trong thiết kế lớp nhằm bảo vệ tối đa tính bao gói và tính toàn vẹn dữ liệu:
+Tầng nghiệp vụ cốt lõi (`com.pfms.domain.model`) đại diện cho hạt nhân kiến trúc của hệ thống PFMS, chịu trách nhiệm quản lý toàn bộ thực thể tài chính, bảo toàn các quy tắc bất biến số học và điều phối hành vi biến động dòng tiền độc lập hoàn toàn khỏi công nghệ giao diện và lưu trữ.
 
-1. Tính bao gói dữ liệu và đối tượng giá trị bất biến:
-Mọi thuộc tính của các lớp thực thể và đối tượng giá trị đều được khai báo với phạm vi truy cập `private`. Các đối tượng giá trị như `Money` và `TransactionDate` được thiết kế bất biến hoàn toàn (`immutable`), không cung cấp bất kỳ phương thức sửa đổi trạng thái nào sau khi khởi tạo. Mọi phép toán số học như cộng hoặc trừ tiền tệ đều tạo ra và trả về một thể hiện `Money` hoàn toàn mới, triệt tiêu nguy cơ phát sinh tác dụng phụ (side-effects).
+#### 3.2.1 Sơ đồ lớp thiết kế và bảng đặc tả thành phần
 
-2. Kế thừa và đa hình trong phân cấp giao dịch:
-Lớp trừu tượng `Transaction` đóng vai trò lớp cha định nghĩa các thuộc tính chung gồm mã định danh, số tiền, ngày giao dịch, loại giao dịch và ghi chú. Hai lớp con cụ thể gồm `IncomeExpenseTransaction` (bổ sung thuộc tính danh mục phân loại) và `TransferTransaction` (bổ sung liên kết ví nguồn và ví đích). Thiết kế này cho phép tầng lưu trữ và các giải thuật tính toán báo cáo xử lý tập hợp các giao dịch thông qua kiểu tham chiếu lớp cha mà không cần quan tâm đến chi tiết riêng biệt của từng loại.
+Mô hình lớp thiết kế dưới đây mô tả cấu trúc tĩnh hoàn chỉnh của 8 thực thể miền, các đối tượng giá trị bất biến và các kiểu liệt kê, thể hiện chi tiết danh sách thuộc tính, phương thức nghiệp vụ và các loại quan hệ cấu trúc hướng đối tượng cốt lõi:
 
-3. Quan hệ hợp thành trong quản lý chi phí:
-Khoản phí giao dịch (`TransactionFee`) được thiết kế theo quan hệ hợp thành với `TransferTransaction`. Bản ghi phí không thể tồn tại độc lập mà gắn liền sinh tử với giao dịch chuyển tiền gốc. Khi một giao dịch chuyển tiền bị xóa hoặc hoàn tác, bản ghi chi phí đi kèm cũng được tự động xử lý đồng bộ.
+![](./imgs/bao-cao-tong-ket-5.png)
 
-## Thiết kế các dịch vụ xử lý nghiệp vụ
+Nhằm hiện thực hóa mô hình miền giàu hành vi và triệt tiêu hoàn toàn hiện tượng suy thoái dữ liệu, cấu trúc tĩnh trên được quy định vai trò nghiệp vụ, thuộc tính và phương thức tác vụ cụ thể cho từng thành phần như sau:
+
+| Lớp | Thuộc tính | Phương thức | Vai trò nghiệp vụ |
+| :--- | :--- | :--- | :--- |
+| `Wallet` | `id: UUID`<br>`name: EntityName`<br>`currentBalance: Money`<br>`state: WalletState`<br>`defaultWallet: boolean` | `credit(Money)`<br>`debit(Money)`<br>`adjustBalance(...)`<br>`archive()`, `activate()`, `delete()` | Quản lý nguồn tiền khả dụng, trực tiếp thực thi biến động số dư và kiểm soát vòng đời ví. Luôn bảo toàn số dư không âm (`currentBalance >= 0`). |
+| `Transaction` | `transactionId: UUID`<br>`amount: Money`<br>`transactionDate: TransactionDate`<br>`note: Note`<br>`fee: TransactionFee` | `applyToWallet()`<br>`revertFromWallet()`<br>`getAmount()`<br>`getFee()` | Lớp trừu tượng đóng vai trò khuôn mẫu chung, quy định hợp đồng đa hình tác động và hoàn tác số dư cho mọi biến động dòng tiền. |
+| `IncomeExpenseTransaction` | `transactionType: TransactionType`<br>`wallet: Wallet`<br>`category: Category` | `applyToWallet()`<br>`revertFromWallet()`<br>`getWallet()`<br>`getCategory()` | Hiện thực hóa giao dịch thu chi gắn với một danh mục phân loại mục đích; tự động hạch toán chi phí phát sinh đi kèm nếu có. |
+| `TransferTransaction` | `sourceWallet: Wallet`<br>`destinationWallet: Wallet` | `applyToWallet()`<br>`revertFromWallet()`<br>`getSourceWallet()`<br>`getDestinationWallet()` | Hiện thực hóa chuyển tiền hai chiều giữa ví nguồn và ví đích theo cơ chế nguyên tử bảo toàn tổng tài sản; hỗ trợ phí chuyển tiền. |
+| `TransactionFee` | `feeId: UUID`<br>`parentTransactionId: UUID`<br>`amount: Money`<br>`wallet: Wallet`<br>`category: Category` | `applyFee()`<br>`revertFee()`<br>`getAmount()`<br>`getFeeId()` | Đại diện cho khoản chi phí phát sinh gắn liền sinh tử với giao dịch gốc, được khấu trừ trực tiếp tại ví phát lệnh giao dịch. |
+| `Category` | `categoryId: UUID`<br>`name: EntityName`<br>`needGroupId: UUID`<br>`transactionType: TransactionType`<br>`status: EntityStatus` | `rename(String)`<br>`markDeleted()`<br>`restore(boolean)`<br>`getCategoryId()` | Danh mục thu chi chi tiết cấp 3 gán nhãn mục đích cho từng giao dịch; áp dụng cơ chế xóa mềm nhằm bảo vệ tính toàn vẹn dữ liệu lịch sử. |
+| `NeedGroup` | `needGroupId: UUID`<br>`name: EntityName`<br>`transactionType: TransactionType`<br>`status: EntityStatus`<br>`categories: List<Category>` | `addCategory(Category)`<br>`removeCategory(Category)`<br>`rename(String)` | Quản lý nhóm nhu cầu tài chính cấp 2 (Thiết yếu, Linh hoạt, Tích lũy) gom cụm các danh mục con phục vụ phân tích cơ cấu chi tiêu. |
+| `BalanceAdjustmentRecord` | `recordId: UUID`<br>`walletId: UUID`<br>`previousBalance: Money`<br>`actualBalance: Money`<br>`difference: Money` | `getPreviousBalance()`<br>`getActualBalance()`<br>`getDifference()` | Lưu vết kiểm toán sự kiện đối soát kiểm kê tiền thực tế so với sổ sách; ghi nhận độ lệch đại số để điều chỉnh số dư về đúng thực tế. |
+| `Money` | `amount: BigDecimal`<br>`currency: Currency` | `add(Money)`<br>`subtract(Money)`<br>`multiply(BigDecimal)`<br>`isPositive()`, `isZero()` | Đối tượng giá trị bất biến bọc đại lượng tiền tệ độ chính xác cao; áp dụng làm tròn nửa chẵn (`HALF_EVEN`), loại trừ sai số dấu phẩy động. |
+| `TransactionDate` | `date: LocalDate` | `getDate()`<br>`isBefore(TransactionDate)`<br>`isAfter(TransactionDate)` | Đối tượng giá trị bất biến bọc mốc ngày phát sinh giao dịch theo ISO-8601; chặn ngày vượt quá thời điểm hiện tại của hệ thống. |
+| `EntityName` & `Note` | `value: String` | `getValue()`<br>`Note.empty()` | Đối tượng giá trị chuẩn hóa chuỗi ký tự tên gọi (1–50 ký tự) và ghi chú diễn giải (tối đa 255 ký tự kèm cơ chế đối tượng rỗng). |
+
+#### 3.2.2 Phân tích các quan hệ cấu trúc giữa các lớp trong mô hình thiết kế
+
+Mô hình lớp miền nghiệp vụ của hệ thống PFMS hiện thực hóa 4 loại quan hệ cấu trúc chuẩn mực trong UML, định hình luồng tương tác và ràng buộc vòng đời giữa các thực thể:
+
+1. **Quan hệ kế thừa (Generalization/Inheritance):**
+   - Hai thực thể giao dịch cụ thể `IncomeExpenseTransaction` và `TransferTransaction` kế thừa trực tiếp từ lớp cơ sở trừu tượng `Transaction`.
+   - Mối quan hệ này cho phép trừu tượng hóa các trường trạng thái và hành vi chung của dòng tiền (`transactionId`, `amount`, `transactionDate`, `note`, `fee`), đồng thời quy định hợp đồng đa hình bắt buộc cho các lớp con.
+
+2. **Quan hệ hợp thành (Composition):**
+   - Lớp `TransactionFee` được liên kết với `Transaction` thông qua quan hệ hợp thành với bội số `1` đến `0..1` (mỗi giao dịch có thể phát sinh tối đa một bản ghi chi phí đi kèm).
+   - Bản ghi chi phí phụ thuộc hoàn toàn vào vòng đời của giao dịch chủ quản. Khi giao dịch chuyển tiền được tạo lập, bản ghi phí được sinh ra đồng thời; khi giao dịch bị hoàn tác hoặc hủy bỏ, bản ghi phí được xử lý đồng bộ, triệt tiêu nguy cơ phát sinh dữ liệu chi phí mồ côi.
+
+3. **Quan hệ kết tập (Aggregation):**
+   - Thực thể `NeedGroup` thiết lập quan hệ kết tập với tập hợp các `Category` cấp dưới thông qua bội số `1` đến `*` (một nhóm nhu cầu chứa danh sách nhiều danh mục con qua thuộc tính `categories`).
+   - Quan hệ này phân tách ranh giới rõ ràng: nhóm nhu cầu đóng vai trò gom cụm logic để tính toán tỷ trọng phân bổ dòng tiền, nhưng các danh mục con vẫn duy trì định danh và vòng đời độc lập, cho phép người dùng đổi tên hoặc xóa mềm từng danh mục mà không làm phá vỡ toàn bộ cấu trúc của nhóm cha.
+
+4. **Quan hệ liên kết và chiều điều hướng (Association & Navigability):**
+   - Giao dịch thu chi `IncomeExpenseTransaction` duy trì liên kết một chiều (`* --> 1`) tới `Category` để xác định mục đích chi tiêu và tới `Wallet` để xác định tài khoản phát sinh.
+   - Giao dịch chuyển tiền `TransferTransaction` duy trì liên kết tới hai ví độc lập: `sourceWallet` (ví trích tiền kèm phí) và `destinationWallet` (ví nhận tiền). Bản ghi `BalanceAdjustmentRecord` duy trì liên kết một chiều tới `Wallet` được kiểm kê để lưu vết đối soát.
+
+#### 3.2.3 Hiện thực hóa bốn tính chất cốt lõi của lập trình hướng đối tượng
+
+Kiến trúc tầng miền của PFMS vận dụng sâu sắc 4 nguyên lý nền tảng của lập trình hướng đối tượng nhằm bảo vệ tối đa tính toàn vẹn nghiệp vụ tài chính:
+
+1. **Tính đóng gói (Encapsulation):**
+   - Toàn bộ trường dữ liệu của mọi thực thể đều được khai báo với phạm vi truy cập `private` hoặc `protected`, loại bỏ triệt để các phương thức setter tự do nhằm ngăn chặn việc biến đổi trạng thái tùy tiện từ bên ngoài.
+   - Các đại lượng tài chính và mốc thời gian được đóng gói vào các Đối tượng giá trị bất biến (`Money`, `TransactionDate`, `EntityName`, `Note`). Các phép toán số học trên `Money` luôn sinh ra một đối tượng mới hoàn toàn độc lập, áp dụng quy tắc làm tròn nửa chẵn (`HALF_EVEN`) với thang đo 4 chữ số thập phân, triệt tiêu hoàn toàn sai số dấu phẩy động và các tác dụng phụ ngoài ý muốn.
+
+2. **Tính trừu tượng (Abstraction):**
+   - Lớp cơ sở trừu tượng `Transaction` chỉ quy định giao ước "CÁI GÌ" cần thực hiện thông qua chữ ký của hai phương thức trừu tượng `applyToWallet()` và `revertFromWallet()`, che giấu hoàn toàn chi tiết "LÀM NHƯ THẾ NÀO".
+   - Tính trừu tượng còn thể hiện ở mô hình máy trạng thái `WalletState`: các hành vi nạp tiền, chi tiền, chuyển đổi trạng thái của `Wallet` được trừu tượng hóa qua giao diện trạng thái, giải phóng thực thể ví khỏi các khối lệnh rẽ nhánh phức tạp.
+
+3. **Tính kế thừa (Inheritance):**
+   - Triệt tiêu hoàn toàn sự trùng lặp mã nguồn (nguyên lý DRY): các lớp con `IncomeExpenseTransaction` và `TransferTransaction` tái sử dụng toàn bộ định danh, mốc thời gian, số tiền và các phương thức kiểm tra điều kiện biên từ lớp cha `Transaction`.
+   - Lớp con chỉ tập trung mở rộng các thuộc tính nghiệp vụ đặc thù: `IncomeExpenseTransaction` mở rộng thêm liên kết danh mục phân loại mục đích; `TransferTransaction` mở rộng thêm liên kết ví đích hai chiều.
+
+4. **Tính đa hình (Polymorphism):**
+   - Hiện thực hóa cơ chế liên kết động: Cùng một lời gọi phương thức `transaction.applyToWallet()`, hệ thống tự động định tuyến hành vi tại thời điểm thực thi. Nếu là giao dịch thu chi, hệ thống tác động lên một ví duy nhất; nếu là chuyển tiền, hệ thống trích nợ ví nguồn và ghi có vào ví đích theo cơ chế nguyên tử.
+   - Nhờ tính đa hình, tầng dịch vụ (`TransactionServiceImpl`) và các thuật toán tổng hợp báo cáo chỉ cần tương tác qua kiểu tham chiếu cha `Transaction`. Khi hệ thống cần bổ sung loại giao dịch mới trong tương lai, mã nguồn điều phối hoàn toàn không phải thay đổi, thỏa mãn xuất sắc nguyên lý Đóng/Mở.
+
+### 3.3 Thiết kế các dịch vụ xử lý nghiệp vụ
 
 Tầng dịch vụ ứng dụng được phân rã thành 6 giao diện chuyên biệt, đảm bảo tính gắn kết cao và tuân thủ nguyên lý phân tách giao diện:
 
@@ -215,7 +277,7 @@ Tầng dịch vụ ứng dụng được phân rã thành 6 giao diện chuyên 
 | `ReportService` | `ReportServiceImpl` | Tổng hợp dòng tiền 12 tháng, phân tích cơ cấu chi tiêu theo nhóm và danh mục, tính toán các chỉ số sức khỏe tài chính. |
 | `DataManagementService` | `DataManagementServiceImpl` | Xuất toàn bộ dữ liệu ra tệp JSON, kiểm định và nạp dữ liệu từ bản sao lưu, thực hiện đối soát toàn diện tính toàn vẹn số học. |
 
-## Thiết kế cơ chế lưu trữ và truy xuất dữ liệu
+### 3.4 Thiết kế cơ chế lưu trữ và truy xuất dữ liệu
 
 Tầng lưu trữ được thiết kế dựa trên mẫu Repository kết hợp kỹ thuật lập trình tổng quát với Generics:
 
@@ -230,17 +292,17 @@ Hệ thống cung cấp hai nhóm lớp cài đặt:
 - Cài đặt tệp bền vững (`JsonWalletRepository`, `JsonTransactionRepository`...): Đọc và ghi dữ liệu ra tệp định dạng JSON trên ổ đĩa. Quá trình ghi tệp áp dụng kỹ thuật ghi nguyên tử: dữ liệu được ghi vào một tệp tạm thời `.tmp`, sau khi hoàn tất thành công mới tiến hành đổi tên đè lên tệp chính. Kỹ thuật này bảo đảm tệp dữ liệu không bao giờ bị hỏng dù xảy ra sự cố mất điện đột ngột trong khi ghi.
 - Cài đặt bộ nhớ tạm thời (`MemoryWalletRepository`, `MemoryTransactionRepository`...): Lưu trữ các đối tượng trực tiếp trong `ConcurrentHashMap`, hỗ trợ thực thi nhanh toàn bộ bộ kiểm thử tự động với tốc độ tính bằng mili-giây mà không bị nghẽn vào ra ổ đĩa.
 
-## Sơ đồ tương tác chi tiết giữa các đối tượng
+### 3.5 Sơ đồ tương tác chi tiết giữa các đối tượng
 
 Sơ đồ tuần tự thiết kế dưới đây thể hiện quy trình phối hợp chi tiết giữa các tầng khi người dùng thực hiện ghi nhận một khoản chi tiêu mới:
 
-![Sơ đồ tương tác chi tiết cho nghiệp vụ chuyển tiền giữa hai ví nội bộ](imgs/bao-cao-tong-ket-pfms-5.png){width=85%}
+![](./imgs/bao-cao-tong-ket-6.png)
 
-## Cơ chế kiểm soát lỗi và ngoại lệ
+### 3.6 Cơ chế kiểm soát lỗi và ngoại lệ
 
 Hệ thống xây dựng một cây phân cấp ngoại lệ nghiệp vụ có cấu trúc chặt chẽ, kế thừa trực tiếp từ lớp ngoại lệ cơ sở `BusinessException` (thuộc nhóm `RuntimeException`):
 
-![Sơ đồ phân cấp cấu trúc kiểm soát lỗi và ngoại lệ nghiệp vụ](imgs/bao-cao-tong-ket-pfms-6.png){width=85%}
+![](./imgs/bao-cao-tong-ket-7.png)
 
 Ý nghĩa và ngữ cảnh ném lỗi của từng lớp ngoại lệ:
 - `EntityNotFoundException`: Ném ra khi tra cứu một thực thể (ví, danh mục, giao dịch) theo mã định danh nhưng không tìm thấy trong kho dữ liệu.
@@ -251,9 +313,9 @@ Hệ thống xây dựng một cây phân cấp ngoại lệ nghiệp vụ có c
 
 Mỗi ngoại lệ đều đi kèm một mã lỗi chuẩn hóa (`ErrorCode`) định dạng rõ ràng, cho phép tầng trình diễn tự động chuyển dịch sang các thông điệp cảnh báo thân thiện với người dùng cuối mà không làm lộ các chi tiết kỹ thuật nội bộ của hệ thống.
 
-# Cài đặt phần mềm và áp dụng mẫu thiết kế
+## 4. Cài đặt phần mềm và áp dụng mẫu thiết kế
 
-## Áp dụng năm nguyên lý thiết kế hướng đối tượng
+### 4.1 Áp dụng năm nguyên lý thiết kế hướng đối tượng
 
 Hệ thống Quản lý Tài chính Cá nhân áp dụng trọn vẹn 5 nguyên lý SOLID trên các lớp và giao diện thực tế của dự án, bảo đảm tính gắn kết cao và độ ghép nối lỏng:
 
@@ -269,32 +331,32 @@ Hệ thống duy trì điểm cân bằng kỹ thuật thực tế nhằm tránh
 - Sử dụng cơ chế tiêm phụ thuộc thủ công thuần Java tại điểm khởi động chương trình (`Main`), không đưa các khung công nghệ nặng như Spring Framework vào ứng dụng máy tính để bàn cục bộ.
 - Tái sử dụng giao diện kho lưu trữ cơ sở `GenericRepository<E, ID>` để chuẩn hóa các thao tác cơ bản, chỉ khai báo thêm các phương thức nghiệp vụ thực sự cần thiết theo từng ca sử dụng.
 
-## Cài đặt các mẫu thiết kế kinh điển
+### 4.2 Cài đặt các mẫu thiết kế kinh điển
 
 Hệ thống chọn lọc và cài đặt 4 mẫu thiết kế hướng đối tượng cốt lõi thuộc nhóm mẫu thiết kế kinh điển GoF nhằm chuẩn hóa quá trình tạo lập đối tượng, đóng gói thuật toán xuất dữ liệu, quản lý trạng thái và ghi nhận vết kiểm toán:
 
-### Mẫu phương thức nhà máy trong khởi tạo giao dịch
+#### 4.2.1 Mẫu phương thức nhà máy trong khởi tạo giao dịch
 
 Lớp `TransactionFactory` được định vị tại tầng nghiệp vụ (`com.pfms.domain.model`) nhằm đóng gói toàn bộ quy trình tiếp nhận tham số, phân định đa hình và khởi tạo đúng loại giao dịch:
 
-![Cài đặt mẫu phương thức nhà máy (Factory Method Pattern) trong khởi tạo giao dịch](imgs/bao-cao-tong-ket-pfms-7.png){width=85%}
+![](./imgs/bao-cao-tong-ket-8.png)
 
 Lợi ích kỹ thuật:
 - Đóng gói trọn vẹn quy trình tạo lập giao dịch phức tạp kèm chi phí hợp thành sinh tử.
 - Giải phóng các lớp dịch vụ `TransactionServiceImpl` và `TransferServiceImpl` khỏi việc gọi trực tiếp lệnh `new` cho từng lớp con, giúp tầng dịch vụ không bị phụ thuộc vào chi tiết cài đặt của các lớp cụ thể.
 
-### Mẫu chiến lược trong xuất báo cáo tài chính
+#### 4.2.2 Mẫu chiến lược trong xuất báo cáo tài chính
 
 Hệ thống sử dụng mẫu thiết kế Chiến lược để đóng gói các thuật toán định dạng và xuất báo cáo tài chính ra nhiều định dạng khác nhau:
 
-![Cài đặt mẫu chiến lược (Strategy Pattern) trong xuất báo cáo tài chính](imgs/bao-cao-tong-ket-pfms-8.png){width=85%}
+![](./imgs/bao-cao-tong-ket-9.png)
 
 Lợi ích kỹ thuật:
 - Giao diện `ReportExportStrategy` định nghĩa phương thức xuất dữ liệu chuẩn mực `export(ReportData data, Path targetPath)`.
 - Hai chiến lược cài đặt gồm `JsonReportStrategy` (kết xuất tệp cấu trúc JSON phục vụ lưu trữ trao đổi) và `TextTableReportStrategy` (kết xuất báo cáo bảng văn bản định dạng bảng ASCII phục vụ in ấn hoặc đọc nhanh).
 - Lớp ngữ cảnh `ReportExporter` cho phép tráo đổi linh hoạt định dạng xuất tại thời điểm thực thi dựa trên lựa chọn của người dùng tại giao diện mà không phải sửa đổi mã nguồn điều phối.
 
-### Mẫu trạng thái trong quản lý vòng đời thực thể
+#### 4.2.3 Mẫu trạng thái trong quản lý vòng đời thực thể
 
 Thực thể Ví tiền (`Wallet`) đóng vai trò ngữ cảnh áp dụng mẫu thiết kế Trạng thái để kiểm soát vòng đời và hành vi biến động số dư. Cấu trúc lớp gồm giao diện `WalletState` và 3 lớp trạng thái cụ thể:
 - `ActiveWalletState`: Trạng thái hoạt động, tiếp nhận bình thường mọi biến động dòng tiền gồm nạp tiền (`credit`), chi tiêu (`debit`), chuyển tiền và cho phép chuyển sang trạng thái lưu trữ hoặc xóa.
@@ -303,7 +365,7 @@ Thực thể Ví tiền (`Wallet`) đóng vai trò ngữ cảnh áp dụng mẫu
 
 Việc đóng gói hành vi vào các lớp trạng thái giúp loại bỏ hoàn toàn các khối lệnh rẽ nhánh điều kiện lặp lại `if-else` trong các phương thức của `Wallet`.
 
-### Mẫu người quan sát trong theo dõi biến động dữ liệu
+#### 4.2.4 Mẫu người quan sát trong theo dõi biến động dữ liệu
 
 Hệ thống áp dụng mẫu thiết kế Người quan sát để xử lý các tác vụ phụ trợ sau khi một giao dịch tài chính hoàn tất mà không làm thắt chặt khớp nối trong tầng dịch vụ:
 - Nguồn phát sự kiện: Lớp `TransactionServiceImpl` phối hợp cùng bộ điều phối `TransactionEventPublisher` đóng vai trò là chủ thể phát sự kiện.
@@ -313,7 +375,7 @@ Hệ thống áp dụng mẫu thiết kế Người quan sát để xử lý cá
 
 Cơ chế này giúp tầng dịch vụ chỉ tập trung vào việc hạch toán giao dịch chính mà không bị phụ thuộc vào các phân hệ ghi nhật ký hay kiểm toán bên ngoài.
 
-## Xử lý tính toán tài chính chính xác và cấu trúc dữ liệu
+### 4.3 Xử lý tính toán tài chính chính xác và cấu trúc dữ liệu
 
 Trong lập trình tài chính, độ chính xác số học là yếu tố sống còn. Hệ thống thiết lập các chuẩn mực kỹ thuật nghiêm ngặt trong mã nguồn:
 
@@ -331,9 +393,9 @@ Hệ thống xây dựng lớp tiện ích tập trung `Preconditions` để th�
 - `requireValidDateRange(LocalDate from, LocalDate to)`: Đảm bảo ngày bắt đầu không được sau ngày kết thúc.
 Các kiểm tra này giúp hệ thống phát hiện và ngăn chặn dữ liệu không hợp lệ từ sớm (Fail-fast principle).
 
-# Kiểm thử, vận hành và đánh giá kết quả
+## 5. Kiểm thử, vận hành và đánh giá kết quả
 
-## Chiến lược kiểm thử tự động
+### 5.1 Chiến lược kiểm thử tự động
 
 Hệ thống Quản lý Tài chính Cá nhân áp dụng chiến lược kiểm thử tự động toàn diện với khung kiểm thử JUnit 5, kết hợp chặt chẽ với phương pháp phát triển hướng kiểm thử TDD:
 
@@ -349,7 +411,7 @@ Các bài kiểm thử trạng thái thẩm định việc chuyển đổi giữ
 4. Kiểm thử tầng dịch vụ độc lập với bộ nhớ tạm:
 Bằng cách sử dụng các kho lưu trữ trong bộ nhớ (`MemoryWalletRepository`, `MemoryTransactionRepository`...), toàn bộ các ca sử dụng phức tạp của tầng dịch vụ được kiểm thử với đầy đủ các kịch bản thành công và ngoại lệ mà không phải phụ thuộc vào việc đọc ghi tệp vật lý trên đĩa.
 
-## Kết quả kiểm thử thực tế trên hệ thống
+### 5.2 Kết quả kiểm thử thực tế trên hệ thống
 
 Quá trình xây dựng và kiểm thử hệ thống được tự động hóa hoàn toàn thông qua công cụ Apache Maven. Kết quả thực thi thực tế của bộ kiểm thử trên toàn bộ dự án:
 
@@ -378,7 +440,7 @@ Bảng phân bổ các ca kiểm thử theo từng phân hệ kiến trúc:
 | **Tầng Trình diễn và Điều khiển** (`presentation`) | 1.067 tests | 100% (1067/1067) | Khởi tạo giao diện đồ họa Swing, kiểm tra biến đổi DTO, bộ điều khiển sự kiện và các chiến lược xuất báo cáo. |
 | **Tổng cộng toàn hệ thống** | **2.288 tests** | **100%** | **Hệ thống đạt trạng thái không lỗi (0 failures, 0 errors, 0 skipped).** |
 
-## Giao diện ứng dụng và kịch bản vận hành
+### 5.3 Giao diện ứng dụng và kịch bản vận hành
 
 Hệ thống xây dựng giao diện đồ họa người dùng bằng Java Swing, tuân thủ mô hình kiến trúc Model-View-Presenter (MVP) và tổ chức mã nguồn theo tính năng (Package-by-Feature):
 
@@ -398,7 +460,7 @@ Kịch bản vận hành trình diễn hệ thống qua 6 bước:
 5. Bước 5: Truy cập phân hệ Báo cáo, xem biểu bảng dòng tiền và cơ cấu chi tiêu trong tháng hiện tại. Người dùng nhấn nút xuất báo cáo ra tệp bảng văn bản để lưu trữ.
 6. Bước 6: Truy cập phân hệ Quản trị dữ liệu, xuất toàn bộ dữ liệu ra tệp sao lưu JSON an toàn và chạy chức năng đối soát số học. Hệ thống thông báo toàn bộ dữ liệu được bảo toàn nguyên vẹn với 0 sai lệch.
 
-## Đánh giá kết quả đạt được và hướng phát triển
+### 5.4 Đánh giá kết quả đạt được và hướng phát triển
 
 Đánh giá kết quả đạt được:
 - Hệ thống hoàn thành 100% mục tiêu ban đầu của đề tài môn học, đáp ứng đầy đủ 20 ca sử dụng chuẩn hóa trải đều trên 6 phân hệ nghiệp vụ.
@@ -415,7 +477,7 @@ Hướng phát triển trong tương lai:
 - Mở rộng hỗ trợ tính năng quản lý danh mục đầu tư tài chính sinh lời và đa tiền tệ với bảng tỷ giá quy đổi linh hoạt.
 - Đóng gói ứng dụng thành tệp cài đặt độc lập cho từng hệ điều hành máy trạm.
 
-# Tài liệu tham khảo
+## 6. Tài liệu tham khảo
 
 1. Bloch, J. (2018). *Effective Java* (3rd ed.). Addison-Wesley Professional.
 2. Cockburn, A. (2001). *Writing Effective Use Cases*. Addison-Wesley Professional.

@@ -336,16 +336,260 @@ Trách nhiệm cụ thể của từng tầng:
 
 ### 3.2 Thiết kế chi tiết các lớp dữ liệu và thực thể
 
-Hệ thống vận dụng sâu sắc các nguyên lý hướng đối tượng trong thiết kế lớp nhằm bảo vệ tối đa tính bao gói và tính toàn vẹn dữ liệu:
+Tầng nghiệp vụ cốt lõi (`com.pfms.domain.model`) đại diện cho hạt nhân kiến trúc của hệ thống PFMS, chịu trách nhiệm quản lý toàn bộ thực thể tài chính, bảo toàn các quy tắc bất biến số học và điều phối hành vi biến động dòng tiền độc lập hoàn toàn khỏi công nghệ giao diện và lưu trữ.
 
-1. Tính bao gói dữ liệu và đối tượng giá trị bất biến:
-Mọi thuộc tính của các lớp thực thể và đối tượng giá trị đều được khai báo với phạm vi truy cập `private`. Các đối tượng giá trị như `Money` và `TransactionDate` được thiết kế bất biến hoàn toàn (`immutable`), không cung cấp bất kỳ phương thức sửa đổi trạng thái nào sau khi khởi tạo. Mọi phép toán số học như cộng hoặc trừ tiền tệ đều tạo ra và trả về một thể hiện `Money` hoàn toàn mới, triệt tiêu nguy cơ phát sinh tác dụng phụ (side-effects).
+#### 3.2.1 Sơ đồ lớp thiết kế và bảng đặc tả thành phần
 
-2. Kế thừa và đa hình trong phân cấp giao dịch:
-Lớp trừu tượng `Transaction` đóng vai trò lớp cha định nghĩa các thuộc tính chung gồm mã định danh, số tiền, ngày giao dịch, loại giao dịch và ghi chú. Hai lớp con cụ thể gồm `IncomeExpenseTransaction` (bổ sung thuộc tính danh mục phân loại) và `TransferTransaction` (bổ sung liên kết ví nguồn và ví đích). Thiết kế này cho phép tầng lưu trữ và các giải thuật tính toán báo cáo xử lý tập hợp các giao dịch thông qua kiểu tham chiếu lớp cha mà không cần quan tâm đến chi tiết riêng biệt của từng loại.
+Mô hình lớp thiết kế dưới đây mô tả cấu trúc tĩnh hoàn chỉnh của 8 thực thể miền, các đối tượng giá trị bất biến và các kiểu liệt kê, thể hiện chi tiết danh sách thuộc tính, phương thức nghiệp vụ và các loại quan hệ cấu trúc hướng đối tượng cốt lõi:
 
-3. Quan hệ hợp thành trong quản lý chi phí:
-Khoản phí giao dịch (`TransactionFee`) được thiết kế theo quan hệ hợp thành với `TransferTransaction`. Bản ghi phí không thể tồn tại độc lập mà gắn liền sinh tử với giao dịch chuyển tiền gốc. Khi một giao dịch chuyển tiền bị xóa hoặc hoàn tác, bản ghi chi phí đi kèm cũng được tự động xử lý đồng bộ.
+```mermaid
+classDiagram
+    direction TB
+
+    class EntityStatus {
+        <<enumeration>>
+        ACTIVE
+        ARCHIVED
+        DELETED
+    }
+
+    class TransactionType {
+        <<enumeration>>
+        INCOME
+        EXPENSE
+    }
+
+    class Money {
+        <<Value Object>>
+        -BigDecimal amount
+        -Currency currency
+        +add(Money) Money
+        +subtract(Money) Money
+        +multiply(BigDecimal) Money
+        +isPositive() boolean
+        +isNegative() boolean
+        +isZero() boolean
+        +getAmount() BigDecimal
+    }
+
+    class TransactionDate {
+        <<Value Object>>
+        -LocalDate date
+        +getDate() LocalDate
+        +isBefore(TransactionDate) boolean
+        +isAfter(TransactionDate) boolean
+    }
+
+    class EntityName {
+        <<Value Object>>
+        -String value
+        +getValue() String
+    }
+
+    class Note {
+        <<Value Object>>
+        -String value
+        +getValue() String
+        +empty()$ Note
+    }
+
+    class Wallet {
+        -UUID id
+        -EntityName name
+        -Note note
+        -boolean defaultWallet
+        -LocalDateTime createdAt
+        -WalletState state
+        -Money currentBalance
+        +credit(Money) void
+        +debit(Money) void
+        +adjustBalance(Money, TransactionDate, String) BalanceAdjustmentRecord
+        +archive() void
+        +activate() void
+        +delete() void
+        +rename(String) void
+        +getId() UUID
+        +getCurrentBalance() Money
+        +getStatus() EntityStatus
+    }
+
+    class BalanceAdjustmentRecord {
+        -UUID recordId
+        -UUID walletId
+        -Money previousBalance
+        -Money actualBalance
+        -Money difference
+        -TransactionDate adjustedAt
+        -String reason
+        -LocalDateTime createdAt
+        +getRecordId() UUID
+        +getPreviousBalance() Money
+        +getActualBalance() Money
+        +getDifference() Money
+        +getAdjustedAt() TransactionDate
+    }
+
+    class Transaction {
+        <<abstract>>
+        #UUID transactionId
+        #Money amount
+        #TransactionDate transactionDate
+        #Note note
+        #TransactionFee fee
+        #LocalDateTime createdAt
+        +applyToWallet()* void
+        +revertFromWallet()* void
+        +getTransactionId() UUID
+        +getAmount() Money
+        +getTransactionDate() TransactionDate
+        +getFee() Optional~TransactionFee~
+    }
+
+    class IncomeExpenseTransaction {
+        -TransactionType transactionType
+        -Wallet wallet
+        -Category category
+        +applyToWallet() void
+        +revertFromWallet() void
+        +getTransactionType() TransactionType
+        +getWallet() Wallet
+        +getCategory() Category
+    }
+
+    class TransferTransaction {
+        -Wallet sourceWallet
+        -Wallet destinationWallet
+        +applyToWallet() void
+        +revertFromWallet() void
+        +getSourceWallet() Wallet
+        +getDestinationWallet() Wallet
+    }
+
+    class TransactionFee {
+        -UUID feeId
+        -UUID parentTransactionId
+        -Money amount
+        -Wallet wallet
+        -Category category
+        +applyFee() void
+        +revertFee() void
+        +getFeeId() UUID
+        +getParentTransactionId() UUID
+        +getAmount() Money
+        +getWallet() Wallet
+        +getCategory() Category
+    }
+
+    class NeedGroup {
+        -UUID needGroupId
+        -EntityName name
+        -TransactionType transactionType
+        -EntityStatus status
+        -List~Category~ categories
+        -LocalDateTime createdAt
+        +addCategory(Category) void
+        +removeCategory(Category) void
+        +rename(String) void
+        +getNeedGroupId() UUID
+        +getName() String
+        +getTransactionType() TransactionType
+        +getStatus() EntityStatus
+    }
+
+    class Category {
+        -UUID categoryId
+        -EntityName name
+        -UUID needGroupId
+        -TransactionType transactionType
+        -EntityStatus status
+        -LocalDateTime createdAt
+        +rename(String) void
+        +markDeleted() void
+        +restore(boolean) void
+        +getCategoryId() UUID
+        +getNeedGroupId() UUID
+        +getTransactionType() TransactionType
+        +getStatus() EntityStatus
+    }
+
+    Transaction <|-- IncomeExpenseTransaction : kế thừa
+    Transaction <|-- TransferTransaction : kế thừa
+
+    Transaction "1" *-- "0..1" TransactionFee : chi phí kèm theo
+
+    NeedGroup "1" o-- "*" Category : chứa danh mục con
+
+    IncomeExpenseTransaction "*" --> "1" Category : phân loại mục đích
+    IncomeExpenseTransaction "*" --> "1" Wallet : tác động ví
+    TransferTransaction "*" --> "1" Wallet : ví nguồn
+    TransferTransaction "*" --> "1" Wallet : ví đích
+    TransactionFee "*" --> "1" Wallet : trích phí từ ví
+    BalanceAdjustmentRecord "*" --> "1" Wallet : kiểm kê ví
+
+    Wallet --> Money : quản lý số dư
+    Wallet --> EntityName : định danh
+    Transaction --> Money : giá trị giao dịch
+    Transaction --> TransactionDate : ngày phát sinh
+    Transaction --> Note : ghi chú
+    Category --> EntityName : tên danh mục
+    NeedGroup --> EntityName : tên nhóm
+```
+
+Nhằm hiện thực hóa mô hình miền giàu hành vi và triệt tiêu hoàn toàn hiện tượng suy thoái dữ liệu, cấu trúc tĩnh trên được quy định vai trò nghiệp vụ, thuộc tính và phương thức tác vụ cụ thể cho từng thành phần như sau:
+
+| Lớp | Thuộc tính | Phương thức | Vai trò nghiệp vụ |
+| :--- | :--- | :--- | :--- |
+| `Wallet` | `id: UUID`<br>`name: EntityName`<br>`currentBalance: Money`<br>`state: WalletState`<br>`defaultWallet: boolean` | `credit(Money)`<br>`debit(Money)`<br>`adjustBalance(...)`<br>`archive()`, `activate()`, `delete()` | Quản lý nguồn tiền khả dụng, trực tiếp thực thi biến động số dư và kiểm soát vòng đời ví. Luôn bảo toàn số dư không âm (`currentBalance >= 0`). |
+| `Transaction` | `transactionId: UUID`<br>`amount: Money`<br>`transactionDate: TransactionDate`<br>`note: Note`<br>`fee: TransactionFee` | `applyToWallet()`<br>`revertFromWallet()`<br>`getAmount()`<br>`getFee()` | Lớp trừu tượng đóng vai trò khuôn mẫu chung, quy định hợp đồng đa hình tác động và hoàn tác số dư cho mọi biến động dòng tiền. |
+| `IncomeExpenseTransaction` | `transactionType: TransactionType`<br>`wallet: Wallet`<br>`category: Category` | `applyToWallet()`<br>`revertFromWallet()`<br>`getWallet()`<br>`getCategory()` | Hiện thực hóa giao dịch thu chi gắn với một danh mục phân loại mục đích; tự động hạch toán chi phí phát sinh đi kèm nếu có. |
+| `TransferTransaction` | `sourceWallet: Wallet`<br>`destinationWallet: Wallet` | `applyToWallet()`<br>`revertFromWallet()`<br>`getSourceWallet()`<br>`getDestinationWallet()` | Hiện thực hóa chuyển tiền hai chiều giữa ví nguồn và ví đích theo cơ chế nguyên tử bảo toàn tổng tài sản; hỗ trợ phí chuyển tiền. |
+| `TransactionFee` | `feeId: UUID`<br>`parentTransactionId: UUID`<br>`amount: Money`<br>`wallet: Wallet`<br>`category: Category` | `applyFee()`<br>`revertFee()`<br>`getAmount()`<br>`getFeeId()` | Đại diện cho khoản chi phí phát sinh gắn liền sinh tử với giao dịch gốc, được khấu trừ trực tiếp tại ví phát lệnh giao dịch. |
+| `Category` | `categoryId: UUID`<br>`name: EntityName`<br>`needGroupId: UUID`<br>`transactionType: TransactionType`<br>`status: EntityStatus` | `rename(String)`<br>`markDeleted()`<br>`restore(boolean)`<br>`getCategoryId()` | Danh mục thu chi chi tiết cấp 3 gán nhãn mục đích cho từng giao dịch; áp dụng cơ chế xóa mềm nhằm bảo vệ tính toàn vẹn dữ liệu lịch sử. |
+| `NeedGroup` | `needGroupId: UUID`<br>`name: EntityName`<br>`transactionType: TransactionType`<br>`status: EntityStatus`<br>`categories: List<Category>` | `addCategory(Category)`<br>`removeCategory(Category)`<br>`rename(String)` | Quản lý nhóm nhu cầu tài chính cấp 2 (Thiết yếu, Linh hoạt, Tích lũy) gom cụm các danh mục con phục vụ phân tích cơ cấu chi tiêu. |
+| `BalanceAdjustmentRecord` | `recordId: UUID`<br>`walletId: UUID`<br>`previousBalance: Money`<br>`actualBalance: Money`<br>`difference: Money` | `getPreviousBalance()`<br>`getActualBalance()`<br>`getDifference()` | Lưu vết kiểm toán sự kiện đối soát kiểm kê tiền thực tế so với sổ sách; ghi nhận độ lệch đại số để điều chỉnh số dư về đúng thực tế. |
+| `Money` | `amount: BigDecimal`<br>`currency: Currency` | `add(Money)`<br>`subtract(Money)`<br>`multiply(BigDecimal)`<br>`isPositive()`, `isZero()` | Đối tượng giá trị bất biến bọc đại lượng tiền tệ độ chính xác cao; áp dụng làm tròn nửa chẵn (`HALF_EVEN`), loại trừ sai số dấu phẩy động. |
+| `TransactionDate` | `date: LocalDate` | `getDate()`<br>`isBefore(TransactionDate)`<br>`isAfter(TransactionDate)` | Đối tượng giá trị bất biến bọc mốc ngày phát sinh giao dịch theo ISO-8601; chặn ngày vượt quá thời điểm hiện tại của hệ thống. |
+| `EntityName` & `Note` | `value: String` | `getValue()`<br>`Note.empty()` | Đối tượng giá trị chuẩn hóa chuỗi ký tự tên gọi (1–50 ký tự) và ghi chú diễn giải (tối đa 255 ký tự kèm cơ chế đối tượng rỗng). |
+
+#### 3.2.2 Phân tích các quan hệ cấu trúc giữa các lớp trong mô hình thiết kế
+
+Mô hình lớp miền nghiệp vụ của hệ thống PFMS hiện thực hóa 4 loại quan hệ cấu trúc chuẩn mực trong UML, định hình luồng tương tác và ràng buộc vòng đời giữa các thực thể:
+
+1. **Quan hệ kế thừa (Generalization/Inheritance):**
+   - Hai thực thể giao dịch cụ thể `IncomeExpenseTransaction` và `TransferTransaction` kế thừa trực tiếp từ lớp cơ sở trừu tượng `Transaction`.
+   - Mối quan hệ này cho phép trừu tượng hóa các trường trạng thái và hành vi chung của dòng tiền (`transactionId`, `amount`, `transactionDate`, `note`, `fee`), đồng thời quy định hợp đồng đa hình bắt buộc cho các lớp con.
+
+2. **Quan hệ hợp thành (Composition):**
+   - Lớp `TransactionFee` được liên kết với `Transaction` thông qua quan hệ hợp thành với bội số `1` đến `0..1` (mỗi giao dịch có thể phát sinh tối đa một bản ghi chi phí đi kèm).
+   - Bản ghi chi phí phụ thuộc hoàn toàn vào vòng đời của giao dịch chủ quản. Khi giao dịch chuyển tiền được tạo lập, bản ghi phí được sinh ra đồng thời; khi giao dịch bị hoàn tác hoặc hủy bỏ, bản ghi phí được xử lý đồng bộ, triệt tiêu nguy cơ phát sinh dữ liệu chi phí mồ côi.
+
+3. **Quan hệ kết tập (Aggregation):**
+   - Thực thể `NeedGroup` thiết lập quan hệ kết tập với tập hợp các `Category` cấp dưới thông qua bội số `1` đến `*` (một nhóm nhu cầu chứa danh sách nhiều danh mục con qua thuộc tính `categories`).
+   - Quan hệ này phân tách ranh giới rõ ràng: nhóm nhu cầu đóng vai trò gom cụm logic để tính toán tỷ trọng phân bổ dòng tiền, nhưng các danh mục con vẫn duy trì định danh và vòng đời độc lập, cho phép người dùng đổi tên hoặc xóa mềm từng danh mục mà không làm phá vỡ toàn bộ cấu trúc của nhóm cha.
+
+4. **Quan hệ liên kết và chiều điều hướng (Association & Navigability):**
+   - Giao dịch thu chi `IncomeExpenseTransaction` duy trì liên kết một chiều (`* --> 1`) tới `Category` để xác định mục đích chi tiêu và tới `Wallet` để xác định tài khoản phát sinh.
+   - Giao dịch chuyển tiền `TransferTransaction` duy trì liên kết tới hai ví độc lập: `sourceWallet` (ví trích tiền kèm phí) và `destinationWallet` (ví nhận tiền). Bản ghi `BalanceAdjustmentRecord` duy trì liên kết một chiều tới `Wallet` được kiểm kê để lưu vết đối soát.
+
+#### 3.2.3 Hiện thực hóa bốn tính chất cốt lõi của lập trình hướng đối tượng
+
+Kiến trúc tầng miền của PFMS vận dụng sâu sắc 4 nguyên lý nền tảng của lập trình hướng đối tượng nhằm bảo vệ tối đa tính toàn vẹn nghiệp vụ tài chính:
+
+1. **Tính đóng gói (Encapsulation):**
+   - Toàn bộ trường dữ liệu của mọi thực thể đều được khai báo với phạm vi truy cập `private` hoặc `protected`, loại bỏ triệt để các phương thức setter tự do nhằm ngăn chặn việc biến đổi trạng thái tùy tiện từ bên ngoài.
+   - Các đại lượng tài chính và mốc thời gian được đóng gói vào các Đối tượng giá trị bất biến (`Money`, `TransactionDate`, `EntityName`, `Note`). Các phép toán số học trên `Money` luôn sinh ra một đối tượng mới hoàn toàn độc lập, áp dụng quy tắc làm tròn nửa chẵn (`HALF_EVEN`) với thang đo 4 chữ số thập phân, triệt tiêu hoàn toàn sai số dấu phẩy động và các tác dụng phụ ngoài ý muốn.
+
+2. **Tính trừu tượng (Abstraction):**
+   - Lớp cơ sở trừu tượng `Transaction` chỉ quy định giao ước "CÁI GÌ" cần thực hiện thông qua chữ ký của hai phương thức trừu tượng `applyToWallet()` và `revertFromWallet()`, che giấu hoàn toàn chi tiết "LÀM NHƯ THẾ NÀO".
+   - Tính trừu tượng còn thể hiện ở mô hình máy trạng thái `WalletState`: các hành vi nạp tiền, chi tiền, chuyển đổi trạng thái của `Wallet` được trừu tượng hóa qua giao diện trạng thái, giải phóng thực thể ví khỏi các khối lệnh rẽ nhánh phức tạp.
+
+3. **Tính kế thừa (Inheritance):**
+   - Triệt tiêu hoàn toàn sự trùng lặp mã nguồn (nguyên lý DRY): các lớp con `IncomeExpenseTransaction` và `TransferTransaction` tái sử dụng toàn bộ định danh, mốc thời gian, số tiền và các phương thức kiểm tra điều kiện biên từ lớp cha `Transaction`.
+   - Lớp con chỉ tập trung mở rộng các thuộc tính nghiệp vụ đặc thù: `IncomeExpenseTransaction` mở rộng thêm liên kết danh mục phân loại mục đích; `TransferTransaction` mở rộng thêm liên kết ví đích hai chiều.
+
+4. **Tính đa hình (Polymorphism):**
+   - Hiện thực hóa cơ chế liên kết động: Cùng một lời gọi phương thức `transaction.applyToWallet()`, hệ thống tự động định tuyến hành vi tại thời điểm thực thi. Nếu là giao dịch thu chi, hệ thống tác động lên một ví duy nhất; nếu là chuyển tiền, hệ thống trích nợ ví nguồn và ghi có vào ví đích theo cơ chế nguyên tử.
+   - Nhờ tính đa hình, tầng dịch vụ (`TransactionServiceImpl`) và các thuật toán tổng hợp báo cáo chỉ cần tương tác qua kiểu tham chiếu cha `Transaction`. Khi hệ thống cần bổ sung loại giao dịch mới trong tương lai, mã nguồn điều phối hoàn toàn không phải thay đổi, thỏa mãn xuất sắc nguyên lý Đóng/Mở.
 
 ### 3.3 Thiết kế các dịch vụ xử lý nghiệp vụ
 
