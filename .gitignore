@@ -17,3 +17,4 @@ dependency-reduced-pom.xml
 *.toc
 *.lof
 *.log
+data/

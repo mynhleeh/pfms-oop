@@ -6,8 +6,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.pfms</groupId>
-    <artifactId>pfms-core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>pfms-oop</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>Personal Finance Management System</name>
